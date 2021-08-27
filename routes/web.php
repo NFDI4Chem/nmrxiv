@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use Illuminate\Http\Request; 
 
 /*
 |--------------------------------------------------------------------------
@@ -24,6 +25,10 @@ Route::get('/', function () {
     ]);
 });
 
-Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
-    return Inertia::render('Dashboard');
+Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function (Request $request) {
+    $team = $request->user()->currentTeam;
+    $team->users = $team->allUsers();
+    return Inertia::render('Dashboard', [
+        'team' => $team
+    ]);
 })->name('dashboard');
