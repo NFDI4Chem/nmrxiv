@@ -70,9 +70,13 @@ jobs:
       - name: Prepare The Environment
         run: cp .env.example .env
       - name: Create Database
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: database/database.sqlite
         run: |
-          sudo systemctl start mysql
-          mysql --user="sail" --password="password" -e "CREATE DATABASE 'nmrxiv' character set UTF8mb4 collate utf8mb4_bin;"
+          mkdir -p database
+          touch database/database.sqlite
+          php artisan migrate
       - name: Install Composer Dependencies
         run: composer install --no-progress --prefer-dist --optimize-autoloader
       - name: Generate Application Key
