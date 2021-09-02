@@ -30,42 +30,43 @@ jobs:
         mkdir -p database
         touch database/database.sqlite
         php artisan migrate
-    - name: Execute tests (Unit and Feature tests) via PHPUnit
+    - name: Bring the server up
       run: | 
         ./vendor/bin/sail up
+    - name: Execute tests (Unit and Feature tests) via PHPUnit
         ./vendor/bin/phpunit
 
-  app-tests:
-    runs-on: ubuntu-latest
-    services:
-      mysql:
-        image: mysql:5.7
-        env:
-          MYSQL_ALLOW_EMPTY_PASSWORD: no
-          MYSQL_DATABASE: nmrxiv
-          MYSQL_USERNAME: sail
-          MYSQL_PASSWORD: password
-        ports:
-          - 3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-    steps:
-      - uses: actions/checkout@v1
-      - name: Copy .env
-        run: php -r "file_exists('.env') || copy('.env.example', '.env');"
-      - name: Install Composer Dependencies
-        run: composer install -q --no-ansi --no-interaction --no-scripts --no-suggest --no-progress --prefer-dist
-      - name: Install NPM Dependencies
-        run: npm install
-      - name: Generate key
-        run: php artisan key:generate
-      - name: Execute tests (Unit and Feature tests) using PHPUnit
-        env:
-          DB_PORT: ${{ job.services.mysql.ports[3306] }}
-        run: |
-          ./vendor/bin/sail up
-          ./vendor/bin/phpunit
-      - name: Execute tests (Unit and Feature tests) using JEST
-        run: node_modules/.bin/jest
+  # app-tests:
+  #   runs-on: ubuntu-latest
+  #   services:
+  #     mysql:
+  #       image: mysql:5.7
+  #       env:
+  #         MYSQL_ALLOW_EMPTY_PASSWORD: no
+  #         MYSQL_DATABASE: nmrxiv
+  #         MYSQL_USERNAME: sail
+  #         MYSQL_PASSWORD: password
+  #       ports:
+  #         - 3306
+  #       options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+  #   steps:
+  #     - uses: actions/checkout@v1
+  #     - name: Copy .env
+  #       run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+  #     - name: Install Composer Dependencies
+  #       run: composer install -q --no-ansi --no-interaction --no-scripts --no-suggest --no-progress --prefer-dist
+  #     - name: Install NPM Dependencies
+  #       run: npm install
+  #     - name: Generate key
+  #       run: php artisan key:generate
+  #     - name: Execute tests (Unit and Feature tests) using PHPUnit
+  #       env:
+  #         DB_PORT: ${{ job.services.mysql.ports[3306] }}
+  #       run: |
+  #         ./vendor/bin/sail up
+  #         ./vendor/bin/phpunit
+  #     - name: Execute tests (Unit and Feature tests) using JEST
+  #       run: node_modules/.bin/jest
 
   # dusk-php:
   #   runs-on: ubuntu-latest
