@@ -31,10 +31,9 @@ jobs:
         touch database/database.sqlite
         php artisan migrate
     - name: Bring the server up
-      run: | 
-        ./vendor/bin/sail up
+      run: ./vendor/bin/sail up
     - name: Execute tests (Unit and Feature tests) via PHPUnit
-        ./vendor/bin/phpunit
+      run: ./vendor/bin/phpunit
 
   # app-tests:
   #   runs-on: ubuntu-latest
