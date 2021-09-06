@@ -12,7 +12,9 @@
         "laravel/framework": "^8.54",
         "laravel/jetstream": "^2.3",
         "laravel/sanctum": "^2.6",
+        "laravel/socialite": "^5.2",
         "laravel/tinker": "^2.5",
+        "socialiteproviders/orcid": "^5.0",
         "spatie/laravel-cookie-consent": "^2.12",
         "spatie/laravel-permission": "^4.3",
         "tightenco/ziggy": "^1.0"
