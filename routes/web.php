@@ -3,7 +3,8 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use Illuminate\Http\Request; 
+use Illuminate\Http\Request;
+use App\Http\Controllers\Auth\SocialController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,6 +16,13 @@ use Illuminate\Http\Request;
 | contains the "web" middleware group. Now create something great!
 |
 */
+
+Route::group([
+    'prefix' => 'auth'
+], function () {
+    Route::get('/login/{service}', [SocialController::class, 'redirectToProvider']);
+    Route::get('/login/{service}/callback', [SocialController::class, 'handleProviderCallback']);    
+});
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
