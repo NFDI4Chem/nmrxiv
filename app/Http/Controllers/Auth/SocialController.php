@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\Auth;
 
+use DB;
 use Auth;
 use App\Models\User;
+use App\Models\Team;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Laravel\Socialite\Facades\Socialite;
-use Laravel\Spark\Events\Auth\UserRegistered;
+use Illuminate\Auth\Events\Registered;
 
 class SocialController extends Controller
 {
@@ -43,17 +45,24 @@ class SocialController extends Controller
                 $user = User::where('email', $email)->first();
             }
             if (!$user) {
-                $user = User::create([
+                $user = tap(User::create([
                     'name' => $providerUser->getName(),
-                    'email' => $providerUser->getEmail(),
-                ]);
+                    'email' => $providerUser->getEmail()
+                ]), function (User $user) {
+                    $user->ownedTeams()->save(Team::forceCreate([
+                        'user_id' => $user->id,
+                        'name' => explode(' ', $user->name, 2)[0]."'s Team",
+                        'personal_team' => true,
+                    ]));
+                });
             }
             $user->linkedSocialAccounts()->create([
                 'provider_id' => $providerUser->getId(),
                 'provider_name' => $service,
             ]);
+            event(new Registered($user));
         }
         Auth::login($user);
-        return redirect('/home');
+        return redirect('/dashboard');
     }
 }
