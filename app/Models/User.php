@@ -60,4 +60,14 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $appends = [
         'profile_photo_url',
     ];
+
+    /**
+     * User model and LinkedSocialAccount relationship - one to many
+     *
+     * @var array
+     */
+    public function linkedSocialAccounts()
+    {
+        return $this->hasMany(LinkedSocialAccount::class);
+    }
 }
