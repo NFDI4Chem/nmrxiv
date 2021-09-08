@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Auth\Events\Registered;
+use App\Models\LinkedSocialAccount;
 
 class SocialController extends Controller
 {
@@ -32,7 +33,7 @@ class SocialController extends Controller
     {
         $providerUser = Socialite::driver($service)->user();
 
-        $linkedSocialAccount = \App\Models\LinkedSocialAccount::where('provider_name', $service)
+        $linkedSocialAccount = LinkedSocialAccount::where('provider_name', $service)
             ->where('provider_id', $providerUser->getId())
             ->first();
 
