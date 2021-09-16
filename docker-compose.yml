@@ -10,7 +10,7 @@ services:
     ports: 
       - "8080:80"
     volumes: 
-      - '.:/var/www/html'
+      - '.:/var/www'
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
     depends_on: 
       - php
@@ -42,8 +42,8 @@ services:
       MYSQL_USER: '${DB_USERNAME}'
       MYSQL_PASSWORD: '${DB_PASSWORD}'
       MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
-    # volumes:
-    #   - dbdata:/var/lib/mysql/
+    volumes:
+      - dbdata:/var/lib/mysql/
     networks: 
       - laravel
 
@@ -53,8 +53,12 @@ services:
       dockerfile: Dockerfile
     container_name: php
     volumes: 
-        - '.:/var/www/html'
+        - '.:/var/www'
     ports: 
       - "9000:9000"
     networks: 
       - laravel
+#Volumes
+volumes:
+  dbdata:
+    driver: local
