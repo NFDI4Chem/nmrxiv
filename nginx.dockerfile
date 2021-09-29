@@ -1,13 +1,13 @@
-# FROM node:15.5-alpine AS assets-build
+FROM node:15.5-alpine AS assets-build
 
-# WORKDIR /var/www/
+WORKDIR /var/www/html
 
-# COPY . /var/www/
+COPY . /var/www/html/
 
-# RUN npm ci
-# RUN npm run production
+RUN npm ci
+RUN npm run production
 
 FROM nginx:1.19-alpine AS nginx
 
 COPY vhost.conf /etc/nginx/conf.d/default.conf
-# COPY --from=assets-build /var/www/public /var/www/
+COPY --from=assets-build /var/www/html/public /var/www/html/
