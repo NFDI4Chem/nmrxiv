@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nmrxiv
+data:
+  APP_NAME: nmrXiv
+  APP_ENV: production
+  APP_KEY: base64:+utph0E0ofSVkoH+Z+KFiuS0UPkixymqAF5/vplXtjs=
+  APP_DEBUG: "true"
+  APP_URL: http://35.234.84.114:80
+
+  LOG_CHANNEL: stack
+  LOG_LEVEL: debug
+
+  DB_CONNECTION: mysql
+  DB_HOST: mysql
+  DB_PORT: "3306"
+  DB_DATABASE: nmrxiv
+  DB_USERNAME: sail
+  DB_PASSWORD: password
+
+  BROADCAST_DRIVER: log
+  CACHE_DRIVER: file
+  FILESYSTEM_DRIVER: local
+  QUEUE_CONNECTION: sync
+  SESSION_DRIVER: database
+  SESSION_LIFETIME: "120"
+
+  MEMCACHED_HOST: memcached
+
+  REDIS_HOST: redis
+  REDIS_PASSWORD: "null"
+  REDIS_PORT: "6379"
+
+  MAIL_MAILER: smtp
+  MAIL_HOST: smtp.uni-jena.de
+  MAIL_PORT: "587"
+  MAIL_USERNAME: ro76zik
+  MAIL_PASSWORD: NFD!4Chem
+  #MAIL_ENCRYPTION: null
+  MAIL_FROM_ADDRESS: chat@nfdi4chem.de
+  MAIL_FROM_NAME: nmrXiv
+
+  MIX_PUSHER_APP_KEY: "${PUSHER_APP_KEY}"
+  MIX_PUSHER_APP_CLUSTER: "${PUSHER_APP_CLUSTER}"
+
+  SCOUT_DRIVER: meilisearch
+  MEILISEARCH_HOST: http://meilisearch:7700
+
+  GITHUB_CLIENT_ID: 3ae720d92ad3e94b6002
+  GITHUB_CLIENT_SECRET: e33f62682a8e018f7272ffe6879cdf9a7caf13fc
+  GITHUB_REDIRECT_URL: http://localhost:80/auth/login/github/callback
+
+  ORCID_CLIENT_ID: APP-RBHXSRXY148AFXP8
+  ORCID_CLIENT_SECRET: e6f2b9da-5498-4f02-b876-e2bf959d4150
+  ORCID_REDIRECT_URL: http://localhost:80/auth/login/orcid/callback
+
+  TWITTER_CLIENT_ID: UIB2GZQ1XFjrbeBqxTciE6noY
+  TWITTER_CLIENT_SECRET: gDs39pBaXMqZNTUuuc1kvT9JFlmPyiYlEUEyPQUEWmt6wacP5g
+  TWITTER_REDIRECT_URL: http://localhost:80/auth/login/twitter/callback

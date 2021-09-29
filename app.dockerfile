@@ -6,7 +6,6 @@ RUN docker-php-ext-install exif
 RUN docker-php-ext-install gd
 RUN docker-php-ext-install zip
 RUN docker-php-ext-install pdo_mysql
-#RUN docker-php-ext-install mysqli pdo pdo_mysql
 RUN pecl install apcu
 RUN docker-php-ext-enable apcu
 
@@ -21,7 +20,7 @@ COPY /artisan artisan
 
 FROM base AS build-fpm
 
-WORKDIR /var/www/
+WORKDIR /var/www/html
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 COPY /artisan artisan
@@ -34,12 +33,12 @@ COPY /config config
 COPY /routes routes
 
 
-COPY . /var/www/
+COPY . /var/www/html
 
-RUN composer install 
+RUN composer install
 
 RUN composer dump-autoload -o
 
 FROM build-fpm AS fpm
 
-COPY --from=build-fpm /var/www/ /var/www/
+COPY --from=build-fpm /var/www/html /var/www/html
