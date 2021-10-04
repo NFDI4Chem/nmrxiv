@@ -20101,6 +20101,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 
 
+
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   components: {
     Head: _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_7__.Head,
@@ -20119,6 +20120,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
   },
   data: function data() {
     return {
+      isSingleSignOn: false,
+      isOrchid: false,
+      isTwitter: false,
+      isGithub: false,
       form: this.$inertia.form({
         email: '',
         password: '',
@@ -20139,6 +20144,15 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
           return _this.form.reset('password');
         }
       });
+    }
+  },
+  beforeMount: function beforeMount() {
+    this.isOrchid = "MISSING_ENV_VAR".ORCID_CLIENT_ID ? true : false;
+    this.isTwitter =  true ? true : 0;
+    this.isGithub = "MISSING_ENV_VAR".GITHUB_CLIENT_ID ? true : false;
+
+    if (this.isOrchid || this.isTwitter || this.isGithub) {
+      this.isSingleSignOn = true;
     }
   }
 });
@@ -22495,7 +22509,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
 
 
-var _hoisted_1 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div class=\"px-12 py-8 mx-auto max-w-4xl\"><div><div class=\"flex items-baseline justify-between\"><div><h2 class=\"text-lg\">Projects</h2><div class=\"mt-2 text-sm text-gray-700\"><div class=\"max-w-2xl\"> Each team may house a variety of projects. Projects can be versioned, command invocations, and metrics. </div></div></div><div class=\"flex-shrink-0 ml-4\"><button type=\"button\" class=\"inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500\"> New Project </button><!----><!----></div></div><div class=\"mt-4\"><div class=\"px-6 py-4 bg-white shadow-md rounded-lg\"><div class=\"flex items-center\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" class=\"h-6 w-6\"><path d=\"M3 6l9 4v12l-9-4V6zm14-3v2c0 1.1-2.24 2-5 2s-5-.9-5-2V3c0 1.1 2.24 2 5 2s5-.9 5-2z\" class=\"fill-current text-gray-400\"></path><polygon points=\"21 6 12 10 12 22 21 18\" class=\"fill-current text-gray-600\"></polygon></svg><div class=\"\n                  ml-3\n                  font-semibold\n                  text-sm text-gray-600\n                  uppercase\n                  tracking-wider\n                \"> Create Your First Project </div></div><div class=\"mt-3 max-w-2xl text-sm text-gray-700\"> nmrXiv is organized around projects. Projects can contain as many studies as you wish and each study receives its very own URL. To learn more, check out our documentation. </div></div></div></div><!----></div>", 1);
+var _hoisted_1 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div class=\"px-12 py-8 mx-auto max-w-4xl\"><div><div class=\"flex items-baseline justify-between\"><div><h2 class=\"text-lg\">Projects</h2><div class=\"mt-2 text-sm text-gray-700\"><div class=\"max-w-2xl\"> Each team may house a variety of projects. Projects can be versioned, command invocations, and metrics. </div></div></div><div class=\"flex-shrink-0 ml-4\"><button type=\"button\" class=\"inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500\"> New Project </button><!----><!----></div></div><div class=\"mt-4\"><div class=\"px-6 py-4 bg-white shadow-md rounded-lg\"><div class=\"flex items-center\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" class=\"h-6 w-6\"><path d=\"M3 6l9 4v12l-9-4V6zm14-3v2c0 1.1-2.24 2-5 2s-5-.9-5-2V3c0 1.1 2.24 2 5 2s5-.9 5-2z\" class=\"fill-current text-gray-400\"></path><polygon points=\"21 6 12 10 12 22 21 18\" class=\"fill-current text-gray-600\"></polygon></svg><div class=\"\r\n                  ml-3\r\n                  font-semibold\r\n                  text-sm text-gray-600\r\n                  uppercase\r\n                  tracking-wider\r\n                \"> Create Your First Project </div></div><div class=\"mt-3 max-w-2xl text-sm text-gray-700\"> nmrXiv is organized around projects. Projects can contain as many studies as you wish and each study receives its very own URL. To learn more, check out our documentation. </div></div></div></div><!----></div>", 1);
 
 var _hoisted_2 = [_hoisted_1];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
@@ -22851,12 +22865,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     title: $props.title
   }, null, 8
   /* PROPS */
-  , ["title"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_jet_banner), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Off-canvas menu for mobile, show/hide based on off-canvas menu state. "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("\n                Off-canvas menu overlay, show/hide based on off-canvas menu state.\n\n                Entering: \"transition-opacity ease-linear duration-300\"\n                    From: \"opacity-0\"\n                    To: \"opacity-100\"\n                Leaving: \"transition-opacity ease-linear duration-300\"\n                    From: \"opacity-100\"\n                    To: \"opacity-0\"\n                "), _hoisted_3, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("\n                Off-canvas menu, show/hide based on off-canvas menu state.\n\n                Entering: \"transition ease-in-out duration-300 transform\"\n                    From: \"-translate-x-full\"\n                    To: \"translate-x-0\"\n                Leaving: \"transition ease-in-out duration-300 transform\"\n                    From: \"translate-x-0\"\n                    To: \"-translate-x-full\"\n                "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("\n                    Close button, show/hide based on off-canvas menu state.\n\n                    Entering: \"ease-in-out duration-300\"\n                    From: \"opacity-0\"\n                    To: \"opacity-100\"\n                    Leaving: \"ease-in-out duration-300\"\n                    From: \"opacity-100\"\n                    To: \"opacity-0\"\n                "), _hoisted_5, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("nav", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Current: \"bg-gray-100 text-gray-900\", Default: \"text-gray-600 hover:bg-gray-50 hover:text-gray-900\" "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Link, {
+  , ["title"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_jet_banner), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Off-canvas menu for mobile, show/hide based on off-canvas menu state. "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("\r\n                Off-canvas menu overlay, show/hide based on off-canvas menu state.\r\n\r\n                Entering: \"transition-opacity ease-linear duration-300\"\r\n                    From: \"opacity-0\"\r\n                    To: \"opacity-100\"\r\n                Leaving: \"transition-opacity ease-linear duration-300\"\r\n                    From: \"opacity-100\"\r\n                    To: \"opacity-0\"\r\n                "), _hoisted_3, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("\r\n                Off-canvas menu, show/hide based on off-canvas menu state.\r\n\r\n                Entering: \"transition ease-in-out duration-300 transform\"\r\n                    From: \"-translate-x-full\"\r\n                    To: \"translate-x-0\"\r\n                Leaving: \"transition ease-in-out duration-300 transform\"\r\n                    From: \"translate-x-0\"\r\n                    To: \"-translate-x-full\"\r\n                "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("\r\n                    Close button, show/hide based on off-canvas menu state.\r\n\r\n                    Entering: \"ease-in-out duration-300\"\r\n                    From: \"opacity-0\"\r\n                    To: \"opacity-100\"\r\n                    Leaving: \"ease-in-out duration-300\"\r\n                    From: \"opacity-100\"\r\n                    To: \"opacity-0\"\r\n                "), _hoisted_5, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("nav", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Current: \"bg-gray-100 text-gray-900\", Default: \"text-gray-600 hover:bg-gray-50 hover:text-gray-900\" "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Link, {
     href: _ctx.route('dashboard'),
     "class": "bg-gray-100 text-gray-900 group flex items-center px-2 py-2 text-base font-medium rounded-md"
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("\n                        Heroicon name: outline/home\n\n                        Current: \"text-gray-500\", Default: \"text-gray-400 group-hover:text-gray-500\"\n                        "), _hoisted_9, _hoisted_10];
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("\r\n                        Heroicon name: outline/home\r\n\r\n                        Current: \"text-gray-500\", Default: \"text-gray-400 group-hover:text-gray-500\"\r\n                        "), _hoisted_9, _hoisted_10];
     }),
     _: 1
     /* STABLE */
@@ -22889,7 +22903,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     content: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_27, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Team Management "), _ctx.$page.props.jetstream.hasTeamFeatures ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
         key: 0
-      }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"block px-4 py-2 text-xs text-gray-400\">\n                                                    Manage Team\n                                                </div> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Team Settings "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <jet-dropdown-link :href=\"route('teams.show', $page.props.user.current_team)\">\n                                                    Team Settings\n                                                </jet-dropdown-link> "), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(_ctx.$page.props.user.all_teams, function (team) {
+      }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"block px-4 py-2 text-xs text-gray-400\">\r\n                                                    Manage Team\r\n                                                </div> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Team Settings "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <jet-dropdown-link :href=\"route('teams.show', $page.props.user.current_team)\">\r\n                                                    Team Settings\r\n                                                </jet-dropdown-link> "), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(_ctx.$page.props.user.all_teams, function (team) {
         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("form", {
           key: team.id,
           onSubmit: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
@@ -22913,7 +22927,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         , _hoisted_28);
       }), 128
       /* KEYED_FRAGMENT */
-      )), _hoisted_36, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Team Switcher "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"block px-4 py-2 text-xs text-gray-400\">\n                                                    Switch Teams\n                                                </div> "), _ctx.$page.props.jetstream.canCreateTeams ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_jet_dropdown_link, {
+      )), _hoisted_36, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Team Switcher "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"block px-4 py-2 text-xs text-gray-400\">\r\n                                                    Switch Teams\r\n                                                </div> "), _ctx.$page.props.jetstream.canCreateTeams ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_jet_dropdown_link, {
         key: 0,
         href: _ctx.route('teams.create')
       }, {
@@ -22937,7 +22951,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "class": "my-6 text-gray-900 group flex items-center px-2 py-3 text-sm font-medium rounded-md"
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("\n                            Heroicon name: outline/home\n\n                            Current: \"text-gray-500\", Default: \"text-gray-400 group-hover:text-gray-500\"\n                        "), _hoisted_38, _hoisted_39];
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("\r\n                            Heroicon name: outline/home\r\n\r\n                            Current: \"text-gray-500\", Default: \"text-gray-400 group-hover:text-gray-500\"\r\n                        "), _hoisted_38, _hoisted_39];
     }),
     _: 1
     /* STABLE */
@@ -23009,7 +23023,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     _: 1
     /* STABLE */
 
-  })])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("main", _hoisted_65, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Page Heading "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <header class=\"bg-white shadow\" v-if=\"$slots.header\">\n                        <div class=\"max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8\">\n                            <slot name=\"header\"></slot>\n                        </div>\n                    </header> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_66, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_67, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_68, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.renderSlot)(_ctx.$slots, "header")])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderSlot)(_ctx.$slots, "default")])])])]);
+  })])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("main", _hoisted_65, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Page Heading "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <header class=\"bg-white shadow\" v-if=\"$slots.header\">\r\n                        <div class=\"max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8\">\r\n                            <slot name=\"header\"></slot>\r\n                        </div>\r\n                    </header> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_66, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_67, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_68, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.renderSlot)(_ctx.$slots, "header")])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderSlot)(_ctx.$slots, "default")])])])]);
 }
 
 /***/ }),
@@ -23716,9 +23730,11 @@ var _hoisted_11 = {
 
 var _hoisted_12 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Not registered? Register here ");
 
-var _hoisted_13 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+var _hoisted_13 = {
   "class": "mt-6"
-}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+};
+
+var _hoisted_14 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
   "class": "relative"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
   "class": "absolute inset-0 flex items-center"
@@ -23728,9 +23744,15 @@ var _hoisted_13 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
   "class": "relative flex justify-center text-sm"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
   "class": "px-2 bg-white text-gray-500"
-}, " Or continue with ")])]), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+}, " Or continue with ")])], -1
+/* HOISTED */
+);
+
+var _hoisted_15 = {
   "class": "mt-6 grid grid-cols-3 gap-3"
-}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
+};
+
+var _hoisted_16 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
   href: "/auth/login/orcid",
   "class": "w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
@@ -23744,7 +23766,13 @@ var _hoisted_13 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
   xmlns: "http://www.w3.org/2000/svg"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("title", null, "ORCID icon"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("path", {
   d: "M12 0C5.372 0 0 5.372 0 12s5.372 12 12 12 12-5.372 12-12S18.628 0 12 0zM7.369 4.378c.525 0 .947.431.947.947s-.422.947-.947.947a.95.95 0 0 1-.947-.947c0-.525.422-.947.947-.947zm-.722 3.038h1.444v10.041H6.647V7.416zm3.562 0h3.9c3.712 0 5.344 2.653 5.344 5.025 0 2.578-2.016 5.025-5.325 5.025h-3.919V7.416zm1.444 1.303v7.444h2.297c3.272 0 4.022-2.484 4.022-3.722 0-2.016-1.284-3.722-4.097-3.722h-2.222z"
-})])])]), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
+})])], -1
+/* HOISTED */
+);
+
+var _hoisted_17 = [_hoisted_16];
+
+var _hoisted_18 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
   href: "/auth/login/twitter",
   "class": "w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-900 hover:bg-gray-50"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
@@ -23754,9 +23782,22 @@ var _hoisted_13 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
   fill: "currentColor",
   viewBox: "0 0 20 20",
   "aria-hidden": "true"
-}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("path", {
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("svg", {
+  style: {
+    "height": "20px"
+  },
+  role: "img",
+  viewBox: "0 0 24 24",
+  xmlns: "http://www.w3.org/2000/svg"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("title", null, "Twitter"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("path", {
   d: "M6.29 18.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0020 3.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.073 4.073 0 01.8 7.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 010 16.407a11.616 11.616 0 006.29 1.84"
-})])])]), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
+})])])], -1
+/* HOISTED */
+);
+
+var _hoisted_19 = [_hoisted_18];
+
+var _hoisted_20 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
   href: "/auth/login/github",
   "class": "w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-900 hover:bg-gray-50"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
@@ -23770,10 +23811,11 @@ var _hoisted_13 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
   "fill-rule": "evenodd",
   d: "M10 0C4.477 0 0 4.484 0 10.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0110 4.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0020 10.017C20 4.484 15.522 0 10 0z",
   "clip-rule": "evenodd"
-})])])])])], -1
+})])], -1
 /* HOISTED */
 );
 
+var _hoisted_21 = [_hoisted_20];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_Head = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Head");
 
@@ -23887,7 +23929,15 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       /* PROPS */
       , ["href"])])], 32
       /* HYDRATE_EVENTS */
-      ), _hoisted_13];
+      ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [_hoisted_14, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_15, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, _hoisted_17, 512
+      /* NEED_PATCH */
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $data.isOrchid]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, _hoisted_19, 512
+      /* NEED_PATCH */
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $data.isTwitter]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, _hoisted_21, 512
+      /* NEED_PATCH */
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $data.isGithub]])])], 512
+      /* NEED_PATCH */
+      ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $data.isSingleSignOn]])];
     }),
     _: 1
     /* STABLE */
@@ -24533,7 +24583,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         "class": "text-sm text-gray-800 font-bold"
       }, " Team Settings ", 8
       /* PROPS */
-      , _hoisted_4)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <h2 class=\"font-semibold text-xl text-gray-800 leading-tight\">\n                Dashboard\n            </h2> ")];
+      , _hoisted_4)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <h2 class=\"font-semibold text-xl text-gray-800 leading-tight\">\r\n                Dashboard\r\n            </h2> ")];
     }),
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_welcome)])];
@@ -26754,16 +26804,16 @@ var _hoisted_2 = {
   "class": "pt-8 overflow-hidden sm:pt-12 lg:relative lg:py-48"
 };
 var _hoisted_3 = {
-  "class": "\n            mx-auto\n            max-w-md\n            px-4\n            sm:max-w-3xl\n            sm:px-6\n            lg:px-8\n            lg:max-w-7xl\n            lg:grid lg:grid-cols-2\n            lg:gap-24\n          "
+  "class": "\r\n            mx-auto\r\n            max-w-md\r\n            px-4\r\n            sm:max-w-3xl\r\n            sm:px-6\r\n            lg:px-8\r\n            lg:max-w-7xl\r\n            lg:grid lg:grid-cols-2\r\n            lg:gap-24\r\n          "
 };
 
-var _hoisted_4 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div class=\"mt-10\"><div class=\"mt-6 sm:max-w-xl\"><h1 class=\"\n                    text-4xl\n                    font-extrabold\n                    text-gray-900\n                    tracking-tight\n                    sm:text-5xl\n                  \"> nmrXiv </h1><p class=\"mt-6 text-xl text-gray-500\"> New, highly visible, and consensus-driven NMR data repository and computational platform. The ultimate goal is to accelerate broader coordination and data sharing among natural product (NP) researchers by enabling storage, management, sharing and analysis of NMR data. </p></div><div class=\"mt-10\"><a href=\"/login\" class=\"\n                    rounded-md\n                    border border-transparent\n                    px-5\n                    py-3\n                    bg-rose-500\n                    text-base\n                    font-medium\n                    text-white\n                    shadow\n                    hover:bg-rose-600\n                    focus:outline-none\n                    focus:ring-2 focus:ring-rose-500 focus:ring-offset-2\n                    sm:px-10\n                  \"> Login </a><a href=\"/register\" class=\"\n                    rounded-md\n                    border border-transparent\n                    px-5\n                    ml-2\n                    py-3\n                    bg-white-500\n                    text-base\n                    font-medium\n                    text-dark\n                    shadow\n                    hover:bg-white-600\n                    focus:outline-none\n                    focus:ring-2 focus:ring-rose-500 focus:ring-offset-2\n                    sm:px-10\n                  \"> Register </a></div></div>", 1);
+var _hoisted_4 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div class=\"mt-10\"><div class=\"mt-6 sm:max-w-xl\"><h1 class=\"\r\n                    text-4xl\r\n                    font-extrabold\r\n                    text-gray-900\r\n                    tracking-tight\r\n                    sm:text-5xl\r\n                  \"> nmrXiv </h1><p class=\"mt-6 text-xl text-gray-500\"> New, highly visible, and consensus-driven NMR data repository and computational platform. The ultimate goal is to accelerate broader coordination and data sharing among natural product (NP) researchers by enabling storage, management, sharing and analysis of NMR data. </p></div><div class=\"mt-10\"><a href=\"/login\" class=\"\r\n                    rounded-md\r\n                    border border-transparent\r\n                    px-5\r\n                    py-3\r\n                    bg-rose-500\r\n                    text-base\r\n                    font-medium\r\n                    text-white\r\n                    shadow\r\n                    hover:bg-rose-600\r\n                    focus:outline-none\r\n                    focus:ring-2 focus:ring-rose-500 focus:ring-offset-2\r\n                    sm:px-10\r\n                  \"> Login </a><a href=\"/register\" class=\"\r\n                    rounded-md\r\n                    border border-transparent\r\n                    px-5\r\n                    ml-2\r\n                    py-3\r\n                    bg-white-500\r\n                    text-base\r\n                    font-medium\r\n                    text-dark\r\n                    shadow\r\n                    hover:bg-white-600\r\n                    focus:outline-none\r\n                    focus:ring-2 focus:ring-rose-500 focus:ring-offset-2\r\n                    sm:px-10\r\n                  \"> Register </a></div></div>", 1);
 
-var _hoisted_5 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div class=\"sm:mx-auto sm:max-w-3xl sm:px-6\"><div class=\"\n              py-12\n              sm:relative\n              sm:mt-12\n              sm:py-16\n              lg:absolute\n              lg:inset-y-0\n              lg:right-0\n              lg:w-1/2\n            \"><div class=\"hidden sm:block\"><div class=\"\n                  absolute\n                  inset-y-0\n                  left-1/2\n                  w-screen\n                  bg-gray-50\n                  rounded-l-3xl\n                  lg:left-80\n                  lg:right-0\n                  lg:w-full\n                \"></div><svg class=\"absolute top-8 right-1/2 -mr-3 lg:m-0 lg:left-0\" width=\"404\" height=\"392\" fill=\"none\" viewBox=\"0 0 404 392\"><defs><pattern id=\"837c3e70-6c3a-44e6-8854-cc48c737b659\" x=\"0\" y=\"0\" width=\"20\" height=\"20\" patternUnits=\"userSpaceOnUse\"><rect x=\"0\" y=\"0\" width=\"4\" height=\"4\" class=\"text-gray-200\" fill=\"currentColor\"></rect></pattern></defs><rect width=\"404\" height=\"392\" fill=\"url(#837c3e70-6c3a-44e6-8854-cc48c737b659)\"></rect></svg></div><div class=\"\n                relative\n                pl-4\n                -mr-40\n                sm:mx-auto\n                sm:max-w-3xl\n                sm:px-0\n                lg:max-w-none\n                lg:h-full\n                lg:pl-12\n              \"><img class=\"\n                  w-full\n                  rounded-md\n                  shadow-xl\n                  ring-1 ring-black ring-opacity-5\n                  lg:h-full\n                  lg:w-auto\n                  lg:max-w-none\n                \" src=\"/img/website.jpg\" alt=\"\"></div></div></div>", 1);
+var _hoisted_5 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div class=\"sm:mx-auto sm:max-w-3xl sm:px-6\"><div class=\"\r\n              py-12\r\n              sm:relative\r\n              sm:mt-12\r\n              sm:py-16\r\n              lg:absolute\r\n              lg:inset-y-0\r\n              lg:right-0\r\n              lg:w-1/2\r\n            \"><div class=\"hidden sm:block\"><div class=\"\r\n                  absolute\r\n                  inset-y-0\r\n                  left-1/2\r\n                  w-screen\r\n                  bg-gray-50\r\n                  rounded-l-3xl\r\n                  lg:left-80\r\n                  lg:right-0\r\n                  lg:w-full\r\n                \"></div><svg class=\"absolute top-8 right-1/2 -mr-3 lg:m-0 lg:left-0\" width=\"404\" height=\"392\" fill=\"none\" viewBox=\"0 0 404 392\"><defs><pattern id=\"837c3e70-6c3a-44e6-8854-cc48c737b659\" x=\"0\" y=\"0\" width=\"20\" height=\"20\" patternUnits=\"userSpaceOnUse\"><rect x=\"0\" y=\"0\" width=\"4\" height=\"4\" class=\"text-gray-200\" fill=\"currentColor\"></rect></pattern></defs><rect width=\"404\" height=\"392\" fill=\"url(#837c3e70-6c3a-44e6-8854-cc48c737b659)\"></rect></svg></div><div class=\"\r\n                relative\r\n                pl-4\r\n                -mr-40\r\n                sm:mx-auto\r\n                sm:max-w-3xl\r\n                sm:px-0\r\n                lg:max-w-none\r\n                lg:h-full\r\n                lg:pl-12\r\n              \"><img class=\"\r\n                  w-full\r\n                  rounded-md\r\n                  shadow-xl\r\n                  ring-1 ring-black ring-opacity-5\r\n                  lg:h-full\r\n                  lg:w-auto\r\n                  lg:max-w-none\r\n                \" src=\"/img/website.jpg\" alt=\"\"></div></div></div>", 1);
 
-var _hoisted_6 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div class=\"relative mt-24 sm:mt-32 sm:py-16\"><div aria-hidden=\"true\" class=\"hidden sm:block\"><div class=\"absolute inset-y-0 left-0 w-1/2 bg-gray-50 rounded-r-3xl\"></div><svg class=\"absolute top-8 left-1/2 -ml-3\" width=\"404\" height=\"392\" fill=\"none\" viewBox=\"0 0 404 392\"><defs><pattern id=\"8228f071-bcee-4ec8-905a-2a059a2cc4fb\" x=\"0\" y=\"0\" width=\"20\" height=\"20\" patternUnits=\"userSpaceOnUse\"><rect x=\"0\" y=\"0\" width=\"4\" height=\"4\" class=\"text-gray-200\" fill=\"currentColor\"></rect></pattern></defs><rect width=\"404\" height=\"392\" fill=\"url(#8228f071-bcee-4ec8-905a-2a059a2cc4fb)\"></rect></svg></div><div class=\"\n            mx-auto\n            max-w-md\n            px-4\n            sm:max-w-3xl\n            sm:px-6\n            lg:max-w-7xl\n            lg:px-8\n          \"><div class=\"\n              relative\n              rounded-2xl\n              px-6\n              py-10\n              bg-rose-500\n              overflow-hidden\n              shadow-xl\n              sm:px-12\n              sm:py-20\n            \"><div aria-hidden=\"true\" class=\"absolute inset-0 -mt-72 sm:-mt-32 md:mt-0\"><svg class=\"absolute inset-0 h-full w-full\" preserveAspectRatio=\"xMidYMid slice\" xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 1463 360\"><path class=\"text-rose-400 text-opacity-40\" fill=\"currentColor\" d=\"M-82.673 72l1761.849 472.086-134.327 501.315-1761.85-472.086z\"></path><path class=\"text-rose-600 text-opacity-40\" fill=\"currentColor\" d=\"M-217.088 544.086L1544.761 72l134.327 501.316-1761.849 472.086z\"></path></svg></div><div class=\"relative\"><div class=\"sm:text-center\"><h2 class=\"\n                    text-3xl\n                    font-extrabold\n                    text-white\n                    tracking-tight\n                    sm:text-4xl\n                  \"> Get notified when we’re launching. </h2></div><form action=\"#\" class=\"mt-12 sm:mx-auto sm:max-w-lg sm:flex\"><div class=\"min-w-0 flex-1\"><label for=\"cta-email\" class=\"sr-only\">Email address</label><input id=\"cta-email\" type=\"email\" class=\"\n                      block\n                      w-full\n                      border border-transparent\n                      rounded-md\n                      px-5\n                      py-3\n                      text-base text-gray-900\n                      placeholder-gray-500\n                      shadow-sm\n                      focus:outline-none\n                      focus:border-transparent\n                      focus:ring-2\n                      focus:ring-white\n                      focus:ring-offset-2\n                      focus:ring-offset-rose-500\n                    \" placeholder=\"Enter your email\"></div><div class=\"mt-4 sm:mt-0 sm:ml-3\"><button type=\"submit\" class=\"\n                      block\n                      w-full\n                      rounded-md\n                      border border-transparent\n                      px-5\n                      py-3\n                      bg-gray-900\n                      text-base\n                      font-medium\n                      text-white\n                      shadow\n                      hover:bg-black\n                      focus:outline-none\n                      focus:ring-2\n                      focus:ring-white\n                      focus:ring-offset-2\n                      focus:ring-offset-rose-500\n                      sm:px-10\n                    \"> Notify me </button></div></form></div></div></div></div>", 1);
+var _hoisted_6 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div class=\"relative mt-24 sm:mt-32 sm:py-16\"><div aria-hidden=\"true\" class=\"hidden sm:block\"><div class=\"absolute inset-y-0 left-0 w-1/2 bg-gray-50 rounded-r-3xl\"></div><svg class=\"absolute top-8 left-1/2 -ml-3\" width=\"404\" height=\"392\" fill=\"none\" viewBox=\"0 0 404 392\"><defs><pattern id=\"8228f071-bcee-4ec8-905a-2a059a2cc4fb\" x=\"0\" y=\"0\" width=\"20\" height=\"20\" patternUnits=\"userSpaceOnUse\"><rect x=\"0\" y=\"0\" width=\"4\" height=\"4\" class=\"text-gray-200\" fill=\"currentColor\"></rect></pattern></defs><rect width=\"404\" height=\"392\" fill=\"url(#8228f071-bcee-4ec8-905a-2a059a2cc4fb)\"></rect></svg></div><div class=\"\r\n            mx-auto\r\n            max-w-md\r\n            px-4\r\n            sm:max-w-3xl\r\n            sm:px-6\r\n            lg:max-w-7xl\r\n            lg:px-8\r\n          \"><div class=\"\r\n              relative\r\n              rounded-2xl\r\n              px-6\r\n              py-10\r\n              bg-rose-500\r\n              overflow-hidden\r\n              shadow-xl\r\n              sm:px-12\r\n              sm:py-20\r\n            \"><div aria-hidden=\"true\" class=\"absolute inset-0 -mt-72 sm:-mt-32 md:mt-0\"><svg class=\"absolute inset-0 h-full w-full\" preserveAspectRatio=\"xMidYMid slice\" xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 1463 360\"><path class=\"text-rose-400 text-opacity-40\" fill=\"currentColor\" d=\"M-82.673 72l1761.849 472.086-134.327 501.315-1761.85-472.086z\"></path><path class=\"text-rose-600 text-opacity-40\" fill=\"currentColor\" d=\"M-217.088 544.086L1544.761 72l134.327 501.316-1761.849 472.086z\"></path></svg></div><div class=\"relative\"><div class=\"sm:text-center\"><h2 class=\"\r\n                    text-3xl\r\n                    font-extrabold\r\n                    text-white\r\n                    tracking-tight\r\n                    sm:text-4xl\r\n                  \"> Get notified when we’re launching. </h2></div><form action=\"#\" class=\"mt-12 sm:mx-auto sm:max-w-lg sm:flex\"><div class=\"min-w-0 flex-1\"><label for=\"cta-email\" class=\"sr-only\">Email address</label><input id=\"cta-email\" type=\"email\" class=\"\r\n                      block\r\n                      w-full\r\n                      border border-transparent\r\n                      rounded-md\r\n                      px-5\r\n                      py-3\r\n                      text-base text-gray-900\r\n                      placeholder-gray-500\r\n                      shadow-sm\r\n                      focus:outline-none\r\n                      focus:border-transparent\r\n                      focus:ring-2\r\n                      focus:ring-white\r\n                      focus:ring-offset-2\r\n                      focus:ring-offset-rose-500\r\n                    \" placeholder=\"Enter your email\"></div><div class=\"mt-4 sm:mt-0 sm:ml-3\"><button type=\"submit\" class=\"\r\n                      block\r\n                      w-full\r\n                      rounded-md\r\n                      border border-transparent\r\n                      px-5\r\n                      py-3\r\n                      bg-gray-900\r\n                      text-base\r\n                      font-medium\r\n                      text-white\r\n                      shadow\r\n                      hover:bg-black\r\n                      focus:outline-none\r\n                      focus:ring-2\r\n                      focus:ring-white\r\n                      focus:ring-offset-2\r\n                      focus:ring-offset-rose-500\r\n                      sm:px-10\r\n                    \"> Notify me </button></div></form></div></div></div></div>", 1);
 
-var _hoisted_7 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<footer class=\"mt-24 bg-gray-900 sm:mt-12\"><div class=\"\n          mx-auto\n          max-w-md\n          py-12\n          px-4\n          overflow-hidden\n          sm:max-w-3xl\n          sm:px-6\n          lg:max-w-7xl\n          lg:px-8\n        \"><nav class=\"-mx-5 -my-2 flex flex-wrap justify-center\" aria-label=\"Footer\"><div class=\"px-5 py-2\"><a href=\"#\" class=\"text-base text-gray-400 hover:text-gray-300\"> About </a></div><div class=\"px-5 py-2\"><a href=\"#\" class=\"text-base text-gray-400 hover:text-gray-300\"> Docs </a></div><div class=\"px-5 py-2\"><a href=\"#\" class=\"text-base text-gray-400 hover:text-gray-300\"> Privacy </a></div><div class=\"px-5 py-2\"><a href=\"#\" class=\"text-base text-gray-400 hover:text-gray-300\"> Terms </a></div><div class=\"px-5 py-2\"><a href=\"#\" class=\"text-base text-gray-400 hover:text-gray-300\"> Cookies </a></div></nav><p class=\"mt-8 text-center text-base text-gray-400\"> © 2021 nmrXiv. All rights reserved. </p></div></footer>", 1);
+var _hoisted_7 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<footer class=\"mt-24 bg-gray-900 sm:mt-12\"><div class=\"\r\n          mx-auto\r\n          max-w-md\r\n          py-12\r\n          px-4\r\n          overflow-hidden\r\n          sm:max-w-3xl\r\n          sm:px-6\r\n          lg:max-w-7xl\r\n          lg:px-8\r\n        \"><nav class=\"-mx-5 -my-2 flex flex-wrap justify-center\" aria-label=\"Footer\"><div class=\"px-5 py-2\"><a href=\"#\" class=\"text-base text-gray-400 hover:text-gray-300\"> About </a></div><div class=\"px-5 py-2\"><a href=\"#\" class=\"text-base text-gray-400 hover:text-gray-300\"> Docs </a></div><div class=\"px-5 py-2\"><a href=\"#\" class=\"text-base text-gray-400 hover:text-gray-300\"> Privacy </a></div><div class=\"px-5 py-2\"><a href=\"#\" class=\"text-base text-gray-400 hover:text-gray-300\"> Terms </a></div><div class=\"px-5 py-2\"><a href=\"#\" class=\"text-base text-gray-400 hover:text-gray-300\"> Cookies </a></div></nav><p class=\"mt-8 text-center text-base text-gray-400\"> © 2021 nmrXiv. All rights reserved. </p></div></footer>", 1);
 
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_Head = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Head");
@@ -26772,7 +26822,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Head, {
     title: "Welcome"
-  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("\n  This example requires Tailwind CSS v2.0+ \n  \n  This example requires some changes to your config:\n  \n  ```\n  // tailwind.config.js\n  const colors = require('tailwindcss/colors')\n  \n  module.exports = {\n    // ...\n    theme: {\n      extend: {\n        colors: {\n          rose: colors.rose,\n        },\n      },\n    },\n    plugins: [\n      // ...\n      require('@tailwindcss/forms'),\n    ],\n  }\n  ```\n"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("main", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Hero section "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_jet_application_mark, {
+  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("\r\n  This example requires Tailwind CSS v2.0+ \r\n  \r\n  This example requires some changes to your config:\r\n  \r\n  ```\r\n  // tailwind.config.js\r\n  const colors = require('tailwindcss/colors')\r\n  \r\n  module.exports = {\r\n    // ...\r\n    theme: {\r\n      extend: {\r\n        colors: {\r\n          rose: colors.rose,\r\n        },\r\n      },\r\n    },\r\n    plugins: [\r\n      // ...\r\n      require('@tailwindcss/forms'),\r\n    ],\r\n  }\r\n  ```\r\n"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("main", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Hero section "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_jet_application_mark, {
     "class": "block h-12 w-auto"
   })]), _hoisted_4])]), _hoisted_5]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" CTA section "), _hoisted_6]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Footer section "), _hoisted_7])], 64
   /* STABLE_FRAGMENT */
