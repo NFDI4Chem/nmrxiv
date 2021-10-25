@@ -75,6 +75,7 @@ spec:
             - name: testing
               mountPath: /var/www/html/storage/framework/testing
           resources: {}
-          image: eu.gcr.io/nmrxiv/app:latest
+          #image: eu.gcr.io/nmrxiv/app:latest
+          image: eu.gcr.io/PROJECT_ID/IMAGE:TAG
           ports:
             - containerPort: 9000
