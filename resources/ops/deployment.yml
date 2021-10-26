@@ -31,7 +31,7 @@ spec:
         fsGroup: 82
       initContainers:
         - name: database-migrations
-          image: eu.gcr.io/nmrxiv/app:latest
+          image: eu.gcr.io/PROJECT_ID/IMAGE:TAG
           envFrom:
             - configMapRef:
                 name: nmrxiv
@@ -46,7 +46,7 @@ spec:
       containers:
         - name: nginx
           # imagePullPolicy: Never
-          image: eu.gcr.io/nmrxiv/nginx:latest
+          image: eu.gcr.io/PROJECT_ID/NGINX_IMAGE:TAG
           resources:
             limits:
               cpu: 500m

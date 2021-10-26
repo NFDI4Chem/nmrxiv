@@ -9,7 +9,8 @@ env:
   GKE_CLUSTER: nmrxiv-app-cluster
   GKE_ZONE: europe-west3-a
   DEPLOYMENT_NAME: nmrxiv-app
-  IMAGE: app
+  APP_IMAGE: app
+  NGINX_IMAGE: nginx
 
 jobs:
   setup-build-publish-deploy:
@@ -38,17 +39,29 @@ jobs:
         credentials: ${{ secrets.GKE_SA_KEY }}
 
     # Build the Docker image
-    - name: Build
+    - name: Build App Image
       run: |-
         docker build -f app.dockerfile \
-          --tag "eu.gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA" \
+          --tag "eu.gcr.io/$PROJECT_ID/$APP_IMAGE:$GITHUB_SHA" \
+          --build-arg GITHUB_SHA="$GITHUB_SHA" \
+          --build-arg GITHUB_REF="$GITHUB_REF" \
+          .
+    - name: Build Nginx Image
+      run: |-
+        docker build -f nginx.dockerfile \
+          --tag "eu.gcr.io/$PROJECT_ID/$APP_IMAGE:$GITHUB_SHA" \
           --build-arg GITHUB_SHA="$GITHUB_SHA" \
           --build-arg GITHUB_REF="$GITHUB_REF" \
           .
     # Push the Docker image to Google Container Registry
-    - name: Publish
+    - name: Publish App Image to GCR
       run: |-
-        docker push "eu.gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA"
+        docker push "eu.gcr.io/$PROJECT_ID/$APP_IMAGE:$GITHUB_SHA"
+
+    - name: Publish Nginx Image to GCR
+      run: |-
+        docker push "eu.gcr.io/$PROJECT_ID/$NGINX_IMAGE:$GITHUB_SHA"
+
     # Set up kustomize
     - name: Set up Kustomize
       run: |-
@@ -57,7 +70,8 @@ jobs:
     # Deploy the Docker image to the GKE cluster
     - name: Deploy
       run: |-
-        ./kustomize edit set image eu.gcr.io/PROJECT_ID/IMAGE:TAG=eu.gcr.io/$PROJECT_ID/$IMAGE:$GITHUB_SHA
+        ./kustomize edit set image eu.gcr.io/PROJECT_ID/APP_IMAGE:TAG=eu.gcr.io/$PROJECT_ID/$APP_IMAGE:$GITHUB_SHA
+        ./kustomize edit set image eu.gcr.io/PROJECT_ID/NGINX_IMAGE:TAG=eu.gcr.io/$PROJECT_ID/$NGINX_IMAGE:$GITHUB_SHA
         ./kustomize build . | kubectl apply -f -
         kubectl rollout status deployment/$DEPLOYMENT_NAME
         kubectl get services -o wide
