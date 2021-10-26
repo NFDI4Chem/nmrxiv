@@ -49,7 +49,7 @@ jobs:
     - name: Build Nginx Image
       run: |-
         docker build -f nginx.dockerfile \
-          --tag "eu.gcr.io/$PROJECT_ID/$APP_IMAGE:$GITHUB_SHA" \
+          --tag "eu.gcr.io/$PROJECT_ID/$NGINX_IMAGE:$GITHUB_SHA" \
           --build-arg GITHUB_SHA="$GITHUB_SHA" \
           --build-arg GITHUB_REF="$GITHUB_REF" \
           .
