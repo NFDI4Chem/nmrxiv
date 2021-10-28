@@ -31,7 +31,7 @@ spec:
         fsGroup: 82
       initContainers:
         - name: database-migrations
-          image: eu.gcr.io/PROJECT_ID/IMAGE:TAG
+          image: eu.gcr.io/PROJECT_ID/APP_IMAGE:TAG
           envFrom:
             - configMapRef:
                 name: nmrxiv
@@ -76,6 +76,6 @@ spec:
               mountPath: /var/www/html/storage/framework/testing
           resources: {}
           #image: eu.gcr.io/nmrxiv/app:latest
-          image: eu.gcr.io/PROJECT_ID/IMAGE:TAG
+          image: eu.gcr.io/PROJECT_ID/APP_IMAGE:TAG
           ports:
             - containerPort: 9000
