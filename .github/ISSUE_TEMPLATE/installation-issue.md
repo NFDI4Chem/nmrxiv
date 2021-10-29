@@ -1,6 +1,6 @@
 ---
 name: Installation issue
-about: Describe this issue template's purpose here.
+about: Issue with local/production installation.
 title: ''
 labels: installation issue
 assignees: ''

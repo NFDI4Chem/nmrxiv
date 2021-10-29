@@ -1,6 +1,6 @@
 ---
 name: Documentation issue
-about: Describe this issue template's purpose here.
+about: Suggestion or improvement for documentation.
 title: ''
 labels: documentation
 assignees: ''
