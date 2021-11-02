@@ -13,4 +13,4 @@ npm-debug.log
 yarn-error.log
 /.idea
 /.vscode
-/resources/ops/configmap.yml
+/resources/ops/kubernetes/configmap.yml

@@ -41,14 +41,14 @@ jobs:
     # Build the Docker image
     - name: Build App Image
       run: |-
-        docker build -f app.dockerfile \
+        docker build -f ./resources/ops/docker/app/app.dockerfile \
           --tag "eu.gcr.io/$PROJECT_ID/$APP_IMAGE:$GITHUB_SHA" \
           --build-arg GITHUB_SHA="$GITHUB_SHA" \
           --build-arg GITHUB_REF="$GITHUB_REF" \
           .
     - name: Build Nginx Image
       run: |-
-        docker build -f nginx.dockerfile \
+        docker build -f ./resources/ops/docker/nginx/nginx.dockerfile \
           --tag "eu.gcr.io/$PROJECT_ID/$NGINX_IMAGE:$GITHUB_SHA" \
           --build-arg GITHUB_SHA="$GITHUB_SHA" \
           --build-arg GITHUB_REF="$GITHUB_REF" \
