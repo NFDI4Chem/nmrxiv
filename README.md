@@ -14,7 +14,7 @@ To get more details about nmrXiv, visit our [documentation site.](https://docs.n
 
 If you discover any issue or need any support please raise a ticket at our [Help Desk.](https://helpdesk.nfdi4chem.de/).
 
-# Features and Bugs
+## Features and Bugs
 
 To raise request for any new feature or report any bug please add it to our [Github Issues.](https://github.com/NFDI4Chem/nmrxiv/issues)
 
