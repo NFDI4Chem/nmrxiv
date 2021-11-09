@@ -11,10 +11,10 @@ spec:
     metadata:
       labels:
         app: nmrxiv-app
-      annotations:
-        prometheus.io/scrape: "true"
-        prometheus.io/path: /metrics
-        prometheus.io/port: "80"
+      # annotations:
+      #   prometheus.io/scrape: "true"
+      #   prometheus.io/path: /metrics
+      #   prometheus.io/port: "80"
     spec:
       volumes:
         - name: logs
@@ -35,8 +35,8 @@ spec:
           envFrom:
             - configMapRef:
                 name: nmrxiv
-            # - secretRef:
-            #     name: laravel
+            - secretRef:
+                name: nmrxiv-secret
           command:
             - "php"
           args:
@@ -58,8 +58,8 @@ spec:
           envFrom:
             - configMapRef:
                 name: nmrxiv
-            # - secretRef:
-            #     name: laravel
+            - secretRef:
+                name: nmrxiv-secret
           securityContext:
             runAsUser: 82
             readOnlyRootFilesystem: true
