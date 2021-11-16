@@ -5,9 +5,14 @@ RUN apk add --update zlib-dev libpng-dev libzip-dev $PHPIZE_DEPS
 RUN docker-php-ext-install exif
 RUN docker-php-ext-install gd
 RUN docker-php-ext-install zip
-RUN docker-php-ext-install pdo_mysql
+#RUN docker-php-ext-install pdo_mysql
 RUN pecl install apcu
 RUN docker-php-ext-enable apcu
+
+RUN set -ex \
+  && apk --no-cache add \
+    postgresql-dev
+RUN docker-php-ext-install pdo pdo_pgsql
 
 FROM base AS dev
 
