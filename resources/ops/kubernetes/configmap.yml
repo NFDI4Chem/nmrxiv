@@ -3,6 +3,7 @@ kind: ConfigMap
 metadata:
   name: nmrxiv
 data:
+#App Properties
   APP_NAME: nmrXiv
   APP_ENV: development
   APP_DEBUG: "true"
@@ -11,3 +12,6 @@ data:
   LOG_CHANNEL: stack
   LOG_LEVEL: debug
 
+#OAuth Properties
+  TWITTER_REDIRECT_URL: https://dev.nmrxiv.org/auth/login/twitter/callback
+  GITHUB_REDIRECT_URL: https://dev.nmrxiv.org/auth/login/github/callback
