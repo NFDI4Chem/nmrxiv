@@ -252,7 +252,7 @@
                             <span class="ml-2"> Activity </span>
                           </a>
                         </div>
-                        <activity-details :project="project" ref="activityDetailsElement"></activity-details>
+                        <project-activity :project="project" ref="activityDetailsElement"></project-activity>
                       </div>
                     </div>
                   </div>
@@ -295,7 +295,7 @@ import { XIcon } from "@heroicons/vue/outline";
 import { LinkIcon, PlusSmIcon, QuestionMarkCircleIcon, ExclamationCircleIcon } from "@heroicons/vue/solid";
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/vue";
 import JetInputError from "@/Jetstream/InputError.vue";
-import ActivityDetails from "@/Shared/ActivityDetails.vue";
+import ProjectActivity from "@/Pages/Project/Partials/Activity.vue";
 
 export default {
   components: {
@@ -305,7 +305,7 @@ export default {
     TransitionChild,
     TransitionRoot,
     JetInputError,
-    ActivityDetails,
+    ProjectActivity,
     Tab,
     TabGroup,
     TabList,
