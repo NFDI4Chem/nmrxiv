@@ -28,7 +28,9 @@
     "dependencies": {
         "@headlessui/vue": "^1.4.2",
         "@heroicons/vue": "^1.0.5",
+        "@types/marked": "^4.0.1",
         "@vue-hero-icons/outline": "^1.7.2",
+        "marked": "^4.0.4",
         "popper.js": "^1.16.1"
     }
 }
