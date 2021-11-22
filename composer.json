@@ -17,7 +17,7 @@
         "laravel/tinker": "^2.5",
         "socialiteproviders/orcid": "^5.0",
         "spatie/laravel-cookie-consent": "^2.12",
-        "spatie/laravel-permission": "^4.3",
+        "spatie/laravel-permission": "^5.1",
         "tightenco/ziggy": "^1.0"
     },
     "require-dev": {

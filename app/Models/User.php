@@ -2,15 +2,15 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Laravel\Fortify\TwoFactorAuthenticatable;
-use Laravel\Jetstream\HasProfilePhoto;
-use Laravel\Jetstream\HasTeams;
-use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
+use Laravel\Jetstream\HasProfilePhoto;
+use Laravel\Sanctum\HasApiTokens;
+use Laravel\Jetstream\HasTeams;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -28,7 +28,7 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'name', 'first_name', 'last_name' , 'email', 'password',
     ];
 
     /**
@@ -69,5 +69,38 @@ class User extends Authenticatable implements MustVerifyEmail
     public function linkedSocialAccounts()
     {
         return $this->hasMany(LinkedSocialAccount::class);
+    }
+
+    /**
+     * Get the default profile photo URL if no profile photo has been uploaded.
+     *
+     * @return string
+     */
+    protected function defaultProfilePhotoUrl()
+    {
+        return 'https://ui-avatars.com/api/?name='.urlencode($this->first_name.'+'.$this->last_name).'&color=7F9CF5&background=EBF4FF';
+    }
+
+    public function scopeOrderByName($query)
+    {
+        return $query->orderBy('last_name')->orderBy('first_name');
+    }
+
+    public function scopeWhereRole($query, $role)
+    {
+        return $query->whereHas("roles", function($q) use($role) { $q->where("name", $role); });
+    }
+
+    public function scopeFilter($query, array $filters)
+    {
+        return $query->when($filters['search'] ?? null, function ($query, $search) {
+            $query->where(function ($query) use ($search) {
+                $query->where('first_name', 'like', '%'.$search.'%')
+                    ->orWhere('last_name', 'like', '%'.$search.'%')
+                    ->orWhere('email', 'like', '%'.$search.'%');
+            });
+        })->when($filters['role'] ?? null, function ($query, $role) {
+            $query->whereRole($role);
+        });
     }
 }
