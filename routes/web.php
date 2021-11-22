@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Auth\SocialController;
 use App\Http\Controllers\Admin\ConsoleController;
 use App\Http\Controllers\Admin\UsersController;
+use App\Http\Controllers\ProjectController;
+use App\Models\Project;
 
 Route::group([
     'prefix' => 'auth'
@@ -30,10 +32,28 @@ Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function (Req
     if ($team) {
         $team->users = $team->allUsers();
     }
+    $projects = Project::where('owner_id', $user->id)->where('team_id', $team->id)->get();
     return Inertia::render('Dashboard', [
         'team' => $team,
+        'projects' => $projects
     ]);
 })->name('dashboard');
+
+
+Route::group(['middleware' => ['auth']], function () {
+    Route::get('projects/{project}', [ProjectController::class, 'show'])
+        ->name('project');
+    Route::get('projects/{project}/settings', [ProjectController::class, 'settings'])
+        ->name('project.settings');
+    Route::delete('projects/{project}', [ProjectController::class, 'destroy'])
+        ->name('project.destroy');
+    Route::post('projects/create', [ProjectController::class, 'store'])
+        ->name('projects.create');
+    Route::put('projects/{project}/update', [ProjectController::class, 'update'])
+        ->name('projects.update');
+    Route::get('projects/{project}/activity', [ProjectController::class, 'activity'])
+        ->name('projects.activity');
+});
 
 Route::group([
     'prefix' => 'admin'
