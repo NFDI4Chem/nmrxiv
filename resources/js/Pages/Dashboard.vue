@@ -20,7 +20,7 @@
         </template>
 
         <div class="py-12">
-            <welcome />
+            <welcome :projects="projects" />
         </div>
     </app-layout>
 </template>
@@ -36,7 +36,8 @@
         },
         props: [
             'user',
-            'team'
+            'team',
+            'projects'
         ]
     }
 </script>
