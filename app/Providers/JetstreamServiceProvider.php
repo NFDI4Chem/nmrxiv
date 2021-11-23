@@ -51,11 +51,27 @@ class JetstreamServiceProvider extends ServiceProvider
     {
         Jetstream::defaultApiTokenPermissions(['read']);
 
-        Jetstream::permissions([
-            'create',
-            'read',
-            'update',
-            'delete',
-        ]);
+        Jetstream::role('owner', 'Owner', [
+            'project:create',
+            'project:read',
+            'project:update',
+            'project:delete',
+            'study:create',
+            'study:read',
+            'study:update',
+            'study:delete',
+        ])->description('Can read and/or update including delete the project.');
+        
+        Jetstream::role('collaborator', 'Collaborator', [
+            'project:read',
+            'project:update',
+            'study:read',
+            'study:update',
+        ])->description('Can read and/or update project information.');
+
+        Jetstream::role('reviewer', 'Reviewer', [
+            'project:read',
+            'study:read',
+        ])->description('Can only read project information.');
     }
 }

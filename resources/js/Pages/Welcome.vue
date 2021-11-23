@@ -26,10 +26,10 @@
   }
   ```
 -->
-  <div class="bg-white">
+  <div class="flex flex-col h-screen justify-between">
     <main>
       <!-- Hero section -->
-      <div class="pt-8 overflow-hidden sm:pt-12 lg:relative lg:py-48">
+      <div class="pt-8 mb-auto overflow-hidden sm:pt-12 lg:relative lg:py-48">
         <div
           class="
             mx-auto
@@ -141,7 +141,7 @@
               <svg
                 class="absolute top-8 right-1/2 -mr-3 lg:m-0 lg:left-0"
                 width="404"
-                height="392"
+                height="200"
                 fill="none"
                 viewBox="0 0 404 392"
               >
@@ -166,7 +166,7 @@
                 </defs>
                 <rect
                   width="404"
-                  height="392"
+                  height="200"
                   fill="url(#837c3e70-6c3a-44e6-8854-cc48c737b659)"
                 />
               </svg>
@@ -202,7 +202,7 @@
         </div>
       </div>
       <!-- CTA section -->
-      <div class="relative mt-24 sm:mt-32 sm:py-16">
+      <div class="relative mt-5 sm:mt-5 sm:py-16">
         <div aria-hidden="true" class="hidden sm:block">
           <div
             class="absolute inset-y-0 left-0 w-1/2 bg-gray-50 rounded-r-3xl"
@@ -210,9 +210,9 @@
           <svg
             class="absolute top-8 left-1/2 -ml-3"
             width="404"
-            height="392"
+            height="200"
             fill="none"
-            viewBox="0 0 404 392"
+            viewBox="0 0 404 200"
           >
             <defs>
               <pattern
@@ -235,128 +235,10 @@
             </defs>
             <rect
               width="404"
-              height="392"
+              height="150"
               fill="url(#8228f071-bcee-4ec8-905a-2a059a2cc4fb)"
             />
           </svg>
-        </div>
-        <div
-          class="
-            mx-auto
-            max-w-md
-            px-4
-            sm:max-w-3xl
-            sm:px-6
-            lg:max-w-7xl
-            lg:px-8
-          "
-        >
-          <div
-            class="
-              relative
-              rounded-2xl
-              px-6
-              py-10
-              bg-rose-500
-              overflow-hidden
-              shadow-xl
-              sm:px-12
-              sm:py-20
-            "
-          >
-            <div
-              aria-hidden="true"
-              class="absolute inset-0 -mt-72 sm:-mt-32 md:mt-0"
-            >
-              <svg
-                class="absolute inset-0 h-full w-full"
-                preserveAspectRatio="xMidYMid slice"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 1463 360"
-              >
-                <path
-                  class="text-rose-400 text-opacity-40"
-                  fill="currentColor"
-                  d="M-82.673 72l1761.849 472.086-134.327 501.315-1761.85-472.086z"
-                />
-                <path
-                  class="text-rose-600 text-opacity-40"
-                  fill="currentColor"
-                  d="M-217.088 544.086L1544.761 72l134.327 501.316-1761.849 472.086z"
-                />
-              </svg>
-            </div>
-            <div class="relative">
-              <div class="sm:text-center">
-                <h2
-                  class="
-                    text-3xl
-                    font-extrabold
-                    text-white
-                    tracking-tight
-                    sm:text-4xl
-                  "
-                >
-                  Get notified when we&rsquo;re launching.
-                </h2>
-              </div>
-              <form action="#" class="mt-12 sm:mx-auto sm:max-w-lg sm:flex">
-                <div class="min-w-0 flex-1">
-                  <label for="cta-email" class="sr-only">Email address</label>
-                  <input
-                    id="cta-email"
-                    type="email"
-                    class="
-                      block
-                      w-full
-                      border border-transparent
-                      rounded-md
-                      px-5
-                      py-3
-                      text-base text-gray-900
-                      placeholder-gray-500
-                      shadow-sm
-                      focus:outline-none
-                      focus:border-transparent
-                      focus:ring-2
-                      focus:ring-white
-                      focus:ring-offset-2
-                      focus:ring-offset-rose-500
-                    "
-                    placeholder="Enter your email"
-                  />
-                </div>
-                <div class="mt-4 sm:mt-0 sm:ml-3">
-                  <button
-                    type="submit"
-                    class="
-                      block
-                      w-full
-                      rounded-md
-                      border border-transparent
-                      px-5
-                      py-3
-                      bg-gray-900
-                      text-base
-                      font-medium
-                      text-white
-                      shadow
-                      hover:bg-black
-                      focus:outline-none
-                      focus:ring-2
-                      focus:ring-white
-                      focus:ring-offset-2
-                      focus:ring-offset-rose-500
-                      sm:px-10
-                    "
-                  >
-                    Notify me
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
         </div>
       </div>
     </main>
@@ -380,33 +262,22 @@
           class="-mx-5 -my-2 flex flex-wrap justify-center"
           aria-label="Footer"
         >
-          <div class="px-5 py-2">
-            <a href="#" class="text-base text-gray-400 hover:text-gray-300">
-              About
-            </a>
-          </div>
 
           <div class="px-5 py-2">
-            <a href="#" class="text-base text-gray-400 hover:text-gray-300">
+            <a href="https://docs.nmrxiv.org/" target="_blank" class="text-base text-gray-400 hover:text-gray-300">
               Docs
             </a>
           </div>
 
           <div class="px-5 py-2">
-            <a href="#" class="text-base text-gray-400 hover:text-gray-300">
+            <a href="/privacy-policy" class="text-base text-gray-400 hover:text-gray-300">
               Privacy
             </a>
           </div>
 
           <div class="px-5 py-2">
-            <a href="#" class="text-base text-gray-400 hover:text-gray-300">
+            <a href="/terms-of-service" class="text-base text-gray-400 hover:text-gray-300">
               Terms
-            </a>
-          </div>
-
-          <div class="px-5 py-2">
-            <a href="#" class="text-base text-gray-400 hover:text-gray-300">
-              Cookies
             </a>
           </div>
         </nav>
