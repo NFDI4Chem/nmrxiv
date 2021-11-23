@@ -8,6 +8,7 @@ use App\Http\Controllers\Auth\SocialController;
 use App\Http\Controllers\Admin\ConsoleController;
 use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\StudyController;
 use App\Models\Project;
 
 Route::group([
@@ -39,7 +40,6 @@ Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function (Req
     ]);
 })->name('dashboard');
 
-
 Route::group(['middleware' => ['auth']], function () {
     Route::get('projects/{project}', [ProjectController::class, 'show'])
         ->name('project');
@@ -53,6 +53,19 @@ Route::group(['middleware' => ['auth']], function () {
         ->name('projects.update');
     Route::get('projects/{project}/activity', [ProjectController::class, 'activity'])
         ->name('projects.activity');
+    
+    Route::get('studies/{study}', [StudyController::class, 'show'])
+        ->name('study');
+    Route::get('studies/{study}/settings', [StudyController::class, 'settings'])
+        ->name('study.settings');
+    Route::delete('studies/{study}', [StudyController::class, 'destroy'])
+        ->name('study.destroy');
+    Route::post('studies/create', [StudyController::class, 'store'])
+        ->name('studies.create');
+    Route::put('studies/{study}/update', [StudyController::class, 'update'])
+        ->name('studies.update');
+    Route::get('studies/{study}/activity', [StudyController::class, 'activity'])
+        ->name('studies.activity');
 });
 
 Route::group([

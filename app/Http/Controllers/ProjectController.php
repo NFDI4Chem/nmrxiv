@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Actions\Project\CreateNewProject;
 use App\Actions\Project\UpdateProject;
 use App\Models\Project;
+use App\Models\Study;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Laravel\Fortify\Actions\ConfirmPassword;
 use Inertia\Inertia;
@@ -28,7 +29,7 @@ class ProjectController extends Controller
     {
         return Inertia::render('Project/Show', [
             'project' => $project,
-            'studies' => []
+            'studies' => $project->studies
         ]);
     }
 
@@ -36,7 +37,7 @@ class ProjectController extends Controller
     {
         return Inertia::render('Project/Settings', [
             'project' => $project,
-            'studies' => []
+            'studies' => $project->studies
         ]);
     }
 
