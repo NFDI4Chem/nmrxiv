@@ -21,7 +21,7 @@ export default {
       return new Intl.DateTimeFormat('en', { dateStyle: 'full', timeStyle: 'short' }).format(date);
     },
     md(data) {
-      return marked.parse(data);
+      return data ? marked.parse(data) : "";
     },
   },
 }
