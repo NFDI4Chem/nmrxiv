@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use OwenIt\Auditing\Contracts\Auditable;
 
-class Project extends Model implements Auditable
+class Study extends Model implements Auditable
 {
     use HasFactory;
     use \OwenIt\Auditing\Auditable;
@@ -26,12 +26,12 @@ class Project extends Model implements Auditable
         'access_type',
         'team_id',
         'owner_id',
-        'project_photo_path'
+        'project_id',
+        'study_photo_path'
     ];
 
-    public function studies()
+    public function project()
     {
-        return $this->hasMany(Study::class, 'project_id');
+        return $this->belongsTo(Project::class, 'project_id');
     }
-
 }

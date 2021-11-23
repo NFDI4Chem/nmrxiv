@@ -1,17 +1,17 @@
 <template>
-  <app-layout :title="project.name">
+  <app-layout :title="study.name">
     <template #header>
       <div>
         <div
           class="flex items-center text-sm text-gray-700 uppercase font-bold tracking-widest"
         >
-          <Link :href="route('project', project.id)">{{ project.name }}</Link>&nbsp;/&nbsp;Settings
+          <Link :href="route('study', study.id)">{{ study.name }}</Link>&nbsp;/&nbsp;Settings
         </div>
       </div>
     </template>
     <div class="py-12 px-10">
       <div>
-        <project-delete :project="project"></project-delete>
+        <study-delete :study="study"></study-delete>
       </div>
     </div>
   </app-layout>
@@ -20,14 +20,14 @@
 <script>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import { Link } from "@inertiajs/inertia-vue3";
-import ProjectDelete from "@/Pages/Project/Partials/Delete.vue";
+import StudyDelete from "@/Pages/Study/Partials/Delete.vue";
 
 export default {
   components: {
     Link,
     AppLayout,
-    ProjectDelete
+    StudyDelete
   },
-  props: ["project", "studies"],
+  props: ["study"],
 };
 </script>
