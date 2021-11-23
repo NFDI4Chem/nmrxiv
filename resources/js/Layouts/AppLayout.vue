@@ -420,7 +420,7 @@
       <main class="flex-1 relative overflow-y-auto focus:outline-none">
         <div class="bg-white border-b">
           <div class="px-12">
-            <div class="flex justify-between py-6">
+            <div class="flex flex-nowrap justify-between py-6">
               <slot name="header"></slot>
             </div>
           </div>

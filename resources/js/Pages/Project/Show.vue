@@ -89,7 +89,7 @@
     </template>
     <div class="py-12 px-10">
       <div>
-        <study-index :studies="studies" />
+        <study-index :project="project" :studies="studies" />
       </div>
     </div>
   </app-layout>
@@ -98,7 +98,7 @@
 <script>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import { Link } from "@inertiajs/inertia-vue3";
-import StudyIndex from "@/Jetstream/StudyIndex.vue";
+import StudyIndex from "@/Pages/Study/Index.vue";
 import ProjectDetails from './Partials/Details.vue';
 import { ref } from 'vue'
 

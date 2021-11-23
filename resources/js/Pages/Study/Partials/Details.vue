@@ -22,7 +22,7 @@
                   <div class="py-6 px-4 bg-indigo-700 sm:px-6">
                     <div class="flex items-center justify-between">
                       <DialogTitle class="text-lg font-medium text-white">
-                        {{ project.name }}
+                        {{ study.name }}
                       </DialogTitle>
                       <div class="ml-3 h-7 flex items-center">
                         <button
@@ -41,17 +41,17 @@
                       <div class="space-y-6 pt-6 pb-5">
                         <div>
                           <label
-                            for="project-name"
+                            for="study-name"
                             class="block text-sm font-medium text-gray-900"
                           >
-                            Project name
+                            Study name
                           </label>
                           <div class="mt-1">
                             <input
                               v-model="form.name"
                               type="text"
-                              name="project-name"
-                              id="project-name"
+                              name="study-name"
+                              id="study-name"
                               class="block w-full shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md"
                             />
                           </div>
@@ -176,7 +176,7 @@
                                   Public access
                                 </label>
                                 <p id="privacy-public-description" class="text-gray-500">
-                                  Everyone with the link will see this project.
+                                  Everyone with the link will see this study.
                                 </p>
                               </div>
                             </div>
@@ -186,26 +186,26 @@
                                   <input
                                     :checked="form.is_public === false"
                                     v-model="form.is_public"
-                                    id="privacy-private-to-project"
+                                    id="privacy-private-to-study"
                                     name="privacy"
                                     value="false"
-                                    aria-describedby="privacy-private-to-project-description"
+                                    aria-describedby="privacy-private-to-study-description"
                                     type="radio"
                                     class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300"
                                   />
                                 </div>
                                 <div class="pl-7 text-sm">
                                   <label
-                                    for="privacy-private-to-project"
+                                    for="privacy-private-to-study"
                                     class="font-medium text-gray-900"
                                   >
-                                    Private to project members
+                                    Private to study members
                                   </label>
                                   <p
-                                    id="privacy-private-to-project-description"
+                                    id="privacy-private-to-study-description"
                                     class="text-gray-500"
                                   >
-                                    Only members of this project would be able to access.
+                                    Only members of this study would be able to access.
                                   </p>
                                 </div>
                               </div>
@@ -252,7 +252,7 @@
                             <span class="ml-2"> Activity </span>
                           </a>
                         </div>
-                        <project-activity :project="project" ref="activityDetailsElement"></project-activity>
+                        <study-activity :study="study" ref="activityDetailsElement"></study-activity>
                       </div>
                     </div>
                   </div>
@@ -268,7 +268,7 @@
                   <button
                     type="submit"
                     class="ml-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                    @click="updateProject"
+                    @click="updateStudy"
                   >
                     Save
                   </button>
@@ -295,7 +295,7 @@ import { XIcon } from "@heroicons/vue/outline";
 import { LinkIcon, PlusSmIcon, QuestionMarkCircleIcon, ExclamationCircleIcon } from "@heroicons/vue/solid";
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/vue";
 import JetInputError from "@/Jetstream/InputError.vue";
-import ProjectActivity from "@/Pages/Project/Partials/Activity.vue";
+import StudyActivity from "@/Pages/Study/Partials/Activity.vue";
 
 export default {
   components: {
@@ -305,7 +305,7 @@ export default {
     TransitionChild,
     TransitionRoot,
     JetInputError,
-    ProjectActivity,
+    StudyActivity,
     Tab,
     TabGroup,
     TabList,
@@ -317,7 +317,7 @@ export default {
     ExclamationCircleIcon,
     XIcon,
   },
-  props: ["project"],
+  props: ["study"],
   setup() {
     const activityDetailsElement = ref(null)
     return {
@@ -328,14 +328,14 @@ export default {
     return {
       form: this.$inertia.form({
         _method: "PUT",
-        name: this.project.name,
-        description: this.project.description,
+        name: this.study.name,
+        description: this.study.description,
         error_message: null,
-        team_id: this.project.team_id,
-        owner_id: this.project.owner_id,
-        color: this.project.color,
-        starred: this.project.starred,
-        is_public: this.project.is_public,
+        team_id: this.study.team_id,
+        owner_id: this.study.owner_id,
+        color: this.study.color,
+        starred: this.study.starred,
+        is_public: this.study.is_public,
       }),
       open: false,
     };
@@ -344,10 +344,11 @@ export default {
     toggleDetails() {
       this.open = !this.open;
     },
-    updateProject() {
-      this.form.owner_id = this.project.owner_id;
-      this.form.team_id = this.project.team_id;
-      this.form.post(route("projects.update", this.project.id), {
+    updateStudy() {
+      this.form.owner_id = this.study.owner_id;
+      this.form.team_id = this.study.team_id;
+      this.form.project_id = this.study.project_id;
+      this.form.post(route("studies.update", this.study.id), {
         preserveScroll: true,
         onSuccess: () => {},
         onError: (err) => console.error(err),
