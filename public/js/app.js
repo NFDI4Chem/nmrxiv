@@ -39114,7 +39114,7 @@ __webpack_require__.r(__webpack_exports__);
       }).format(date);
     },
     md: function md(data) {
-      return marked__WEBPACK_IMPORTED_MODULE_0__.parse(data);
+      return data ? marked__WEBPACK_IMPORTED_MODULE_0__.parse(data) : "";
     }
   }
 });
