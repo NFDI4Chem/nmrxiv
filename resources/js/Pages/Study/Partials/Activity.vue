@@ -21,7 +21,7 @@
                   <div>
                     <div class="mt-4 flex items-start justify-between">
                       <div>
-                        <h2 class="text-lg font-medium text-gray-900">{{ project.name }}</h2>
+                        <h2 class="text-lg font-medium text-gray-900">{{ study.name }}</h2>
                       </div>
                     </div>
                   </div>
@@ -89,7 +89,7 @@ export default {
     PlusSmIcon,
     XIcon,
   },
-  props: ['study', 'project'],
+  props: ['study'],
   data() {
     return {
       open: false,
@@ -97,14 +97,14 @@ export default {
     };
   },
   updated() {
-    this.fetchActivity(this.project)
+    this.fetchActivity(this.study)
   },
   methods: {
     toggleDetails() {
       this.open = !this.open;
     },
     fetchActivity(entity){
-      axios.get(route('projects.activity', entity.id)).then(res => {
+      axios.get(route('studies.activity', entity.id)).then(res => {
         this.audit = res.data.audit
       })
     }
