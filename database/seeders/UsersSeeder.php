@@ -28,7 +28,7 @@ class UsersSeeder extends Seeder
         $admin->ownedTeams()->save(Team::forceCreate([
             'user_id' => $admin->id,
             'name' => explode(' ', $admin->first_name, 2)[0]."'s Team",
-            'personal_team' => true,
+            'personal_team' => boolval(1),
         ]));
 
         $admin->assignRole('super-admin');
