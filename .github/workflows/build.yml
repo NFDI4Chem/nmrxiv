@@ -2,7 +2,7 @@ name : nmrXiv application - Github Actions
 
 on:
   push:
-    branches: [devops-dev]
+    branches: [devops-staging]
 
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
@@ -15,7 +15,7 @@ env:
 jobs:
   setup-build-publish-deploy:
     name: Setup, Build, Publish, and Deploy
-    if: github.ref == 'refs/heads/devops-dev'
+    if: github.ref == 'refs/heads/devops-staging'
     runs-on: ubuntu-latest
     #needs: build
     steps:
