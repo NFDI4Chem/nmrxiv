@@ -43,7 +43,7 @@
                     our documentation.
                 </div>
                 <button
-                    @click="createProjectDialog = true"
+                    @click="openProjectCreateDialog()"
                     type="button"
                     class="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 mt-6 focus:ring-offset-2 focus:ring-indigo-500"
                 >
