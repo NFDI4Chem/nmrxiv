@@ -10,8 +10,13 @@
 
         <form @submit.prevent="submit">
             <div>
-                <jet-label for="name" value="Name" />
-                <jet-input id="name" type="text" class="mt-1 block w-full" v-model="form.name" required autofocus autocomplete="name" />
+                <jet-label for="first_name" value="First Name" />
+                <jet-input id="first_name" type="text" class="mt-1 block w-full" v-model="form.first_name" required autofocus autocomplete="first_name" />
+            </div>
+
+            <div class="mt-4">
+                <jet-label for="last_name" value="Last Name" />
+                <jet-input id="last_name" type="text" class="mt-1 block w-full" v-model="form.last_name" required autofocus autocomplete="last_name" />
             </div>
 
             <div class="mt-4">
@@ -42,14 +47,17 @@
             </div>
 
             <div class="flex items-center justify-end mt-4">
-                <Link :href="route('login')" class="underline text-sm text-gray-600 hover:text-gray-900">
-                    Already registered?
-                </Link>
-
-                <jet-button class="ml-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
+                <jet-button class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
                     Register
                 </jet-button>
             </div>
+
+            <div class="flex items-center justify-center mt-4">
+                <Link :href="route('login')" class="underline text-sm text-gray-600 hover:text-gray-900">
+                    Already registered? Login here
+                </Link>
+            </div>
+
         </form>
     </jet-authentication-card>
 </template>
@@ -80,7 +88,8 @@
         data() {
             return {
                 form: this.$inertia.form({
-                    name: '',
+                    first_name: '',
+                    last_name: '',
                     email: '',
                     password: '',
                     password_confirmation: '',

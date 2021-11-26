@@ -23,23 +23,36 @@
                 <jet-input id="password" type="password" class="mt-1 block w-full" v-model="form.password" required autocomplete="current-password" />
             </div>
 
-            <div class="block mt-4">
+            <div class="flex items-center justify-between mt-4">
+              <div class="flex items-center">
                 <label class="flex items-center">
                     <jet-checkbox name="remember" v-model:checked="form.remember" />
                     <span class="ml-2 text-sm text-gray-600">Remember me</span>
                 </label>
-            </div>
+              </div>
 
-            <div class="flex items-center justify-end mt-4">
+              <div class="text-sm">
                 <Link v-if="canResetPassword" :href="route('password.request')" class="underline text-sm text-gray-600 hover:text-gray-900">
                     Forgot your password?
                 </Link>
+              </div>
+            </div>
 
-                <jet-button class="ml-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
+            <div class="mt-4">
+                <jet-button class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
                     Log in
                 </jet-button>
             </div>
+
+             <div class="flex items-center justify-center mt-4">
+                <Link :href="route('register')" class="underline text-sm text-gray-600 hover:text-gray-900">
+                    Not registered? Register here
+                </Link>
+            </div>
+
+            <single-sign-on />
         </form>
+
     </jet-authentication-card>
 </template>
 
@@ -51,7 +64,8 @@
     import JetCheckbox from '@/Jetstream/Checkbox.vue'
     import JetLabel from '@/Jetstream/Label.vue'
     import JetValidationErrors from '@/Jetstream/ValidationErrors.vue'
-    import { Head, Link } from '@inertiajs/inertia-vue3';
+    import SingleSignOn from '@/App/SingleSignOn.vue';
+    import { Head, Link } from '@inertiajs/inertia-vue3'
 
     export default {
         components: {
@@ -63,12 +77,14 @@
             JetCheckbox,
             JetLabel,
             JetValidationErrors,
+            SingleSignOn,
             Link,
         },
 
+      
         props: {
             canResetPassword: Boolean,
-            status: String
+            status: String,
         },
 
         data() {
@@ -80,7 +96,6 @@
                 })
             }
         },
-
         methods: {
             submit() {
                 this.form
