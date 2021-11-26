@@ -14,7 +14,7 @@
         "@inertiajs/inertia-vue3": "^0.5.1",
         "@inertiajs/progress": "^0.2.6",
         "@tailwindcss/forms": "^0.2.1",
-        "@tailwindcss/typography": "^0.3.0",
+        "@tailwindcss/typography": "^0.3.1",
         "@vue/compiler-sfc": "^3.0.5",
         "axios": "^0.21",
         "laravel-mix": "^6.0.6",
@@ -24,5 +24,13 @@
         "tailwindcss": "^2.0.1",
         "vue": "^3.0.5",
         "vue-loader": "^16.1.2"
+    },
+    "dependencies": {
+        "@headlessui/vue": "^1.4.2",
+        "@heroicons/vue": "^1.0.5",
+        "@types/marked": "^4.0.1",
+        "@vue-hero-icons/outline": "^1.7.2",
+        "marked": "^4.0.4",
+        "popper.js": "^1.16.1"
     }
 }
