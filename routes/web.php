@@ -27,6 +27,8 @@ Route::get('/', function () {
     ]);
 });
 
+Route::supportBubble();
+
 Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function (Request $request) {
     $user = $request->user();
     $team = $user->currentTeam;
