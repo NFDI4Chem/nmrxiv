@@ -9,6 +9,8 @@ module.exports = {
         './storage/framework/views/*.php',
         './resources/views/**/*.blade.php',
         './resources/js/**/*.vue',
+        './vendor/spatie/laravel-support-bubble/config/**/*.php',
+        './vendor/spatie/laravel-support-bubble/resources/views/**/*.blade.php',
     ],
 
     theme: {
