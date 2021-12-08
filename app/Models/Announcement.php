@@ -10,17 +10,18 @@ class Announcement extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name',
+        'title',
         'description',
         'status',
         'start_time',
         'end_time',
         'user_id',
     ];
-
     
     /**
-     * Announcement belongs to the user
+     * Get the owner of the announcement.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function owner()
     {
