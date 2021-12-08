@@ -72,6 +72,14 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Get the announcements createad by the user
+     */
+    public function announcements()
+    {
+        return $this->hasMany(Announcement::class);
+    }
+
+    /**
      * Get the default profile photo URL if no profile photo has been uploaded.
      *
      * @return string
