@@ -72,7 +72,9 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
-     * Get the announcements createad by the user
+     * Get the announcements created by the user
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function announcements()
     {
