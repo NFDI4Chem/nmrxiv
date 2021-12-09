@@ -15,9 +15,9 @@ class Announcement extends Migration
     {
         Schema::create('announcements', function(Blueprint $table) {
             $table->id();
-            $table->text('title');
+            $table->string('title');
             $table->text('message');
-            $table->string('status');
+            $table->enum('status', ['active', 'inactive'])->default('active');
             $table->timestamp('start_time');
             $table->timestamp('end_time');
             $table->foreignId('user_id')->nullable();

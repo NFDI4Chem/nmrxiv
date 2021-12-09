@@ -11,13 +11,13 @@ class Announcement extends Model
 
     protected $fillable = [
         'title',
-        'description',
+        'message',
         'status',
         'start_time',
         'end_time',
         'user_id',
     ];
-    
+
     /**
      * Get the owner of the announcement.
      * 
