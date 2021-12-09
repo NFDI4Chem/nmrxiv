@@ -39,7 +39,7 @@ class AnnouncementSeeder extends Seeder
             $admin_id = $admin->id;
         } 
         else {
-            $admin = User::where('email', 'superadmin@email.com')->first();
+            $admin = User::role('super-admin')->firstOrFail();
             $admin_id = $admin->id;
         }
 

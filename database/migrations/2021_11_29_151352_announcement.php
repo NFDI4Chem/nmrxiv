@@ -17,7 +17,7 @@ class Announcement extends Migration
             $table->id();
             $table->string('title');
             $table->text('message');
-            $table->enum('status', ['active', 'inactive'])->default('active');
+            $table->enum('status', ['active', 'inactive'])->default('inactive');
             $table->timestamp('start_time');
             $table->timestamp('end_time');
             $table->foreignId('user_id')->nullable();
