@@ -124,6 +124,11 @@
     </template>
 
     <template #actions>
+      <jet-secondary-button :class="{ 'opacity-25': form.processing }" :disabled="form.processing"
+          @click="back"
+        >
+          Cancel
+      </jet-secondary-button>
       <jet-action-message :on="form.recentlySuccessful" class="mr-3">
         Saved.
       </jet-action-message>
@@ -234,6 +239,10 @@ export default {
         this.$refs.photo.value = null;
       }
       
+    },
+
+    back() {
+      window.history.back();
     },
   },
 };
