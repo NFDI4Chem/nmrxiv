@@ -1,0 +1,455 @@
+<template>
+    <app-layout title="Announcements and Notifications">
+        <template #header>
+            <div>
+                <bread-crumbs :pages="pages" />
+                <div class="mt-2 md:flex md:items-center md:justify-between ">
+                    <div class="flex-1 min-w-0">
+                        <div
+                            class="
+                                flex
+                                items-center
+                                text-sm text-gray-700
+                                uppercase
+                                font-bold
+                                tracking-widest
+                                mt-3
+                            "
+                        >
+                            Announcements & Notifications
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+        <div class="py-12 px-10">
+            <div class="mb-6 flex justify-between items-center">
+                <div class="flex items-center">
+                    <div class="flex w-full bg-white shadow rounded">
+                        
+                        <input
+                            class="
+                                relative
+                                w-full
+                                border-0
+                                px-6
+                                py-3
+                                rounded-r
+                                focus:shadow-outline
+                            "
+                            autocomplete="off"
+                            type="text"
+                            name="search"
+                            placeholder="Search…"
+                            :value="modelValue"
+                            @input="
+                                $emit('update:modelValue', $event.target.value)
+                            "
+                        />
+                    </div>
+                    <button
+                        class="
+                            ml-3
+                            text-sm text-gray-500
+                            hover:text-gray-700
+                            focus:text-indigo-500
+                        "
+                        type="button"
+                        @click="$emit('reset')"
+                    >
+                        Reset
+                    </button>
+                </div>
+                <Button
+                    class="
+                        ml-3
+                        inline-flex
+                        items-center
+                        px-4
+                        py-2
+                        border border-transparent
+                        rounded-md
+                        shadow-sm
+                        text-sm
+                        font-medium
+                        text-white
+                        bg-indigo-600
+                        hover:bg-indigo-700
+                        focus:outline-none
+                        focus:ring-2
+                        focus:ring-offset-2
+                        focus:ring-indigo-500
+                    "
+                    @click="openAnnouncementCreateDialog()"
+                    type="button"
+                >
+                    <span>Create</span>&nbsp;
+                    <span class="hidden md:inline">Notifications</span>
+                </Button>
+            </div>
+            <div>
+                <div class="bg-white rounded-md shadow overflow-x-auto">
+                    <table class="divide-y divide-gray-200 w-full table-fixed ">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th
+                                    scope="col"
+                                    class="
+                                        px-6
+                                        py-3
+                                        text-left text-xs
+                                        font-medium
+                                        text-gray-500
+                                        uppercase
+                                        tracking-wider
+                                    "
+                                >
+                                    Title
+                                </th>
+                                <th
+                                    scope="col"
+                                    class="
+                                        px-6
+                                        py-3
+                                        text-left text-xs
+                                        font-medium
+                                        text-gray-500
+                                        uppercase
+                                        tracking-wider
+                                    "
+                                >
+                                    Message
+                                </th>
+                                <th
+                                    scope="col"
+                                    class="
+                                        px-6
+                                        py-3
+                                        text-left text-xs
+                                        font-medium
+                                        text-gray-500
+                                        uppercase
+                                        tracking-wider
+                                    "
+                                >
+                                    Status
+                                </th>
+                                <th
+                                    scope="col"
+                                    class="
+                                        px-6
+                                        py-3
+                                        text-left text-xs
+                                        font-medium
+                                        text-gray-500
+                                        uppercase
+                                        tracking-wider
+                                    "
+                                >
+                                    Start Time
+                                </th>
+                                <th
+                                    scope="col"
+                                    class="
+                                        px-6
+                                        py-3
+                                        text-left text-xs
+                                        font-medium
+                                        text-gray-500
+                                        uppercase
+                                        tracking-wider
+                                    "
+                                >
+                                    End Time
+                                </th>
+                                <th
+                                    scope="col"
+                                    class="
+                                        px-6
+                                        py-3
+                                        text-left text-xs
+                                        font-medium
+                                        text-gray-500
+                                        uppercase
+                                        tracking-wider
+                                    "
+                                >
+                                    Created By
+                                </th>
+                                <th
+                                    scope="col"
+                                    class="
+                                        px-6
+                                        py-3
+                                        text-left text-xs
+                                        font-medium
+                                        text-gray-500
+                                        uppercase
+                                        tracking-wider
+                                    "
+                                >
+                                    Edit
+                                </th>
+                                <th
+                                    scope="col"
+                                    class="
+                                        px-6
+                                        py-3
+                                        text-left text-xs
+                                        font-medium
+                                        text-gray-500
+                                        uppercase
+                                        tracking-wider
+                                    "
+                                >
+                                    Delete
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <tr
+                                v-for="announcement in announcements"
+                                :key="announcement.id"
+                            >
+                                <td class="py-4 whitespace-nowrap">
+                                    <div class="ml-4">
+                                        <div
+                                            class="
+                                                text-sm
+                                                font-medium
+                                                text-gray-900
+                                            "
+                                        >
+                                            {{ announcement.title }}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-4 text-sm text-gray-500 break-normal  ">
+                                    <div class="ml-4">
+                                        <div
+                                            class="
+                                                text-sm
+                                                font-medium
+                                                text-gray-900
+                                            "
+                                        >
+                                            {{ announcement.message }}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-5 py-4 whitespace-nowrap ">
+                                    <span
+                                        v-if="announcement.status == 'active' || announcement.status == 'Active' "
+                                        class="
+                                            px-2
+                                            inline-flex
+                                            text-xs
+                                            leading-5
+                                            font-semibold
+                                            rounded-full
+                                            bg-green-100
+                                            text-green-800
+                                        "
+                                    >
+                                        Active
+                                    </span>
+                                    <span
+                                        v-else
+                                        class="
+                                            px-2
+                                            inline-flex
+                                            text-xs
+                                            leading-5
+                                            font-semibold
+                                            rounded-full
+                                            bg-red-100
+                                            text-green-800
+                                        "
+                                    >
+                                        Inactive
+                                    </span>
+                                </td>
+                                <td class="py-4 whitespace-nowrap">
+                                    <div class="ml-4">
+                                        <div
+                                            class="
+                                                text-sm
+                                                font-medium
+                                                text-gray-900
+                                            "
+                                        >
+                                            {{ announcement.start_time }}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-4 whitespace-nowrap">
+                                    <div class="ml-4">
+                                        <div
+                                            class="
+                                                text-sm
+                                                font-medium
+                                                text-gray-900
+                                            "
+                                        >
+                                            {{ announcement.end_time }}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-4 whitespace-nowrap">
+                                    <div class="ml-4">
+                                        <div
+                                            class="
+                                                text-sm
+                                                font-medium
+                                                text-gray-900
+                                            "
+                                        >
+                                            {{ announcement.created_by }}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td
+                                    class="
+                                        px-6
+                                        py-4
+                                        text-sm
+                                        leading-5
+                                        text-gray-500
+                                        whitespace-no-wrap
+                                        border-b border-gray-200
+                                    "
+                                >
+                                    <button
+                                        type="button"
+                                        class="
+                                            inline-flex
+                                            items-center
+                                            p-1
+                                            border border-transparent
+                                            rounded-full
+                                            shadow-sm
+                                            text-white
+                                            bg-indigo-600
+                                            hover:bg-indigo-700
+                                            focus:outline-none
+                                            focus:ring-2
+                                            focus:ring-offset-2
+                                            focus:ring-indigo-500
+                                        "
+                                        @click="
+                                            openAnnouncementEditDialog(
+                                                announcement
+                                            )
+                                        "
+                                    >
+                                        <icon name="edit" />
+                                    </button>
+                                </td>
+                                <td
+                                    class="
+                                        px-6
+                                        py-4
+                                        text-sm
+                                        leading-5
+                                        text-gray-500
+                                        whitespace-no-wrap
+                                        border-b border-gray-200
+                                    "
+                                >
+                                    <button
+                                        type="button"
+                                        class="
+                                            inline-flex
+                                            items-center
+                                            p-1
+                                            border border-transparent
+                                            rounded-full
+                                            shadow-sm
+                                            text-white
+                                            bg-indigo-600
+                                            hover:bg-indigo-700
+                                            focus:outline-none
+                                            focus:ring-2
+                                            focus:ring-offset-2
+                                            focus:ring-indigo-500
+                                        "
+                                        @click="
+                                            deleteAnnouncement(announcement.id)
+                                        "
+                                    >
+                                        <icon name="delete" />
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <announcement-create
+                ref="announcementCreateElement"
+            ></announcement-create>
+            <announcement-edit
+                ref="announcementEditElement"
+            ></announcement-edit>
+        </div>
+    </app-layout>
+</template>
+
+<script>
+import AppLayout from "@/Layouts/AppLayout.vue";
+import BreadCrumbs from "../../Jetstream/BreadCrumbs.vue";
+import Icon from "@/Shared/Icon.vue";
+import AnnouncementCreate from "@/Pages/Announcement/Partials/Create.vue";
+import AnnouncementEdit from "@/Pages/Announcement/Partials/Edit.vue";
+import { ref } from "vue";
+
+export default {
+    components: {
+        AppLayout,
+        BreadCrumbs,
+        Icon,
+        AnnouncementCreate,
+        AnnouncementEdit,
+    },
+    setup() {
+        const announcementCreateElement = ref(null);
+        const announcementEditElement = ref(null);
+        return {
+            announcementCreateElement,
+            announcementEditElement,
+        };
+    },
+    props: {
+        announcements: Array,
+        filters: Object,
+    },
+    data() {
+        return {
+            form: this.$inertia.form({
+                search: this.filters.search,
+            }),
+            pages: [
+                { name: "Console", route: "console", current: false },
+                {
+                    name: "Announcements",
+                    route: "announcements",
+                    current: true,
+                },
+            ],
+        };
+    },
+    methods: {
+        openAnnouncementCreateDialog() {
+            this.announcementCreateElement.toggleCreateAnnouncementDialog();
+        },
+        openAnnouncementEditDialog(announcement) {
+            this.announcementEditElement.toggleEditAnnouncementDialog(
+                announcement
+            );
+        },
+        deleteAnnouncement(id) {
+            this.form.delete(route("announcements.destroy", id), {});
+        },
+    },
+};
+</script>

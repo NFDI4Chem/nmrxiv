@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\StudyController;
 use App\Models\Project;
+use App\Http\Controllers\Admin\AnnouncementController;
 
 Route::group([
     'prefix' => 'auth'
@@ -101,6 +102,22 @@ Route::group([
 
             Route::delete('users/edit/{user}/photo', [UsersController::class, 'destroyPhoto'])
             ->name('users.destroy-photo');
+        });
+
+        // Adding routes for announcements section
+        Route::group(['middleware' => ['auth', 'permission:manage roles|manage platform']], function () {
+            // Announcements
+            Route::get('announcements', [AnnouncementController::class, 'index'])
+            ->name('announcements');
+            
+            Route::post('announcements/create', [AnnouncementController::class, 'create'])
+            ->name('announcements.create');
+
+            Route::post('announcements/{announcement}', [AnnouncementController::class, 'update'])
+            ->name('announcements.edit');
+
+            Route::delete('announcements/{announcement}', [AnnouncementController::class, 'destroy'])
+            ->name('announcements.destroy');
         });
     });
 });
