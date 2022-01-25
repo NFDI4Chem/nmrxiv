@@ -72,3 +72,4 @@ jobs:
       run: |-
         kubectl rollout restart deployment/$DEPLOYMENT_NAME
         kubectl rollout status deployment/$DEPLOYMENT_NAME --timeout=300s
+        kubectl get services -o wide
