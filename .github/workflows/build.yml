@@ -6,7 +6,7 @@ on:
 
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
-  GKE_CLUSTER: nmrxiv-helm-chart
+  GKE_CLUSTER: nmrxiv-app-cluster
   GKE_ZONE: europe-west3-a
   DEPLOYMENT_NAME: nmrxiv-nmrxiv-app
   APP_IMAGE: app
