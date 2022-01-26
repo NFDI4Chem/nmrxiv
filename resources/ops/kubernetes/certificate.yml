@@ -1,7 +1,0 @@
-apiVersion: networking.gke.io/v1
-kind: ManagedCertificate
-metadata:
-  name: nmrxiv-app-dev-certificate
-spec:
-  domains:
-    - dev.nmrxiv.org
