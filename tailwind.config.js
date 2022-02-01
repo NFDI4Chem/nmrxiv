@@ -21,7 +21,17 @@ module.exports = {
             colors: {
                 rose: colors.rose,
                 sky: colors.sky,
-                teal: colors.teal,
+                'teal': {
+                    100: '#019DBB',
+                    200: '#019DBB',
+                    300: '#019DBB',
+                    400: '#02abc9',
+                    500: '#019DBB',
+                    600: '#0088a0',
+                    700: '#019DBB',
+                    800: '#019DBB',
+                    900: '#019DBB',
+                },
             },
         },
     },
