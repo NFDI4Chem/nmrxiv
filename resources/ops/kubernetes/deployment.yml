@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nmrxiv-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nmrxiv-app
+  template:
+    metadata:
+      labels:
+        app: nmrxiv-app
+      # annotations:
+      #   prometheus.io/scrape: "true"
+      #   prometheus.io/path: /metrics
+      #   prometheus.io/port: "80"
+    spec:
+      volumes:
+        - name: logs
+          emptyDir: {}
+        - name: cache
+          emptyDir: {}
+        - name: testing
+          emptyDir: {}
+        - name: sessions
+          emptyDir: {}
+        - name: views
+          emptyDir: {}
+      securityContext:
+        fsGroup: 82
+      initContainers:
+        - name: database-migrations
+          image: eu.gcr.io/PROJECT_ID/APP_IMAGE:TAG
+          envFrom:
+            - configMapRef:
+                name: nmrxiv
+            - secretRef:
+                name: nmrxiv-secret
+          command:
+            - "php"
+          args:
+            - "artisan"
+            - "migrate"
+            - "--force"
+      containers:
+        - name: nginx
+          # imagePullPolicy: Never
+          image: eu.gcr.io/PROJECT_ID/NGINX_IMAGE:TAG
+          resources:
+            limits:
+              cpu: 500m
+              memory: 50M
+          ports:
+            - containerPort: 80
+        - name: php
+        #  imagePullPolicy: Never
+          envFrom:
+            - configMapRef:
+                name: nmrxiv
+            - secretRef:
+                name: nmrxiv-secret
+          securityContext:
+            runAsUser: 82
+            readOnlyRootFilesystem: true
+          volumeMounts:
+            - name: logs
+              mountPath: /var/www/html/storage/logs
+            - name: cache
+              mountPath: /var/www/html/storage/framework/cache
+            - name: sessions
+              mountPath: /var/www/html/storage/framework/sessions
+            - name: views
+              mountPath: /var/www/html/storage/framework/views
+            - name: testing
+              mountPath: /var/www/html/storage/framework/testing
+          resources: {}
+          #image: eu.gcr.io/nmrxiv/app:latest
+          image: eu.gcr.io/PROJECT_ID/APP_IMAGE:TAG
+          ports:
+            - containerPort: 9000
