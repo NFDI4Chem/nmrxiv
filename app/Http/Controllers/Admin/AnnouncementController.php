@@ -73,28 +73,6 @@ class AnnouncementController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Request $request, $id)
-    {
-        //
-    }
-
-    /**
      * Update the specified announcement in the storage.
      *
      * @param  \Illuminate\Http\Request  $request
