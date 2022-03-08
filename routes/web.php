@@ -69,6 +69,9 @@ Route::group(['middleware' => ['auth']], function () {
         ->name('studies.update');
     Route::get('studies/{study}/activity', [StudyController::class, 'activity'])
         ->name('studies.activity');
+
+    Route::post('markNotificationAsRead', [AnnouncementController::class, 'markNotificationAsRead'])
+       ->name('announcements.markNotificationAsRead');
 });
 
 Route::group([

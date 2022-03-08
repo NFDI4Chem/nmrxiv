@@ -27,6 +27,10 @@
   ```
 -->
   <div class="flex flex-col h-screen justify-between">
+    <!-- Banner -->
+    <div v-if="showBanner">
+      <header-banner :message='$page.props.bannerMessage'/>
+    </div>
     <main>
       <!-- Hero section -->
       <div class="pt-8 mb-auto overflow-hidden sm:pt-12 lg:relative lg:py-48">
@@ -35,12 +39,8 @@
             mx-auto
             max-w-md
             px-4
-            sm:max-w-3xl
-            sm:px-6
-            lg:px-8
-            lg:max-w-7xl
-            lg:grid lg:grid-cols-2
-            lg:gap-24
+            sm:max-w-3xl sm:px-6
+            lg:px-8 lg:max-w-7xl lg:grid lg:grid-cols-2 lg:gap-24
           "
         >
           <div>
@@ -61,7 +61,11 @@
                   nmrXiv
                 </h1>
                 <p class="mt-6 text-xl text-gray-500">
-                  New, highly visible, and consensus-driven NMR data repository and computational platform. The ultimate goal is to accelerate broader coordination and data sharing among natural product (NP) researchers by enabling storage, management, sharing and analysis of NMR data.
+                  New, highly visible, and consensus-driven NMR data repository
+                  and computational platform. The ultimate goal is to accelerate
+                  broader coordination and data sharing among natural product
+                  (NP) researchers by enabling storage, management, sharing and
+                  analysis of NMR data.
                 </p>
               </div>
               <div class="mt-10">
@@ -79,7 +83,9 @@
                     shadow
                     hover:bg-rose-600
                     focus:outline-none
-                    focus:ring-2 focus:ring-rose-500 focus:ring-offset-2
+                    focus:ring-2
+                    focus:ring-rose-500
+                    focus:ring-offset-2
                     sm:px-10
                   "
                 >
@@ -100,7 +106,9 @@
                     shadow
                     hover:bg-white-600
                     focus:outline-none
-                    focus:ring-2 focus:ring-rose-500 focus:ring-offset-2
+                    focus:ring-2
+                    focus:ring-rose-500
+                    focus:ring-offset-2
                     sm:px-10
                   "
                 >
@@ -115,13 +123,8 @@
           <div
             class="
               py-12
-              sm:relative
-              sm:mt-12
-              sm:py-16
-              lg:absolute
-              lg:inset-y-0
-              lg:right-0
-              lg:w-1/2
+              sm:relative sm:mt-12 sm:py-16
+              lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2
             "
           >
             <div class="hidden sm:block">
@@ -133,9 +136,7 @@
                   w-screen
                   bg-gray-50
                   rounded-l-3xl
-                  lg:left-80
-                  lg:right-0
-                  lg:w-full
+                  lg:left-80 lg:right-0 lg:w-full
                 "
               ></div>
               <svg
@@ -176,12 +177,8 @@
                 relative
                 pl-4
                 -mr-40
-                sm:mx-auto
-                sm:max-w-3xl
-                sm:px-0
-                lg:max-w-none
-                lg:h-full
-                lg:pl-12
+                sm:mx-auto sm:max-w-3xl sm:px-0
+                lg:max-w-none lg:h-full lg:pl-12
               "
             >
               <img
@@ -190,9 +187,7 @@
                   rounded-md
                   shadow-xl
                   ring-1 ring-black ring-opacity-5
-                  lg:h-full
-                  lg:w-auto
-                  lg:max-w-none
+                  lg:h-full lg:w-auto lg:max-w-none
                 "
                 src="/img/website.jpg"
                 alt=""
@@ -252,31 +247,38 @@
           py-12
           px-4
           overflow-hidden
-          sm:max-w-3xl
-          sm:px-6
-          lg:max-w-7xl
-          lg:px-8
+          sm:max-w-3xl sm:px-6
+          lg:max-w-7xl lg:px-8
         "
       >
         <nav
           class="-mx-5 -my-2 flex flex-wrap justify-center"
           aria-label="Footer"
         >
-
           <div class="px-5 py-2">
-            <a href="https://docs.nmrxiv.org/" target="_blank" class="text-base text-gray-400 hover:text-gray-300">
+            <a
+              href="https://docs.nmrxiv.org/"
+              target="_blank"
+              class="text-base text-gray-400 hover:text-gray-300"
+            >
               Docs
             </a>
           </div>
 
           <div class="px-5 py-2">
-            <a href="/privacy-policy" class="text-base text-gray-400 hover:text-gray-300">
+            <a
+              href="/privacy-policy"
+              class="text-base text-gray-400 hover:text-gray-300"
+            >
               Privacy
             </a>
           </div>
 
           <div class="px-5 py-2">
-            <a href="/terms-of-service" class="text-base text-gray-400 hover:text-gray-300">
+            <a
+              href="/terms-of-service"
+              class="text-base text-gray-400 hover:text-gray-300"
+            >
               Terms
             </a>
           </div>
@@ -294,15 +296,21 @@
 
 <script>
 import { Head, Link } from "@inertiajs/inertia-vue3";
-import JetApplicationMark from '@/Jetstream/ApplicationMark.vue'
+import JetApplicationMark from "@/Jetstream/ApplicationMark.vue";
+import HeaderBanner from "@/Shared/HeaderBanner.vue";
 
 export default {
   components: {
     Head,
     Link,
-    JetApplicationMark
+    JetApplicationMark,
+    HeaderBanner,
   },
-
+  computed: {
+    showBanner() {
+      return this.$page.props.showBanner;
+    },
+  },
   props: {
     canLogin: Boolean,
     canRegister: Boolean,
