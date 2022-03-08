@@ -1,5 +1,9 @@
 <template>
     <Head title="Register" />
+    <!-- Banner -->
+    <div v-if="showBanner">
+      <header-banner :message='$page.props.bannerMessage'/>
+    </div>
 
     <jet-authentication-card>
         <template #logo>
@@ -71,6 +75,7 @@
     import JetLabel from '@/Jetstream/Label.vue'
     import JetValidationErrors from '@/Jetstream/ValidationErrors.vue'
     import { Head, Link } from '@inertiajs/inertia-vue3';
+    import HeaderBanner from "@/Shared/HeaderBanner.vue";
 
     export default {
         components: {
@@ -82,6 +87,7 @@
             JetCheckbox,
             JetLabel,
             JetValidationErrors,
+            HeaderBanner,
             Link,
         },
 
@@ -103,6 +109,11 @@
                 this.form.post(this.route('register'), {
                     onFinish: () => this.form.reset('password', 'password_confirmation'),
                 })
+            }
+        },
+        computed: {
+            showBanner() {
+                return this.$page.props.showBanner;
             }
         }
     }

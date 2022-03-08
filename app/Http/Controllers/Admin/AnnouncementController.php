@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Notifications\AnnouncementNotification;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 use App\Models\Announcement;
 use Illuminate\Http\Request;
+use App\Models\User;
 use Inertia\Inertia;
 
 
@@ -47,7 +50,7 @@ class AnnouncementController extends Controller
     {
         $input = $request->all();
         $user = $request->user();
-
+        $allUser = User::all();
         //Validating the entries 
         Validator::make($request->all(), [
             'title'      => ['required', 'string', 'max:255'],
@@ -69,7 +72,9 @@ class AnnouncementController extends Controller
                 $announcement->save();
             });
         });
-        return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('status', 'announcement-created');
+        Notification::send($allUser, new AnnouncementNotification($request));
+        //return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('status', 'announcement-created')
+        return redirect()->route('announcements')->with('success', 'Announcement created successfully');
     }
 
     /**
@@ -99,7 +104,8 @@ class AnnouncementController extends Controller
             ]);
         $announcement->save();
 
-        return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('status', 'announcement-updated');
+        //return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('status', 'announcement-updated');
+        return redirect()->route('announcements')->with('success', 'Announcement updated successfully');
     }
 
     /**
@@ -113,6 +119,23 @@ class AnnouncementController extends Controller
     {
         $announcement->delete();
 
-        return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('status', 'announcement-deleted');
+        //return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('status', 'announcement-deleted');
+        return redirect()->route('announcements')->with('success', 'Announcement deleted successfully');
     }
+
+    /**
+     * Mark the particular notification as read.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function markNotificationAsRead(Request $request)
+    {
+        $input = $request->all();
+        $user = User::find($input['user_id']);
+        $user->notifications->where('id' , $input['id'])->markAsRead();
+        return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('status', 'notification-markedAsRead');
+        
+    }
+
 }

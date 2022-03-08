@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
 use Inertia\Middleware;
+use App\Models\User;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -35,7 +36,7 @@ class HandleInertiaRequests extends Middleware
      * @return array
      */
     public function share(Request $request)
-    {
+    {   
         return array_merge(parent::share($request), [
             'user.permissions' => fn() => $request->user() ?
                 $request->user()->getPermissionsViaRoles()->pluck('name')
@@ -43,9 +44,27 @@ class HandleInertiaRequests extends Middleware
             'user.roles' => fn() => $request->user() ?
                 $request->user()->getRoleNames()
                 : null,
+            'notificationsList' => function () use($request){
+                $user = $request->user();
+                $notificationList = [];
+                if($user){
+                    foreach ($user->unreadNotifications as $notification) {
+                        $notificationList[] = $notification;
+                    }
+                }
+                return $notificationList;
+            },
+            'flash' => function () use($request) {
+                return [
+                    'success' => $request->session()->get('success'),
+                    'error' => $request->session()->get('error'),
+                ];
+            },
             'twitter' => (env('TWITTER_CLIENT_ID') !== null && env('TWITTER_CLIENT_ID') !== ''),
             'github'  => (env('GITHUB_CLIENT_ID') !== null && env('GITHUB_CLIENT_ID') !== ''),
-            'orcid'  => (env('ORCID_CLIENT_ID') !== null && env('ORCID_CLIENT_ID') !== '')
+            'orcid'   => (env('ORCID_CLIENT_ID') !== null && env('ORCID_CLIENT_ID') !== ''),
+            'showBanner'     => env('SHOW_BANNER'),
+            'bannerMessage' => env('BANNER_MESSAGE'),
         ]);
     }
 

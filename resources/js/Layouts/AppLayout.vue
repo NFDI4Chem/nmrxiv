@@ -28,7 +28,17 @@
           leave-from="translate-x-0"
           leave-to="-translate-x-full"
         >
-          <div class="relative flex-1 flex flex-col max-w-xs w-full pt-5 pb-4 bg-white">
+          <div
+            class="
+              relative
+              flex-1 flex flex-col
+              max-w-xs
+              w-full
+              pt-5
+              pb-4
+              bg-white
+            "
+          >
             <TransitionChild
               as="template"
               enter="ease-in-out duration-300"
@@ -41,7 +51,19 @@
               <div class="absolute top-0 right-0 -mr-12 pt-2">
                 <button
                   type="button"
-                  class="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
+                  class="
+                    ml-1
+                    flex
+                    items-center
+                    justify-center
+                    h-10
+                    w-10
+                    rounded-full
+                    focus:outline-none
+                    focus:ring-2
+                    focus:ring-inset
+                    focus:ring-white
+                  "
                   @click="sidebarOpen = false"
                 >
                   <span class="sr-only">Close sidebar</span>
@@ -58,7 +80,18 @@
               <nav class="flex-1 px-2 bg-white space-y-1">
                 <Link
                   :href="route('dashboard')"
-                  class="my-6 text-gray-900 group flex items-center px-2 py-3 text-sm font-medium rounded-md"
+                  class="
+                    my-6
+                    text-gray-900
+                    group
+                    flex
+                    items-center
+                    px-2
+                    py-3
+                    text-sm
+                    font-medium
+                    rounded-md
+                  "
                 >
                   <svg
                     class="text-gray-500 mr-3 flex-shrink-0 h-6 w-6"
@@ -89,7 +122,13 @@
 
     <div class="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0">
       <div
-        class="flex flex-col flex-grow border-r border-gray-200 pt-5 bg-white overflow-y-auto"
+        class="
+          flex flex-col flex-grow
+          border-r border-gray-200
+          pt-5
+          bg-white
+          overflow-y-auto
+        "
       >
         <div class="flex items-center flex-shrink-0 px-4">
           <Link :href="route('dashboard')">
@@ -100,7 +139,17 @@
           <nav class="flex-1 px-2 bg-white space-y-1">
             <Link
               :href="route('dashboard')"
-              class="text-gray-900 group flex items-center px-2 py-3 text-sm font-medium rounded-md"
+              class="
+                text-gray-900
+                group
+                flex
+                items-center
+                px-2
+                py-3
+                text-sm
+                font-medium
+                rounded-md
+              "
             >
               <svg
                 class="text-gray-500 mr-3 flex-shrink-0 h-6 w-6"
@@ -127,7 +176,16 @@
       <div class="sticky top-0 z-10 flex-shrink-0 flex h-16 bg-white shadow">
         <button
           type="button"
-          class="px-4 border-r border-gray-200 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 md:hidden"
+          class="
+            px-4
+            border-r border-gray-200
+            text-gray-500
+            focus:outline-none
+            focus:ring-2
+            focus:ring-inset
+            focus:ring-indigo-500
+            md:hidden
+          "
           @click="sidebarOpen = true"
         >
           <span class="sr-only">Open sidebar</span>
@@ -137,15 +195,39 @@
           <div class="flex-1 flex">
             <form class="w-full flex md:ml-0" action="#" method="GET">
               <label for="search-field" class="sr-only">Search</label>
-              <div class="relative w-full text-gray-400 focus-within:text-gray-600">
+              <div
+                class="relative w-full text-gray-400 focus-within:text-gray-600"
+              >
                 <div
-                  class="absolute inset-y-0 left-0 flex items-center pointer-events-none"
+                  class="
+                    absolute
+                    inset-y-0
+                    left-0
+                    flex
+                    items-center
+                    pointer-events-none
+                  "
                 >
                   <SearchIcon class="h-5 w-5" aria-hidden="true" />
                 </div>
                 <input
                   id="search-field"
-                  class="block w-full h-full pl-8 pr-3 py-2 border-transparent text-gray-900 placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-0 focus:border-transparent sm:text-sm"
+                  class="
+                    block
+                    w-full
+                    h-full
+                    pl-8
+                    pr-3
+                    py-2
+                    border-transparent
+                    text-gray-900
+                    placeholder-gray-500
+                    focus:outline-none
+                    focus:placeholder-gray-400
+                    focus:ring-0
+                    focus:border-transparent
+                    sm:text-sm
+                  "
                   placeholder="Search"
                   type="search"
                   name="search"
@@ -153,7 +235,129 @@
               </div>
             </form>
           </div>
+          <flash-messages />
+          <div
+            v-if="
+              $page.props.notificationsList.length > 0 &&
+              $page.props.notificationsList[0]
+            "
+          >
+            <notification :notification="$page.props.notificationsList[0]" />
+          </div>
           <div class="ml-4 flex items-center md:ml-6">
+            <Menu as="div" class="ml-3 relative">
+              <div>
+                <span>
+                  <MenuButton
+                    type="button"
+                    class="
+                      inline-flex
+                      items-center
+                      px-3
+                      py-2
+                      border border-transparent
+                      text-sm
+                      leading-4
+                      font-medium
+                      rounded-md
+                      text-gray-500
+                      bg-white
+                      hover:text-gray-700
+                      focus:outline-none
+                      transition
+                    "
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-6 w-6"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                      />
+                    </svg>
+                    <span
+                      v-if="hasUnreadNotification()"
+                      class="
+                        inline-flex
+                        items-center
+                        justify-center
+                        px-2
+                        py-1
+                        mr-2
+                        text-xs
+                        font-bold
+                        leading-none
+                        text-red-100
+                        bg-red-600
+                        rounded-full
+                      "
+                    >
+                      {{ countNotification() }}</span
+                    >
+                  </MenuButton>
+                </span>
+              </div>
+              <transition
+                enter-active-class="transition ease-out duration-100"
+                enter-from-class="transform opacity-0 scale-95"
+                enter-to-class="transform opacity-100 scale-100"
+                leave-active-class="transition ease-in duration-75"
+                leave-from-class="transform opacity-100 scale-100"
+                leave-to-class="transform opacity-0 scale-95"
+              >
+                <MenuItems
+                  class="
+                    origin-top-right
+                    absolute
+                    right-0
+                    mt-2
+                    w-56
+                    rounded-md
+                    shadow-lg
+                    bg-white
+                    ring-1 ring-black ring-opacity-5
+                    divide-y divide-gray-100
+                    focus:outline-none
+                  "
+                >
+                  <span v-if="hasUnreadNotification() > 0">
+                    <template
+                      v-for="notification in $page.props.notificationsList"
+                      :key="notification"
+                    >
+                      <MenuItem
+                        v-on:click="openShowNotificationDialog(notification)"
+                      >
+                        <a
+                          href="#"
+                          class="
+                            text-gray-900 text-gray-700
+                            block
+                            px-4
+                            py-2
+                            text-sm
+                            hover:bg-gray-100
+                          "
+                        >
+                          {{ notification.data["title"] }}
+                        </a>
+                      </MenuItem>
+                    </template>
+                  </span>
+                  <span v-else>
+                    <div class="block px-4 py-2 text-xs text-gray-600">
+                      No unread notifications
+                    </div>
+                  </span>
+                </MenuItems>
+              </transition>
+            </Menu>
             <a href="https://docs.nmrxiv.org" target="_blank"
               ><svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -173,7 +377,14 @@
               <div v-if="$page.props.user.current_team.personal_team">
                 <MenuButton
                   v-if="!$page.props.jetstream.managesProfilePhotos"
-                  class="flex text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition"
+                  class="
+                    flex
+                    text-sm
+                    border-2 border-transparent
+                    rounded-full
+                    focus:outline-none focus:border-gray-300
+                    transition
+                  "
                 >
                   <img
                     class="h-8 w-8 rounded-full object-cover"
@@ -184,7 +395,22 @@
                 <span v-else class="inline-flex rounded-md">
                   <MenuButton
                     type="button"
-                    class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition"
+                    class="
+                      inline-flex
+                      items-center
+                      px-3
+                      py-2
+                      border border-transparent
+                      text-sm
+                      leading-4
+                      font-medium
+                      rounded-md
+                      text-gray-500
+                      bg-white
+                      hover:text-gray-700
+                      focus:outline-none
+                      transition
+                    "
                   >
                     <img
                       class="h-8 w-8 rounded-full object-cover mr-2"
@@ -212,31 +438,46 @@
               </div>
               <div v-else>
                 <MenuButton
-                    type="button"
-                    class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition"
-                  >
-                    <img
-                      class="h-8 w-8 rounded-full object-cover mr-2"
-                      :src="$page.props.user.current_team.profile_photo_url"
-                      :alt="$page.props.user.current_team.name"
-                    />
-                    <span class="flex md:block hidden">{{
-                      $page.props.user.current_team.name
-                    }}</span>
+                  type="button"
+                  class="
+                    inline-flex
+                    items-center
+                    px-3
+                    py-2
+                    border border-transparent
+                    text-sm
+                    leading-4
+                    font-medium
+                    rounded-md
+                    text-gray-500
+                    bg-white
+                    hover:text-gray-700
+                    focus:outline-none
+                    transition
+                  "
+                >
+                  <img
+                    class="h-8 w-8 rounded-full object-cover mr-2"
+                    :src="$page.props.user.current_team.profile_photo_url"
+                    :alt="$page.props.user.current_team.name"
+                  />
+                  <span class="flex md:block hidden">{{
+                    $page.props.user.current_team.name
+                  }}</span>
 
-                    <svg
-                      class="ml-2 -mr-0.5 h-4 w-4"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fill-rule="evenodd"
-                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                        clip-rule="evenodd"
-                      />
-                    </svg>
-                  </MenuButton>
+                  <svg
+                    class="ml-2 -mr-0.5 h-4 w-4"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                </MenuButton>
               </div>
               <transition
                 enter-active-class="transition ease-out duration-100"
@@ -247,17 +488,38 @@
                 leave-to-class="transform opacity-0 scale-95"
               >
                 <MenuItems
-                  class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
+                  class="
+                    origin-top-right
+                    absolute
+                    right-0
+                    mt-2
+                    w-48
+                    rounded-md
+                    shadow-lg
+                    py-1
+                    bg-white
+                    ring-1 ring-black ring-opacity-5
+                    focus:outline-none
+                  "
                 >
                   <span v-if="hasAnyPermission(['manage platform'])">
-                    <div class="block px-4 py-2 text-xs text-gray-400">Admin</div>
+                    <div class="block px-4 py-2 text-xs text-gray-400">
+                      Admin
+                    </div>
                     <jet-dropdown-link :href="route('console')">
                       Console
                     </jet-dropdown-link>
                   </span>
                   <span v-if="$page.props.jetstream.hasTeamFeatures">
-                    <form @submit.prevent="switchToTeam($page.props.user.all_teams[0])">
-                      <jet-dropdown-link v-if="!$page.props.user.current_team.personal_team" as="button">
+                    <form
+                      @submit.prevent="
+                        switchToTeam($page.props.user.all_teams[0])
+                      "
+                    >
+                      <jet-dropdown-link
+                        v-if="!$page.props.user.current_team.personal_team"
+                        as="button"
+                      >
                         <div class="flex items-center">
                           <svg
                             class="mr-2 h-5 w-5 text-gray-400"
@@ -272,18 +534,31 @@
                               d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                             ></path>
                           </svg>
-                          <div>{{ $page.props.user.first_name }} {{ $page.props.user.last_name }}</div>
+                          <div>
+                            {{ $page.props.user.first_name }}
+                            {{ $page.props.user.last_name }}
+                          </div>
                         </div>
                       </jet-dropdown-link>
                     </form>
-                    <div class="block px-4 py-2 text-xs text-gray-400">Team</div>
+                    <div class="block px-4 py-2 text-xs text-gray-400">
+                      Team
+                    </div>
                     <template v-if="$page.props.jetstream.hasTeamFeatures">
-                      <template v-for="team in $page.props.user.all_teams" :key="team.id">
+                      <template
+                        v-for="team in $page.props.user.all_teams"
+                        :key="team.id"
+                      >
                         <form @submit.prevent="switchToTeam(team)">
-                          <jet-dropdown-link v-if="!team.personal_team" as="button">
+                          <jet-dropdown-link
+                            v-if="!team.personal_team"
+                            as="button"
+                          >
                             <div class="flex items-center">
                               <svg
-                                v-if="team.id == $page.props.user.current_team_id"
+                                v-if="
+                                  team.id == $page.props.user.current_team_id
+                                "
                                 class="mr-2 h-5 w-5 text-green-400"
                                 fill="none"
                                 stroke-linecap="round"
@@ -323,7 +598,9 @@
                       </jet-dropdown-link>
                     </template>
                   </span>
-                  <div class="block px-4 py-2 text-xs text-gray-400">Manage Account</div>
+                  <div class="block px-4 py-2 text-xs text-gray-400">
+                    Manage Account
+                  </div>
 
                   <jet-dropdown-link :href="route('profile.show')">
                     Profile
@@ -359,6 +636,7 @@
         <slot></slot>
       </main>
     </div>
+    <notification ref="notificationElement"> </notification>
   </div>
 </template>
 <script>
@@ -367,6 +645,9 @@ import { Head, Link } from "@inertiajs/inertia-vue3";
 import JetBanner from "@/Jetstream/Banner.vue";
 import JetDropdown from "@/Jetstream/Dropdown.vue";
 import JetDropdownLink from "@/Jetstream/DropdownLink.vue";
+import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
+import FlashMessages from "@/Shared/FlashMessages";
+import Notification from "@/Shared/Notification.vue";
 import { ref } from "vue";
 import {
   Dialog,
@@ -378,11 +659,7 @@ import {
   TransitionChild,
   TransitionRoot,
 } from "@headlessui/vue";
-import {
-  BellIcon,
-  MenuAlt2Icon,
-  XIcon,
-} from "@heroicons/vue/outline";
+import { BellIcon, MenuAlt2Icon, XIcon } from "@heroicons/vue/outline";
 import { SearchIcon } from "@heroicons/vue/solid";
 
 const userNavigation = [];
@@ -396,6 +673,7 @@ export default {
     JetApplicationLogo,
     JetDropdownLink,
     JetDropdown,
+    JetSecondaryButton,
     Link,
     Head,
     Dialog,
@@ -410,13 +688,17 @@ export default {
     MenuAlt2Icon,
     SearchIcon,
     XIcon,
+    FlashMessages,
+    Notification,
   },
   setup() {
     const sidebarOpen = ref(false);
+    const notificationElement = ref(null);
 
     return {
       userNavigation,
       sidebarOpen,
+      notificationElement,
     };
   },
   methods: {
@@ -434,6 +716,18 @@ export default {
 
     logout() {
       this.$inertia.post(route("logout"));
+    },
+
+    openShowNotificationDialog(notification) {
+      this.notificationElement.toggleShowNotificationDialog(notification);
+    },
+
+    hasUnreadNotification() {
+      return this.$page.props.notificationsList.length > 0;
+    },
+
+    countNotification() {
+      return this.$page.props.notificationsList.length;
     },
   },
 };
