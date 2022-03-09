@@ -98,7 +98,7 @@
     </template>
 
     <template #footer>
-      <jet-secondary-button @click="editAnnouncementDialog = false">
+      <jet-secondary-button @click='onCancel'>
         Cancel
       </jet-secondary-button>
 
@@ -195,6 +195,11 @@ export default {
       this.editAnnouncementForm.end_time = announcement.end_time;
       this.editAnnouncementDialog = !this.editAnnouncementDialog;
     },
+    onCancel(){
+      this.editAnnouncementDialog = false;
+      this.editAnnouncementForm.clearErrors();
+      this.$page.props.errors = new Object;
+    }
   },
 };
 </script>
