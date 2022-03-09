@@ -95,7 +95,7 @@
     </template>
 
     <template #footer>
-      <jet-secondary-button @click="createAnnouncementDialog = false">
+      <jet-secondary-button @click='onCancel'>
         Cancel
       </jet-secondary-button>
 
@@ -180,6 +180,11 @@ export default {
     toggleCreateAnnouncementDialog() {
       this.createAnnouncementDialog = !this.createAnnouncementDialog;
     },
+    onCancel(){
+      this.createAnnouncementDialog = false;
+      this.createAnnouncementForm.clearErrors();
+      this.$page.props.errors = new Object;
+    }
   },
 };
 </script>
