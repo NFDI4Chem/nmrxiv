@@ -24,8 +24,12 @@ class AnnouncementController extends Controller
     public function index(Request $request)
     {
         return Inertia::render('Announcement/Index', [
-            'filters' => $request->all('search', 'owner', 'role', 'trashed'),
             'announcements' => Announcement::with('owner')->orderby('created_at', 'DESC')
+                ->when($request->input('search'), function($query, $search) {
+                    $query->where('message', 'like', "%{$search}%")
+                    ->orWhere('title', 'like', "%{$search}%")
+                    ->orWhere('status', 'like', "%{$search}%");
+                })
                 ->get()
                 ->transform(function ($announcements) {
                     return [
