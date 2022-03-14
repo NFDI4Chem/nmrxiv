@@ -24,9 +24,11 @@
     </template>
     <div class="py-12 px-10">
       <div class="mb-6 flex justify-between items-center">
+        <!-- Search -->
         <div class="flex items-center">
           <div class="flex w-full bg-white shadow rounded">
             <input
+              v-model="search"
               class="
                 relative
                 w-full
@@ -40,8 +42,6 @@
               type="text"
               name="search"
               placeholder="Search…"
-              :value="modelValue"
-              @input="$emit('update:modelValue', $event.target.value)"
             />
           </div>
           <button
@@ -52,7 +52,7 @@
               focus:text-indigo-500
             "
             type="button"
-            @click="$emit('reset')"
+            @click='reset()'
           >
             Reset
           </button>
@@ -391,7 +391,8 @@ import AnnouncementEdit from "@/Pages/Announcement/Partials/Edit.vue";
 import JetConfirmationModal from "@/Jetstream/ConfirmationModal.vue";
 import JetDangerButton from "@/Jetstream/DangerButton.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
-import { ref } from "vue";
+import { ref, watch } from "vue";
+import { Inertia } from "@inertiajs/inertia";
 
 export default {
   components: {
@@ -407,9 +408,20 @@ export default {
   setup() {
     const announcementCreateElement = ref(null);
     const announcementEditElement = ref(null);
+    const search = ref("");
+    watch(search, (value) => {
+      Inertia.get(
+        "announcements",
+        { search: value },
+        {
+          preserveState: true,
+        }
+      );
+    });
     return {
       announcementCreateElement,
       announcementEditElement,
+      search,
     };
   },
   props: {
@@ -420,9 +432,6 @@ export default {
     return {
       confirmingAnnouncementDeletion: false,
       announcementId: null,
-      form: this.$inertia.form({
-        search: this.filters.search,
-      }),
       pages: [
         { name: "Console", route: "console", current: false },
         {
@@ -434,6 +443,9 @@ export default {
     };
   },
   methods: {
+    reset() {
+      this.search = null;
+    },
     openAnnouncementCreateDialog() {
       this.announcementCreateElement.toggleCreateAnnouncementDialog();
     },
@@ -444,7 +456,7 @@ export default {
       this.form.delete(route("announcements.destroy", id), {
         onSuccess: () => {
           this.confirmingAnnouncementDeletion = false;
-          this.announcementId - null;
+          this.announcementId = null;
         },
         onError: (err) => console.error(err),
       });
