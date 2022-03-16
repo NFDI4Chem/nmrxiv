@@ -33,5 +33,6 @@
         "marked": "^4.0.4",
         "popper.js": "^1.16.1",
         "vue3-date-time-picker": "^2.3.6"
-    }
+    },
+    "version": "0.0.0"
 }
