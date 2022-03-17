@@ -2,7 +2,7 @@ name : nmrXiv application - Github Actions
 
 on:
   push:
-    branches: [helm-deploy]
+    branches: [dev-helm-deploy]
 
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
@@ -15,7 +15,7 @@ env:
 jobs:
   setup-build-publish-deploy:
     name: Setup, Build, Publish, and Deploy
-    if: github.ref == 'refs/heads/helm-deploy'
+    if: github.ref == 'refs/heads/dev-helm-deploy'
     runs-on: ubuntu-latest
     #needs: build
     steps:
