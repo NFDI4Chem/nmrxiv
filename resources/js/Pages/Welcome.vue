@@ -61,7 +61,7 @@
                   nmrXiv
                 </h1>
                 <p class="mt-6 text-xl text-gray-500">
-                  New, highly visible, and consensus-driven NMR data repository and computational platform. The ultimate goal is to accelerate broader coordination and data sharing among natural product (NP) researchers by enabling storage, management, sharing and analysis of NMR data.
+                  Prod New, highly visible, and consensus-driven NMR data repository and computational platform. The ultimate goal is to accelerate broader coordination and data sharing among natural product (NP) researchers by enabling storage, management, sharing and analysis of NMR data.
                 </p>
               </div>
               <div class="mt-10">

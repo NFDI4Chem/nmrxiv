@@ -1,9 +1,7 @@
-# https://cert-manager.io/docs/tutorials/acme/nginx-ingress/#step-2-deploy-the-nginx-ingress-controller
-
    apiVersion: cert-manager.io/v1
    kind: Issuer
    metadata:
-     name: letsencrypt-dev
+     name: letsencrypt-prod
    spec:
      acme:
        # The ACME server URL
@@ -12,7 +10,7 @@
        email: nisha.sharma@uni-jena.de
        # Name of a secret used to store the ACME account private key
        privateKeySecretRef:
-         name: letsencrypt-dev
+         name: letsencrypt-prod
        # Enable the HTTP-01 challenge provider
        solvers:
        - http01:
