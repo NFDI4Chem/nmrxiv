@@ -41,6 +41,7 @@ jobs:
 
     # Build the Docker image
     - name: Build App Image
+      echo "docker push europe-west3-docker.pkg.dev/${{ PROJECT_ID }}/${{ REPOSITORY_NAME }}/${{ APP_IMAGE:latest }}"
       run: |-
         docker build -f ./resources/ops/docker/app/app.dockerfile \
           --tag "europe-west3-docker.pkg.dev/$PROJECT_ID/$REPOSITORY_NAME/$APP_IMAGE:latest" \
