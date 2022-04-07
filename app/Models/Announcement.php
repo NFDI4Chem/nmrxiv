@@ -17,7 +17,7 @@ class Announcement extends Model
         'end_time',
         'user_id',
     ];
-
+    
     /**
      * Get the owner of the announcement.
      * 

@@ -40,12 +40,19 @@ class HandleInertiaRequests extends Middleware
             'user.permissions' => fn() => $request->user() ?
                 $request->user()->getPermissionsViaRoles()->pluck('name')
                 : null,
+            'flash' => function () use($request) {
+                return [
+                    'success' => $request->session()->get('success'),
+                    'error' => $request->session()->get('error'),
+                    ];
+                },
             'user.roles' => fn() => $request->user() ?
                 $request->user()->getRoleNames()
                 : null,
             'twitter' => (env('TWITTER_CLIENT_ID') !== null && env('TWITTER_CLIENT_ID') !== ''),
             'github'  => (env('GITHUB_CLIENT_ID') !== null && env('GITHUB_CLIENT_ID') !== ''),
-            'orcid'  => (env('ORCID_CLIENT_ID') !== null && env('ORCID_CLIENT_ID') !== '')
+            'orcid'  => (env('ORCID_CLIENT_ID') !== null && env('ORCID_CLIENT_ID') !== ''),
+            'bannerMessage' => "You may experience sudden downtime on 12/10/2021 for few hours between 12-2 pm CET, due to some mandatory scheduled maintenance of the site. Apologies for any inconvenience caused.", //for demo purpose
         ]);
     }
 
