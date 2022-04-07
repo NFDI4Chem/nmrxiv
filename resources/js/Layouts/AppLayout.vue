@@ -1,6 +1,7 @@
 <template>
   <Head :title="title" />
   <jet-banner />
+  <announcement-banner :message='$page.props.bannerMessage'/>
   <div>
     <TransitionRoot as="template" :show="sidebarOpen">
       <Dialog
@@ -153,6 +154,7 @@
               </div>
             </form>
           </div>
+          <flash-messages />
           <div class="ml-4 flex items-center md:ml-6">
             <a href="https://docs.nmrxiv.org" target="_blank"
               ><svg
@@ -367,6 +369,8 @@ import { Head, Link } from "@inertiajs/inertia-vue3";
 import JetBanner from "@/Jetstream/Banner.vue";
 import JetDropdown from "@/Jetstream/Dropdown.vue";
 import JetDropdownLink from "@/Jetstream/DropdownLink.vue";
+import FlashMessages from "@/Shared/FlashMessages";
+import AnnouncementBanner from "@/Shared/AnnouncementBanner.vue";
 import { ref } from "vue";
 import {
   Dialog,
@@ -410,10 +414,12 @@ export default {
     MenuAlt2Icon,
     SearchIcon,
     XIcon,
+    FlashMessages,
+    AnnouncementBanner,
+
   },
   setup() {
     const sidebarOpen = ref(false);
-
     return {
       userNavigation,
       sidebarOpen,

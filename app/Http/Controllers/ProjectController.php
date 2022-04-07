@@ -16,13 +16,13 @@ class ProjectController extends Controller
     public function store(Request $request, CreateNewProject $creator)
     {
         $project = $creator->create($request->all());
-        return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('status', 'project-created');
+        return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('success', 'Project created successfully');
     }
 
     public function update(Request $request, UpdateProject $updater, Project $project)
     {
         $updater->update($project, $request->all());
-        return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('status', 'project-updated');
+        return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('success', 'Project updated successfully');
     }
 
     public function show(Request $request, Project $project)
@@ -55,7 +55,7 @@ class ProjectController extends Controller
 
         $project->delete();
 
-        return redirect()->route('dashboard');
+        return redirect()->route('dashboard')->with('success', 'Project deleted successfully');
     }
 
     public function activity(Request $request, Project $project)

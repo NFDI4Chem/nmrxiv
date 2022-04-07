@@ -15,13 +15,13 @@ class StudyController extends Controller
     public function store(Request $request, CreateNewStudy $creator)
     {
         $study = $creator->create($request->all());
-        return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('status', 'study-created');
+        return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('success', 'Study created successfully');
     }
 
     public function update(Request $request, UpdateStudy $updater, Study $study)
     {
         $updater->update($study, $request->all());
-        return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('status', 'study-updated');
+        return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('success', 'Study updated successfully');
     }
 
     public function show(Request $request, Study $study)
@@ -54,7 +54,7 @@ class StudyController extends Controller
 
         $study->delete();
 
-        return redirect()->route('dashboard');
+        return redirect()->route('dashboard')->with('success', 'Study deleted successfully');
     }
 
     public function activity(Request $request, Study $study)
