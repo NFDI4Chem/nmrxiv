@@ -1,67 +1,74 @@
+<!-- This example requires Tailwind CSS v2.0+ -->
 <template>
-  <div
-    class="
-      h-full
-      w-full
-      lg:max-w-full lg:flex
-      border-r border-b border-l border-l
-      lg:border-l lg:border-t lg:border-indigo-400
-      bg-white
-      rounded-lg
-      lg:rounded-b lg:rounded-r
-      p-4
-      flex flex-col
-      justify-between
-      leading-normal
-      transition
-      ease-in-out
-      delay-150
-      hover:-translate-y-1 hover:scale-100 hover:bg-indigo-100
-      duration-300
-    "
-  >
-    <div class="mb-8">
-      <p v-if="isPublic" class="text-sm text-gray-600 flex items-center">
-        <LockOpenIcon class="w-3 h-3 text-green-600" />
-        <span class="ml-2 text-indigo-700">Public</span>
-      </p>
-      <p v-else class="text-sm text-gray-600 flex items-center">
-        <LockClosedIcon class="w-3 h-3" />
-        <span class="ml-2 text-indigo-700">Private</span>
-      </p>
-      <div class="text-gray-900 font-bold text-xl mb-2">{{ name }}</div>
-      <p class="text-gray-700 text-base">{{ description }}</p>
+    <div class="col-span-1 bg-white rounded-lg shadow divide-gray-200 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-100 hover:bg-indigo-100 duration-300">
+        <div class="w-full h-30 flex items-center justify-between p-6 space-x-6">
+            <div class="flex-1 truncate">
+                <div class="flex place-content-between space-x-3">
+                    <h3 class="text-gray-900 text-l font-semibold truncate">
+                        {{ name }}
+                    </h3>
+                    <div
+                        v-if="isPublic"
+                        class="flex items-center shrink-0 inline-block px-2 py-0.5 text-green-800 text-xs font-medium bg-green-100 rounded-full"
+                    >
+                        <LockOpenIcon class="w-3 h-3 text-green-600" />
+                        <span class="ml-1">Public</span>
+                    </div>
+                    <div
+                        v-else
+                        class="flex items-center shrink-0 inline-block px-2 py-0.5 text-indigo-800 text-xs font-medium bg-indigo-100 rounded-full"
+                    >
+                        <LockClosedIcon class="w-3 h-3 text-indigo-600" />
+                        <span class="ml-1">Private</span>
+                    </div>
+                </div>
+                <p v-if="description" class="mt-1 font-serif text-gray-500 text-sm truncate">
+                    {{ description }}
+                </p>
+                <p v-else class="mt-1 font-serif text-gray-400 text-sm italic truncate">
+                    No description provided.
+                </p>
+            </div>
+        </div>
+        <div>
+            <div class="flex items-center">
+                <img
+                    class="w-10 h-10 rounded-full mr-4 ml-4 mb-4"
+                    src="https://images.unsplash.com/photo-1520785643438-5bf77931f493?ixlib=rb-=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=facearea&amp;facepad=8&amp;w=256&amp;h=256&amp;q=80"
+                    alt="Avatar of Jonathan Reinink"
+                />
+                <div class="mr-4 mb-4 ">
+                    <p class="text-sm font-semibold text-gray-500">Eduardo Benz</p> 
+                    <p class="text-sm font-medium text-gray-500">{{ created_at }}</p>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="flex items-center">
-      <div class="text-sm">
-        <p class="text-indigo-400">Created on</p>
-        <p class="text-gray-700">{{ created_at }}</p>
-        <p class="text-gray-700 leading-none">{{ created_by }}</p>
-      </div>
-    </div>
-  </div>
 </template>
 
 <script>
 import { LockClosedIcon } from "@heroicons/vue/solid";
 import { LockOpenIcon } from "@heroicons/vue/solid";
+import { MailIcon, PhoneIcon } from "@heroicons/vue/solid";
 
 export default {
-  components: {
-    LockClosedIcon,
-    LockOpenIcon,
-  },
-  setup() {},
-  props: {
-    isPublic: Boolean,
-    name: String,
-    description: String,
-    created_by: String,
-    created_at: Date,
-  },
-  data() {
-    return {};
-  },
-  methods: {},
+    components: {
+        LockClosedIcon,
+        LockOpenIcon,
+        MailIcon,
+        PhoneIcon,
+    },
+    setup() {},
+    props: {
+        isPublic: Boolean,
+        name: String,
+        description: String,
+        created_by: String,
+        created_at: Date,
+    },
+    data() {
+        return {};
+    },
+    methods: {},
 };
 </script>

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="px-12 py-8 mx-auto max-w-full">
+    <div>
         <div class="flex items-baseline justify-between">
           <div>
             <h2 class="text-lg">Studies</h2>
@@ -22,7 +22,7 @@
           </div>
         </div>
         <div v-if="studies.length <= 0">
-          <div class="mt-4">
+          <div class="mt-4 px-12 py-8 mx-auto max-w-4xl">
             <div class="px-6 py-4 bg-white shadow-md rounded-lg">
               <div class="flex items-center">
                 <svg
@@ -77,7 +77,7 @@
             </div>
           </div>
         </div>
-        <div v-else class="py-5 pb-5 grid grid-cols-5 gap-4">
+        <div v-else class="py-5 pb-5 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           <div :key="study.uuid" v-for="study in studies">
             <Link :href="route('study', [study.id])">
             <study-card
