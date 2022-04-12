@@ -5,34 +5,35 @@
   >
     <div class="w-full h-30 flex items-center justify-between p-6 space-x-6">
       <div class="flex-1">
-        <div class="flex place-content-between space-x-3">
+        <div style="min-height: 50px;" class="flex place-content-between space-x-3">
           <h3 class="text-gray-900 text-l font-semibold line-clamp-2">
             {{ name }}
           </h3>
         </div>
-        <p v-if="description" class="mt-1 text-gray-500 text-sm line-clamp-4">
-          {{ description }}
-        </p>
-        <p v-else class="mt-1 text-gray-400 text-sm italic line-clamp-4">
-          No description provided.
-        </p>
+        <div style="min-height: 100px;">
+          <p v-if="description" class="mt-1 text-gray-500 text-sm line-clamp-4">
+            {{ description }}
+          </p>
+          <p v-else class="mt-1 text-gray-400 text-sm italic line-clamp-4">
+            No description provided.
+          </p>
+        </div>
       </div>
     </div>
     <!-- TODO: Co-authors preview -->
     <!-- <div>
-            <div class="flex items-center">
-                <img
-                    class="w-10 h-10 rounded-full mr-4 ml-4 mb-4"
-                    src="https://images.unsplash.com/photo-1520785643438-5bf77931f493?ixlib=rb-=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=facearea&amp;facepad=8&amp;w=256&amp;h=256&amp;q=80"
-                    alt="Avatar of Jonathan Reinink"
-                />
-                <div class="mr-4 mb-4 ">
-                    <p class="text-sm font-semibold text-gray-500">Eduardo Benz</p> 
-                    <p class="text-sm font-medium text-gray-500">{{ created_at }}</p>
-                </div>
+        <div class="flex items-center">
+            <img
+                class="w-10 h-10 rounded-full mr-4 ml-4 mb-4"
+                src="https://images.unsplash.com/photo-1520785643438-5bf77931f493?ixlib=rb-=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=facearea&amp;facepad=8&amp;w=256&amp;h=256&amp;q=80"
+                alt="Avatar of Jonathan Reinink"
+            />
+            <div class="mr-4 mb-4 ">
+                <p class="text-sm font-semibold text-gray-500">Eduardo Benz</p> 
+                <p class="text-sm font-medium text-gray-500">{{ created_at }}</p>
             </div>
-        </div> -->
-
+        </div>
+    </div> -->
     <div>
       <div class="-mt-px border-t flex divide-x divide-gray-200">
         <div class="w-0 flex-1 flex">
@@ -61,20 +62,6 @@
         </div>
       </div>
     </div>
-    <!-- <div
-
-class="flex items-center shrink-0 inline-block px-2 py-0.5 text-green-800 text-xs font-medium bg-green-100 rounded-full"
->
-
-<span class="ml-1">Public</span>
-</div>
-<div
-v-else
-class="flex items-center shrink-0 inline-block px-2 py-0.5 text-indigo-800 text-xs font-medium bg-indigo-100 rounded-full"
->
-
-</div>
--->
   </div>
 </template>
 
