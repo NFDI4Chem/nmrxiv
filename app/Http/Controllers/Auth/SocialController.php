@@ -52,7 +52,7 @@ class SocialController extends Controller
         if ($linkedSocialAccount) {
             $user = $linkedSocialAccount->user;
         } else {
-            if (!$email = $providerUser->getEmail()) {
+            if ($email = $providerUser->getEmail()) {
                 $user = User::where('email', $email)->first();
             }else{
                 return Redirect::route('login')->with('message', 'We require your email id to communicate. Please enable email sharing on your ORCID account and try again.');
