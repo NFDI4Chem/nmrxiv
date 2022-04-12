@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use DB;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\Team;
 use Illuminate\Http\Request;
@@ -11,6 +11,8 @@ use App\Http\Controllers\Controller;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Auth\Events\Registered;
 use App\Models\LinkedSocialAccount;
+use Illuminate\Support\Facades\Redirect;
+use Laravel\Socialite\Two\InvalidStateException;
 
 class SocialController extends Controller
 {
@@ -21,7 +23,11 @@ class SocialController extends Controller
      */
     public function redirectToProvider($service)
     {
-        return Socialite::driver($service)->redirect();
+        if($service == 'orcid'){
+            return Socialite::driver('orcid')->scopes(['/authenticate','openid','/read-limited'])->redirect();
+        }else{
+            return Socialite::driver($service)->redirect();
+        }
     }
 
     /**
@@ -31,7 +37,11 @@ class SocialController extends Controller
      */
     public function handleProviderCallback($service)
     {
-        $providerUser = Socialite::driver($service)->user();
+        try {
+            $providerUser = Socialite::driver($service)->user();
+        } catch (InvalidStateException $e) {
+            $providerUser = Socialite::driver($service)->stateless()->user();
+        }
 
         $linkedSocialAccount = LinkedSocialAccount::where('provider_name', $service)
             ->where('provider_id', $providerUser->getId())
@@ -42,12 +52,15 @@ class SocialController extends Controller
         if ($linkedSocialAccount) {
             $user = $linkedSocialAccount->user;
         } else {
-            if ($email = $providerUser->getEmail()) {
+            if (!$email = $providerUser->getEmail()) {
                 $user = User::where('email', $email)->first();
+            }else{
+                return Redirect::route('login')->with('message', 'We require your email id to communicate. Please enable email sharing on your ORCID account and try again.');
             }
             if (!$user) {
                 $user = tap(User::create([
-                    'name' => $providerUser->getName(),
+                    'first_name' =>  explode(' ', $providerUser->getName(), 2)[0],
+                    'last_name' =>  explode(' ', $providerUser->getName(), 2)[1],
                     'email' => $providerUser->getEmail()
                 ]), function (User $user) {
                     $user->ownedTeams()->save(Team::forceCreate([
