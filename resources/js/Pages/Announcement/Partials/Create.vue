@@ -8,7 +8,7 @@
             <jet-validation-errors class="mb-4" />
             <div class="relative z-0 mt-1 rounded-lg cursor-pointer">
                 <div
-                    class="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6"
+                    class="mt-6 grid grid-cols-1 gap-y-4 gap-x-4 sm:grid-cols-6"
                 >
                     <div class="sm:col-span-6">
                         <label
@@ -47,10 +47,20 @@
                         </div>
                     </div>
                 </div>
+                <div class="py-2">
+                    <label
+                        class="block text-sm font-medium text-gray-700, block text-sm font-medium text-gray-700"
+                    >
+                        Status
+                    </label>
+                    <toggle-button v-model:enabled="createAnnouncementForm.enabled" />
+                </div>
 
-                <div class="sm grid grid-cols-2 gap-4 pt-4">
+                <div class="sm grid grid-cols-2 gap-4 pt-1">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700, block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500">
+                        <label
+                            class="block text-sm font-medium text-gray-700, block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
+                        >
                             Start Time
                         </label>
                         <Datepicker
@@ -58,7 +68,9 @@
                         ></Datepicker>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700, block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500">
+                        <label
+                            class="block text-sm font-medium text-gray-700, block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
+                        >
                             End Time
                         </label>
                         <Datepicker
@@ -95,77 +107,80 @@ import { Link } from "@inertiajs/inertia-vue3";
 import { AtSymbolIcon, CodeIcon, LinkIcon } from "@heroicons/vue/solid";
 import JetValidationErrors from "@/Jetstream/ValidationErrors.vue";
 import { ref } from "vue";
+import ToggleButton from "@/Shared/ToggleButton.vue";
 import {
-  Switch,
-  SwitchDescription,
-  SwitchGroup,
-  SwitchLabel,
+    Switch,
+    SwitchDescription,
+    SwitchGroup,
+    SwitchLabel,
 } from "@headlessui/vue";
 import Datepicker from "vue3-date-time-picker";
 import "vue3-date-time-picker/dist/main.css";
 
 export default {
-  components: {
-    Switch,
-    SwitchDescription,
-    SwitchGroup,
-    SwitchLabel,
-    AtSymbolIcon,
-    CodeIcon,
-    LinkIcon,
-    JetDialogModal,
-    JetSecondaryButton,
-    JetValidationErrors,
-    JetButton,
-    Link,
-    CheckCircleIcon,
-    ChevronRightIcon,
-    Datepicker,
-  },
-
-  data() {
-    return {
-      createAnnouncementForm: this.$inertia.form({
-        _method: "POST",
-        title: "",
-        message: "",
-        error_message: null,
-        creator_id: null,
-        start_time: new Date(),
-        end_time: this.setEndTime(),
-      }),
-      createAnnouncementDialog: false,
-    };
-  },
-
-  props: [],
-
-  methods: {
-    setEndTime(){
-        var start_time = new Date();
-        var end_time = new Date();
-        end_time.setDate( start_time.getDate() + 7 );
-        return end_time;
+    components: {
+        Switch,
+        SwitchDescription,
+        SwitchGroup,
+        SwitchLabel,
+        AtSymbolIcon,
+        CodeIcon,
+        LinkIcon,
+        JetDialogModal,
+        JetSecondaryButton,
+        JetValidationErrors,
+        JetButton,
+        Link,
+        CheckCircleIcon,
+        ChevronRightIcon,
+        Datepicker,
+        ToggleButton,
     },
-    createAnnouncement() {
-      this.createAnnouncementForm.creator_id = this.$page.props.user.id;
-      this.createAnnouncementForm.post(route("announcements.create"), {
-        preserveScroll: true,
-        onSuccess: () => {
-          this.createAnnouncementDialog = false;
-          this.createAnnouncementForm.reset();
+
+    data() {
+        return {
+            createAnnouncementForm: this.$inertia.form({
+                _method: "POST",
+                title: "",
+                message: "",
+                enabled: true,
+                error_message: null,
+                creator_id: null,
+                start_time: new Date(),
+                end_time: this.setEndTime(),
+            }),
+            createAnnouncementDialog: false,
+        };
+    },
+
+    props: [],
+
+    methods: {
+        setEndTime() {
+            var start_time = new Date();
+            var end_time = new Date();
+            end_time.setDate(start_time.getDate() + 7);
+            return end_time;
         },
-        onError: (err) => console.error(err),
-      });
+        createAnnouncement() {
+            this.createAnnouncementForm.creator_id = this.$page.props.user.id;
+            this.createAnnouncementForm.post(route("announcements.create"), {
+                preserveScroll: true,
+                onSuccess: () => {
+                    this.createAnnouncementDialog = false;
+                    this.createAnnouncementForm.reset();
+                },
+                onError: (err) => console.error(err),
+            });
+        },
+        toggleCreateAnnouncementDialog() {
+            this.createAnnouncementDialog = !this.createAnnouncementDialog;
+        },
+        onCancel() {
+            this.createAnnouncementDialog = false;
+            this.createAnnouncementForm.clearErrors();
+            this.$page.props.errors = new Object();
+        },
     },
-    toggleCreateAnnouncementDialog() {
-      this.createAnnouncementDialog = !this.createAnnouncementDialog;
-    },
-    onCancel(){
-      this.createAnnouncementDialog = false;
-      this.createAnnouncementForm.clearErrors();
-      this.$page.props.errors = new Object;
-    }
-  },
 };
 </script>
