@@ -43,7 +43,7 @@ class AnnouncementSeeder extends Seeder
         //Creating seeder for the announcement table
         $announcement = Announcement::create([
             'title'       => "Scheduled-Maintenace",
-            'status'      => "inactive",
+            'status'      => "active",
             'start_time'  => Carbon::now(),
             'end_time'    => Carbon::now()->addDays(30),
             'message'     => "You may experience sudden downtime on 12/10/2021 for few hours between 12-2 pm CET, due to some mandatory scheduled maintenance of the site. Apologies for any inconvenience caused. ",

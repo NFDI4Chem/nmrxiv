@@ -52,6 +52,10 @@ class AnnouncementController extends Controller
         $input = $request->all();
         $user = $request->user();
 
+        if($input['enabled'])
+            $input['status'] = 'active';
+        else
+            $input['status'] = 'inactive';
         //Validating the entries 
         Validator::make($request->all(), [
             'title'      => ['required', 'string', 'max:255'],
@@ -65,7 +69,7 @@ class AnnouncementController extends Controller
             return tap(Announcement::create([
                 'title'       => $input['title'],
                 'message'     => $input['message'],
-                'status'      => 'active',
+                'status'      => $input['status'],
                 'start_time'  => $input['start_time'],
                 'end_time'    => $input['end_time'],
             ]), function (Announcement $announcement) use ($user) {
@@ -86,7 +90,10 @@ class AnnouncementController extends Controller
     public function update(Request $request, Announcement $announcement)
     {
         $input = $request->all();
-
+        if($input['enabled'])
+            $input['status'] = 'active';
+        else
+            $input['status'] = 'inactive';
         Validator::make($input, [
             'title'      => ['required', 'string', 'max:255'],
             'message'    => ['required'],
@@ -98,6 +105,7 @@ class AnnouncementController extends Controller
             ->update([
                 'title'       => $input['title'],
                 'message'     => $input['message'],
+                'status'      => $input['status'],
                 'start_time'  => $input['start_time'],
                 'end_time'    => $input['end_time'],
             ]);

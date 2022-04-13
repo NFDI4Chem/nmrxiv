@@ -27,6 +27,7 @@
   ```
 -->
   <div class="flex flex-col h-screen justify-between">
+  <announcement-banner :message='$page.props.bannerMessage'/>
     <main>
       <!-- Hero section -->
       <div class="pt-8 mb-auto overflow-hidden sm:pt-12 lg:relative lg:py-48">
@@ -294,13 +295,15 @@
 
 <script>
 import { Head, Link } from "@inertiajs/inertia-vue3";
-import JetApplicationMark from '@/Jetstream/ApplicationMark.vue'
+import JetApplicationMark from '@/Jetstream/ApplicationMark.vue';
+import AnnouncementBanner from "@/Shared/AnnouncementBanner.vue";
 
 export default {
   components: {
     Head,
     Link,
-    JetApplicationMark
+    JetApplicationMark,
+    AnnouncementBanner
   },
 
   props: {

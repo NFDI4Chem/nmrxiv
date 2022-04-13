@@ -1,5 +1,6 @@
 <template>
     <Head title="Log in" />
+    <announcement-banner :message='$page.props.bannerMessage'/>
 
     <jet-authentication-card>
         <template #logo>
@@ -64,8 +65,9 @@
     import JetCheckbox from '@/Jetstream/Checkbox.vue'
     import JetLabel from '@/Jetstream/Label.vue'
     import JetValidationErrors from '@/Jetstream/ValidationErrors.vue'
-    import SingleSignOn from '@/App/SingleSignOn.vue';
+    import SingleSignOn from '@/App/SingleSignOn.vue'
     import { Head, Link } from '@inertiajs/inertia-vue3'
+    import AnnouncementBanner from '@/Shared/AnnouncementBanner.vue'
 
     export default {
         components: {
@@ -79,6 +81,7 @@
             JetValidationErrors,
             SingleSignOn,
             Link,
+            AnnouncementBanner,
         },
 
       
