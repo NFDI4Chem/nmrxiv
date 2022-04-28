@@ -72,12 +72,12 @@
                     border border-transparent
                     px-5
                     py-3
-                    bg-rose-500
+                    bg-teal-500
                     text-base
                     font-medium
                     text-white
                     shadow
-                    hover:bg-rose-600
+                    hover:bg-teal-600
                     focus:outline-none
                     focus:ring-2 focus:ring-rose-500 focus:ring-offset-2
                     sm:px-10
@@ -282,7 +282,7 @@
           </div>
         </nav>
         <p class="mt-8 text-center text-base text-gray-400">
-          &copy; 2021 nmrXiv. All rights reserved.
+          &copy; 2022 nmrXiv. All rights reserved.
         </p>
       </div>
     </footer>

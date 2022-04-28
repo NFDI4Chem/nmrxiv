@@ -1,6 +1,6 @@
 <template>
   <TransitionRoot as="template" :show="open">
-    <Dialog as="div" class="fixed inset-0 overflow-hidden z-50" @close="open = false">
+    <Dialog as="div" class="fixed inset-0 overflow-hidden z-50">
       <div class="absolute inset-0 overflow-hidden">
         <DialogOverlay class="absolute inset-0" />
 
@@ -14,12 +14,12 @@
             leave-from="translate-x-0"
             leave-to="translate-x-full"
           >
-            <div class="w-screen max-w-md">
+            <div class="w-screen max-w-2xl">
               <div
                 class="h-full divide-y divide-gray-200 flex flex-col bg-white shadow-xl"
               >
                 <div class="flex-1 h-0 overflow-y-auto">
-                  <div class="py-6 px-4 bg-indigo-700 sm:px-6">
+                  <div class="py-6 px-4 sm:px-6"  :style="'background-color:'+project.color">
                     <div class="flex items-center justify-between">
                       <DialogTitle class="text-lg font-medium text-white">
                         {{ project.name }}
@@ -27,7 +27,7 @@
                       <div class="ml-3 h-7 flex items-center">
                         <button
                           type="button"
-                          class="bg-indigo-700 rounded-md text-indigo-200 hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
+                          class="rounded-md hover:text-black text-white"
                           @click="open = false"
                         >
                           <span class="sr-only">Close panel</span>
@@ -150,6 +150,28 @@
                             />
                           </div>
                         </div>
+                        <div>
+                          <label
+                            for="study-name"
+                            class="block text-sm font-medium text-gray-900"
+                          >
+                            Color
+                          </label>
+                          <color-picker v-model:pureColor="form.color"/>
+                        </div>
+                        <div>
+                           <SwitchGroup as="div" class="flex items-center">
+                              <Switch v-model="form.starred" :class="[form.starred ? 'bg-indigo-600' : 'bg-gray-200', 'relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500']">
+                                <span aria-hidden="true" :class="[form.starred ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200']" />
+                              </Switch>
+                              <SwitchLabel v-if="form.starred" as="span" class="ml-3">
+                                <span class="text-sm font-medium text-gray-900">Remove from starred </span>
+                              </SwitchLabel>
+                              <SwitchLabel v-else as="span" class="ml-3">
+                                <span class="text-sm font-medium text-gray-900">Add to starred </span>
+                              </SwitchLabel>
+                          </SwitchGroup>
+                        </div>
                         <fieldset>
                           <legend class="text-sm font-medium text-gray-900">
                             Privacy
@@ -214,22 +236,80 @@
                         </fieldset>
                       </div>
                       <div class="pt-4 pb-6">
-                        <div
-                          v-if="form.is_public == true || form.is_public == 'true'"
-                          class="flex text-sm"
-                        >
-                          <a
-                            href="#"
-                            class="group inline-flex items-center font-medium text-indigo-600 hover:text-indigo-900"
-                          >
-                            <LinkIcon
-                              class="h-5 w-5 text-indigo-500 group-hover:text-indigo-900"
-                              aria-hidden="true"
-                            />
-                            <span class="ml-2"> Copy link </span>
-                          </a>
+                        <div v-if="form.is_public == true || form.is_public == 'true'">
+                          <label for="email" class="block text-sm font-medium text-gray-700">Public URL</label>
+                          <div class="mt-1 flex rounded-md shadow-sm">
+                            <div class="relative flex items-stretch flex-grow focus-within:z-10">
+                              <input @focus="$event.target.select()"  id="projectPublicURLCopy" v-model="project.public_url" type="text" class="rounded-l-md focus:ring-indigo-500 focus:border-indigo-500 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300" />
+                            </div>
+                            <button @click="copyToClipboard(project.public_url, 'projectPublicURLCopy')" type="button" class="-ml-px relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
+                              <span><ClipboardCopyIcon class="h-5 w-5" aria-hidden="true" /></span>
+                            </button>
+                          </div>
                         </div>
-                        <div class="mt-4 flex text-sm">
+                        <div v-else>
+                          <div class="space-y-1">
+                            <div class="relative flex items-start">
+                              <div class="flex items-center h-5">
+                                <input v-model="linkAccess" type="checkbox" class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded" />
+                              </div>
+                              <div class="ml-3 text-sm">
+                                <label class="font-medium text-gray-700">Any one with link</label>
+                              </div>
+                            </div>
+                            <div v-if="linkAccess">
+                              <div class="flex">
+                                <div class="flex-grow">
+                                  <input @focus="$event.target.select()" id="projectPrivateURLCopy" readonly type="text" :value="project.private_url" class="rounded-l-md focus:ring-indigo-500 focus:border-indigo-500 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300" />
+                                </div>
+                                <button @click="copyToClipboard(project.private_url, 'projectPrivateURLCopy')" type="button" class="-ml-px relative inline-flex items-center space-x-2 px-2 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
+                                  <span><ClipboardCopyIcon class="h-5 w-5" aria-hidden="true" /></span>
+                                </button>
+                              </div>
+                              <div class="mt-3">
+                                  <Listbox as="div" v-model="selectedAccessType">
+                                    <div class="relative">
+                                      <div class="inline-flex shadow-sm rounded-md divide-x divide-indigo-600">
+                                        <div class="relative z-0 inline-flex shadow-sm rounded-md divide-x divide-indigo-600">
+                                          <div class="relative inline-flex items-center bg-indigo-500 py-2 pl-3 pr-4 border border-transparent rounded-l-md shadow-sm text-white">
+                                            <CheckIcon class="h-5 w-5" aria-hidden="true" />
+                                            <p class="ml-2.5 text-sm font-medium">{{ selectedAccessType.title }}</p>
+                                          </div>
+                                          <ListboxButton class="relative inline-flex items-center bg-indigo-500 p-2 rounded-l-none rounded-r-md text-sm font-medium text-white hover:bg-indigo-600 focus:outline-none focus:z-10 focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500">
+                                            <span class="sr-only">Change published status</span>
+                                            <ChevronDownIcon class="h-5 w-5 text-white" aria-hidden="true" />
+                                          </ListboxButton>
+                                        </div>
+                                      </div>
+
+                                      <transition leave-active-class="transition ease-in duration-100" leave-from-class="opacity-100" leave-to-class="opacity-0">
+                                        <ListboxOptions class="origin-top-right absolute z-10 left-0 mt-2 w-72 rounded-md shadow-lg overflow-hidden bg-white divide-y divide-gray-200 ring-1 ring-black ring-opacity-5 focus:outline-none">
+                                          <ListboxOption as="template" v-for="option in publishingOptions" :key="option.title" :value="option" v-slot="{ active, selectedAccessType }">
+                                            <li :class="[active ? 'text-white bg-indigo-500' : 'text-gray-900', 'cursor-default select-none relative p-4 text-sm']">
+                                              <div class="flex flex-col">
+                                                <div class="flex justify-between">
+                                                  <p :class="selectedAccessType ? 'font-semibold' : 'font-normal'">
+                                                    {{ option.title }}
+                                                  </p>
+                                                  <span v-if="selectedAccessType" :class="active ? 'text-white' : 'text-indigo-500'">
+                                                    <CheckIcon class="h-5 w-5" aria-hidden="true" />
+                                                  </span>
+                                                </div>
+                                                <p :class="[active ? 'text-indigo-200' : 'text-gray-500', 'mt-2']">
+                                                  {{ option.description }}
+                                                </p>
+                                              </div>
+                                            </li>
+                                          </ListboxOption>
+                                        </ListboxOptions>
+                                      </transition>
+                                    </div>
+                                  </Listbox>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="mt-6 flex text-sm">
                           <a
                             class="group inline-flex items-center text-gray-500 hover:text-gray-900"
                           >
@@ -258,6 +338,9 @@
                   </div>
                 </div>
                 <div class="flex-shrink-0 px-4 py-4 flex justify-end">
+                  <jet-action-message :on="form.recentlySuccessful" class="mr-3 py-2 text-green-200">
+                      Saved.
+                  </jet-action-message>
                   <button
                     type="button"
                     class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
@@ -283,7 +366,8 @@
 </template>
 
 <script>
-import { ref } from "vue";
+import JetActionMessage from '@/Jetstream/ActionMessage.vue'
+import { ref, defineComponent } from "vue";
 import {
   Dialog,
   DialogOverlay,
@@ -293,11 +377,21 @@ import {
 } from "@headlessui/vue";
 import { XIcon } from "@heroicons/vue/outline";
 import { LinkIcon, PlusSmIcon, QuestionMarkCircleIcon, ExclamationCircleIcon } from "@heroicons/vue/solid";
-import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/vue";
+import { Listbox, ListboxButton, ListboxLabel, ListboxOption, ListboxOptions, Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import ProjectActivity from "@/Pages/Project/Partials/Activity.vue";
+import { ColorPicker } from "vue3-colorpicker";
+import "vue3-colorpicker/style.css";
+import { Switch, SwitchGroup, SwitchLabel } from '@headlessui/vue'
+import { ClipboardCopyIcon, CheckIcon, ChevronDownIcon } from '@heroicons/vue/solid'
 
-export default {
+const publishingOptions = [
+  { value: 'viewer', title: 'Viewer', description: 'Anyone on the internet with this link can view', current: true },
+  { value: 'commentor', title: 'Commentor', description: 'Anyone on the internet with this link can comment', current: false },
+  { value: 'editor', title: 'Editor', description: 'Anyone on the internet with this link can edit (sign in required)', current: false },
+]
+
+export default defineComponent({
   components: {
     Dialog,
     DialogOverlay,
@@ -306,6 +400,12 @@ export default {
     TransitionRoot,
     JetInputError,
     ProjectActivity,
+    JetActionMessage,
+    Listbox,
+    ListboxButton,
+    ListboxLabel,
+    ListboxOption,
+    ListboxOptions,
     Tab,
     TabGroup,
     TabList,
@@ -316,12 +416,20 @@ export default {
     QuestionMarkCircleIcon,
     ExclamationCircleIcon,
     XIcon,
+    ColorPicker,
+    Switch,
+    SwitchGroup,
+    SwitchLabel,
+    ClipboardCopyIcon,
+    CheckIcon,
+    ChevronDownIcon,
   },
   props: ["project"],
   setup() {
     const activityDetailsElement = ref(null)
     return {
-      activityDetailsElement
+      activityDetailsElement,
+      publishingOptions,
     }
   },
   data() {
@@ -335,9 +443,13 @@ export default {
         owner_id: this.project.owner_id,
         color: this.project.color,
         starred: this.project.starred,
+        access: this.project.access,
+        access_type: this.project.access_type,
         is_public: this.project.is_public,
       }),
       open: false,
+      selectedAccessType: publishingOptions.filter( option => option.value == this.project.access_type)[0],
+      linkAccess : this.project.access == 'link'
     };
   },
   methods: {
@@ -347,6 +459,12 @@ export default {
     updateProject() {
       this.form.owner_id = this.project.owner_id;
       this.form.team_id = this.project.team_id;
+      if(this.linkAccess){
+        this.form.access = "link"
+        this.form.access_type = this.selectedAccessType.value
+      }else{
+        this.form.access = "restricted"
+      }
       this.form.post(route("projects.update", this.project.id), {
         preserveScroll: true,
         onSuccess: () => {},
@@ -357,5 +475,5 @@ export default {
       this.activityDetailsElement.toggleDetails()
     }
   },
-};
+});
 </script>
