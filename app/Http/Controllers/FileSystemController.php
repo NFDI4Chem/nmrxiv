@@ -22,10 +22,10 @@ class FileSystemController extends Controller
     {
         $file = $request->get('file');
 
+        $destination = $request->get('destination');
+
         $project = Project::find($request->get('project_id'));
         $study = Study::find($request->get('study_id'));
-
-        $baseDirectory = $request->get('base');
 
         $path = null;
 
@@ -33,7 +33,7 @@ class FileSystemController extends Controller
             $path = $file['fullPath'];
         }
         
-        $hasDirectories = $path ? true : false;
+        $hasDirectories = ($path || $destination != '/') ? true : false;
         
         $filename = $file['upload']['filename'];
 
@@ -45,22 +45,23 @@ class FileSystemController extends Controller
 
         $relativefilePath = $path ? $path : $filename;
 
+        if($destination){
+            $relativefilePath =  $destination . '/' . $relativefilePath;
+            $path = $destination . '/' . $path;
+        }
+
         $environment = env('APP_ENV', 'local');
 
-        $filePath = $environment . "/" . $project->uuid . "/" . $study->uuid . "/" . $relativefilePath;
-
+        $filePath = $environment . "/" . $project->uuid . "/" . $study->uuid . $relativefilePath;
         if($hasDirectories){
-            $directories =  array_filter(explode('/', str_replace($filename, '' , $path)));
-            if($baseDirectory){
-                $level = 0;
-            }
+            $directories =  array_values(array_filter(explode('/', str_replace($filename, '' , $path))));
             if(($level + count($directories) - 1) > $level){
                 for ($currentLevel; $currentLevel < ($level + count($directories) - 1); $currentLevel++) {
                     $parentFileSystemObject = FileSystemObject::firstOrCreate([
                         'name' => $directories[$currentLevel],
                         'slug' => Str::slug($directories[$currentLevel],'-'),
                         'description' => $directories[$currentLevel],
-                        'relative_url' => str_replace( '//', '/', '/' . explode($directories[$currentLevel], $path)[0] . "/" . $directories[$currentLevel]),
+                        'relative_url' => rtrim(preg_replace('~//+~', '/', '/' . explode($directories[$currentLevel], $path)[0] . "/" . $directories[$currentLevel]),'/'),
                         'type' => 'directory',
                         'key' => $directories[$currentLevel],
                         'is_root' => $currentLevel == 0 ? 1 : 0,
@@ -72,7 +73,7 @@ class FileSystemController extends Controller
                         'name' => $directories[$currentLevel+1],
                         'slug' => Str::slug($directories[$currentLevel+1],'-'),
                         'description' => $directories[$currentLevel+1],
-                        'relative_url' => str_replace( '//', '/', '/' . explode($directories[$currentLevel+1], $path)[0] . "/" . $directories[$currentLevel+1]),
+                        'relative_url' => rtrim(preg_replace('~//+~', '/', '/' . explode($directories[$currentLevel+1], $path)[0] . "/" . $directories[$currentLevel+1]),'/'),
                         'type' => 'directory',
                         'key' => $directories[$currentLevel+1],
                         'is_root' => $currentLevel + 1 == 0 ? 1 : 0,
@@ -92,7 +93,7 @@ class FileSystemController extends Controller
                     'name' => $directories[$currentLevel],
                     'slug' => Str::slug($directories[$currentLevel],'-'),
                     'description' => $directories[$currentLevel],
-                    'relative_url' => str_replace( '//', '/', '/' . explode($directories[$currentLevel], $path)[0] . "/" . $directories[$currentLevel]),
+                    'relative_url' => rtrim(preg_replace('~//+~', '/', '/' . explode($directories[$currentLevel], $path)[0] . "/" . $directories[$currentLevel]),'/'),
                     'type' => 'directory',
                     'key' => $directories[$currentLevel],
                     'is_root' => $currentLevel == 0 ? 1 : 0,
@@ -112,7 +113,7 @@ class FileSystemController extends Controller
             'name' => $filename,
             'slug' => Str::slug($filename,'-'),
             'description' => $filename,
-            'relative_url' => $path,
+            'relative_url' =>  rtrim(preg_replace('~//+~', '/',$path),'/'),
             'type' => 'file',
             'key' => $filename,
             'is_root' => 0,
