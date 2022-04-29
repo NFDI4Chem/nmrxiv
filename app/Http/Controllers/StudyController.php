@@ -9,6 +9,7 @@ use App\Models\Study;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Laravel\Fortify\Actions\ConfirmPassword;
 use Inertia\Inertia;
+use App\Models\FileSystemObject;
 
 class StudyController extends Controller
 {
@@ -26,7 +27,60 @@ class StudyController extends Controller
 
     public function show(Request $request, Study $study)
     {
-        return Inertia::render('Study/Show', [
+        return Inertia::render('Study/About', [
+            'study' => $study,
+            'project' => $study->project
+        ]);
+    }
+    
+    public function protocols(Request $request, Study $study)
+    {
+        return Inertia::render('Study/Protocols', [
+            'study' => $study,
+            'project' => $study->project
+        ]);
+    }
+
+    public function assays(Request $request, Study $study)
+    {
+        return Inertia::render('Study/Assays', [
+            'study' => $study,
+            'project' => $study->project
+        ]);
+    }
+
+    public function Files(Request $request, Study $study)
+    {
+        return Inertia::render('Study/Files', [
+            'study' => $study,
+            'project' => $study->project,
+            'files' => FileSystemObject::with('children')->where([
+                ['level', 0],
+                ['project_id', $study->project->id],
+                ['study_id', $study->id]
+            ])->orderBy('type')->get()
+        ]);
+    }
+
+    public function MolecularIdentifications(Request $request, Study $study)
+    {
+        return Inertia::render('Study/MolecularIdentifications', [
+            'study' => $study,
+            'project' => $study->project
+        ]);
+    }
+
+    public function Integrations(Request $request, Study $study)
+    {
+        return Inertia::render('Study/Integrations', [
+            'study' => $study,
+            'project' => $study->project
+        ]);
+    }
+
+    public function Notifications(Request $request, Study $study)
+    {
+        return Inertia::render('Study/Notifications', [
             'study' => $study,
             'project' => $study->project
         ]);

@@ -18,19 +18,24 @@
         "@vue/compiler-sfc": "^3.0.5",
         "axios": "^0.21",
         "laravel-mix": "^6.0.6",
+        "laravel-vapor": "^0.5.1",
         "lodash": "^4.17.19",
         "postcss": "^8.1.14",
         "postcss-import": "^12.0.1",
-        "tailwindcss": "^2.0.1",
+        "tailwindcss": "^2.2.19",
         "vue": "^3.0.5",
         "vue-loader": "^16.1.2"
     },
     "dependencies": {
         "@headlessui/vue": "^1.4.2",
         "@heroicons/vue": "^1.0.5",
+        "@tailwindcss/line-clamp": "^0.3.1",
         "@types/marked": "^4.0.1",
         "@vue-hero-icons/outline": "^1.7.2",
+        "dropzone": "^6.0.0-beta.2",
         "marked": "^4.0.4",
-        "popper.js": "^1.16.1"
+        "popper.js": "^1.16.1",
+        "vue3-clipboard": "^1.0.0",
+        "vue3-colorpicker": "^2.0.4"
     }
 }

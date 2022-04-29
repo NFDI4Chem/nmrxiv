@@ -113,9 +113,9 @@
             <div class="mt-2 flex items-center text-sm text-gray-500">
               <a @click="toggleDetails" class="cursor-pointer inline-flex items-center"
                 ><ExclamationCircleIcon
-                              class="h-5 w-5 text-gray-400 group-hover:text-gray-500"
-                              aria-hidden="true"
-                            />
+                  class="h-5 w-5 text-gray-400 group-hover:text-gray-500"
+                  aria-hidden="true"
+                />
                 <span class="ml-2">View details</span></a
               >
             </div>
@@ -125,7 +125,7 @@
       </div>
     </template>
     <div class="pb-12 pt-6 px-10">
-      <study-content :study="study"></study-content>
+      <slot name="scontent"></slot>
     </div>
   </app-layout>
 </template>
@@ -134,7 +134,6 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import { Link } from "@inertiajs/inertia-vue3";
 import StudyDetails from "./Partials/Details.vue";
-import StudyContent from "./Partials/Content.vue";
 import { ref } from "vue";
 import {
   BriefcaseIcon,
@@ -146,11 +145,10 @@ import {
   LinkIcon,
   LocationMarkerIcon,
   PencilIcon,
-  ExclamationCircleIcon
+  ExclamationCircleIcon,
 } from "@heroicons/vue/solid";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
-import {  } from "@heroicons/vue/solid";
-
+import {} from "@heroicons/vue/solid";
 
 export default {
   components: {
@@ -158,7 +156,6 @@ export default {
     AppLayout,
     StudyDetails,
     ExclamationCircleIcon,
-    StudyContent,
     Menu,
     MenuButton,
     MenuItem,

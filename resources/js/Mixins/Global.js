@@ -1,4 +1,6 @@
 import * as marked from 'marked';
+import { copyText } from 'vue3-clipboard';
+import { ref } from 'vue';
 
 export default {
   methods: {
@@ -23,5 +25,15 @@ export default {
     md(data) {
       return data ? marked.parse(data) : "";
     },
+    copyToClipboard(text, id){
+      document.getElementById(id).select();
+      copyText(text, undefined, (error, event) => {
+        if (error) {
+          console.log(error)
+        } else {
+          // console.log(event)
+        }
+      })
+    }
   },
 }
