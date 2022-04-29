@@ -12,7 +12,8 @@ RUN docker-php-ext-enable apcu
 RUN set -ex \
   && apk --no-cache add \
     postgresql-dev
-RUN docker-php-ext-install pdo pdo_pgsql
+RUN docker-php-ext-install pdo pdo_pgsql'
+RUN apt-get install git
 
 FROM base AS dev
 
@@ -40,7 +41,7 @@ COPY /routes routes
 
 COPY . /var/www/html
 
-RUN composer install --prefer-dist
+RUN composer install
 
 RUN composer dump-autoload -o
 
