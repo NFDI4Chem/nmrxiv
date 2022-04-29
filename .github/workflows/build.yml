@@ -1,4 +1,4 @@
-name : nmrXiv application - Github Actions
+name : Deploy to GKE
 
 on:
   push:
