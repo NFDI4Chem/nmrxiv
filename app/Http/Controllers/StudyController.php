@@ -66,22 +66,25 @@ class StudyController extends Controller
 
     public function file(Request $request, $code, Study $study, $filename)
     {
-        $file = FileSystemObject::where([
+        $file = FileSystemObject::with('project', 'study')->where([
             ['slug', $filename],
             ['study_id', $study->id]
         ])->first();
-        $path = $file->path;
+
+        $environment = env('APP_ENV', 'local');
+
+        $path =  preg_replace('~//+~', '/', "/" . $environment . "/" . $file->project->uuid . "/" . $file->study->uuid  . "/" .  $file->relative_url);
+        
         if(Storage::has($path)){
             $data = Storage::get($path);
-            $getMimeType = Storage::getMimetype($path);
             $newFileName = $file->name; 
             $headers = [
-                'Content-type' => $getMimeType, 
                 'Access-Control-Allow-Origin' => '*',
                 'Content-Disposition'=>sprintf('attachment; filename="%s"', $newFileName)
             ];
             return Response::make($data, 200, $headers);
         }
+
         return Response::make(null, 404);
     }
 
