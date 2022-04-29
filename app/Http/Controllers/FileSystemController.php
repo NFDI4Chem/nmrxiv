@@ -52,7 +52,8 @@ class FileSystemController extends Controller
 
         $environment = env('APP_ENV', 'local');
 
-        $filePath = $environment . "/" . $project->uuid . "/" . $study->uuid . $relativefilePath;
+        $filePath = preg_replace('~//+~', '/', $environment . "/" . $project->uuid . "/" . $study->uuid . $relativefilePath);
+        
         if($hasDirectories){
             $directories =  array_values(array_filter(explode('/', str_replace($filename, '' , $path))));
             if(($level + count($directories) - 1) > $level){
@@ -113,7 +114,7 @@ class FileSystemController extends Controller
             'name' => $filename,
             'slug' => Str::slug($filename,'-'),
             'description' => $filename,
-            'relative_url' =>  rtrim(preg_replace('~//+~', '/',$path),'/'),
+            'relative_url' =>  rtrim(preg_replace('~//+~', '/',$relativefilePath),'/'),
             'type' => 'file',
             'key' => $filename,
             'is_root' => 0,

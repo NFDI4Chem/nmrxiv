@@ -8,8 +8,10 @@ use App\Actions\Study\UpdateStudy;
 use App\Models\Study;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Laravel\Fortify\Actions\ConfirmPassword;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use App\Models\FileSystemObject;
+use Illuminate\Support\Facades\Response;
 
 class StudyController extends Controller
 {
@@ -49,7 +51,7 @@ class StudyController extends Controller
         ]);
     }
 
-    public function Files(Request $request, Study $study)
+    public function files(Request $request, Study $study)
     {
         return Inertia::render('Study/Files', [
             'study' => $study,
@@ -60,6 +62,30 @@ class StudyController extends Controller
                 ['study_id', $study->id]
             ])->orderBy('type')->get()
         ]);
+    }
+
+    public function file(Request $request, $code, Study $study, $filename)
+    {
+        $file = FileSystemObject::with('project', 'study')->where([
+            ['slug', $filename],
+            ['study_id', $study->id]
+        ])->first();
+
+        $environment = env('APP_ENV', 'local');
+
+        $path =  preg_replace('~//+~', '/', "/" . $environment . "/" . $file->project->uuid . "/" . $file->study->uuid  . "/" .  $file->relative_url);
+        
+        if(Storage::has($path)){
+            $data = Storage::get($path);
+            $newFileName = $file->name; 
+            $headers = [
+                'Access-Control-Allow-Origin' => '*',
+                'Content-Disposition'=>sprintf('attachment; filename="%s"', $newFileName)
+            ];
+            return Response::make($data, 200, $headers);
+        }
+
+        return Response::make(null, 404);
     }
 
     public function MolecularIdentifications(Request $request, Study $study)
