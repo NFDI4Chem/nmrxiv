@@ -223,7 +223,7 @@
                   <div class="">
                     <span v-if="selectedFileSystemObject && selectedFileSystemObject.type == 'file'" >
                       <span v-if="selectedFileSystemObject.key.indexOf('.dx') > -1 || selectedFileSystemObject.key.indexOf('.jdx') > -1  || selectedFileSystemObject.key.indexOf('.zip') > -1  || selectedFileSystemObject.key.indexOf('.json') > -1">
-                        <iframe v-on:load="loadSpectra()" name="crossDomainIframe" frameborder="0" allowfullscreen style="width:100%; height:500px" src="//nmriumdev.nmrxiv.org/"></iframe>
+                        <iframe v-on:load="loadSpectra()" name="crossDomainIframe" frameborder="0" allowfullscreen style="width:100%; height:500px" :src="nmriumURL"></iframe>
                       </span>
                       <span v-else>
                         {{ selectedFileSystemObject }}
@@ -352,7 +352,7 @@ export default {
             {
               source: {
                 jcampURL:
-                  'http://localhost:80/asc/studies/'+this.study.id+'/file/' + this.selectedFileSystemObject.slug,
+                  this.url + '/asc/studies/'+this.study.id+'/file/' + this.selectedFileSystemObject.slug,
               },
             },
           ]
@@ -361,5 +361,13 @@ export default {
       }
     }
   },
+  computed: {
+    url() {
+      return String(this.$page.props.url) ;
+    },
+    nmriumURL() {
+      return this.$page.props.nmriumURL ?  String(this.$page.props.nmriumURL) : '//nmriumdev.nmrxiv.org' ;
+    }
+  }
 };
 </script>
