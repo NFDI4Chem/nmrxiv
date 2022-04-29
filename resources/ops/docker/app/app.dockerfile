@@ -40,7 +40,7 @@ COPY /routes routes
 
 COPY . /var/www/html
 
-RUN composer install
+RUN composer install --prefer-dist
 
 RUN composer dump-autoload -o
 
