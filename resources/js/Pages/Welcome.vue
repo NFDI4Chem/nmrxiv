@@ -194,7 +194,7 @@
                   lg:w-auto
                   lg:max-w-none
                 "
-                src="/img/website.jpg"
+                src="/img/dashboard.PNG"
                 alt=""
               />
             </div>
