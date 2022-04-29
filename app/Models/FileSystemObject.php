@@ -45,4 +45,14 @@ class FileSystemObject extends Model
     {
         return $this->hasMany(FileSystemObject::class, 'parent_id', 'id');
     }
+
+    public function project()
+    {
+        return $this->belongsTo(Project::class, 'project_id');
+    }
+
+    public function study()
+    {
+        return $this->belongsTo(Study::class, 'study_id');
+    }
 }
