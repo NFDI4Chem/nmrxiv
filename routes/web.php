@@ -30,6 +30,9 @@ Route::get('/', function () {
 
 Route::supportBubble();
 
+Route::get('{code}/studies/{study}/file/{filename}', [StudyController::class, 'file'])
+        ->name('study.file');
+
 Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function (Request $request) {
     $user = $request->user();
     $team = $user->currentTeam;
@@ -63,6 +66,7 @@ Route::group(['middleware' => ['auth']], function () {
         ->name('study');
     Route::get('studies/{study}/files', [StudyController::class, 'files'])
         ->name('study.files');
+
     Route::get('studies/{study}/settings', [StudyController::class, 'settings'])
         ->name('study.settings');
     Route::delete('studies/{study}', [StudyController::class, 'destroy'])
