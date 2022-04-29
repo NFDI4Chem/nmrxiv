@@ -1,6 +1,7 @@
 FROM php:8.0.13-fpm-alpine AS base
 
 RUN apk add --update zlib-dev libpng-dev libzip-dev $PHPIZE_DEPS
+RUN apk add git
 
 RUN docker-php-ext-install exif
 RUN docker-php-ext-install gd
@@ -12,8 +13,7 @@ RUN docker-php-ext-enable apcu
 RUN set -ex \
   && apk --no-cache add \
     postgresql-dev
-RUN docker-php-ext-install pdo pdo_pgsql'
-RUN apt-get install git
+RUN docker-php-ext-install pdo pdo_pgsql
 
 FROM base AS dev
 
