@@ -220,13 +220,14 @@
                   </ul>
                 </div>
                 <div v-else>
-                  <div v-if="selectedFileSystemObject">
-                    <span v-if="selectedFileSystemObject == 'root'">
-                      <span>Summary</span>
-                      
-                    </span>
-                    <span v-else>
-                      <b>{{ selectedFileSystemObject.name }}</b>
+                  <div class="">
+                    <span v-if="selectedFileSystemObject && selectedFileSystemObject.type == 'file'" >
+                      <span v-if="selectedFileSystemObject.key.indexOf('.dx') > -1 || selectedFileSystemObject.key.indexOf('.jdx') > -1  || selectedFileSystemObject.key.indexOf('.zip') > -1  || selectedFileSystemObject.key.indexOf('.json') > -1">
+                        <iframe v-on:load="loadSpectra()" name="crossDomainIframe" frameborder="0" allowfullscreen style="width:100%; height:500px" src="//nmriumdev.nmrxiv.org/"></iframe>
+                      </span>
+                      <span v-else>
+                        {{ selectedFileSystemObject }}
+                      </span>
                     </span>
                   </div>
                 </div>
@@ -245,6 +246,7 @@ import StudyContent from "@/Pages/Study/Content.vue";
 import { Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/vue";
 import { FolderIcon, DocumentTextIcon } from "@heroicons/vue/solid";
 import { Inertia } from '@inertiajs/inertia';
+import { nextTick } from 'vue';
 
 export default {
   props: ["study", "project", "files"],
@@ -325,7 +327,7 @@ export default {
     this.selectedFileSystemObject = "root"
   },
   methods: {
-    displaySelected(file) {
+    async displaySelected(file) {
       this.selectedFileSystemObject = file;
       if(file == "root" ){
         this.selectedFolder = "/"
@@ -340,7 +342,24 @@ export default {
           }
         }
       }
+      this.loadSpectra()
     },
+    loadSpectra(){
+      const iframe = window.frames.crossDomainIframe
+      if(iframe){
+        let data = {
+          spectra: [
+            {
+              source: {
+                jcampURL:
+                  'http://localhost:80/asc/studies/'+this.study.id+'/file/' + this.selectedFileSystemObject.slug,
+              },
+            },
+          ]
+        }
+        iframe.postMessage({ type: `nmr-wrapper:load`, data }, "*")
+      }
+    }
   },
 };
 </script>
