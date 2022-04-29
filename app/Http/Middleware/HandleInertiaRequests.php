@@ -50,7 +50,7 @@ class HandleInertiaRequests extends Middleware
             'github'  => (env('GITHUB_CLIENT_ID') !== null && env('GITHUB_CLIENT_ID') !== ''),
             'orcid'  => (env('ORCID_CLIENT_ID') !== null && env('ORCID_CLIENT_ID') !== ''),
             'url'  => env('APP_URL'),
-            'nmriumURL' => env('nmriumURL'),
+            'nmriumURL' => env('NMRIUM_URL'),
         ]);
     }
 
