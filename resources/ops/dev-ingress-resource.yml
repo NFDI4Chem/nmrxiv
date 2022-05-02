@@ -1,0 +1,39 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-resource-dev
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    #kubernetes.io/ingress.global-static-ip-name: nmrxiv-dev-ip-address
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    cert-manager.io/issuer: "letsencrypt-dev"
+
+spec:
+  tls:
+  - hosts:
+      - dev.nmrxiv.org
+    secretName: nmrxiv-app-dev-tls
+  - hosts:
+      - docs.nmrxiv.org
+    secretName: nmrxiv-app-doc-tls
+  rules:
+  - host: dev.nmrxiv.org
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: nmrxiv-nmrxiv-app
+            port:
+              number: 80
+  - host: docs.nmrxiv.org
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: doc-nmrxiv-doc
+            port:
+              number: 80

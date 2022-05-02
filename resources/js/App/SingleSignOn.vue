@@ -44,13 +44,13 @@
     export default {     
         computed: {
           hasTwitterClientID() {
-            return this.$page.props.twitter;
+            return String(this.$page.props.twitter).toLowerCase() == "true" ;
           },
           hasGithubClientID() {
-            return this.$page.props.github;
+            return String(this.$page.props.github).toLowerCase() == "true";
           },
           hasOrcidClientID() {
-            return this.$page.props.orcid;
+            return String(this.$page.props.orcid).toLowerCase() == "true";
           },
           hasSingleSingOn() {
             if(this.hasTwitterClientID || this.hasGithubClientID || this.hasOrcidClientID) {

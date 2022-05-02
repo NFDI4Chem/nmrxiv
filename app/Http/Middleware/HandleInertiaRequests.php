@@ -38,6 +38,9 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request)
     {
         return array_merge(parent::share($request), [
+            'flash' => [
+                'message' => fn () => $request->session()->get('message')
+            ],
             'user.permissions' => fn() => $request->user() ?
                 $request->user()->getPermissionsViaRoles()->pluck('name')
                 : null,
@@ -53,7 +56,9 @@ class HandleInertiaRequests extends Middleware
             'twitter' => (env('TWITTER_CLIENT_ID') !== null && env('TWITTER_CLIENT_ID') !== ''),
             'github'  => (env('GITHUB_CLIENT_ID') !== null && env('GITHUB_CLIENT_ID') !== ''),
             'orcid'  => (env('ORCID_CLIENT_ID') !== null && env('ORCID_CLIENT_ID') !== ''),
-            'config.announcements' => Announcement::active()
+            'config.announcements' => Announcement::active(),
+            'url'  => env('APP_URL'),
+            'nmriumURL' => env('NMRIUM_URL'),
         ]);
     }
 
