@@ -149,7 +149,6 @@ import {
   ExclamationCircleIcon
 } from "@heroicons/vue/solid";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
-import {  } from "@heroicons/vue/solid";
 
 
 export default {

@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
 use Inertia\Middleware;
+use App\Models\Announcement;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -52,7 +53,7 @@ class HandleInertiaRequests extends Middleware
             'twitter' => (env('TWITTER_CLIENT_ID') !== null && env('TWITTER_CLIENT_ID') !== ''),
             'github'  => (env('GITHUB_CLIENT_ID') !== null && env('GITHUB_CLIENT_ID') !== ''),
             'orcid'  => (env('ORCID_CLIENT_ID') !== null && env('ORCID_CLIENT_ID') !== ''),
-            'bannerMessage' => "You may experience sudden downtime on 12/10/2021 for few hours between 12-2 pm CET, due to some mandatory scheduled maintenance of the site. Apologies for any inconvenience caused.", //for demo purpose
+            'config.announcements' => Announcement::active()
         ]);
     }
 
