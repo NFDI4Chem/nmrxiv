@@ -30,8 +30,28 @@ class Study extends Model implements Auditable
         'study_photo_path'
     ];
 
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
+    protected $appends = [
+        'public_url',
+        'private_url',
+    ];
+
     public function project()
     {
         return $this->belongsTo(Project::class, 'project_id');
+    }
+
+    protected function getPublicUrlAttribute()
+    {
+        return  env('APP_URL', null)."/projects/".urlencode($this->slug);
+    }
+
+    protected function getPrivateUrlAttribute()
+    {
+        return  env('APP_URL', null)."/projects/".urlencode($this->url);
     }
 }

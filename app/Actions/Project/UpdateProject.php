@@ -32,7 +32,6 @@ class UpdateProject
             'color' => array_key_exists('color', $input) ? $input['color'] : null,
             'starred'  => array_key_exists('starred', $input) ?$input['starred'] : null,
             'location' => array_key_exists('location', $input) ?$input['location'] : null,
-            'url'  => array_key_exists('url', $input) ?$input['url'] : null,
             'type'  => array_key_exists('type', $input) ?$input['type'] : null,
             'access'  => array_key_exists('access', $input) ?$input['access'] : 'restricted',
             'access_type'  => array_key_exists('access_type', $input) ? $input['access_type'] : 'viewer',

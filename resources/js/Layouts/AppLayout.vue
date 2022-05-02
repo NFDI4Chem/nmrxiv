@@ -120,6 +120,18 @@
               </svg>
               Dashboard
             </Link>
+            <!-- <div class="space-y-1 mt-4">
+              <h3 class="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider" id="projects-headline">
+                Projects
+              </h3>
+              <div class="space-y-1" role="group" aria-labelledby="projects-headline">
+                <a v-for="item in secondaryNavigation" :key="item.name" :href="item.href" class="group flex items-center px-3 py-2 text-sm font-medium text-gray-600 rounded-md hover:text-gray-900 hover:bg-gray-50">
+                  <span class="truncate">
+                    {{ item.name }}
+                  </span>
+                </a>
+              </div>
+            </div> -->
           </nav>
         </div>
       </div>
@@ -391,6 +403,11 @@ import { SearchIcon } from "@heroicons/vue/solid";
 
 const userNavigation = [];
 
+const secondaryNavigation = [
+  { name: 'Starred', href: '#' },
+  { name: 'Shared with me', href: '#' },
+]
+
 export default {
   props: {
     title: String,
@@ -422,7 +439,8 @@ export default {
     const sidebarOpen = ref(false);
     return {
       userNavigation,
-      sidebarOpen,
+      secondaryNavigation,
+      sidebarOpen
     };
   },
   methods: {
