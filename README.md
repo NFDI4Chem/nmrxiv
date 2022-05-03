@@ -1,4 +1,4 @@
-<p align="center"><a href="https://dev.nmrxiv.org" target="_blank"><img src="/public/img/logo.png" width="400"></a></p>
+<p align="center"><a href="https://dev.nmrxiv.org" target="_blank"><img src="/public/img/logo.svg" width="400"></a></p>
 
 ## About nmrXiv
 
