@@ -1,7 +1,7 @@
 <template>
   <Head :title="title" />
   <jet-banner />
-  <announcement-banner :message='$page.props.bannerMessage'/>
+  <announcement-banner/>
   <div>
     <TransitionRoot as="template" :show="sidebarOpen">
       <Dialog

@@ -59,6 +59,7 @@ class HandleInertiaRequests extends Middleware
             'config.announcements' => Announcement::active(),
             'url'  => env('APP_URL'),
             'nmriumURL' => env('NMRIUM_URL'),
+            'environment' => env('APP_ENV')
         ]);
     }
 
