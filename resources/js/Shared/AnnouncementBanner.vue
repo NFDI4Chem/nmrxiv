@@ -35,7 +35,6 @@ export default {
     Button,
   },
   props: {
-    message: String,
   },
   data() {
     return {
