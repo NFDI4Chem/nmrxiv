@@ -270,8 +270,8 @@
                     </jet-dropdown-link>
                   </span>
                   <span v-if="$page.props.jetstream.hasTeamFeatures">
-                    <form @submit.prevent="switchToTeam($page.props.user.all_teams[0])">
-                      <jet-dropdown-link v-if="!$page.props.user.current_team.personal_team" as="button">
+                    <form v-if="!$page.props.user.current_team.personal_team" @submit.prevent="switchToTeam(personalTeam)">
+                      <jet-dropdown-link as="button">
                         <div class="flex items-center">
                           <svg
                             class="mr-2 h-5 w-5 text-gray-400"
@@ -460,5 +460,10 @@ export default {
       this.$inertia.post(route("logout"));
     },
   },
+  computed:{
+      personalTeam(){
+          return this.$page.props.user.all_teams.filter(t => t.personal_team)[0]
+      }
+    }
 };
 </script>
