@@ -32,7 +32,7 @@
           <h2
             class="mt-2 text-2xl font-bold break-words leading-7 text-gray-900 sm:text-3xl"
           >
-            {{ study.name }}
+            <StarIcon :class="[ study.starred ? 'text-yellow-400' : 'text-gray-200', 'h-5 w-5 inline flex-shrink-0 -ml-8 mr-0.5']" aria-hidden="true" /> {{ study.name }}
           </h2>
           <div class="mt-1 flex flex-col sm:flex-row sm:flex-wrap sm:mt-0 sm:space-x-6">
             <div class="mt-2 flex items-center text-sm text-gray-500">
@@ -134,6 +134,7 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import { Link } from "@inertiajs/inertia-vue3";
 import StudyDetails from "./Partials/Details.vue";
+import { StarIcon } from "@heroicons/vue/solid";
 import { ref } from "vue";
 import {
   BriefcaseIcon,
@@ -168,6 +169,7 @@ export default {
     LinkIcon,
     LocationMarkerIcon,
     PencilIcon,
+    StarIcon
   },
   props: ["study", "project"],
   data() {

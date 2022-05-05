@@ -19,7 +19,7 @@
                 class="h-full divide-y divide-gray-200 flex flex-col bg-white shadow-xl"
               >
                 <div class="flex-1 h-0 overflow-y-auto">
-                  <div class="py-6 px-4 sm:px-6"  :style="'background-color:'+project.color">
+                  <div class="py-6 px-4 sm:px-6"  :style="[ (project.color && project.color!='') ? ('background-color:' + project.color)  : 'background-color:rgb(75,75,75)']">
                     <div class="flex items-center justify-between">
                       <DialogTitle class="text-lg font-medium text-white">
                         {{ project.name }}

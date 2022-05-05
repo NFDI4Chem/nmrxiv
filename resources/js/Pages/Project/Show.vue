@@ -5,7 +5,7 @@
         <div
           class="flex pr-20 items-center text-sm text-gray-700 uppercase font-bold tracking-widest"
         >
-          {{ project.name }}
+          <StarIcon :class="[ project.starred ? 'text-yellow-400' : 'text-gray-200', 'h-5 w-5 flex-shrink-0 -ml-1 mr-1']" aria-hidden="true" /> {{ project.name }}
         </div>
         <div class="cursor-pointer inline-flex items-center mt-3">
           <span v-if="project.is_public" class="inline-flex items-center">
@@ -101,13 +101,15 @@ import { Link } from "@inertiajs/inertia-vue3";
 import StudyIndex from "@/Pages/Study/Index.vue";
 import ProjectDetails from './Partials/Details.vue';
 import { ref } from 'vue'
+import { StarIcon } from "@heroicons/vue/solid";
 
 export default {
   components: {
     Link,
     AppLayout,
     StudyIndex,
-    ProjectDetails
+    ProjectDetails,
+    StarIcon
   },
   props: ["project", "studies"],
   data() {
