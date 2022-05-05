@@ -6,11 +6,12 @@ on:
 
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
-  GKE_CLUSTER: nmrxiv-dev-and-doc
+  GKE_CLUSTER: nmrxiv-dev
   GKE_ZONE: europe-west3-a
   DEPLOYMENT_NAME: nmrxiv-nmrxiv-app
-  APP_IMAGE: app
-  NGINX_IMAGE: nginx
+  REPOSITORY_NAME: nmrxiv-dev
+  APP_IMAGE: nmrxiv-app
+  NGINX_IMAGE: nmrxiv-nginx
 
 jobs:
   setup-build-publish-deploy:
@@ -30,7 +31,7 @@ jobs:
 
     # Configure docker to use the gcloud command-line tool as a credential helper
     - run: |-
-        gcloud --quiet auth configure-docker
+        gcloud auth configure-docker europe-west3-docker.pkg.dev
     # Get the GKE credentials so we can deploy to the cluster
     - uses: google-github-actions/get-gke-credentials@v0.3.0
       with:
@@ -42,32 +43,26 @@ jobs:
     - name: Build App Image
       run: |-
         docker build -f ./resources/ops/docker/app/app.dockerfile \
-          --tag "eu.gcr.io/$PROJECT_ID/$APP_IMAGE:latest" \
+          --tag "europe-west3-docker.pkg.dev/$PROJECT_ID/$REPOSITORY_NAME/$APP_IMAGE:latest" \
           --build-arg GITHUB_SHA="$GITHUB_SHA" \
           --build-arg GITHUB_REF="$GITHUB_REF" \
           .
     - name: Build Nginx Image
       run: |-
         docker build -f ./resources/ops/docker/nginx/nginx.dockerfile \
-          --tag "eu.gcr.io/$PROJECT_ID/$NGINX_IMAGE:latest" \
+          --tag "europe-west3-docker.pkg.dev/$PROJECT_ID/$REPOSITORY_NAME/$NGINX_IMAGE:latest" \
           --build-arg GITHUB_SHA="$GITHUB_SHA" \
           --build-arg GITHUB_REF="$GITHUB_REF" \
           .
     # Push the Docker image to Google Container Registry
     - name: Publish App Image to GCR
       run: |-
-        docker push "eu.gcr.io/$PROJECT_ID/$APP_IMAGE:latest"
+        docker push "europe-west3-docker.pkg.dev/$PROJECT_ID/$REPOSITORY_NAME/$APP_IMAGE:latest"
 
     - name: Publish Nginx Image to GCR
       run: |-
-        docker push "eu.gcr.io/$PROJECT_ID/$NGINX_IMAGE:latest"
+        docker push "europe-west3-docker.pkg.dev/$PROJECT_ID/$REPOSITORY_NAME/$NGINX_IMAGE:latest"
 
-    # Set up kustomize
-    # - name: Set up Kustomize
-    #   run: |-
-    #     curl --location https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv4.2.0/kustomize_v4.2.0_linux_amd64.tar.gz | tar xz
-    #     chmod u+x ./kustomize
-    # Deploy the latest Docker image to the GKE cluster
     - name: Deploy
       run: |-
         kubectl rollout restart deployment/$DEPLOYMENT_NAME
