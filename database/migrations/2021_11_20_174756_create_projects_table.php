@@ -17,7 +17,7 @@ class CreateProjectsTable extends Migration
             $table->id();
             $table->string('name');
             $table->string('slug');
-            $table->string('color')->nullable();
+            $table->string('color')->nullable()->default('rgb(75, 75, 75)');
             $table->boolean('starred')->nullable()->default(0);
             $table->boolean('is_public')->nullable()->default(0);
             $table->boolean('is_deleted')->nullable()->default(0);
