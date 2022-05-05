@@ -264,12 +264,14 @@
                   class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
                 >
                   <span v-if="hasAnyPermission(['manage platform'])">
-                    <div class="block px-4 py-2 text-xs text-gray-400">Admin</div>
+                    <div class="block px-4 pt-2 text-xs text-gray-400">Management</div>
                     <jet-dropdown-link :href="route('console')">
-                      Console
+                      Admin Console
                     </jet-dropdown-link>
                   </span>
+                  <div class="border-t border-gray-100"></div>
                   <span v-if="$page.props.jetstream.hasTeamFeatures">
+                    <div v-if="!$page.props.user.current_team.personal_team" class="block px-4 pt-2 text-xs text-gray-400">Personal Account</div>
                     <form v-if="!$page.props.user.current_team.personal_team" @submit.prevent="switchToTeam(personalTeam)">
                       <jet-dropdown-link as="button">
                         <div class="flex items-center">
@@ -290,7 +292,7 @@
                         </div>
                       </jet-dropdown-link>
                     </form>
-                    <div class="block px-4 py-2 text-xs text-gray-400">Team</div>
+                    <div class="block px-4 pt-2 text-xs text-gray-400">Teams</div>
                     <template v-if="$page.props.jetstream.hasTeamFeatures">
                       <template v-for="team in $page.props.user.all_teams" :key="team.id">
                         <form @submit.prevent="switchToTeam(team)">
@@ -337,7 +339,10 @@
                       </jet-dropdown-link>
                     </template>
                   </span>
-                  <div class="block px-4 py-2 text-xs text-gray-400">Manage Account</div>
+
+                  <div class="border-t border-gray-100"></div>
+
+                  <div class="block px-4 pt-2 text-xs text-gray-400">Manage Account</div>
 
                   <jet-dropdown-link :href="route('profile.show')">
                     Profile
