@@ -155,10 +155,16 @@
                             <span class="ml-2">Private</span>
                         </span>
                         </span>
-                        <span class="text-sm text-gray-600 pr-5">
-                        <span class="text-gray-400">Created on</span>
-                        {{ formatDate(project.created_at) }}
-                        </span>
+                        <div class="grid grid-cols-1 pt-1">
+                            <div class="text-sm text-gray-600 pr-5">
+                                <span class="text-gray-400">Last updated on</span> 
+                                {{ formatDate(project.updated_at) }}
+                                </div>
+                            <div class="text-sm text-gray-600 pr-5">
+                                <span class="text-gray-400">Created on</span> 
+                                {{ formatDate(project.created_at) }}
+                                </div>
+                        </div>
                     </div>
                     </div>
                     <div class="border-l">
