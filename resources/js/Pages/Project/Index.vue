@@ -4,7 +4,7 @@
           <div>
               <h2 class="text-lg">Projects</h2>
               <div class="mt-2 text-sm text-gray-700">
-              <div class="mßax-w-2xl">Each team may house a variety of projects.</div>
+              <div class="mßax-w-2xl">You may house a variety of projects.</div>
               </div>
           </div>
           <div class="flex-shrink-0 ml-4">
