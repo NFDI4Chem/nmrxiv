@@ -7,7 +7,7 @@ use App\Models\Announcement;
 use App\Models\User;
 use App\Models\Team;
 use Carbon\Carbon;
-
+use Illuminate\Support\Str;
 
 class AnnouncementSeeder extends Seeder
 {
@@ -20,6 +20,7 @@ class AnnouncementSeeder extends Seeder
     {   
         // Get the first super admin account
         $admin = User::role('super-admin')->first();
+        $password = Str::random();
 
         // If doesnt exist create one and assign the role super admin
         if(is_null($admin)){
@@ -27,7 +28,7 @@ class AnnouncementSeeder extends Seeder
                 'first_name'        => "Super admin",
                 'last_name'         => "User",
                 'email'             => 'superadmin@email.com',
-                'password'          => bcrypt('secret'),
+                'password'          => bcrypt($password),
                 'email_verified_at' => Carbon::now()
             ]);
 
