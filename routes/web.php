@@ -8,8 +8,10 @@ use App\Http\Controllers\Auth\SocialController;
 use App\Http\Controllers\Admin\ConsoleController;
 use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\FileSystemController;
 use App\Http\Controllers\StudyController;
 use App\Models\Project;
+use App\Http\Controllers\Admin\AnnouncementController;
 
 Route::group([
     'prefix' => 'auth'
@@ -27,6 +29,11 @@ Route::get('/', function () {
     ]);
 });
 
+Route::supportBubble();
+
+Route::get('{code}/studies/{study}/file/{filename}', [StudyController::class, 'file'])
+        ->name('study.file');
+
 Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function (Request $request) {
     $user = $request->user();
     $team = $user->currentTeam;
@@ -41,6 +48,8 @@ Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function (Req
 })->name('dashboard');
 
 Route::group(['middleware' => ['auth']], function () {
+    Route::post('/storage/signed-storage-url',  [FileSystemController::class, 'signedStorageURL']);
+    
     Route::get('projects/{project}', [ProjectController::class, 'show'])
         ->name('project');
     Route::get('projects/{project}/settings', [ProjectController::class, 'settings'])
@@ -56,6 +65,9 @@ Route::group(['middleware' => ['auth']], function () {
     
     Route::get('studies/{study}', [StudyController::class, 'show'])
         ->name('study');
+    Route::get('studies/{study}/files', [StudyController::class, 'files'])
+        ->name('study.files');
+
     Route::get('studies/{study}/settings', [StudyController::class, 'settings'])
         ->name('study.settings');
     Route::delete('studies/{study}', [StudyController::class, 'destroy'])
@@ -101,6 +113,22 @@ Route::group([
 
             Route::delete('users/edit/{user}/photo', [UsersController::class, 'destroyPhoto'])
             ->name('users.destroy-photo');
+        });
+
+        // Adding routes for announcements section
+        Route::group(['middleware' => ['auth', 'permission:manage roles|manage platform']], function () {
+            // Announcements
+            Route::get('announcements', [AnnouncementController::class, 'index'])
+            ->name('announcements');
+            
+            Route::post('announcements/create', [AnnouncementController::class, 'create'])
+            ->name('announcements.create');
+
+            Route::post('announcements/{announcement}', [AnnouncementController::class, 'update'])
+            ->name('announcements.edit');
+
+            Route::delete('announcements/{announcement}', [AnnouncementController::class, 'destroy'])
+            ->name('announcements.destroy');
         });
     });
 });

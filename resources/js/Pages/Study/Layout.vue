@@ -32,7 +32,7 @@
           <h2
             class="mt-2 text-2xl font-bold break-words leading-7 text-gray-900 sm:text-3xl"
           >
-            {{ study.name }}
+            <StarIcon :class="[ study.starred ? 'text-yellow-400' : 'text-gray-200', 'h-5 w-5 inline flex-shrink-0 -ml-8 mr-0.5']" aria-hidden="true" /> {{ study.name }}
           </h2>
           <div class="mt-1 flex flex-col sm:flex-row sm:flex-wrap sm:mt-0 sm:space-x-6">
             <div class="mt-2 flex items-center text-sm text-gray-500">
@@ -113,9 +113,9 @@
             <div class="mt-2 flex items-center text-sm text-gray-500">
               <a @click="toggleDetails" class="cursor-pointer inline-flex items-center"
                 ><ExclamationCircleIcon
-                              class="h-5 w-5 text-gray-400 group-hover:text-gray-500"
-                              aria-hidden="true"
-                            />
+                  class="h-5 w-5 text-gray-400 group-hover:text-gray-500"
+                  aria-hidden="true"
+                />
                 <span class="ml-2">View details</span></a
               >
             </div>
@@ -125,7 +125,7 @@
       </div>
     </template>
     <div class="pb-12 pt-6 px-10">
-      <study-content :study="study"></study-content>
+      <slot name="scontent"></slot>
     </div>
   </app-layout>
 </template>
@@ -134,7 +134,7 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import { Link } from "@inertiajs/inertia-vue3";
 import StudyDetails from "./Partials/Details.vue";
-import StudyContent from "./Partials/Content.vue";
+import { StarIcon } from "@heroicons/vue/solid";
 import { ref } from "vue";
 import {
   BriefcaseIcon,
@@ -146,11 +146,9 @@ import {
   LinkIcon,
   LocationMarkerIcon,
   PencilIcon,
-  ExclamationCircleIcon
+  ExclamationCircleIcon,
 } from "@heroicons/vue/solid";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
-import {  } from "@heroicons/vue/solid";
-
 
 export default {
   components: {
@@ -158,7 +156,6 @@ export default {
     AppLayout,
     StudyDetails,
     ExclamationCircleIcon,
-    StudyContent,
     Menu,
     MenuButton,
     MenuItem,
@@ -172,6 +169,7 @@ export default {
     LinkIcon,
     LocationMarkerIcon,
     PencilIcon,
+    StarIcon
   },
   props: ["study", "project"],
   data() {

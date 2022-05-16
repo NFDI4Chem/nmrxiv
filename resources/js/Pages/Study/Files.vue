@@ -1,0 +1,273 @@
+<template>
+  <div>
+    <study-content :project="project" :study="study" current="Files">
+      <template #study-section>
+        <div class="divide-y divide-gray-200 sm:col-span-9">
+          <div class="py-6 px-4 sm:p-6">
+            <div class="flex flex-item">
+              <h2 class="text-lg leading-6 font-medium text-gray-900">Data set</h2>
+            </div>
+          </div>
+          <div v-if="file">
+            <div class="min-w-0 flex-1 min-h-screen border-t border-gray-200 lg:flex">
+              <aside class="hidden py-3 px-2 lg:block lg:flex-shrink-0 lg:order-first">
+                <div
+                  v-if="file != null"
+                  class="h-full relative flex flex-col w-64 border-r border-gray-200 overflow-y-auto"
+                >
+                  <children :file="file" :study="study" :project="project"></children>
+                </div>
+              </aside>
+              <section
+                class="min-w-0 p-6 flex-1 h-full flex flex-col overflow-y-auto lg:order-last"
+              >
+                <div>
+                  <form class="dropzone py-2 mb-3">
+                    <div id="dropzone-message" class="text-center">
+                      <div
+                        type="button"
+                        class="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                      >
+                        <svg
+                          class="mx-auto h-12 w-12 text-gray-400"
+                          xmlns="http://www.w3.org/2000/svg"
+                          stroke="currentColor"
+                          fill="none"
+                          viewBox="0 0 48 48"
+                          aria-hidden="true"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M8 14v20c0 4.418 7.163 8 16 8 1.381 0 2.721-.087 4-.252M8 14c0 4.418 7.163 8 16 8s16-3.582 16-8M8 14c0-4.418 7.163-8 16-8s16 3.582 16 8m0 0v14m0-4c0 4.418-7.163 8-16 8S8 28.418 8 24m32 10v6m0 0v6m0-6h6m-6 0h-6"
+                          />
+                        </svg>
+                        <span class="mt-2 block text-sm font-medium text-gray-900">
+                          Drop Files or Folders to upload to
+                          <span v-if="$page.props.selectedFolder"
+                            >"{{ $page.props.selectedFolder }}"</span
+                          >
+                          folder
+                        </span>
+
+                        <div v-if="progress > 0" class="relative mt-5">
+                          <div
+                            class="overflow-hidden h-2 text-xs flex rounded bg-gray-200"
+                          >
+                            <div
+                              :style="'width: ' + progress + '%'"
+                              class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-green-500"
+                            ></div>
+                          </div>
+                        </div>
+                        <div v-if="progress > 0">
+                          <span class="mt-2 block text-sm font-medium text-gray-900">
+                            {{ status }} ({{ progress }}%)
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+                <div
+                  class="mb-3"
+                  v-if="$page.props.selectedFileSystemObject && $page.props.selectedFileSystemObject.has_children"
+                >
+                  <ul
+                    role="list"
+                    class="mb-3 grid grid-cols-1 gap-5 sm:gap-6 sm:grid-cols-2 lg:grid-cols-4"
+                  >
+                    <li
+                      v-for="file in $page.props.selectedFileSystemObject.children"
+                      :key="file.key"
+                      class="relative shadow rounded-lg"
+                    >
+                      <div
+                        class="group block w-full aspect-w-10 aspect-h-7 py-4 bg-gray-100 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 focus-within:ring-indigo-500 overflow-hidden"
+                      >
+                        <span v-if="file.type == 'directory'">
+                          <FolderIcon
+                            class="h-28 w-28 text-gray-400 flex-shrink-0 mx-auto"
+                            aria-hidden="true"
+                          />
+                        </span>
+                        <span v-else>
+                          <DocumentTextIcon
+                            class="h-28 w-28 text-gray-400 flex-shrink-0 mx-auto"
+                            aria-hidden="true"
+                          />
+                        </span>
+                      </div>
+                      <p
+                        class="mt-2 px-2 py-1 block text-sm font-medium text-gray-900 pointer-events-none"
+                      >
+                        {{ file.name }}
+                      </p>
+                      <p
+                        class="block text-sm font-medium text-gray-500 pointer-events-none"
+                      >
+                        {{ file.size }}
+                      </p>
+                    </li>
+                  </ul>
+                </div>
+                <div v-else>
+                  <div class="">
+                    <span
+                      v-if="
+                        $page.props.selectedFileSystemObject &&
+                        $page.props.selectedFileSystemObject.type == 'file'
+                      "
+                    >
+                      <span
+                        v-if="
+                          $page.props.selectedFileSystemObject.key.indexOf('.dx') > -1 ||
+                          $page.props.selectedFileSystemObject.key.indexOf('.jdx') > -1 ||
+                          $page.props.selectedFileSystemObject.key.indexOf('.zip') > -1 ||
+                          $page.props.selectedFileSystemObject.key.indexOf('.json') > -1
+                        "
+                      >
+                        <iframe
+                          v-on:load="loadSpectra()"
+                          name="crossDomainIframe"
+                          frameborder="0"
+                          allowfullscreen
+                          style="width: 100%; height: 500px"
+                          :src="nmriumURL"
+                        ></iframe>
+                      </span>
+                      <span v-else>
+                        {{ $page.props.selectedFileSystemObject }}
+                      </span>
+                    </span>
+                  </div>
+                </div>
+              </section>
+            </div>
+          </div>
+        </div>
+      </template>
+    </study-content>
+  </div>
+</template>
+
+<script>
+import { Dropzone } from "dropzone";
+import { Inertia } from "@inertiajs/inertia";
+import StudyContent from "@/Pages/Study/Content.vue";
+import { FolderIcon, DocumentTextIcon } from "@heroicons/vue/solid";
+import { Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/vue";
+
+export default {
+  props: ["study", "project", "file"],
+  components: {
+    StudyContent,
+    Disclosure,
+    DisclosureButton,
+    DisclosurePanel,
+    FolderIcon,
+    DocumentTextIcon,
+  },
+  setup() {
+    return {};
+  },
+  data() {
+    return {
+      progress: 0,
+      status: null,
+      selectedFileSystemObject: null,
+      selectedFolder: "/",
+    };
+  },
+  mounted() {
+    const vm = this;
+    vm.$page.props.selectedFileSystemObject = vm.file;
+    let options = {
+      url: "/",
+      method: "put",
+      sending(file, xhr) {
+        let _send = xhr.send;
+        xhr.send = () => {
+          _send.call(xhr, file);
+        };
+      },
+      autoProcessQueue: false,
+      uploadMultiple: true,
+      disablePreviews: true,
+      parallelUploads: 100,
+      maxFiles: 100,
+      dictDefaultMessage: document.querySelector("#dropzone-message").innerHTML,
+      done() {},
+      accept(file, done) {
+        const url = "/storage/signed-storage-url";
+        axios
+          .post(url, {
+            file: file,
+            destination: vm.selectedFolder,
+            project_id: vm.project.id,
+            study_id: vm.study.id,
+          })
+          .then(function (response) {
+            let data = response.data;
+            let headers = data.headers;
+            if ("Host" in headers) {
+              delete headers.Host;
+            }
+            file.uploadURL = data.url;
+            done();
+            setTimeout(() => vm.dropzone.processFile(file));
+          });
+      },
+      totaluploadprogress: function (progress) {
+        vm.progress = Math.ceil(progress);
+      },
+      queuecomplete: function () {
+        vm.status = "UPLOAD COMPLETE";
+        Inertia.reload();
+        this.$page.props.selectedFileSystemObject = this.files[0];
+      },
+    };
+    this.dropzone = new Dropzone(this.$el, options);
+
+    vm.dropzone.on("processing", (file) => {
+      vm.status = "UPLOAD IN PROGRESS";
+      vm.dropzone.options.url = file.uploadURL;
+    });
+
+    this.$page.props.selectedFileSystemObject = "root";
+  },
+  methods: {
+    loadSpectra() {
+      const iframe = window.frames.crossDomainIframe;
+      if (iframe) {
+        let data = {
+          spectra: [
+            {
+              source: {
+                jcampURL:
+                  this.url +
+                  "/asc/studies/" +
+                  this.study.id +
+                  "/file/" +
+                  this.$page.props.selectedFileSystemObject.slug,
+              },
+            },
+          ],
+        };
+        iframe.postMessage({ type: `nmr-wrapper:load`, data }, "*");
+      }
+    },
+  },
+  computed: {
+    url() {
+      return String(this.$page.props.url);
+    },
+    nmriumURL() {
+      return this.$page.props.nmriumURL
+        ? String(this.$page.props.nmriumURL)
+        : "//nmriumdev.nmrxiv.org";
+    }
+  },
+};
+</script>
