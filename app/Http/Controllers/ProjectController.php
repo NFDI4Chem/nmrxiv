@@ -10,6 +10,7 @@ use App\Models\Study;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Laravel\Fortify\Actions\ConfirmPassword;
 use Inertia\Inertia;
+use Illuminate\Validation\ValidationException;
 
 class ProjectController extends Controller
 {
