@@ -1,7 +1,7 @@
 <template>
   <span class="text-sm" v-if="file">
     <nav class="flex-1 space-y-1 bg-white" aria-label="Sidebar">
-      <Disclosure as="div" class="space-y-1" v-slot="{ open = true }">
+      <Disclosure as="div" :defaultOpen="file.name == '/'" class="space-y-1" v-slot="{ open = true }">
         <div
           :class="[
             $page.props.selectedFileSystemObject &&
