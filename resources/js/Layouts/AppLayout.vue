@@ -1,6 +1,7 @@
 <template>
   <Head :title="title" />
   <jet-banner />
+  <announcement-banner/>
   <div>
     <TransitionRoot as="template" :show="sidebarOpen">
       <Dialog
@@ -54,91 +55,8 @@
                 <jet-application-logo class="block h-8 w-auto" />
               </Link>
             </div>
-            <div class="mt-5 flex-1 h-0 overflow-y-auto">
+            <div class="mt-1 flex-1 h-0 overflow-y-auto">
               <nav class="flex-1 px-2 bg-white space-y-1">
-                <div class="relative mb-4">
-                  <jet-dropdown
-                    align="center"
-                    width="60"
-                    v-if="$page.props.jetstream.hasTeamFeatures"
-                  >
-                    <template #trigger>
-                      <span class="min-w-100 rounded-md">
-                        <button
-                          type="button"
-                          class="text-base flex min-w-full py-4 items-center px-3 py-2 border font-light leading-4 font-large rounded-md text-gray-500 bg-white hover:bg-gray-50 hover:text-gray-700 focus:outline-none focus:bg-gray-50 active:bg-gray-50 transition"
-                        >
-                          {{ $page.props.user.current_team.name }}
-                          <svg
-                            class="ml-2 -mr-0.5 h-4 w-4"
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                          >
-                            <path
-                              fill-rule="evenodd"
-                              d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
-                              clip-rule="evenodd"
-                            />
-                          </svg>
-                        </button>
-                      </span>
-                    </template>
-                    <template #content>
-                      <div class="w-60">
-                        <template v-if="$page.props.jetstream.hasTeamFeatures">
-                          <template
-                            v-for="team in $page.props.user.all_teams"
-                            :key="team.id"
-                          >
-                            <form @submit.prevent="switchToTeam(team)">
-                              <jet-dropdown-link as="button">
-                                <div class="flex items-center">
-                                  <svg
-                                    v-if="team.id == $page.props.user.current_team_id"
-                                    class="mr-2 h-5 w-5 text-green-400"
-                                    fill="none"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                  >
-                                    <path
-                                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                                    ></path>
-                                  </svg>
-                                  <svg
-                                    v-else
-                                    class="mr-2 h-5 w-5 text-gray-400"
-                                    fill="none"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                  >
-                                    <path
-                                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                                    ></path>
-                                  </svg>
-                                  <div>{{ team.name }}</div>
-                                </div>
-                              </jet-dropdown-link>
-                            </form>
-                          </template>
-                          <div class="border-t border-gray-100"></div>
-                          <jet-dropdown-link
-                            :href="route('teams.create')"
-                            v-if="$page.props.jetstream.canCreateTeams"
-                          >
-                            Create New Team
-                          </jet-dropdown-link>
-                        </template>
-                      </div>
-                    </template>
-                  </jet-dropdown>
-                </div>
                 <Link
                   :href="route('dashboard')"
                   class="my-6 text-gray-900 group flex items-center px-2 py-3 text-sm font-medium rounded-md"
@@ -181,90 +99,9 @@
         </div>
         <div class="mt-5 flex-grow flex flex-col">
           <nav class="flex-1 px-2 bg-white space-y-1">
-            <div class="relative mb-4">
-              <jet-dropdown
-                align="center"
-                width="60"
-                v-if="$page.props.jetstream.hasTeamFeatures"
-              >
-                <template #trigger>
-                  <span class="min-w-100 rounded-md">
-                    <button
-                      type="button"
-                      class="text-base flex min-w-full py-4 items-center px-3 py-2 border font-light leading-4 font-large rounded-md text-gray-500 bg-white hover:bg-gray-50 hover:text-gray-700 focus:outline-none focus:bg-gray-50 active:bg-gray-50 transition"
-                    >
-                      {{ $page.props.user.current_team.name }}
-
-                      <svg
-                        class="ml-2 -mr-0.5 h-4 w-4"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path
-                          fill-rule="evenodd"
-                          d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
-                          clip-rule="evenodd"
-                        />
-                      </svg>
-                    </button>
-                  </span>
-                </template>
-                <template #content>
-                  <div class="w-60">
-                    <template v-if="$page.props.jetstream.hasTeamFeatures">
-                      <template v-for="team in $page.props.user.all_teams" :key="team.id">
-                        <form @submit.prevent="switchToTeam(team)">
-                          <jet-dropdown-link as="button">
-                            <div class="flex items-center">
-                              <svg
-                                v-if="team.id == $page.props.user.current_team_id"
-                                class="mr-2 h-5 w-5 text-green-400"
-                                fill="none"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                                ></path>
-                              </svg>
-                              <svg
-                                v-else
-                                class="mr-2 h-5 w-5 text-gray-400"
-                                fill="none"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                                ></path>
-                              </svg>
-                              <div>{{ team.name }}</div>
-                            </div>
-                          </jet-dropdown-link>
-                        </form>
-                      </template>
-                      <div class="border-t border-gray-100"></div>
-                      <jet-dropdown-link
-                        :href="route('teams.create')"
-                        v-if="$page.props.jetstream.canCreateTeams"
-                      >
-                        Create New Team
-                      </jet-dropdown-link>
-                    </template>
-                  </div>
-                </template>
-              </jet-dropdown>
-            </div>
             <Link
               :href="route('dashboard')"
-              class="my-6 text-gray-900 group flex items-center px-2 py-3 text-sm font-medium rounded-md"
+              class="text-gray-900 group flex items-center px-2 py-3 text-sm font-medium rounded-md"
             >
               <svg
                 class="text-gray-500 mr-3 flex-shrink-0 h-6 w-6"
@@ -283,6 +120,18 @@
               </svg>
               Dashboard
             </Link>
+            <!-- <div class="space-y-1 mt-4">
+              <h3 class="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider" id="projects-headline">
+                Projects
+              </h3>
+              <div class="space-y-1" role="group" aria-labelledby="projects-headline">
+                <a v-for="item in secondaryNavigation" :key="item.name" :href="item.href" class="group flex items-center px-3 py-2 text-sm font-medium text-gray-600 rounded-md hover:text-gray-900 hover:bg-gray-50">
+                  <span class="truncate">
+                    {{ item.name }}
+                  </span>
+                </a>
+              </div>
+            </div> -->
           </nav>
         </div>
       </div>
@@ -317,6 +166,7 @@
               </div>
             </form>
           </div>
+          <flash-messages />
           <div class="ml-4 flex items-center md:ml-6">
             <a href="https://docs.nmrxiv.org" target="_blank"
               ><svg
@@ -334,7 +184,7 @@
                 ></path></svg
             ></a>
             <Menu as="div" class="ml-3 relative">
-              <div>
+              <div v-if="$page.props.user.current_team.personal_team">
                 <MenuButton
                   v-if="!$page.props.jetstream.managesProfilePhotos"
                   class="flex text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition"
@@ -374,6 +224,34 @@
                   </MenuButton>
                 </span>
               </div>
+              <div v-else>
+                <MenuButton
+                    type="button"
+                    class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition"
+                  >
+                    <img
+                      class="h-8 w-8 rounded-full object-cover mr-2"
+                      :src="$page.props.user.current_team.profile_photo_url"
+                      :alt="$page.props.user.current_team.name"
+                    />
+                    <span class="flex md:block hidden">{{
+                      $page.props.user.current_team.name
+                    }}</span>
+
+                    <svg
+                      class="ml-2 -mr-0.5 h-4 w-4"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                  </MenuButton>
+              </div>
               <transition
                 enter-active-class="transition ease-out duration-100"
                 enter-from-class="transform opacity-0 scale-95"
@@ -386,13 +264,85 @@
                   class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
                 >
                   <span v-if="hasAnyPermission(['manage platform'])">
-                    <div class="block px-4 py-2 text-xs text-gray-400">Admin</div>
+                    <div class="block px-4 pt-2 text-xs text-gray-400">Management</div>
                     <jet-dropdown-link :href="route('console')">
-                      Console
+                      Admin Console
                     </jet-dropdown-link>
                   </span>
+                  <div class="border-t border-gray-100"></div>
+                  <span v-if="$page.props.jetstream.hasTeamFeatures">
+                    <div v-if="!$page.props.user.current_team.personal_team" class="block px-4 pt-2 text-xs text-gray-400">Personal Account</div>
+                    <form v-if="!$page.props.user.current_team.personal_team" @submit.prevent="switchToTeam(personalTeam)">
+                      <jet-dropdown-link as="button">
+                        <div class="flex items-center">
+                          <svg
+                            class="mr-2 h-5 w-5 text-gray-400"
+                            fill="none"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                            ></path>
+                          </svg>
+                          <div>{{ $page.props.user.first_name }} {{ $page.props.user.last_name }}</div>
+                        </div>
+                      </jet-dropdown-link>
+                    </form>
+                    <div class="block px-4 pt-2 text-xs text-gray-400">Teams</div>
+                    <template v-if="$page.props.jetstream.hasTeamFeatures">
+                      <template v-for="team in $page.props.user.all_teams" :key="team.id">
+                        <form @submit.prevent="switchToTeam(team)">
+                          <jet-dropdown-link v-if="!team.personal_team" as="button">
+                            <div class="flex items-center">
+                              <svg
+                                v-if="team.id == $page.props.user.current_team_id"
+                                class="mr-2 h-5 w-5 text-green-400"
+                                fill="none"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                ></path>
+                              </svg>
+                              <svg
+                                v-else
+                                class="mr-2 h-5 w-5 text-gray-400"
+                                fill="none"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                ></path>
+                              </svg>
+                              <div>{{ team.name }}</div>
+                            </div>
+                          </jet-dropdown-link>
+                        </form>
+                      </template>
+                      <jet-dropdown-link
+                        :href="route('teams.create')"
+                        v-if="$page.props.jetstream.canCreateTeams"
+                      >
+                        Create New Team
+                      </jet-dropdown-link>
+                    </template>
+                  </span>
 
-                  <div class="block px-4 py-2 text-xs text-gray-400">Manage Account</div>
+                  <div class="border-t border-gray-100"></div>
+
+                  <div class="block px-4 pt-2 text-xs text-gray-400">Manage Account</div>
 
                   <jet-dropdown-link :href="route('profile.show')">
                     Profile
@@ -436,6 +386,8 @@ import { Head, Link } from "@inertiajs/inertia-vue3";
 import JetBanner from "@/Jetstream/Banner.vue";
 import JetDropdown from "@/Jetstream/Dropdown.vue";
 import JetDropdownLink from "@/Jetstream/DropdownLink.vue";
+import FlashMessages from "@/Shared/FlashMessages";
+import AnnouncementBanner from "@/Shared/AnnouncementBanner.vue";
 import { ref } from "vue";
 import {
   Dialog,
@@ -455,6 +407,11 @@ import {
 import { SearchIcon } from "@heroicons/vue/solid";
 
 const userNavigation = [];
+
+const secondaryNavigation = [
+  { name: 'Starred', href: '#' },
+  { name: 'Shared with me', href: '#' },
+]
 
 export default {
   props: {
@@ -479,13 +436,16 @@ export default {
     MenuAlt2Icon,
     SearchIcon,
     XIcon,
+    FlashMessages,
+    AnnouncementBanner,
+
   },
   setup() {
     const sidebarOpen = ref(false);
-
     return {
       userNavigation,
-      sidebarOpen,
+      secondaryNavigation,
+      sidebarOpen
     };
   },
   methods: {
@@ -505,5 +465,10 @@ export default {
       this.$inertia.post(route("logout"));
     },
   },
+  computed:{
+      personalTeam(){
+          return this.$page.props.user.all_teams.filter(t => t.personal_team)[0]
+      }
+    }
 };
 </script>
