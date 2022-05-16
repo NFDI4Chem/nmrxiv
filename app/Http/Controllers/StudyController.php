@@ -56,11 +56,14 @@ class StudyController extends Controller
         return Inertia::render('Study/Files', [
             'study' => $study,
             'project' => $study->project,
-            'files' => FileSystemObject::with('children')->where([
-                ['level', 0],
-                ['project_id', $study->project->id],
-                ['study_id', $study->id]
-            ])->orderBy('type')->get()
+            'file' => [
+                'name' => '/',
+                'children' => FileSystemObject::with('children')->where([
+                    ['level', 0],
+                    ['project_id', $study->project->id],
+                    ['study_id', $study->id]
+                ])->orderBy('type')->get()
+            ]
         ]);
     }
 
