@@ -26,7 +26,7 @@ class UsersSeeder extends Seeder
             'first_name'     => "Super admin",
             'last_name'     => "User",
             'email'    => $email,
-            'password' => $password,
+            'password' => bcrypt($password),
             'email_verified_at' => Carbon::now()
         ]);
 
