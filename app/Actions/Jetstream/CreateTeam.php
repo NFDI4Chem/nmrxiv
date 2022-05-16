@@ -32,6 +32,7 @@ class CreateTeam implements CreatesTeams
             'personal_team' => false,
         ]));
 
-        return $team;
+        //return $team;
+        return redirect()->route('dashboard')->with('success', 'Team created successfully');
     }
 }

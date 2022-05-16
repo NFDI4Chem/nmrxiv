@@ -15,5 +15,6 @@ class DeleteTeam implements DeletesTeams
     public function delete($team)
     {
         $team->purge();
+        return redirect()->route('dashboard')->with('success', 'Team deleted successfully');
     }
 }

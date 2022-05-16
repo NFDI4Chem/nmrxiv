@@ -27,6 +27,8 @@ class RemoveTeamMember implements RemovesTeamMembers
         $team->removeUser($teamMember);
 
         TeamMemberRemoved::dispatch($team, $teamMember);
+
+        return redirect()->route('dashboard')->with('success', 'Member removed successfully');
     }
 
     /**
