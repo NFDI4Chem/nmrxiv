@@ -27,5 +27,7 @@ class UpdateTeamName implements UpdatesTeamNames
         $team->forceFill([
             'name' => $input['name'],
         ])->save();
+
+        return redirect()->route('dashboard')->with('success', 'Team name updated successfully');
     }
 }
