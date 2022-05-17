@@ -4,9 +4,9 @@
     class="fixed z-50 bg-yellow-400 border-b w-screen border-black-800"
   >
     <div class="max-w-7xl mx-auto py-1 px-6">
-      <p class="text-sm text-dark font-semibold animate-pulse">
+      <p class="text-sm text-justify text-dark font-semibold animate-pulse">
         <span :key="announcement.id" v-for="announcement in announcements">
-          <span class="sm:text-justify" v-html="announcement.message"></span>
+          <span v-html="announcement.message"></span>
         </span>
       </p>
       <div
