@@ -72,7 +72,10 @@
                 </div>
                 <div
                   class="mb-3"
-                  v-if="$page.props.selectedFileSystemObject && $page.props.selectedFileSystemObject.has_children"
+                  v-if="
+                    $page.props.selectedFileSystemObject &&
+                    $page.props.selectedFileSystemObject.has_children
+                  "
                 >
                   <ul
                     role="list"
@@ -88,6 +91,7 @@
                       >
                         <span v-if="file.type == 'directory'">
                           <FolderIcon
+                            @doubleclick.stop="displaySelected(file)"
                             class="h-28 w-28 text-gray-400 flex-shrink-0 mx-auto"
                             aria-hidden="true"
                           />
@@ -193,10 +197,10 @@ export default {
         };
       },
       autoProcessQueue: false,
-      uploadMultiple: true,
+      uploadMultiple: false,
       disablePreviews: true,
-      parallelUploads: 100,
-      maxFiles: 100,
+      parallelUploads: 1,
+      maxFiles: 10000,
       dictDefaultMessage: document.querySelector("#dropzone-message").innerHTML,
       done() {},
       accept(file, done) {
@@ -204,7 +208,7 @@ export default {
         axios
           .post(url, {
             file: file,
-            destination: vm.selectedFolder,
+            destination: vm.$page.props.selectedFolder,
             project_id: vm.project.id,
             study_id: vm.study.id,
           })
@@ -238,6 +242,38 @@ export default {
     this.$page.props.selectedFileSystemObject = "root";
   },
   methods: {
+    displaySelected(file) {
+      this.$page.props.selectedFileSystemObject = file;
+
+      let sFolder = "/";
+      if (this.$page.props.selectedFileSystemObject.name == "/") {
+        sFolder = "/";
+      } else {
+        if (this.$page.props.selectedFileSystemObject.type != "file") {
+          sFolder = this.$page.props.selectedFileSystemObject.relative_url;
+        } else {
+          if (this.$page.props.selectedFileSystemObject.parent_id == null) {
+            sFolder = "/";
+          } else {
+            sFolder = this.$page.props.selectedFileSystemObject.relative_url.replace(
+              "/" + this.$page.props.selectedFileSystemObject.name,
+              ""
+            );
+          }
+        }
+      }
+      this.$page.props.selectedFolder = sFolder;
+
+      if (file.has_children && file.level > 0 && !file.children) {
+        file.loading = true
+        axios
+          .get("/api/v1/files/children/" + this.study.id + "/" + file.id)
+          .then((response) => {
+            file.children = response.data.files[0].children;
+            file.loading = false
+          });
+      }
+    },
     loadSpectra() {
       const iframe = window.frames.crossDomainIframe;
       if (iframe) {
@@ -257,7 +293,7 @@ export default {
         };
         iframe.postMessage({ type: `nmr-wrapper:load`, data }, "*");
       }
-    },
+    }
   },
   computed: {
     url() {
