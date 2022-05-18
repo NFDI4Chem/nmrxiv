@@ -15,7 +15,12 @@
                   v-if="file != null"
                   class="h-full relative flex flex-col w-64 border-r border-gray-200 overflow-y-auto"
                 >
-                  <children :file="file" :study="study" :project="project"></children>
+                  <children
+                    @reload-nmrium="loadSpectra()"
+                    :file="file"
+                    :study="study"
+                    :project="project"
+                  ></children>
                 </div>
               </aside>
               <section
@@ -124,7 +129,8 @@
                         $page.props.selectedFileSystemObject.type == 'file'
                       "
                     >
-                      <span
+                      <div
+                        class="mb-4"
                         v-if="
                           $page.props.selectedFileSystemObject.key.indexOf('.dx') > -1 ||
                           $page.props.selectedFileSystemObject.key.indexOf('.jdx') > -1 ||
@@ -140,10 +146,11 @@
                           style="width: 100%; height: 500px"
                           :src="nmriumURL"
                         ></iframe>
-                      </span>
-                      <span v-else>
-                        {{ $page.props.selectedFileSystemObject }}
-                      </span>
+                      </div>
+                      <File-details
+                        :study="study"
+                        :file="$page.props.selectedFileSystemObject"
+                      ></File-details>
                     </span>
                   </div>
                 </div>
@@ -160,6 +167,7 @@
 import { Dropzone } from "dropzone";
 import { Inertia } from "@inertiajs/inertia";
 import StudyContent from "@/Pages/Study/Content.vue";
+import FileDetails from "@/Shared/FileDetails.vue";
 import { FolderIcon, DocumentTextIcon } from "@heroicons/vue/solid";
 import { Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/vue";
 
@@ -172,6 +180,7 @@ export default {
     DisclosurePanel,
     FolderIcon,
     DocumentTextIcon,
+    FileDetails,
   },
   setup() {
     return {};
@@ -265,35 +274,31 @@ export default {
       this.$page.props.selectedFolder = sFolder;
 
       if (file.has_children && file.level > 0 && !file.children) {
-        file.loading = true
+        file.loading = true;
         axios
           .get("/api/v1/files/children/" + this.study.id + "/" + file.id)
           .then((response) => {
             file.children = response.data.files[0].children;
-            file.loading = false
+            file.loading = false;
           });
       }
+      this.$emit("reloadnmrium");
     },
     loadSpectra() {
       const iframe = window.frames.crossDomainIframe;
       if (iframe) {
         let data = {
-          spectra: [
-            {
-              source: {
-                jcampURL:
-                  this.url +
-                  "/asc/studies/" +
-                  this.study.id +
-                  "/file/" +
-                  this.$page.props.selectedFileSystemObject.slug,
-              },
-            },
+          urls: [
+            this.url +
+              "/asc/studies/" +
+              this.study.id +
+              "/file/" +
+              this.$page.props.selectedFileSystemObject.name,
           ],
         };
-        iframe.postMessage({ type: `nmr-wrapper:load`, data }, "*");
+        iframe.postMessage({ type: `nmr-wrapper:loadURLs`, data }, "*");
       }
-    }
+    },
   },
   computed: {
     url() {
@@ -303,7 +308,7 @@ export default {
       return this.$page.props.nmriumURL
         ? String(this.$page.props.nmriumURL)
         : "//nmriumdev.nmrxiv.org";
-    }
+    },
   },
 };
 </script>
