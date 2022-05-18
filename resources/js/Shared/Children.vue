@@ -226,7 +226,6 @@ export default {
   methods: {
     displaySelected(file) {
       this.$page.props.selectedFileSystemObject = file;
-
       let sFolder = "/";
       if (this.$page.props.selectedFileSystemObject.name == "/") {
         sFolder = "/";
@@ -244,7 +243,6 @@ export default {
           }
         }
       }
-      console.log(this.$page.props.selectedFileSystemObject.relative_url, "/" + this.$page.props.selectedFileSystemObject.name)
 
       this.$page.props.selectedFolder = sFolder;
 
@@ -257,6 +255,8 @@ export default {
             file.loading = false;
           });
       }
+
+      this.$emit("reload-nmrium");
     },
   },
   computed: {},
