@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -18,28 +17,32 @@ class StudyController extends Controller
     public function store(Request $request, CreateNewStudy $creator)
     {
         $study = $creator->create($request->all());
-        return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('success', 'Study created successfully');
+        return $request->wantsJson()
+            ? new JsonResponse('', 200)
+            : back()->with('success', 'Study created successfully');
     }
 
     public function update(Request $request, UpdateStudy $updater, Study $study)
     {
         $updater->update($study, $request->all());
-        return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('success', 'Study updated successfully');
+        return $request->wantsJson()
+            ? new JsonResponse('', 200)
+            : back()->with('success', 'Study updated successfully');
     }
 
     public function show(Request $request, Study $study)
     {
         return Inertia::render('Study/About', [
             'study' => $study,
-            'project' => $study->project
+            'project' => $study->project,
         ]);
     }
-    
+
     public function protocols(Request $request, Study $study)
     {
         return Inertia::render('Study/Protocols', [
             'study' => $study,
-            'project' => $study->project
+            'project' => $study->project,
         ]);
     }
 
@@ -47,7 +50,7 @@ class StudyController extends Controller
     {
         return Inertia::render('Study/Assays', [
             'study' => $study,
-            'project' => $study->project
+            'project' => $study->project,
         ]);
     }
 
@@ -58,32 +61,48 @@ class StudyController extends Controller
             'project' => $study->project,
             'file' => [
                 'name' => '/',
-                'children' => FileSystemObject::with('children')->where([
-                    ['level', 0],
-                    ['project_id', $study->project->id],
-                    ['study_id', $study->id]
-                ])->orderBy('type')->get()
-            ]
+                'children' => FileSystemObject::with('children')
+                    ->where([
+                        ['level', 0],
+                        ['project_id', $study->project->id],
+                        ['study_id', $study->id],
+                    ])
+                    ->orderBy('type')
+                    ->get(),
+            ],
         ]);
     }
 
     public function file(Request $request, $code, Study $study, $filename)
     {
-        $file = FileSystemObject::with('project', 'study')->where([
-            ['slug', $filename],
-            ['study_id', $study->id]
-        ])->first();
+        $file = FileSystemObject::with('project', 'study')
+            ->where([['name', $filename], ['study_id', $study->id]])
+            ->first();
 
         $environment = env('APP_ENV', 'local');
 
-        $path =  preg_replace('~//+~', '/', "/" . $environment . "/" . $file->project->uuid . "/" . $file->study->uuid  . "/" .  $file->relative_url);
-        
-        if(Storage::has($path)){
+        $path = preg_replace(
+            '~//+~',
+            '/',
+            '/' .
+                $environment .
+                '/' .
+                $file->project->uuid .
+                '/' .
+                $file->study->uuid .
+                '/' .
+                $file->relative_url
+        );
+
+        if (Storage::has($path)) {
             $data = Storage::get($path);
-            $newFileName = $file->name; 
+            $newFileName = $file->name;
             $headers = [
                 'Access-Control-Allow-Origin' => '*',
-                'Content-Disposition'=>sprintf('attachment; filename="%s"', $newFileName)
+                'Content-Disposition' => sprintf(
+                    'attachment; filename="%s"',
+                    $newFileName
+                ),
             ];
             return Response::make($data, 200, $headers);
         }
@@ -95,7 +114,7 @@ class StudyController extends Controller
     {
         return Inertia::render('Study/MolecularIdentifications', [
             'study' => $study,
-            'project' => $study->project
+            'project' => $study->project,
         ]);
     }
 
@@ -103,7 +122,7 @@ class StudyController extends Controller
     {
         return Inertia::render('Study/Integrations', [
             'study' => $study,
-            'project' => $study->project
+            'project' => $study->project,
         ]);
     }
 
@@ -111,7 +130,7 @@ class StudyController extends Controller
     {
         return Inertia::render('Study/Notifications', [
             'study' => $study,
-            'project' => $study->project
+            'project' => $study->project,
         ]);
     }
 
@@ -119,17 +138,22 @@ class StudyController extends Controller
     {
         return Inertia::render('Study/Settings', [
             'study' => $study,
-            'project' => $study->project
+            'project' => $study->project,
         ]);
     }
 
-    public function destroy(Request $request, StatefulGuard $guard, Study $study)
-    {
+    public function destroy(
+        Request $request,
+        StatefulGuard $guard,
+        Study $study
+    ) {
         $confirmed = app(ConfirmPassword::class)(
-            $guard, $request->user(), $request->password
+            $guard,
+            $request->user(),
+            $request->password
         );
 
-        if (! $confirmed) {
+        if (!$confirmed) {
             throw ValidationException::withMessages([
                 'password' => __('The password is incorrect.'),
             ]);
@@ -137,11 +161,19 @@ class StudyController extends Controller
 
         $study->delete();
 
-        return redirect()->route('dashboard')->with('success', 'Study deleted successfully');
+        return redirect()
+            ->route('dashboard')
+            ->with('success', 'Study deleted successfully');
     }
 
     public function activity(Request $request, Study $study)
     {
-        return response()->json(['audit' => $study->audits()->with('user')->orderBy('created_at', 'desc')->get()]);
+        return response()->json([
+            'audit' => $study
+                ->audits()
+                ->with('user')
+                ->orderBy('created_at', 'desc')
+                ->get(),
+        ]);
     }
 }
