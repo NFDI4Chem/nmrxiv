@@ -3,12 +3,44 @@
     <study-content :project="project" :study="study" current="Files">
       <template #study-section>
         <div class="divide-y divide-gray-200 sm:col-span-9">
-          <div class="py-6 px-4 sm:p-6">
+          <!-- <div class="py-6 px-4 sm:p-6">
             <div class="flex flex-item">
               <h2 class="text-lg leading-6 font-medium text-gray-900">Data set</h2>
             </div>
-          </div>
+          </div> -->
           <div v-if="file">
+                            <nav
+                    v-if="$page.props.selectedFolder"
+                    class="flex p-3"
+                    aria-label="Breadcrumb"
+                  >
+                    <ol role="list" class="flex items-center space-x-2">
+                      <li>
+                        <div>
+                          <a href="#" class="text-gray-400 hover:text-gray-900">
+                            <HomeIcon class="flex-shrink-0 h-5 w-5" aria-hidden="true" />
+                            <span class="sr-only">Home</span>
+                          </a>
+                        </div>
+                      </li>
+                      <li
+                        v-for="page in $page.props.selectedFolder.split('/')"
+                        :key="page.name"
+                      >
+                        <div v-if="page != ''" class="flex items-center">
+                          <ChevronRightIcon
+                            class="flex-shrink-0 h-5 w-5 text-gray-400"
+                            aria-hidden="true"
+                          />
+                          <a
+                            class="ml-4 text-sm font-medium text-gray-500 hover:text-gray-700"
+                            :aria-current="page ? 'page' : undefined"
+                            >{{ page }}</a
+                          >
+                        </div>
+                      </li>
+                    </ol>
+                  </nav>
             <div class="min-w-0 flex-1 min-h-screen border-t border-gray-200 lg:flex">
               <aside class="hidden py-3 px-2 lg:block lg:flex-shrink-0 lg:order-first">
                 <div
@@ -27,6 +59,7 @@
                 class="min-w-0 p-6 flex-1 h-full flex flex-col overflow-y-auto lg:order-last"
               >
                 <div>
+  
                   <form class="dropzone py-2 mb-3">
                     <div id="dropzone-message" class="text-center">
                       <div
@@ -96,8 +129,8 @@
                       >
                         <span v-if="file.type == 'directory'">
                           <FolderIcon
-                            @doubleclick.stop="displaySelected(file)"
-                            class="h-28 w-28 text-gray-400 flex-shrink-0 mx-auto"
+                            @dblclick.stop="displaySelected(file)"
+                            class="cursor-pointer h-28 w-28 text-gray-400 flex-shrink-0 mx-auto"
                             aria-hidden="true"
                           />
                         </span>
@@ -143,6 +176,7 @@
                           name="crossDomainIframe"
                           frameborder="0"
                           allowfullscreen
+                          class="rounded-md border"
                           style="width: 100%; height: 500px"
                           :src="nmriumURL"
                         ></iframe>
@@ -168,9 +202,13 @@ import { Dropzone } from "dropzone";
 import { Inertia } from "@inertiajs/inertia";
 import StudyContent from "@/Pages/Study/Content.vue";
 import FileDetails from "@/Shared/FileDetails.vue";
-import { FolderIcon, DocumentTextIcon } from "@heroicons/vue/solid";
+import {
+  FolderIcon,
+  DocumentTextIcon,
+  ChevronRightIcon,
+  HomeIcon,
+} from "@heroicons/vue/solid";
 import { Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/vue";
-
 export default {
   props: ["study", "project", "file"],
   components: {
@@ -181,6 +219,8 @@ export default {
     FolderIcon,
     DocumentTextIcon,
     FileDetails,
+    ChevronRightIcon,
+    HomeIcon,
   },
   setup() {
     return {};
@@ -190,12 +230,12 @@ export default {
       progress: 0,
       status: null,
       selectedFileSystemObject: null,
-      selectedFolder: "/",
     };
   },
   mounted() {
     const vm = this;
     vm.$page.props.selectedFileSystemObject = vm.file;
+    vm.$page.props.selectedFolder = '/';
     let options = {
       url: "/",
       method: "put",
@@ -252,6 +292,7 @@ export default {
   },
   methods: {
     displaySelected(file) {
+      console.log("hi");
       this.$page.props.selectedFileSystemObject = file;
 
       let sFolder = "/";
