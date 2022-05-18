@@ -11,7 +11,7 @@
               </div>
             </div>
           </div>
-          <div class="flex-shrink-0 ml-4">
+          <div v-if='hasPermissionToCreateStudy' class="flex-shrink-0 ml-4">
             <button
               @click="openStudyCreateDialog()"
               type="button"
@@ -122,5 +122,19 @@ export default {
           this.studyCreateElement.toggleCreateStudyDialog()
       }
   },
+
+  computed: {
+      hasPermissionToCreateStudy(){
+        var permissions = this.$page.props.currentTeamPermissions ? this.$page.props.currentTeamPermissions : null;
+        if(permissions.length > 0){
+            for(var i=0; i<permissions.length; i++){
+            if(permissions[i] == 'study:create' || permissions[i] == '*'){
+                return true;
+            }
+          }
+        }
+        return false;
+      }
+  }
 };
 </script>

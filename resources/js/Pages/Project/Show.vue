@@ -76,9 +76,12 @@
           </span>
           <a @click="toggleDetails" class="cursor-pointer inline-flex items-center ml-7"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-4 h-4"><path d="M4 15a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h7a1 1 0 0 1 .7.3L13.42 5H21a1 1 0 0 1 .9 1.45L19.61 11l2.27 4.55A1 1 0 0 1 21 17h-8a1 1 0 0 1-.7-.3L10.58 15H4z" class="fill-current text-gray-400"></path> <rect width="2" height="20" x="2" y="2" rx="1" class="fill-current text-gray-600"></rect></svg> <span class="ml-2">View details</span></a>
           <project-details ref="projectDetailsElement" :project="project" />
+          <project-details-read-only ref="projectDetailsReadOnlyElement" :project="project" />
         </div>
       </div>
-      <div class="flex-nowrap">
+      <div
+        v-if="hasPermissionsToDelete" 
+        class="flex-nowrap"  >
         <Link
           :href="route('project.settings', project.id)"
           class="text-sm flex-nowrap text-gray-800 font-bold"
@@ -100,6 +103,7 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import { Link } from "@inertiajs/inertia-vue3";
 import StudyIndex from "@/Pages/Study/Index.vue";
 import ProjectDetails from './Partials/Details.vue';
+import ProjectDetailsReadOnly from './Partials/DetailsReadOnly.vue';
 import { ref } from 'vue'
 import { StarIcon } from "@heroicons/vue/solid";
 
@@ -109,7 +113,8 @@ export default {
     AppLayout,
     StudyIndex,
     ProjectDetails,
-    StarIcon
+    StarIcon,
+    ProjectDetailsReadOnly
   },
   props: ["project", "studies"],
   data() {
@@ -117,15 +122,47 @@ export default {
     };
   },
   setup() {
-    const projectDetailsElement = ref(null)
+    const projectDetailsElement = ref(null);
+    const projectDetailsReadOnlyElement = ref(null)
     return {
-      projectDetailsElement
+      projectDetailsElement,
+      projectDetailsReadOnlyElement
     }
   },
   methods: {
     toggleDetails(){
+    if(this.hasPermissionsToUpdate)
       this.projectDetailsElement.toggleDetails()
+    else  
+      this.projectDetailsReadOnlyElement.toggleDetails()
     }
   },
+
+  computed: {
+    hasPermissionsToDelete(){
+      var permissions = this.$page.props.currentTeamPermissions ? this.$page.props.currentTeamPermissions : null;
+      if(permissions.length > 0){
+        for(var i=0; i<permissions.length; i++){
+          if(permissions[i] == 'project:delete' || permissions[i] == '*'){
+            return true;
+          }
+        }
+      }
+      return false;
+    },
+    hasPermissionsToUpdate(){
+      var permissions = this.$page.props.currentTeamPermissions ? this.$page.props.currentTeamPermissions : null;
+      if(permissions.length > 0){
+        for(var i=0; i<permissions.length; i++){
+          if(permissions[i] == 'project:update' || permissions[i] == '*'){
+            return true;
+          }
+        }
+      }
+      return false;
+    },
+
+
+  }
 };
 </script>

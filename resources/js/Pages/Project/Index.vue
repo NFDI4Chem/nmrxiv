@@ -7,7 +7,7 @@
               <div class="mßax-w-2xl">You may house a variety of projects.</div>
               </div>
           </div>
-          <div class="flex-shrink-0 ml-4">
+          <div v-if='hasPermissionToCreateProject' class="flex-shrink-0 ml-4">
               <button
               @click="openProjectCreateDialog()"
               type="button"
@@ -62,7 +62,9 @@
                         d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"
                     />
                     </svg>
-                    <span class="mt-2 block text-sm font-medium text-gray-900">
+                    <span 
+                        v-if='hasPermissionToCreate' 
+                        class="mt-2 block text-sm font-medium text-gray-900">
                     Create a new project
                     </span>
                 </button>
@@ -211,5 +213,18 @@ export default {
           this.projectCreateElement.toggleCreateProjectDialog()
       }
   },
+  computed: {
+      hasPermissionToCreateProject(){
+        var permissions = this.$page.props.currentTeamPermissions ? this.$page.props.currentTeamPermissions : null;
+        if(permissions.length > 0){
+            for(var i=0; i<permissions.length; i++){
+            if(permissions[i] == 'project:create' || permissions[i] == '*'){
+                return true;
+            }
+          }
+        }
+        return false;
+      }
+  }
 };
 </script>

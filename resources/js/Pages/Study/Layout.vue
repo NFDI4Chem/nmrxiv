@@ -120,6 +120,7 @@
               >
             </div>
             <study-details ref="studyDetailsElement" :study="study" />
+            <study-details-read-only ref="studyDetailsReadOnlyElement" :study="study" />
           </div>
         </div>
       </div>
@@ -134,6 +135,7 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import { Link } from "@inertiajs/inertia-vue3";
 import StudyDetails from "./Partials/Details.vue";
+import StudyDetailsReadOnly from "./Partials/DetailsReadOnly.vue";
 import { StarIcon } from "@heroicons/vue/solid";
 import { ref } from "vue";
 import {
@@ -169,7 +171,8 @@ export default {
     LinkIcon,
     LocationMarkerIcon,
     PencilIcon,
-    StarIcon
+    StarIcon,
+    StudyDetailsReadOnly
   },
   props: ["study", "project"],
   data() {
@@ -177,14 +180,32 @@ export default {
   },
   setup() {
     const studyDetailsElement = ref(null);
+    const studyDetailsReadOnlyElement = ref(null);
     return {
       studyDetailsElement,
+      studyDetailsReadOnlyElement,
     };
   },
   methods: {
     toggleDetails() {
-      this.studyDetailsElement.toggleDetails();
+      if(this.hasPermissionToUpdate)
+        this.studyDetailsElement.toggleDetails();
+      else
+        this.studyDetailsReadOnlyElement.toggleDetails();
     },
   },
+computed: {
+  hasPermissionToUpdate(){
+    var permissions = this.$page.props.currentTeamPermissions ? this.$page.props.currentTeamPermissions : null;
+      if(permissions.length > 0){
+        for(var i=0; i<permissions.length; i++){
+          if(permissions[i] == 'study:update' || permissions[i] == '*'){
+              return true;
+            }
+          }
+        }
+    return false;
+  }
+}
 };
 </script>
