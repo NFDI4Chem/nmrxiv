@@ -244,7 +244,7 @@ export default {
           _send.call(xhr, file);
         };
       },
-      autoProcessQueue: true,
+      autoProcessQueue: false,
       uploadMultiple: false,
       disablePreviews: true,
       parallelUploads: 1,
