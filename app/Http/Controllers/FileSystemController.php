@@ -24,17 +24,17 @@ class FileSystemController extends Controller
 
         $destination = $request->get('destination');
 
-        $path = null;
-
-        $hasDirectories = ($path || $destination != '/') ? true : false;
-
         $project = Project::find($request->get('project_id'));
 
         $study = Study::find($request->get('study_id'));
 
+        $path = null;
+
         if(array_key_exists('fullPath', $file)){
             $path = $file['fullPath'];
         }
+
+        $hasDirectories = ($path || $destination != '/') ? true : false;
         
         $filename = $file['upload']['filename'];
 
