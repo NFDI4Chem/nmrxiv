@@ -24,6 +24,14 @@
  * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
  */
 
+/**
+ * openchemlib - Manipulate molecules
+ * @version v7.4.3
+ * @date 2021-10-02T06:09:41.864Z
+ * @link https://github.com/cheminfo/openchemlib-js
+ * @license BSD-3-Clause
+*/
+
 /**!
  * @fileOverview Kickass library to create and place poppers near their reference elements.
  * @version 1.16.1
