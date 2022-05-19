@@ -28,6 +28,7 @@
                                 class="flex-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full min-w-0 rounded sm:text-sm border-gray-300"
                             />
                         </div>
+                         <jet-input-error :message="editAnnouncementForm.errors.title" class="mt-2" />
                     </div>
                     <div class="sm:col-span-6">
                         <label
@@ -46,6 +47,10 @@
                                 class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
                             />
                         </div>
+                        <jet-input-error
+                            :message="editAnnouncementForm.errors.message"
+                            class="mt-2"
+                        />
                         <div class="py-2">
                             <label
                                 class="block text-sm font-medium text-gray-700, block text-sm font-medium text-gray-700"
@@ -56,10 +61,6 @@
                                 v-model:enabled="editAnnouncementForm.enabled"
                             />
                         </div>
-                        <jet-input-error
-                            :message="editAnnouncementForm.errors.description"
-                            class="mt-2"
-                        />
                     </div>
                 </div>
 
@@ -71,6 +72,7 @@
                         <Datepicker
                             v-model="editAnnouncementForm.start_time"
                         ></Datepicker>
+                        <jet-input-error :message="editAnnouncementForm.errors.start_time" class="mt-2" />
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700">
@@ -79,6 +81,7 @@
                         <Datepicker
                             v-model="editAnnouncementForm.end_time"
                         ></Datepicker>
+                        <jet-input-error :message="editAnnouncementForm.errors.end_time" class="mt-2" />
                     </div>
                 </div>
             </div>
@@ -109,7 +112,6 @@ import { CheckCircleIcon, ChevronRightIcon } from "@heroicons/vue/solid";
 import { Link } from "@inertiajs/inertia-vue3";
 import { AtSymbolIcon, CodeIcon, LinkIcon } from "@heroicons/vue/solid";
 import JetInputError from "@/Jetstream/InputError.vue";
-import JetValidationErrors from "@/Jetstream/ValidationErrors.vue";
 import ToggleButton from "@/Shared/ToggleButton.vue";
 import {
     Switch,
@@ -131,7 +133,6 @@ export default {
         LinkIcon,
         JetDialogModal,
         JetSecondaryButton,
-        JetValidationErrors,
         JetButton,
         Link,
         CheckCircleIcon,

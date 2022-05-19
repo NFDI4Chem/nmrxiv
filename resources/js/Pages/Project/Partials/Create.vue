@@ -6,7 +6,7 @@
       <div class="relative z-0 mt-1 rounded-lg cursor-pointer">
         <div class="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
           <div class="sm:col-span-6">
-            <label for="name" class="block text-sm font-medium text-gray-700">
+            <label for="name" class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500">
               Name
             </label>
             <div class="mt-1 flex rounded-md shadow-sm">
