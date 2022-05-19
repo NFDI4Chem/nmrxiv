@@ -19,6 +19,7 @@
                 class="flex-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full min-w-0 rounded sm:text-sm border-gray-300"
               />
             </div>
+            <jet-input-error :message="createStudyForm.errors.name" class="mt-2" />
           </div>
           <div class="sm:col-span-6">
             <TabGroup v-slot="{ $selectedIndex }">
@@ -101,10 +102,6 @@
                 Styling with Markdown is supported</small
               >
             </label>
-            <jet-input-error
-              :message="createStudyForm.errors.description"
-              class="mt-2"
-            />
           </div>
           <div class="sm:col-span-6">
             <SwitchGroup as="div" class="flex items-center">
@@ -226,7 +223,7 @@
     </template>
 
     <template #footer>
-      <jet-secondary-button @click="createStudyDialog = false">
+      <jet-secondary-button @click="toggleCreateStudyDialog">
         Cancel
       </jet-secondary-button>
 
@@ -313,6 +310,7 @@ export default {
     },
     toggleCreateStudyDialog(){
         this.createStudyDialog = !this.createStudyDialog;
+        this.createStudyForm.clearErrors();
     }
   },
 };
