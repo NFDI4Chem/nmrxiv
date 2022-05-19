@@ -375,8 +375,9 @@ export default {
         .then((response) => {
           if (response && response.data != "") {
             let mol = OCL.Molecule.fromMolfile(response.data);
-            console.log(mol.toIsomericSmiles())
-            this.svgString = mol.toSVG(300, 300);
+            if(mol.toIsomericSmiles() != ''){
+              this.svgString = mol.toSVG(300, 300);
+            }
           }
         });
     },
