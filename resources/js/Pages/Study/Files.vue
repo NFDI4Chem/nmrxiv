@@ -201,6 +201,7 @@ import { Dropzone } from "dropzone";
 import { Inertia } from "@inertiajs/inertia";
 import StudyContent from "@/Pages/Study/Content.vue";
 import FileDetails from "@/Shared/FileDetails.vue";
+import axiosRetry from "axios-retry";
 import {
   FolderIcon,
   DocumentTextIcon,
@@ -253,12 +254,29 @@ export default {
       done() {},
       accept(file, done) {
         const url = "/storage/signed-storage-url";
-        axios
+
+        const client = axios.create({ baseURL: window.location.origin });
+        axiosRetry(client, {
+          retries: 3,
+          retryCondition: (error) => {
+            return error.response.status === 500;
+          },
+        });
+
+        client
           .post(url, {
             file: file,
             destination: vm.$page.props.selectedFolder,
             project_id: vm.project.id,
             study_id: vm.study.id,
+          })
+          .catch((err) => {
+            // The first request fails
+            if (err.response.status !== 200 || err.response.status !== 201) {
+              throw new Error(
+                `API call failed with status code: ${err.response.status} after multiple attempts`
+              );
+            }
           })
           .then(function (response) {
             let data = response.data;
@@ -267,8 +285,8 @@ export default {
               delete headers.Host;
             }
             file.uploadURL = data.url;
-            done();
             setTimeout(() => vm.dropzone.processFile(file));
+            done();
           });
       },
       totaluploadprogress: function (progress) {
