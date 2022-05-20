@@ -14,9 +14,19 @@
             </div>
 
             <div class="mt-5">
-                <jet-danger-button @click="confirmProjectDeletion">
-                    Delete Project
-                </jet-danger-button>
+                <span v-if="hasPassword">
+                    <jet-danger-button @click="confirmProjectDeletion">
+                        Delete Project
+                    </jet-danger-button>
+                </span>
+                <span v-else>
+                    <div class="max-w-xl text-sm text-red-600 pb-1">
+                        Please set your password before deleting the project.
+                    </div> 
+                    <jet-danger-button disabled>
+                        Delete Project 
+                    </jet-danger-button>
+                </span>
             </div>
 
             <!-- Delete Project Confirmation Modal -->
@@ -76,7 +86,9 @@
 
                 form: this.$inertia.form({
                     password: '',
-                })
+                }),
+
+                hasPassword: false
             }
         },
 
@@ -100,9 +112,14 @@
 
             closeModal() {
                 this.confirmingProjectDeletion = false
-
                 this.form.reset()
             },
+
         },
+        beforeMount(){
+            axios.get(route('projects.checkIfUserHasPassword', this.project.id)).then(res => {
+                this.hasPassword = res.data.hasPassword;
+            })
+        }
     }
 </script>
