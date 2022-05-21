@@ -42,8 +42,19 @@ class ProjectController extends Controller
         ]);
     }
 
+    public function checkIfUserHasPassword(Request $request, Project $project){
+        $user = $request->user();
+        $hasPassword = false;
+        if($user->password){
+            $hasPassword = true;
+        }        
+        return response()->json([
+            'hasPassword' => $hasPassword
+        ]);
+    }
+
     public function destroy(Request $request, StatefulGuard $guard, Project $project)
-    {
+    {   
         $confirmed = app(ConfirmPassword::class)(
             $guard, $request->user(), $request->password
         );
