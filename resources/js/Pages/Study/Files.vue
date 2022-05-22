@@ -180,6 +180,9 @@
                           :src="nmriumURL"
                         ></iframe>
                       </div>
+                      <div class="rounded-md border my-3 flex justify-center items-center " v-if="svgString">
+                        <span v-html="svgString"></span>
+                      </div>
                       <File-details
                         :study="study"
                         :file="$page.props.selectedFileSystemObject"
@@ -202,6 +205,8 @@ import { Inertia } from "@inertiajs/inertia";
 import StudyContent from "@/Pages/Study/Content.vue";
 import FileDetails from "@/Shared/FileDetails.vue";
 import axiosRetry from "axios-retry";
+import OCL from "openchemlib/minimal";
+
 import {
   FolderIcon,
   DocumentTextIcon,
@@ -230,6 +235,7 @@ export default {
       progress: 0,
       status: null,
       selectedFileSystemObject: null,
+      svgString: null,
     };
   },
   mounted() {
@@ -309,7 +315,6 @@ export default {
   },
   methods: {
     displaySelected(file) {
-      console.log("hi");
       this.$page.props.selectedFileSystemObject = file;
 
       let sFolder = "/";
@@ -343,6 +348,12 @@ export default {
       this.$emit("reloadnmrium");
     },
     loadSpectra() {
+      if (
+        this.$page.props.selectedFileSystemObject &&
+        this.$page.props.selectedFileSystemObject.key.indexOf(".mol") > -1
+      ) {
+        this.loadMol(this.$page.props.selectedFileSystemObject);
+      }
       const iframe = window.frames.crossDomainIframe;
       if (iframe) {
         let data = {
@@ -356,6 +367,19 @@ export default {
         };
         iframe.postMessage({ type: `nmr-wrapper:loadURLs`, data }, "*");
       }
+    },
+    loadMol(file) {
+      this.svgString = null
+      axios
+        .get(this.url + "/asc/studies/" + this.study.id + "/file/" + file.name)
+        .then((response) => {
+          if (response && response.data != "") {
+            let mol = OCL.Molecule.fromMolfile(response.data);
+            if(mol.toIsomericSmiles() != ''){
+              this.svgString = mol.toSVG(300, 300);
+            }
+          }
+        });
     },
   },
   computed: {
