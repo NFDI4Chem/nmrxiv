@@ -6,7 +6,7 @@
       <div class="relative z-0 mt-1 rounded-lg cursor-pointer">
         <div class="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
           <div class="sm:col-span-6">
-            <label for="name" class="block text-sm font-medium text-gray-700">
+            <label for="name" class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500">
               Name
             </label>
             <div class="mt-1 flex rounded-md shadow-sm">
@@ -19,6 +19,10 @@
                 class="flex-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full min-w-0 rounded sm:text-sm border-gray-300"
               />
             </div>
+              <jet-input-error
+                :message="createProjectForm.errors.name"
+                class="mt-2"
+              />
           </div>
           <div class="sm:col-span-6">
             <TabGroup v-slot="{ $selectedIndex }">
@@ -101,10 +105,6 @@
                 Styling with Markdown is supported</small
               >
             </label>
-            <jet-input-error
-              :message="createProjectForm.errors.description"
-              class="mt-2"
-            />
           </div>
           <div class="sm:col-span-6">
             <SwitchGroup as="div" class="flex items-center">
@@ -238,7 +238,7 @@
     </template>
 
     <template #footer>
-      <jet-secondary-button @click="createProjectDialog = false">
+      <jet-secondary-button @click="toggleCreateProjectDialog">
         Cancel
       </jet-secondary-button>
 
@@ -323,6 +323,7 @@ export default {
     },
     toggleCreateProjectDialog(){
         this.createProjectDialog = !this.createProjectDialog;
+        this.createProjectForm.clearErrors();
     }
   },
 };

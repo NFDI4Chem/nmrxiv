@@ -5,7 +5,6 @@
     >
         <template #title> New Announcement </template>
         <template #content>
-            <jet-validation-errors class="mb-4" />
             <div class="relative z-0 mt-1 rounded-lg cursor-pointer">
                 <div
                     class="mt-6 grid grid-cols-1 gap-y-4 gap-x-4 sm:grid-cols-6"
@@ -27,6 +26,7 @@
                                 class="flex-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full min-w-0 rounded sm:text-sm border-gray-300"
                             />
                         </div>
+                    <jet-input-error :message="createAnnouncementForm.errors.title" class="mt-2" />
                     </div>
                     <div class="sm:col-span-6">
                         <label
@@ -45,6 +45,7 @@
                                 class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
                             />
                         </div>
+                        <jet-input-error :message="createAnnouncementForm.errors.message" class="mt-2" />
                     </div>
                 </div>
                 <div class="py-2">
@@ -66,7 +67,9 @@
                         <Datepicker
                             v-model="createAnnouncementForm.start_time"
                         ></Datepicker>
+                        <jet-input-error :message="createAnnouncementForm.errors.start_time" class="mt-2" />
                     </div>
+                    
                     <div>
                         <label
                             class="block text-sm font-medium text-gray-700, block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
@@ -76,6 +79,7 @@
                         <Datepicker
                             v-model="createAnnouncementForm.end_time"
                         ></Datepicker>
+                        <jet-input-error :message="createAnnouncementForm.errors.end_time" class="mt-2" />
                     </div>
                 </div>
             </div>
@@ -105,7 +109,7 @@ import JetButton from "@/Jetstream/Button.vue";
 import { CheckCircleIcon, ChevronRightIcon } from "@heroicons/vue/solid";
 import { Link } from "@inertiajs/inertia-vue3";
 import { AtSymbolIcon, CodeIcon, LinkIcon } from "@heroicons/vue/solid";
-import JetValidationErrors from "@/Jetstream/ValidationErrors.vue";
+import JetInputError from "@/Jetstream/InputError.vue";
 import { ref } from "vue";
 import ToggleButton from "@/Shared/ToggleButton.vue";
 import {
@@ -128,13 +132,13 @@ export default {
         LinkIcon,
         JetDialogModal,
         JetSecondaryButton,
-        JetValidationErrors,
         JetButton,
         Link,
         CheckCircleIcon,
         ChevronRightIcon,
         Datepicker,
         ToggleButton,
+        JetInputError,
     },
 
     data() {
