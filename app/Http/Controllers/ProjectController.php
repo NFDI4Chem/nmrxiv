@@ -7,6 +7,7 @@ use App\Actions\Project\CreateNewProject;
 use App\Actions\Project\UpdateProject;
 use App\Models\Project;
 use App\Models\Study;
+use Auth;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Laravel\Fortify\Actions\ConfirmPassword;
 use Inertia\Inertia;
@@ -14,6 +15,27 @@ use Illuminate\Validation\ValidationException;
 
 class ProjectController extends Controller
 {
+    public function publicProjectView(Request $request, $slug)
+    {
+        $project = Project::where('slug', $slug)->firstOrFail();
+
+        if($project->is_public){
+            return Inertia::render('Public/Project', [
+                'project' => $project,
+                'studies' => $project->studies
+            ]);
+        }
+    }
+
+    public function publicProjectsView(Request $request)
+    {
+        $projects = Project::where('is_public', TRUE)->simplePaginate(15);
+
+        return Inertia::render('Public/Projects', [
+            'projects' => $projects
+        ]);
+    }
+
     public function store(Request $request, CreateNewProject $creator)
     {
         $project = $creator->create($request->all());

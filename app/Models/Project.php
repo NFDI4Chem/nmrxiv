@@ -5,9 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use OwenIt\Auditing\Contracts\Auditable;
+use Laravel\Scout\Searchable;
 
 class Project extends Model implements Auditable
 {
+    use Searchable;
     use HasFactory;
     use \OwenIt\Auditing\Auditable;
 
