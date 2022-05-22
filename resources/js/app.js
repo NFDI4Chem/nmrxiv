@@ -5,6 +5,7 @@ import { createInertiaApp } from '@inertiajs/inertia-vue3';
 import { InertiaProgress } from '@inertiajs/progress';
 import helpers from "./Mixins/Global.js";
 import Children from "@/Shared/Children.vue";
+import InstantSearch from 'vue-instantsearch/vue3/es';
 
 const appName = window.document.getElementsByTagName('title')[0]?.innerText || 'Laravel';
 
@@ -17,6 +18,7 @@ createInertiaApp({
             .component('Children', Children)
             .mixin({ methods: { route } })
             .mixin(helpers)
+            .use(InstantSearch)
             .mount(el);
     },
 });
