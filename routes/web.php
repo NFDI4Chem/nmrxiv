@@ -71,6 +71,9 @@ Route::group(['middleware' => ['auth']], function () {
             ->name('projects.update');
         Route::get('projects/{project}/activity', [ProjectController::class, 'activity'])
             ->name('projects.activity');
+        Route::get('projects/{project}/checkIfUserHasPassword', [ProjectController::class, 'checkIfUserHasPassword'])
+            ->name('projects.checkIfUserHasPassword'); 
+        
         
         Route::get('studies/{study}', [StudyController::class, 'show'])
             ->name('study');
