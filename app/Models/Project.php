@@ -9,7 +9,7 @@ use Laravel\Scout\Searchable;
 
 class Project extends Model implements Auditable
 {
-    use Searchable;
+    // use Searchable;
     use HasFactory;
     use \OwenIt\Auditing\Auditable;
 
