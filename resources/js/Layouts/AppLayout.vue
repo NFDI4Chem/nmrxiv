@@ -154,7 +154,7 @@
         </button>
         <div class="flex-1 px-4 py-2 flex justify-between">
           <div class="flex-1 flex">
-            <search :host="MEILISEARCH_HOST" :akey="MEILISEARCH_KEY"></search>
+            <search :host="MEILISEARCH_HOST" :akey="MEILISEARCH_PUBLICKEY"></search>
             <!-- <form class="w-full flex md:ml-0" action="#" method="GET">
               <label for="search-field" class="sr-only">Search</label>
               <div class="relative w-full text-gray-400 focus-within:text-gray-600">
@@ -550,8 +550,8 @@ export default {
     MEILISEARCH_HOST() {
       return this.$page.props.MEILISEARCH_HOST;
     },
-    MEILISEARCH_KEY() {
-      return this.$page.props.MEILISEARCH_KEY;
+    MEILISEARCH_PUBLICKEY() {
+      return this.$page.props.MEILISEARCH_PUBLICKEY;
     },
   },
 };
