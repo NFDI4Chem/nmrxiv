@@ -61,7 +61,7 @@ class HandleInertiaRequests extends Middleware
             'nmriumURL' => env('NMRIUM_URL'),
             'environment' => env('APP_ENV'),
             'MEILISEARCH_HOST'  => (env('MEILISEARCH_HOST')),
-            'MEILISEARCH_KEY'  => (env('MEILISEARCH_KEY')),
+            'MEILISEARCH_PUBLICKEY'  => (env('MEILISEARCH_PUBLICKEY')),
             'SCOUT_PREFIX'  => (env('SCOUT_PREFIX'))
         ]);
     }
