@@ -259,7 +259,7 @@ export default {
       dictDefaultMessage: document.querySelector("#dropzone-message").innerHTML,
       done() {},
       accept(file, done) {
-        const url = "/storage/signed-storage-url";
+        const url = "/dashboard/storage/signed-storage-url";
 
         const client = axios.create({ baseURL: window.location.origin });
         axiosRetry(client, {
