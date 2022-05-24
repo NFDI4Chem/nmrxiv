@@ -16,6 +16,12 @@ spec:
   - hosts:
       - docs.nmrxiv.org
     secretName: nmrxiv-app-doc-tls
+  - hosts:
+      - nmriumdev.nmrxiv.org
+    secretName: nmrxiv-nmrium-tls
+  - hosts:
+      - msdev.nmrxiv.org
+    secretName: nmrxiv-ms-tls
   rules:
   - host: dev.nmrxiv.org
     http:
@@ -37,3 +43,23 @@ spec:
             name: doc-nmrxiv-doc
             port:
               number: 80
+  - host: nmriumdev.nmrxiv.org
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: nmrxiv-nmrium
+            port:
+              number: 80
+  - host: msdev.nmrxiv.org
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: nmrxiv-meilisearch
+            port:
+              number: 7700
