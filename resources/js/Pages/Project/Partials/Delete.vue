@@ -14,27 +14,16 @@
             </div>
 
             <div class="mt-5">
-                <span v-if="hasPassword">
                     <jet-danger-button @click="confirmProjectDeletion">
                         Delete Project
                     </jet-danger-button>
-                </span>
-                <span v-else>
-                    <div class="max-w-xl text-sm text-red-600 pb-1">
-                        Please set your password before deleting the project.
-                    </div> 
-                    <jet-danger-button disabled>
-                        Delete Project 
-                    </jet-danger-button>
-                </span>
             </div>
 
-            <!-- Delete Project Confirmation Modal -->
+            <!-- Delete Project Confirmation Modal  -->
             <jet-dialog-modal :show="confirmingProjectDeletion" @close="closeModal">
                 <template #title>
                     Delete Project
                 </template>
-
                 <template #content>
                     Are you sure you want to delete your project? Once your project is deleted, all of its resources and data will be permanently deleted. Please enter your password to confirm you would like to permanently delete your project.
 
@@ -58,6 +47,23 @@
                     </jet-danger-button>
                 </template>
             </jet-dialog-modal>
+
+            <!-- Delete Project Confirmation Modal if User doesnot have password -->
+            <jet-dialog-modal :show="confirmingProjectDeletionWithoutPassword" @close="closeModal">
+                <template #title>
+                    Delete Project
+                </template>
+
+                <template #content>
+                    You need to set your password first before deleting the project.
+                </template>
+
+                <template #footer>
+                    <jet-secondary-button @click="closeModal">
+                        Close
+                    </jet-secondary-button>
+                </template>
+            </jet-dialog-modal>
         </template>
     </jet-action-section>
 </template>
@@ -69,6 +75,7 @@
     import JetInput from '@/Jetstream/Input.vue'
     import JetInputError from '@/Jetstream/InputError.vue'
     import JetSecondaryButton from '@/Jetstream/SecondaryButton.vue'
+    import { Link } from "@inertiajs/inertia-vue3";
 
     export default {
         components: {
@@ -78,11 +85,13 @@
             JetInput,
             JetInputError,
             JetSecondaryButton,
+            Link,
         },
 
         data() {
             return {
                 confirmingProjectDeletion: false,
+                confirmingProjectDeletionWithoutPassword: false,
 
                 form: this.$inertia.form({
                     password: '',
@@ -96,9 +105,17 @@
 
         methods: {
             confirmProjectDeletion() {
-                this.confirmingProjectDeletion = true;
+                console.log('check password starts..');
+                axios.get(route('projects.checkIfUserHasPassword', this.project.id)).then(res => {
+                    this.hasPassword = res.data.hasPassword;
+                }).finally(() => { 
+                    if(this.hasPassword)
+                        this.confirmingProjectDeletion = true;
+                    else 
+                        this.confirmingProjectDeletionWithoutPassword = true;
+                });
 
-                setTimeout(() => this.$refs.password.focus(), 250)
+               setTimeout(() => this.$refs.password.focus(), 250)
             },
 
             deleteProject() {
@@ -110,16 +127,16 @@
                 })
             },
 
+            // setPassword(){
+            //    this.form.post(this.route('password.request'));
+            // },
+
             closeModal() {
                 this.confirmingProjectDeletion = false
+                this.confirmingProjectDeletionWithoutPassword = false
                 this.form.reset()
             },
 
         },
-        beforeMount(){
-            axios.get(route('projects.checkIfUserHasPassword', this.project.id)).then(res => {
-                this.hasPassword = res.data.hasPassword;
-            })
-        }
     }
 </script>
