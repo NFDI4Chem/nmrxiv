@@ -10,8 +10,8 @@
                         {{ user.current_team.name }}
                     </div>&nbsp;Dashboard
                 </div> 
-                <div v-if="team.users.length > 1" class="flex mt-3 flex-row-reverse justify-end">
-                    <img :key="user.id" v-for="user in team.users" class="w-8 h-8 -mr-3 rounded-full border-3 border-dark" :src="user.profile_photo_url" :alt="user.name" />
+                <div v-if="team.users" class="flex mt-3 flex-row-reverse justify-end">
+                    <img :key="user.id" v-for="user in team.users" class="w-8 h-8 -mr-2 rounded-full border-2 border-white" :src="user.profile_photo_url" :alt="user.name" />
                 </div>
             </div> 
             <div v-if="!team.personal_team">
@@ -21,7 +21,7 @@
             </div>
         </template>
         <div class="px-12 py-8 mx-auto max-w-4xl">
-            <team-projects :projects="projects"></team-projects>
+            <team-projects :editable="editable" :mode="'create'" :projects="projects"></team-projects>
         </div>
     </app-layout>
 </template>
@@ -38,7 +38,19 @@
         props: [
             'user',
             'team',
-            'projects'
-        ]
+            'projects',
+            'teamRole'
+        ],
+        computed:{
+            editable(){
+                if(this.teamRole && this.teamRole.name){
+                    if (this.teamRole.key == 'owner' || this.teamRole.key == 'collaborator'){
+                        return true
+                    }else{
+                        return false
+                    }
+                }
+            }
+        }
     }
 </script>

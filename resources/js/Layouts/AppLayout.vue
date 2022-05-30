@@ -2,7 +2,7 @@
   <Head :title="title" />
   <jet-banner />
   <announcement-banner />
-   <div class="h-full flex min-h-screen">
+  <div class="h-full flex min-h-screen">
     <TransitionRoot as="template" :show="sidebarOpen">
       <Dialog
         as="div"
@@ -56,13 +56,17 @@
               </Link>
             </div>
             <div class="mt-1 flex-1 h-0 overflow-y-auto">
-              <nav v-for="item in filteredNavigation" :key="item.name" class="flex-1 px-2 bg-white space-y-1">
+              <nav
+                v-for="item in filteredNavigation"
+                :key="item.name"
+                class="flex-1 px-2 bg-white space-y-1"
+              >
                 <Link
                   :href="item.href"
                   class="my-6 text-gray-900 group flex items-center px-2 text-sm font-medium rounded-md"
                 >
                   <div class="pl-2 pr-4">
-                  <component :is="item.icon" class="h-6 w-6" aria-hidden="true" />
+                    <component :is="item.icon" class="h-6 w-6" aria-hidden="true" />
                   </div>
                   {{ item.name }}
                 </Link>
@@ -75,35 +79,37 @@
         </div>
       </Dialog>
     </TransitionRoot>
-
-    <div v-if="collapseSidebar" class="hidden md:flex md:flex-shrink-0 md:fixed md:inset-y-0">
+    <div v-if="collapseSidebar" class="hidden bg-white border-r md:flex md:flex-shrink-0 md:inset-y-0 z-10">
       <div class="flex flex-col w-20">
-        <div class="flex-1 flex flex-col min-h-0 overflow-y-auto bg-teal-600">
+        <div class="flex-1 flex flex-col min-h-0 overflow-y-auto">
           <div class="flex-1">
-            <div class="bg-white py-3.5 pt-4 flex flex-shrink-0 px-4">
+            <div class="bg-white border-b pb-4 pt-4 flex flex-shrink-0 px-4">
               <jet-application-mark class="block h-8 p-0.5 ml-1.5 w-auto" />
             </div>
             <div class="px-4 flex flex-col mt-3 mb-1">
-            <button type="button" class="inline-flex items-center text-center px-3 py-3 border border-transparent text-base font-medium rounded-full shadow-sm text-dark bg-white bg-white-600 hover:bg-white-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white-500">
-              <PlusIcon class="h-6 w-6 text-dark" aria-hidden="true" />
-            </button>
-          </div>
+              <create mode="icon"></create>
+            </div>
             <nav aria-label="Sidebar" class="flex flex-col items-center py-4 px-0">
-              <a v-for="item in filteredNavigation" :key="item.name"
-                :href="item.href" class="w-full px-7 hover:bg-gray-700 text-white group flex items-center py-3 text-sm font-medium">
+              <Link
+                v-for="item in filteredNavigation"
+                :key="item.name"
+                :href="item.href"
+                :class="[ $page.url === item.href ? ' border-r-4 bg-gray-200 border-r-black' : '', 'w-full px-7 hover:bg-gray-700 hover:text-white group flex items-center py-3 text-sm font-medium ' +
+                  item.bg]"
+              >
                 <component :is="item.icon" class="h-6 w-6" aria-hidden="true" />
                 <span class="sr-only"> {{ item.name }} </span>
-              </a>
+              </Link>
             </nav>
           </div>
-          <div class="flex-shrink-0 flex pb-5">
-          </div>
+          <div class="flex-shrink-0 flex pb-5"></div>
         </div>
       </div>
     </div>
-
-    
-    <div v-if="!collapseSidebar" class="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0">
+    <div
+      v-if="!collapseSidebar"
+      class="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 z-10"
+    >
       <div
         class="flex flex-col flex-grow border-r border-gray-200 bg-white overflow-y-auto"
       >
@@ -113,7 +119,7 @@
           class="rounded px-1 mx-1 mr-3 border-gray-200 text-gray-500"
           @click="toggleCollapseSidebar()"
         >
-          <MenuAlt2Icon class="h-6 w-6" aria-hidden="true" />
+          <MenuIcon class="h-6 w-6" aria-hidden="true" />
         </button> -->
           <Link class="ml-2" :href="route('dashboard')">
             <jet-application-logo class="block h-10 w-auto" />
@@ -121,28 +127,50 @@
         </div>
         <div class="flex-grow flex flex-col -mt-1.5">
           <div class="px-4 flex flex-col mt-3 mb-1">
-            <button type="button" class="px-3 inline-flex items-center text-center py-3 border border-transparent text-base font-medium rounded-full shadow-sm text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
-              <PlusIcon class="h-6 w-6 text-white" aria-hidden="true" />&emsp;Create
-            </button>
+            <create mode="button"></create>
           </div>
           <nav class="py-4 px-0 bg-white">
-            <a v-for="item in filteredNavigation" :key="item.name"
-              :href="item.href" class="px-5 hover:bg-gray-700 hover:text-white group flex items-center py-3 text-sm font-medium">
-              <component :is="item.icon" class="mr-3 ml-2 h-6 w-6" aria-hidden="true" />
-              <span class="flex-1"> {{ item.name }} </span>
-            </a>
+            <div v-for="item in filteredNavigation" :class="[item.auth ? 'pb-2 border-b' : '']" :key="item.name">
+              <Link
+                :href="item.href"
+                :class="[ $page.url === item.href ? ' border-r-4 bg-gray-200 border-r-black' : '', 'w-full px-7 hover:bg-gray-700 hover:text-white group flex items-center py-3 text-sm font-medium ' +
+                  item.bg]"
+              >
+                <component :is="item.icon" class="mr-3 ml-2 h-6 w-6" aria-hidden="true" />
+                <span class="flex-1"> {{ item.name }} </span>
+              </Link>
+              <Link
+                v-for="child in item.children"
+                :key="child.name"
+                :href="child.href"
+                :class="[ $page.url === child.href ? ' border-r-4 bg-gray-200 border-r-black' : '', 'w-full px-10 hover:bg-gray-700 hover:text-white group flex items-center py-1.5 text-sm font-small ' +
+                  child.bg]"
+              >
+                <component
+                  :is="child.icon"
+                  class="mr-3 ml-2 h-4 w-4"
+                  aria-hidden="true"
+                />
+                <span class="flex-1"> {{ child.name }} </span>
+              </Link>
+            </div>
           </nav>
         </div>
       </div>
     </div>
-    <div :class="[ collapseSidebar ? 'md:pl-20' : 'md:pl-64', 'flex flex-col flex-1']">
+    <div
+      :class="[
+        collapseSidebar ? 'md:pl-20 md:-ml-20' : 'md:pl-64',
+        'flex flex-col flex-1 z-0',
+      ]"
+    >
       <div class="sticky top-0 z-10 flex-shrink-0 flex h-16 bg-white shadow">
         <button
           type="button"
           class="p-4 rounded mx-1 mr-3 border-gray-200 text-gray-500"
           @click="toggleCollapseSidebar()"
         >
-          <MenuAlt2Icon class="h-6 w-6" aria-hidden="true" />
+          <MenuIcon class="h-6 w-6" aria-hidden="true" />
         </button>
         <button
           type="button"
@@ -150,7 +178,7 @@
           @click="sidebarOpen = true"
         >
           <span class="sr-only">Open sidebar</span>
-          <MenuAlt2Icon class="h-6 w-6" aria-hidden="true" />
+          <MenuIcon class="h-6 w-6" aria-hidden="true" />
         </button>
         <div class="flex-1 px-4 py-2 flex justify-between">
           <div class="flex-1 flex">
@@ -326,7 +354,7 @@
                             <div class="flex items-center">
                               <svg
                                 v-if="team.id == $page.props.user.current_team_id"
-                                class="mr-2 h-5 w-5 text-gray-400"
+                                class="mr-2 h-5 w-5 text-green-400"
                                 fill="none"
                                 stroke-linecap="round"
                                 stroke-linejoin="round"
@@ -429,6 +457,7 @@
 <script>
 import JetApplicationLogo from "@/Jetstream/ApplicationLogo.vue";
 import Search from "@/Shared/Search.vue";
+import Create from "@/Shared/CreateButton.vue";
 import JetApplicationMark from "@/Jetstream/ApplicationMark.vue";
 import { Head, Link } from "@inertiajs/inertia-vue3";
 import JetBanner from "@/Jetstream/Banner.vue";
@@ -453,9 +482,14 @@ import {
   Dialog,
   DialogPanel,
   TransitionChild,
-  TransitionRoot,
+  TransitionRoot
 } from "@headlessui/vue";
-import { BellIcon, MenuAlt2Icon, XIcon } from "@heroicons/vue/outline";
+import { BellIcon, MenuIcon, XIcon, ClockIcon,
+  UsersIcon,
+  StarIcon,
+  FolderIcon,
+  ViewGridIcon,
+  TrashIcon, } from "@heroicons/vue/outline";
 import { SearchIcon, PlusIcon } from "@heroicons/vue/solid";
 
 const userNavigation = [];
@@ -466,9 +500,51 @@ const secondaryNavigation = [
 ];
 
 const navigation = [
-  { auth: true, name: "Dashboard", href: "/dashboard", icon: HomeIcon },
-  { auth: false, name: "Projects", href: "/projects", icon: BookmarkAltIcon },
-  { auth: false, name: "Datasets", href: "/datasets", icon: InboxIcon },
+  {
+    auth: true,
+    name: "Dashboard",
+    href: "/dashboard",
+    icon: HomeIcon,
+    bg: "bg-gray-50",
+    children: [
+      {
+        auth: true,
+        name: "Shared with me",
+        href: "/dashboard/shared-with-me",
+        icon: UsersIcon,
+        bg: "bg-white",
+      },
+      {
+        auth: false,
+        name: "Recent",
+        href: "/dashboard/recent",
+        icon: ClockIcon,
+        bg: "bg-white",
+      },
+      {
+        auth: false,
+        name: "Starred",
+        href: "/dashboard/starred",
+        icon: StarIcon,
+        bg: "bg-white",
+      },
+      {
+        auth: false,
+        name: "Archive",
+        href: "/dashboard/archive",
+        icon: TrashIcon,
+        bg: "bg-white",
+      },
+    ],
+  },
+  {
+    auth: false,
+    name: "Projects",
+    href: "/projects",
+    icon: FolderIcon,
+    bg: "bg-white",
+  },
+  { auth: false, name: "Datasets", href: "/datasets", icon: ViewGridIcon, bg: "bg-white" },
 ];
 
 export default {
@@ -492,19 +568,26 @@ export default {
     TransitionChild,
     TransitionRoot,
     BellIcon,
-    MenuAlt2Icon,
+    MenuIcon,
     SearchIcon,
     XIcon,
     PlusIcon,
     FlashMessages,
     DialogPanel,
     AnnouncementBanner,
-    Search
+    Search,
+    Create,
+    ClockIcon,
+    UsersIcon,
+    StarIcon,
+    TrashIcon,
+    FolderIcon,
+    ViewGridIcon
   },
   setup() {
-    var collapseSidebarStatus = JSON.parse(localStorage.getItem('collapseSidebarStatus'));
-    if(!collapseSidebarStatus){
-      collapseSidebarStatus = false
+    var collapseSidebarStatus = JSON.parse(localStorage.getItem("collapseSidebarStatus"));
+    if (!collapseSidebarStatus) {
+      collapseSidebarStatus = false;
     }
     const sidebarOpen = ref(false);
     const collapseSidebar = ref(collapseSidebarStatus);
@@ -528,20 +611,20 @@ export default {
         }
       );
     },
-    toggleCollapseSidebar(){
-      this.collapseSidebar = !this.collapseSidebar
-      localStorage.setItem('collapseSidebarStatus', this.collapseSidebar);
+    toggleCollapseSidebar() {
+      this.collapseSidebar = !this.collapseSidebar;
+      localStorage.setItem("collapseSidebarStatus", this.collapseSidebar);
     },
     logout() {
       this.$inertia.post(route("logout"));
     },
   },
   computed: {
-    filteredNavigation(){
-      if (this.$page.props.user.first_name){
-        return this.navigation
-      }else{
-        return this.navigation.filter( i => !i.auth)
+    filteredNavigation() {
+      if (this.$page.props.user.first_name) {
+        return this.navigation;
+      } else {
+        return this.navigation.filter((i) => !i.auth);
       }
     },
     personalTeam() {

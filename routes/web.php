@@ -8,6 +8,7 @@ use App\Http\Controllers\Auth\SocialController;
 use App\Http\Controllers\Admin\ConsoleController;
 use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DatasetController;
 use App\Http\Controllers\FileSystemController;
 use App\Http\Controllers\StudyController;
@@ -35,28 +36,27 @@ Route::supportBubble();
 Route::get('{code}/studies/{study}/file/{filename}', [StudyController::class, 'file'])
         ->name('study.file');
 
-Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function (Request $request) {
-    $user = $request->user();
-    $team = $user->currentTeam;
-    if ($team) {
-        $team->users = $team->allUsers();
-    }
-    $projects = Project::where('owner_id', $user->id)->where('team_id', $team->id)->get();
-    return Inertia::render('Dashboard', [
-        'team' => $team,
-        'projects' => $projects
-    ]);
-})->name('dashboard');
+Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
 
 Route::get('projects/{slug}', [ProjectController::class, 'publicProjectView'])->name('public.project');
 Route::get('projects', [ProjectController::class, 'publicProjectsView'])->name('public.projects');
 Route::get('datasets/{slug}', [DatasetController::class, 'publicDatasetView'])->name('public.dataset');
 Route::get('datasets', [DatasetController::class, 'publicDatasetsView'])->name('public.datasets');
 
-Route::group(['middleware' => ['auth']], function () {
+Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::group([
         'prefix' => 'dashboard'
     ], function () {
+        
+        Route::get('shared-with-me', [DashboardController::class, 'sharedWithMe'])
+            ->name('shared-with-me');
+        Route::get('starred', [DashboardController::class, 'starred'])
+            ->name('starred');
+        Route::get('archive', [DashboardController::class, 'archive'])
+            ->name('archive');
+        Route::get('recent', [DashboardController::class, 'recent'])
+            ->name('recent');
+            
         Route::post('/storage/signed-storage-url',  [FileSystemController::class, 'signedStorageURL']);
         
         Route::get('projects/{project}', [ProjectController::class, 'show'])
@@ -73,7 +73,16 @@ Route::group(['middleware' => ['auth']], function () {
             ->name('projects.activity');
         Route::get('projects/{project}/checkIfUserHasPassword', [ProjectController::class, 'checkIfUserHasPassword'])
             ->name('projects.checkIfUserHasPassword'); 
-        
+        Route::post('projects/{project}/toggleStarred', [ProjectController::class, 'toggleStarred'])
+            ->name('projects.toggle-starred');    
+        Route::post('projects/{project}/members', [ProjectController::class, 'memberStore'])->name('project-members.store');
+        Route::get('/project-invitations/{invitation}', [ProjectController::class, 'acceptInvitation'])
+                            ->middleware(['signed'])
+                            ->name('project-invitations.accept');
+        Route::delete('/project-invitations/{invitation}', [ProjectController::class, 'destroyInvitation'])
+                    ->name('project-invitations.destroy');
+        Route::put('/projects/{project}/members/{user}', [ProjectController::class, 'updateMemberRole'])->name('project-members.update');
+        Route::delete('/projects/{project}/members/{user}', [ProjectController::class, 'removeMember'])->name('project-members.destroy');
         
         Route::get('studies/{study}', [StudyController::class, 'show'])
             ->name('study');
@@ -101,7 +110,7 @@ Route::group([
         Route::get('console', [ConsoleController::class, 'index'])
         ->name('console');
 
-        Route::group(['middleware' => ['auth', 'permission:manage roles|manage platform']], function () {
+        Route::group(['middleware' => ['permission:manage roles|manage platform']], function () {
             // Users
             Route::get('users', [UsersController::class, 'index'])
             ->name('users');
@@ -126,10 +135,7 @@ Route::group([
 
             Route::delete('users/edit/{user}/photo', [UsersController::class, 'destroyPhoto'])
             ->name('users.destroy-photo');
-        });
-
-        // Adding routes for announcements section
-        Route::group(['middleware' => ['auth', 'permission:manage roles|manage platform']], function () {
+       
             // Announcements
             Route::get('announcements', [AnnouncementController::class, 'index'])
             ->name('announcements');
