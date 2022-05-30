@@ -19,7 +19,14 @@
                 class="h-full divide-y divide-gray-200 flex flex-col bg-white shadow-xl"
               >
                 <div class="flex-1 h-0 overflow-y-auto">
-                  <div class="py-6 px-4 sm:px-6"  :style="[ (project.color && project.color!='') ? ('background-color:' + project.color)  : 'background-color:rgb(75,75,75)']">
+                  <div
+                    class="py-6 px-4 sm:px-6"
+                    :style="[
+                      project.color && project.color != ''
+                        ? 'background-color:' + project.color
+                        : 'background-color:rgb(75,75,75)',
+                    ]"
+                  >
                     <div class="flex items-center justify-between">
                       <DialogTitle class="text-lg font-medium text-white">
                         {{ project.name }}
@@ -50,9 +57,10 @@
                             <input
                               v-model="form.name"
                               type="text"
+                              :readonly="!editable"
                               name="project-name"
                               id="project-name"
-                              class="block w-full shadow-sm sm:text-sm focus:ring-teal-500 focus:border-teal-500 border-gray-300 rounded-md"
+                              class="block w-full shadow-sm sm:text-sm focus:ring-gray-500 focus:border-gray-500 border-gray-300 rounded-md"
                             />
                           </div>
                         </div>
@@ -98,10 +106,11 @@
                                     <textarea
                                       v-model="form.description"
                                       id="description"
+                                      :readonly="!editable"
                                       name="description"
                                       placeholder="Description (Optional)"
                                       rows="3"
-                                      class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                                      class="shadow-sm focus:ring-gray-500 focus:border-gray-500 block w-full sm:text-sm border-gray-300 rounded-md"
                                     />
                                   </div>
                                 </TabPanel>
@@ -150,27 +159,14 @@
                             />
                           </div>
                         </div>
-                        <div>
+                        <div v-if="editable">
                           <label
                             for="study-name"
                             class="block text-sm font-medium text-gray-900"
                           >
                             Color
                           </label>
-                          <color-picker v-model:pureColor="form.color"/>
-                        </div>
-                        <div>
-                           <SwitchGroup as="div" class="flex items-center">
-                              <Switch v-model="form.starred" :class="[form.starred ? 'bg-teal-500' : 'bg-gray-200', 'relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500']">
-                                <span aria-hidden="true" :class="[form.starred ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200']" />
-                              </Switch>
-                              <SwitchLabel v-if="form.starred" as="span" class="ml-3">
-                                <span class="text-sm font-medium text-gray-900">Remove from starred </span>
-                              </SwitchLabel>
-                              <SwitchLabel v-else as="span" class="ml-3">
-                                <span class="text-sm font-medium text-gray-900">Add to starred </span>
-                              </SwitchLabel>
-                          </SwitchGroup>
+                          <color-picker v-model:pureColor="form.color" />
                         </div>
                         <fieldset>
                           <legend class="text-sm font-medium text-gray-900">
@@ -182,12 +178,13 @@
                                 <input
                                   :checked="form.is_public === true"
                                   v-model="form.is_public"
+                                  :disabled="!editable"
                                   id="privacy-public"
                                   name="privacy"
                                   value="true"
                                   aria-describedby="privacy-public-description"
                                   type="radio"
-                                  class="focus:ring-teal-500 h-4 w-4 text-teal-500 border-gray-300"
+                                  class="focus:ring-gray-500 h-4 w-4 text-gray-600 border-gray-300"
                                 />
                               </div>
                               <div class="pl-7 text-sm">
@@ -208,12 +205,13 @@
                                   <input
                                     :checked="form.is_public === false"
                                     v-model="form.is_public"
+                                    :disabled="!editable"
                                     id="privacy-private-to-project"
                                     name="privacy"
                                     value="false"
                                     aria-describedby="privacy-private-to-project-description"
                                     type="radio"
-                                    class="focus:ring-teal-500 h-4 w-4 text-teal-500 border-gray-300"
+                                    class="focus:ring-gray-500 h-4 w-4 text-gray-600 border-gray-300"
                                   />
                                 </div>
                                 <div class="pl-7 text-sm">
@@ -235,15 +233,39 @@
                           </div>
                         </fieldset>
                       </div>
-                      <div class="pt-4 pb-6">
+                      <div v-if="editable" class="pt-4 pb-6">
                         <div v-if="form.is_public == true || form.is_public == 'true'">
-                          <label for="email" class="block text-sm font-medium text-gray-700">Public URL</label>
+                          <label
+                            for="email"
+                            class="block text-sm font-medium text-gray-700"
+                            >Public URL</label
+                          >
                           <div class="mt-1 flex rounded-md shadow-sm">
-                            <div class="relative flex items-stretch flex-grow focus-within:z-10">
-                              <input @focus="$event.target.select()"  id="projectPublicURLCopy" v-model="project.public_url" type="text" class="rounded-l-md focus:ring-teal-500 focus:border-teal-500 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300" />
+                            <div
+                              class="relative flex items-stretch flex-grow focus-within:z-10"
+                            >
+                              <input
+                                @focus="$event.target.select()"
+                                :readonly="!editable"
+                                id="projectPublicURLCopy"
+                                v-model="project.public_url"
+                                type="text"
+                                class="rounded-l-md focus:ring-gray-500 focus:border-gray-500 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300"
+                              />
                             </div>
-                            <button @click="copyToClipboard(project.public_url, 'projectPublicURLCopy')" type="button" class="-ml-px relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500">
-                              <span><ClipboardCopyIcon class="h-5 w-5" aria-hidden="true" /></span>
+                            <button
+                              @click="
+                                copyToClipboard(
+                                  project.public_url,
+                                  'projectPublicURLCopy'
+                                )
+                              "
+                              type="button"
+                              class="-ml-px relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500"
+                            >
+                              <span
+                                ><ClipboardCopyIcon class="h-5 w-5" aria-hidden="true"
+                              /></span>
                             </button>
                           </div>
                         </div>
@@ -251,60 +273,143 @@
                           <div class="space-y-1">
                             <div class="relative flex items-start">
                               <div class="flex items-center h-5">
-                                <input v-model="linkAccess" type="checkbox" class="focus:ring-teal-500 h-4 w-4 text-teal-500 border-gray-300 rounded" />
+                                <input
+                                  v-model="linkAccess"
+                                  type="checkbox"
+                                  class="focus:ring-gray-500 h-4 w-4 text-gray-600 border-gray-300 rounded"
+                                />
                               </div>
                               <div class="ml-3 text-sm">
-                                <label class="font-medium text-gray-700">Any one with link</label>
+                                <label class="font-medium text-gray-700"
+                                  >Any one with link</label
+                                >
                               </div>
                             </div>
                             <div v-if="linkAccess">
                               <div class="flex">
                                 <div class="flex-grow">
-                                  <input @focus="$event.target.select()" id="projectPrivateURLCopy" readonly type="text" :value="project.private_url" class="rounded-l-md focus:ring-teal-500 focus:border-teal-500 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300" />
+                                  <input
+                                    @focus="$event.target.select()"
+                                    id="projectPrivateURLCopy"
+                                    readonly
+                                    type="text"
+                                    :value="project.private_url"
+                                    class="rounded-l-md focus:ring-gray-500 focus:border-gray-500 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300"
+                                  />
                                 </div>
-                                <button @click="copyToClipboard(project.private_url, 'projectPrivateURLCopy')" type="button" class="-ml-px relative inline-flex items-center space-x-2 px-2 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500">
-                                  <span><ClipboardCopyIcon class="h-5 w-5" aria-hidden="true" /></span>
+                                <button
+                                  @click="
+                                    copyToClipboard(
+                                      project.private_url,
+                                      'projectPrivateURLCopy'
+                                    )
+                                  "
+                                  type="button"
+                                  class="-ml-px relative inline-flex items-center space-x-2 px-2 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500"
+                                >
+                                  <span
+                                    ><ClipboardCopyIcon
+                                      class="h-5 w-5"
+                                      aria-hidden="true"
+                                  /></span>
                                 </button>
                               </div>
                               <div class="mt-3">
-                                  <Listbox as="div" v-model="selectedAccessType">
-                                    <div class="relative">
-                                      <div class="inline-flex shadow-sm rounded-md divide-x divide-teal-500">
-                                        <div class="relative z-0 inline-flex shadow-sm rounded-md divide-x divide-teal-500">
-                                          <div class="relative inline-flex items-center bg-teal-500 py-2 pl-3 pr-4 border border-transparent rounded-l-md shadow-sm text-white">
-                                            <CheckIcon class="h-5 w-5" aria-hidden="true" />
-                                            <p class="ml-2.5 text-sm font-medium">{{ selectedAccessType.title }}</p>
-                                          </div>
-                                          <ListboxButton class="relative inline-flex items-center bg-teal-500 p-2 rounded-l-none rounded-r-md text-sm font-medium text-white hover:bg-teal-500 focus:outline-none focus:z-10 focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-teal-500">
-                                            <span class="sr-only">Change published status</span>
-                                            <ChevronDownIcon class="h-5 w-5 text-white" aria-hidden="true" />
-                                          </ListboxButton>
+                                <Listbox as="div" v-model="selectedAccessType">
+                                  <div class="relative">
+                                    <div
+                                      class="inline-flex shadow-sm rounded-md divide-x divide-gray-600"
+                                    >
+                                      <div
+                                        class="relative z-0 inline-flex shadow-sm rounded-md divide-x divide-gray-600"
+                                      >
+                                        <div
+                                          class="relative inline-flex items-center bg-gray-500 py-2 pl-3 pr-4 border border-transparent rounded-l-md shadow-sm text-white"
+                                        >
+                                          <CheckIcon class="h-5 w-5" aria-hidden="true" />
+                                          <p class="ml-2.5 text-sm font-medium">
+                                            {{ selectedAccessType.title }}
+                                          </p>
                                         </div>
+                                        <ListboxButton
+                                          class="relative inline-flex items-center bg-gray-500 p-2 rounded-l-none rounded-r-md text-sm font-medium text-white hover:bg-gray-600 focus:outline-none focus:z-10 focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-gray-500"
+                                        >
+                                          <span class="sr-only"
+                                            >Change published status</span
+                                          >
+                                          <ChevronDownIcon
+                                            class="h-5 w-5 text-white"
+                                            aria-hidden="true"
+                                          />
+                                        </ListboxButton>
                                       </div>
-
-                                      <transition leave-active-class="transition ease-in duration-100" leave-from-class="opacity-100" leave-to-class="opacity-0">
-                                        <ListboxOptions class="origin-top-right absolute z-10 left-0 mt-2 w-72 rounded-md shadow-lg overflow-hidden bg-white divide-y divide-gray-200 ring-1 ring-black ring-opacity-5 focus:outline-none">
-                                          <ListboxOption as="template" v-for="option in publishingOptions" :key="option.title" :value="option" v-slot="{ active, selectedAccessType }">
-                                            <li :class="[active ? 'text-white bg-teal-500' : 'text-gray-900', 'cursor-default select-none relative p-4 text-sm']">
-                                              <div class="flex flex-col">
-                                                <div class="flex justify-between">
-                                                  <p :class="selectedAccessType ? 'font-semibold' : 'font-normal'">
-                                                    {{ option.title }}
-                                                  </p>
-                                                  <span v-if="selectedAccessType" :class="active ? 'text-white' : 'text-teal-500'">
-                                                    <CheckIcon class="h-5 w-5" aria-hidden="true" />
-                                                  </span>
-                                                </div>
-                                                <p :class="[active ? 'text-teal-200' : 'text-gray-500', 'mt-2']">
-                                                  {{ option.description }}
-                                                </p>
-                                              </div>
-                                            </li>
-                                          </ListboxOption>
-                                        </ListboxOptions>
-                                      </transition>
                                     </div>
-                                  </Listbox>
+
+                                    <transition
+                                      leave-active-class="transition ease-in duration-100"
+                                      leave-from-class="opacity-100"
+                                      leave-to-class="opacity-0"
+                                    >
+                                      <ListboxOptions
+                                        class="origin-top-right absolute z-10 left-0 mt-2 w-72 rounded-md shadow-lg overflow-hidden bg-white divide-y divide-gray-200 ring-1 ring-black ring-opacity-5 focus:outline-none"
+                                      >
+                                        <ListboxOption
+                                          as="template"
+                                          v-for="option in publishingOptions"
+                                          :key="option.title"
+                                          :value="option"
+                                          v-slot="{ active, selectedAccessType }"
+                                        >
+                                          <li
+                                            :class="[
+                                              active
+                                                ? 'text-white bg-gray-500'
+                                                : 'text-gray-900',
+                                              'cursor-default select-none relative p-4 text-sm',
+                                            ]"
+                                          >
+                                            <div class="flex flex-col">
+                                              <div class="flex justify-between">
+                                                <p
+                                                  :class="
+                                                    selectedAccessType
+                                                      ? 'font-semibold'
+                                                      : 'font-normal'
+                                                  "
+                                                >
+                                                  {{ option.title }}
+                                                </p>
+                                                <span
+                                                  v-if="selectedAccessType"
+                                                  :class="
+                                                    active
+                                                      ? 'text-white'
+                                                      : 'text-gray-500'
+                                                  "
+                                                >
+                                                  <CheckIcon
+                                                    class="h-5 w-5"
+                                                    aria-hidden="true"
+                                                  />
+                                                </span>
+                                              </div>
+                                              <p
+                                                :class="[
+                                                  active
+                                                    ? 'text-gray-200'
+                                                    : 'text-gray-500',
+                                                  'mt-2',
+                                                ]"
+                                              >
+                                                {{ option.description }}
+                                              </p>
+                                            </div>
+                                          </li>
+                                        </ListboxOption>
+                                      </ListboxOptions>
+                                    </transition>
+                                  </div>
+                                </Listbox>
                               </div>
                             </div>
                           </div>
@@ -332,24 +437,32 @@
                             <span class="ml-2"> Activity </span>
                           </a>
                         </div>
-                        <project-activity :project="project" ref="activityDetailsElement"></project-activity>
+                        <project-activity
+                          :project="project"
+                          ref="activityDetailsElement"
+                        ></project-activity>
                       </div>
                     </div>
                   </div>
                 </div>
                 <div class="flex-shrink-0 px-4 py-4 flex justify-end">
-                  <jet-action-message :on="form.recentlySuccessful" class="mr-3 py-2 text-green-200">
-                      Saved.
+                  <jet-action-message
+                    :on="form.recentlySuccessful"
+                    class="mr-3 py-2 text-green-200"
+                  >
+                    Saved.
                   </jet-action-message>
                   <jet-secondary-button
-                    class="ml-2"
+                    type="button"
+                    class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
                     @click="open = false"
                   >
                     Cancel
                   </jet-secondary-button>
                   <jet-button
+                    v-if="editable"
                     type="submit"
-                    class="ml-2"
+                    class="ml-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
                     @click="updateProject"
                   >
                     Save
@@ -365,7 +478,7 @@
 </template>
 
 <script>
-import JetActionMessage from '@/Jetstream/ActionMessage.vue'
+import JetActionMessage from "@/Jetstream/ActionMessage.vue";
 import { ref, defineComponent } from "vue";
 import {
   Dialog,
@@ -375,22 +488,53 @@ import {
   TransitionRoot,
 } from "@headlessui/vue";
 import { XIcon } from "@heroicons/vue/outline";
-import { LinkIcon, PlusSmIcon, QuestionMarkCircleIcon, ExclamationCircleIcon } from "@heroicons/vue/solid";
-import { Listbox, ListboxButton, ListboxLabel, ListboxOption, ListboxOptions, Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/vue";
+import {
+  LinkIcon,
+  PlusSmIcon,
+  QuestionMarkCircleIcon,
+  ExclamationCircleIcon,
+} from "@heroicons/vue/solid";
+import {
+  Listbox,
+  ListboxButton,
+  ListboxLabel,
+  ListboxOption,
+  ListboxOptions,
+  Tab,
+  TabGroup,
+  TabList,
+  TabPanel,
+  TabPanels,
+} from "@headlessui/vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import ProjectActivity from "@/Pages/Project/Partials/Activity.vue";
 import { ColorPicker } from "vue3-colorpicker";
 import "vue3-colorpicker/style.css";
-import { Switch, SwitchGroup, SwitchLabel } from '@headlessui/vue'
-import { ClipboardCopyIcon, CheckIcon, ChevronDownIcon } from '@heroicons/vue/solid'
+import { Switch, SwitchGroup, SwitchLabel } from "@headlessui/vue";
+import { ClipboardCopyIcon, CheckIcon, ChevronDownIcon } from "@heroicons/vue/solid";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import JetButton from "@/Jetstream/Button.vue";
 
 const publishingOptions = [
-  { value: 'viewer', title: 'Viewer', description: 'Anyone on the internet with this link can view', current: true },
-  { value: 'commentor', title: 'Commentor', description: 'Anyone on the internet with this link can comment', current: false },
-  { value: 'editor', title: 'Editor', description: 'Anyone on the internet with this link can edit (sign in required)', current: false },
-]
+  {
+    value: "viewer",
+    title: "Viewer",
+    description: "Anyone on the internet with this link can view",
+    current: true,
+  },
+  {
+    value: "commentor",
+    title: "Commentor",
+    description: "Anyone on the internet with this link can comment",
+    current: false,
+  },
+  {
+    value: "editor",
+    title: "Editor",
+    description: "Anyone on the internet with this link can edit (sign in required)",
+    current: false,
+  },
+];
 
 export default defineComponent({
   components: {
@@ -427,13 +571,13 @@ export default defineComponent({
     CheckIcon,
     ChevronDownIcon,
   },
-  props: ["project"],
+  props: ["project", "role"],
   setup() {
-    const activityDetailsElement = ref(null)
+    const activityDetailsElement = ref(null);
     return {
       activityDetailsElement,
       publishingOptions,
-    }
+    };
   },
   data() {
     return {
@@ -451,8 +595,10 @@ export default defineComponent({
         is_public: this.project.is_public,
       }),
       open: false,
-      selectedAccessType: publishingOptions.filter( option => option.value == this.project.access_type)[0],
-      linkAccess : this.project.access == 'link'
+      selectedAccessType: publishingOptions.filter(
+        (option) => option.value == this.project.access_type
+      )[0],
+      linkAccess: this.project.access == "link",
     };
   },
   methods: {
@@ -462,21 +608,32 @@ export default defineComponent({
     updateProject() {
       this.form.owner_id = this.project.owner_id;
       this.form.team_id = this.project.team_id;
-      if(this.linkAccess){
-        this.form.access = "link"
-        this.form.access_type = this.selectedAccessType.value
-      }else{
-        this.form.access = "restricted"
+      if (this.linkAccess) {
+        this.form.access = "link";
+        this.form.access_type = this.selectedAccessType.value;
+      } else {
+        this.form.access = "restricted";
       }
       this.form.post(route("projects.update", this.project.id), {
         preserveScroll: true,
-        onSuccess: () => { this.open = false },
+        onSuccess: () => {
+          this.open = false;
+        },
         onError: (err) => console.error(err),
       });
     },
     toggleActivityDetails() {
-      this.activityDetailsElement.toggleDetails()
-    }
+      this.activityDetailsElement.toggleDetails();
+    },
   },
+  computed:{
+    editable(){
+      if(this.role){
+        return this.role == 'owner' ||  this.role == 'collaborator'
+      }else{
+        return false
+      }
+    }
+  }
 });
 </script>

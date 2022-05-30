@@ -82,6 +82,40 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * User model and Projects relationship - many to many
+     *
+     * @var array
+     */
+    public function projects()
+    {
+        return $this->belongsToMany(Project::class);
+    }
+
+    /**
+     * User model and Projects relationship - many to many
+     *
+     * @var array
+     */
+    public function recentProjects()
+    {
+        return $this->projects()->orderBy('updated_at','DESC');
+    }
+
+    /**
+     * Determine if the user owns the given project.
+     *
+     * @param  mixed  $project
+     * @return bool
+     */
+    public function ownsProject($project)
+    {
+        if (is_null($project)) {
+            return false;
+        }
+        return $this->id == $project->owner_id;
+    }
+
+    /**
      * Get the default profile photo URL if no profile photo has been uploaded.
      *
      * @return string

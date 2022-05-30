@@ -32,7 +32,7 @@
                         <jet-label for="roles" value="Role" />
                         <jet-input-error :message="addTeamMemberForm.errors.role" class="mt-2" />
 
-                        <div class="relative z-0 mt-1 border border-gray-200 rounded-lg cursor-pointer">
+                        <div class="relative z-0 mt-1 border border-gray-200 rounded-lg cursor-pointer text-left">
                             <button type="button" class="relative px-4 py-3 inline-flex w-full rounded-lg focus:z-10 focus:outline-none focus:border-blue-300 focus:ring focus:ring-blue-200"
                                             :class="{'border-t border-gray-200 rounded-t-none': i > 0, 'rounded-b-none': i != Object.keys(availableRoles).length - 1}"
                                             @click="addTeamMemberForm.role = role.key"
@@ -49,7 +49,7 @@
                                     </div>
 
                                     <!-- Role Description -->
-                                    <div class="mt-2 text-xs text-gray-600">
+                                    <div class="mt-2 text-xs text-left text-gray-600">
                                         {{ role.description }}
                                     </div>
                                 </div>
