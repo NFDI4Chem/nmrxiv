@@ -8,13 +8,13 @@
               </div>
           </div>
           <div class="flex-shrink-0 ml-4">
-              <button
+              <jet-button
               @click="openProjectCreateDialog()"
               type="button"
-              class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              class="ml-2"
               >
               New Project
-              </button>
+              </jet-button>
           </div>
         </div>
         <span v-if="projects.length <= 0">
@@ -188,12 +188,14 @@
 <script>
 import { Link } from "@inertiajs/inertia-vue3";
 import ProjectCreate from "@/Pages/Project/Partials/Create.vue";
+import JetButton from "@/Jetstream/Button.vue";
 import { ref } from 'vue'
 
 export default {
   components: {
       Link,
-      ProjectCreate
+      ProjectCreate,
+      JetButton
   },
   setup() {
     const projectCreateElement = ref(null)
