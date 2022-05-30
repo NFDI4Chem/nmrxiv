@@ -177,7 +177,7 @@ export default {
       this.open = !this.open;
     },
     fetchActivity(entity) {
-      axios.get(route("projects.activity", entity.id)).then((res) => {
+      axios.get(route("dashboard.project.activity", entity.id)).then((res) => {
         this.audit = res.data.audit;
       });
     },

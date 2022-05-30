@@ -55,6 +55,10 @@
                               class="block w-full shadow-sm sm:text-sm focus:ring-gray-500 focus:border-gray-500 border-gray-300 rounded-md"
                             />
                           </div>
+                          <jet-input-error
+                            :message="form.errors.name"
+                            class="mt-2"
+                          />                          
                         </div>
                         <div>
                           <label
@@ -458,7 +462,7 @@ export default {
       }else{
         this.form.access = "restricted"
       }
-      this.form.post(route("studies.update", this.study.id), {
+      this.form.post(route("dashboard.study.update", this.study.id), {
         preserveScroll: true,
         onSuccess: () => { this.open = false },
         onError: (err) => console.error(err),

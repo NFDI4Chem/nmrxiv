@@ -43,8 +43,8 @@ export default {
     return {
       pages: [
         { name: "Console", route: "console", current: false },
-        { name: "Users", route: "users", current: false },
-        { name: "Create User", route: "users.create", current: true }
+        { name: "Users", route: "console.users", current: false },
+        { name: "Create User", route: "console.users.create", current: true }
       ],
     };
   },

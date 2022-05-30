@@ -59,7 +59,7 @@ class UsersController extends Controller
     {
         $user = $creator->create($request->all());
         event(new Registered($user));
-        return redirect::route('users.edit', [$user]);
+        return redirect()->route('console.users')->with('success', 'User created successfully');
     }
 
     public function edit(User $user)
@@ -79,7 +79,7 @@ class UsersController extends Controller
     {
         $updater->update($user, $request->all());
 
-        return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('status', 'profile-information-updated');
+        return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('success', 'Profile updated succesfully');
     }
 
     public function updatePassword(User $user, Request $request)
@@ -92,7 +92,7 @@ class UsersController extends Controller
             'password' => Hash::make($request['password']),
         ])->save();
 
-        return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('status', 'profile-information-updated');
+        return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('success', 'Profile updated succesfully');
     }
 
     public function updateRole(User $user, Request $request)
@@ -113,7 +113,7 @@ class UsersController extends Controller
             $user->syncRoles([$role]);
         }
 
-        return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('status', 'profile-information-updated');
+        return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('success', 'Profile updated succesfully');
     }
 
     public function destroyPhoto(User $user, Request $request)

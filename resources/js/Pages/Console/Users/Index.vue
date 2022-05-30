@@ -30,7 +30,7 @@
         </search-filter>
         <Link
           class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring focus:ring-gray-300 disabled:opacity-25 transition"
-          :href="route('users.create')"
+          :href="route('console.users.create')"
         >
           <span>Create</span>&nbsp;
           <span class="hidden md:inline">User</span>
@@ -114,7 +114,7 @@
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <Link
-                    :href="route('users.edit', user.id)"
+                    :href="route('console.users.edit', user.id)"
                     class="text-indigo-600 hover:text-indigo-900"
                     >Edit</Link
                   >
@@ -254,7 +254,7 @@ export default {
 
       pages: [
         { name: "Console", route: "console", current: false },
-        { name: "Users", route: "users", current: true },
+        { name: "Users", route: "console.users", current: true },
       ],
     };
   },
@@ -263,7 +263,7 @@ export default {
       handler: throttle(function () {
         let query = pickBy(this.form);
         this.$inertia.replace(
-          this.route("users", Object.keys(query).length ? query : { remember: "forget" })
+          this.route("console.users", Object.keys(query).length ? query : { remember: "forget" })
         );
       }, 150),
       deep: true,
@@ -284,7 +284,7 @@ export default {
       this.currentlyManagingRole = true;
     },
     updateRole() {
-      this.updateRoleForm.put(route("users.update-role", [this.managingRoleFor]), {
+      this.updateRoleForm.put(route("console.users.update-role", [this.managingRoleFor]), {
         preserveScroll: true,
         onSuccess: () => (this.currentlyManagingRole = false),
         onError: (data) => {

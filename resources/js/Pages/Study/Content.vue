@@ -34,8 +34,8 @@ import {
   FolderOpenIcon,
 } from "@heroicons/vue/outline";
 const subNavigation = [
-  { name: "About", route: "study", icon: DatabaseIcon },
-  { name: "Files", route: "study.files", icon: FolderOpenIcon },
+  { name: "About", route: "dashboard.studies", icon: DatabaseIcon },
+  { name: "Files", route: "dashboard.study.files", icon: FolderOpenIcon },
 ];
 
 export default {
