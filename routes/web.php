@@ -60,36 +60,36 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/storage/signed-storage-url',  [FileSystemController::class, 'signedStorageURL']);
         
         Route::get('projects/{project}', [ProjectController::class, 'show'])
-            ->name('project');
+            ->name('dashboard.projects');
         Route::get('projects/{project}/settings', [ProjectController::class, 'settings'])
-            ->name('project.settings');
+            ->name('dashboard.project.settings');
         Route::delete('projects/{project}', [ProjectController::class, 'destroy'])
-            ->name('project.destroy');
+            ->name('dashboard.project.destroy');
         Route::post('projects/create', [ProjectController::class, 'store'])
-            ->name('projects.create');
+            ->name('dashboard.project.create');
         Route::put('projects/{project}/update', [ProjectController::class, 'update'])
-            ->name('projects.update');
+            ->name('dashboard.project.update');
         Route::get('projects/{project}/activity', [ProjectController::class, 'activity'])
-            ->name('projects.activity');
+            ->name('dashboard.project.activity');
         Route::get('projects/{project}/checkIfUserHasPassword', [ProjectController::class, 'checkIfUserHasPassword'])
-            ->name('projects.checkIfUserHasPassword'); 
+            ->name('dashboard.project.checkIfUserHasPassword'); 
         
         
         Route::get('studies/{study}', [StudyController::class, 'show'])
-            ->name('study');
+            ->name('dashboard.studies');
         Route::get('studies/{study}/files', [StudyController::class, 'files'])
-            ->name('study.files');
+            ->name('dashboard.study.files');
 
         Route::get('studies/{study}/settings', [StudyController::class, 'settings'])
-            ->name('study.settings');
+            ->name('dashboard.study.settings');
         Route::delete('studies/{study}', [StudyController::class, 'destroy'])
-            ->name('study.destroy');
+            ->name('dashboard.study.destroy');
         Route::post('studies/create', [StudyController::class, 'store'])
-            ->name('studies.create');
+            ->name('dashboard.study.create');
         Route::put('studies/{study}/update', [StudyController::class, 'update'])
-            ->name('studies.update');
+            ->name('dashboard.study.update');
         Route::get('studies/{study}/activity', [StudyController::class, 'activity'])
-            ->name('studies.activity');
+            ->name('dashboard.study.activity');
     });
 });
 
@@ -104,44 +104,44 @@ Route::group([
         Route::group(['middleware' => ['auth', 'permission:manage roles|manage platform']], function () {
             // Users
             Route::get('users', [UsersController::class, 'index'])
-            ->name('users');
+            ->name('console.users');
         
             Route::get('users/create', [UsersController::class, 'create'])
-            ->name('users.create');
+            ->name('console.users.create');
 
             Route::post('users', [UsersController::class, 'store'])
-            ->name('users.store');
+            ->name('console.users.store');
 
             Route::get('users/edit/{user}', [UsersController::class, 'edit'])
-            ->name('users.edit');
+            ->name('console.users.edit');
 
             Route::put('users/edit/{user}', [UsersController::class, 'update'])
-            ->name('users.update');
+            ->name('console.users.update');
 
             Route::put('users/edit/{user}/password', [UsersController::class, 'updatePassword'])
-            ->name('users.update-password');
+            ->name('console.users.update-password');
 
             Route::put('users/edit/{user}/role', [UsersController::class, 'updateRole'])
-            ->name('users.update-role');
+            ->name('console.users.update-role');
 
             Route::delete('users/edit/{user}/photo', [UsersController::class, 'destroyPhoto'])
-            ->name('users.destroy-photo');
+            ->name('console.users.destroy-photo');
         });
 
         // Adding routes for announcements section
         Route::group(['middleware' => ['auth', 'permission:manage roles|manage platform']], function () {
             // Announcements
             Route::get('announcements', [AnnouncementController::class, 'index'])
-            ->name('announcements');
+            ->name('console.announcements');
             
             Route::post('announcements/create', [AnnouncementController::class, 'create'])
-            ->name('announcements.create');
+            ->name('console.announcements.create');
 
             Route::post('announcements/{announcement}', [AnnouncementController::class, 'update'])
-            ->name('announcements.edit');
+            ->name('console.announcements.edit');
 
             Route::delete('announcements/{announcement}', [AnnouncementController::class, 'destroy'])
-            ->name('announcements.destroy');
+            ->name('console.announcements.destroy');
         });
     });
 });

@@ -77,7 +77,7 @@ class AnnouncementController extends Controller
                 $announcement->save();
             });
         });
-        return redirect()->route('announcements')->with('success', 'Announcement created successfully');
+        return redirect()->route('console.announcements')->with('success', 'Announcement created successfully');
     }
 
     /**
@@ -111,7 +111,7 @@ class AnnouncementController extends Controller
             ]);
         $announcement->save();
 
-        return redirect()->route('announcements')->with('success', 'Announcement updated successfully');
+        return redirect()->route('console.announcements')->with('success', 'Announcement updated successfully');
     }
 
     /**
@@ -125,6 +125,6 @@ class AnnouncementController extends Controller
     {
         $announcement->delete();
 
-        return redirect()->route('announcements')->with('success', 'Announcement deleted successfully');
+        return redirect()->route('console.announcements')->with('success', 'Announcement deleted successfully');
     }
 }

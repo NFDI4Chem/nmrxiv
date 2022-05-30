@@ -34,14 +34,14 @@
                         heading="Users & Profiles"
                         description="Allows managing users including edit/view their permissions."
                         name="users"
-                        path="users"
+                        path="console.users"
                     />
                     <!-- Announcement Block -->
                     <blocks
                         heading="Announcements"
                         description="Manage announcements."
                         name="announcements"
-                        path="announcements"
+                        path="console.announcements"
                     />
                 </div>
             </div>

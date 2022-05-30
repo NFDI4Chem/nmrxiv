@@ -104,7 +104,7 @@ export default {
       this.open = !this.open;
     },
     fetchActivity(entity){
-      axios.get(route('studies.activity', entity.id)).then(res => {
+      axios.get(route('dashboard.study.activity', entity.id)).then(res => {
         this.audit = res.data.audit
       })
     }

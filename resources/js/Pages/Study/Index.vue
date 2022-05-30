@@ -78,7 +78,7 @@
         </div>
         <div v-else class="py-5 pb-5 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           <div :key="study.uuid" v-for="study in studies">
-            <Link :href="route('study', [study.id])">
+            <Link :href="route('dashboard.studies', [study.id])">
             <study-card
               :isPublic=study.is_public
               :name=study.name

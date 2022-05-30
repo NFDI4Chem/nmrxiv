@@ -166,7 +166,7 @@ export default {
         editAnnouncement() {
             //this.editAnnouncementForm.creator_id = this.$page.props.user.id;
             this.editAnnouncementForm.post(
-                route("announcements.edit", this.editAnnouncementForm.id),
+                route("console.announcements.edit", this.editAnnouncementForm.id),
                 {
                     preserveScroll: true,
                     onSuccess: () => {
