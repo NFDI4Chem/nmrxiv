@@ -177,7 +177,7 @@
       </div>
       <div v-if="canDeleteProject" class="flex-nowrap">
         <Link
-          :href="route('project.settings', project.id)"
+          :href="route('dashboard.project.settings', project.id)"
           class="text-sm flex-nowrap text-gray-800 font-bold"
         >
           Project&nbsp;Settings

@@ -413,38 +413,16 @@
                               </div>
                             </div>
                           </div>
+                          <project-activity
+                            :project="project"
+                            ref="activityDetailsElement"
+                          ></project-activity>
                         </div>
-                        <div class="mt-6 flex text-sm">
-                          <a
-                            class="group inline-flex items-center text-gray-500 hover:text-gray-900"
-                          >
-                            <QuestionMarkCircleIcon
-                              class="h-5 w-5 text-gray-400 group-hover:text-gray-500"
-                              aria-hidden="true"
-                            />
-                            <span class="ml-2"> Learn more about sharing </span>
-                          </a>
-                        </div>
-                        <div class="mt-4 flex text-sm">
-                          <a
-                            @click="toggleActivityDetails"
-                            class="cursor-pointer group inline-flex items-center text-gray-500 hover:text-gray-900"
-                          >
-                            <ExclamationCircleIcon
-                              class="h-5 w-5 text-gray-400 group-hover:text-gray-500"
-                              aria-hidden="true"
-                            />
-                            <span class="ml-2"> Activity </span>
-                          </a>
-                        </div>
-                        <project-activity
-                          :project="project"
-                          ref="activityDetailsElement"
-                        ></project-activity>
                       </div>
                     </div>
                   </div>
                 </div>
+
                 <div class="flex-shrink-0 px-4 py-4 flex justify-end">
                   <jet-action-message
                     :on="form.recentlySuccessful"
@@ -538,16 +516,25 @@ const publishingOptions = [
 
 export default defineComponent({
   components: {
+    Switch,
+    SwitchGroup,
+    SwitchLabel,
+    JetSecondaryButton,
+    JetButton,
     Dialog,
     DialogOverlay,
     DialogTitle,
     TransitionChild,
-    TransitionRoot,
-    JetInputError,
-    ProjectActivity,
+    ColorPicker,
     JetActionMessage,
-    JetSecondaryButton,
-    JetButton,
+    JetInputError,
+    XIcon,
+    ProjectActivity,
+    TransitionRoot,
+    LinkIcon,
+    PlusSmIcon,
+    QuestionMarkCircleIcon,
+    ExclamationCircleIcon,
     Listbox,
     ListboxButton,
     ListboxLabel,
@@ -558,15 +545,6 @@ export default defineComponent({
     TabList,
     TabPanel,
     TabPanels,
-    LinkIcon,
-    PlusSmIcon,
-    QuestionMarkCircleIcon,
-    ExclamationCircleIcon,
-    XIcon,
-    ColorPicker,
-    Switch,
-    SwitchGroup,
-    SwitchLabel,
     ClipboardCopyIcon,
     CheckIcon,
     ChevronDownIcon,
@@ -626,14 +604,14 @@ export default defineComponent({
       this.activityDetailsElement.toggleDetails();
     },
   },
-  computed:{
-    editable(){
-      if(this.role){
-        return this.role == 'owner' ||  this.role == 'collaborator'
-      }else{
-        return false
+  computed: {
+    editable() {
+      if (this.role) {
+        return this.role == "owner" || this.role == "collaborator";
+      } else {
+        return false;
       }
-    }
-  }
+    },
+  },
 });
 </script>

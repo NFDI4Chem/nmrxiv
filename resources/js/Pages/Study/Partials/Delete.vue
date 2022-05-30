@@ -90,7 +90,7 @@
             },
 
             deleteStudy() {
-                this.form.delete(route('study.destroy', this.study.id), {
+                this.form.delete(route('dashboard.study.destroy', this.study.id), {
                     preserveScroll: true,
                     onSuccess: () => this.closeModal(),
                     onError: () => this.$refs.password.focus(),

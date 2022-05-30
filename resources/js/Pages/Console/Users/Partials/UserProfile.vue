@@ -186,13 +186,13 @@ export default {
       }
 
       if (this.user) {
-        this.form.post(route("users.update", this.user.id), {
+        this.form.post(route("console.users.update", this.user.id), {
           errorBag: "updateProfileInformation",
           preserveScroll: true,
           onSuccess: () => this.clearPhotoFileInput(),
         });
       } else {
-        this.form.post(route("users.store"), {
+        this.form.post(route("console.users.store"), {
           errorBag: "updateProfileInformation",
           preserveScroll: true,
           onSuccess: () => this.clearPhotoFileInput(),

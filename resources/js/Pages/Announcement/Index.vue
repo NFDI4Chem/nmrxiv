@@ -300,21 +300,13 @@ export default {
                 { name: "Console", route: "console", current: false },
                 {
                     name: "Announcements",
-                    route: "announcements",
+                    route: "console.announcements",
                     current: true,
                 },
             ],
         };
     },
     methods: {
-        // convertDate(date){
-        //     if(date){
-        //         date = date.getDate();
-        //         date.toDateString();
-        //         return date;
-        //     }
-        //     return null;
-        // },
         reset() {
             this.search = null;
         },
@@ -327,7 +319,7 @@ export default {
             );
         },
         deleteAnnouncement(id) {
-            this.form.delete(route("announcements.destroy", id), {
+            this.form.delete(route("console.announcements.destroy", id), {
                 onSuccess: () => {
                     this.closeModal();
                     this.announcementId = null;
