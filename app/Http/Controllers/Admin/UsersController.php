@@ -116,10 +116,22 @@ class UsersController extends Controller
         return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('success', 'Profile updated succesfully');
     }
 
+    public function checkPassword(Request $request){
+        $user = $request->user();
+        $hasPassword = false;
+        if($user->password){
+            $hasPassword = true;
+        }        
+        return response()->json([
+            'hasPassword' => $hasPassword
+        ]);
+    }
+
     public function destroyPhoto(User $user, Request $request)
     {
         $user->deleteProfilePhoto();
 
         return back(303)->with('status', 'profile-photo-deleted');
     }
+
 }

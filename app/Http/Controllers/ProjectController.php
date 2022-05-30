@@ -95,17 +95,6 @@ class ProjectController extends Controller
         ]);
     }
 
-    public function checkIfUserHasPassword(Request $request, Project $project){
-        $user = $request->user();
-        $hasPassword = false;
-        if($user->password){
-            $hasPassword = true;
-        }        
-        return response()->json([
-            'hasPassword' => $hasPassword
-        ]);
-    }
-
     public function toggleStarred(Request $request, Project $project){
         $user = $request->user();
         $hasPassword = false;

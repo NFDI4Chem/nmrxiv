@@ -20,6 +20,9 @@ Route::group([
 ], function () {
     Route::get('/login/{service}', [SocialController::class, 'redirectToProvider']);
     Route::get('/login/{service}/callback', [SocialController::class, 'handleProviderCallback']);    
+    Route::get('/checkPassword', [UsersController::class, 'checkPassword'])
+    ->name('auth.checkPassword'); 
+
 });
 
 Route::get('/', function () {
@@ -71,14 +74,12 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
             ->name('dashboard.project.update');
         Route::get('projects/{project}/activity', [ProjectController::class, 'activity'])
             ->name('dashboard.project.activity');
-        Route::get('projects/{project}/checkIfUserHasPassword', [ProjectController::class, 'checkIfUserHasPassword'])
-            ->name('projects.checkIfUserHasPassword'); 
         Route::post('projects/{project}/toggleStarred', [ProjectController::class, 'toggleStarred'])
             ->name('projects.toggle-starred');    
         Route::post('projects/{project}/members', [ProjectController::class, 'memberStore'])->name('project-members.store');
         Route::get('/project-invitations/{invitation}', [ProjectController::class, 'acceptInvitation'])
-                            ->middleware(['signed'])
-                            ->name('project-invitations.accept');
+                ->middleware(['signed'])
+                ->name('project-invitations.accept');
         Route::delete('/project-invitations/{invitation}', [ProjectController::class, 'destroyInvitation'])
                     ->name('project-invitations.destroy');
         Route::put('/projects/{project}/members/{user}', [ProjectController::class, 'updateMemberRole'])->name('project-members.update');
