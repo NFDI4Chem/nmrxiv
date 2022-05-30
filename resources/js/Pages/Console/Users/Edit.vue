@@ -52,14 +52,14 @@ export default {
     return {
       pages: [
         { name: "Console", route: "console", current: false },
-        { name: "Users", route: "users", current: false },
-        { name: this.edituser.first_name + " " + this.edituser.last_name, route: "users.update", current: true, id: this.edituser.id }
+        { name: "Users", route: "console.users", current: false },
+        { name: this.edituser.first_name + " " + this.edituser.last_name, route: "console.users.update", current: true, id: this.edituser.id }
       ],
     };
   },
   methods: {
     update() {
-      this.form.post(this.route("users.update", this.edituser.id), {
+      this.form.post(this.route("console.users.update", this.edituser.id), {
         onSuccess: () => this.form.reset("password", "photo"),
       });
     }
