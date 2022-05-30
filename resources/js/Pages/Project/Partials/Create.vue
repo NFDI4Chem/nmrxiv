@@ -27,7 +27,8 @@
           <div class="sm:col-span-6">
             <TabGroup v-slot="{ $selectedIndex }">
               <TabList class="flex items-center">
-                <Tab as="template" v-slot="{ selected }">
+                <Tab as="template" v-slot="{ selected }"
+                  class="after:content-['*'] after:ml-0.5 after:text-red-500">
                   <button
                     :class="[
                       selected
@@ -86,6 +87,10 @@
                 </TabPanel>
               </TabPanels>
             </TabGroup>
+              <jet-input-error
+                :message="createProjectForm.errors.description"
+                class="mt-2"
+              />
             <label class="block text-sm font-medium text-gray-700"
               ><small
                 ><svg

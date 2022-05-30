@@ -12,13 +12,12 @@
             </div>
           </div>
           <div class="flex-shrink-0 ml-4">
-            <button
+            <jet-button
               @click="openStudyCreateDialog()"
-              type="button"
-              class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              class="ml-2"
             >
               New Study
-            </button>
+            </jet-button>
           </div>
         </div>
         <div v-if="studies.length <= 0">
@@ -100,12 +99,14 @@ import { ref } from 'vue'
 import { Link } from "@inertiajs/inertia-vue3";
 import StudyCreate from "@/Pages/Study/Partials/Create.vue";
 import StudyCard from "@/Shared/StudyCard.vue";
+import JetButton from "@/Jetstream/Button.vue";
 
 export default {
   components: {
     Link,
     StudyCreate,
     StudyCard,
+    JetButton,
   },
   setup() {
     const studyCreateElement = ref(null)
