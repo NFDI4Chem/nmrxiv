@@ -71,7 +71,7 @@
         </span>
         <span v-else>
             <div :key="project.uuid" v-for="project in projects" class="mt-8">
-                <Link :href="route('project', [project.id])">
+                <Link :href="route('dashboard.projects', [project.id])">
                 <div
                     class="flex justify-between items-center bg-white shadow-md rounded-lg px-6 py-6 hover:drop-shadow-xl cursor-pointer"
                 >

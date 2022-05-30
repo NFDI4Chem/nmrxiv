@@ -5,7 +5,7 @@
         <div
           class="flex items-center text-sm text-gray-700 uppercase font-bold tracking-widest"
         >
-          <Link :href="route('project', project.id)">{{ project.name }}</Link>&nbsp;/&nbsp;Settings
+          <Link :href="route('dashboard.projects', project.id)">{{ project.name }}</Link>&nbsp;/&nbsp;Settings
         </div>
       </div>
     </template>

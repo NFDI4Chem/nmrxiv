@@ -168,7 +168,7 @@ export default {
         },
         createAnnouncement() {
             this.createAnnouncementForm.creator_id = this.$page.props.user.id;
-            this.createAnnouncementForm.post(route("announcements.create"), {
+            this.createAnnouncementForm.post(route("console.announcements.create"), {
                 preserveScroll: true,
                 onSuccess: () => {
                     this.createAnnouncementDialog = false;
