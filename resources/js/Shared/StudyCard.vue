@@ -25,7 +25,7 @@
           v-else
           class="relative w-0 flex-1 inline-flex items-center justify-center py-4 text-sm text-gray-700 font-medium border border-transparent rounded-br-lg hover:text-gray-500"
         >
-          <LockClosedIcon class="w-3 h-3 text-indigo-600" />
+          <LockClosedIcon class="w-3 h-3 text-teal-600" />
           <span class="ml-1">Private</span>
         </a>
       </div>
