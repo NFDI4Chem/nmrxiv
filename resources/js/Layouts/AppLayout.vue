@@ -1,5 +1,6 @@
 <template>
   <Head :title="title" />
+  <AppTour />
   <jet-banner />
   <announcement-banner />
   <div class="h-full flex min-h-screen">
@@ -79,7 +80,10 @@
         </div>
       </Dialog>
     </TransitionRoot>
-    <div v-if="collapseSidebar" class="hidden bg-white border-r md:flex md:flex-shrink-0 md:inset-y-0 z-10">
+    <div
+      v-if="collapseSidebar"
+      class="hidden bg-white border-r md:flex md:flex-shrink-0 md:inset-y-0 z-10"
+    >
       <div class="flex flex-col w-20">
         <div class="flex-1 flex flex-col min-h-0 overflow-y-auto">
           <div class="flex-1">
@@ -94,8 +98,11 @@
                 v-for="item in filteredNavigation"
                 :key="item.name"
                 :href="item.href"
-                :class="[ $page.url === item.href ? ' border-r-4 bg-gray-200 border-r-black' : '', 'w-full px-7 hover:bg-gray-700 hover:text-white group flex items-center py-3 text-sm font-medium ' +
-                  item.bg]"
+                :class="[
+                  $page.url === item.href ? ' border-r-4 bg-gray-200 border-r-black' : '',
+                  'w-full px-7 hover:bg-gray-700 hover:text-white group flex items-center py-3 text-sm font-medium ' +
+                    item.bg,
+                ]"
               >
                 <component :is="item.icon" class="h-6 w-6" aria-hidden="true" />
                 <span class="sr-only"> {{ item.name }} </span>
@@ -130,11 +137,18 @@
             <create mode="button"></create>
           </div>
           <nav class="py-4 px-0 bg-white">
-            <div v-for="item in filteredNavigation" :class="[item.auth ? 'pb-2 border-b' : '']" :key="item.name">
+            <div
+              v-for="item in filteredNavigation"
+              :class="[item.auth ? 'pb-2 border-b' : '']"
+              :key="item.name"
+            >
               <Link
                 :href="item.href"
-                :class="[ $page.url === item.href ? ' border-r-4 bg-gray-200 border-r-black' : '', 'w-full px-7 hover:bg-gray-700 hover:text-white group flex items-center py-3 text-sm font-medium ' +
-                  item.bg]"
+                :class="[
+                  $page.url === item.href ? ' border-r-4 bg-gray-200 border-r-black' : '',
+                  'w-full px-7 hover:bg-gray-700 hover:text-white group flex items-center py-3 text-sm font-medium ' +
+                    item.bg,
+                ]"
               >
                 <component :is="item.icon" class="mr-3 ml-2 h-6 w-6" aria-hidden="true" />
                 <span class="flex-1"> {{ item.name }} </span>
@@ -143,8 +157,13 @@
                 v-for="child in item.children"
                 :key="child.name"
                 :href="child.href"
-                :class="[ $page.url === child.href ? ' border-r-4 bg-gray-200 border-r-black' : '', 'w-full px-10 hover:bg-gray-700 hover:text-white group flex items-center py-1.5 text-sm font-small ' +
-                  child.bg]"
+                :class="[
+                  $page.url === child.href
+                    ? ' border-r-4 bg-gray-200 border-r-black'
+                    : '',
+                  'w-full px-10 hover:bg-gray-700 hover:text-white group flex items-center py-1.5 text-sm font-small ' +
+                    child.bg,
+                ]"
               >
                 <component
                   :is="child.icon"
@@ -218,6 +237,21 @@
                     d="M12 21V5a5 5 0 0 1 4-2h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4.34a2 2 0 0 0-1.42.59l-.83.82A2 2 0 0 1 12 21z"
                     class="fill-current text-gray-600"
                   ></path></svg
+              ></a>
+            </div>
+            <div class="ml-5">
+              <a class="cursor-pointer text-gray-600" @click="startTour" target="_blank"
+                ><svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-5 w-5"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M18 3a1 1 0 00-1.447-.894L8.763 6H5a3 3 0 000 6h.28l1.771 5.316A1 1 0 008 18h1a1 1 0 001-1v-4.382l6.553 3.276A1 1 0 0018 15V3z"
+                    clip-rule="evenodd"
+                  /></svg
               ></a>
             </div>
             <Menu as="div" v-if="$page.props.user" class="ml-3 relative">
@@ -465,6 +499,7 @@ import JetDropdown from "@/Jetstream/Dropdown.vue";
 import JetDropdownLink from "@/Jetstream/DropdownLink.vue";
 import FlashMessages from "@/Shared/FlashMessages";
 import AnnouncementBanner from "@/Shared/AnnouncementBanner.vue";
+import AppTour from "@/App/Tour.vue";
 import {
   BookmarkAltIcon,
   FireIcon,
@@ -482,14 +517,19 @@ import {
   Dialog,
   DialogPanel,
   TransitionChild,
-  TransitionRoot
+  TransitionRoot,
 } from "@headlessui/vue";
-import { BellIcon, MenuIcon, XIcon, ClockIcon,
+import {
+  BellIcon,
+  MenuIcon,
+  XIcon,
+  ClockIcon,
   UsersIcon,
   StarIcon,
   FolderIcon,
   ViewGridIcon,
-  TrashIcon, } from "@heroicons/vue/outline";
+  TrashIcon,
+} from "@heroicons/vue/outline";
 import { SearchIcon, PlusIcon } from "@heroicons/vue/solid";
 
 const userNavigation = [];
@@ -544,7 +584,13 @@ const navigation = [
     icon: FolderIcon,
     bg: "bg-white",
   },
-  { auth: false, name: "Datasets", href: "/datasets", icon: ViewGridIcon, bg: "bg-white" },
+  {
+    auth: false,
+    name: "Datasets",
+    href: "/datasets",
+    icon: ViewGridIcon,
+    bg: "bg-white",
+  },
 ];
 
 export default {
@@ -552,6 +598,7 @@ export default {
     title: String,
   },
   components: {
+    AppTour,
     JetBanner,
     JetApplicationLogo,
     JetApplicationMark,
@@ -582,7 +629,7 @@ export default {
     StarIcon,
     TrashIcon,
     FolderIcon,
-    ViewGridIcon
+    ViewGridIcon,
   },
   setup() {
     var collapseSidebarStatus = JSON.parse(localStorage.getItem("collapseSidebarStatus"));
@@ -617,6 +664,9 @@ export default {
     },
     logout() {
       this.$inertia.post(route("logout"));
+    },
+    startTour() {
+      this.$tours["appTour"].start();
     },
   },
   computed: {
