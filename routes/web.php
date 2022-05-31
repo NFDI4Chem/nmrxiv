@@ -1,19 +1,21 @@
 <?php
 
-use Illuminate\Foundation\Application;
-use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-use Illuminate\Http\Request;
+use App\Http\Controllers\Admin\AnnouncementController;
 use App\Http\Controllers\Auth\SocialController;
 use App\Http\Controllers\Admin\ConsoleController;
 use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\ProjectInvitationController;
+use App\Http\Controllers\ProjectMemberController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DatasetController;
 use App\Http\Controllers\FileSystemController;
 use App\Http\Controllers\StudyController;
+use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 use App\Models\Project;
-use App\Http\Controllers\Admin\AnnouncementController;
+use Inertia\Inertia;
 
 Route::group([
     'prefix' => 'auth'
@@ -21,8 +23,7 @@ Route::group([
     Route::get('/login/{service}', [SocialController::class, 'redirectToProvider']);
     Route::get('/login/{service}/callback', [SocialController::class, 'handleProviderCallback']);    
     Route::get('/checkPassword', [UsersController::class, 'checkPassword'])
-    ->name('auth.checkPassword'); 
-
+        ->name('auth.checkPassword'); 
 });
 
 Route::get('/', function () {
@@ -37,20 +38,23 @@ Route::get('/', function () {
 Route::supportBubble();
 
 Route::get('{code}/studies/{study}/file/{filename}', [StudyController::class, 'file'])
-        ->name('study.file');
+    ->name('study.file');
 
 Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
 
-Route::get('projects/{slug}', [ProjectController::class, 'publicProjectView'])->name('public.project');
-Route::get('projects', [ProjectController::class, 'publicProjectsView'])->name('public.projects');
-Route::get('datasets/{slug}', [DatasetController::class, 'publicDatasetView'])->name('public.dataset');
-Route::get('datasets', [DatasetController::class, 'publicDatasetsView'])->name('public.datasets');
+Route::get('projects/{slug}', [ProjectController::class, 'publicProjectView'])
+    ->name('public.project');
+Route::get('projects', [ProjectController::class, 'publicProjectsView'])
+    ->name('public.projects');
+Route::get('datasets/{slug}', [DatasetController::class, 'publicDatasetView'])
+    ->name('public.dataset');
+Route::get('datasets', [DatasetController::class, 'publicDatasetsView'])
+    ->name('public.datasets');
 
 Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::group([
         'prefix' => 'dashboard'
     ], function () {
-        
         Route::get('shared-with-me', [DashboardController::class, 'sharedWithMe'])
             ->name('shared-with-me');
         Route::get('starred', [DashboardController::class, 'starred'])
@@ -75,21 +79,25 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
         Route::get('projects/{project}/activity', [ProjectController::class, 'activity'])
             ->name('dashboard.project.activity');
         Route::post('projects/{project}/toggleStarred', [ProjectController::class, 'toggleStarred'])
-            ->name('projects.toggle-starred');    
-        Route::post('projects/{project}/members', [ProjectController::class, 'memberStore'])->name('project-members.store');
-        Route::get('/project-invitations/{invitation}', [ProjectController::class, 'acceptInvitation'])
-                ->middleware(['signed'])
-                ->name('project-invitations.accept');
-        Route::delete('/project-invitations/{invitation}', [ProjectController::class, 'destroyInvitation'])
-                    ->name('project-invitations.destroy');
-        Route::put('/projects/{project}/members/{user}', [ProjectController::class, 'updateMemberRole'])->name('project-members.update');
-        Route::delete('/projects/{project}/members/{user}', [ProjectController::class, 'removeMember'])->name('project-members.destroy');
+            ->name('projects.toggle-starred');
+
+        Route::post('projects/{project}/members', [ProjectMemberController::class, 'memberStore'])
+            ->name('project-members.store');
+        Route::put('/projects/{project}/members/{user}', [ProjectMemberController::class, 'updateMemberRole'])
+            ->name('project-members.update');
+        Route::delete('/projects/{project}/members/{user}', [ProjectMemberController::class, 'removeMember'])
+            ->name('project-members.destroy');
+
+        Route::get('/project-invitations/{invitation}', [ProjectInvitationController::class, 'acceptInvitation'])
+            ->middleware(['signed'])
+            ->name('project-invitations.accept');
+        Route::delete('/project-invitations/{invitation}', [ProjectInvitationController::class, 'destroyInvitation'])
+            ->name('project-invitations.destroy');
         
         Route::get('studies/{study}', [StudyController::class, 'show'])
             ->name('dashboard.studies');
         Route::get('studies/{study}/files', [StudyController::class, 'files'])
             ->name('dashboard.study.files');
-
         Route::get('studies/{study}/settings', [StudyController::class, 'settings'])
             ->name('dashboard.study.settings');
         Route::delete('studies/{study}', [StudyController::class, 'destroy'])

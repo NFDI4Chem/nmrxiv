@@ -1,8 +1,7 @@
 @component('mail::message')
 {{ __('You have been invited to join the :project project!', ['project' => $invitation->project->name]) }}
 
-{{ __('Message:') }}
-
+{{ __('Message:') }}  
 {{ __(':message', ['message' => $invitation->message]) }}
 
 @if (Laravel\Fortify\Features::enabled(Laravel\Fortify\Features::registration()))
