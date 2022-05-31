@@ -592,7 +592,7 @@ export default defineComponent({
       } else {
         this.form.access = "restricted";
       }
-      this.form.post(route("projects.update", this.project.id), {
+      this.form.post(route("dashboard.project.update", this.project.id), {
         preserveScroll: true,
         onSuccess: () => {
           this.open = false;
