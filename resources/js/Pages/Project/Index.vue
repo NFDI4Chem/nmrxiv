@@ -9,6 +9,7 @@
       </div>
       <div class="flex-shrink-0 ml-4">
         <button
+        id="v-step-1"
           v-if="mode == 'create' && editable"
           @click="openProjectCreateDialog()"
           type="button"
