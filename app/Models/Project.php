@@ -84,7 +84,7 @@ class Project extends Model implements Auditable
      */
     public function allUsers()
     {
-        return $this->users->merge([$this->owner]);
+        return $this->users;
     }
 
     /**
@@ -97,7 +97,7 @@ class Project extends Model implements Auditable
         return $this->belongsToMany(User::class)
             ->withPivot('role')
             ->withTimestamps()
-            ->as('project-membership');
+            ->as('projectMembership');
     }
 
     /**
@@ -148,8 +148,8 @@ class Project extends Model implements Auditable
         $user = $this->userWithEmail($email);
 
         if($user){
-            if($user['project-membership']){
-                return $user['project-membership']['role'];
+            if($user['projectMembership']){
+                return $user['projectMembership']['role'];
             }elseIf($this->owner_id == $user->id){
                 return 'owner';
             }

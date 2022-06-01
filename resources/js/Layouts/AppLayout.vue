@@ -570,8 +570,8 @@ const navigation = [
       },
       {
         auth: false,
-        name: "Archive",
-        href: "/dashboard/archive",
+        name: "Trashed",
+        href: "/dashboard/trashed",
         icon: TrashIcon,
         bg: "bg-white",
       },

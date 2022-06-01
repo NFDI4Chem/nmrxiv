@@ -7,6 +7,7 @@ use App\Actions\Project\CreateNewProject;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Laravel\Fortify\Actions\ConfirmPassword;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Auth\Access\AuthorizationException;
 use App\Actions\Project\UpdateProject;
 use App\Actions\Project\DeleteProject;
 use Laravel\Jetstream\Jetstream;
@@ -24,12 +25,17 @@ class ProjectController extends Controller
     {
         $project = Project::where('slug', $slug)->firstOrFail();
 
-        if($project->is_public){
-            return Inertia::render('Public/Project', [
-                'project' => $project,
-                'studies' => $project->studies
-            ]);
+        if(!$project->is_public){
+
+            if (! Gate::forUser($request->user())->check('viewProject', $project)) {
+                throw new AuthorizationException;
+            }
         }
+
+        return Inertia::render('Public/Project', [
+            'project' => $project,
+            'studies' => $project->studies
+        ]);
     }
 
     public function publicProjectsView(Request $request)
@@ -44,11 +50,15 @@ class ProjectController extends Controller
 
     public function show(Request $request, Project $project)
     {
+        if (! Gate::forUser($request->user())->check('viewProject', $project)) {
+            throw new AuthorizationException;
+        }
+
         $team = $project->nonPersonalTeam;
         return Inertia::render('Project/Show', [
             'project' => $project->load('projectInvitations'),
             'team' => $team ? $team->load('users', 'owner') : null,
-            'members' => $project->users,
+            'members' => $project->allUsers(),
             'availableRoles' => array_values(Jetstream::$roles),
             'studies' => $project->studies,
             'projectRole' => $project->userProjectRole(Auth::user()->email),
@@ -61,6 +71,10 @@ class ProjectController extends Controller
 
     public function settings(Request $request, Project $project)
     {
+        if (! Gate::forUser($request->user())->check('viewProject', $project)) {
+            throw new AuthorizationException;
+        }
+
         return Inertia::render('Project/Settings', [
             'project' => $project,
             'studies' => $project->studies
@@ -69,23 +83,41 @@ class ProjectController extends Controller
 
     public function activity(Request $request, Project $project)
     {
+        if (! Gate::forUser($request->user())->check('viewProject', $project)) {
+            throw new AuthorizationException;
+        }
+
         return response()->json(['audit' => $project->audits()->with('user')->orderBy('created_at', 'desc')->get()]);
     }
 
     public function store(Request $request, CreateNewProject $creator)
     {
+
         $project = $creator->create($request->all());
+
+        if (! Gate::forUser($request->user())->check('createProject', $project)) {
+            throw new AuthorizationException;
+        }
+
         return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('success', 'Project created successfully');
     }
 
     public function update(Request $request, UpdateProject $updater, Project $project)
     {
+        if (! Gate::forUser($request->user())->check('updateProject', $project)) {
+            throw new AuthorizationException;
+        }
+
         $updater->update($project, $request->all());
         return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('success', 'Project updated successfully');
     }
 
     public function destroy(Request $request, StatefulGuard $guard, Project $project, DeleteProject $creator)
     {   
+        if (! Gate::forUser($request->user())->check('deleteProject', $project)) {
+            throw new AuthorizationException;
+        }
+
         $confirmed = app(ConfirmPassword::class)(
             $guard, $request->user(), $request->password
         );

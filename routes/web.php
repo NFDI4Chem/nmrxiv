@@ -59,8 +59,8 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
             ->name('shared-with-me');
         Route::get('starred', [DashboardController::class, 'starred'])
             ->name('starred');
-        Route::get('archive', [DashboardController::class, 'archive'])
-            ->name('archive');
+        Route::get('trashed', [DashboardController::class, 'trashed'])
+            ->name('trashed');
         Route::get('recent', [DashboardController::class, 'recent'])
             ->name('recent');
             

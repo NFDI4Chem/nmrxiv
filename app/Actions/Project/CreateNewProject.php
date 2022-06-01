@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use App\Models\User;
 
 class CreateNewProject
 {
@@ -41,7 +42,13 @@ class CreateNewProject
                 'owner_id'  => $input['owner_id'],
                 'is_public'  => $input['is_public'],
                 'project_photo_path' => array_key_exists('project_photo_path', $input) ? $input['project_photo_path'] : null,
-            ]), function (Project $project) {
+            ]), function (Project $project) use ($input)  {
+                $user = User::find($input['owner_id']);
+                if(!is_null($user)){
+                    $project->users()->attach(
+                        $user, ['role' => 'creator']
+                    );
+                }
             });
         });
     }

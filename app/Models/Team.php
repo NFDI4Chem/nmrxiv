@@ -60,4 +60,14 @@ class Team extends JetstreamTeam
     {
         return 'https://ui-avatars.com/api/?name='.urlencode($this->name).'&color=7F9CF5&background=EBF4FF';
     }
+
+    /**
+     * Team model and Project relationship - one to many
+     *
+     * @var array
+     */
+    public function projects()
+    {
+        return $this->hasMany(Project::class);
+    }
 }

@@ -155,7 +155,7 @@
                 />
               </svg>
             </span>
-            <span v-if="projectRole == 'owner'">
+            <span v-if="projectRole == 'owner' || projectRole == 'creator'">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 class="h-6 w-6 py-1 mr-1"

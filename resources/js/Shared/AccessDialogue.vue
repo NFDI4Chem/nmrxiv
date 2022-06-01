@@ -85,7 +85,7 @@
               </div>
               <div class="mt-5 sm:mt-0 sm:ml-6 sm:flex-shrink-0 sm:flex sm:items-center">
                 <button
-                  v-if="!addUser && role!='reviewer'"
+                  v-if="!addUser && role != 'reviewer'"
                   @click="addUser = true"
                   type="button"
                   class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none sm:text-sm"
@@ -106,7 +106,7 @@
                   >&nbsp; SHARE
                 </button>
                 <button
-                  v-if="addUser && role!='reviewer'"
+                  v-if="addUser && role != 'reviewer'"
                   @click="addUser = false"
                   type="button"
                   class="inline-flex items-center px-4 py-2 border shadow-sm font-medium rounded-md text-dark bg-white-600 hover:bg-white-700 focus:outline-none sm:text-sm"
@@ -136,9 +136,9 @@
                 class="my-5 shadow divide-y divide-gray-200"
               >
                 <li v-for="person in members" :key="person.email">
-                  <a class="block hover:bg-gray-50">
+                  <a class="block">
                     <div class="flex items-center px-4 py-4 sm:px-6">
-                      <div class="min-w-0 flex-1 flex items-center">
+                      <div class="min-w-0 flex-1 pt-3 flex items-center">
                         <div class="flex-shrink-0">
                           <img
                             :key="person.id"
@@ -147,10 +147,13 @@
                             :alt="person.first_name"
                           />
                         </div>
-                        <div class="min-w-0 flex-1 px-4 md:grid md:grid-cols-2 md:gap-4">
+                        <div class="min-w-0 flex-1 px-4">
                           <div>
-                            <p class="text-sm font-medium text-gray-600 truncate">
-                              {{ person.first_name }}
+                            <p class="text-sm font-medium text-gray-600">
+                              {{ person.first_name }} {{ person.last_name }}
+                              <span v-if="$page.props.user.email == person.email"
+                                >(you)</span
+                              >
                             </p>
                             <p class="mt-2 flex items-center text-sm text-gray-500">
                               <svg
@@ -167,65 +170,78 @@
                                   d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"
                                 />
                               </svg>
-                              <span class="truncate">{{ person.email }}</span>
+                              <span>{{ person.email }}</span>
                             </p>
                           </div>
                         </div>
                       </div>
-                      <div v-if="role && role!='reviewer'">
-                        <Menu as="div" class="relative inline-block text-left">
-                          <div>
-                            <MenuButton
-                              class="inline-flex justify-center w-full rounded-md capitalize border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500"
-                            >
-                              {{ person["project-membership"].role }}
-                              <ChevronDownIcon
-                                class="-mr-1 ml-2 h-5 w-5"
-                                aria-hidden="true"
-                              />
-                            </MenuButton>
-                          </div>
-
-                          <transition
-                            enter-active-class="transition ease-out duration-100"
-                            enter-from-class="transform opacity-0 scale-95"
-                            enter-to-class="transform opacity-100 scale-100"
-                            leave-active-class="transition ease-in duration-75"
-                            leave-from-class="transform opacity-100 scale-100"
-                            leave-to-class="transform opacity-0 scale-95"
+                      <div class="-mt-4">
+                        <div v-if="role && role != 'reviewer'">
+                          <div
+                            v-if="
+                              person['project_membership'].role &&
+                              person['project_membership'].role == 'creator'
+                            "
                           >
-                            <MenuItems
-                              class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
+                            <span class="ml-6 text-sm text-dark-500"> Creator </span>
+                          </div>
+                          <div v-else>
+                            <button
+                              @click="removeProjectMember(person)"
+                              class="cursor-pointer mr-3 text-sm text-red-500 hover:text-red-700"
                             >
-                              <div class="py-1">
-                                <span v-for="role in availableRoles" :key="role.key">
-                                  <MenuItem
-                                    @click="updateRole(role, person)"
-                                    v-if="person['project-membership'].role != role.key"
-                                    v-slot="{ active }"
-                                  >
-                                    <a
-                                      href="#"
-                                      :class="[
-                                        active
-                                          ? 'bg-gray-100 text-gray-900'
-                                          : 'text-gray-700',
-                                        'block px-4 py-2 text-sm',
-                                      ]"
-                                      >{{ role.name }}</a
-                                    >
-                                  </MenuItem>
-                                </span>
+                              Remove
+                            </button>
+                            <Menu as="div" class="relative inline-block text-left">
+                              <div>
+                                <MenuButton
+                                  class="inline-flex justify-center w-full rounded-md capitalize border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500"
+                                >
+                                  {{ person["project_membership"].role }}
+                                  <ChevronDownIcon
+                                    class="-mr-1 ml-2 h-5 w-5"
+                                    aria-hidden="true"
+                                  />
+                                </MenuButton>
                               </div>
-                            </MenuItems>
-                          </transition>
-                        </Menu>
-                        <button
-                          @click="removeProjectMember(person)"
-                          class="cursor-pointer ml-6 text-sm text-red-500"
-                        >
-                          Remove
-                        </button>
+                              <transition
+                                enter-active-class="transition ease-out duration-100"
+                                enter-from-class="transform opacity-0 scale-95"
+                                enter-to-class="transform opacity-100 scale-100"
+                                leave-active-class="transition ease-in duration-75"
+                                leave-from-class="transform opacity-100 scale-100"
+                                leave-to-class="transform opacity-0 scale-95"
+                              >
+                                <MenuItems
+                                  class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
+                                >
+                                  <div class="py-1">
+                                    <span v-for="role in availableRoles" :key="role.key">
+                                      <MenuItem
+                                        @click="updateRole(role, person)"
+                                        v-if="
+                                          person['project_membership'].role != role.key
+                                        "
+                                        v-slot="{ active }"
+                                      >
+                                        <a
+                                          href="#"
+                                          :class="[
+                                            active
+                                              ? 'bg-gray-100 text-gray-900'
+                                              : 'text-gray-700',
+                                            'block px-4 py-2 text-sm',
+                                          ]"
+                                          >{{ role.name }}</a
+                                        >
+                                      </MenuItem>
+                                    </span>
+                                  </div>
+                                </MenuItems>
+                              </transition>
+                            </Menu>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </a>
