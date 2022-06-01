@@ -484,6 +484,7 @@
           </div>
         </div>
         <slot></slot>
+        <project-create ref="projectCreateElement"></project-create>
       </main>
     </div>
   </div>
@@ -500,6 +501,7 @@ import JetDropdownLink from "@/Jetstream/DropdownLink.vue";
 import FlashMessages from "@/Shared/FlashMessages";
 import AnnouncementBanner from "@/Shared/AnnouncementBanner.vue";
 import AppTour from "@/App/Tour.vue";
+import ProjectCreate from "@/Pages/Project/Partials/Create.vue";
 import {
   BookmarkAltIcon,
   FireIcon,
@@ -531,6 +533,7 @@ import {
   TrashIcon,
 } from "@heroicons/vue/outline";
 import { SearchIcon, PlusIcon } from "@heroicons/vue/solid";
+import { inject } from 'vue';
 
 const userNavigation = [];
 
@@ -598,6 +601,7 @@ export default {
     title: String,
   },
   components: {
+    ProjectCreate,
     AppTour,
     JetBanner,
     JetApplicationLogo,
@@ -632,19 +636,28 @@ export default {
     ViewGridIcon,
   },
   setup() {
+    const projectCreateElement = ref(null);
     var collapseSidebarStatus = JSON.parse(localStorage.getItem("collapseSidebarStatus"));
     if (!collapseSidebarStatus) {
       collapseSidebarStatus = false;
     }
     const sidebarOpen = ref(false);
     const collapseSidebar = ref(collapseSidebarStatus);
+    
     return {
       userNavigation,
       secondaryNavigation,
       sidebarOpen,
       collapseSidebar,
       navigation,
+      projectCreateElement,
     };
+  },
+  mounted() { 
+    const emitter = inject('emitter'); 
+    emitter.on("openProjectCreateDialog", () => {
+      this.openProjectCreateDialog()
+    });
   },
   methods: {
     switchToTeam(team) {
@@ -667,6 +680,9 @@ export default {
     },
     startTour() {
       this.$tours["appTour"].start();
+    },
+    openProjectCreateDialog() {
+      this.projectCreateElement.toggleCreateProjectDialog();
     },
   },
   computed: {

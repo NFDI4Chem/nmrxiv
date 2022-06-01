@@ -32,9 +32,9 @@
         class="z-50 origin-top-right fixed mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 focus:outline-none"
       >
         <div class="py-1">
-          <MenuItem v-slot="{ active }">
+          <MenuItem class="cursor-pointer" v-slot="{ active }">
             <a
-              href="#"
+              @click="openProjectCreateDialog"
               :class="[
                 active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
                 'group flex items-center px-4 py-2 text-sm',
@@ -96,7 +96,7 @@ import {
   UserAddIcon,
   PlusIcon,
 } from "@heroicons/vue/solid";
-
+import { inject } from 'vue';
 export default {
   props: {
     mode: String,
@@ -116,8 +116,17 @@ export default {
     UserAddIcon,
     PlusIcon,
   },
-  setup() {},
-  methods: {},
+  setup() {
+    const emitter = inject('emitter'); // Inject `emitter`
+    const openProjectCreateDialog = () => {
+      emitter.emit('openProjectCreateDialog', 100);
+    };
+    return {
+      openProjectCreateDialog
+    }
+  },
+  methods: {
+  },
   computed: {},
 };
 </script>

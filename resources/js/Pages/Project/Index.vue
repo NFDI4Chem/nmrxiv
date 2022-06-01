@@ -11,7 +11,7 @@
         <button
         id="v-step-1"
           v-if="mode == 'create' && editable"
-          @click="openProjectCreateDialog()"
+          @click="openProjectCreateDialog"
           type="button"
           class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
         >
@@ -189,33 +189,30 @@
         </Link>
       </div>
     </span>
-    <project-create ref="projectCreateElement"></project-create>
   </div>
 </template>
 <script>
 import { Link } from "@inertiajs/inertia-vue3";
-import ProjectCreate from "@/Pages/Project/Partials/Create.vue";
-import { ref } from "vue";
+import { inject } from 'vue';
 
 export default {
   components: {
     Link,
-    ProjectCreate,
   },
   setup() {
-    const projectCreateElement = ref(null);
-    return {
-      projectCreateElement,
+    const emitter = inject('emitter'); // Inject `emitter`
+    const openProjectCreateDialog = () => {
+      emitter.emit('openProjectCreateDialog', 100);
     };
+    return {
+      openProjectCreateDialog
+    }
   },
   props: ["projects", "mode", "editable", "team"],
   data() {
     return {};
   },
   methods: {
-    openProjectCreateDialog() {
-      this.projectCreateElement.toggleCreateProjectDialog();
-    },
   },
 };
 </script>

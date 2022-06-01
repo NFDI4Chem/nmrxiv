@@ -36,6 +36,7 @@
         "axios-retry": "^3.2.5",
         "dropzone": "^6.0.0-beta.2",
         "marked": "^4.0.4",
+        "mitt": "^3.0.0",
         "openchemlib": "^7.4.3",
         "popper.js": "^1.16.1",
         "vue-instantsearch": "^4.3.3",

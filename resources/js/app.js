@@ -6,9 +6,11 @@ import { InertiaProgress } from '@inertiajs/progress';
 import helpers from "./Mixins/Global.js";
 import Children from "@/Shared/Children.vue";
 import InstantSearch from 'vue-instantsearch/vue3/es';
-import Vue3Tour from 'vue3-tour'
+import Vue3Tour from 'vue3-tour';
+import mitt from 'mitt';
 
 const appName = window.document.getElementsByTagName('title')[0]?.innerText || 'Laravel';
+const emitter = mitt();
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
@@ -21,6 +23,7 @@ createInertiaApp({
             .mixin(helpers)
             .use(InstantSearch)
             .use(Vue3Tour)
+            .provide('emitter', emitter)
             .mount(el);
     },
 });
