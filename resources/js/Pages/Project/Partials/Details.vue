@@ -63,7 +63,9 @@
                               class="block w-full shadow-sm sm:text-sm focus:ring-gray-500 focus:border-gray-500 border-gray-300 rounded-md"
                             />
                           </div>
+                          <jet-input-error :message="form.errors.name" class="mt-2" />
                         </div>
+                        
                         <div>
                           <label
                             for="description"

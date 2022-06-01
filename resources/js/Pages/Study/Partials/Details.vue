@@ -129,6 +129,10 @@
                                 </TabPanel>
                               </TabPanels>
                             </TabGroup>
+                              <jet-input-error
+                                :message="form.errors.description"
+                                class="mt-2"
+                              />
                             <label class="block text-sm font-medium text-gray-700"
                               ><small
                                 ><svg
