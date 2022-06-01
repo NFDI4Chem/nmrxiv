@@ -484,7 +484,7 @@
           </div>
         </div>
         <slot></slot>
-        <project-create ref="projectCreateElement"></project-create>
+        <project-create></project-create>
       </main>
     </div>
   </div>
@@ -533,7 +533,6 @@ import {
   TrashIcon,
 } from "@heroicons/vue/outline";
 import { SearchIcon, PlusIcon } from "@heroicons/vue/solid";
-import { inject } from 'vue';
 
 const userNavigation = [];
 
@@ -636,7 +635,6 @@ export default {
     ViewGridIcon,
   },
   setup() {
-    const projectCreateElement = ref(null);
     var collapseSidebarStatus = JSON.parse(localStorage.getItem("collapseSidebarStatus"));
     if (!collapseSidebarStatus) {
       collapseSidebarStatus = false;
@@ -650,14 +648,7 @@ export default {
       sidebarOpen,
       collapseSidebar,
       navigation,
-      projectCreateElement,
     };
-  },
-  mounted() { 
-    const emitter = inject('emitter'); 
-    emitter.on("openProjectCreateDialog", () => {
-      this.openProjectCreateDialog()
-    });
   },
   methods: {
     switchToTeam(team) {
@@ -680,10 +671,7 @@ export default {
     },
     startTour() {
       this.$tours["appTour"].start();
-    },
-    openProjectCreateDialog() {
-      this.projectCreateElement.toggleCreateProjectDialog();
-    },
+    }
   },
   computed: {
     filteredNavigation() {
