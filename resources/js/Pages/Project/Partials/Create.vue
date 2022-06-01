@@ -6,7 +6,10 @@
       <div class="relative z-0 mt-1 rounded-lg cursor-pointer">
         <div class="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
           <div class="sm:col-span-6">
-            <label for="name" class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500">
+            <label
+              for="name"
+              class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
+            >
               Name
             </label>
             <div class="mt-1 flex rounded-md shadow-sm">
@@ -19,16 +22,16 @@
                 class="flex-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full min-w-0 rounded sm:text-sm border-gray-300"
               />
             </div>
-              <jet-input-error
-                :message="createProjectForm.errors.name"
-                class="mt-2"
-              />
+            <jet-input-error :message="createProjectForm.errors.name" class="mt-2" />
           </div>
           <div class="sm:col-span-6">
             <TabGroup v-slot="{ $selectedIndex }">
               <TabList class="flex items-center">
-                <Tab as="template" v-slot="{ selected }"
-                  class="after:content-['*'] after:ml-0.5 after:text-red-500">
+                <Tab
+                  as="template"
+                  v-slot="{ selected }"
+                  class="after:content-['*'] after:ml-0.5 after:text-red-500"
+                >
                   <button
                     :class="[
                       selected
@@ -87,10 +90,10 @@
                 </TabPanel>
               </TabPanels>
             </TabGroup>
-              <jet-input-error
-                :message="createProjectForm.errors.description"
-                class="mt-2"
-              />
+            <jet-input-error
+              :message="createProjectForm.errors.description"
+              class="mt-2"
+            />
             <label class="block text-sm font-medium text-gray-700"
               ><small
                 ><svg
@@ -107,7 +110,14 @@
                     d="M14.85 3H1.15C.52 3 0 3.52 0 4.15v7.69C0 12.48.52 13 1.15 13h13.69c.64 0 1.15-.52 1.15-1.15v-7.7C16 3.52 15.48 3 14.85 3zM9 11H7V8L5.5 9.92 4 8v3H2V5h2l1.5 2L7 5h2v6zm2.99.5L9.5 8H11V5h2v3h1.5l-2.51 3.5z"
                   ></path>
                 </svg>
-                Styling with Markdown is <span @click="createProjectForm.description = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.'">supported</span></small
+                Styling with Markdown is
+                <span
+                  @click="
+                    createProjectForm.description =
+                      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.'
+                  "
+                  >supported</span
+                ></small
               >
             </label>
           </div>
@@ -270,6 +280,7 @@ import { AtSymbolIcon, CodeIcon, LinkIcon } from "@heroicons/vue/solid";
 import JetInputError from "@/Jetstream/InputError.vue";
 import { ref } from "vue";
 import { Switch, SwitchDescription, SwitchGroup, SwitchLabel } from "@headlessui/vue";
+import { inject } from 'vue';
 
 export default {
   components: {
@@ -292,6 +303,13 @@ export default {
     CheckCircleIcon,
     ChevronRightIcon,
     JetInputError,
+  },
+
+  mounted() {
+    const emitter = inject("emitter");
+    emitter.on("openProjectCreateDialog", () => {
+      this.createProjectDialog = true;
+    });
   },
 
   data() {
@@ -326,10 +344,10 @@ export default {
         onError: (err) => console.error(err),
       });
     },
-    toggleCreateProjectDialog(){
-        this.createProjectDialog = !this.createProjectDialog;
-        this.createProjectForm.clearErrors();
-    }
+    toggleCreateProjectDialog() {
+      this.createProjectDialog = !this.createProjectDialog;
+      this.createProjectForm.clearErrors();
+    },
   },
 };
 </script>
