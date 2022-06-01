@@ -30,7 +30,7 @@
                         ></path></svg
                       ><a
                         class="ml-4 text-sm font-medium text-gray-500 hover:text-gray-700"
-                        >Archive</a
+                        >Trash</a
                       >
                     </div>
                   </li>
@@ -39,7 +39,7 @@
               <h2
                 class="mt-2 text-2xl font-bold break-words leading-7 text-gray-900 sm:text-3xl"
               >
-                Archive
+                Trash
               </h2>
             </div>
           </div>
@@ -65,9 +65,9 @@
             d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
           />
         </svg>
-        <h3 class="mt-2 text-sm font-medium text-gray-900">Archives empty</h3>
+        <h3 class="mt-2 text-sm font-medium text-gray-900">No items in the trash.</h3>
         <p class="mt-1 text-sm text-gray-500">
-          You dont have any Projects, Studies or Datasets in archives.
+          You dont have any Projects, Studies or Datasets in your trash.
         </p>
       </div>
     </div>

@@ -21,7 +21,7 @@
             </div>
         </template>
         <div class="px-12 py-8 mx-auto max-w-4xl">
-            <team-projects :editable="editable" :mode="'create'" :projects="projects"></team-projects>
+            <team-projects :team="team" :editable="editable" :mode="'create'" :projects="projects"></team-projects>
         </div>
     </app-layout>
 </template>

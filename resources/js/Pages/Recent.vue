@@ -47,7 +47,30 @@
       </div>
     </template>
     <div class="px-12 py-8 mx-auto max-w-4xl">
-      <team-projects  :mode="'listing'" :projects="projects"></team-projects>
+      <team-projects  :mode="'listing'" :projects="projects">
+        <template #emptyText
+          ><div class="text-center py-12">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="mx-auto h-24 w-24 text-gray-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+              />
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">No Projects Yet.</h3>
+            <p class="mt-1 text-sm text-gray-500">
+              When you have projects associated with your account they appear here in the order of the most recently updated ones first.
+            </p>
+          </div></template
+        >
+      </team-projects>
     </div>
   </app-layout>
 </template>

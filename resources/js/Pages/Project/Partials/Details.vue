@@ -607,7 +607,7 @@ export default defineComponent({
   computed: {
     editable() {
       if (this.role) {
-        return this.role == "owner" || this.role == "collaborator";
+        return this.role == "creator" || this.role == "owner" || this.role == "collaborator";
       } else {
         return false;
       }

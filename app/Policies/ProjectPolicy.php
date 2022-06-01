@@ -40,6 +40,10 @@ class ProjectPolicy
      */
     public function viewProject(User $user, Project $project)
     {
+        if (is_null($user) && $project->is_public) {
+            return true;
+        }
+
         return $user->belongsToProject($project);
     }
 
@@ -63,7 +67,19 @@ class ProjectPolicy
      */
     public function updateProject(User $user, Project $project)
     {
-        return $user->ownsProject($project);
+        return $user->canUpdateProject($project);
+    }
+
+    /**
+     * Determine whether the user can delete the model.
+     *
+     * @param  \App\Models\User  $user
+     * @param  \App\Models\Project  $project
+     * @return mixed
+     */
+    public function deleteProject(User $user, Project $project)
+    {
+        return $user->isCreator($project);
     }
 
     /**
@@ -98,18 +114,6 @@ class ProjectPolicy
      * @return mixed
      */
     public function removeProjectMember(User $user, Project $project)
-    {
-        return $user->ownsProject($project);
-    }
-
-    /**
-     * Determine whether the user can delete the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Project  $project
-     * @return mixed
-     */
-    public function deleteProject(User $user, Project $project)
     {
         return $user->ownsProject($project);
     }

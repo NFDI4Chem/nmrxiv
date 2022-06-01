@@ -3,9 +3,9 @@
     <div class="flex items-baseline justify-between">
       <div>
         <h2 class="text-lg">Projects</h2>
-        <div class="mt-2 text-sm text-gray-700">
-          <div class="mßax-w-2xl">You may house a variety of projects.</div>
-        </div>
+        <!-- <div class="mt-2 text-sm text-gray-700"> -->
+          <!-- <div class="max-w-2xl">You may house a variety of projects.</div> -->
+        <!-- </div> -->
       </div>
       <div class="flex-shrink-0 ml-4">
         <button
@@ -19,8 +19,8 @@
         </button>
       </div>
     </div>
-    <span v-if="projects.length <= 0 && mode == 'create' && editable">
-      <div class="mt-4">
+    <span v-if="projects.length <= 0">
+      <div v-if="mode == 'create' && editable" class="mt-4">
         <div class="px-6 py-4 bg-white shadow-md rounded-lg">
           <div class="flex items-center">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-6 w-6">
@@ -69,6 +69,9 @@
             </span>
           </button>
         </div>
+      </div>
+      <div v-else>
+        <slot name="emptyText"></slot>
       </div>
     </span>
     <span v-else>
@@ -155,7 +158,7 @@
                     </svg>
                     <span class="ml-2">Private</span>
                   </span>
-                  <div v-if="project.owner_id != $page.props.user.id" class="text-sm text-gray-600 pr-5">
+                  <div v-if="(team && team.id != project.team_id) || project.owner_id != $page.props.user.id" class="text-sm text-gray-600 pr-5">
                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"> Shared by: {{ project.owner.first_name }} {{ project.owner.last_name }}</span>
                   </div>
                 </span>
@@ -205,7 +208,7 @@ export default {
       projectCreateElement,
     };
   },
-  props: ["projects", "mode", "editable"],
+  props: ["projects", "mode", "editable", "team"],
   data() {
     return {};
   },

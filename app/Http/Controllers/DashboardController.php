@@ -15,9 +15,9 @@ class DashboardController extends Controller
         if ($team) {
             $team->users = $team->allUsers();
             if (!$team->personal_team) {
-                $projects = Project::where('team_id', $team->id)->get();
+                $projects = Project::with('users', 'owner')->where('team_id', $team->id)->get();
             } else {
-                $projects = Project::where('owner_id', $user->id)
+                $projects = Project::with('users', 'owner')->where('owner_id', $user->id)
                     ->where('team_id', $team->id)
                     ->get();
             }
@@ -34,7 +34,7 @@ class DashboardController extends Controller
     {
         $user = $request->user();
 
-        $projects = $user->projects;
+        $projects = $user->sharedProjects;
 
         $projects->load('owner');
 
@@ -43,14 +43,14 @@ class DashboardController extends Controller
         ]);
     }
 
-    public function archive(Request $request)
+    public function trashed(Request $request)
     {
         $user = $request->user();
         $projects = Project::where('owner_id', $user->id)
             ->where('is_archived', true)
             ->get();
 
-        return Inertia::render('Archive', [
+        return Inertia::render('Trashed', [
             'projects' => $projects,
         ]);
     }
@@ -70,27 +70,16 @@ class DashboardController extends Controller
     {
         $user = $request->user();
         $team = $user->currentTeam;
-        if ($team) {
-            $team->users = $team->allUsers();
-            if (!$team->personal_team) {
-                $projects = Project::where('team_id', $team->id)
-                    ->orderBy('updated_at', 'DESC')
-                    ->get()
-                    ->merge($user->recentProjects)
-                    ->load('owner');
-            } else {
-                $projects = Project::where('owner_id', $user->id)
-                    ->where('team_id', $team->id)
-                    ->orderBy('updated_at', 'DESC')
-                    ->get()
-                    ->merge($user->recentProjects)
-                    ->load('owner');
-            }
+
+        $projects = $user->projects->load('owner');
+
+        foreach($user->allTeams() as $team){
+            $projects = $projects->concat($team->projects->load('owner'));
         }
 
-        // $projects = $projects->sortByDesc('updated_at');
-
-        // $projects->all();
+        $projects = $projects->unique()->sortByDesc(function ($project) {
+            return $project['updated_at'];
+        })->values();
 
         return Inertia::render('Recent', [
             'team' => $team,
