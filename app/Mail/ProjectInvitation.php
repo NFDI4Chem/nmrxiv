@@ -9,7 +9,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\URL;
 use App\Models\ProjectInvitation as ProjectInvitationModel;
 
-class ProjectInvitation extends Mailable implements ShouldQueue
+class ProjectInvitation extends Mailable
 {
     use Queueable, SerializesModels;
 
