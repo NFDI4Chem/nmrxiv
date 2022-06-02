@@ -11,6 +11,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DatasetController;
 use App\Http\Controllers\FileSystemController;
 use App\Http\Controllers\StudyController;
+use App\Http\Controllers\StudyInvitationController;
+use App\Http\Controllers\StudyMemberController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
@@ -108,6 +110,20 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
             ->name('dashboard.study.update');
         Route::get('studies/{study}/activity', [StudyController::class, 'activity'])
             ->name('dashboard.study.activity');
+
+
+        Route::post('studies/{study}/members', [StudyMemberController::class, 'memberStore'])
+            ->name('study-members.store');
+        Route::put('/studies/{study}/members/{user}', [StudyMemberController::class, 'updateMemberRole'])
+            ->name('study-members.update');
+        Route::delete('/studies/{study}/members/{user}', [StudyMemberController::class, 'removeMember'])
+            ->name('study-members.destroy');
+
+        Route::get('/study-invitations/{invitation}', [StudyInvitationController::class, 'acceptInvitation'])
+            ->middleware(['signed'])
+            ->name('study-invitations.accept');
+        Route::delete('/study-invitations/{invitation}', [StudyInvitationController::class, 'destroyInvitation'])
+            ->name('study-invitations.destroy');
     });
 });
 
