@@ -36,6 +36,13 @@
           </h2>
           <div class="mt-1 flex flex-col sm:flex-row sm:flex-wrap sm:mt-0 sm:space-x-6">
             <div class="mt-2 flex items-center text-sm text-gray-500">
+              <access-dialogue
+            :available-roles="availableRoles"
+            :role="projectRole"
+            :team="team"
+            :members="members"
+            :project="project"
+          />
               <span v-if="study.is_public" class="inline-flex items-center">
                 <svg
                   class="h-3 w-3 text-green-400 inline"

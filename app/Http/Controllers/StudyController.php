@@ -1,16 +1,19 @@
 <?php
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Actions\Study\CreateNewStudy;
-use App\Actions\Study\UpdateStudy;
-use App\Models\Study;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Laravel\Fortify\Actions\ConfirmPassword;
 use Illuminate\Support\Facades\Storage;
-use Inertia\Inertia;
-use App\Models\FileSystemObject;
 use Illuminate\Support\Facades\Response;
+use App\Actions\Study\CreateNewStudy;
+use App\Actions\Study\UpdateStudy;
+use Laravel\Jetstream\Jetstream;
+use App\Models\FileSystemObject;
+use Illuminate\Http\Request;
+use App\Models\Study;
+use Inertia\Inertia;
+use Auth;
 
 class StudyController extends Controller
 {
@@ -32,9 +35,23 @@ class StudyController extends Controller
 
     public function show(Request $request, Study $study)
     {
-        return Inertia::render('Study/About', [
-            'study' => $study,
-            'project' => $study->project,
+        if (! Gate::forUser($request->user())->check('viewStudy', $study)) {
+            throw new AuthorizationException;
+        }
+
+        $project = $study->project; 
+        $team = $project->nonPersonalTeam;
+        return Inertia::render('Study/Show', [
+            'study' => $study->load('studyInvitations'),
+            'team' => $team ? $team->load('users', 'owner') : null,
+            'project' => $project ? $project->load('users', 'owner') : null,
+            'members' => $project->allUsers(),
+            'availableRoles' => array_values(Jetstream::$roles),
+            'studyRole' => $study->userProjectRole(Auth::user()->email),
+            'studyPermissions' => [
+                'canDeleteStudy' => Gate::check('deleteStudy', $study),
+                'canUpdateStudy' => Gate::check('updateStudy', $study),
+            ],
         ]);
     }
 
