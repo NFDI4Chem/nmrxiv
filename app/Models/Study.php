@@ -5,9 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use OwenIt\Auditing\Contracts\Auditable;
+use App\Traits\CacheClear;
 
 class Study extends Model implements Auditable
 {
+    use CacheClear;
     use HasFactory;
     use \OwenIt\Auditing\Auditable;
 
