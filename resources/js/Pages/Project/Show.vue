@@ -242,7 +242,7 @@ export default {
     },
     editable() {
       if (this.projectRole) {
-        if (this.projectRole == "owner" || this.projectRole == "collaborator") {
+        if (this.projectRole == "creator" || this.projectRole == "owner" || this.projectRole == "collaborator") {
           return true;
         } else {
           return false;
