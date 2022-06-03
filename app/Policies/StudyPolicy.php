@@ -4,9 +4,10 @@ namespace App\Policies;
 
 use App\Models\User;
 use App\Models\Project;
+use App\Models\Study;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class ProjectPolicy
+class StudyPolicy
 {
     use HandlesAuthorization;
 
@@ -35,16 +36,16 @@ class ProjectPolicy
      * Determine whether the user can view the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Project  $project
+     * @param  \App\Models\Study  $study
      * @return mixed
      */
-    public function viewProject(User $user, Project $project)
+    public function viewStudy(User $user, Study $study)
     {
-        if (is_null($user) && $project->is_public) {
+        if (is_null($user) && $study->is_public) {
             return true;
         }
 
-        return $user->belongsToProject($project);
+        return $user->belongsToStudy($study);
     }
 
     /**
@@ -53,7 +54,7 @@ class ProjectPolicy
      * @param  \App\Models\User  $user
      * @return mixed
      */
-    public function createProject(User $user)
+    public function createStudy(User $user)
     {
         return true;
     }
@@ -62,59 +63,59 @@ class ProjectPolicy
      * Determine whether the user can update the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Project  $project
+     * @param  \App\Models\Study  $study
      * @return mixed
      */
-    public function updateProject(User $user, Project $project)
+    public function updateStudy(User $user, Study $study)
     {
-        return $user->canUpdateProject($project);
+        return $user->canUpdateStudy($study);
     }
 
     /**
      * Determine whether the user can delete the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Project  $project
+     * @param  \App\Models\Study  $study
      * @return mixed
      */
-    public function deleteProject(User $user, Project $project)
+    public function deleteStudy(User $user, Study $study)
     {
-        return $user->isProjectCreator($project);
+        return $user->isStudyCreator($study);
     }
 
     /**
-     * Determine whether the user can add project members.
+     * Determine whether the user can add study members.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Project  $project
+     * @param  \App\Models\Study  $study
      * @return mixed
      */
-    public function addProjectMember(User $user, Project $project)
+    public function addStudyMember(User $user, Study $study)
     {
-        return $user->ownsProject($project);
+        return $user->ownsStudy($study);
     }
 
     /**
-     * Determine whether the user can update project member permissions.
+     * Determine whether the user can update study member permissions.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Project  $project
+     * @param  \App\Models\Study  $study
      * @return mixed
      */
-    public function updateProjectMember(User $user, Project $project)
+    public function updateStudyMember(User $user, Study $study)
     {
-        return $user->ownsProject($project);
+        return $user->ownsStudy($study);
     }
 
     /**
-     * Determine whether the user can remove project members.
+     * Determine whether the user can remove study members.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Project  $project
+     * @param  \App\Models\Study  $study
      * @return mixed
      */
-    public function removeProjectMember(User $user, Project $project)
+    public function removeStudyMember(User $user, Study $study)
     {
-        return $user->ownsProject($project);
+        return $user->ownsStudy($study);
     }
 }

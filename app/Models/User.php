@@ -19,6 +19,7 @@ class User extends Authenticatable implements MustVerifyEmail
     use HasProfilePhoto;
     use HasTeams;
     use HasProjects;
+    use HasStudies;
     use Notifiable;
     use TwoFactorAuthenticatable;
     use HasRoles;

@@ -179,15 +179,15 @@
                         <div v-if="role && role != 'reviewer'">
                           <div
                             v-if="
-                              person['project_membership'].role &&
-                              person['project_membership'].role == 'creator'
+                              person[model + '_membership'].role &&
+                              person[model + '_membership'].role == 'creator'
                             "
                           >
                             <span class="ml-6 text-sm text-dark-500"> Creator </span>
                           </div>
                           <div v-else>
                             <button
-                              @click="removeProjectMember(person)"
+                              @click="removeModelMember(person)"
                               class="cursor-pointer mr-3 text-sm text-red-500 hover:text-red-700"
                             >
                               Remove
@@ -197,7 +197,7 @@
                                 <MenuButton
                                   class="inline-flex justify-center w-full rounded-md capitalize border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500"
                                 >
-                                  {{ person["project_membership"].role }}
+                                  {{ person[ model + "_membership"].role }}
                                   <ChevronDownIcon
                                     class="-mr-1 ml-2 h-5 w-5"
                                     aria-hidden="true"
@@ -220,7 +220,7 @@
                                       <MenuItem
                                         @click="updateRole(role, person)"
                                         v-if="
-                                          person['project_membership'].role != role.key
+                                          person[ model + '_membership'].role != role.key
                                         "
                                         v-slot="{ active }"
                                       >
@@ -254,7 +254,7 @@
                   </h2>
                   <p class="mt-1 text-sm text-gray-500">
                     All the users (corresponding roles) in the team will be applicable to
-                    this project.
+                    this {{ model }}.
                   </p>
                 </div>
                 <div class="bg-white shadow overflow-hidden sm:rounded-md">
@@ -358,7 +358,7 @@
                   </ul>
                 </div>
               </span>
-              <div class="pb-5" v-if="project.project_invitations.length > 0">
+              <div class="pb-5" v-if="modelInvitations.length > 0">
                 <jet-modal-form-section class="mt-10 sm:mt-0">
                   <template #form>
                     <div class="mb-2 mt-5 col-span-12">
@@ -366,22 +366,22 @@
                         Pending Project Invitations
                       </h2>
                       <p class="mt-1 text-sm text-gray-500">
-                        These people have been invited to your project and have been sent
-                        an invitation email. They may join the project by accepting the
+                        These people have been invited to your {{ model }} and have been sent
+                        an invitation email. They may join the {{ model }} by accepting the
                         email invitation.
                       </p>
                     </div>
                     <div class="space-y-3 col-span-12 mb-3">
                       <div
                         class="flex px-4 items-center justify-between"
-                        v-for="invitation in project.project_invitations"
+                        v-for="invitation in modelInvitations"
                         :key="invitation.id"
                       >
                         <div class="text-gray-600">{{ invitation.email }}</div>
                         <div class="flex items-center">
                           <button
                             class="cursor-pointer ml-6 text-sm text-red-500 focus:outline-none"
-                            @click="cancelProjectInvitation(invitation)"
+                            @click="cancelModelInvitation(invitation)"
                           >
                             Cancel
                           </button>
@@ -393,7 +393,7 @@
               </div>
             </div>
             <div v-else>
-              <jet-modal-form-section class="space-y-3" @submitted="addProjectMember">
+              <jet-modal-form-section class="space-y-3" @submitted="addModelMember">
                 <template #form>
                   <div class="col-span-12">
                     <div class="max-w-xl mt-2 text-sm text-gray-600">
@@ -535,9 +535,12 @@ export default {
   props: {
     members: Object,
     project: Object,
+    study: Object,
+    dataset: Object,
     team: Object,
     availableRoles: Object,
     role: String,
+    model: String
   },
   components: {
     Menu,
@@ -586,26 +589,26 @@ export default {
       updateRoleForm: this.$inertia.form({
         role: null,
       }),
-      removeProjectMemberForm: this.$inertia.form(),
+      removeModelMemberForm: this.$inertia.form(),
     };
   },
   methods: {
-    addProjectMember() {
-      this.addMemberForm.post(route("project-members.store", this.project), {
-        errorBag: "addProjectMember",
+    addModelMember() {
+      this.addMemberForm.post(route(this.model +  "-members.store", this[this.model]), {
+        errorBag: "addModelMember",
         preserveScroll: true,
         onSuccess: () => this.addMemberForm.reset(),
       });
     },
-    cancelProjectInvitation(invitation) {
-      this.$inertia.delete(route("project-invitations.destroy", invitation), {
+    cancelModelInvitation(invitation) {
+      this.$inertia.delete(route(this.model +  "-invitations.destroy", invitation), {
         preserveScroll: true,
       });
     },
     updateRole(role, managingRoleFor) {
       this.updateRoleForm.role = role.key;
       this.updateRoleForm.put(
-        route("project-members.update", [this.project, managingRoleFor]),
+        route( this.model +  "-members.update", [this[this.model], managingRoleFor]),
         {
           preserveScroll: true,
           onSuccess: () => {
@@ -614,11 +617,11 @@ export default {
         }
       );
     },
-    removeProjectMember(projectMemberBeingRemoved) {
-      this.removeProjectMemberForm.delete(
-        route("project-members.destroy", [this.project, projectMemberBeingRemoved]),
+    removeModelMember(modelMemberBeingRemoved) {
+      this.removeModelMemberForm.delete(
+        route(this.model +  "-members.destroy", [this[this.model], modelMemberBeingRemoved]),
         {
-          errorBag: "removeProjectMember",
+          errorBag: "removeModelMember",
           preserveScroll: true,
           preserveState: true,
           onSuccess: () => {},
@@ -626,6 +629,18 @@ export default {
       );
     },
   },
-  computed: {},
+  computed: {
+    modelObject(){
+      if(this.model == 'study'){
+        console.log(this.study)
+        return this.study
+      }else if(this.model == 'project'){
+        return this.project
+      }
+    },
+    modelInvitations(){
+      return this.modelObject[this.model+'_invitations']
+    }
+  },
 };
 </script>
