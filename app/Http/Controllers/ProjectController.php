@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Gate;
 use App\Actions\Project\CreateNewProject;
 use Illuminate\Contracts\Auth\StatefulGuard;
@@ -40,7 +41,10 @@ class ProjectController extends Controller
 
     public function publicProjectsView(Request $request)
     {
-        $projects = Project::where('is_public', TRUE)->simplePaginate(15);
+        
+        $projects = Cache::rememberForever('projects', function (){
+            return Project::where('is_public', TRUE)->simplePaginate(15);
+        });
 
         return Inertia::render('Public/Projects', [
             'projects' => $projects

@@ -12,9 +12,11 @@ use Maize\Markable\Models\Like;
 use Maize\Markable\Models\Favorite;
 use Maize\Markable\Models\Bookmark;
 use Maize\Markable\Models\Reaction;
+use App\Traits\CacheClear;
 
 class Project extends Model implements Auditable
 {
+    use CacheClear;
     // use Searchable;
     use Markable;
     use HasFactory;
