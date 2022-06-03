@@ -5,122 +5,134 @@ namespace App\Models;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
 
-trait HasProjects
+trait HasStudies
 {
     /**
-     * User model and Projects relationship - many to many
+     * User model and Studies relationship - many to many
      *
      * @var array
      */
-    public function projects()
+    public function studies()
     {
-        return $this->belongsToMany(Project::class);
+        return $this->belongsToMany(Study::class);
     }
 
     /**
-     * User model and Projects relationship - many to many
+     * User model and Studies relationship - many to many
      *
      * @var array
      */
-    public function sharedProjects()
+    public function sharedStudies()
     {
-        return $this->projects()->wherePivot('role', '!=', 'creator');
+        return $this->studies()->wherePivot('role', '!=', 'creator');
     }
 
     /**
-     * User model and Projects relationship - many to many
+     * User model and Studies relationship - many to many
      *
      * @var array
      */
-    public function recentProjects()
+    public function recentStudies()
     {
-        return $this->projects()->orderBy('updated_at','DESC');
+        return $this->studies()->orderBy('updated_at','DESC');
     }
 
 
     /**
-     * Determine if the user belongs to the given project.
+     * Determine if the user belongs to the given study.
      *
-     * @param  mixed  $project
+     * @param  mixed  $study
      * @return bool
      */
-    public function belongsToProject($project)
+    public function belongsToStudy($study)
     {
-        if (is_null($project)) {
+        if (is_null($study)) {
             return false;
         }
 
-        return ($this->hasProjectRole($project, 'owner') || $this->hasProjectRole($project, 'collaborator') || $this->hasProjectRole($project, 'reviewer'));
+        return ($this->hasStudyRole($study, 'creator') || $this->hasStudyRole($study, 'owner') || $this->hasStudyRole($study, 'collaborator') || $this->hasStudyRole($study, 'reviewer'));
     }
 
     /**
-     * Determine if the user is the creator the given project.
+     * Determine if the user is the creator the given study.
      *
-     * @param  mixed  $project
+     * @param  mixed  $study
      * @return bool
      */
-    public function isCreator($project)
+    public function isStudyCreator($study)
     {
-        if (is_null($project)) {
+        if (is_null($study)) {
             return false;
         }
         
-        return $this->id == $project->owner_id;
+        return $this->id == $study->owner_id;
     }
 
     /**
-     * Determine if the user is the owner of the given project.
+     * Determine if the user is the owner of the given study.
      *
-     * @param  mixed  $project
+     * @param  mixed  $study
      * @return bool
      */
-    public function ownsProject($project)
+    public function ownsStudy($study)
     {
-        if (is_null($project)) {
+        if (is_null($study)) {
             return false;
         }
 
-        return $this->hasProjectRole($project, 'owner');
+        return $this->hasStudyRole($study, 'owner');
     }
 
     /**
-     * Determine if the user can update the given project.
+     * Determine if the user can update the given study.
      *
-     * @param  mixed  $project
+     * @param  mixed  $study
      * @return bool
      */
-    public function canUpdateProject($project)
+    public function canUpdateStudy($study)
     {
-        if (is_null($project)) {
+        if (is_null($study)) {
             return false;
         }
 
 
-        return ($this->hasProjectRole($project, 'owner') || $this->hasProjectRole($project, 'collaborator'));
+        return ($this->hasStudyRole($study, 'owner') || $this->hasStudyRole($study, 'collaborator'));
     }
 
     /**
-     * Determine if the user has the given role for the given project.
+     * Determine if the user has the given role for the given study.
      *
-     * @param  mixed  $project
+     * @param  mixed  $study
      * @param  mixed  $role
      * @return bool
      */
-    public function hasProjectRole($project, $role)
+    public function hasStudyRole($study, $role)
     {
-        if (is_null($project) || is_null($role)) {
+        if (is_null($study) || is_null($role)) {
             return false;
         }
 
         if($role == 'owner'){
-            if($this->isCreator($project)){
+            if($this->isStudyCreator($study)){
                 return true;
             }
         }
 
         $id = $this->id; 
 
-        $projectUser = $project->users->first(function ($u) use ($id) {
+        $studyUser = $study->users->first(function ($u) use ($id) {
+            return $u->id === $id;
+        });
+
+        if (!is_null($studyUser)){
+            if($studyUser->studyMembership->role == $role){
+                return true;
+            }else{
+                return false;
+            }
+        }
+
+        $projectUser = $study->project->users->first(function ($u) use ($id) {
             return $u->id === $id;
         });
 
@@ -132,7 +144,7 @@ trait HasProjects
             }
         }
 
-        $team = $project->team;
+        $team = $study->team;
 
         if(!$team->personal_team){
         
@@ -141,7 +153,7 @@ trait HasProjects
             });
         
             if (!is_null($teamUser)){
-                if($teamUser->projectMembership->role == $role){
+                if($teamUser->studyMembership->role == $role){
                     return true;
                 }else{
                     return false;

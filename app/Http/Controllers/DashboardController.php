@@ -34,12 +34,13 @@ class DashboardController extends Controller
     {
         $user = $request->user();
 
-        $projects = $user->sharedProjects;
+        $projects = $user->sharedProjects->load('owner');
 
-        $projects->load('owner');
+        $studies = $user->sharedStudies->load('owner');
 
         return Inertia::render('SharedWithMe', [
             'projects' => $projects,
+            'studies' => $studies,
         ]);
     }
 

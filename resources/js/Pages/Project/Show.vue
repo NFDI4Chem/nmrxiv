@@ -22,6 +22,7 @@
             :team="team"
             :members="members"
             :project="project"
+            model="project"
           />
           <a
             @click="toggleDetails"

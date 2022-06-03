@@ -24,7 +24,7 @@ class InviteStudyMember
      */
     public function invite($user, $study, string $email, string $role = null, string $message = null)
     {
-        // Gate::forUser($user)->authorize('addStudyMember', $study);
+        Gate::forUser($user)->authorize('addStudyMember', $study);
 
         $this->validate($study, $email, $role, $message);
 
@@ -57,7 +57,7 @@ class InviteStudyMember
             'email.unique' => __('This user has already been invited to the study.'),
         ])->after(
             $this->ensureUserIsNotAlreadyOnStudy($study, $email)
-        )->validateWithBag('addStudyMember');
+        )->validateWithBag('addModelMember');
     }
 
     /**
