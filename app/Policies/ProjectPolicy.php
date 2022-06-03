@@ -79,7 +79,7 @@ class ProjectPolicy
      */
     public function deleteProject(User $user, Project $project)
     {
-        return $user->isCreator($project);
+        return $user->isProjectCreator($project);
     }
 
     /**

@@ -50,7 +50,7 @@ trait HasProjects
             return false;
         }
 
-        return ($this->hasProjectRole($project, 'owner') || $this->hasProjectRole($project, 'collaborator') || $this->hasProjectRole($project, 'reviewer'));
+        return ($this->hasProjectRole($project, 'creator') || $this->hasProjectRole($project, 'owner') || $this->hasProjectRole($project, 'collaborator') || $this->hasProjectRole($project, 'reviewer'));
     }
 
     /**
@@ -59,7 +59,7 @@ trait HasProjects
      * @param  mixed  $project
      * @return bool
      */
-    public function isCreator($project)
+    public function isProjectCreator($project)
     {
         if (is_null($project)) {
             return false;
@@ -113,7 +113,7 @@ trait HasProjects
         }
 
         if($role == 'owner'){
-            if($this->isCreator($project)){
+            if($this->isProjectCreator($project)){
                 return true;
             }
         }

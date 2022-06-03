@@ -1,6 +1,6 @@
 <template>
   <div>
-    <study-content :project="project" :study="study" current="About">
+    <study-content model="study" :project="project" :study="study" :team="team" :members="members" :availableRoles="availableRoles" :studyPermissions="studyPermissions" :studyRole="studyRole" current="About">
       <template #study-section>
         <div class="divide-y divide-gray-200 sm:col-span-9">
           <!-- Profile section -->
@@ -27,10 +27,7 @@
                     </button>
                   </div>
                 </div>
-                <p
-                  v-html="md(study.description)"
-                  class="mt-3 text-gray-600"
-                ></p>
+                <p v-html="md(study.description)" class="mt-3 text-gray-600"></p>
               </div>
             </div>
           </div>
@@ -44,7 +41,15 @@
 import { PlusSmIcon } from "@heroicons/vue/solid";
 import StudyContent from "@/Pages/Study/Content.vue";
 export default {
-  props: ["study", "project"],
+  props: [
+    "study",
+    "project",
+    "team",
+    "members",
+    "availableRoles",
+    "studyPermissions",
+    "studyRole",
+  ],
   components: {
     StudyContent,
     PlusSmIcon,

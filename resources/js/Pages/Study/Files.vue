@@ -1,6 +1,16 @@
 <template>
   <div>
-    <study-content :project="project" :study="study" current="Files">
+    <study-content
+      model="study"
+      :project="project"
+      :study="study"
+      :team="team"
+      :members="members"
+      :availableRoles="availableRoles"
+      :studyPermissions="studyPermissions"
+      :studyRole="studyRole"
+      current="Files"
+    >
       <template #study-section>
         <div class="divide-y divide-gray-200 sm:col-span-9">
           <!-- <div class="py-6 px-4 sm:p-6">
@@ -180,7 +190,10 @@
                           :src="nmriumURL"
                         ></iframe>
                       </div>
-                      <div class="rounded-md border my-3 flex justify-center items-center " v-if="svgString">
+                      <div
+                        class="rounded-md border my-3 flex justify-center items-center"
+                        v-if="svgString"
+                      >
                         <span v-html="svgString"></span>
                       </div>
                       <File-details
@@ -215,7 +228,16 @@ import {
 } from "@heroicons/vue/solid";
 import { Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/vue";
 export default {
-  props: ["study", "project", "file"],
+  props: [
+    "study",
+    "project",
+    "file",
+    "team",
+    "members",
+    "availableRoles",
+    "studyPermissions",
+    "studyRole",
+  ],
   components: {
     StudyContent,
     Disclosure,
@@ -369,13 +391,13 @@ export default {
       }
     },
     loadMol(file) {
-      this.svgString = null
+      this.svgString = null;
       axios
         .get(this.url + "/asc/studies/" + this.study.id + "/file/" + file.name)
         .then((response) => {
           if (response && response.data != "") {
             let mol = OCL.Molecule.fromMolfile(response.data);
-            if(mol.toIsomericSmiles() != ''){
+            if (mol.toIsomericSmiles() != "") {
               this.svgString = mol.toSVG(300, 300);
             }
           }

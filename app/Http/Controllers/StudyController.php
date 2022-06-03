@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Laravel\Fortify\Actions\ConfirmPassword;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Response;
 use App\Actions\Study\CreateNewStudy;
@@ -41,13 +42,14 @@ class StudyController extends Controller
 
         $project = $study->project; 
         $team = $project->nonPersonalTeam;
-        return Inertia::render('Study/Show', [
-            'study' => $study->load('studyInvitations'),
+
+        return Inertia::render('Study/About', [
+            'study' => $study->load('users', 'owner', 'studyInvitations'),
             'team' => $team ? $team->load('users', 'owner') : null,
             'project' => $project ? $project->load('users', 'owner') : null,
-            'members' => $project->allUsers(),
+            'members' => $study->allUsers(),
             'availableRoles' => array_values(Jetstream::$roles),
-            'studyRole' => $study->userProjectRole(Auth::user()->email),
+            'studyRole' => $study->userStudyRole(Auth::user()->email),
             'studyPermissions' => [
                 'canDeleteStudy' => Gate::check('deleteStudy', $study),
                 'canUpdateStudy' => Gate::check('updateStudy', $study),
@@ -73,9 +75,24 @@ class StudyController extends Controller
 
     public function files(Request $request, Study $study)
     {
+        if (! Gate::forUser($request->user())->check('viewStudy', $study)) {
+            throw new AuthorizationException;
+        }
+
+        $project = $study->project; 
+        $team = $project->nonPersonalTeam;
+
         return Inertia::render('Study/Files', [
-            'study' => $study,
-            'project' => $study->project,
+            'study' => $study->load('users', 'owner', 'studyInvitations'),
+            'team' => $team ? $team->load('users', 'owner') : null,
+            'project' => $project ? $project->load('users', 'owner') : null,
+            'members' => $study->allUsers(),
+            'availableRoles' => array_values(Jetstream::$roles),
+            'studyRole' => $study->userStudyRole(Auth::user()->email),
+            'studyPermissions' => [
+                'canDeleteStudy' => Gate::check('deleteStudy', $study),
+                'canUpdateStudy' => Gate::check('updateStudy', $study),
+            ],
             'file' => [
                 'name' => '/',
                 'children' => FileSystemObject::with('children')

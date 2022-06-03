@@ -80,7 +80,7 @@ class StudyPolicy
      */
     public function deleteStudy(User $user, Study $study)
     {
-        return $user->isCreator($study);
+        return $user->isStudyCreator($study);
     }
 
     /**
