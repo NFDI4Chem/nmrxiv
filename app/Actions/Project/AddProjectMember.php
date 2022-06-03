@@ -54,7 +54,7 @@ class AddProjectMember
             'email.exists' => __('We were unable to find a registered user with this email address.'),
         ])->after(
             $this->ensureUserIsNotAlreadyOnProject($project, $email)
-        )->validateWithBag('addProjectMember');
+        )->validateWithBag('addModelMember');
     }
 
     /**

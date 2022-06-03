@@ -1,6 +1,6 @@
 <template>
   <div>
-    <study-layout :project="project" :study="study">
+    <study-layout :model="model" :project="project" :study="study" :team="team" :members="members" :availableRoles="availableRoles" :studyPermissions="studyPermissions" :studyRole="studyRole">
       <template #scontent>
         <div class="bg-white shadow-md rounded-lg">
           <div class="md:hidden">
@@ -39,7 +39,13 @@ const subNavigation = [
 ];
 
 export default {
-  props: ["study", "project", "current"],
+  props: ["study", "project", "current", 
+    "team",
+    "members",
+    "availableRoles",
+    "studyPermissions",
+    "studyRole",
+    "model"],
   components: {
     StudyLayout,
     Link

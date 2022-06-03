@@ -66,11 +66,31 @@
             </svg>
             <h3 class="mt-2 text-sm font-medium text-gray-900">No Projects Shared.</h3>
             <p class="mt-1 text-sm text-gray-500">
-              When projects are shared you will receive an email with the invitation. Once accepted the project will be added to your account. Team projects are automatically added to the members.
+              When projects are shared you will receive an email with the invitation. Once
+              accepted the project will be added to your account. Team projects are
+              automatically added to the members.
             </p>
           </div></template
         >
       </team-projects>
+    </div>
+    <div class="px-12 border-t py-8 mx-auto max-w-4xl">
+      <div>
+        <h2 class="text-lg">Studies</h2>
+      </div>
+      <div class="flex items-baseline justify-between">
+        <div class="py-8 mx-auto max-w-4xl">
+          <div
+            class="mx-auto max-w-md grid gap-8 sm:max-w-lg lg:grid-cols-3 lg:max-w-7xl"
+          >
+            <div :key="study.uuid" v-for="study in studies">
+              <Link :href="route('dashboard.studies', [study.id])">
+                <study-card :study="study" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </app-layout>
 </template>
@@ -78,12 +98,16 @@
 <script>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import TeamProjects from "@/Pages/Project/Index.vue";
+import StudyCard from "@/Shared/StudyCard.vue";
+import { Link } from "@inertiajs/inertia-vue3";
 
 export default {
   components: {
     AppLayout,
     TeamProjects,
+    StudyCard,
+    Link,
   },
-  props: ["user", "team", "projects"],
+  props: ["user", "team", "projects", "studies"],
 };
 </script>
