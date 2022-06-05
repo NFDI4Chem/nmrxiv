@@ -47,9 +47,9 @@
               Project
             </a>
           </MenuItem>
-          <MenuItem v-slot="{ active }">
+          <MenuItem class="cursor-pointer" v-if="allowStudyCreation" v-slot="{ active }">
             <a
-              href="#"
+              @click="openStudyCreateDialog"
               :class="[
                 active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
                 'group flex items-center px-4 py-2 text-sm',
@@ -96,7 +96,7 @@ import {
   UserAddIcon,
   PlusIcon,
 } from "@heroicons/vue/solid";
-import { inject } from 'vue';
+import { inject } from "vue";
 export default {
   props: {
     mode: String,
@@ -117,16 +117,27 @@ export default {
     PlusIcon,
   },
   setup() {
-    const emitter = inject('emitter'); // Inject `emitter`
+    const emitter = inject("emitter"); // Inject `emitter`
     const openProjectCreateDialog = () => {
-      emitter.emit('openProjectCreateDialog', 100);
+      emitter.emit("openProjectCreateDialog", {});
+    };
+    const openStudyCreateDialog = () => {
+      emitter.emit("openStudyCreateDialog", {});
     };
     return {
-      openProjectCreateDialog
-    }
+      openProjectCreateDialog,
+      openStudyCreateDialog
+    };
   },
-  methods: {
+  methods: {},
+  computed: {
+    allowStudyCreation() {
+      if (this.route().current() == "dashboard.projects") {
+        return true;
+      } else {
+        return false;
+      }
+    },
   },
-  computed: {},
 };
 </script>
