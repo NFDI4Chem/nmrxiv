@@ -2,7 +2,7 @@
     <Head title="Log in" />
     <announcement-banner />
 
-    <jet-authentication-card>
+    <jet-authentication-card class="index_beams">
         <template #logo>
             <jet-authentication-card-logo />
         </template>
