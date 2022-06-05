@@ -502,6 +502,7 @@ import FlashMessages from "@/Shared/FlashMessages";
 import AnnouncementBanner from "@/Shared/AnnouncementBanner.vue";
 import AppTour from "@/App/Tour.vue";
 import ProjectCreate from "@/Pages/Project/Partials/Create.vue";
+import StudyCreate from "@/Pages/Study/Partials/Create.vue";
 import {
   BookmarkAltIcon,
   FireIcon,
@@ -633,6 +634,7 @@ export default {
     TrashIcon,
     FolderIcon,
     ViewGridIcon,
+    StudyCreate,
   },
   setup() {
     var collapseSidebarStatus = JSON.parse(localStorage.getItem("collapseSidebarStatus"));
@@ -641,7 +643,7 @@ export default {
     }
     const sidebarOpen = ref(false);
     const collapseSidebar = ref(collapseSidebarStatus);
-    
+
     return {
       userNavigation,
       secondaryNavigation,
@@ -671,7 +673,7 @@ export default {
     },
     startTour() {
       this.$tours["appTour"].start();
-    }
+    },
   },
   computed: {
     filteredNavigation() {
