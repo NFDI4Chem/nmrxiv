@@ -1,6 +1,6 @@
 <template>
   <jet-dialog-modal :show="createStudyDialog" @close="createStudyDialog = false">
-    <template #title> New Study </template>
+    <template #title> {{ project.name }} <span class="text-gray-400">></span>  New Study </template>
 
     <template #content>
       <div class="relative z-0 mt-1 rounded-lg cursor-pointer">
@@ -262,6 +262,7 @@ import { AtSymbolIcon, CodeIcon, LinkIcon } from "@heroicons/vue/solid";
 import JetInputError from "@/Jetstream/InputError.vue";
 import { ref } from "vue";
 import { Switch, SwitchDescription, SwitchGroup, SwitchLabel } from "@headlessui/vue";
+import { inject } from "vue";
 
 export default {
   components: {
@@ -286,6 +287,13 @@ export default {
     JetInputError,
   },
 
+  mounted() {
+    const emitter = inject("emitter");
+    emitter.on("openStudyCreateDialog", () => {
+      this.createStudyDialog = true;
+    });
+  },
+
   data() {
     return {
       createStudyForm: this.$inertia.form({
@@ -297,7 +305,7 @@ export default {
         owner_id: null,
         color: null,
         starred: null,
-        project_id: this.project.id,
+        project_id: this.project ? this.project.id : null,
         is_public: ref(false),
       }),
       createStudyDialog: false,

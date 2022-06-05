@@ -82,17 +82,16 @@
         </Link>
       </div>
     </div>
-    <study-create :project="project" ref="studyCreateElement"></study-create>
+    <study-create :project="project"></study-create>
   </div>
 </template>
 
 <script>
-import { ref } from "vue";
 import { Link } from "@inertiajs/inertia-vue3";
 import StudyCreate from "@/Pages/Study/Partials/Create.vue";
 import StudyCard from "@/Shared/StudyCard.vue";
 import JetButton from "@/Jetstream/Button.vue";
-
+import { inject } from 'vue';
 export default {
   components: {
     Link,
@@ -101,19 +100,19 @@ export default {
     JetButton,
   },
   setup() {
-    const studyCreateElement = ref(null);
-    return {
-      studyCreateElement,
+    const emitter = inject('emitter'); // Inject `emitter`
+    const openStudyCreateDialog = () => {
+      emitter.emit('openStudyCreateDialog', 100);
     };
+    return {
+      openStudyCreateDialog
+    }
   },
   props: ["studies", "project", "editable"],
   data() {
     return {};
   },
   methods: {
-    openStudyCreateDialog() {
-      this.studyCreateElement.toggleCreateStudyDialog();
-    },
   },
 };
 </script>
