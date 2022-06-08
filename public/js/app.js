@@ -33765,16 +33765,12 @@ __webpack_require__.r(__webpack_exports__);
         'md': 'sm:max-w-md',
         'lg': 'sm:max-w-lg',
         'xl': 'sm:max-w-xl',
-<<<<<<< Updated upstream
         '2xl': 'sm:max-w-2xl',
         '3xl': 'sm:max-w-3xl',
         '4xl': 'sm:max-w-4xl',
         '5xl': 'sm:max-w-5xl',
         '6xl': 'sm:max-w-6xl',
         '7xl': 'sm:max-w-7xl'
-=======
-        '2xl': 'sm:max-w-2xl'
->>>>>>> Stashed changes
       }[this.maxWidth];
     }
   }
@@ -33898,7 +33894,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _App_Tour_vue__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @/App/Tour.vue */ "./resources/js/App/Tour.vue");
 /* harmony import */ var _Pages_Project_Partials_Create_vue__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @/Pages/Project/Partials/Create.vue */ "./resources/js/Pages/Project/Partials/Create.vue");
 /* harmony import */ var _Pages_Study_Partials_Create_vue__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @/Pages/Study/Partials/Create.vue */ "./resources/js/Pages/Study/Partials/Create.vue");
-<<<<<<< Updated upstream
 /* harmony import */ var _Shared_Submission_vue__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @/Shared/Submission.vue */ "./resources/js/Shared/Submission.vue");
 /* harmony import */ var _heroicons_vue_outline__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @heroicons/vue/outline */ "./node_modules/@heroicons/vue/outline/esm/index.js");
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
@@ -33907,14 +33902,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _headlessui_vue__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! @headlessui/vue */ "./node_modules/@headlessui/vue/dist/components/transitions/transition.js");
 /* harmony import */ var _heroicons_vue_solid__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! @heroicons/vue/solid */ "./node_modules/@heroicons/vue/solid/esm/index.js");
 
-=======
-/* harmony import */ var _heroicons_vue_outline__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @heroicons/vue/outline */ "./node_modules/@heroicons/vue/outline/esm/index.js");
-/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
-/* harmony import */ var _headlessui_vue__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! @headlessui/vue */ "./node_modules/@headlessui/vue/dist/components/dialog/dialog.js");
-/* harmony import */ var _headlessui_vue__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! @headlessui/vue */ "./node_modules/@headlessui/vue/dist/components/menu/menu.js");
-/* harmony import */ var _headlessui_vue__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! @headlessui/vue */ "./node_modules/@headlessui/vue/dist/components/transitions/transition.js");
-/* harmony import */ var _heroicons_vue_solid__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @heroicons/vue/solid */ "./node_modules/@heroicons/vue/solid/esm/index.js");
->>>>>>> Stashed changes
 
 
 
@@ -33945,72 +33932,44 @@ var navigation = [{
   auth: true,
   name: "Dashboard",
   href: "/dashboard",
-<<<<<<< Updated upstream
   icon: _heroicons_vue_outline__WEBPACK_IMPORTED_MODULE_14__.HomeIcon,
-=======
-  icon: _heroicons_vue_outline__WEBPACK_IMPORTED_MODULE_13__.HomeIcon,
->>>>>>> Stashed changes
   bg: "bg-gray-50",
   children: [{
     auth: true,
     name: "Shared with me",
     href: "/dashboard/shared-with-me",
-<<<<<<< Updated upstream
     icon: _heroicons_vue_outline__WEBPACK_IMPORTED_MODULE_14__.UsersIcon,
-=======
-    icon: _heroicons_vue_outline__WEBPACK_IMPORTED_MODULE_13__.UsersIcon,
->>>>>>> Stashed changes
     bg: "bg-white"
   }, {
     auth: false,
     name: "Recent",
     href: "/dashboard/recent",
-<<<<<<< Updated upstream
     icon: _heroicons_vue_outline__WEBPACK_IMPORTED_MODULE_14__.ClockIcon,
-=======
-    icon: _heroicons_vue_outline__WEBPACK_IMPORTED_MODULE_13__.ClockIcon,
->>>>>>> Stashed changes
     bg: "bg-white"
   }, {
     auth: false,
     name: "Starred",
     href: "/dashboard/starred",
-<<<<<<< Updated upstream
     icon: _heroicons_vue_outline__WEBPACK_IMPORTED_MODULE_14__.StarIcon,
-=======
-    icon: _heroicons_vue_outline__WEBPACK_IMPORTED_MODULE_13__.StarIcon,
->>>>>>> Stashed changes
     bg: "bg-white"
   }, {
     auth: false,
     name: "Trashed",
     href: "/dashboard/trashed",
-<<<<<<< Updated upstream
     icon: _heroicons_vue_outline__WEBPACK_IMPORTED_MODULE_14__.TrashIcon,
-=======
-    icon: _heroicons_vue_outline__WEBPACK_IMPORTED_MODULE_13__.TrashIcon,
->>>>>>> Stashed changes
     bg: "bg-white"
   }]
 }, {
   auth: false,
   name: "Projects",
   href: "/projects",
-<<<<<<< Updated upstream
   icon: _heroicons_vue_outline__WEBPACK_IMPORTED_MODULE_14__.FolderIcon,
-=======
-  icon: _heroicons_vue_outline__WEBPACK_IMPORTED_MODULE_13__.FolderIcon,
->>>>>>> Stashed changes
   bg: "bg-white"
 }, {
   auth: false,
   name: "Datasets",
   href: "/datasets",
-<<<<<<< Updated upstream
   icon: _heroicons_vue_outline__WEBPACK_IMPORTED_MODULE_14__.ViewGridIcon,
-=======
-  icon: _heroicons_vue_outline__WEBPACK_IMPORTED_MODULE_13__.ViewGridIcon,
->>>>>>> Stashed changes
   bg: "bg-white"
 }];
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
@@ -34027,7 +33986,6 @@ var navigation = [{
     JetDropdown: _Jetstream_Dropdown_vue__WEBPACK_IMPORTED_MODULE_6__["default"],
     Link: _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_4__.Link,
     Head: _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_4__.Head,
-<<<<<<< Updated upstream
     Dialog: _headlessui_vue__WEBPACK_IMPORTED_MODULE_17__.Dialog,
     DialogOverlay: _headlessui_vue__WEBPACK_IMPORTED_MODULE_17__.DialogOverlay,
     Menu: _headlessui_vue__WEBPACK_IMPORTED_MODULE_18__.Menu,
@@ -34054,33 +34012,6 @@ var navigation = [{
     ViewGridIcon: _heroicons_vue_outline__WEBPACK_IMPORTED_MODULE_14__.ViewGridIcon,
     StudyCreate: _Pages_Study_Partials_Create_vue__WEBPACK_IMPORTED_MODULE_12__["default"],
     Submission: _Shared_Submission_vue__WEBPACK_IMPORTED_MODULE_13__["default"]
-=======
-    Dialog: _headlessui_vue__WEBPACK_IMPORTED_MODULE_16__.Dialog,
-    DialogOverlay: _headlessui_vue__WEBPACK_IMPORTED_MODULE_16__.DialogOverlay,
-    Menu: _headlessui_vue__WEBPACK_IMPORTED_MODULE_17__.Menu,
-    MenuButton: _headlessui_vue__WEBPACK_IMPORTED_MODULE_17__.MenuButton,
-    MenuItem: _headlessui_vue__WEBPACK_IMPORTED_MODULE_17__.MenuItem,
-    MenuItems: _headlessui_vue__WEBPACK_IMPORTED_MODULE_17__.MenuItems,
-    TransitionChild: _headlessui_vue__WEBPACK_IMPORTED_MODULE_18__.TransitionChild,
-    TransitionRoot: _headlessui_vue__WEBPACK_IMPORTED_MODULE_18__.TransitionRoot,
-    BellIcon: _heroicons_vue_outline__WEBPACK_IMPORTED_MODULE_13__.BellIcon,
-    MenuIcon: _heroicons_vue_outline__WEBPACK_IMPORTED_MODULE_13__.MenuIcon,
-    SearchIcon: _heroicons_vue_solid__WEBPACK_IMPORTED_MODULE_15__.SearchIcon,
-    XIcon: _heroicons_vue_outline__WEBPACK_IMPORTED_MODULE_13__.XIcon,
-    PlusIcon: _heroicons_vue_solid__WEBPACK_IMPORTED_MODULE_15__.PlusIcon,
-    FlashMessages: _Shared_FlashMessages__WEBPACK_IMPORTED_MODULE_8__["default"],
-    DialogPanel: _headlessui_vue__WEBPACK_IMPORTED_MODULE_16__.DialogPanel,
-    AnnouncementBanner: _Shared_AnnouncementBanner_vue__WEBPACK_IMPORTED_MODULE_9__["default"],
-    Search: _Shared_Search_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
-    Create: _Shared_CreateButton_vue__WEBPACK_IMPORTED_MODULE_2__["default"],
-    ClockIcon: _heroicons_vue_outline__WEBPACK_IMPORTED_MODULE_13__.ClockIcon,
-    UsersIcon: _heroicons_vue_outline__WEBPACK_IMPORTED_MODULE_13__.UsersIcon,
-    StarIcon: _heroicons_vue_outline__WEBPACK_IMPORTED_MODULE_13__.StarIcon,
-    TrashIcon: _heroicons_vue_outline__WEBPACK_IMPORTED_MODULE_13__.TrashIcon,
-    FolderIcon: _heroicons_vue_outline__WEBPACK_IMPORTED_MODULE_13__.FolderIcon,
-    ViewGridIcon: _heroicons_vue_outline__WEBPACK_IMPORTED_MODULE_13__.ViewGridIcon,
-    StudyCreate: _Pages_Study_Partials_Create_vue__WEBPACK_IMPORTED_MODULE_12__["default"]
->>>>>>> Stashed changes
   },
   setup: function setup() {
     var collapseSidebarStatus = JSON.parse(localStorage.getItem("collapseSidebarStatus"));
@@ -34089,13 +34020,8 @@ var navigation = [{
       collapseSidebarStatus = false;
     }
 
-<<<<<<< Updated upstream
     var sidebarOpen = (0,vue__WEBPACK_IMPORTED_MODULE_15__.ref)(false);
     var collapseSidebar = (0,vue__WEBPACK_IMPORTED_MODULE_15__.ref)(collapseSidebarStatus);
-=======
-    var sidebarOpen = (0,vue__WEBPACK_IMPORTED_MODULE_14__.ref)(false);
-    var collapseSidebar = (0,vue__WEBPACK_IMPORTED_MODULE_14__.ref)(collapseSidebarStatus);
->>>>>>> Stashed changes
     return {
       userNavigation: userNavigation,
       secondaryNavigation: secondaryNavigation,
@@ -38727,7 +38653,6 @@ __webpack_require__.r(__webpack_exports__);
       emitter.emit("openStudyCreateDialog", {});
     };
 
-<<<<<<< Updated upstream
     var openDatasetCreateDialog = function openDatasetCreateDialog() {
       emitter.emit("openDatasetCreateDialog", {});
     };
@@ -38736,11 +38661,6 @@ __webpack_require__.r(__webpack_exports__);
       openProjectCreateDialog: openProjectCreateDialog,
       openStudyCreateDialog: openStudyCreateDialog,
       openDatasetCreateDialog: openDatasetCreateDialog
-=======
-    return {
-      openProjectCreateDialog: openProjectCreateDialog,
-      openStudyCreateDialog: openStudyCreateDialog
->>>>>>> Stashed changes
     };
   },
   methods: {},
@@ -39107,7 +39027,6 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-<<<<<<< Updated upstream
 /***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/Shared/Submission.vue?vue&type=script&lang=js":
 /*!************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/Shared/Submission.vue?vue&type=script&lang=js ***!
@@ -39316,8 +39235,6 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-=======
->>>>>>> Stashed changes
 /***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/Shared/ToggleButton.vue?vue&type=script&lang=js":
 /*!**************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/Shared/ToggleButton.vue?vue&type=script&lang=js ***!
@@ -41055,11 +40972,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
   var _component_project_create = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("project-create");
 
-<<<<<<< Updated upstream
   var _component_submission = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("submission");
 
-=======
->>>>>>> Stashed changes
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Head, {
     title: $props.title
   }, null, 8
@@ -41511,11 +41425,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     _: 1
     /* STABLE */
 
-<<<<<<< Updated upstream
   })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("main", _hoisted_70, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_71, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_72, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_73, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.renderSlot)(_ctx.$slots, "header")])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderSlot)(_ctx.$slots, "default"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_project_create), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_submission)])], 2
-=======
-  })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("main", _hoisted_70, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_71, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_72, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_73, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.renderSlot)(_ctx.$slots, "header")])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderSlot)(_ctx.$slots, "default"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_project_create)])], 2
->>>>>>> Stashed changes
   /* CLASS */
   )])], 64
   /* STABLE_FRAGMENT */
@@ -54770,7 +54680,6 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                 _: 1
                 /* STABLE */
 
-<<<<<<< Updated upstream
               })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_MenuItem, {
                 "class": "cursor-pointer"
               }, {
@@ -54780,13 +54689,6 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                     onClick: _cache[2] || (_cache[2] = function () {
                       return $setup.openDatasetCreateDialog && $setup.openDatasetCreateDialog.apply($setup, arguments);
                     }),
-=======
-              })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_MenuItem, null, {
-                "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function (_ref3) {
-                  var active = _ref3.active;
-                  return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
-                    href: "#",
->>>>>>> Stashed changes
                     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)([active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'group flex items-center px-4 py-2 text-sm'])
                   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_UserAddIcon, {
                     "class": "mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500",
@@ -55975,7 +55877,6 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
 /***/ }),
 
-<<<<<<< Updated upstream
 /***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/Shared/Submission.vue?vue&type=template&id=7503dda8":
 /*!****************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/Shared/Submission.vue?vue&type=template&id=7503dda8 ***!
@@ -56252,8 +56153,6 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
 /***/ }),
 
-=======
->>>>>>> Stashed changes
 /***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/Shared/ToggleButton.vue?vue&type=template&id=99daf7fc":
 /*!******************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/Shared/ToggleButton.vue?vue&type=template&id=99daf7fc ***!
@@ -94394,7 +94293,6 @@ _StudyCard_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"]._
 
 /***/ }),
 
-<<<<<<< Updated upstream
 /***/ "./resources/js/Shared/Submission.vue":
 /*!********************************************!*\
   !*** ./resources/js/Shared/Submission.vue ***!
@@ -94421,8 +94319,6 @@ _Submission_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"].
 
 /***/ }),
 
-=======
->>>>>>> Stashed changes
 /***/ "./resources/js/Shared/ToggleButton.vue":
 /*!**********************************************!*\
   !*** ./resources/js/Shared/ToggleButton.vue ***!
@@ -96081,7 +95977,6 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-<<<<<<< Updated upstream
 /***/ "./resources/js/Shared/Submission.vue?vue&type=script&lang=js":
 /*!********************************************************************!*\
   !*** ./resources/js/Shared/Submission.vue?vue&type=script&lang=js ***!
@@ -96098,8 +95993,6 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-=======
->>>>>>> Stashed changes
 /***/ "./resources/js/Shared/ToggleButton.vue?vue&type=script&lang=js":
 /*!**********************************************************************!*\
   !*** ./resources/js/Shared/ToggleButton.vue?vue&type=script&lang=js ***!
@@ -97828,7 +97721,6 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-<<<<<<< Updated upstream
 /***/ "./resources/js/Shared/Submission.vue?vue&type=template&id=7503dda8":
 /*!**************************************************************************!*\
   !*** ./resources/js/Shared/Submission.vue?vue&type=template&id=7503dda8 ***!
@@ -97845,8 +97737,6 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-=======
->>>>>>> Stashed changes
 /***/ "./resources/js/Shared/ToggleButton.vue?vue&type=template&id=99daf7fc":
 /*!****************************************************************************!*\
   !*** ./resources/js/Shared/ToggleButton.vue?vue&type=template&id=99daf7fc ***!
