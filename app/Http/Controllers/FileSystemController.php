@@ -42,7 +42,7 @@ class FileSystemController extends Controller
 
             $hasDirectories = $path || $destination != '/' ? true : false;
 
-            $filename = $file['upload']['filename'];
+            $filename = "/" . $file['upload']['filename'];
 
             $user = $request->user();
 
@@ -183,7 +183,12 @@ class FileSystemController extends Controller
                 $childFileSystemObject->has_children = 1;
                 $childFileSystemObject->save();
             }
-
+            $filename = preg_replace(
+                '~/~',
+                '',
+                $filename
+            );
+            
             $fileFileSystemObject = FileSystemObject::firstOrCreate([
                 'name' => $filename,
                 'slug' => Str::slug($filename, '-'),
