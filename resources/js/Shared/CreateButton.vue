@@ -62,9 +62,9 @@
               Study
             </a>
           </MenuItem>
-          <MenuItem v-slot="{ active }">
+          <MenuItem class="cursor-pointer" v-slot="{ active }">
             <a
-              href="#"
+              @click="openDatasetCreateDialog"
               :class="[
                 active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
                 'group flex items-center px-4 py-2 text-sm',
@@ -124,9 +124,13 @@ export default {
     const openStudyCreateDialog = () => {
       emitter.emit("openStudyCreateDialog", {});
     };
+    const openDatasetCreateDialog = () => {
+      emitter.emit("openDatasetCreateDialog", {});
+    };
     return {
       openProjectCreateDialog,
-      openStudyCreateDialog
+      openStudyCreateDialog,
+      openDatasetCreateDialog
     };
   },
   methods: {},
