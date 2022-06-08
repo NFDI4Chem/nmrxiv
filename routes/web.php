@@ -66,6 +66,7 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
         Route::get('recent', [DashboardController::class, 'recent'])
             ->name('recent');
             
+        Route::get('/storage/listFiles',  [FileSystemController::class, 'signedDraftStorageURL']);
         Route::post('/storage/signed-storage-url',  [FileSystemController::class, 'signedStorageURL']);
         
         Route::get('projects/{project}', [ProjectController::class, 'show'])

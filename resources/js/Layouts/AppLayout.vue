@@ -485,6 +485,7 @@
         </div>
         <slot></slot>
         <project-create></project-create>
+        <submission></submission>
       </main>
     </div>
   </div>
@@ -503,6 +504,7 @@ import AnnouncementBanner from "@/Shared/AnnouncementBanner.vue";
 import AppTour from "@/App/Tour.vue";
 import ProjectCreate from "@/Pages/Project/Partials/Create.vue";
 import StudyCreate from "@/Pages/Study/Partials/Create.vue";
+import Submission from "@/Shared/Submission.vue";
 import {
   BookmarkAltIcon,
   FireIcon,
@@ -635,6 +637,7 @@ export default {
     FolderIcon,
     ViewGridIcon,
     StudyCreate,
+    Submission
   },
   setup() {
     var collapseSidebarStatus = JSON.parse(localStorage.getItem("collapseSidebarStatus"));
