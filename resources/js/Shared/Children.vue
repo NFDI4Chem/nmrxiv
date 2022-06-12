@@ -53,11 +53,14 @@
               </svg>
             </span>
           </DisclosureButton>
-          <FolderIcon
-            class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-400"
-            aria-hidden="true"
-          />
-          {{ file.name }}
+          <span v-html="composeIcon(file)" v-if="file.type == 'directory'"></span>
+          <span v-else>
+            <FolderIcon
+              class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-400"
+              aria-hidden="true"
+            />
+          </span>
+          {{ file.name }} 
         </div>
         <DisclosurePanel class="space-y-1">
           <span v-for="sfile in file.children" :key="sfile.name">
@@ -122,11 +125,7 @@
                           </span>
                         </DisclosureButton>
                         <span>
-                          <span v-if="sfile.type == 'directory'">
-                            <FolderIcon
-                              class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-400"
-                              aria-hidden="true"
-                            />
+                          <span v-html="composeIcon(sfile)" v-if="sfile.type == 'directory'">  
                           </span>
                           <span v-else>
                             <DocumentTextIcon
@@ -224,6 +223,23 @@ export default {
   },
   mounted() {},
   methods: {
+    composeIcon(file){
+      if(file.instrument_type){
+        if(file.instrument_type == 'bruker'){
+          return '<img class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-400" src="https://pbs.twimg.com/profile_images/649199086424473600/zo-TVJZH_400x400.jpg" alt=""/>';
+        }else if(file.instrument_type == 'varian'){
+          return '<img class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-400" src="https://upload.wikimedia.org/wikipedia/en/5/58/Varian-inc-logo.JPG" alt=""/>';
+        }else if(file.instrument_type == 'joel'){
+          return '<img class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-400" src="https://pbs.twimg.com/profile_images/907699108214972418/gpdCRCaS_400x400.jpg" alt=""/>';
+        }
+      }
+
+      if(file.model_type == 'study'){
+        return '<span class="relative inline-flex"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-400"><path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path></svg><span class="flex absolute h-2 w-2 top-0 right-0"><span class="absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-sky-500"></span></span></span>'
+      }
+
+      return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-400"><path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path></svg>'
+    },  
     displaySelected(file) {
       this.$page.props.selectedFileSystemObject = file;
       let sFolder = "/";
@@ -248,12 +264,10 @@ export default {
 
       if (file.has_children && file.level > 0 && !file.children) {
         file.loading = true;
-        axios
-          .get("/api/v1/files/children/" + this.study.id + "/" + file.id)
-          .then((response) => {
-            file.children = response.data.files[0].children;
-            file.loading = false;
-          });
+        axios.get("/api/v1/files/children/" + file.id).then((response) => {
+          file.children = response.data.files[0].children;
+          file.loading = false;
+        });
       }
 
       this.$emit("reload-nmrium");
