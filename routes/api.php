@@ -25,6 +25,6 @@ Route::prefix('v1')->group(function () {
     });
 
     Route::prefix('files')->group(function () {
-        Route::get('/children/{study}/{file}', [FileSystemController::class, 'children']);
+        Route::get('/children/{file}', [FileSystemController::class, 'children']);
     });    
 });

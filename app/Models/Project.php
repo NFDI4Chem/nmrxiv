@@ -37,6 +37,8 @@ class Project extends Model implements Auditable
         'access_type',
         'team_id',
         'owner_id',
+        'draft_id',
+        'fs_id',
         'project_photo_path',
     ];
 
@@ -67,6 +69,11 @@ class Project extends Model implements Auditable
     public function nonPersonalTeam()
     {
         return $this->team()->where('personal_team', false);
+    }
+
+    public function draft()
+    {
+        return $this->belongsTo(Draft::class, 'draft_id');
     }
 
     /**

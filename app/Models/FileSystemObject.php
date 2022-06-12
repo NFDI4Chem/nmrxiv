@@ -32,6 +32,8 @@ class FileSystemObject extends Model
         'owner_id',
         'project_id',
         'study_id',
+        'dataset_id',
+        'draft_id',
         'version_id',
         'version',
         'parent_id',
@@ -46,9 +48,19 @@ class FileSystemObject extends Model
         return $this->hasMany(FileSystemObject::class, 'parent_id', 'id');
     }
 
+    public function parent()
+    {
+        return $this->belongsTo(FileSystemObject::class, 'parent_id');
+    }
+
     public function project()
     {
         return $this->belongsTo(Project::class, 'project_id');
+    }
+
+    public function draft()
+    {
+        return $this->belongsTo(Project::class, 'draft_id');
     }
 
     public function study()

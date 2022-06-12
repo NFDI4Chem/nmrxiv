@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 
 class FileSystemController extends Controller
 {
-    public function children(Request $request, Study $study, $fileId)
+    public function children(Request $request, $fileId)
     {
         return [
             'files' => FileSystemObject::with('children')->where([

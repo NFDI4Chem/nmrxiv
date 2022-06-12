@@ -21,6 +21,8 @@ class CreateFileSystemObjectsTable extends Migration
             $table->string('relative_url', 2048)->nullable();
             $table->string('path', 2048)->nullable();
             $table->enum('type', ['directory', 'file'])->default('file');
+            $table->string('model_type')->nullable();
+            $table->string('instrument_type')->nullable();
             $table->string('key');
             $table->string('compressionInfo')->nullable();
             $table->string('kernelSessionInfo')->nullable();
@@ -40,6 +42,8 @@ class CreateFileSystemObjectsTable extends Migration
             $table->foreignId('parent_id')->nullable();
             $table->foreignId('project_id')->nullable();
             $table->foreignId('study_id')->nullable();
+            $table->foreignId('dataset_id')->nullable();
+            $table->foreignId('draft_id')->nullable();
             $table->foreignId('version_id')->nullable();
             $table->json('info')->nullable()->default('{}');
             $table->json('settings')->nullable()->default('{}');

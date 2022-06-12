@@ -28,8 +28,10 @@ class Study extends Model implements Auditable
         'access', 
         'access_type',
         'team_id',
+        'draft_id',
         'owner_id',
         'project_id',
+        'fs_id',
         'study_photo_path'
     ];
 
@@ -56,6 +58,16 @@ class Study extends Model implements Auditable
     protected function getPrivateUrlAttribute()
     {
         return  env('APP_URL', null)."/projects/".urlencode($this->url);
+    }
+
+    public function draft()
+    {
+        return $this->belongsTo(Draft::class, 'draft_id');
+    }
+
+    public function fsObject()
+    {
+        return $this->hasOne(FileSystemObject::class, 'fs_id');
     }
 
     /**
@@ -91,6 +103,11 @@ class Study extends Model implements Auditable
     public function team()
     {
         return $this->belongsTo(Team::class, 'team_id');
+    }
+
+    public function datasets()
+    {
+        return $this->hasMany(Dataset::class);
     }
 
     /**

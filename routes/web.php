@@ -13,6 +13,7 @@ use App\Http\Controllers\FileSystemController;
 use App\Http\Controllers\StudyController;
 use App\Http\Controllers\StudyInvitationController;
 use App\Http\Controllers\StudyMemberController;
+use App\Http\Controllers\DraftController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
@@ -38,6 +39,9 @@ Route::get('/', function () {
 });
 
 Route::supportBubble();
+
+Route::get('download/{code}/datasets/{dataset}/{filename}', [DatasetController::class, 'download'])
+    ->name('dataset.download');
 
 Route::get('{code}/studies/{study}/file/{filename}', [StudyController::class, 'file'])
     ->name('study.file');
@@ -66,8 +70,10 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
         Route::get('recent', [DashboardController::class, 'recent'])
             ->name('recent');
             
-        Route::get('/storage/listFiles',  [FileSystemController::class, 'signedDraftStorageURL']);
+        Route::post('/storage/signed-draft-storage-url',  [FileSystemController::class, 'signedDraftStorageURL']);
         Route::post('/storage/signed-storage-url',  [FileSystemController::class, 'signedStorageURL']);
+
+        Route::get('/drafts',  [DraftController::class, 'all']);
         
         Route::get('projects/{project}', [ProjectController::class, 'show'])
             ->name('dashboard.projects');
@@ -125,6 +131,14 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
             ->name('study-invitations.accept');
         Route::delete('/study-invitations/{invitation}', [StudyInvitationController::class, 'destroyInvitation'])
             ->name('study-invitations.destroy');
+
+
+        Route::get('drafts/{draft}/files', [DraftController::class, 'files'])
+            ->name('dashboard.draft.files');
+        Route::get('drafts/{draft}/annotate', [DraftController::class, 'annotate'])
+            ->name('dashboard.draft.annotate');
+        Route::get('drafts/{draft}/process', [DraftController::class, 'process'])
+            ->name('dashboard.draft.process');
     });
 });
 
