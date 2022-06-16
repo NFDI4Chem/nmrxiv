@@ -31,7 +31,8 @@ class Dataset extends Model implements Auditable
         'project_id',
         'draft_id',
         'fs_id',
-        'dataset_photo_path'
+        'dataset_photo_path',
+        'nmrium_info'
     ];
 
     /**

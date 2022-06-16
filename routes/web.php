@@ -133,11 +133,14 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
             ->name('study-invitations.destroy');
 
 
+        Route::post('datasets/{dataset}/nmriumInfo', [DatasetController::class, 'nmriumInfo'])
+            ->name('dashboard.datasets.nmriumInfo');
+
         Route::get('drafts/{draft}/files', [DraftController::class, 'files'])
             ->name('dashboard.draft.files');
         Route::get('drafts/{draft}/annotate', [DraftController::class, 'annotate'])
             ->name('dashboard.draft.annotate');
-        Route::get('drafts/{draft}/process', [DraftController::class, 'process'])
+        Route::post('drafts/{draft}/process', [DraftController::class, 'process'])
             ->name('dashboard.draft.process');
     });
 });

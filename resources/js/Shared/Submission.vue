@@ -7,9 +7,48 @@
     <template #title>
       <div
         v-if="!loading && currentDraft"
-        class="lg:border-t lg:border-b lg:border-gray-200"
+        class="lg:border-b lg:border-gray-200 pb-3 pr-5 -mx-6"
       >
-        <nav class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" aria-label="Progress">
+        <div class="flex items-left justify-start pl-5 float-left">
+          <b>{{ steps.find((step) => step.status === "current").name }}</b>
+        </div>
+        <nav class="flex items-right justify-end" aria-label="Progress">
+          <p class="text-sm font-medium">
+            Step {{ steps.findIndex((step) => step.status === "current") + 1 }} of
+            {{ steps.length }}
+          </p>
+          <ol role="list" class="ml-8 flex items-center space-x-5">
+            <li v-for="step in steps" :key="step.name">
+              <a
+                v-if="step.status === 'complete'"
+                :href="step.href"
+                class="block w-2.5 h-2.5 bg-teal-600 rounded-full hover:bg-teal-900"
+              >
+              </a>
+              <a
+                v-else-if="step.status === 'current'"
+                :href="step.href"
+                class="relative flex items-center justify-center"
+                aria-current="step"
+              >
+                <span class="absolute w-5 h-5 p-px flex" aria-hidden="true">
+                  <span class="w-full h-full rounded-full bg-blue-100" />
+                </span>
+                <span
+                  class="relative block w-2.5 h-2.5 bg-teal-600 rounded-full"
+                  aria-hidden="true"
+                />
+              </a>
+              <a
+                v-else
+                :href="step.href"
+                class="block w-2.5 h-2.5 bg-gray-200 rounded-full hover:bg-gray-400"
+              >
+              </a>
+            </li>
+          </ol>
+        </nav>
+        <!-- <nav class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" aria-label="Progress">
           <ol
             role="list"
             class="rounded-md overflow-hidden lg:flex lg:border-l lg:border-r lg:border-gray-200 lg:rounded-none"
@@ -138,9 +177,10 @@
               </div>
             </li>
           </ol>
-        </nav>
+        </nav> -->
       </div>
     </template>
+
     <template #content>
       <div v-if="!loading" class="max-h-screen">
         <div v-if="drafts.length > 0 && !currentDraft">
@@ -150,37 +190,78 @@
               <li v-for="draft in drafts" :key="draft.id" class="py-4">
                 <div class="flex items-center space-x-4">
                   <div class="flex-1 min-w-0">
-                    <p class="text-sm font-medium text-gray-900 truncate">
-                      {{ draft.name }}
+                    <p class="text-lg font-large text-black truncate">
+                      <b>{{ draft.name }}</b>
+                    </p>
+                    <p class="text-sm font-medium text-gray-600 truncate pr-10">
+                      {{ draft.description }}
+                    </p>
+                    <p class="text-sm font-medium text-gray-500 truncate">
+                      ID: {{ draft.key }}
                     </p>
                     <p class="text-sm text-gray-500 truncate">
-                      {{ draft.created_at }}
+                      Created at: {{ formatDateTime(draft.created_at) }}
                     </p>
                   </div>
                   <div>
-                    <a
+                    <button
                       @click="selectDraft(draft)"
-                      class="cursor-pointer inline-flex items-center shadow-sm px-2.5 py-0.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50"
+                      class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring focus:ring-gray-300 disabled:opacity-25 transition ml-2"
                     >
                       Select
-                    </a>
+                    </button>
                   </div>
                 </div>
               </li>
             </ul>
           </div>
-          <div class="mt-6">
-            <a
+          <div class="relative mt-6">
+            <div class="absolute inset-0 flex items-center" aria-hidden="true">
+              <div class="w-full border-t border-gray-300" />
+            </div>
+            <div class="relative flex justify-center">
+              <span class="px-2 bg-white text-sm text-gray-500"> Or </span>
+            </div>
+          </div>
+          <div class="mt-6 justify-center items-center flex">
+            <button
               @click="createNewDraft()"
-              class="w-full flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+              class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring focus:ring-gray-300 disabled:opacity-25 transition"
             >
               Create New
-            </a>
+            </button>
           </div>
         </div>
         <div v-else>
           <div v-if="currentStep.id == '01'">
-            <div v-if="currentDraft">
+            <div style="height: 75vh; overflow-y: scroll" v-if="currentDraft">
+              <div class="mb-3">
+                <label for="project-name" class="block text-sm font-medium text-gray-700">
+                  Project Name
+                </label>
+                <div class="mt-1">
+                  <input
+                    type="text"
+                    name="project-name"
+                    v-model="draftName"
+                    class="block w-full shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm border-gray-300 rounded-md"
+                  />
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="description" class="block text-sm font-medium text-gray-700">
+                  Description
+                </label>
+                <div class="mt-1">
+                  <textarea
+                    id="description"
+                    name="description"
+                    v-model="draftDescription"
+                    rows="3"
+                    class="block w-full shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm border border-gray-300 rounded-md"
+                  ></textarea>
+                </div>
+              </div>
               <small @click="annotate()">Draft ID: {{ currentDraft.name }}</small>
               <form id="submission-dropzone" class="py-2 mb-3">
                 <div id="submission-dropzone-message" class="text-center">
@@ -231,20 +312,635 @@
               </div>
             </div>
           </div>
-          <div v-if="currentStep.id == '02'">
-            <div style="height: 80vh; overflow: scroll !important">
+          <div class="-mx-6 -my-4" v-if="currentStep.id == '02'">
+            <div style="height: 80vh">
+              <div class="flex-1 flex xl:overflow-hidden">
+                <nav
+                  aria-label="Sections"
+                  class="hidden flex-shrink-0 w-64 bg-white border-r border-blue-gray-200 xl:flex xl:flex-col"
+                >
+                  <div
+                    class="border-gray-200 px-4 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider flex-shrink-0 border-b border-blue-gray-200 flex items-center"
+                  >
+                    STUDY
+                  </div>
+                  <div class="flex-1 min-h-0 overflow-y-auto">
+                    <a
+                      v-for="study in studies"
+                      :key="study.slug"
+                      :class="[
+                        selectedStudy.id == study.id
+                          ? 'bg-gray-800 text-white'
+                          : 'hover:bg-gray-200 hover:bg-opacity-50',
+                        'cursor-pointer flex p-4 border-b border-blue-gray-200',
+                      ]"
+                      @click="selectStudy(study)"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="flex-shrink-0 -mt-0.5 h-6 w-6 text-blue-gray-400"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"
+                        />
+                      </svg>
+                      <div class="ml-3 text-sm">
+                        <p class="font-medium text-blue-gray-900">{{ study.name }}</p>
+                        <!-- <p class="mt-1 text-blue-gray-500">{{ item.description }}</p> -->
+                      </div>
+                    </a>
+                  </div>
+                </nav>
+                <div
+                  style="height: 80vh; overflow: scroll !important"
+                  class="flex-1 xl:overflow-y-auto p-2"
+                >
+                  <div class="mx-auto flex flex-col md:px-4 xl:px-0">
+                    <main class="flex-1">
+                      <div class="relative mx-auto md:px-4 xl:px-0">
+                        <div class="pt-10 pb-16">
+                          <div class="px-4 sm:px-6">
+                            <h1 class="text-3xl font-extrabold text-gray-900">
+                              {{ selectedStudy.name }}
+                            </h1>
+                          </div>
+
+                          <div class="lg:hidden px-4 sm:px-6">
+                            <label for="selected-tab" class="sr-only">Select a tab</label>
+                            <select
+                              id="selected-tab"
+                              name="selected-tab"
+                              class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm rounded-md"
+                            >
+                              <option
+                                v-for="tab in tabs"
+                                :key="tab.name"
+                                :selected="tab.current"
+                              >
+                                {{ tab.name }}
+                              </option>
+                            </select>
+                          </div>
+                          <div class="hidden lg:block px-4 sm:px-6">
+                            <div class="border-b border-gray-200">
+                              <nav class="-mb-px flex space-x-8">
+                                <a
+                                  v-for="tab in tabs"
+                                  :key="tab.name"
+                                  @click="selectTab(tab)"
+                                  :class="[
+                                    tab.current
+                                      ? 'border-teal-500 text-teal-600'
+                                      : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700',
+                                    'cursor-pointer whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm',
+                                  ]"
+                                >
+                                  {{ tab.name }}
+                                </a>
+                              </nav>
+                            </div>
+                          </div>
+                          <div v-if="currentTab.name == 'Meta Data'" class="px-4 sm:px-6">
+                            <div class="pt-4 xl:col-span-2">
+                              <div class="mb-3">
+                                <label
+                                  for="study-name"
+                                  class="block text-sm font-medium text-gray-700"
+                                >
+                                  Name
+                                </label>
+                                <div class="mt-1">
+                                  <input
+                                    type="text"
+                                    name="study-name"
+                                    v-model="studyName"
+                                    class="block w-full shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm border-gray-300 rounded-md"
+                                  />
+                                </div>
+                              </div>
+                              <div class="mb-3">
+                                <label
+                                  for="description"
+                                  class="block text-sm font-medium text-gray-700"
+                                >
+                                  Description
+                                </label>
+                                <div class="mt-1">
+                                  <textarea
+                                    id="study-description"
+                                    name="study-description"
+                                    v-model="studyDescription"
+                                    rows="3"
+                                    class="block w-full shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm border border-gray-300 rounded-md"
+                                  ></textarea>
+                                </div>
+                              </div>
+                              <h1 class="text-xl font-bold text-gray-900">
+                                Sample Information
+                              </h1>
+                              <section
+                                aria-labelledby="activity-title"
+                                class="mt-2 xl:mt-2"
+                              >
+                                <div>
+                                  <div class="pb-1">
+                                    <h2
+                                      id="activity-title"
+                                      class="text-lg font-medium text-gray-900"
+                                    >
+                                      Protocols
+                                    </h2>
+                                  </div>
+                                  <div class="pt-3">
+                                    <div>
+                                      <label
+                                        for="about"
+                                        class="block text-sm font-medium text-gray-700"
+                                      >
+                                        Sample Collection
+                                      </label>
+                                      <div class="mt-1">
+                                        <textarea
+                                          id="about"
+                                          name="about"
+                                          rows="3"
+                                          class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border border-gray-300 rounded-md"
+                                        ></textarea>
+                                      </div>
+                                      <p class="mt-2 text-sm text-gray-500">
+                                        Describe your sample collection protocol. Protocol
+                                        parameters can be provided below.
+                                      </p>
+                                    </div>
+                                    <div class="mt-3">
+                                      <h2 class="text-sm font-medium text-gray-500">
+                                        Sample Collection Parameters
+                                      </h2>
+                                      <ul role="list" class="mt-2 leading-8">
+                                        <li class="inline">
+                                          <a
+                                            href="#"
+                                            class="relative inline-flex items-center rounded-full border border-gray-300 px-3 py-0.5"
+                                          >
+                                            <div
+                                              class="absolute flex-shrink-0 flex items-center justify-center"
+                                            >
+                                              <span
+                                                class="h-1.5 w-1.5 rounded-full bg-rose-500"
+                                                aria-hidden="true"
+                                              ></span>
+                                            </div>
+                                            <div
+                                              class="ml-3.5 text-sm font-medium text-gray-900"
+                                            >
+                                              Bug
+                                            </div>
+                                          </a>
+                                          <!-- space -->
+                                        </li>
+                                        <li class="inline">
+                                          <a
+                                            href="#"
+                                            class="relative inline-flex items-center rounded-full border border-gray-300 px-3 py-0.5"
+                                          >
+                                            <div
+                                              class="absolute flex-shrink-0 flex items-center justify-center"
+                                            >
+                                              <span
+                                                class="h-1.5 w-1.5 rounded-full bg-teal-500"
+                                                aria-hidden="true"
+                                              ></span>
+                                            </div>
+                                            <div
+                                              class="ml-3.5 text-sm font-medium text-gray-900"
+                                            >
+                                              Accessibility
+                                            </div>
+                                          </a>
+                                          <!-- space -->
+                                        </li>
+                                      </ul>
+                                    </div>
+                                  </div>
+                                  <div class="pt-3">
+                                    <div>
+                                      <label
+                                        for="about"
+                                        class="block text-sm font-medium text-gray-700"
+                                      >
+                                        Extraction
+                                      </label>
+                                      <div class="mt-1">
+                                        <textarea
+                                          id="about"
+                                          name="about"
+                                          rows="3"
+                                          class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border border-gray-300 rounded-md"
+                                        ></textarea>
+                                      </div>
+                                      <p class="mt-2 text-sm text-gray-500">
+                                        Describe yourextraction protocol. Protocol
+                                        parameters can be provided below.
+                                      </p>
+                                    </div>
+                                    <div class="mt-3">
+                                      <h2 class="text-sm font-medium text-gray-500">
+                                        Extraction Protocol Parameters
+                                      </h2>
+                                      <ul role="list" class="mt-2 leading-8">
+                                        <li class="inline">
+                                          <a
+                                            href="#"
+                                            class="relative inline-flex items-center rounded-full border border-gray-300 px-3 py-0.5"
+                                          >
+                                            <div
+                                              class="absolute flex-shrink-0 flex items-center justify-center"
+                                            >
+                                              <span
+                                                class="h-1.5 w-1.5 rounded-full bg-rose-500"
+                                                aria-hidden="true"
+                                              ></span>
+                                            </div>
+                                            <div
+                                              class="ml-3.5 text-sm font-medium text-gray-900"
+                                            >
+                                              Bug
+                                            </div>
+                                          </a>
+                                          <!-- space -->
+                                        </li>
+                                        <li class="inline">
+                                          <a
+                                            href="#"
+                                            class="relative inline-flex items-center rounded-full border border-gray-300 px-3 py-0.5"
+                                          >
+                                            <div
+                                              class="absolute flex-shrink-0 flex items-center justify-center"
+                                            >
+                                              <span
+                                                class="h-1.5 w-1.5 rounded-full bg-teal-500"
+                                                aria-hidden="true"
+                                              ></span>
+                                            </div>
+                                            <div
+                                              class="ml-3.5 text-sm font-medium text-gray-900"
+                                            >
+                                              Accessibility
+                                            </div>
+                                          </a>
+                                          <!-- space -->
+                                        </li>
+                                      </ul>
+                                    </div>
+                                  </div>
+                                </div>
+                              </section>
+                            </div>
+                          </div>
+                          <div
+                            v-if="currentTab.name == 'Experiments (Spectra)'"
+                            class="px-4 sm:px-6 md:px-0"
+                          >
+                            <div class="p-6">
+                              <div>
+                                <label
+                                  for="location"
+                                  class="block text-sm font-medium text-gray-700"
+                                  >Select Experiment</label
+                                >
+                                <select
+                                  @change="loadSpectra"
+                                  v-model="selectedDataset"
+                                  id="location"
+                                  name="location"
+                                  class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm rounded-md"
+                                >
+                                  <option
+                                    :value="dataset"
+                                    v-for="dataset in selectedStudy.datasets"
+                                    :key="dataset.slug"
+                                  >
+                                    {{ dataset.name }}
+                                  </option>
+                                </select>
+                              </div>
+                              <div class="my-7">
+                                <iframe
+                                  v-on:load="loadSpectra()"
+                                  name="submissionNMRiumIframe"
+                                  frameborder="0"
+                                  allowfullscreen
+                                  class="rounded-md border"
+                                  style="width: 100%; height: 75vh; max-height: 600px"
+                                  :src="nmriumURL"
+                                ></iframe>
+                              </div>
+                              <div v-if="currentMolecules.length > 0">
+                                <ul
+                                  role="list"
+                                  class="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8"
+                                >
+                                  <li
+                                    v-for="molecule in currentMolecules"
+                                    :key="molecule.key"
+                                    class="relative"
+                                  >
+                                    <div
+                                      class="group block w-full aspect-w-10 aspect-h-7 rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 focus-within:ring-teal-500 overflow-hidden"
+                                    >
+                                      <div
+                                        class="object-cover pointer-events-none group-hover:opacity-75"
+                                        v-html="molecule.svg"
+                                      ></div>
+                                      <button
+                                        type="button"
+                                        class="absolute inset-0 focus:outline-none"
+                                      >
+                                        <span class="sr-only"
+                                          >View details for {{ file.title }}</span
+                                        >
+                                      </button>
+                                    </div>
+                                    <p
+                                      class="mt-2 block text-sm font-medium text-gray-900 truncate pointer-events-none"
+                                    >
+                                      {{ file.title }}
+                                    </p>
+                                    <p
+                                      class="block text-sm font-medium text-gray-500 pointer-events-none"
+                                    >
+                                      {{ file.size }}
+                                    </p>
+                                  </li>
+                                </ul>
+                              </div>
+                              <div class="grid grid-cols-2">
+                                <div class="p-1 pr-2">
+                                  <label
+                                    for="location"
+                                    class="block text-sm font-medium text-gray-700"
+                                    >Info</label
+                                  >
+                                  <div
+                                    class="overflow-hidden ring-1 mt-3 ring-black ring-opacity-5 md:rounded-lg"
+                                    v-if="selectedSpectraData"
+                                  >
+                                    <table
+                                      class="min-w-full border divide-y divide-gray-300"
+                                    >
+                                      <thead class="bg-gray-50">
+                                        <tr>
+                                          <th
+                                            scope="col"
+                                            class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 lg:pl-8"
+                                          >
+                                            Field
+                                          </th>
+                                          <th
+                                            scope="col"
+                                            class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                                          >
+                                            Value
+                                          </th>
+                                        </tr>
+                                      </thead>
+                                      <tbody class="divide-y divide-gray-200 bg-white">
+                                        <tr
+                                          v-for="key in Object.keys(
+                                            selectedSpectraData.info
+                                          )"
+                                          :key="key"
+                                        >
+                                          <td
+                                            class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8"
+                                          >
+                                            {{ key }}
+                                          </td>
+                                          <td
+                                            class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"
+                                          >
+                                            {{ selectedSpectraData.info[key] }}
+                                          </td>
+                                        </tr>
+
+                                        <!-- More people... -->
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                </div>
+                                <div class="p-1 pr-2">
+                                  <div class="px-4 py-5 sm:p-6">
+                                    <div>
+                                      <div>
+                                        <label
+                                          for="about"
+                                          class="block text-sm font-medium text-gray-700"
+                                        >
+                                          NMR Sample preparation
+                                        </label>
+                                        <div class="mt-1">
+                                          <textarea
+                                            id="about"
+                                            name="about"
+                                            rows="3"
+                                            class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border border-gray-300 rounded-md"
+                                          ></textarea>
+                                        </div>
+                                        <p class="mt-2 text-sm text-gray-500">
+                                          Describe yourextraction protocol. Protocol
+                                          parameters can be provided below.
+                                        </p>
+                                      </div>
+                                      <div class="mt-3">
+                                        <h2 class="text-sm font-medium text-gray-500">
+                                          Extraction Protocol Parameters
+                                        </h2>
+                                        <ul role="list" class="mt-2 leading-8">
+                                          <li class="inline">
+                                            <a
+                                              href="#"
+                                              class="relative inline-flex items-center rounded-full border border-gray-300 px-3 py-0.5"
+                                            >
+                                              <div
+                                                class="absolute flex-shrink-0 flex items-center justify-center"
+                                              >
+                                                <span
+                                                  class="h-1.5 w-1.5 rounded-full bg-rose-500"
+                                                  aria-hidden="true"
+                                                ></span>
+                                              </div>
+                                              <div
+                                                class="ml-3.5 text-sm font-medium text-gray-900"
+                                              >
+                                                Bug
+                                              </div>
+                                            </a>
+                                            <!-- space -->
+                                          </li>
+                                          <li class="inline">
+                                            <a
+                                              href="#"
+                                              class="relative inline-flex items-center rounded-full border border-gray-300 px-3 py-0.5"
+                                            >
+                                              <div
+                                                class="absolute flex-shrink-0 flex items-center justify-center"
+                                              >
+                                                <span
+                                                  class="h-1.5 w-1.5 rounded-full bg-teal-500"
+                                                  aria-hidden="true"
+                                                ></span>
+                                              </div>
+                                              <div
+                                                class="ml-3.5 text-sm font-medium text-gray-900"
+                                              >
+                                                Accessibility
+                                              </div>
+                                            </a>
+                                            <!-- space -->
+                                          </li>
+                                        </ul>
+                                      </div>
+                                    </div>
+                                    <div class="mt-3">
+                                      <div>
+                                        <label
+                                          for="about"
+                                          class="block text-sm font-medium text-gray-700"
+                                        >
+                                          Data transformation
+                                        </label>
+                                        <div class="mt-1">
+                                          <textarea
+                                            id="about"
+                                            name="about"
+                                            rows="3"
+                                            class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border border-gray-300 rounded-md"
+                                          ></textarea>
+                                        </div>
+                                        <p class="mt-2 text-sm text-gray-500">
+                                          Describe yourextraction protocol. Protocol
+                                          parameters can be provided below.
+                                        </p>
+                                      </div>
+                                      <div class="mt-3">
+                                        <h2 class="text-sm font-medium text-gray-500">
+                                          Data transformation Protocol Parameters
+                                        </h2>
+                                        <ul role="list" class="mt-2 leading-8">
+                                          <li class="inline">
+                                            <a
+                                              href="#"
+                                              class="relative inline-flex items-center rounded-full border border-gray-300 px-3 py-0.5"
+                                            >
+                                              <div
+                                                class="absolute flex-shrink-0 flex items-center justify-center"
+                                              >
+                                                <span
+                                                  class="h-1.5 w-1.5 rounded-full bg-rose-500"
+                                                  aria-hidden="true"
+                                                ></span>
+                                              </div>
+                                              <div
+                                                class="ml-3.5 text-sm font-medium text-gray-900"
+                                              >
+                                                Bug
+                                              </div>
+                                            </a>
+                                            <!-- space -->
+                                          </li>
+                                          <li class="inline">
+                                            <a
+                                              href="#"
+                                              class="relative inline-flex items-center rounded-full border border-gray-300 px-3 py-0.5"
+                                            >
+                                              <div
+                                                class="absolute flex-shrink-0 flex items-center justify-center"
+                                              >
+                                                <span
+                                                  class="h-1.5 w-1.5 rounded-full bg-teal-500"
+                                                  aria-hidden="true"
+                                                ></span>
+                                              </div>
+                                              <div
+                                                class="ml-3.5 text-sm font-medium text-gray-900"
+                                              >
+                                                Accessibility
+                                              </div>
+                                            </a>
+                                            <!-- space -->
+                                          </li>
+                                        </ul>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div
+                            v-if="currentTab.name == 'Chemical Composition'"
+                            class="px-4 sm:px-6 md:px-0"
+                          >
+                            <div v-if="selectedStudy">
+                              <div
+                                v-if="
+                                  selectedStudy.molecules &&
+                                  selectStudy.molecules.length == 0
+                                "
+                              >
+                                <template>
+                                  <button
+                                    type="button"
+                                    class="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                  >
+                                    <svg
+                                      class="mx-auto h-12 w-12 text-gray-400"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      stroke="currentColor"
+                                      fill="none"
+                                      viewBox="0 0 48 48"
+                                      aria-hidden="true"
+                                    >
+                                      <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M8 14v20c0 4.418 7.163 8 16 8 1.381 0 2.721-.087 4-.252M8 14c0 4.418 7.163 8 16 8s16-3.582 16-8M8 14c0-4.418 7.163-8 16-8s16 3.582 16 8m0 0v14m0-4c0 4.418-7.163 8-16 8S8 28.418 8 24m32 10v6m0 0v6m0-6h6m-6 0h-6"
+                                      />
+                                    </svg>
+                                    <span
+                                      class="mt-2 block text-sm font-medium text-gray-900"
+                                    >
+                                      Create a new database
+                                    </span>
+                                  </button>
+                                </template>
+                              </div>
+                              <div
+                                v-if="
+                                  selectedStudy.molecules &&
+                                  selectStudy.molecules.length > 0
+                                "
+                              >
+                                Mols
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </main>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- <div style="height: 80vh; overflow: scroll !important">
               <div class="mb-4 bg-white flex items-start justify-center">
                 <div class="relative z-0 inline-flex shadow-sm rounded-md">
-                  <button
-                    type="button"
-                    class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
-                  >
-                    <ChevronLeftIcon class="h-5 w-5" aria-hidden="true" />
-                    <span class="sr-only">Previous</span>
-                  </button>
                   <Menu as="div" class="-ml-px relative block">
                     <MenuButton
-                      class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                      class="relative rounded-l inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
                     >
                       <b>STUDY: {{ selectedStudy.name }}</b>
                       <ChevronDownIcon class="h-5 w-5" aria-hidden="true" />
@@ -258,7 +954,7 @@
                       leave-to-class="transform opacity-0 scale-95"
                     >
                       <MenuItems
-                        class="origin-top-right absolute right-0 mt-2 -mr-1 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
+                        class="origin-top-right cursor-pointer absolute right-0 mt-2 -mr-1 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
                       >
                         <div class="py-1">
                           <MenuItem
@@ -282,9 +978,9 @@
                   </Menu>
                   <Menu as="div" class="-ml-px relative block">
                     <MenuButton
-                      class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                      class="relative rounded-r inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
                     >
-                      <b>SPECTRA DATASET: {{ selectedDataset.name }}</b>
+                      <b>Experiment: {{ selectedDataset.name }}</b>
                       <ChevronDownIcon class="h-5 w-5" aria-hidden="true" />
                     </MenuButton>
                     <transition
@@ -296,7 +992,7 @@
                       leave-to-class="transform opacity-0 scale-95"
                     >
                       <MenuItems
-                        class="origin-top-right absolute right-0 mt-2 -mr-1 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
+                        class="origin-top-right cursor-pointer absolute right-0 mt-2 -mr-1 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
                       >
                         <div class="py-1">
                           <MenuItem
@@ -318,13 +1014,6 @@
                       </MenuItems>
                     </transition>
                   </Menu>
-                  <button
-                    type="button"
-                    class="-ml-px relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
-                  >
-                    <span class="sr-only">Next</span>
-                    <ChevronRightIcon class="h-5 w-5" aria-hidden="true" />
-                  </button>
                 </div>
               </div>
               <iframe
@@ -336,8 +1025,9 @@
                 style="width: 100%; height: 75vh"
                 :src="nmriumURL"
               ></iframe>
-            </div>
+            </div> -->
           </div>
+          <div v-if="currentStep.id == '03'">h</div>
         </div>
       </div>
       <div v-else>
@@ -366,14 +1056,55 @@
     </template>
 
     <template v-if="!loading && currentDraft" #footer>
-      <jet-secondary-button @click="toggleCreateDatasetDialog">
-        Cancel
-      </jet-secondary-button>
-
       <span v-if="currentStep.id == '01'">
+        <jet-secondary-button @click="toggleCreateDatasetDialog">
+          Cancel
+        </jet-secondary-button>
         <jet-button
           class="ml-2"
           @click="process"
+          :class="{ 'opacity-25': createDatasetForm.processing }"
+          :disabled="createDatasetForm.processing"
+        >
+          Proceed
+        </jet-button>
+      </span>
+      <span v-if="currentStep.id == '02'">
+        <jet-button
+          class="ml-2 float-left"
+          @click="selectStep(1)"
+          :class="{ 'opacity-25': createDatasetForm.processing }"
+          :disabled="createDatasetForm.processing"
+        >
+          Back
+        </jet-button>
+        <jet-secondary-button @click="toggleCreateDatasetDialog">
+          Cancel
+        </jet-secondary-button>
+        <jet-button
+          class="ml-2"
+          @click="selectStep(3)"
+          :class="{ 'opacity-25': createDatasetForm.processing }"
+          :disabled="createDatasetForm.processing"
+        >
+          Proceed
+        </jet-button>
+      </span>
+      <span v-if="currentStep.id == '03'">
+        <jet-button
+          class="ml-2 float-left"
+          @click="selectStep(2)"
+          :class="{ 'opacity-25': createDatasetForm.processing }"
+          :disabled="createDatasetForm.processing"
+        >
+          Back
+        </jet-button>
+        <jet-secondary-button @click="toggleCreateDatasetDialog">
+          Cancel
+        </jet-secondary-button>
+        <jet-button
+          class="ml-2"
+          @click="selectStep(4)"
           :class="{ 'opacity-25': createDatasetForm.processing }"
           :disabled="createDatasetForm.processing"
         >
@@ -446,6 +1177,7 @@ export default {
 
   data() {
     return {
+      selectedSpectraData: null,
       drafts: [],
       defaultDraft: null,
       currentDraft: null,
@@ -478,27 +1210,26 @@ export default {
         },
         {
           id: "02",
-          name: "Assignments",
+          name: "Assignments & Meta data",
           description: "Cursus semper viverra.",
           href: "#",
           status: "upcoming",
         },
         {
           id: "03",
-          name: "Meta data",
-          description: "Penatibus eu quis ante.",
-          href: "#",
-          status: "upcoming",
-        },
-        {
-          id: "04",
           name: "Complete",
           description: "Penatibus eu quis ante.",
           href: "#",
           status: "upcoming",
         },
       ],
+      tabs: [
+        { name: "Experiments (Spectra)", current: true },
+        { name: "Chemical Composition", current: false },
+        { name: "Meta Data", current: false },
+      ],
       createDatasetDialog: false,
+      currentMolecules: [],
     };
   },
 
@@ -590,29 +1321,34 @@ export default {
           this.loadFiles();
         });
     },
-    selectDataset(dataset){
-      this.selectedDataset = dataset
-      this.loadSpectra()
+    selectDataset(dataset) {
+      this.selectedDataset = dataset;
+      this.loadSpectra();
     },
-    selectStudy(study){
-      this.selectedStudy = study
-      this.selectDataset(this.selectedStudy.datasets[0])
-    },  
+    selectStudy(study) {
+      this.selectedStudy = study;
+      this.selectDataset(this.selectedStudy.datasets[0]);
+    },
     process() {
       axios
-        .get("/dashboard/drafts/" + this.currentDraft.id + "/process")
+        .post("/dashboard/drafts/" + this.currentDraft.id + "/process", {
+          name: this.draftName,
+          description: this.draftDescription,
+        })
         .then((response) => {
           this.project = response.data.project;
           this.studies = response.data.studies;
           if (this.project && this.studies.length > 0) {
             this.selectedStudy = this.studies[0];
-            this.selectedDataset = this.selectedStudy.datasets[0]
+            this.selectedDataset = this.selectedStudy.datasets[0];
             this.selectStep(2);
           }
         });
     },
     selectDraft(draft) {
       this.currentDraft = draft;
+      this.draftName = this.currentDraft.name;
+      this.draftDescription = this.currentDraft.description;
       this.loadDropZone();
       this.loadFiles();
     },
@@ -633,13 +1369,45 @@ export default {
     loadSpectra() {
       const iframe = window.frames.submissionNMRiumIframe;
       if (iframe) {
-        let data = {
-          urls: [
-            this.url + "/download/asc/datasets/" + this.selectedDataset.id + "/" + this.selectedDataset.name + ".zip"
-          ],
-        };
-        iframe.postMessage({ type: `nmr-wrapper:loadURLs`, data }, "*");
+        console.log(JSON.parse(this.selectedDataset.nmrium_info));
+        if (!this.selectedDataset.nmrium_info) {
+          let data = {
+            urls: [
+              this.url +
+                "/download/asc/datasets/" +
+                this.selectedDataset.id +
+                "/" +
+                this.selectedDataset.name +
+                ".zip",
+            ],
+          };
+          iframe.postMessage({ type: `nmr-wrapper:loadURLs`, data }, "*");
+        } else {
+          let data = { spectra: [JSON.parse(this.selectedDataset.nmrium_info)] };
+          iframe.postMessage({ type: `nmr-wrapper:load`, data }, "*");
+        }
+
+        window.addEventListener("message", (e) => {
+          if (e.origin != "https://nmriumdev.nmrxiv.org") {
+            return;
+          }
+          if (e.data.type == "nmr-wrapper:dataChange") {
+            this.selectedSpectraData = e.data.data.data.find(
+              (d) => d.info.type == "NMR Spectrum"
+            );
+            this.currentMolecules = e.data.data.molecules;
+            this.updateDataSet();
+          }
+        });
       }
+    },
+    updateDataSet() {
+      axios
+        .post("/dashboard/datasets/" + this.selectedDataset.id + "/nmriumInfo", {
+          spectra: this.selectedSpectraData,
+          molecules: this.currentMolecules,
+        })
+        .then((response) => {});
     },
     loadFiles() {
       axios
@@ -676,6 +1444,15 @@ export default {
       this.createDatasetDialog = !this.createDatasetDialog;
       this.createDatasetForm.clearErrors();
     },
+    selectTab(tab) {
+      this.tabs.forEach((t) => {
+        if (t.name == tab.name) {
+          t.current = true;
+        } else {
+          t.current = false;
+        }
+      });
+    },
   },
   computed: {
     currentStep() {
@@ -686,8 +1463,11 @@ export default {
     },
     nmriumURL() {
       return this.$page.props.nmriumURL
-        ? String(this.$page.props.nmriumURL)
-        : "http://nmriumdev.nmrxiv.org";
+        ? String(this.$page.props.nmriumURL + "?workspace=embedded")
+        : "http://nmriumdev.nmrxiv.org?workspace=embedded";
+    },
+    currentTab() {
+      return this.tabs.find((t) => t.current);
     },
   },
 };
