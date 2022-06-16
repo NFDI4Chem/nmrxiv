@@ -25,6 +25,7 @@ return new class extends Migration
             $table->string('location')->nullable();
             $table->string('url', 2048)->nullable();
             $table->longText('description')->nullable();
+            $table->json('nmrium_info')->nullable();
             $table->integer('sort_order')->default('1');
             $table->string('type')->nullable();
             $table->uuid('uuid')->unique();

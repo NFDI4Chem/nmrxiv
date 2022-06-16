@@ -107,6 +107,13 @@ class StudyController extends Controller
         ]);
     }
 
+    public function files(Request $request, Study $study)
+    {
+
+        
+        
+    }
+
     public function file(Request $request, $code, Study $study, $filename)
     {
         $file = FileSystemObject::with('project', 'study')
@@ -140,7 +147,6 @@ class StudyController extends Controller
             ];
             return Response::make($data, 200, $headers);
         }
-
         return Response::make(null, 404);
     }
 

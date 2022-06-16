@@ -29,6 +29,7 @@ class DraftController extends Controller
 
         $drafts = Draft::whereHas('files')
             ->Where('owner_id', $user_id)
+            ->orderBy('updated_at', 'DESC')
             ->get();
 
         $defaultDraft = Draft::doesntHave('files')
@@ -45,8 +46,8 @@ class DraftController extends Controller
             );
 
             $defaultDraft = Draft::create([
-                'name' => $id,
-                'slug' => Str::slug($id),
+                'name' => "Untitled Project",
+                'slug' => Str::slug('"Untitled Project"'),
                 'description' => '',
                 'relative_url' => rtrim(
                     preg_replace('~//+~', '/', '/' . $id),
@@ -92,6 +93,12 @@ class DraftController extends Controller
             ->orderBy('type')
             ->get();
 
+        // Update title and description of the draft and project
+
+        $draft->name = $request->get('name');
+        $draft->description = $request->get('description');
+        $draft->save();
+
         $this->processFolder($draftFolders);
 
         $user = Auth::user();
@@ -126,6 +133,10 @@ class DraftController extends Controller
                 $project->users()->attach(
                     $user, ['role' => 'creator']
                 );
+            }else{
+                $project->name = $draft->name;
+                $project->description = $draft->description;
+                $project->save();
             }
 
             // get all the folders with mode_type study
@@ -207,17 +218,6 @@ class DraftController extends Controller
                 'studies' => $project->studies->load('datasets'),
             ]);
         });
-        // move files to the corresponding new location
-        // molecular association and other nmrium operation needs to be tracked with the dataset
-        
-        // gather any other meta data
-            // extract from nmrium
-            // user input
-
-        // confirm success
-            // delete draft
-            // tidy up folders
-
     }
 
     public function annotate(Request $request, Draft $draft)
