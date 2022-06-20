@@ -360,13 +360,12 @@
                   <div class="mx-auto flex flex-col md:px-4 xl:px-0">
                     <main class="flex-1">
                       <div class="relative mx-auto md:px-4 xl:px-0">
-                        <div class="pt-10 pb-16">
+                        <div class="pt-5 pb-16">
                           <div class="px-4 sm:px-6">
                             <h1 class="text-3xl font-extrabold text-gray-900">
                               {{ selectedStudy.name }}
                             </h1>
                           </div>
-
                           <div class="lg:hidden px-4 sm:px-6">
                             <label for="selected-tab" class="sr-only">Select a tab</label>
                             <select
@@ -881,8 +880,151 @@
                           </div>
                           <div
                             v-if="currentTab.name == 'Chemical Composition'"
-                            class="px-4 sm:px-6 md:px-0"
+                            class="px-4 sm:px-6"
                           >
+                            <div class="py-4 max-w-7xl mx-auto">
+                              <div
+                                class="pb-3 border-b border-gray-200 sm:flex sm:items-center sm:justify-between"
+                              >
+                                <h3 class="text-lg leading-6 font-medium text-gray-900">
+                                  Structures
+                                </h3>
+                                <!-- <div class="mt-3 sm:mt-0 sm:ml-4">
+                                  <button
+                                    type="button"
+                                    class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                  >
+                                    Add new
+                                  </button>
+                                </div> -->
+                              </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2">
+                              <div class="pr-2">
+                                <div class="flow-root">
+                                  <ul role="list" class="-mb-8">
+                                    <li v-for="molecule in selectedStudy.sample.molecules" :key="molecule.STANDARD_INCHI">
+                                      <div class="relative pb-8">
+                                        <span
+                                          class="absolute top-5 left-5 -ml-px h-full w-0.5 bg-gray-200"
+                                          aria-hidden="true"
+                                        ></span>
+                                        <div class="relative flex items-start space-x-3">
+                                          <div class="relative">
+                                            <img
+                                              class="h-10 w-10 rounded-full bg-gray-400 flex items-center justify-center ring-8 ring-white"
+                                              :src="'https://ui-avatars.com/api/?name='+molecule.pivot.percentage_composition+'%2BUser&color=7F9CF5&background=EBF4FF'"
+                                              alt=""
+                                            />
+                                            <!-- <span
+                                              class="absolute -bottom-0.5 -right-1 bg-white rounded-tl px-0.5 py-px"
+                                            >
+                                              <svg
+                                                class="h-5 w-5 text-gray-400"
+                                                x-description="Heroicon name: solid/chat-alt"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                viewBox="0 0 20 20"
+                                                fill="currentColor"
+                                                aria-hidden="true"
+                                              >
+                                                <path
+                                                  fill-rule="evenodd"
+                                                  d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zM7 8H5v2h2V8zm2 0h2v2H9V8zm6 0h-2v2h2V8z"
+                                                  clip-rule="evenodd"
+                                                ></path>
+                                              </svg>
+                                            </span> -->
+                                          </div>
+                                          <div class="min-w-0 flex-1">
+                                            <div>
+                                              <div class="text-sm">
+                                                <a
+                                                  href="#"
+                                                  class="font-medium text-gray-900"
+                                                  >{{ molecule.STANDARD_INCHI }}</a
+                                                >
+                                              </div>
+                                              <!-- <p class="mt-0.5 text-sm text-gray-500">
+                                                Commented 6d ago
+                                              </p> -->
+                                            </div>
+                                            <div class="mt-2 text-sm text-gray-700">
+                                              <div
+                                                  class="rounded-md border my-3 flex justify-center items-center"
+                                                >
+                                                  <span v-html="getSVGString(molecule)"></span>
+                                                </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </li>
+
+
+                                  </ul>
+                                </div>
+                              </div>
+                              <div class="pl-2">
+                                <div class="sm:col-span-4">
+                                  <label
+                                    for="email"
+                                    class="block text-sm font-medium text-gray-700"
+                                  >
+                                    SMILES
+                                  </label>
+                                  <div class="mt-1 mb-2">
+                                    <input
+                                      @blur="loadSmiles"
+                                      id="smiles"
+                                      name="smiles"
+                                      v-model="smiles"
+                                      type="text"
+                                      class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                                    />
+                                  </div>
+                                </div>
+                                <div class="relative">
+                                  <div
+                                    class="absolute inset-0 flex items-center"
+                                    aria-hidden="true"
+                                  >
+                                    <div class="w-full border-t border-gray-300" />
+                                  </div>
+                                  <div class="relative flex justify-center">
+                                    <span class="px-2 bg-white text-sm text-gray-500">
+                                      Or
+                                    </span>
+                                  </div>
+                                </div>
+                                <div
+                                  class="w-full border my-4 rounded-md"
+                                  style="height: 400px"
+                                  id="structureSearchEditor"
+                                />
+                                <div class="mt-1 mb-6">
+                                  <label
+                                    for="email"
+                                    class="block text-sm font-medium text-gray-700"
+                                  >
+                                    Percentage composition ({{ percentage }}%)
+                                  </label>
+                                  <slider
+                                    :height="10"
+                                    v-model="percentage"
+                                    color="#F00"
+                                    track-color="#000"
+                                  />
+                                </div>
+                                <button
+                                  @click="saveMolecule"
+                                  type="button"
+                                  class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                >
+                                  SAVE
+                                </button>
+                              </div>
+                            </div>
                             <div v-if="selectedStudy">
                               <div
                                 v-if="
@@ -893,7 +1035,7 @@
                                 <template>
                                   <button
                                     type="button"
-                                    class="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                    class="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                                   >
                                     <svg
                                       class="mx-auto h-12 w-12 text-gray-400"
@@ -1027,7 +1169,7 @@
               ></iframe>
             </div> -->
           </div>
-          <div v-if="currentStep.id == '03'">h</div>
+          <div v-if="currentStep.id == '03'">Successful</div>
         </div>
       </div>
       <div v-else>
@@ -1114,7 +1256,6 @@
     </template>
   </jet-dialog-modal>
 </template>
-
 <script>
 import { Dropzone } from "dropzone";
 import JetDialogModal from "@/Jetstream/DialogModal.vue";
@@ -1130,9 +1271,10 @@ import { Switch, SwitchDescription, SwitchGroup, SwitchLabel } from "@headlessui
 import { inject } from "vue";
 import { CheckIcon } from "@heroicons/vue/solid";
 import axiosRetry from "axios-retry";
-
+import OCL from "openchemlib/full";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import { ChevronLeftIcon, ChevronRightIcon, ChevronDownIcon } from "@heroicons/vue/solid";
+import slider from "vue3-slider";
 
 export default {
   components: {
@@ -1163,6 +1305,7 @@ export default {
     ChevronLeftIcon,
     ChevronRightIcon,
     JetInputError,
+    slider,
   },
 
   mounted() {
@@ -1188,6 +1331,9 @@ export default {
       studies: null,
       progress: 0,
       file: null,
+      editor: null,
+      percentage: 1,
+      smiles: "",
       createDatasetForm: this.$inertia.form({
         _method: "POST",
         name: "",
@@ -1236,6 +1382,10 @@ export default {
   props: [],
 
   methods: {
+    getSVGString(molecule){
+      let mol = OCL.Molecule.fromMolfile( "\n  " + molecule.MOL.replaceAll('"', ''));
+      return mol.toSVG(200, 200);
+    },
     loadDropZone() {
       this.$nextTick(() => {
         const vm = this;
@@ -1369,7 +1519,6 @@ export default {
     loadSpectra() {
       const iframe = window.frames.submissionNMRiumIframe;
       if (iframe) {
-        console.log(JSON.parse(this.selectedDataset.nmrium_info));
         if (!this.selectedDataset.nmrium_info) {
           let data = {
             urls: [
@@ -1448,10 +1597,45 @@ export default {
       this.tabs.forEach((t) => {
         if (t.name == tab.name) {
           t.current = true;
+          this.$nextTick(() => {
+            this.editor = OCL.StructureEditor.createSVGEditor("structureSearchEditor", 1);
+          });
         } else {
           t.current = false;
         }
       });
+    },
+    loadSmiles() {
+      if (this.smiles && this.smiles != "") {
+        this.editor.setSmiles(this.smiles);
+      }
+    },
+    saveMolecule() {
+      let mol = this.editor.getMolFile()
+      axios
+        .post(
+          "https://www.cheminfo.org/webservices/inchi",
+          "molfile=" + mol
+        )
+        .then((response) => {
+          let InChI = response.data.output.InChI
+          let InChIKey = response.data.output.InChIKey
+          let MF = this.editor.getMolecule().getMolecularFormula().formula;
+          axios
+          .post(
+            "/dashboard/studies/" + this.selectedStudy.id + "/molecule", {
+              InChI: InChI,
+              InChIKey: InChIKey,
+              percentage: this.percentage,
+              formula: MF,
+              mol: mol
+            }
+          )
+          .then((res) => {
+            this.smiles = ''
+            this.editor.setSmiles("")
+          });
+        });
     },
   },
   computed: {

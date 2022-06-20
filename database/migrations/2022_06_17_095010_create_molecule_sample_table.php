@@ -13,12 +13,12 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('molecule_study', function (Blueprint $table) {
+        Schema::create('molecule_sample', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('study_id');
+            $table->foreignId('sample_id');
             $table->foreignId('molecule_id');
             $table->string('percentage_composition')->nullable();
-            $table->unique(['study_id', 'molecule_id']);
+            $table->unique(['sample_id', 'molecule_id']);
             $table->timestamps();
         });
     }
@@ -30,6 +30,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('molecule_study');
+        Schema::dropIfExists('molecule_sample');
     }
 };

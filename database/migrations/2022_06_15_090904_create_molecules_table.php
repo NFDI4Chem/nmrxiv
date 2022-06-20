@@ -16,13 +16,13 @@ return new class extends Migration
         Schema::create('molecules', function (Blueprint $table) {
             $table->id();
             $table->longText('CAS_NUMBER')->nullable();
-            $table->longText('FORMULA')->unique();
+            $table->longText('FORMULA');
             $table->float('MOLECULAR_WEIGHT')->nullable();
             $table->longText('SMILES')->nullable();
             $table->longText('SMILES_CHIRAL')->nullable();
             $table->longText('CANONICAL_SMILES')->nullable();
             $table->longText('INCHI')->nullable();
-            $table->longText('STANDARD_INCHI')->nullable();
+            $table->longText('STANDARD_INCHI')->unique();
             $table->longText('INCHI_KEY')->nullable();
             $table->longText('STANDARD_INCHI_KEY')->nullable();
             $table->bigInteger('fp0')->nullable();
@@ -45,7 +45,7 @@ return new class extends Migration
             $table->integer('SSSR')->nullable();
             $table->integer('SAR')->nullable();
             $table->json('COMMENT')->nullable();
-            $table->binary('fORMULA')->nullable();
+            $table->longText('MOL')->nullable();
             $table->integer('MULTIPLICITY_0')->nullable();
             $table->integer('MULTIPLICITY_1')->nullable();
             $table->integer('MULTIPLICITY_2')->nullable();
