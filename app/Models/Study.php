@@ -80,11 +80,6 @@ class Study extends Model implements Auditable
         return $this->hasMany(StudyInvitation::class);
     }
 
-    public function molecules()
-    {
-        return $this->belongsToMany(Molecule::class);
-    }
-
     /**
      * Get the user study role
      *
@@ -113,11 +108,6 @@ class Study extends Model implements Auditable
     public function datasets()
     {
         return $this->hasMany(Dataset::class);
-    }
-
-    public function molecules()
-    {
-        return $this->hasMany(Molecule::class);
     }
 
     /**
@@ -164,6 +154,22 @@ class Study extends Model implements Auditable
         return $this->allUsers()->contains(function ($user) use ($email) {
             return $user->email === $email;
         });
+    }
+
+    /**
+     * Get the sample associated with the study.
+     */
+    public function sample()
+    {
+        return $this->hasOne(Sample::class, 'study_id');
+    }
+
+    /**
+     * Get all of the deployments for the project.
+     */
+    public function molecules()
+    {
+        return $this->sample()->molecules();
     }
 
     /**

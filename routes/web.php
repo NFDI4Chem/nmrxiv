@@ -126,6 +126,9 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
         Route::delete('/studies/{study}/members/{user}', [StudyMemberController::class, 'removeMember'])
             ->name('study-members.destroy');
 
+        Route::post('studies/{study}/molecule', [StudyController::class, 'moleculeStore'])
+            ->name('study-molecule.store');
+
         Route::get('/study-invitations/{invitation}', [StudyInvitationController::class, 'acceptInvitation'])
             ->middleware(['signed'])
             ->name('study-invitations.accept');

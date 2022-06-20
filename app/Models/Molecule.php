@@ -46,11 +46,14 @@ class Molecule extends Model
         'MULTIPLICITY_2',
         'MULTIPLICITY_3',
         'VIEWS',
-        'DOI'
+        'DOI',
+        'MOL'
     ];
 
-    public function studies()
+    public function samples()
     {
-        return $this->belongsToMany(Study::class);
+        return $this->belongsToMany(Sample::class)
+                ->withPivot('percentage_composition')
+                ->withTimestamps();
     }
 }

@@ -10,6 +10,7 @@ use App\Models\Draft;
 use App\Models\Project;
 use App\Models\Study;
 use App\Models\Dataset;
+use App\Models\Sample;
 use Auth;
 
 class DraftController extends Controller
@@ -172,6 +173,14 @@ class DraftController extends Controller
                         'project_id'  => $project->id,
                         'fs_id'  => $folder->id
                     ]);
+                    
+                    $sample = Sample::create([
+                        'name' => $study->name . '_sample',
+                        'slug' => Str::slug($study->name . '_sample', '-'),
+                        'study_id' =>  $study->id,
+                        'project_id' => $study->project->id,
+                    ]);
+                    $study->sample()->save($sample);
 
                     $folder->study_id = $study->id;
                     $folder->save();
@@ -212,10 +221,9 @@ class DraftController extends Controller
                     }
                 }
             }
-
             return response()->json([
                 'project' => $project,
-                'studies' => $project->studies->load('datasets'),
+                'studies' => json_decode($project->studies->load(['datasets', 'sample.molecules']))
             ]);
         });
     }
