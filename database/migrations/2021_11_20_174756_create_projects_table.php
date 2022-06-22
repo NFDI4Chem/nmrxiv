@@ -32,8 +32,10 @@ class CreateProjectsTable extends Migration
             $table->enum('access_type', ['viewer', 'commentor', 'editor'])->default('viewer');
             $table->foreignId('team_id')->nullable();
             $table->foreignId('owner_id')->nullable();
+            $table->foreignId('license_id')->nullable();
             $table->string('project_photo_path', 2048)->nullable();
             $table->timestamps();
+            
         });
     }
 

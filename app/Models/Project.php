@@ -200,4 +200,13 @@ class Project extends Model implements Auditable
     {
         return env('APP_URL', null) . '/projects/' . urlencode($this->url);
     }
+    /**
+     * Get the license of the project.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function license()
+    {
+        return $this->belongsTo(License::class, 'license_id');
+    }
 }

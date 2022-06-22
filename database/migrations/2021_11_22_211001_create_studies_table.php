@@ -33,6 +33,7 @@ class CreateStudiesTable extends Migration
             $table->foreignId('team_id')->nullable();
             $table->foreignId('owner_id')->nullable();
             $table->foreignId('project_id')->nullable();
+            $table->foreignId('license_id')->nullable();
             $table->string('study_photo_path', 2048)->nullable();
             $table->timestamps();
         });

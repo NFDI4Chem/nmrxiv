@@ -61,4 +61,13 @@ class Dataset extends Model
     {
         return $this->belongsTo(Team::class, 'Team_id');
     }
+    /**
+     * Get the license of the dataset.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function license()
+    {
+        return $this->belongsTo(License::class, 'license_id');
+    }
 }
