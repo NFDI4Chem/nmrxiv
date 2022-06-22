@@ -904,7 +904,10 @@
                               <div class="pr-2">
                                 <div class="flow-root">
                                   <ul role="list" class="-mb-8">
-                                    <li v-for="molecule in selectedStudy.sample.molecules" :key="molecule.STANDARD_INCHI">
+                                    <li
+                                      v-for="molecule in selectedStudy.sample.molecules"
+                                      :key="molecule.STANDARD_INCHI"
+                                    >
                                       <div class="relative pb-8">
                                         <span
                                           class="absolute top-5 left-5 -ml-px h-full w-0.5 bg-gray-200"
@@ -914,7 +917,11 @@
                                           <div class="relative">
                                             <img
                                               class="h-10 w-10 rounded-full bg-gray-400 flex items-center justify-center ring-8 ring-white"
-                                              :src="'https://ui-avatars.com/api/?name='+molecule.pivot.percentage_composition+'%2BUser&color=7F9CF5&background=EBF4FF'"
+                                              :src="
+                                                'https://ui-avatars.com/api/?name=' +
+                                                molecule.pivot.percentage_composition +
+                                                '%2BUser&color=7F9CF5&background=EBF4FF'
+                                              "
                                               alt=""
                                             />
                                             <!-- <span
@@ -951,17 +958,17 @@
                                             </div>
                                             <div class="mt-2 text-sm text-gray-700">
                                               <div
-                                                  class="rounded-md border my-3 flex justify-center items-center"
-                                                >
-                                                  <span v-html="getSVGString(molecule)"></span>
-                                                </div>
+                                                class="rounded-md border my-3 flex justify-center items-center"
+                                              >
+                                                <span
+                                                  v-html="getSVGString(molecule)"
+                                                ></span>
+                                              </div>
                                             </div>
                                           </div>
                                         </div>
                                       </div>
                                     </li>
-
-
                                   </ul>
                                 </div>
                               </div>
@@ -1310,9 +1317,27 @@ export default {
 
   mounted() {
     const emitter = inject("emitter");
-    emitter.on("openDatasetCreateDialog", () => {
-      this.createDatasetDialog = true;
-      this.fetchDrafts();
+    emitter.on("openDatasetCreateDialog", (data) => {
+      this.fetchDrafts().then((response) => {
+        this.drafts = response.data.drafts;
+        if (data.draft_id) {
+          let selectedDraft = this.drafts.find(d => d.id == data.draft_id)
+          this.selectDraft(selectedDraft);
+          this.loading = false;
+          this.createDatasetDialog = true;
+          this.loadDropZone();
+        } else {
+          this.defaultDraft = response.data.default;
+          this.createDatasetDialog = true;
+          if (this.drafts.length == 0) {
+            this.currentDraft = this.defaultDraft;
+            this.loading = false;
+            this.loadDropZone();
+          } else {
+            this.loading = false;
+          }
+        }
+      });
     });
   },
 
@@ -1382,8 +1407,8 @@ export default {
   props: [],
 
   methods: {
-    getSVGString(molecule){
-      let mol = OCL.Molecule.fromMolfile( "\n  " + molecule.MOL.replaceAll('"', ''));
+    getSVGString(molecule) {
+      let mol = OCL.Molecule.fromMolfile("\n  " + molecule.MOL.replaceAll('"', ""));
       return mol.toSVG(200, 200);
     },
     loadDropZone() {
@@ -1504,17 +1529,7 @@ export default {
     },
     fetchDrafts() {
       this.loading = true;
-      axios.get("/dashboard/drafts").then((response) => {
-        this.drafts = response.data.drafts;
-        this.defaultDraft = response.data.default;
-        if (this.drafts.length == 0) {
-          this.currentDraft = this.defaultDraft;
-          this.loading = false;
-          this.loadDropZone();
-        } else {
-          this.loading = false;
-        }
-      });
+      return axios.get("/dashboard/drafts");
     },
     loadSpectra() {
       const iframe = window.frames.submissionNMRiumIframe;
@@ -1611,30 +1626,25 @@ export default {
       }
     },
     saveMolecule() {
-      let mol = this.editor.getMolFile()
+      let mol = this.editor.getMolFile();
       axios
-        .post(
-          "https://www.cheminfo.org/webservices/inchi",
-          "molfile=" + mol
-        )
+        .post("https://www.cheminfo.org/webservices/inchi", "molfile=" + mol)
         .then((response) => {
-          let InChI = response.data.output.InChI
-          let InChIKey = response.data.output.InChIKey
+          let InChI = response.data.output.InChI;
+          let InChIKey = response.data.output.InChIKey;
           let MF = this.editor.getMolecule().getMolecularFormula().formula;
           axios
-          .post(
-            "/dashboard/studies/" + this.selectedStudy.id + "/molecule", {
+            .post("/dashboard/studies/" + this.selectedStudy.id + "/molecule", {
               InChI: InChI,
               InChIKey: InChIKey,
               percentage: this.percentage,
               formula: MF,
-              mol: mol
-            }
-          )
-          .then((res) => {
-            this.smiles = ''
-            this.editor.setSmiles("")
-          });
+              mol: mol,
+            })
+            .then((res) => {
+              this.smiles = "";
+              this.editor.setSmiles("");
+            });
         });
     },
   },
