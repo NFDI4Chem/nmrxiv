@@ -245,8 +245,7 @@
                     <ToolTip text="To submit data you will need an account with nmrXiv, so you will be redirected to our register page and once registered you can then go ahead and submit data. For more information please checkout our <a href='//docs.nmrxiv.org' class='text-gray-400' target='_blank'>documentation</a>."></ToolTip>
                   </a>
                   <a
-                    target="_blank"
-                    href="//docs.nmrxiv.org"
+                    href="/projects"
                     class="flex items-center justify-center px-4 py-3 border border-1 text-base font-medium rounded-md shadow-sm text-white bg-teal-500 sm:px-8"
                   >
                     Browse data
@@ -731,26 +730,14 @@ import ToolTip from "@/Shared/ToolTip";
 
 const Search = [
   {
-    name: "Inbox",
-    description: "Get a better understanding of where your traffic is coming from.",
+    name: "Browse",
+    description: "Know more about the data deposited in nmrXiv by browsing projects and datasets. You can also learn more about our data schema on our documentation site.",
     href: "#",
     icon: InboxIcon,
   },
   {
-    name: "Messaging",
-    description: "Speak directly to your customers in a more meaningful way.",
-    href: "#",
-    icon: AnnotationIcon,
-  },
-  {
-    name: "Live Chat",
-    description: "Your customers' data will be safe and secure.",
-    href: "#",
-    icon: ChatAlt2Icon,
-  },
-  {
-    name: "Knowledge Base",
-    description: "Connect with third-party tools that you're already using.",
+    name: "Advanced search",
+    description: "Search similar spectra by simple drag and drop of your machine output files or search spectra by structures. Need further guidance or found any missing information. Reach out to us or check out our documentation site.",
     href: "#",
     icon: QuestionMarkCircleIcon,
   },
@@ -833,8 +820,8 @@ const metrics = [
 ];
 const footerNavigation = {
   Search: [
-    { name: "Browse", href: "#" },
-    { name: "Advanced Search", href: "#" },
+    { name: "Browse", href: "/projects" },
+    { name: "Advanced Search", href: "/projects" },
   ],
   support: [
     { name: "Documentation", href: "https://docs.nmrxiv.org" },
@@ -842,14 +829,14 @@ const footerNavigation = {
     { name: "API Status", href: "https://docs.nmrxiv.org/docs/developer-guides/API" },
   ],
   About: [
-    { name: "Adivsory Board", href: "#" },
-    { name: "Metrics", href: "#" },
-    { name: "Blog", href: "#" },
-    { name: "Press", href: "#" },
+    { name: "Adivsory Board", href: "https://docs.nmrxiv.org/docs/contributing/contributors-and-steering-committee" },
+    // { name: "Metrics", href: "#" },
+    // { name: "Blog", href: "#" },
+    // { name: "Press", href: "#" },
   ],
   legal: [
-    { name: "Privacy", href: "#" },
-    { name: "Terms", href: "#" },
+    { name: "Privacy", href: "/privacy-policy" },
+    { name: "Terms", href: "/terms-of-service" },
   ],
   social: [
     // {
