@@ -34,7 +34,7 @@ return new class extends Migration
             $table->foreignId('owner_id')->nullable();
             $table->foreignId('project_id')->nullable();
             $table->foreignId('study_id')->nullable();
-            $table->string('license')->nullable();
+            $table->foreignId('license_id')->nullable();
             $table->string('dataset_photo_path', 2048)->nullable();
             $table->timestamps();
         });

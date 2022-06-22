@@ -151,4 +151,13 @@ class Study extends Model implements Auditable
             ->withTimestamps()
             ->as('studyMembership');
     }
+    /**
+     * Get the license of the study.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function license()
+    {
+        return $this->belongsTo(License::class, 'license_id');
+    }
 }
