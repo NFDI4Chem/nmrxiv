@@ -88,7 +88,9 @@
         <div class="flex-1 flex flex-col min-h-0 overflow-y-auto">
           <div class="flex-1">
             <div class="bg-white border-b pb-4 pt-4 flex flex-shrink-0 px-4">
-              <jet-application-mark class="block h-8 p-0.5 ml-1.5 w-auto" />
+              <Link :href="route('welcome')">
+                <jet-application-mark class="block h-8 p-0.5 ml-1.5 w-auto" />
+              </Link>
             </div>
             <div class="px-4 flex flex-col mt-3 mb-1">
               <create mode="icon"></create>
@@ -128,7 +130,7 @@
         >
           <MenuIcon class="h-6 w-6" aria-hidden="true" />
         </button> -->
-          <Link class="ml-2" :href="route('dashboard')">
+          <Link class="ml-2" :href="route('welcome')">
             <jet-application-logo class="block h-10 w-auto" />
           </Link>
         </div>

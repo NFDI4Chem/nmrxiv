@@ -17,6 +17,7 @@ use App\Http\Controllers\DraftController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Project;
 use Inertia\Inertia;
 
@@ -30,13 +31,17 @@ Route::group([
 });
 
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
-});
+    if (Auth::check()) {
+        return redirect()->route('dashboard');
+    }else{
+        return Inertia::render('Welcome', [
+            'canLogin' => Route::has('login'),
+            'canRegister' => Route::has('register'),
+            'laravelVersion' => Application::VERSION,
+            'phpVersion' => PHP_VERSION,
+        ]);
+    }
+})->name('welcome');
 
 Route::supportBubble();
 
