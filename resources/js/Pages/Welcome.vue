@@ -217,21 +217,21 @@
           </Popover>
         </header>
         <div class="mx-auto sm:px-6 lg:px-8">
-          <div class="relative sm:rounded-2xl sm:overflow-hidden">
+          <div class="relative sm:rounded-2xl">
             <div class="relative px-4 py-8 sm:px-6 sm:py-12 lg:py-12 lg:px-8">
               <h1
                 class="text-center text-2xl font-extrabold tracking-tight sm:text-5xl lg:text-4xl"
               >
-                <span class="block text-dark">Open, FAIR and Consensus driven</span>
+                <span class="block text-dark">Open, FAIR and Consensus-Driven</span>
                 <span class="block text-teal-200"
-                  >NMR Spectroscopy data repository and analysis platform.</span
+                  >NMR spectroscopy data repository and analysis platform.</span
                 >
               </h1>
               <p
                 class="mt-6 max-w-lg mx-auto text-center text-xl text-dark-200 sm:max-w-3xl"
               >
                 We archive raw and processed NMR data, providing support for browsing,
-                searching, analyzing and disseminating data worldwide.
+                searching, analyzing, and disseminating data worldwide.
               </p>
               <div class="mt-10 max-w-sm mx-auto sm:max-w-none sm:flex sm:justify-center">
                 <div
@@ -242,13 +242,14 @@
                     class="flex items-center justify-center px-4 py-3 border border-1 text-base font-medium rounded-md shadow-sm text-teal-700 bg-white hover:bg-teal-50 sm:px-8"
                   >
                     Submit data
+                    <ToolTip text="To submit data you will need an account with nmrXiv, so you will be redirected to our register page and once registered you can then go ahead and submit data. For more information please checkout our <a href='//docs.nmrxiv.org' class='text-gray-400' target='_blank'>documentation</a>."></ToolTip>
                   </a>
                   <a
                     target="_blank"
                     href="//docs.nmrxiv.org"
                     class="flex items-center justify-center px-4 py-3 border border-1 text-base font-medium rounded-md shadow-sm text-white bg-teal-500 sm:px-8"
                   >
-                    Learn more
+                    Browse data
                   </a>
                 </div>
               </div>
@@ -310,7 +311,7 @@
       </div>
 
       <!-- Alternating Feature Sections -->
-      <div class="relative pt-16 pb-32 overflow-hidden">
+      <div class="relative pt-16 pb-32">
         <div>
           <div
             class="lg:mx-auto lg:max-w-7xl lg:px-8 lg:grid lg:grid-cols-2 lg:grid-flow-col-dense lg:gap-24"
@@ -331,15 +332,14 @@
                     Submit spectral data to us
                   </h2>
                   <p class="mt-4 text-lg text-gray-500">
-                    Semper curabitur ullamcorper posuere nunc sed. Ornare iaculis bibendum
-                    malesuada faucibus lacinia porttitor.
+                    nmrXiv offers you ready to use NMR data management platform to host your raw instrument data and processed files for free and also provides you with tools and services to analyse data. Added to that get expert opinion and support for any of your NMR spectra related queries from the community or provide one yourself. 
                   </p>
                   <div class="mt-6">
                     <a
-                      href="#"
+                      href="/"
                       class="inline-flex bg-gradient-to-r from-indigo-600 to-teal-600 bg-origin-border px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white hover:from-indigo-700 hover:to-teal-700"
                     >
-                      Submit data
+                      Get started
                     </a>
                   </div>
                 </div>
@@ -352,7 +352,7 @@
                 <img
                   class="w-full rounded-xl shadow-xl ring-1 ring-black ring-opacity-5 lg:absolute lg:left-0 lg:h-full lg:w-auto lg:max-w-none"
                   src="/img/s1.png"
-                  alt="Inbox user interface"
+                  alt=""
                 />
               </div>
             </div>
@@ -378,17 +378,14 @@
                     Develop tools with our API
                   </h2>
                   <p class="mt-4 text-lg text-gray-500">
-                    Semper curabitur ullamcorper posuere nunc sed. Ornare iaculis bibendum
-                    malesuada faucibus lacinia porttitor. Pulvinar laoreet sagittis
-                    viverra duis. In venenatis sem arcu pretium pharetra at. Lectus
-                    viverra dui tellus ornare pharetra.
+                    With our stable core platform, software programmers and data scientists can leverage our API to develop additional advanced tools/software utilising the data and rich metadata descriptions.
                   </p>
                   <div class="mt-6">
                     <a
                       href="#"
                       class="inline-flex bg-gradient-to-r from-indigo-600 to-teal-600 bg-origin-border px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white hover:from-indigo-700 hover:to-teal-700"
                     >
-                      Submit data
+                      API Documentation
                     </a>
                   </div>
                 </div>
@@ -400,8 +397,8 @@
               >
                 <img
                   class="w-full rounded-xl shadow-xl ring-1 ring-black ring-opacity-5 lg:absolute lg:right-0 lg:h-full lg:w-auto lg:max-w-none"
-                  src="/img/s1.png"
-                  alt="Customer profile user interface"
+                  src="https://docs.nmrxiv.org/img/postman.png"
+                  alt=""
                 />
               </div>
             </div>
@@ -427,15 +424,20 @@
                     Review and analyse the spectral assignments
                   </h2>
                   <p class="mt-4 text-lg text-gray-500">
-                    Semper curabitur ullamcorper posuere nunc sed. Ornare iaculis bibendum
-                    malesuada faucibus lacinia porttitor.
+                    Data deposited in nmrXiv requires original machine output files. With this original data, researchers can annotate missing assignments in the spectra and also reanalyse previous work to offer additional help. In a way sharing the knowledge and expertise to the next generation of spectroscopic analysts.
                   </p>
                   <div class="mt-6">
                     <a
                       href="#"
                       class="inline-flex bg-gradient-to-r from-indigo-600 to-teal-600 bg-origin-border px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white hover:from-indigo-700 hover:to-teal-700"
                     >
-                      Submit data
+                      Need help with structure ellucidation?
+                    </a><br/>
+                    <a
+                      href="#"
+                      class="inline-flex bg-gradient-to-r from-indigo-600 to-teal-600 bg-origin-border px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white hover:from-indigo-700 hover:to-teal-700 mt-4"
+                    >
+                      Check out active challenges
                     </a>
                   </div>
                 </div>
@@ -448,7 +450,7 @@
                 <img
                   class="w-full rounded-xl shadow-xl ring-1 ring-black ring-opacity-5 lg:absolute lg:left-0 lg:h-full lg:w-auto lg:max-w-none"
                   src="/img/s1.png"
-                  alt="Inbox user interface"
+                  alt=""
                 />
               </div>
             </div>
@@ -464,10 +466,10 @@
           <h2 class="text-3xl font-extrabold text-white tracking-tight">
             Built to be FAIR from ground up
           </h2>
-          <p class="mt-4 max-w-3xl text-lg text-indigo-200">
+          <!-- <p class="mt-4 max-w-3xl text-lg text-indigo-200">
             Ac tincidunt sapien vehicula erat auctor pellentesque rhoncus. Et magna sit
             morbi lobortis. Blandit aliquam sit nisl euismod mattis in.
-          </p>
+          </p> -->
           <div
             class="mt-12 grid grid-cols-1 gap-x-6 gap-y-12 sm:grid-cols-2 lg:mt-16 lg:grid-cols-4 lg:gap-x-8 lg:gap-y-16"
           >
@@ -522,14 +524,15 @@
               >
             </h2>
             <p class="mt-3 text-3xl font-extrabold text-white">
-              Get actionable data that will help develop new and accurate tools using state of the art AI/ML models.
+              Get actionable data that will help develop new and accurate tools using
+              state of the art AI/ML models.
             </p>
-            <p class="mt-5 text-lg text-gray-300">
+            <!-- <p class="mt-5 text-lg text-gray-300">
               Rhoncus sagittis risus arcu erat lectus bibendum. Ut in adipiscing quis in
               viverra tristique sem. Ornare feugiat viverra eleifend fusce orci in quis
               amet. Sit in et vitae tortor, massa. Dapibus laoreet amet lacus nibh integer
               quis. Eu vulputate diam sit tellus quis at.
-            </p>
+            </p> -->
             <div class="mt-12 grid grid-cols-1 gap-y-12 gap-x-6 sm:grid-cols-2">
               <p v-for="item in metrics" :key="item.id">
                 <span class="block text-2xl font-bold text-white">{{ item.stat }}</span>
@@ -557,14 +560,14 @@
           </h2>
           <div class="mt-6 space-y-4 sm:space-y-0 sm:flex sm:space-x-5">
             <a
-              href="#"
+              href="//docs.nmrxiv.org"
               class="flex items-center justify-center bg-gradient-to-r from-indigo-600 to-teal-600 bg-origin-border px-4 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white hover:from-indigo-700 hover:to-teal-700"
             >
               Learn more
             </a>
             <a
-              href="#"
-              class="flex items-center justify-center px-4 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-teal-800 bg-teal-50 hover:bg-teal-100"
+              href="/login"
+              class="flex items-center justify-center px-4 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-teal-800 bg-teal-50 hover:text-gray-900 hover:bg-teal-100"
             >
               Submit data
             </a>
@@ -645,12 +648,10 @@
           </div>
           <div class="mt-12 xl:mt-0">
             <jet-application-logo class="block h-10 p-0.5 ml-1.5 w-auto" />
-            <h3 class="text-sm font-semibold text-gray-400 tracking-wider uppercase">
-              
-            </h3>
-            <p class="mt-4 text-base text-gray-500">
+            <h3 class="text-sm font-semibold text-gray-400 tracking-wider uppercase"></h3>
+            <!-- <p class="mt-4 text-base text-gray-500">
               The latest news, articles, and resources, sent to your inbox weekly.
-            </p>
+            </p> -->
           </div>
           <!-- <div class="mt-12 xl:mt-0">
             <h3 class="text-sm font-semibold text-gray-400 tracking-wider uppercase">
@@ -726,6 +727,7 @@ import {
   XIcon,
 } from "@heroicons/vue/outline";
 import { ChevronDownIcon } from "@heroicons/vue/solid";
+import ToolTip from "@/Shared/ToolTip";
 
 const Search = [
   {
@@ -757,49 +759,49 @@ const features = [
   {
     name: "Advanced search",
     description:
-      "Ac tincidunt sapien vehicula erat auctor pellentesque rhoncus. Et magna sit morbi lobortis.",
+      "",
     icon: InboxIcon,
   },
   {
     name: "Open Source",
     description:
-      "Ac tincidunt sapien vehicula erat auctor pellentesque rhoncus. Et magna sit morbi lobortis.",
+      "",
     icon: UsersIcon,
   },
   {
     name: "Auto Assignments",
     description:
-      "Ac tincidunt sapien vehicula erat auctor pellentesque rhoncus. Et magna sit morbi lobortis.",
+      "",
     icon: TrashIcon,
   },
   {
     name: "Prediction",
     description:
-      "Ac tincidunt sapien vehicula erat auctor pellentesque rhoncus. Et magna sit morbi lobortis.",
+      "",
     icon: PencilAltIcon,
   },
   {
     name: "Schemas and MIChI",
     description:
-      "Ac tincidunt sapien vehicula erat auctor pellentesque rhoncus. Et magna sit morbi lobortis.",
+      "",
     icon: DocumentReportIcon,
   },
   {
     name: "Community challenges",
     description:
-      "Ac tincidunt sapien vehicula erat auctor pellentesque rhoncus. Et magna sit morbi lobortis.",
+      "",
     icon: ReplyIcon,
   },
   {
     name: "Docs & API",
     description:
-      "Ac tincidunt sapien vehicula erat auctor pellentesque rhoncus. Et magna sit morbi lobortis.",
+      "",
     icon: ChatAltIcon,
   },
   {
     name: "Backups",
     description:
-      "Ac tincidunt sapien vehicula erat auctor pellentesque rhoncus. Et magna sit morbi lobortis.",
+      "",
     icon: HeartIcon,
   },
 ];
@@ -807,22 +809,27 @@ const metrics = [
   {
     id: 1,
     stat: "XXXXX Spectra Datasets",
-    emphasis: "Companies",
-    rest: "use laoreet amet lacus nibh integer quis.",
+    emphasis: "",
+    rest: "",
   },
   {
     id: 2,
-    stat: "XX Techniques",
-    emphasis: "Countries around the globe",
-    rest: "lacus nibh integer quis.",
+    stat: "XX Techniques Covered",
+    emphasis: "",
+    rest: "",
   },
   {
     id: 3,
-    stat: "XX Challenges",
-    emphasis: "Customer satisfaction",
-    rest: "laoreet amet lacus nibh integer quis.",
+    stat: "XX Active Challenges",
+    emphasis: "",
+    rest: "",
   },
-  { id: 4, stat: "XXXX Users", emphasis: "Issues resolved", rest: "lacus nibh integer quis." },
+  {
+    id: 4,
+    stat: "XXXX Users",
+    emphasis: "",
+    rest: "",
+  },
 ];
 const footerNavigation = {
   Search: [
@@ -831,14 +838,14 @@ const footerNavigation = {
   ],
   support: [
     { name: "Documentation", href: "https://docs.nmrxiv.org" },
-    { name: "Guides", href: "https://docs.nmrxiv.org" },
-    { name: "API Status", href: "https://docs.nmrxiv.org" },
+    { name: "Guides", href: "https://docs.nmrxiv.org/docs/submission-guides/overview" },
+    { name: "API Status", href: "https://docs.nmrxiv.org/docs/developer-guides/API" },
   ],
   About: [
     { name: "Adivsory Board", href: "#" },
     { name: "Metrics", href: "#" },
     { name: "Blog", href: "#" },
-    { name: "Press", href: "#" }
+    { name: "Press", href: "#" },
   ],
   legal: [
     { name: "Privacy", href: "#" },
@@ -945,6 +952,7 @@ export default {
     PopoverGroup,
     PopoverPanel,
     ChevronDownIcon,
+    ToolTip
   },
 
   setup() {
