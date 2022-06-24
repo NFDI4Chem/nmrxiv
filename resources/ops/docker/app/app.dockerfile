@@ -10,6 +10,7 @@ RUN docker-php-ext-install sockets
 #RUN docker-php-ext-install pdo_mysql
 RUN pecl install apcu
 RUN docker-php-ext-enable apcu
+RUN docker-php-ext-install pcntl
 
 RUN set -ex \
   && apk --no-cache add \
