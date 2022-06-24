@@ -11,8 +11,11 @@ use App\Actions\Study\CreateNewStudy;
 use App\Actions\Study\UpdateStudy;
 use Laravel\Jetstream\Jetstream;
 use App\Models\FileSystemObject;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\Study;
+use App\Models\Sample;
+use App\Models\Molecule;
 use Inertia\Inertia;
 use Auth;
 
@@ -71,6 +74,33 @@ class StudyController extends Controller
             'study' => $study,
             'project' => $study->project,
         ]);
+    }
+
+    public function moleculeStore(Request $request, Study $study){
+        $sample = $study->sample;
+        if(!$sample){
+            $sample = Sample::create([
+                'name' => $study->name . '_sample',
+                'slug' => Str::slug($study->name . '_sample', '-'),
+                'study_id' =>  $study->id,
+                'project_id' => $study->project->id,
+            ]);
+            $study->sample()->save($sample);
+        }
+        $inchi = $request->get('InChI');
+        $molecule = $sample->molecules->where('STANDARD_INCHI', $inchi)->first();
+        if(is_null($molecule)){
+            $molecule = Molecule::firstOrCreate([
+                'STANDARD_INCHI' => $inchi,
+            ],[
+                'FORMULA' => $request->get('formula'),
+                'INCHI_KEY' => $request->get('InChIKey'),
+                'MOL' => $request->get('mol')
+            ]);
+            $sample->molecules()->syncWithPivotValues([$molecule->id], ['percentage_composition' => $request->get('percentage')], false);
+        }
+        $sample = $sample->fresh(); 
+        return $sample->molecules;
     }
 
     public function files(Request $request, Study $study)
@@ -140,7 +170,6 @@ class StudyController extends Controller
             ];
             return Response::make($data, 200, $headers);
         }
-
         return Response::make(null, 404);
     }
 
