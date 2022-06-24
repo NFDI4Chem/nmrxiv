@@ -4,6 +4,7 @@ namespace App\Actions\Study;
 
 use App\Models\Team;
 use App\Models\User;
+use App\Models\Sample;
 use App\Models\Study;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -45,6 +46,15 @@ class CreateNewStudy
                 'is_public'  => $input['is_public'],
                 'study_photo_path' => array_key_exists('study_photo_path', $input) ? $input['study_photo_path'] : null,
             ]), function (Study $study) use ($input) {
+
+                $sample = Sample::create([
+                    'name' => $study->name . '_sample',
+                    'slug' => Str::slug($study->name . '_sample', '-'),
+                    'study_id' =>  $study->id,
+                    'project_id' => $study->project->id,
+                ]);
+                $study->sample()->save($sample);
+
                 $user = User::find($input['owner_id']);
                 if(!is_null($user)){
                     $study->users()->attach(

@@ -60,6 +60,14 @@
  * @license BSD-3-Clause
 */
 
+/**
+ * openchemlib - Manipulate molecules
+ * @version v7.4.3
+ * @date 2021-10-02T06:09:41.911Z
+ * @link https://github.com/cheminfo/openchemlib-js
+ * @license BSD-3-Clause
+*/
+
 /**!
    * @fileOverview Kickass library to create and place poppers near their reference elements.
    * @version 1.16.1
