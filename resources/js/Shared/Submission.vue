@@ -1213,8 +1213,30 @@
           class="ml-2"
           @click="process"
           :class="{ 'opacity-25': createDatasetForm.processing }"
-          :disabled="createDatasetForm.processing"
+          :disabled="createDatasetForm.processing || loading"
         >
+          <span v-if="loadingStep">
+            <svg
+              class="animate-spin -ml-1 mr-3 h-2 w-2 text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+          </span>
           Proceed
         </jet-button>
       </span>
@@ -1321,7 +1343,7 @@ export default {
       this.fetchDrafts().then((response) => {
         this.drafts = response.data.drafts;
         if (data.draft_id) {
-          let selectedDraft = this.drafts.find(d => d.id == data.draft_id)
+          let selectedDraft = this.drafts.find((d) => d.id == data.draft_id);
           this.selectDraft(selectedDraft);
           this.loading = false;
           this.createDatasetDialog = true;
@@ -1352,6 +1374,7 @@ export default {
       selectedStudy: null,
       selectedDataset: null,
       loading: false,
+      loadingStep: false,
       project: null,
       studies: null,
       progress: 0,
@@ -1505,6 +1528,7 @@ export default {
       this.selectDataset(this.selectedStudy.datasets[0]);
     },
     process() {
+      this.loadingStep = true;
       axios
         .post("/dashboard/drafts/" + this.currentDraft.id + "/process", {
           name: this.draftName,
@@ -1516,6 +1540,7 @@ export default {
           if (this.project && this.studies.length > 0) {
             this.selectedStudy = this.studies[0];
             this.selectedDataset = this.selectedStudy.datasets[0];
+            this.loadingStep = false;
             this.selectStep(2);
           }
         });
