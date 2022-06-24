@@ -17,7 +17,7 @@ use App\Traits\CacheClear;
 class Project extends Model implements Auditable
 {
     use CacheClear;
-    use Searchable;
+    // use Searchable;
     use Markable;
     use HasFactory;
     use \OwenIt\Auditing\Auditable;

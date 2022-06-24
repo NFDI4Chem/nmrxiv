@@ -99,8 +99,8 @@ class StudyController extends Controller
             ]);
             $sample->molecules()->syncWithPivotValues([$molecule->id], ['percentage_composition' => $request->get('percentage')], false);
         }
-
-        return $molecule;
+        $sample = $sample->fresh(); 
+        return $sample->molecules;
     }
 
     public function files(Request $request, Study $study)
