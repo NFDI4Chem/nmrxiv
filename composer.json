@@ -13,6 +13,7 @@
         "http-interop/http-factory-guzzle": "^1.2",
         "inertiajs/inertia-laravel": "^0.5.4",
         "laravel/framework": "^9.0",
+        "laravel/horizon": "^5.9",
         "laravel/jetstream": "^2.3",
         "laravel/sanctum": "^2.6",
         "laravel/scout": "^9.4",
