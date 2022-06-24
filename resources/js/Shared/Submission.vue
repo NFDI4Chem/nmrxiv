@@ -607,8 +607,9 @@
                                 <label
                                   for="location"
                                   class="block text-sm font-medium text-gray-700"
-                                  >Select Experiment</label
-                                >
+                                  >Select Experiment
+                                  <small><span class="float-right" v-if="autoSaving">Saving...</span></small>
+                                </label>
                                 <select
                                   @change="loadSpectra"
                                   v-model="selectedDataset"
@@ -902,7 +903,7 @@
 
                             <div class="grid grid-cols-2 gap-2">
                               <div class="pr-2">
-                                <div class="flow-root">
+                                <div v-if="selectedStudy.sample.molecules.length > 0" class="flow-root">
                                   <ul role="list" class="-mb-8">
                                     <li
                                       v-for="molecule in selectedStudy.sample.molecules"
@@ -914,12 +915,12 @@
                                           aria-hidden="true"
                                         ></span>
                                         <div class="relative flex items-start space-x-3">
-                                          <div class="relative">
+                                          <div v-if="molecule && molecule.pivot" class="relative">
                                             <img
                                               class="h-10 w-10 rounded-full bg-gray-400 flex items-center justify-center ring-8 ring-white"
                                               :src="
                                                 'https://ui-avatars.com/api/?name=' +
-                                                molecule.pivot.percentage_composition +
+                                                ('0' + molecule.pivot.percentage_composition).slice(-2) +
                                                 '%2BUser&color=7F9CF5&background=EBF4FF'
                                               "
                                               alt=""
@@ -971,6 +972,15 @@
                                     </li>
                                   </ul>
                                 </div>
+                                <div v-else>
+                                  <div class="text-center my-10 py-10">
+                                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                      <path vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+                                    </svg>
+                                    <h3 class="mt-2 text-sm font-medium text-gray-900">No structures associated with the sample yet!</h3>
+                                    <p class="mt-1 text-sm text-gray-500">Get started by adding a new molecule.</p>
+                                  </div>
+                                </div>
                               </div>
                               <div class="pl-2">
                                 <div class="sm:col-span-4">
@@ -1017,10 +1027,12 @@
                                     Percentage composition ({{ percentage }}%)
                                   </label>
                                   <slider
+                                    :min="0"
+                                    :max="getMax"
                                     :height="10"
                                     v-model="percentage"
-                                    color="#F00"
-                                    track-color="#000"
+                                    color="#000"
+                                    track-color="#999"
                                   />
                                 </div>
                                 <button
@@ -1375,6 +1387,7 @@ export default {
       selectedDataset: null,
       loading: false,
       loadingStep: false,
+      autoSaving: false,
       project: null,
       studies: null,
       progress: 0,
@@ -1431,8 +1444,12 @@ export default {
 
   methods: {
     getSVGString(molecule) {
-      let mol = OCL.Molecule.fromMolfile("\n  " + molecule.MOL.replaceAll('"', ""));
-      return mol.toSVG(200, 200);
+      if(molecule.MOL){
+        let mol = OCL.Molecule.fromMolfile("\n  " + molecule.MOL.replaceAll('"', ""));
+        return mol.toSVG(200, 200);
+      }else{
+        console.log(molecule)
+      }
     },
     loadDropZone() {
       this.$nextTick(() => {
@@ -1591,12 +1608,17 @@ export default {
       }
     },
     updateDataSet() {
-      axios
-        .post("/dashboard/datasets/" + this.selectedDataset.id + "/nmriumInfo", {
-          spectra: this.selectedSpectraData,
-          molecules: this.currentMolecules,
-        })
-        .then((response) => {});
+      if (this.selectedSpectraData != null) {
+        this.autoSaving = true;
+        axios
+          .post("/dashboard/datasets/" + this.selectedDataset.id + "/nmriumInfo", {
+            spectra: this.selectedSpectraData,
+            molecules: this.currentMolecules,
+          })
+          .then((response) => {
+            this.autoSaving = false;
+          });
+      }
     },
     loadFiles() {
       axios
@@ -1667,7 +1689,9 @@ export default {
               mol: mol,
             })
             .then((res) => {
+              this.selectedStudy.sample.molecules = res.data
               this.smiles = "";
+              this.percentage = 0;
               this.editor.setSmiles("");
             });
         });
@@ -1688,6 +1712,18 @@ export default {
     currentTab() {
       return this.tabs.find((t) => t.current);
     },
+    getMax(){
+      if(this.selectedStudy){
+        let totalCount = 0;
+        this.selectedStudy.sample.molecules.forEach( mol => {
+          totalCount += parseInt(mol.pivot.percentage_composition)
+        })
+        console.log(totalCount);
+        return (100 - totalCount);
+      }else{
+        return 100;
+      }
+    }
   },
 };
 </script>
