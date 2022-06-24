@@ -6,7 +6,7 @@ on:
 
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
-  GKE_CLUSTER: test-worker
+  GKE_CLUSTER: nmrxiv-dev
   GKE_ZONE: europe-west3-a
   DEPLOYMENT_NAME: nmrxiv-nmrxiv-app
   REPOSITORY_NAME: nmrxiv-dev
