@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 use App\Models\Study;
 use App\Models\Sample;
 use App\Models\Molecule;
+use Illuminate\Http\JsonResponse;
 use Inertia\Inertia;
 use Auth;
 
@@ -33,7 +34,7 @@ class StudyController extends Controller
     {
         $updater->update($study, $request->all());
         return $request->wantsJson()
-            ? new JsonResponse('', 200)
+            ? new JsonResponse($study->fresh(), 200)
             : back()->with('success', 'Study updated successfully');
     }
 

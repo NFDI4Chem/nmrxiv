@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use App\Models\FileSystemObject;
 use App\Models\Draft;
 use App\Models\Project;
@@ -28,7 +29,8 @@ class DraftController extends Controller
             $user_id = $team->user_id;
         }
 
-        $drafts = Draft::whereHas('files')
+        $drafts = Draft::with('Tags')
+            ->whereHas('files')
             ->Where('owner_id', $user_id)
             ->orderBy('updated_at', 'DESC')
             ->get();
@@ -84,6 +86,63 @@ class DraftController extends Controller
             ]);
     }
 
+    public function complete(Request $request, Draft $draft){
+        $project = Project::where('draft_id', $draft->id)->first();
+
+        $studies = $project->studies;
+
+        $environment = env('APP_ENV', 'local');
+
+        $projectPath = preg_replace(
+            '~//+~',
+            '/',
+            $environment .
+            '/' .
+            $project->uuid
+        );
+
+        $projectFSObjects = FileSystemObject::with('children')
+            ->where([
+                ['draft_id', $draft->id],
+                ['project_id', $project->id]
+            ])
+            ->get();
+
+        foreach($projectFSObjects as $FSObject){
+            $this->moveFolder($FSObject, $draft, $projectPath);
+        }
+
+        $project->draft_id = null;
+        $project->save();
+
+        $draft->delete();
+
+        $project = $project->fresh();
+        
+        return response()->json([
+            'project' => $project,
+            'studies' => json_decode($project->studies->load(['datasets', 'sample.molecules', 'tags']))
+        ]);
+    }
+
+    public function moveFolder($fsObject, $draft, $path){
+        $newPath = str_replace($draft->path, $path, $fsObject->path);
+        $fsObject->path = $newPath;
+        $fsObject->save();
+
+        $fsObjectChildren = $fsObject->children;
+        forEach($fsObjectChildren as $fsObjectChild){
+            if($fsObjectChild->type == 'file'){
+                $newPath = str_replace($draft->path, $path, $fsObjectChild->path);
+                Storage::disk('minio')->move($fsObjectChild->path, $newPath);
+                $fsObjectChild->path = $newPath;
+                $fsObjectChild->save();
+            }else{
+                $this->moveFolder($fsObjectChild, $draft, $path); 
+            }
+        }
+    }
+
     public function process(Request $request, Draft $draft)
     {
         $draftFolders = FileSystemObject::with('children')
@@ -98,6 +157,7 @@ class DraftController extends Controller
 
         $draft->name = $request->get('name');
         $draft->description = $request->get('description');
+        $draft->syncTagsWithType($request->get('tags'), 'Draft');
         $draft->save();
 
         $this->processFolder($draftFolders);
@@ -114,7 +174,7 @@ class DraftController extends Controller
         }
 
 
-        return DB::transaction(function () use ($draft, $draftFolders, $user, $user_id, $team_id) {
+        return DB::transaction(function () use ($draft, $draftFolders, $user, $user_id, $team_id, $request) {
 
             // create a project corresponding to the draft
             $project = Project::where('draft_id', $draft->id)->first();
@@ -134,9 +194,12 @@ class DraftController extends Controller
                 $project->users()->attach(
                     $user, ['role' => 'creator']
                 );
+
+                $project->syncTagsWithType($request->get('tags'), 'Project');
             }else{
                 $project->name = $draft->name;
                 $project->description = $draft->description;
+                $project->syncTagsWithType($request->get('tags'), 'Project');
                 $project->save();
             }
 
@@ -221,9 +284,74 @@ class DraftController extends Controller
                     }
                 }
             }
+
+            $folders = FileSystemObject::with('children')
+                ->where([
+                    ['draft_id', $draft->id],
+                    ['dataset_id', null],
+                ])
+                ->whereIn('instrument_type', ['bruker', 'joel', 'varian'])
+                ->orderBy('type')
+                ->get();
+            
+            foreach($folders as $folder){
+                if($folder->study_id == null){
+                    $study = Study::create([
+                        'name' => "Untitled",
+                        'slug' => Str::slug('Untitled', '-'),
+                        'description' => 'Untitled study for the dataset - ' . $folder->name,
+                        'url'  => Str::random(40),
+                        'uuid'  => Str::uuid(),
+                        'team_id'  => $team_id ? $team_id : null,
+                        'owner_id'  => $user_id,
+                        'draft_id'  => $draft->id,
+                        'project_id'  => $project->id,
+                        'fs_id'  => $folder->id
+                    ]);
+                    
+                    $sample = Sample::create([
+                        'name' => $study->name . '_sample',
+                        'slug' => Str::slug($study->name . '_sample', '-'),
+                        'study_id' =>  $study->id,
+                        'project_id' => $study->project->id,
+                    ]);
+                    $study->sample()->save($sample);
+
+                    $folder->study_id = $study->id;
+                    $folder->save();
+
+
+                    $ds = Dataset::where([
+                        ['draft_id', $draft->id],
+                        ['study_id', $study->id],
+                        ['fs_id', $folder->id],
+                    ])->first();
+
+
+                    if(!$ds){
+                        $ds = Dataset::create([
+                            'name' => $folder->name,
+                            'slug' => Str::slug($folder->name, '-'),
+                            'description' => $folder->name,
+                            'url'  => Str::random(40),
+                            'uuid'  => Str::uuid(),
+                            'team_id'  => $team_id ? $team_id : null,
+                            'owner_id'  => $user_id,
+                            'draft_id'  => $draft->id,
+                            'project_id'  => $project->id,
+                            'study_id'  => $study->id,
+                            'fs_id'  => $folder->id
+                        ]);
+
+                        $folder->dataset_id = $ds->id;
+                        $folder->save();
+                    }
+                }
+            }
+
             return response()->json([
                 'project' => $project,
-                'studies' => json_decode($project->studies->load(['datasets', 'sample.molecules']))
+                'studies' => json_decode($project->studies->load(['datasets', 'sample.molecules', 'tags']))
             ]);
         });
     }

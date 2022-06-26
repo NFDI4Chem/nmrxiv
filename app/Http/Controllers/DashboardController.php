@@ -12,6 +12,8 @@ class DashboardController extends Controller
     {
         $user = $request->user();
         $team = $user->currentTeam;
+        $projects = [];
+        
         if ($team) {
             $team->users = $team->allUsers();
             if (!$team->personal_team) {
