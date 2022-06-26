@@ -150,6 +150,8 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
             ->name('dashboard.draft.annotate');
         Route::post('drafts/{draft}/process', [DraftController::class, 'process'])
             ->name('dashboard.draft.process');
+            Route::post('drafts/{draft}/complete', [DraftController::class, 'complete'])
+            ->name('dashboard.draft.complete');
     });
 });
 

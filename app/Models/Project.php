@@ -13,6 +13,7 @@ use Maize\Markable\Models\Favorite;
 use Maize\Markable\Models\Bookmark;
 use Maize\Markable\Models\Reaction;
 use App\Traits\CacheClear;
+use Spatie\Tags\HasTags;
 
 class Project extends Model implements Auditable
 {
@@ -21,6 +22,7 @@ class Project extends Model implements Auditable
     use Markable;
     use HasFactory;
     use \OwenIt\Auditing\Auditable;
+    use HasTags;
 
     protected $fillable = [
         'name',

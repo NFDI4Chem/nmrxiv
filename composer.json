@@ -29,6 +29,7 @@
         "spatie/laravel-cookie-consent": "^3.2.1",
         "spatie/laravel-permission": "^5.1",
         "spatie/laravel-support-bubble": "^1.2",
+        "spatie/laravel-tags": "^4.3",
         "tightenco/ziggy": "^1.0"
     },
     "require-dev": {
