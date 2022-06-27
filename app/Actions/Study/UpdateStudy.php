@@ -29,16 +29,20 @@ class UpdateStudy
             'name' => $input['name'],
             'slug' => Str::slug($input['name'], '-'),
             'description' => $input['description'],
-            'color' => array_key_exists('color', $input) ? $input['color'] : null,
-            'starred'  => array_key_exists('starred', $input) ?$input['starred'] : null,
-            'location' => array_key_exists('location', $input) ?$input['location'] : null,
-            'url'  => array_key_exists('url', $input) ?$input['url'] : null,
-            'type'  => array_key_exists('type', $input) ?$input['type'] : null,
+            'color' => array_key_exists('color', $input) ? $input['color'] : $study->color,
+            'starred'  => array_key_exists('starred', $input) ?$input['starred'] : $study->starred,
+            'location' => array_key_exists('location', $input) ?$input['location'] : $study->location,
+            'url'  => array_key_exists('url', $input) ?$input['url'] : $study->url,
+            'type'  => array_key_exists('type', $input) ?$input['type'] : $study->type,
             'access'  => array_key_exists('access', $input) ?$input['access'] : 'restricted',
             'access_type'  => array_key_exists('access_type', $input) ? $input['access_type'] : 'viewer',
-            'is_public'  => $input['is_public'],
-            'study_photo_path' => array_key_exists('study_photo_path', $input) ? $input['study_photo_path'] : null,
+            'is_public'  => array_key_exists('is_public', $input) ? $input['is_public'] : $study->is_public,
+            'study_photo_path' => array_key_exists('study_photo_path', $input) ? $input['study_photo_path'] : $study->study_photo_path,
             ])->save();
+
+            if(array_key_exists('tags', $input)){
+                $study->syncTagsWithType($input['tags'], 'Study');
+            }
         });
     }
 }

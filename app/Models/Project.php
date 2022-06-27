@@ -13,6 +13,7 @@ use Maize\Markable\Models\Favorite;
 use Maize\Markable\Models\Bookmark;
 use Maize\Markable\Models\Reaction;
 use App\Traits\CacheClear;
+use Spatie\Tags\HasTags;
 
 class Project extends Model implements Auditable
 {
@@ -21,6 +22,7 @@ class Project extends Model implements Auditable
     use Markable;
     use HasFactory;
     use \OwenIt\Auditing\Auditable;
+    use HasTags;
 
     protected $fillable = [
         'name',
@@ -37,6 +39,8 @@ class Project extends Model implements Auditable
         'access_type',
         'team_id',
         'owner_id',
+        'draft_id',
+        'fs_id',
         'project_photo_path',
     ];
 
@@ -67,6 +71,11 @@ class Project extends Model implements Auditable
     public function nonPersonalTeam()
     {
         return $this->team()->where('personal_team', false);
+    }
+
+    public function draft()
+    {
+        return $this->belongsTo(Draft::class, 'draft_id');
     }
 
     /**

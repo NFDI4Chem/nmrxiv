@@ -4,12 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class Dataset extends Model
+class Dataset extends Model implements Auditable
 {
     use HasFactory;
 
-    use HasFactory;
     use \OwenIt\Auditing\Auditable;
 
     protected $fillable = [
@@ -29,7 +29,10 @@ class Dataset extends Model
         'owner_id',
         'study_id',
         'project_id',
-        'dataset_photo_path'
+        'draft_id',
+        'fs_id',
+        'dataset_photo_path',
+        'nmrium_info'
     ];
 
     /**
@@ -41,6 +44,16 @@ class Dataset extends Model
         'public_url',
         'private_url',
     ];
+
+    protected function getPublicUrlAttribute()
+    {
+        return  env('APP_URL', null)."/datasets/".urlencode($this->slug);
+    }
+
+    protected function getPrivateUrlAttribute()
+    {
+        return  env('APP_URL', null)."/datasets/".urlencode($this->url);
+    }
 
     public function study()
     {
@@ -55,6 +68,11 @@ class Dataset extends Model
     public function owner()
     {
         return $this->belongsTo(User::class, 'owner_id');
+    }
+
+    public function draft()
+    {
+        return $this->belongsTo(Draft::class, 'draft_id');
     }
 
     public function team()

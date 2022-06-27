@@ -173,12 +173,14 @@ return [
         App\Providers\AuthServiceProvider::class,
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
+        App\Providers\HorizonServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         App\Providers\FortifyServiceProvider::class,
         App\Providers\JetstreamServiceProvider::class,
 
         \SocialiteProviders\Manager\ServiceProvider::class,
         OwenIt\Auditing\AuditingServiceProvider::class,
+        App\Providers\MinioStorageServiceProvider::class
     ],
 
     /*

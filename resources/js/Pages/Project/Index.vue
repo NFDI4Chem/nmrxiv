@@ -76,7 +76,7 @@
     </span>
     <span v-else>
       <div :key="project.uuid" v-for="project in projects" class="mt-8">
-        <Link :href="route('dashboard.projects', [project.id])">
+        <a class="cursor-pointer" @click="getLink(project)">
           <div
             class="flex justify-between items-center bg-white shadow-md rounded-lg px-6 py-6 hover:drop-shadow-xl cursor-pointer"
           >
@@ -86,6 +86,7 @@
                   <div class="flex items-center">
                     <span class="flex max-w-2xl break-words block">
                       {{ project.name }}
+                      <span v-if="project.draft_id != null" class="ml-4 inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800"> Draft </span>
                     </span>
                   </div>
                 </div>
@@ -186,7 +187,7 @@
               </svg>
             </div>
           </div>
-        </Link>
+        </a>
       </div>
     </span>
   </div>
@@ -204,8 +205,12 @@ export default {
     const openProjectCreateDialog = () => {
       emitter.emit('openProjectCreateDialog', 100);
     };
+    const openDatasetCreateDialog = (data) => {
+      emitter.emit("openDatasetCreateDialog", data);
+    };
     return {
-      openProjectCreateDialog
+      openProjectCreateDialog,
+      openDatasetCreateDialog
     }
   },
   props: ["projects", "mode", "editable", "team"],
@@ -213,6 +218,17 @@ export default {
     return {};
   },
   methods: {
+    getLink(project){
+      if(project){
+        if(project.draft_id == null){
+          return this.$inertia.visit(this.route('dashboard.projects', [project.id]))
+        }else{
+          this.openDatasetCreateDialog({ 
+            'draft_id' : project.draft_id
+          })
+        }
+      }
+    }
   },
 };
 </script>

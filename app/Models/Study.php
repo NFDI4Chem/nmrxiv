@@ -7,11 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 use OwenIt\Auditing\Contracts\Auditable;
 use App\Models\StudyInvitation;
 use App\Traits\CacheClear;
+use Spatie\Tags\HasTags;
 
 class Study extends Model implements Auditable
 {
     use CacheClear;
     use HasFactory;
+    use HasTags;
     use \OwenIt\Auditing\Auditable;
 
     protected $fillable = [
@@ -28,8 +30,10 @@ class Study extends Model implements Auditable
         'access', 
         'access_type',
         'team_id',
+        'draft_id',
         'owner_id',
         'project_id',
+        'fs_id',
         'study_photo_path'
     ];
 
@@ -56,6 +60,16 @@ class Study extends Model implements Auditable
     protected function getPrivateUrlAttribute()
     {
         return  env('APP_URL', null)."/projects/".urlencode($this->url);
+    }
+
+    public function draft()
+    {
+        return $this->belongsTo(Draft::class, 'draft_id');
+    }
+
+    public function fsObject()
+    {
+        return $this->hasOne(FileSystemObject::class, 'fs_id');
     }
 
     /**
@@ -91,6 +105,11 @@ class Study extends Model implements Auditable
     public function team()
     {
         return $this->belongsTo(Team::class, 'team_id');
+    }
+
+    public function datasets()
+    {
+        return $this->hasMany(Dataset::class);
     }
 
     /**
@@ -137,6 +156,22 @@ class Study extends Model implements Auditable
         return $this->allUsers()->contains(function ($user) use ($email) {
             return $user->email === $email;
         });
+    }
+
+    /**
+     * Get the sample associated with the study.
+     */
+    public function sample()
+    {
+        return $this->hasOne(Sample::class, 'study_id');
+    }
+
+    /**
+     * Get all of the deployments for the project.
+     */
+    public function molecules()
+    {
+        return $this->sample()->molecules();
     }
 
     /**

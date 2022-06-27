@@ -97,11 +97,11 @@ class ProjectController extends Controller
     public function store(Request $request, CreateNewProject $creator)
     {
 
-        $project = $creator->create($request->all());
+        // if (! Gate::forUser($request->user())->check('createProject', $project)) {
+        //     throw new AuthorizationException;
+        // }
 
-        if (! Gate::forUser($request->user())->check('createProject', $project)) {
-            throw new AuthorizationException;
-        }
+        $project = $creator->create($request->all());
 
         return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('success', 'Project created successfully');
     }
@@ -113,6 +113,7 @@ class ProjectController extends Controller
         }
 
         $updater->update($project, $request->all());
+        
         return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('success', 'Project updated successfully');
     }
 
