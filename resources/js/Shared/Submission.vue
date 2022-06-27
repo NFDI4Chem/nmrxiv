@@ -337,7 +337,7 @@
                   >
                     STUDY
                   </div>
-                  <div class="flex-1 min-h-0 overflow-y-auto">
+                  <div style="height: 74vh; overflow: scroll !important">
                     <a
                       v-for="study in studies"
                       :key="study.slug"
