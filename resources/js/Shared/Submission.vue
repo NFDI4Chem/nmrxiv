@@ -1837,8 +1837,8 @@ export default {
     },
     nmriumURL() {
       return this.$page.props.nmriumURL
-        ? String(this.$page.props.nmriumURL + "?workspace=embedded")
-        : "http://nmriumdev.nmrxiv.org?workspace=embedded";
+        ? String(this.$page.props.nmriumURL + "?workspace=embedded&id=" + Math.random())
+        : "http://nmriumdev.nmrxiv.org?workspace=embedded&id="+ Math.random();
     },
     currentTab() {
       return this.tabs.find((t) => t.current);
