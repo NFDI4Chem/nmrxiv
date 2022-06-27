@@ -40,15 +40,15 @@ class CreateFileSystemObjectsTable extends Migration
             $table->integer('level')->default('0');
             $table->foreignId('owner_id')->nullable();
             $table->foreignId('parent_id')->nullable();
-            $table->foreignId('project_id')->nullable();
-            $table->foreignId('study_id')->nullable();
-            $table->foreignId('dataset_id')->nullable();
-            $table->foreignId('draft_id')->nullable();
+            $table->foreignId('project_id')->default(0)->nullable();
+            $table->foreignId('study_id')->default(0)->nullable();
+            $table->foreignId('dataset_id')->default(0)->nullable();
+            $table->foreignId('draft_id')->default(0)->nullable();
             $table->foreignId('version_id')->nullable();
             $table->json('info')->nullable()->default('{}');
             $table->json('settings')->nullable()->default('{}');
             $table->timestamps();
-            $table->unique(['relative_url', 'type', 'key', 'created_at', 'project_id', 'study_id', 'draft_id', 'level', 'slug', 'is_root']);
+            $table->unique(['name', 'slug', 'description', 'relative_url', 'type', 'key', 'is_root', 'project_id', 'study_id', 'draft_id', 'level']);
         });
     }
 
