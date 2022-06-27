@@ -48,7 +48,7 @@ class CreateFileSystemObjectsTable extends Migration
             $table->json('info')->nullable()->default('{}');
             $table->json('settings')->nullable()->default('{}');
             $table->timestamps();
-            $table->unique(['name', 'slug', 'description', 'relative_url', 'type', 'key', 'is_root', 'project_id', 'study_id', 'level']);
+            $table->unique(['name', 'slug', 'description', 'relative_url', 'type', 'key', 'is_root', 'project_id', 'study_id', 'draft_id', 'level']);
         });
     }
 
