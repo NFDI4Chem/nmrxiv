@@ -1,5 +1,5 @@
 <template>
-  <Menu as="div" class="relative inline-block">
+  <!-- <Menu as="div" class="relative inline-block"> -->
     <div>
       <span v-if="mode == 'button'">
         <span v-if="!$page.props.user.email">
@@ -23,7 +23,8 @@
           </a>
         </span>
         <span v-else>
-          <MenuButton
+          <button
+            @click="openDatasetCreateDialog"
             id="v-step-0"
             class="p-3 inline-flex items-center text-center border border-transparent text-base rounded-full shadow-sm text-white inline-flex items-center bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring focus:ring-gray-300 disabled:opacity-25 transition"
           >
@@ -40,7 +41,7 @@
               />
             </svg>
             Upload &emsp;
-          </MenuButton>
+          </button>
         </span>
       </span>
       <span v-if="mode == 'icon'">
@@ -64,7 +65,8 @@
           </a>
         </span>
         <span v-else
-          ><MenuButton
+          ><button
+            @click="openDatasetCreateDialog"
             id="v-step-0"
             class="inline-flex items-center text-center p-3 border border-transparent text-base font-medium rounded-full shadow-sm inline-flex items-center bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring focus:ring-gray-300 disabled:opacity-25 transition"
           >
@@ -79,11 +81,11 @@
                 d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z"
                 clip-rule="evenodd"
               />
-            </svg> </MenuButton
+            </svg> </button
         ></span>
       </span>
     </div>
-    <transition
+    <!-- <transition
       enter-active-class="transition ease-out duration-100"
       enter-from-class="transform opacity-0 scale-95"
       enter-to-class="transform opacity-100 scale-100"
@@ -95,7 +97,7 @@
         class="z-50 origin-top-right fixed mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 focus:outline-none"
       >
         <div class="py-1">
-          <!-- <MenuItem class="cursor-pointer" v-slot="{ active }">
+          <MenuItem class="cursor-pointer" v-slot="{ active }">
             <a
               @click="openProjectCreateDialog"
               :class="[
@@ -124,7 +126,7 @@
               />
               Study
             </a>
-          </MenuItem> -->
+          </MenuItem>
           <MenuItem class="cursor-pointer" v-slot="{ active }">
             <a
               @click="openDatasetCreateDialog"
@@ -142,12 +144,12 @@
           </MenuItem>
         </div>
       </MenuItems>
-    </transition>
-  </Menu>
+    </transition> -->
+  <!-- </Menu> -->
 </template>
 
 <script>
-import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
+import { Menu, MenuItem, MenuItems } from "@headlessui/vue";
 import { ArchiveIcon, PencilAltIcon, TableIcon, PlusIcon } from "@heroicons/vue/solid";
 import { inject } from "vue";
 export default {
@@ -156,7 +158,6 @@ export default {
   },
   components: {
     Menu,
-    MenuButton,
     MenuItem,
     MenuItems,
     ArchiveIcon,

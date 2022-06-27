@@ -180,6 +180,7 @@ return [
 
         \SocialiteProviders\Manager\ServiceProvider::class,
         OwenIt\Auditing\AuditingServiceProvider::class,
+        App\Providers\MinioStorageServiceProvider::class
     ],
 
     /*

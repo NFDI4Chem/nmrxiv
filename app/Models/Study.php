@@ -7,11 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 use OwenIt\Auditing\Contracts\Auditable;
 use App\Models\StudyInvitation;
 use App\Traits\CacheClear;
+use Spatie\Tags\HasTags;
 
 class Study extends Model implements Auditable
 {
     use CacheClear;
     use HasFactory;
+    use HasTags;
     use \OwenIt\Auditing\Auditable;
 
     protected $fillable = [
