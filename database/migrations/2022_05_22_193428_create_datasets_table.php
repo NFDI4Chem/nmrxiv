@@ -25,6 +25,7 @@ return new class extends Migration
             $table->string('location')->nullable();
             $table->string('url', 2048)->nullable();
             $table->longText('description')->nullable();
+            $table->json('nmrium_info')->nullable();
             $table->integer('sort_order')->default('1');
             $table->string('type')->nullable();
             $table->uuid('uuid')->unique();
@@ -35,7 +36,11 @@ return new class extends Migration
             $table->foreignId('project_id')->nullable();
             $table->foreignId('study_id')->nullable();
             $table->foreignId('license_id')->nullable();
+            $table->foreignId('draft_id')->nullable();
+            $table->foreignId('fs_id')->nullable();
+            $table->string('license')->nullable();
             $table->string('dataset_photo_path', 2048)->nullable();
+            $table->timestamp('release_date')->nullable();
             $table->timestamps();
         });
     }

@@ -21,6 +21,8 @@ class CreateFileSystemObjectsTable extends Migration
             $table->string('relative_url', 2048)->nullable();
             $table->string('path', 2048)->nullable();
             $table->enum('type', ['directory', 'file'])->default('file');
+            $table->string('model_type')->nullable();
+            $table->string('instrument_type')->nullable();
             $table->string('key');
             $table->string('compressionInfo')->nullable();
             $table->string('kernelSessionInfo')->nullable();
@@ -38,13 +40,15 @@ class CreateFileSystemObjectsTable extends Migration
             $table->integer('level')->default('0');
             $table->foreignId('owner_id')->nullable();
             $table->foreignId('parent_id')->nullable();
-            $table->foreignId('project_id')->nullable();
-            $table->foreignId('study_id')->nullable();
+            $table->foreignId('project_id')->default(0)->nullable();
+            $table->foreignId('study_id')->default(0)->nullable();
+            $table->foreignId('dataset_id')->default(0)->nullable();
+            $table->foreignId('draft_id')->default(0)->nullable();
             $table->foreignId('version_id')->nullable();
             $table->json('info')->nullable()->default('{}');
             $table->json('settings')->nullable()->default('{}');
             $table->timestamps();
-            $table->unique(['name', 'slug', 'description', 'relative_url', 'type', 'key', 'is_root', 'project_id', 'study_id', 'level']);
+            $table->unique(['name', 'slug', 'description', 'relative_url', 'type', 'key', 'is_root', 'project_id', 'study_id', 'draft_id', 'level']);
         });
     }
 

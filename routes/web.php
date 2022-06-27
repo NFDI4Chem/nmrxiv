@@ -13,9 +13,11 @@ use App\Http\Controllers\FileSystemController;
 use App\Http\Controllers\StudyController;
 use App\Http\Controllers\StudyInvitationController;
 use App\Http\Controllers\StudyMemberController;
+use App\Http\Controllers\DraftController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Project;
 use Inertia\Inertia;
 
@@ -29,15 +31,22 @@ Route::group([
 });
 
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
-});
+    if (Auth::check()) {
+        return redirect()->route('dashboard');
+    }else{
+        return Inertia::render('Welcome', [
+            'canLogin' => Route::has('login'),
+            'canRegister' => Route::has('register'),
+            'laravelVersion' => Application::VERSION,
+            'phpVersion' => PHP_VERSION,
+        ]);
+    }
+})->name('welcome');
 
 Route::supportBubble();
+
+Route::get('download/{code}/datasets/{dataset}/{filename}', [DatasetController::class, 'download'])
+    ->name('dataset.download');
 
 Route::get('{code}/studies/{study}/file/{filename}', [StudyController::class, 'file'])
     ->name('study.file');
@@ -66,7 +75,10 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
         Route::get('recent', [DashboardController::class, 'recent'])
             ->name('recent');
             
+        Route::post('/storage/signed-draft-storage-url',  [FileSystemController::class, 'signedDraftStorageURL']);
         Route::post('/storage/signed-storage-url',  [FileSystemController::class, 'signedStorageURL']);
+
+        Route::get('/drafts',  [DraftController::class, 'all']);
         
         Route::get('projects/{project}', [ProjectController::class, 'show'])
             ->name('dashboard.projects');
@@ -119,11 +131,27 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
         Route::delete('/studies/{study}/members/{user}', [StudyMemberController::class, 'removeMember'])
             ->name('study-members.destroy');
 
+        Route::post('studies/{study}/molecule', [StudyController::class, 'moleculeStore'])
+            ->name('study-molecule.store');
+
         Route::get('/study-invitations/{invitation}', [StudyInvitationController::class, 'acceptInvitation'])
             ->middleware(['signed'])
             ->name('study-invitations.accept');
         Route::delete('/study-invitations/{invitation}', [StudyInvitationController::class, 'destroyInvitation'])
             ->name('study-invitations.destroy');
+
+
+        Route::post('datasets/{dataset}/nmriumInfo', [DatasetController::class, 'nmriumInfo'])
+            ->name('dashboard.datasets.nmriumInfo');
+
+        Route::get('drafts/{draft}/files', [DraftController::class, 'files'])
+            ->name('dashboard.draft.files');
+        Route::get('drafts/{draft}/annotate', [DraftController::class, 'annotate'])
+            ->name('dashboard.draft.annotate');
+        Route::post('drafts/{draft}/process', [DraftController::class, 'process'])
+            ->name('dashboard.draft.process');
+            Route::post('drafts/{draft}/complete', [DraftController::class, 'complete'])
+            ->name('dashboard.draft.complete');
     });
 });
 
