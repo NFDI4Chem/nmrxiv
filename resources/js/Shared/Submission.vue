@@ -250,7 +250,7 @@
               </div>
               <div class="mb-3">
                 <label for="description" class="block text-sm font-medium text-gray-700">
-                  Description
+                  Project Description
                 </label>
                 <div class="mt-1">
                   <textarea
@@ -260,6 +260,19 @@
                     rows="3"
                     class="block w-full shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm border border-gray-300 rounded-md"
                   ></textarea>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="description" class="block text-sm font-medium text-gray-700">
+                  Tags
+                </label>
+                <div>
+                  <vue-tags-input
+                    v-model="draftTag"
+                    max-width="100%"
+                    :tags="draftTags"
+                    @tags-changed="(newTags) => (draftTags = newTags)"
+                  />
                 </div>
               </div>
               <small @click="annotate()">Draft ID: {{ currentDraft.name }}</small>
@@ -324,7 +337,7 @@
                   >
                     STUDY
                   </div>
-                  <div class="flex-1 min-h-0 overflow-y-auto">
+                  <div style="height: 74vh; overflow: scroll !important">
                     <a
                       v-for="study in studies"
                       :key="study.slug"
@@ -346,8 +359,12 @@
                           d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"
                         />
                       </svg>
-                      <div class="ml-3 text-sm">
-                        <p class="font-medium text-blue-gray-900">{{ study.name }}</p>
+                      <div class="ml-3 text-sm w-full">
+                        <p class="font-medium text-blue-gray-900">{{ study.name }}
+                          <span class="float-right" v-if="study.sample.molecules.length > 0">
+                            <img class="flex-shrink-0 -mt-0.5 h-6 w-6 text-blue-gray-400" src="https://upload.wikimedia.org/wikipedia/sco/3/35/ChEBI_logo.png" alt="">
+                          </span>
+                        </p>
                         <!-- <p class="mt-1 text-blue-gray-500">{{ item.description }}</p> -->
                       </div>
                     </a>
@@ -408,7 +425,7 @@
                                   for="study-name"
                                   class="block text-sm font-medium text-gray-700"
                                 >
-                                  Name
+                                  Study Name
                                 </label>
                                 <div class="mt-1">
                                   <input
@@ -424,7 +441,7 @@
                                   for="description"
                                   class="block text-sm font-medium text-gray-700"
                                 >
-                                  Description
+                                  Study Description
                                 </label>
                                 <div class="mt-1">
                                   <textarea
@@ -436,32 +453,50 @@
                                   ></textarea>
                                 </div>
                               </div>
+                              <div class="mb-3">
+                                <label
+                                  for="description"
+                                  class="block text-sm font-medium text-gray-700"
+                                >
+                                  Tags
+                                </label>
+                                <div>
+                                  <vue-tags-input
+                                    v-model="studyTag"
+                                    max-width="100%"
+                                    :tags="studyTags"
+                                    @tags-changed="(newTags) => (studyTags = newTags)"
+                                  />
+                                </div>
+                              </div>
+                              <div class="mb-6">
+                                <button
+                                  @click="saveStudyDetails"
+                                  type="button"
+                                  class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                >
+                                  SAVE
+                                </button>
+                              </div>
                               <h1 class="text-xl font-bold text-gray-900">
-                                Sample Information
+                                Sample Details
                               </h1>
                               <section
                                 aria-labelledby="activity-title"
                                 class="mt-2 xl:mt-2"
                               >
                                 <div>
-                                  <div class="pb-1">
-                                    <h2
-                                      id="activity-title"
-                                      class="text-lg font-medium text-gray-900"
-                                    >
-                                      Protocols
-                                    </h2>
-                                  </div>
                                   <div class="pt-3">
                                     <div>
                                       <label
                                         for="about"
                                         class="block text-sm font-medium text-gray-700"
                                       >
-                                        Sample Collection
+                                        Sample Collection Protocol
                                       </label>
                                       <div class="mt-1">
                                         <textarea
+                                          readonly
                                           id="about"
                                           name="about"
                                           rows="3"
@@ -473,7 +508,7 @@
                                         parameters can be provided below.
                                       </p>
                                     </div>
-                                    <div class="mt-3">
+                                    <!-- <div class="mt-3">
                                       <h2 class="text-sm font-medium text-gray-500">
                                         Sample Collection Parameters
                                       </h2>
@@ -497,7 +532,6 @@
                                               Bug
                                             </div>
                                           </a>
-                                          <!-- space -->
                                         </li>
                                         <li class="inline">
                                           <a
@@ -518,81 +552,9 @@
                                               Accessibility
                                             </div>
                                           </a>
-                                          <!-- space -->
                                         </li>
                                       </ul>
-                                    </div>
-                                  </div>
-                                  <div class="pt-3">
-                                    <div>
-                                      <label
-                                        for="about"
-                                        class="block text-sm font-medium text-gray-700"
-                                      >
-                                        Extraction
-                                      </label>
-                                      <div class="mt-1">
-                                        <textarea
-                                          id="about"
-                                          name="about"
-                                          rows="3"
-                                          class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border border-gray-300 rounded-md"
-                                        ></textarea>
-                                      </div>
-                                      <p class="mt-2 text-sm text-gray-500">
-                                        Describe yourextraction protocol. Protocol
-                                        parameters can be provided below.
-                                      </p>
-                                    </div>
-                                    <div class="mt-3">
-                                      <h2 class="text-sm font-medium text-gray-500">
-                                        Extraction Protocol Parameters
-                                      </h2>
-                                      <ul role="list" class="mt-2 leading-8">
-                                        <li class="inline">
-                                          <a
-                                            href="#"
-                                            class="relative inline-flex items-center rounded-full border border-gray-300 px-3 py-0.5"
-                                          >
-                                            <div
-                                              class="absolute flex-shrink-0 flex items-center justify-center"
-                                            >
-                                              <span
-                                                class="h-1.5 w-1.5 rounded-full bg-rose-500"
-                                                aria-hidden="true"
-                                              ></span>
-                                            </div>
-                                            <div
-                                              class="ml-3.5 text-sm font-medium text-gray-900"
-                                            >
-                                              Bug
-                                            </div>
-                                          </a>
-                                          <!-- space -->
-                                        </li>
-                                        <li class="inline">
-                                          <a
-                                            href="#"
-                                            class="relative inline-flex items-center rounded-full border border-gray-300 px-3 py-0.5"
-                                          >
-                                            <div
-                                              class="absolute flex-shrink-0 flex items-center justify-center"
-                                            >
-                                              <span
-                                                class="h-1.5 w-1.5 rounded-full bg-teal-500"
-                                                aria-hidden="true"
-                                              ></span>
-                                            </div>
-                                            <div
-                                              class="ml-3.5 text-sm font-medium text-gray-900"
-                                            >
-                                              Accessibility
-                                            </div>
-                                          </a>
-                                          <!-- space -->
-                                        </li>
-                                      </ul>
-                                    </div>
+                                    </div> -->
                                   </div>
                                 </div>
                               </section>
@@ -608,7 +570,11 @@
                                   for="location"
                                   class="block text-sm font-medium text-gray-700"
                                   >Select Experiment
-                                  <small><span class="float-right" v-if="autoSaving">Saving...</span></small>
+                                  <small
+                                    ><span class="float-right" v-if="autoSaving"
+                                      >Saving...</span
+                                    ></small
+                                  >
                                 </label>
                                 <select
                                   @change="loadSpectra"
@@ -724,8 +690,6 @@
                                             {{ selectedSpectraData.info[key] }}
                                           </td>
                                         </tr>
-
-                                        <!-- More people... -->
                                       </tbody>
                                     </table>
                                   </div>
@@ -733,7 +697,79 @@
                                 <div class="p-1 pr-2">
                                   <div class="px-4 py-5 sm:p-6">
                                     <div>
-                                      <div>
+                                      <div class="pt-3">
+                                        <div>
+                                          <label
+                                            for="about"
+                                            class="block text-sm font-medium text-gray-700"
+                                          >
+                                            Extraction
+                                          </label>
+                                          <div class="mt-1">
+                                            <textarea
+                                              readonly
+                                              id="about"
+                                              name="about"
+                                              rows="3"
+                                              class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border border-gray-300 rounded-md"
+                                            ></textarea>
+                                          </div>
+                                          <p class="mt-2 text-sm text-gray-500">
+                                            Describe your extraction protocol. Protocol
+                                            parameters can be provided below.
+                                          </p>
+                                        </div>
+                                        <!-- <div class="mt-3">
+                                          <h2 class="text-sm font-medium text-gray-500">
+                                            Extraction Protocol Parameters
+                                          </h2>
+                                          <ul role="list" class="mt-2 leading-8">
+                                            <li class="inline">
+                                              <a
+                                                href="#"
+                                                class="relative inline-flex items-center rounded-full border border-gray-300 px-3 py-0.5"
+                                              >
+                                                <div
+                                                  class="absolute flex-shrink-0 flex items-center justify-center"
+                                                >
+                                                  <span
+                                                    class="h-1.5 w-1.5 rounded-full bg-rose-500"
+                                                    aria-hidden="true"
+                                                  ></span>
+                                                </div>
+                                                <div
+                                                  class="ml-3.5 text-sm font-medium text-gray-900"
+                                                >
+                                                  Bug
+                                                </div>
+                                              </a>
+                                              
+                                            </li>
+                                            <li class="inline">
+                                              <a
+                                                href="#"
+                                                class="relative inline-flex items-center rounded-full border border-gray-300 px-3 py-0.5"
+                                              >
+                                                <div
+                                                  class="absolute flex-shrink-0 flex items-center justify-center"
+                                                >
+                                                  <span
+                                                    class="h-1.5 w-1.5 rounded-full bg-teal-500"
+                                                    aria-hidden="true"
+                                                  ></span>
+                                                </div>
+                                                <div
+                                                  class="ml-3.5 text-sm font-medium text-gray-900"
+                                                >
+                                                  Accessibility
+                                                </div>
+                                              </a>
+                                              
+                                            </li>
+                                          </ul>
+                                        </div> -->
+                                      </div>
+                                      <div class="mt-3">
                                         <label
                                           for="about"
                                           class="block text-sm font-medium text-gray-700"
@@ -742,6 +778,7 @@
                                         </label>
                                         <div class="mt-1">
                                           <textarea
+                                            readonly
                                             id="about"
                                             name="about"
                                             rows="3"
@@ -749,11 +786,12 @@
                                           ></textarea>
                                         </div>
                                         <p class="mt-2 text-sm text-gray-500">
-                                          Describe yourextraction protocol. Protocol
-                                          parameters can be provided below.
+                                          Describe NMR sample preparation protocol
+                                          details. Protocol parameters can be provided
+                                          below.
                                         </p>
                                       </div>
-                                      <div class="mt-3">
+                                      <!-- <div class="mt-3">
                                         <h2 class="text-sm font-medium text-gray-500">
                                           Extraction Protocol Parameters
                                         </h2>
@@ -777,7 +815,7 @@
                                                 Bug
                                               </div>
                                             </a>
-                                            <!-- space -->
+                                            
                                           </li>
                                           <li class="inline">
                                             <a
@@ -798,10 +836,10 @@
                                                 Accessibility
                                               </div>
                                             </a>
-                                            <!-- space -->
+                                            
                                           </li>
                                         </ul>
-                                      </div>
+                                      </div> -->
                                     </div>
                                     <div class="mt-3">
                                       <div>
@@ -813,6 +851,7 @@
                                         </label>
                                         <div class="mt-1">
                                           <textarea
+                                            readonly
                                             id="about"
                                             name="about"
                                             rows="3"
@@ -820,11 +859,12 @@
                                           ></textarea>
                                         </div>
                                         <p class="mt-2 text-sm text-gray-500">
-                                          Describe yourextraction protocol. Protocol
-                                          parameters can be provided below.
+                                          Describe any data transformation protocol
+                                          performed. Protocol parameters can be provided
+                                          below.
                                         </p>
                                       </div>
-                                      <div class="mt-3">
+                                      <!-- <div class="mt-3">
                                         <h2 class="text-sm font-medium text-gray-500">
                                           Data transformation Protocol Parameters
                                         </h2>
@@ -848,7 +888,7 @@
                                                 Bug
                                               </div>
                                             </a>
-                                            <!-- space -->
+                                            
                                           </li>
                                           <li class="inline">
                                             <a
@@ -869,10 +909,10 @@
                                                 Accessibility
                                               </div>
                                             </a>
-                                            <!-- space -->
+                                            
                                           </li>
                                         </ul>
-                                      </div>
+                                      </div> -->
                                     </div>
                                   </div>
                                 </div>
@@ -903,7 +943,10 @@
 
                             <div class="grid grid-cols-2 gap-2">
                               <div class="pr-2">
-                                <div v-if="selectedStudy.sample.molecules.length > 0" class="flow-root">
+                                <div
+                                  v-if="selectedStudy.sample.molecules.length > 0"
+                                  class="flow-root"
+                                >
                                   <ul role="list" class="-mb-8">
                                     <li
                                       v-for="molecule in selectedStudy.sample.molecules"
@@ -915,12 +958,18 @@
                                           aria-hidden="true"
                                         ></span>
                                         <div class="relative flex items-start space-x-3">
-                                          <div v-if="molecule && molecule.pivot" class="relative">
+                                          <div
+                                            v-if="molecule && molecule.pivot"
+                                            class="relative"
+                                          >
                                             <img
                                               class="h-10 w-10 rounded-full bg-gray-400 flex items-center justify-center ring-8 ring-white"
                                               :src="
                                                 'https://ui-avatars.com/api/?name=' +
-                                                ('0' + molecule.pivot.percentage_composition).slice(-2) +
+                                                (
+                                                  '0' +
+                                                  molecule.pivot.percentage_composition
+                                                ).slice(-2) +
                                                 '%2BUser&color=7F9CF5&background=EBF4FF'
                                               "
                                               alt=""
@@ -974,11 +1023,27 @@
                                 </div>
                                 <div v-else>
                                   <div class="text-center my-10 py-10">
-                                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                      <path vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+                                    <svg
+                                      class="mx-auto h-12 w-12 text-gray-400"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
+                                      stroke="currentColor"
+                                      aria-hidden="true"
+                                    >
+                                      <path
+                                        vector-effect="non-scaling-stroke"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"
+                                      />
                                     </svg>
-                                    <h3 class="mt-2 text-sm font-medium text-gray-900">No structures associated with the sample yet!</h3>
-                                    <p class="mt-1 text-sm text-gray-500">Get started by adding a new molecule.</p>
+                                    <h3 class="mt-2 text-sm font-medium text-gray-900">
+                                      No structures associated with the sample yet!
+                                    </h3>
+                                    <p class="mt-1 text-sm text-gray-500">
+                                      Get started by adding a new molecule.
+                                    </p>
                                   </div>
                                 </div>
                               </div>
@@ -1225,7 +1290,7 @@
           class="ml-2"
           @click="process"
           :class="{ 'opacity-25': createDatasetForm.processing }"
-          :disabled="createDatasetForm.processing || loading"
+          :disabled="createDatasetForm.processing || loading || loadingStep"
         >
           <span v-if="loadingStep">
             <svg
@@ -1266,10 +1331,32 @@
         </jet-secondary-button>
         <jet-button
           class="ml-2"
-          @click="selectStep(3)"
+          @click="closeDraft"
           :class="{ 'opacity-25': createDatasetForm.processing }"
-          :disabled="createDatasetForm.processing"
+          :disabled="createDatasetForm.processing || loading || loadingStep"
         >
+          <span v-if="loadingStep">
+            <svg
+              class="animate-spin -ml-1 mr-3 h-2 w-2 text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+          </span>
           Proceed
         </jet-button>
       </span>
@@ -1285,14 +1372,6 @@
         <jet-secondary-button @click="toggleCreateDatasetDialog">
           Cancel
         </jet-secondary-button>
-        <jet-button
-          class="ml-2"
-          @click="selectStep(4)"
-          :class="{ 'opacity-25': createDatasetForm.processing }"
-          :disabled="createDatasetForm.processing"
-        >
-          Proceed
-        </jet-button>
       </span>
     </template>
   </jet-dialog-modal>
@@ -1316,6 +1395,7 @@ import OCL from "openchemlib/full";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import { ChevronLeftIcon, ChevronRightIcon, ChevronDownIcon } from "@heroicons/vue/solid";
 import slider from "vue3-slider";
+import VueTagsInput from "@sipec/vue3-tags-input";
 
 export default {
   components: {
@@ -1347,6 +1427,7 @@ export default {
     ChevronRightIcon,
     JetInputError,
     slider,
+    VueTagsInput,
   },
 
   mounted() {
@@ -1382,6 +1463,12 @@ export default {
       selectedSpectraData: null,
       drafts: [],
       defaultDraft: null,
+      draftTags: [],
+      draftTag: "",
+      studyName: "",
+      studyDescription: "",
+      studyTags: [],
+      studyTag: "",
       currentDraft: null,
       selectedStudy: null,
       selectedDataset: null,
@@ -1444,11 +1531,11 @@ export default {
 
   methods: {
     getSVGString(molecule) {
-      if(molecule.MOL){
+      if (molecule.MOL) {
         let mol = OCL.Molecule.fromMolfile("\n  " + molecule.MOL.replaceAll('"', ""));
         return mol.toSVG(200, 200);
-      }else{
-        console.log(molecule)
+      } else {
+        console.log(molecule);
       }
     },
     loadDropZone() {
@@ -1542,7 +1629,29 @@ export default {
     },
     selectStudy(study) {
       this.selectedStudy = study;
+      this.studyName = this.selectedStudy.name;
+      this.studyDescription = this.selectedStudy.description;
+      let tags = [];
+      this.selectedStudy.tags.forEach((t) => {
+        tags.push({
+          text: t.name["en"],
+        });
+      });
+      this.studyTags = tags;
       this.selectDataset(this.selectedStudy.datasets[0]);
+    },
+    closeDraft(){
+      this.loadingStep = true;
+      axios
+        .post("/dashboard/drafts/" + this.currentDraft.id + "/complete", {})
+        .then((response) => {
+          this.project = response.data.project;
+          this.studies = response.data.studies;
+          if (this.project && this.studies.length > 0) {
+            this.loadingStep = false;
+            this.selectStep(3);
+          }
+        });
     },
     process() {
       this.loadingStep = true;
@@ -1550,12 +1659,13 @@ export default {
         .post("/dashboard/drafts/" + this.currentDraft.id + "/process", {
           name: this.draftName,
           description: this.draftDescription,
+          tags: this.draftTags.map((a) => a.text),
         })
         .then((response) => {
           this.project = response.data.project;
           this.studies = response.data.studies;
           if (this.project && this.studies.length > 0) {
-            this.selectedStudy = this.studies[0];
+            this.selectStudy(this.studies[0]);
             this.selectedDataset = this.selectedStudy.datasets[0];
             this.loadingStep = false;
             this.selectStep(2);
@@ -1566,6 +1676,15 @@ export default {
       this.currentDraft = draft;
       this.draftName = this.currentDraft.name;
       this.draftDescription = this.currentDraft.description;
+      let tags = [];
+      if(this.currentDraft.tags){
+        this.currentDraft.tags.forEach((t) => {
+          tags.push({
+            text: t.name["en"],
+          });
+        });
+        this.draftTags = tags;
+      }
       this.loadDropZone();
       this.loadFiles();
     },
@@ -1672,6 +1791,18 @@ export default {
         this.editor.setSmiles(this.smiles);
       }
     },
+    saveStudyDetails() {
+      this.loadingStep = true;
+      axios
+        .put("/dashboard/studies/" + this.selectedStudy.id + "/update", {
+          name: this.studyName,
+          description: this.studyDescription,
+          tags: this.studyTags.map((a) => a.text),
+        })
+        .then((response) => {
+          this.currentStudy = response;
+        });
+    },
     saveMolecule() {
       let mol = this.editor.getMolFile();
       axios
@@ -1689,7 +1820,7 @@ export default {
               mol: mol,
             })
             .then((res) => {
-              this.selectedStudy.sample.molecules = res.data
+              this.selectedStudy.sample.molecules = res.data;
               this.smiles = "";
               this.percentage = 0;
               this.editor.setSmiles("");
@@ -1712,18 +1843,18 @@ export default {
     currentTab() {
       return this.tabs.find((t) => t.current);
     },
-    getMax(){
-      if(this.selectedStudy){
+    getMax() {
+      if (this.selectedStudy) {
         let totalCount = 0;
-        this.selectedStudy.sample.molecules.forEach( mol => {
-          totalCount += parseInt(mol.pivot.percentage_composition)
-        })
+        this.selectedStudy.sample.molecules.forEach((mol) => {
+          totalCount += parseInt(mol.pivot.percentage_composition);
+        });
         console.log(totalCount);
-        return (100 - totalCount);
-      }else{
+        return 100 - totalCount;
+      } else {
         return 100;
       }
-    }
+    },
   },
 };
 </script>

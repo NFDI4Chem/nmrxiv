@@ -219,9 +219,9 @@ export default {
   },
   methods: {
     getLink(project){
-      if(project && project.draft_id){
+      if(project){
         if(project.draft_id == null){
-          return this.route('dashboard.projects', [project.id])
+          return this.$inertia.visit(this.route('dashboard.projects', [project.id]))
         }else{
           this.openDatasetCreateDialog({ 
             'draft_id' : project.draft_id

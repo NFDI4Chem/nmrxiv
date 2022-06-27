@@ -64,7 +64,7 @@ class DatasetController extends Controller
         $s3Client->registerStreamWrapper();
 
         return response()->stream(
-            function () use ($s3keys, $s3Client, $bucket, $fsObj) {
+            function () use ($s3keys, $s3Client, $bucket, $fsObj, $dataset) {
                 $options = new \ZipStream\Option\Archive();
                 $options->setContentType('application/octet-stream');
                 $options->setZeroHeader(true);
@@ -76,7 +76,7 @@ class DatasetController extends Controller
                     $fileName = basename($key);
                     $s3path = 's3://' . $bucket . '/' . $key;
                     if ($streamRead = fopen($s3path, 'r')) {
-                        $zip->addFileFromStream($fsObj->key . '/' . explode($fsObj->key, $key)[1], $streamRead);
+                        $zip->addFileFromStream($fsObj->key . '/' . explode( $dataset->study->name . '/' . $fsObj->key . '/', $key)[1], $streamRead);
                     } else {
                         die('Could not open stream for reading');
                     }
