@@ -65,7 +65,6 @@
                           </div>
                           <jet-input-error :message="form.errors.name" class="mt-2" />
                         </div>
-                        
                         <div>
                           <label
                             for="description"
@@ -158,6 +157,22 @@
                             <jet-input-error
                               :message="form.errors.description"
                               class="mt-2"
+                            />
+                          </div>
+                        </div>
+                        <div class="mb-3">
+                          <label
+                            for="description"
+                            class="block text-sm font-medium text-gray-700"
+                          >
+                            Tags
+                          </label>
+                          <div>
+                            <vue-tags-input
+                              v-model="form.tag"
+                              max-width="100%"
+                              :tags="form.tags"
+                              @tags-changed="(newTags) => (form.tags = newTags)"
                             />
                           </div>
                         </div>
@@ -504,7 +519,7 @@ import { ClipboardCopyIcon, CheckIcon, ChevronDownIcon } from "@heroicons/vue/so
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import SelectRich from "@/Shared/SelectRich.vue";
 import JetButton from "@/Jetstream/Button.vue";
-
+import VueTagsInput from "@sipec/vue3-tags-input";
 const publishingOptions = [
   {
     value: "viewer",
@@ -561,6 +576,7 @@ export default defineComponent({
     CheckIcon,
     ChevronDownIcon,
     SelectRich,
+    VueTagsInput,
   },
   props: ["project", "role"], 
   setup() {
@@ -585,6 +601,8 @@ export default defineComponent({
         access_type: this.project.access_type,
         is_public: this.project.is_public,
         license: null,
+        tag: "",
+        tags: [],
       }),
       open: false,
       licenses: [],
@@ -609,12 +627,25 @@ export default defineComponent({
       })
   },
   methods: {
+    assignTags() {
+      if (this.study) {
+        let tags = [];
+        this.project.tags.forEach((t) => {
+          tags.push({
+            text: t.name["en"],
+          });
+        });
+        this.form.tags = tags;
+      }
+    },
     toggleDetails() {
       this.open = !this.open;
+      this.assignTags();
     },
     updateProject() {
       this.form.owner_id = this.project.owner_id;
       this.form.team_id = this.project.team_id;
+      this.form.tags = this.form.tags.map((t) => t.text);
       if (this.linkAccess) {
         this.form.access = "link";
         this.form.access_type = this.selectedAccessType.value;
@@ -637,7 +668,9 @@ export default defineComponent({
   computed: {
     editable() {
       if (this.role) {
-        return this.role == "creator" || this.role == "owner" || this.role == "collaborator";
+        return (
+          this.role == "creator" || this.role == "owner" || this.role == "collaborator"
+        );
       } else {
         return false;
       }
