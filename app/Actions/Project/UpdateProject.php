@@ -40,6 +40,10 @@ class UpdateProject
             'is_public'  => $input['is_public'],
             'project_photo_path' => array_key_exists('project_photo_path', $input) ? $input['project_photo_path'] : null,
             ])->save();
+            
+            if(array_key_exists('tags', $input)){
+                $project->syncTagsWithType( $input['tags'], 'Project');
+            }
         });
     }
 }
