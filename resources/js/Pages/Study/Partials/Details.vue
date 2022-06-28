@@ -1,7 +1,7 @@
 <template>
   <TransitionRoot as="template" :show="open">
-    <Dialog as="div" class="fixed inset-0 overflow-hidden z-50">
-      <div class="absolute inset-0 overflow-hidden">
+    <Dialog as="div" class="fixed inset-0  z-50">
+      <div class="absolute inset-0 ">
         <DialogOverlay class="absolute inset-0" />
 
         <div class="fixed inset-y-0 pl-16 max-w-full right-0 flex">
@@ -231,6 +231,15 @@
                         </fieldset>
                       </div>
                       <div class="pt-4 pb-6">
+                        <div class="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
+                        <div>
+                          <select-rich label="License" v-model:selected="form.license"
+                            :items="licenses"
+                          />
+                        </div>
+                        </div>
+                      </div>
+                      <div class="pt-4 pb-6">
                         <div v-if="form.is_public == true || form.is_public == 'true'">
                           <label for="email" class="block text-sm font-medium text-gray-700">Public URL</label>
                           <div class="mt-1 flex rounded-md shadow-sm">
@@ -381,6 +390,7 @@ import { Switch, SwitchGroup, SwitchLabel } from '@headlessui/vue'
 import { ClipboardCopyIcon, CheckIcon, ChevronDownIcon } from '@heroicons/vue/solid'
 import { Listbox, ListboxButton, ListboxLabel, ListboxOption, ListboxOptions } from "@headlessui/vue";
 import JetButton from "@/Jetstream/Button.vue";
+import SelectRich from "@/Shared/SelectRich.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 
 const publishingOptions = [
@@ -423,6 +433,7 @@ export default {
     ClipboardCopyIcon,
     CheckIcon,
     ChevronDownIcon,
+    SelectRich,
   },
   props: ["study"],
   setup() {
@@ -446,11 +457,27 @@ export default {
         is_public: this.study.is_public,
         access: this.study.access,
         access_type: this.study.access_type,
+        license: null,
       }),
       open: false,
+      licenses: [],
       selectedAccessType: publishingOptions.filter( option => option.value == this.study.access_type)[0],
       linkAccess : this.study.access == 'link'
     };
+  },
+  mounted(){
+    if(this.study.license_id){
+    axios
+      .get(route("console.license.getLicensebyId",this.study.license_id))
+      .then((res) => {
+        this.form.license = res.data[0];
+      })
+    }
+    axios
+      .get(route("console.licenses"))
+      .then((res) => {
+        this.licenses = res.data;
+      })
   },
   methods: {
     toggleDetails() {

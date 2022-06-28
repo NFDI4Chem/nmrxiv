@@ -13,6 +13,9 @@ class License extends Model
         'title'
     ];
 
+    protected $casts = [
+        'permissions' => 'array'
+    ];
     /**
      * Define hasMany relation with projects
      * 

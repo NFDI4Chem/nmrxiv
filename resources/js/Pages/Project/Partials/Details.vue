@@ -1,7 +1,7 @@
 <template>
   <TransitionRoot as="template" :show="open">
-    <Dialog as="div" class="fixed inset-0 overflow-hidden z-50">
-      <div class="absolute inset-0 overflow-hidden">
+    <Dialog as="div" class="fixed inset-0 z-50">
+      <div class="absolute inset-0">
         <DialogOverlay class="absolute inset-0" />
 
         <div class="fixed inset-y-0 pl-16 max-w-full right-0 flex">
@@ -234,6 +234,15 @@
                             </div>
                           </div>
                         </fieldset>
+                      </div>
+                      <div v-if="editable" class="pt-4 pb-6">
+                        <div class="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
+                        <div>
+                          <select-rich label="License" v-model:selected="form.license"
+                            :items="licenses"
+                          />
+                        </div>
+                        </div>
                       </div>
                       <div v-if="editable" class="pt-4 pb-6">
                         <div v-if="form.is_public == true || form.is_public == 'true'">
@@ -493,6 +502,7 @@ import "vue3-colorpicker/style.css";
 import { Switch, SwitchGroup, SwitchLabel } from "@headlessui/vue";
 import { ClipboardCopyIcon, CheckIcon, ChevronDownIcon } from "@heroicons/vue/solid";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
+import SelectRich from "@/Shared/SelectRich.vue";
 import JetButton from "@/Jetstream/Button.vue";
 
 const publishingOptions = [
@@ -550,8 +560,9 @@ export default defineComponent({
     ClipboardCopyIcon,
     CheckIcon,
     ChevronDownIcon,
+    SelectRich,
   },
-  props: ["project", "role"],
+  props: ["project", "role"], 
   setup() {
     const activityDetailsElement = ref(null);
     return {
@@ -573,13 +584,29 @@ export default defineComponent({
         access: this.project.access,
         access_type: this.project.access_type,
         is_public: this.project.is_public,
+        license: null,
       }),
       open: false,
+      licenses: [],
       selectedAccessType: publishingOptions.filter(
         (option) => option.value == this.project.access_type
       )[0],
       linkAccess: this.project.access == "link",
     };
+  },
+  mounted(){
+    if(this.project.license_id){
+    axios
+      .get(route("console.license.getLicensebyId",this.project.license_id))
+      .then((res) => {
+        this.form.license = res.data[0];
+      })
+    }
+    axios
+      .get(route("console.licenses"))
+      .then((res) => {
+        this.licenses = res.data;
+      })
   },
   methods: {
     toggleDetails() {
@@ -601,6 +628,7 @@ export default defineComponent({
         },
         onError: (err) => console.error(err),
       });
+     
     },
     toggleActivityDetails() {
       this.activityDetailsElement.toggleDetails();

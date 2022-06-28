@@ -231,6 +231,13 @@
             </SwitchGroup>
           </div>
         </div>
+        <div class="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-1">
+          <div>
+            <select-rich label="License" v-model:selected="createStudyForm.license"
+              :items="licenses"
+            />         
+            </div>
+        </div>
       </div>
     </template>
 
@@ -262,6 +269,7 @@ import { AtSymbolIcon, CodeIcon, LinkIcon } from "@heroicons/vue/solid";
 import JetInputError from "@/Jetstream/InputError.vue";
 import { ref } from "vue";
 import { Switch, SwitchDescription, SwitchGroup, SwitchLabel } from "@headlessui/vue";
+import SelectRich from "@/Shared/SelectRich.vue";
 import { inject } from "vue";
 
 export default {
@@ -285,6 +293,7 @@ export default {
     CheckCircleIcon,
     ChevronRightIcon,
     JetInputError,
+    SelectRich,
   },
 
   mounted() {
@@ -292,6 +301,18 @@ export default {
     emitter.on("openStudyCreateDialog", () => {
       this.createStudyDialog = true;
     });
+    axios
+      .get(route("console.licenses"))
+      .then((res) => {
+        this.licenses = res.data;
+      })
+    if(this.project.license_id){
+      axios
+      .get(route("console.license.getLicensebyId",this.project.license_id))
+      .then((res) => {
+        this.createStudyForm.license = res.data[0];
+      })
+    }
   },
 
   data() {
@@ -307,13 +328,14 @@ export default {
         starred: null,
         project_id: this.project ? this.project.id : null,
         is_public: ref(false),
+        license: null,
       }),
       createStudyDialog: false,
+      licenses: [],
     };
   },
 
   props: ['project'],
-
   methods: {
     createStudy() {
       this.createStudyForm.owner_id = this.$page.props.user.id;

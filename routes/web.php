@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AnnouncementController;
 use App\Http\Controllers\Auth\SocialController;
 use App\Http\Controllers\Admin\ConsoleController;
 use App\Http\Controllers\Admin\UsersController;
+use App\Http\Controllers\Admin\LicenseController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectInvitationController;
 use App\Http\Controllers\ProjectMemberController;
@@ -123,7 +124,6 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
         Route::get('studies/{study}/activity', [StudyController::class, 'activity'])
             ->name('dashboard.study.activity');
 
-
         Route::post('studies/{study}/members', [StudyMemberController::class, 'memberStore'])
             ->name('study-members.store');
         Route::put('/studies/{study}/members/{user}', [StudyMemberController::class, 'updateMemberRole'])
@@ -204,6 +204,16 @@ Route::group([
 
             Route::delete('announcements/{announcement}', [AnnouncementController::class, 'destroy'])
             ->name('console.announcements.destroy');
+        });
+
+        // Adding routes for licenses section
+        Route::group(['middleware' => ['auth', 'permission:manage roles|manage platform']], function () {
+            // License
+            Route::get('licenses', [LicenseController::class, 'index'])
+            ->name('console.licenses');
+
+            Route::get('licenses/{id}', [LicenseController::class, 'getLicensebyId'])
+            ->name('console.license.getLicensebyId');
         });
     });
 });

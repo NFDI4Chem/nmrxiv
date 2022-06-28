@@ -34,7 +34,8 @@ class Study extends Model implements Auditable
         'owner_id',
         'project_id',
         'fs_id',
-        'study_photo_path'
+        'study_photo_path',
+        'license_id'
     ];
 
     /**
