@@ -19,7 +19,14 @@
                 class="h-full divide-y divide-gray-200 flex flex-col bg-white shadow-xl"
               >
                 <div class="flex-1 h-0 overflow-y-auto">
-                  <div class="py-6 px-4 sm:px-6" :style="[ (study.color && study.color!='') ? ('background-color:' + study.color)  : 'background-color:rgb(75,75,75)']">
+                  <div
+                    class="py-6 px-4 sm:px-6"
+                    :style="[
+                      study.color && study.color != ''
+                        ? 'background-color:' + study.color
+                        : 'background-color:rgb(75,75,75)',
+                    ]"
+                  >
                     <div class="flex items-center justify-between">
                       <DialogTitle class="text-lg font-medium text-white">
                         {{ study.name }}
@@ -55,10 +62,7 @@
                               class="block w-full shadow-sm sm:text-sm focus:ring-gray-500 focus:border-gray-500 border-gray-300 rounded-md"
                             />
                           </div>
-                          <jet-input-error
-                            :message="form.errors.name"
-                            class="mt-2"
-                          />                          
+                          <jet-input-error :message="form.errors.name" class="mt-2" />
                         </div>
                         <div>
                           <label
@@ -129,10 +133,10 @@
                                 </TabPanel>
                               </TabPanels>
                             </TabGroup>
-                              <jet-input-error
-                                :message="form.errors.description"
-                                class="mt-2"
-                              />
+                            <jet-input-error
+                              :message="form.errors.description"
+                              class="mt-2"
+                            />
                             <label class="block text-sm font-medium text-gray-700"
                               ><small
                                 ><svg
@@ -152,9 +156,21 @@
                                 Styling with Markdown is supported</small
                               >
                             </label>
-                            <jet-input-error
-                              :message="form.errors.description"
-                              class="mt-2"
+                          </div>
+                        </div>
+                        <div class="mb-3">
+                          <label
+                            for="description"
+                            class="block text-sm font-medium text-gray-700"
+                          >
+                            Tags
+                          </label>
+                          <div>
+                            <vue-tags-input
+                              v-model="form.tag"
+                              max-width="100%"
+                              :tags="form.tags"
+                              @tags-changed="(newTags) => (form.tags = newTags)"
                             />
                           </div>
                         </div>
@@ -165,7 +181,7 @@
                           >
                             Color
                           </label>
-                          <color-picker v-model:pureColor="form.color"/>
+                          <color-picker v-model:pureColor="form.color" />
                         </div>
                         <fieldset>
                           <legend class="text-sm font-medium text-gray-900">
@@ -232,13 +248,33 @@
                       </div>
                       <div class="pt-4 pb-6">
                         <div v-if="form.is_public == true || form.is_public == 'true'">
-                          <label for="email" class="block text-sm font-medium text-gray-700">Public URL</label>
+                          <label
+                            for="email"
+                            class="block text-sm font-medium text-gray-700"
+                            >Public URL</label
+                          >
                           <div class="mt-1 flex rounded-md shadow-sm">
-                            <div class="relative flex items-stretch flex-grow focus-within:z-10">
-                              <input @focus="$event.target.select()"  id="studyPublicURLCopy" v-model="study.public_url" type="text" class="rounded-l-md focus:ring-gray-500 focus:border-gray-500 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300" />
+                            <div
+                              class="relative flex items-stretch flex-grow focus-within:z-10"
+                            >
+                              <input
+                                @focus="$event.target.select()"
+                                id="studyPublicURLCopy"
+                                v-model="study.public_url"
+                                type="text"
+                                class="rounded-l-md focus:ring-gray-500 focus:border-gray-500 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300"
+                              />
                             </div>
-                            <button @click="copyToClipboard(study.public_url, 'studyPublicURLCopy')" type="button" class="-ml-px relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500">
-                              <span><ClipboardCopyIcon class="h-5 w-5" aria-hidden="true" /></span>
+                            <button
+                              @click="
+                                copyToClipboard(study.public_url, 'studyPublicURLCopy')
+                              "
+                              type="button"
+                              class="-ml-px relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500"
+                            >
+                              <span
+                                ><ClipboardCopyIcon class="h-5 w-5" aria-hidden="true"
+                              /></span>
                             </button>
                           </div>
                         </div>
@@ -246,60 +282,143 @@
                           <div class="space-y-1">
                             <div class="relative flex items-start">
                               <div class="flex items-center h-5">
-                                <input v-model="linkAccess" type="checkbox" class="focus:ring-gray-500 h-4 w-4 text-gray-600 border-gray-300 rounded" />
+                                <input
+                                  v-model="linkAccess"
+                                  type="checkbox"
+                                  class="focus:ring-gray-500 h-4 w-4 text-gray-600 border-gray-300 rounded"
+                                />
                               </div>
                               <div class="ml-3 text-sm">
-                                <label class="font-medium text-gray-700">Any one with link</label>
+                                <label class="font-medium text-gray-700"
+                                  >Any one with link</label
+                                >
                               </div>
                             </div>
                             <div v-if="linkAccess">
                               <div class="flex">
                                 <div class="flex-grow">
-                                  <input @focus="$event.target.select()" id="studyPrivateURLCopy" readonly type="text" :value="study.private_url" class="rounded-l-md focus:ring-gray-500 focus:border-gray-500 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300" />
+                                  <input
+                                    @focus="$event.target.select()"
+                                    id="studyPrivateURLCopy"
+                                    readonly
+                                    type="text"
+                                    :value="study.private_url"
+                                    class="rounded-l-md focus:ring-gray-500 focus:border-gray-500 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300"
+                                  />
                                 </div>
-                                <button @click="copyToClipboard(study.private_url, 'studyPrivateURLCopy')" type="button" class="-ml-px relative inline-flex items-center space-x-2 px-2 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500">
-                                  <span><ClipboardCopyIcon class="h-5 w-5" aria-hidden="true" /></span>
+                                <button
+                                  @click="
+                                    copyToClipboard(
+                                      study.private_url,
+                                      'studyPrivateURLCopy'
+                                    )
+                                  "
+                                  type="button"
+                                  class="-ml-px relative inline-flex items-center space-x-2 px-2 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500"
+                                >
+                                  <span
+                                    ><ClipboardCopyIcon
+                                      class="h-5 w-5"
+                                      aria-hidden="true"
+                                  /></span>
                                 </button>
                               </div>
                               <div class="mt-3">
-                                  <Listbox as="div" v-model="selectedAccessType">
-                                    <div class="relative">
-                                      <div class="inline-flex shadow-sm rounded-md divide-x divide-gray-600">
-                                        <div class="relative z-0 inline-flex shadow-sm rounded-md divide-x divide-gray-600">
-                                          <div class="relative inline-flex items-center bg-gray-500 py-2 pl-3 pr-4 border border-transparent rounded-l-md shadow-sm text-white">
-                                            <CheckIcon class="h-5 w-5" aria-hidden="true" />
-                                            <p class="ml-2.5 text-sm font-medium">{{ selectedAccessType.title }}</p>
-                                          </div>
-                                          <ListboxButton class="relative inline-flex items-center bg-gray-500 p-2 rounded-l-none rounded-r-md text-sm font-medium text-white hover:bg-gray-600 focus:outline-none focus:z-10 focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-gray-500">
-                                            <span class="sr-only">Change published status</span>
-                                            <ChevronDownIcon class="h-5 w-5 text-white" aria-hidden="true" />
-                                          </ListboxButton>
+                                <Listbox as="div" v-model="selectedAccessType">
+                                  <div class="relative">
+                                    <div
+                                      class="inline-flex shadow-sm rounded-md divide-x divide-gray-600"
+                                    >
+                                      <div
+                                        class="relative z-0 inline-flex shadow-sm rounded-md divide-x divide-gray-600"
+                                      >
+                                        <div
+                                          class="relative inline-flex items-center bg-gray-500 py-2 pl-3 pr-4 border border-transparent rounded-l-md shadow-sm text-white"
+                                        >
+                                          <CheckIcon class="h-5 w-5" aria-hidden="true" />
+                                          <p class="ml-2.5 text-sm font-medium">
+                                            {{ selectedAccessType.title }}
+                                          </p>
                                         </div>
+                                        <ListboxButton
+                                          class="relative inline-flex items-center bg-gray-500 p-2 rounded-l-none rounded-r-md text-sm font-medium text-white hover:bg-gray-600 focus:outline-none focus:z-10 focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-gray-500"
+                                        >
+                                          <span class="sr-only"
+                                            >Change published status</span
+                                          >
+                                          <ChevronDownIcon
+                                            class="h-5 w-5 text-white"
+                                            aria-hidden="true"
+                                          />
+                                        </ListboxButton>
                                       </div>
-
-                                      <transition leave-active-class="transition ease-in duration-100" leave-from-class="opacity-100" leave-to-class="opacity-0">
-                                        <ListboxOptions class="origin-top-right absolute z-10 left-0 mt-2 w-72 rounded-md shadow-lg overflow-hidden bg-white divide-y divide-gray-200 ring-1 ring-black ring-opacity-5 focus:outline-none">
-                                          <ListboxOption as="template" v-for="option in publishingOptions" :key="option.title" :value="option" v-slot="{ active, selectedAccessType }">
-                                            <li :class="[active ? 'text-white bg-gray-500' : 'text-gray-900', 'cursor-default select-none relative p-4 text-sm']">
-                                              <div class="flex flex-col">
-                                                <div class="flex justify-between">
-                                                  <p :class="selectedAccessType ? 'font-semibold' : 'font-normal'">
-                                                    {{ option.title }}
-                                                  </p>
-                                                  <span v-if="selectedAccessType" :class="active ? 'text-white' : 'text-gray-500'">
-                                                    <CheckIcon class="h-5 w-5" aria-hidden="true" />
-                                                  </span>
-                                                </div>
-                                                <p :class="[active ? 'text-gray-200' : 'text-gray-500', 'mt-2']">
-                                                  {{ option.description }}
-                                                </p>
-                                              </div>
-                                            </li>
-                                          </ListboxOption>
-                                        </ListboxOptions>
-                                      </transition>
                                     </div>
-                                  </Listbox>
+
+                                    <transition
+                                      leave-active-class="transition ease-in duration-100"
+                                      leave-from-class="opacity-100"
+                                      leave-to-class="opacity-0"
+                                    >
+                                      <ListboxOptions
+                                        class="origin-top-right absolute z-10 left-0 mt-2 w-72 rounded-md shadow-lg overflow-hidden bg-white divide-y divide-gray-200 ring-1 ring-black ring-opacity-5 focus:outline-none"
+                                      >
+                                        <ListboxOption
+                                          as="template"
+                                          v-for="option in publishingOptions"
+                                          :key="option.title"
+                                          :value="option"
+                                          v-slot="{ active, selectedAccessType }"
+                                        >
+                                          <li
+                                            :class="[
+                                              active
+                                                ? 'text-white bg-gray-500'
+                                                : 'text-gray-900',
+                                              'cursor-default select-none relative p-4 text-sm',
+                                            ]"
+                                          >
+                                            <div class="flex flex-col">
+                                              <div class="flex justify-between">
+                                                <p
+                                                  :class="
+                                                    selectedAccessType
+                                                      ? 'font-semibold'
+                                                      : 'font-normal'
+                                                  "
+                                                >
+                                                  {{ option.title }}
+                                                </p>
+                                                <span
+                                                  v-if="selectedAccessType"
+                                                  :class="
+                                                    active
+                                                      ? 'text-white'
+                                                      : 'text-gray-500'
+                                                  "
+                                                >
+                                                  <CheckIcon
+                                                    class="h-5 w-5"
+                                                    aria-hidden="true"
+                                                  />
+                                                </span>
+                                              </div>
+                                              <p
+                                                :class="[
+                                                  active
+                                                    ? 'text-gray-200'
+                                                    : 'text-gray-500',
+                                                  'mt-2',
+                                                ]"
+                                              >
+                                                {{ option.description }}
+                                              </p>
+                                            </div>
+                                          </li>
+                                        </ListboxOption>
+                                      </ListboxOptions>
+                                    </transition>
+                                  </div>
+                                </Listbox>
                               </div>
                             </div>
                           </div>
@@ -327,14 +446,20 @@
                             <span class="ml-2"> Activity </span>
                           </a>
                         </div>
-                        <study-activity :study="study" ref="activityDetailsElement"></study-activity>
+                        <study-activity
+                          :study="study"
+                          ref="activityDetailsElement"
+                        ></study-activity>
                       </div>
                     </div>
                   </div>
                 </div>
                 <div class="flex-shrink-0 px-4 py-4 flex justify-end">
-                  <jet-action-message :on="form.recentlySuccessful" class="mr-3 py-2 text-green-200">
-                      Saved.
+                  <jet-action-message
+                    :on="form.recentlySuccessful"
+                    class="mr-3 py-2 text-green-200"
+                  >
+                    Saved.
                   </jet-action-message>
                   <jet-secondary-button
                     type="button"
@@ -362,7 +487,7 @@
 
 <script>
 import { ref } from "vue";
-import JetActionMessage from '@/Jetstream/ActionMessage.vue'
+import JetActionMessage from "@/Jetstream/ActionMessage.vue";
 import {
   Dialog,
   DialogOverlay,
@@ -371,23 +496,51 @@ import {
   TransitionRoot,
 } from "@headlessui/vue";
 import { XIcon } from "@heroicons/vue/outline";
-import { LinkIcon, PlusSmIcon, QuestionMarkCircleIcon, ExclamationCircleIcon } from "@heroicons/vue/solid";
+import {
+  LinkIcon,
+  PlusSmIcon,
+  QuestionMarkCircleIcon,
+  ExclamationCircleIcon,
+} from "@heroicons/vue/solid";
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import StudyActivity from "@/Pages/Study/Partials/Activity.vue";
 import { ColorPicker } from "vue3-colorpicker";
 import "vue3-colorpicker/style.css";
-import { Switch, SwitchGroup, SwitchLabel } from '@headlessui/vue'
-import { ClipboardCopyIcon, CheckIcon, ChevronDownIcon } from '@heroicons/vue/solid'
-import { Listbox, ListboxButton, ListboxLabel, ListboxOption, ListboxOptions } from "@headlessui/vue";
+import { Switch, SwitchGroup, SwitchLabel } from "@headlessui/vue";
+import { ClipboardCopyIcon, CheckIcon, ChevronDownIcon } from "@heroicons/vue/solid";
+import {
+  Listbox,
+  ListboxButton,
+  ListboxLabel,
+  ListboxOption,
+  ListboxOptions,
+} from "@headlessui/vue";
 import JetButton from "@/Jetstream/Button.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
+import VueTagsInput from "@sipec/vue3-tags-input";
+import { inject } from "vue";
 
 const publishingOptions = [
-  { value: 'viewer', title: 'Viewer', description: 'Anyone on the internet with this link can view', current: true },
-  { value: 'commentor', title: 'Commentor', description: 'Anyone on the internet with this link can comment', current: false },
-  { value: 'editor', title: 'Editor', description: 'Anyone on the internet with this link can edit (sign in required)', current: false },
-]
+  {
+    value: "viewer",
+    title: "Viewer",
+    description: "Anyone on the internet with this link can view",
+    current: true,
+  },
+  {
+    value: "commentor",
+    title: "Commentor",
+    description: "Anyone on the internet with this link can comment",
+    current: false,
+  },
+  {
+    value: "editor",
+    title: "Editor",
+    description: "Anyone on the internet with this link can edit (sign in required)",
+    current: false,
+  },
+];
 
 export default {
   components: {
@@ -423,14 +576,20 @@ export default {
     ClipboardCopyIcon,
     CheckIcon,
     ChevronDownIcon,
+    VueTagsInput,
   },
   props: ["study"],
+  mounted() {
+    const emitter = inject("emitter");
+    emitter.on("openStudyDetails", (data) => {
+      this.open = true;
+    });
+  },
   setup() {
-    const activityDetailsElement = ref(null)
+    const activityDetailsElement = ref(null);
     return {
-      publishingOptions,
-      activityDetailsElement
-    }
+      activityDetailsElement,
+    };
   },
   data() {
     return {
@@ -446,35 +605,63 @@ export default {
         is_public: this.study.is_public,
         access: this.study.access,
         access_type: this.study.access_type,
+        tag: "",
+        tags: this.getTags(),
       }),
       open: false,
-      selectedAccessType: publishingOptions.filter( option => option.value == this.study.access_type)[0],
-      linkAccess : this.study.access == 'link'
+      selectedAccessType: publishingOptions.filter(
+        (option) => option.value == this.study.access_type
+      )[0],
+      linkAccess: this.study.access == "link",
     };
   },
   methods: {
     toggleDetails() {
       this.open = !this.open;
     },
+    getTags() {
+      if (this.study && this.study.tags) {
+        let tags = [];
+        this.study.tags.forEach((t) => {
+          tags.push({
+            text: t.name["en"],
+          });
+        });
+        return tags;
+      }
+      return [];
+    },
     updateStudy() {
       this.form.owner_id = this.study.owner_id;
       this.form.team_id = this.study.team_id;
       this.form.project_id = this.study.project_id;
-      if(this.linkAccess){
-        this.form.access = "link"
-        this.form.access_type = this.selectedAccessType.value
-      }else{
-        this.form.access = "restricted"
+      this.form.tags = this.form.tags.map((t) => t.text);
+      if (this.linkAccess) {
+        this.form.access = "link";
+        this.form.access_type = this.selectedAccessType.value;
+      } else {
+        this.form.access = "restricted";
       }
       this.form.post(route("dashboard.study.update", this.study.id), {
         preserveScroll: true,
-        onSuccess: () => { this.open = false },
-        onError: (err) => console.error(err),
+        onSuccess: () => {
+          this.open = false;
+          this.form.tags = this.getTags();
+        },
+        onError: (err) => {
+          let tags = [];
+          this.form.tags.forEach((t) => {
+            tags.push({
+              text: t,
+            });
+          });
+          this.form.tags = tags;
+        },
       });
     },
     toggleActivityDetails() {
-      this.activityDetailsElement.toggleDetails()
-    }
+      this.activityDetailsElement.toggleDetails();
+    },
   },
 };
 </script>
