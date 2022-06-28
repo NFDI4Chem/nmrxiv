@@ -63,6 +63,9 @@ class UpdateProject
                     }
                 }
             }
+            if(array_key_exists('tags', $input)){
+                $project->syncTagsWithType( $input['tags'], 'Project');
+            }
         });
     }
 }

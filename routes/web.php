@@ -113,6 +113,8 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
             ->name('dashboard.studies');
         Route::get('studies/{study}/files', [StudyController::class, 'files'])
             ->name('dashboard.study.files');
+        Route::get('studies/{study}/datasets', [StudyController::class, 'datasets'])
+            ->name('dashboard.study.datasets');
         Route::get('studies/{study}/settings', [StudyController::class, 'settings'])
             ->name('dashboard.study.settings');
         Route::delete('studies/{study}', [StudyController::class, 'destroy'])
