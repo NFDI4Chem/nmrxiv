@@ -48,7 +48,7 @@ class StudyController extends Controller
         $team = $project->nonPersonalTeam;
 
         return Inertia::render('Study/About', [
-            'study' => $study->load('users', 'owner', 'studyInvitations', 'datasets', 'tags'),
+            'study' => $study->load('users', 'owner', 'studyInvitations', 'tags', 'sample.molecules'),
             'team' => $team ? $team->load('users', 'owner') : null,
             'project' => $project ? $project->load('users', 'owner') : null,
             'members' => $study->allUsers(),
@@ -69,11 +69,26 @@ class StudyController extends Controller
         ]);
     }
 
-    public function assays(Request $request, Study $study)
+    public function datasets(Request $request, Study $study)
     {
-        return Inertia::render('Study/Assays', [
-            'study' => $study,
-            'project' => $study->project,
+        if (! Gate::forUser($request->user())->check('viewStudy', $study)) {
+            throw new AuthorizationException;
+        }
+
+        $project = $study->project; 
+        $team = $project->nonPersonalTeam;
+
+        return Inertia::render('Study/Datasets', [
+            'study' => $study->load('users', 'owner', 'studyInvitations', 'datasets'),
+            'team' => $team ? $team->load('users', 'owner') : null,
+            'project' => $project ? $project->load('users', 'owner') : null,
+            'members' => $study->allUsers(),
+            'availableRoles' => array_values(Jetstream::$roles),
+            'studyRole' => $study->userStudyRole(Auth::user()->email),
+            'studyPermissions' => [
+                'canDeleteStudy' => Gate::check('deleteStudy', $study),
+                'canUpdateStudy' => Gate::check('updateStudy', $study),
+            ],
         ]);
     }
 
