@@ -14,15 +14,16 @@ return new class extends Migration
     public function up()
     {
         Schema::create('licenses', function (Blueprint $table) {
-            $table->string('id');
-            $table->string('name');
+            $table->id();
+            $table->string('title');
+            $table->string('slug');
             $table->string('spdx_id')->nullable();
             $table->string('url')->nullable();
             $table->string('node_id')->nullable();
             $table->string('html_url')->nullable();
             $table->longText('description')->nullable();
             $table->string('implementation')->nullable();
-            $table->char('permissions')->nullable();
+            $table->json('permissions')->nullable();
             $table->longText('body')->nullable();
             $table->timestamps();
         });

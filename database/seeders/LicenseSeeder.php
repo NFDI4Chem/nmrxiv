@@ -30,15 +30,15 @@ class LicenseSeeder extends Seeder
                     ]);
                     if($licenseResponse){
                         $license = License::create([
-                            'id'            => $licenseResponse['key'],
-                            'name'          => $licenseResponse['name'],
+                            'title'         => $licenseResponse['name'],
+                            'slug'          => $licenseResponse['key'],
                             'spdx_id'       => $licenseResponse['spdx_id'],
                             'url'           => $licenseResponse['url'],
                             'node_id'       => $licenseResponse['node_id'],
                             'html_url'      => $licenseResponse['html_url'],
                             'description'   => $licenseResponse['description'],
                             'implementation'=> $licenseResponse['implementation'],
-                           // 'permissions'   => $licenseResponse['permissions'],
+                            'permissions'   => json_encode($licenseResponse['permissions']),
                             'body'          => $licenseResponse['body'],
                         ]);
                     }
