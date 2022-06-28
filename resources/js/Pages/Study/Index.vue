@@ -4,10 +4,10 @@
       <div>
         <h2 class="text-lg">Studies</h2>
         <div class="mt-2 text-sm text-gray-700">
-          <div class="max-w-2xl text-m">
+          <!-- <div class="max-w-2xl text-m">
             Each project may house a variety of studies. Studies can be versioned, command
             invocations, and metrics.
-          </div>
+          </div> -->
         </div>
       </div>
       <div class="flex-shrink-0 ml-4">
@@ -73,9 +73,10 @@
         </div>
       </div>
     </div>
-    <div v-else
-        class="mt-12 mx-auto max-w-md grid gap-8 sm:max-w-lg lg:grid-cols-3 lg:max-w-7xl"
-      >
+    <div
+      v-else
+      class="mt-8 mx-auto max-w-md grid gap-8 sm:max-w-lg lg:grid-cols-3 lg:max-w-7xl"
+    >
       <div :key="study.uuid" v-for="study in studies">
         <Link :href="route('dashboard.studies', [study.id])">
           <study-card :study="study" />
@@ -91,7 +92,7 @@ import { Link } from "@inertiajs/inertia-vue3";
 import StudyCreate from "@/Pages/Study/Partials/Create.vue";
 import StudyCard from "@/Shared/StudyCard.vue";
 import JetButton from "@/Jetstream/Button.vue";
-import { inject } from 'vue';
+import { inject } from "vue";
 export default {
   components: {
     Link,
@@ -100,19 +101,18 @@ export default {
     JetButton,
   },
   setup() {
-    const emitter = inject('emitter'); // Inject `emitter`
+    const emitter = inject("emitter"); // Inject `emitter`
     const openStudyCreateDialog = () => {
-      emitter.emit('openStudyCreateDialog', 100);
+      emitter.emit("openStudyCreateDialog", 100);
     };
     return {
-      openStudyCreateDialog
-    }
+      openStudyCreateDialog,
+    };
   },
   props: ["studies", "project", "editable"],
   data() {
     return {};
   },
-  methods: {
-  },
+  methods: {},
 };
 </script>

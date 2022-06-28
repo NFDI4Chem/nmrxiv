@@ -34,7 +34,6 @@ class DatasetController extends Controller
 
     public function download(Request $request, $code, Dataset $dataset, $filename)
     {
-
         $fsObj = FileSystemObject::where([
             ['dataset_id', $dataset->id],
         ])->first();
@@ -47,11 +46,9 @@ class DatasetController extends Controller
             $request->input('bucket') ?:
             config('filesystems.disks.minio.bucket');
 
-        // $command = $this->createCommand($request, $client, $bucket, $path);
-
         $command = $s3Client->getCommand('ListObjects');
         $command['Bucket'] = $bucket;
-        $command['Prefix'] = $path;
+        $command['Prefix'] = $path . '/';
 
         $result = $s3Client->execute($command);
 
@@ -76,7 +73,7 @@ class DatasetController extends Controller
                     $fileName = basename($key);
                     $s3path = 's3://' . $bucket . '/' . $key;
                     if ($streamRead = fopen($s3path, 'r')) {
-                        $zip->addFileFromStream($fsObj->key . '/' . explode( $dataset->study->name . '/' . $fsObj->key . '/', $key)[1], $streamRead);
+                        $zip->addFileFromStream($fsObj->key . '/' . explode( '/' . $dataset->study->name . '/' . $fsObj->key . '/', $key)[1], $streamRead);
                     } else {
                         die('Could not open stream for reading');
                     }
