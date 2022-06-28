@@ -156,10 +156,6 @@
                                 Styling with Markdown is supported</small
                               >
                             </label>
-                            <jet-input-error
-                              :message="form.errors.description"
-                              class="mt-2"
-                            />
                           </div>
                         </div>
                         <div class="mb-3">
@@ -622,7 +618,6 @@ export default {
   methods: {
     toggleDetails() {
       this.open = !this.open;
-      this.assignTags();
     },
     getTags() {
       if (this.study && this.study.tags) {
@@ -651,9 +646,17 @@ export default {
         preserveScroll: true,
         onSuccess: () => {
           this.open = false;
-          this.form.tags = this.getTags()
+          this.form.tags = this.getTags();
         },
-        onError: (err) => console.error(err),
+        onError: (err) => {
+          let tags = [];
+          this.form.tags.forEach((t) => {
+            tags.push({
+              text: t,
+            });
+          });
+          this.form.tags = tags;
+        },
       });
     },
     toggleActivityDetails() {
