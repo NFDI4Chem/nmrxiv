@@ -60,7 +60,7 @@ class ProjectController extends Controller
 
         $team = $project->nonPersonalTeam;
         return Inertia::render('Project/Show', [
-            'project' => $project->load('projectInvitations'),
+            'project' => $project->load('projectInvitations', 'tags'),
             'team' => $team ? $team->load('users', 'owner') : null,
             'members' => $project->allUsers(),
             'availableRoles' => array_values(Jetstream::$roles),

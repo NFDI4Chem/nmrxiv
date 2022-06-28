@@ -48,7 +48,7 @@ class StudyController extends Controller
         $team = $project->nonPersonalTeam;
 
         return Inertia::render('Study/About', [
-            'study' => $study->load('users', 'owner', 'studyInvitations'),
+            'study' => $study->load('users', 'owner', 'studyInvitations', 'datasets', 'tags'),
             'team' => $team ? $team->load('users', 'owner') : null,
             'project' => $project ? $project->load('users', 'owner') : null,
             'members' => $study->allUsers(),
@@ -128,7 +128,6 @@ class StudyController extends Controller
                 'name' => '/',
                 'children' => FileSystemObject::with('children')
                     ->where([
-                        ['level', 0],
                         ['project_id', $study->project->id],
                         ['study_id', $study->id],
                     ])
