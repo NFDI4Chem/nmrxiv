@@ -24,59 +24,154 @@ class FileSystemController extends Controller
     {
         $filePath = null;
 
-        DB::transaction(function () use ($request, &$filePath) {
+        $files = $request->get('files');
+
+        $filesURLs = [];
+
+        foreach($files as $file){
+            DB::transaction(function () use ($request, &$filePath, $file) {
             
-            $file = $request->get('file');
 
-            $destination = $request->get('destination');
-
-            $draft = Draft::find($request->get('draft_id'));
-
-            $path = null;
-
-            if (array_key_exists('fullPath', $file)) {
-                $path = $file['fullPath'];
-            }
-
-            $hasDirectories = $path || $destination != '/' ? true : false;
-
-            $filename = "/" . $file['upload']['filename'];
-
-            $user = $request->user();
-
-            $level = 0;
-
-            $currentLevel = $level;
-
-            $relativefilePath = $path ? $path : $filename;
-
-            $relativefilePath = $destination . '/' . $relativefilePath;
-            $path = $destination . '/' . $path;
-
-            $environment = env('APP_ENV', 'local');
-
-            $filePath = preg_replace(
-                '~//+~',
-                '/',
-                    '/' .
-                    $draft->path .
-                    '/'
-                    .
-                    $relativefilePath
-            );
-
-            if ($hasDirectories) {
-                $directories = array_values(
-                    array_filter(
-                        explode('/', str_replace($filename, '', $path))
-                    )
+                $destination = $request->get('destination');
+    
+                $draft = Draft::find($request->get('draft_id'));
+    
+                $path = null;
+    
+                if (array_key_exists('fullPath', $file)) {
+                    $path = $file['fullPath'];
+                }
+    
+                $hasDirectories = $path || $destination != '/' ? true : false;
+    
+                $filename = "/" . $file['upload']['filename'];
+    
+                $user = $request->user();
+    
+                $level = 0;
+    
+                $currentLevel = $level;
+    
+                $relativefilePath = $path ? $path : $filename;
+    
+                $relativefilePath = $destination . '/' . $relativefilePath;
+                $path = $destination . '/' . $path;
+    
+                $environment = env('APP_ENV', 'local');
+    
+                $filePath = preg_replace(
+                    '~//+~',
+                    '/',
+                        '/' .
+                        $draft->path .
+                        '/'
+                        .
+                        $relativefilePath
                 );
-                if ($level + count($directories) - 1 > $level) {
-                    for (
-                        $currentLevel;
-                        $currentLevel < $level + count($directories) - 1;
-                        $currentLevel++
-                    ) {
+    
+                if ($hasDirectories) {
+                    $directories = array_values(
+                        array_filter(
+                            explode('/', str_replace($filename, '', $path))
+                        )
+                    );
+                    if ($level + count($directories) - 1 > $level) {
+                        for (
+                            $currentLevel;
+                            $currentLevel < $level + count($directories) - 1;
+                            $currentLevel++
+                        ) {
+                            $dPath = join(
+                                '/',
+                                array_slice($directories, 0, $currentLevel)
+                            );
+                            $rURL = rtrim(
+                                preg_replace(
+                                    '~//+~',
+                                    '/',
+                                    '/' .
+                                        $dPath .
+                                        '/' .
+                                        $directories[$currentLevel]
+                                ),
+                                '/'
+                            );
+                            $parentFileSystemObject = FileSystemObject::firstOrCreate(
+                                [
+                                    'name' => $directories[$currentLevel],
+                                    'slug' => Str::slug(
+                                        $directories[$currentLevel],
+                                        '-'
+                                    ),
+                                    'description' => $directories[$currentLevel],
+                                    'relative_url' => $rURL,
+                                    'path' => preg_replace(
+                                        '~//+~',
+                                        '/',
+                                            '/' .
+                                            $draft->path .
+                                            '/'
+                                            .
+                                            $rURL
+                                    ),
+                                    'type' => 'directory',
+                                    'key' => $directories[$currentLevel],
+                                    'is_root' => $currentLevel == 0 ? 1 : 0,
+                                    'draft_id' => $draft->id,
+                                    'level' => $currentLevel,
+                                ]
+                            );
+    
+                            $dPath = join(
+                                '/',
+                                array_slice($directories, 0, $currentLevel + 1)
+                            );
+                            $rURL = rtrim(
+                                preg_replace(
+                                    '~//+~',
+                                    '/',
+                                    '/' .
+                                        $dPath .
+                                        '/' .
+                                        $directories[$currentLevel + 1]
+                                ),
+                                '/'
+                            ); 
+                            $childFileSystemObject = FileSystemObject::firstOrCreate(
+                                [
+                                    'name' => $directories[$currentLevel + 1],
+                                    'slug' => Str::slug(
+                                        $directories[$currentLevel + 1],
+                                        '-'
+                                    ),
+                                    'description' =>
+                                        $directories[$currentLevel + 1],
+                                    'relative_url' => $rURL,
+                                    'path' => preg_replace(
+                                        '~//+~',
+                                        '/',
+                                            '/' .
+                                            $draft->path .
+                                            '/'
+                                            .
+                                            $rURL
+                                    ),
+                                    'type' => 'directory',
+                                    'key' => $directories[$currentLevel + 1],
+                                    'is_root' => $currentLevel + 1 == 0 ? 1 : 0,
+                                    'draft_id' => $draft->id,
+                                    'level' => $currentLevel + 1,
+                                ]
+                            );
+                            if (!$childFileSystemObject->parent_id) {
+                                $childFileSystemObject->parent_id =
+                                    $parentFileSystemObject->id;
+                                $childFileSystemObject->save();
+                                $parentFileSystemObject->has_children = 1;
+                                $parentFileSystemObject->save();
+                            }
+                        }
+                    } else {
                         $dPath = join(
                             '/',
                             array_slice($directories, 0, $currentLevel)
@@ -85,176 +180,91 @@ class FileSystemController extends Controller
                             preg_replace(
                                 '~//+~',
                                 '/',
-                                '/' .
-                                    $dPath .
-                                    '/' .
-                                    $directories[$currentLevel]
+                                '/' . $dPath . '/' . $directories[$currentLevel]
                             ),
                             '/'
                         );
-                        $parentFileSystemObject = FileSystemObject::firstOrCreate(
-                            [
-                                'name' => $directories[$currentLevel],
-                                'slug' => Str::slug(
-                                    $directories[$currentLevel],
-                                    '-'
-                                ),
-                                'description' => $directories[$currentLevel],
-                                'relative_url' => $rURL,
-                                'path' => preg_replace(
-                                    '~//+~',
-                                    '/',
-                                        '/' .
-                                        $draft->path .
-                                        '/'
-                                        .
-                                        $rURL
-                                ),
-                                'type' => 'directory',
-                                'key' => $directories[$currentLevel],
-                                'is_root' => $currentLevel == 0 ? 1 : 0,
-                                'draft_id' => $draft->id,
-                                'level' => $currentLevel,
-                            ]
-                        );
-
-                        $dPath = join(
-                            '/',
-                            array_slice($directories, 0, $currentLevel + 1)
-                        );
-                        $rURL = rtrim(
-                            preg_replace(
+                        $childFileSystemObject = FileSystemObject::firstOrCreate([
+                            'name' => $directories[$currentLevel],
+                            'slug' => Str::slug($directories[$currentLevel], '-'),
+                            'description' => $directories[$currentLevel],
+                            'relative_url' => $rURL,
+                            'path' =>  preg_replace(
                                 '~//+~',
                                 '/',
-                                '/' .
-                                    $dPath .
                                     '/' .
-                                    $directories[$currentLevel + 1]
+                                    $draft->path .
+                                    '/'
+                                    .
+                                    $rURL
                             ),
-                            '/'
-                        ); 
-                        $childFileSystemObject = FileSystemObject::firstOrCreate(
-                            [
-                                'name' => $directories[$currentLevel + 1],
-                                'slug' => Str::slug(
-                                    $directories[$currentLevel + 1],
-                                    '-'
-                                ),
-                                'description' =>
-                                    $directories[$currentLevel + 1],
-                                'relative_url' => $rURL,
-                                'path' => preg_replace(
-                                    '~//+~',
-                                    '/',
-                                        '/' .
-                                        $draft->path .
-                                        '/'
-                                        .
-                                        $rURL
-                                ),
-                                'type' => 'directory',
-                                'key' => $directories[$currentLevel + 1],
-                                'is_root' => $currentLevel + 1 == 0 ? 1 : 0,
-                                'draft_id' => $draft->id,
-                                'level' => $currentLevel + 1,
-                            ]
-                        );
-                        if (!$childFileSystemObject->parent_id) {
-                            $childFileSystemObject->parent_id =
-                                $parentFileSystemObject->id;
-                            $childFileSystemObject->save();
-                            $parentFileSystemObject->has_children = 1;
-                            $parentFileSystemObject->save();
-                        }
+                            'type' => 'directory',
+                            'key' => $directories[$currentLevel],
+                            'is_root' => $currentLevel == 0 ? 1 : 0,
+                            'draft_id' => $draft->id,
+                            'level' => $currentLevel,
+                        ]);
                     }
-                } else {
-                    $dPath = join(
-                        '/',
-                        array_slice($directories, 0, $currentLevel)
-                    );
-                    $rURL = rtrim(
-                        preg_replace(
-                            '~//+~',
-                            '/',
-                            '/' . $dPath . '/' . $directories[$currentLevel]
-                        ),
-                        '/'
-                    );
-                    $childFileSystemObject = FileSystemObject::firstOrCreate([
-                        'name' => $directories[$currentLevel],
-                        'slug' => Str::slug($directories[$currentLevel], '-'),
-                        'description' => $directories[$currentLevel],
-                        'relative_url' => $rURL,
-                        'path' =>  preg_replace(
-                            '~//+~',
-                            '/',
-                                '/' .
-                                $draft->path .
-                                '/'
-                                .
-                                $rURL
-                        ),
-                        'type' => 'directory',
-                        'key' => $directories[$currentLevel],
-                        'is_root' => $currentLevel == 0 ? 1 : 0,
-                        'draft_id' => $draft->id,
-                        'level' => $currentLevel,
-                    ]);
                 }
-            }
+    
+                if ($hasDirectories) {
+                    $childFileSystemObject->has_children = 1;
+                    $childFileSystemObject->save();
+                }
+    
+                $filename = preg_replace(
+                    '~/~',
+                    '',
+                    $filename
+                );
+    
+                $fileFileSystemObject = FileSystemObject::firstOrCreate([
+                    'name' => $filename,
+                    'slug' => Str::slug($filename, '-'),
+                    'description' => $filename,
+                    'relative_url' => rtrim(
+                        preg_replace('~//+~', '/', $relativefilePath),
+                        '/'
+                    ),
+                    'path' => $filePath,
+                    'type' => 'file',
+                    'key' => $filename,
+                    'is_root' => 0,
+                    'draft_id' => $draft->id,
+                    'level' => $hasDirectories ? $currentLevel + 1 : $currentLevel,
+                    'parent_id' => $hasDirectories
+                        ? $childFileSystemObject->id
+                        : null,
+                ]);
+                
+            }, 5);
 
-            if ($hasDirectories) {
-                $childFileSystemObject->has_children = 1;
-                $childFileSystemObject->save();
-            }
-
-            $filename = preg_replace(
-                '~/~',
-                '',
-                $filename
-            );
-
-            $fileFileSystemObject = FileSystemObject::firstOrCreate([
-                'name' => $filename,
-                'slug' => Str::slug($filename, '-'),
-                'description' => $filename,
-                'relative_url' => rtrim(
-                    preg_replace('~//+~', '/', $relativefilePath),
-                    '/'
-                ),
-                'path' => $filePath,
-                'type' => 'file',
-                'key' => $filename,
-                'is_root' => 0,
-                'draft_id' => $draft->id,
-                'level' => $hasDirectories ? $currentLevel + 1 : $currentLevel,
-                'parent_id' => $hasDirectories
-                    ? $childFileSystemObject->id
-                    : null,
-            ]);
-        }, 5);
-
-        $bucket =
+            $bucket =
             $request->input('bucket') ?:
             config('filesystems.disks.minio.bucket');
 
-        $client = $this->storageClient();
+            $client = $this->storageClient();
 
-        $uuid = (string) Str::uuid();
+            $uuid = (string) Str::uuid();
 
-        $signedRequest = $client->createPresignedRequest(
-            $this->createCommand($request, $client, $bucket, $key = $filePath),
-            '+90 minutes'
-        );
+            $signedRequest = $client->createPresignedRequest(
+                $this->createCommand($request, $client, $bucket, $key = $filePath),
+                '+90 minutes'
+            );
 
-        return response()->json(
-            [
+            array_push($filesURLs, [
                 'uuid' => $uuid,
                 'bucket' => $bucket,
                 'key' => $key,
+                'fullPath' => $file['fullPath'],
                 'url' => (string) $signedRequest->getUri(),
                 'headers' => $this->headers($request, $signedRequest),
-            ],
+            ]);
+        }
+
+        
+        return response()->json(
+            $filesURLs,
             201
         );
     }

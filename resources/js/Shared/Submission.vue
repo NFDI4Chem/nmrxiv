@@ -304,17 +304,22 @@
                       >
                       folder
                     </span>
-                    <div v-if="progress > 0" class="relative mt-5">
+                    <div v-if="dropzone" class="relative mt-5">
                       <div class="overflow-hidden h-2 text-xs flex rounded bg-gray-200">
                         <div
-                          :style="'width: ' + progress + '%'"
+                          :style="
+                            'width: ' +
+                            precentageUpload(dropzone.files.length, uploadedFiles) +
+                            '%'
+                          "
                           class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-green-500"
                         ></div>
                       </div>
-                    </div>
-                    <div v-if="progress > 0">
-                      <span class="mt-2 block text-sm font-medium text-gray-900">
-                        {{ status }} ({{ progress }}%)
+                      <span
+                        v-if="status"
+                        class="mt-2 block text-sm font-medium text-gray-900"
+                      >
+                        {{ status }}
                       </span>
                     </div>
                   </div>
@@ -360,9 +365,17 @@
                         />
                       </svg>
                       <div class="ml-3 text-sm w-full">
-                        <p class="font-medium text-blue-gray-900">{{ study.name }}
-                          <span class="float-right" v-if="study.sample.molecules.length > 0">
-                            <img class="flex-shrink-0 -mt-0.5 h-6 w-6 text-blue-gray-400" src="https://upload.wikimedia.org/wikipedia/sco/3/35/ChEBI_logo.png" alt="">
+                        <p class="font-medium text-blue-gray-900">
+                          {{ study.name }}
+                          <span
+                            class="float-right"
+                            v-if="study.sample.molecules.length > 0"
+                          >
+                            <img
+                              class="flex-shrink-0 -mt-0.5 h-6 w-6 text-blue-gray-400"
+                              src="https://upload.wikimedia.org/wikipedia/sco/3/35/ChEBI_logo.png"
+                              alt=""
+                            />
                           </span>
                         </p>
                         <!-- <p class="mt-1 text-blue-gray-500">{{ item.description }}</p> -->
@@ -1460,6 +1473,8 @@ export default {
 
   data() {
     return {
+      status: null,
+      dropzone: null,
       selectedSpectraData: null,
       drafts: [],
       defaultDraft: null,
@@ -1474,6 +1489,7 @@ export default {
       selectedDataset: null,
       loading: false,
       loadingStep: false,
+      uploadedFiles: 0,
       autoSaving: false,
       project: null,
       studies: null,
@@ -1541,6 +1557,13 @@ export default {
     loadDropZone() {
       this.$nextTick(() => {
         const vm = this;
+        vm.count = 0;
+        vm.processedBatchesCount = 0;
+        vm.batchesCount = 0;
+        vm.filesBatch = [];
+        vm.refreshing = false;
+        vm.files = [];
+        vm.lastStep = false;
         vm.$page.props.selectedFileSystemObject = vm.file;
         vm.$page.props.selectedFolder = "/";
         let options = {
@@ -1553,74 +1576,103 @@ export default {
             };
           },
           autoProcessQueue: false,
-          uploadMultiple: false,
+          uploadMultiple: true,
           disablePreviews: true,
-          parallelUploads: 1,
-          maxFiles: 10000,
+          parallelUploads: 100,
+          autoQueue: false,
+          maxFiles: 100,
           dictDefaultMessage: document.querySelector("#submission-dropzone-message")
             .innerHTML,
-          done() {},
-          accept(file, done) {
-            const url = "/dashboard/storage/signed-draft-storage-url";
-
-            const client = axios.create({ baseURL: window.location.origin });
-            axiosRetry(client, {
-              retries: 3,
-              retryCondition: (error) => {
-                return error.response.status === 500;
-              },
-            });
-
-            client
-              .post(url, {
-                file: file,
-                destination: vm.$page.props.selectedFolder,
-                draft_id: vm.currentDraft.id,
-                // study_id: vm.study.id,
-              })
-              .catch((err) => {
-                // The first request fails
-                if (err.response.status !== 200 || err.response.status !== 201) {
-                  throw new Error(
-                    `API call failed with status code: ${err.response.status} after multiple attempts`
-                  );
-                }
-              })
-              .then(function (response) {
-                let data = response.data;
-                let headers = data.headers;
-                if ("Host" in headers) {
-                  delete headers.Host;
-                }
-                file.uploadURL = data.url;
-                setTimeout(() => vm.dropzone.processFile(file));
-                done();
-              });
+          accept(file) {
+            if (vm.count > 99) {
+              vm.processFilesDZL(vm, file);
+            } else {
+              vm.count += 1;
+            }
+            vm.processedCount += 1;
           },
           totaluploadprogress: function (progress) {
             vm.progress = Math.ceil(progress);
           },
-          queuecomplete: function () {
+        };
+        vm.dropzone = new Dropzone("#submission-dropzone", options);
+        vm.dropzone.on("processing", (file) => {
+          vm.dropzone.options.url = file.uploadURL;
+          vm.status = "UPLOAD IN PROGRESS";
+        });
+        vm.dropzone.on("addedfile", (file) => {
+          vm.files.push(file);
+          if (vm.count <= 100) {
+            vm.filesBatch.push(file);
+          }
+        });
+        vm.dropzone.on("success", (file) => {
+          vm.uploadedFiles += 1;
+          if (vm.batchesCount == vm.processedBatchesCount && vm.filesBatch.length > 0) {
+            vm.lastStep = true;
+            vm.processFilesDZL(vm);
+          }
+          if (
+            vm.batchesCount == vm.processedBatchesCount &&
+            vm.uploadedFiles == vm.dropzone.files.length
+          ) {
             vm.status = "UPLOAD COMPLETE";
             vm.annotate();
             vm.$page.props.selectedFileSystemObject = this.files[0];
-          },
-        };
-        this.dropzone = new Dropzone("#submission-dropzone", options);
-        vm.dropzone.on("processing", (file) => {
-          vm.status = "UPLOAD IN PROGRESS";
-          vm.dropzone.options.url = file.uploadURL;
+          }
         });
       });
+    },
+    processFilesDZL(vm) {
+      vm.batchesCount += 1;
+      const url = "/dashboard/storage/signed-draft-storage-url";
+      const client = axios.create({ baseURL: window.location.origin });
+      axiosRetry(client, {
+        retries: 3,
+        retryCondition: (error) => {
+          return error.response.status === 500;
+        },
+      });
+      client
+        .post(url, {
+          files: vm.filesBatch,
+          destination: vm.$page.props.selectedFolder,
+          draft_id: vm.currentDraft.id,
+        })
+        .catch((err) => {
+          if (err.response.status !== 200 || err.response.status !== 201) {
+            throw new Error(
+              `API call failed with status code: ${err.response.status} after multiple attempts`
+            );
+          }
+        })
+        .then(function (response) {
+          vm.processedBatchesCount += 1;
+          let data = response.data;
+          data.forEach((u) => {
+            let cFile = vm.files.find((f) => f.fullPath == u.fullPath);
+            if (cFile) {
+              let headers = u.headers;
+              if ("Host" in headers) {
+                delete headers.Host;
+              }
+              cFile.uploadURL = u.url;
+              setTimeout(() => vm.dropzone.processFile(cFile));
+            }
+          });
+        });
+      vm.filesBatch = [];
+      vm.count = 0;
     },
     createNewDraft() {
       this.selectDraft(this.defaultDraft);
     },
     annotate() {
+      this.status = "PROCESSING FILES";
       axios
         .get("/dashboard/drafts/" + this.currentDraft.id + "/annotate")
         .then((response) => {
-          this.loadFiles();
+          this.loadFiles(true);
         });
     },
     selectDataset(dataset) {
@@ -1640,7 +1692,7 @@ export default {
       this.studyTags = tags;
       this.selectDataset(this.selectedStudy.datasets[0]);
     },
-    closeDraft(){
+    closeDraft() {
       this.loadingStep = true;
       axios
         .post("/dashboard/drafts/" + this.currentDraft.id + "/complete", {})
@@ -1677,7 +1729,7 @@ export default {
       this.draftName = this.currentDraft.name;
       this.draftDescription = this.currentDraft.description;
       let tags = [];
-      if(this.currentDraft.tags){
+      if (this.currentDraft.tags) {
         this.currentDraft.tags.forEach((t) => {
           tags.push({
             text: t.name["en"],
@@ -1686,7 +1738,7 @@ export default {
         this.draftTags = tags;
       }
       this.loadDropZone();
-      this.loadFiles();
+      this.loadFiles(false);
     },
     fetchDrafts() {
       this.loading = true;
@@ -1739,11 +1791,20 @@ export default {
           });
       }
     },
-    loadFiles() {
+    loadFiles(updateStatus) {
+      if (updateStatus) {
+        this.status = "REFRESHING FILES";
+      }
       axios
         .get("/dashboard/drafts/" + this.currentDraft.id + "/files")
         .then((response) => {
           this.file = response.data.file;
+          if (updateStatus) {
+            this.status = "UPLOAD COMPLETE";
+            setTimeout(() => {
+              this.status = null;
+            }, 5000);
+          }
         });
     },
     selectStep(id) {
@@ -1827,6 +1888,9 @@ export default {
             });
         });
     },
+    precentageUpload(a, b) {
+      return (parseInt(b) / parseInt(a)) * 100;
+    },
   },
   computed: {
     currentStep() {
@@ -1838,7 +1902,7 @@ export default {
     nmriumURL() {
       return this.$page.props.nmriumURL
         ? String(this.$page.props.nmriumURL + "?workspace=embedded&id=" + Math.random())
-        : "http://nmriumdev.nmrxiv.org?workspace=embedded&id="+ Math.random();
+        : "http://nmriumdev.nmrxiv.org?workspace=embedded&id=" + Math.random();
     },
     currentTab() {
       return this.tabs.find((t) => t.current);
