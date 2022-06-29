@@ -249,6 +249,13 @@
             </SwitchGroup>
           </div>
         </div>
+        <div class="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-1">
+          <div>
+            <select-rich label="License" v-model:selected="createProjectForm.license"
+              :items="licenses"
+            />
+          </div>
+        </div>
       </div>
     </template>
 
@@ -281,6 +288,8 @@ import JetInputError from "@/Jetstream/InputError.vue";
 import { ref } from "vue";
 import { Switch, SwitchDescription, SwitchGroup, SwitchLabel } from "@headlessui/vue";
 import { inject } from 'vue';
+import SelectRich from "@/Shared/SelectRich.vue";
+import axios from 'axios';
 
 export default {
   components: {
@@ -303,6 +312,7 @@ export default {
     CheckCircleIcon,
     ChevronRightIcon,
     JetInputError,
+    SelectRich,
   },
 
   mounted() {
@@ -310,6 +320,11 @@ export default {
     emitter.on("openProjectCreateDialog", () => {
       this.createProjectDialog = true;
     });
+    axios
+      .get(route("console.licenses"))
+      .then((res) => {
+        this.licenses = res.data;
+      })
   },
 
   data() {
@@ -324,8 +339,10 @@ export default {
         color: null,
         starred: null,
         is_public: ref(false),
+        license: null,
       }),
       createProjectDialog: false,
+      licenses: [],
     };
   },
 

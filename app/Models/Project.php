@@ -42,6 +42,7 @@ class Project extends Model implements Auditable
         'draft_id',
         'fs_id',
         'project_photo_path',
+        'license_id',
     ];
 
     protected static $marks = [
@@ -208,5 +209,14 @@ class Project extends Model implements Auditable
     protected function getPrivateUrlAttribute()
     {
         return env('APP_URL', null) . '/projects/' . urlencode($this->url);
+    }
+    /**
+     * Get the license of the project.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function license()
+    {
+        return $this->belongsTo(License::class, 'license_id');
     }
 }

@@ -32,7 +32,8 @@ class Dataset extends Model implements Auditable
         'draft_id',
         'fs_id',
         'dataset_photo_path',
-        'nmrium_info'
+        'nmrium_info',
+        'license_id'
     ];
 
     /**
@@ -78,5 +79,14 @@ class Dataset extends Model implements Auditable
     public function team()
     {
         return $this->belongsTo(Team::class, 'Team_id');
+    }
+    /**
+     * Get the license of the dataset.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function license()
+    {
+        return $this->belongsTo(License::class, 'license_id');
     }
 }
