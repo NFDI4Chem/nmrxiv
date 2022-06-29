@@ -21,13 +21,14 @@ class CreateNewStudy
      */
     public function create(array $input)
     {
+        $license = $input['license'];
         Validator::make($input, [
             'name' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'min:20'],
             'project_id' => ['required']
         ])->validate();
 
-        return DB::transaction(function () use ($input) {
+        return DB::transaction(function () use ($input, $license) {
             return tap(Study::create([
                 'name' => $input['name'],
                 'slug' => Str::slug($input['name'], '-'),
@@ -44,6 +45,7 @@ class CreateNewStudy
                 'project_id' => $input['project_id'],
                 'owner_id'  => $input['owner_id'],
                 'is_public'  => $input['is_public'],
+                'license_id'  => $license ? $license['id'] : null,
                 'study_photo_path' => array_key_exists('study_photo_path', $input) ? $input['study_photo_path'] : null,
             ]), function (Study $study) use ($input) {
 

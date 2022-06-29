@@ -34,7 +34,8 @@ class Study extends Model implements Auditable
         'owner_id',
         'project_id',
         'fs_id',
-        'study_photo_path'
+        'study_photo_path',
+        'license_id'
     ];
 
     /**
@@ -185,5 +186,14 @@ class Study extends Model implements Auditable
             ->withPivot('role')
             ->withTimestamps()
             ->as('studyMembership');
+    }
+    /**
+     * Get the license of the study.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function license()
+    {
+        return $this->belongsTo(License::class, 'license_id');
     }
 }

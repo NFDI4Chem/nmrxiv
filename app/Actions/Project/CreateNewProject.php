@@ -20,12 +20,14 @@ class CreateNewProject
      */
     public function create(array $input)
     {
+       $license = $input['license'];
+
         Validator::make($input, [
             'name' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'min:20'],
         ])->validate();
 
-        return DB::transaction(function () use ($input) {
+        return DB::transaction(function () use ($input,$license) {
             return tap(Project::create([
                 'name' => $input['name'],
                 'slug' => Str::slug($input['name'], '-'),
@@ -40,6 +42,7 @@ class CreateNewProject
                 'access_type'  => array_key_exists('access_type', $input) ? $input['access_type'] : 'viewer',
                 'team_id'  => $input['team_id'],
                 'owner_id'  => $input['owner_id'],
+                'license_id'  => $license ? $license['id'] : null,
                 'is_public'  => $input['is_public'],
                 'project_photo_path' => array_key_exists('project_photo_path', $input) ? $input['project_photo_path'] : null,
             ]), function (Project $project) use ($input)  {
