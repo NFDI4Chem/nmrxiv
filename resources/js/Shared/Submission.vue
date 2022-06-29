@@ -1635,7 +1635,7 @@ export default {
       });
       client
         .post(url, {
-          files: vm.filesBatch,
+          draft_files: vm.filesBatch,
           destination: vm.$page.props.selectedFolder,
           draft_id: vm.currentDraft.id,
         })
