@@ -24,7 +24,7 @@ class FileSystemController extends Controller
     {
         $filePath = null;
 
-        $files = $request->get('draft_files');
+        $files = json_decode($request->get('draft_files'));
 
         $filesURLs = [];
 
