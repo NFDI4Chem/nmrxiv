@@ -4,6 +4,8 @@ namespace App\Actions\Project;
 
 use App\Models\Team;
 use App\Models\Project;
+use App\Models\Study;
+use App\Models\Dataset;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -18,13 +20,15 @@ class UpdateProject
      * @return \App\Models\Project
      */
     public function update(Project $project, array $input)
-    {
+    {   
         Validator::make($input, [
             'name' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'min:20'],
         ])->validate();
 
-        return DB::transaction(function () use ($input, $project) {
+        $license = $input['license'];
+
+        return DB::transaction(function () use ($input, $project, $license) {
             $project->forceFill([
             'name' => $input['name'],
             'slug' => Str::slug($input['name'], '-'),
@@ -38,9 +42,27 @@ class UpdateProject
             'team_id'  => $input['team_id'],
             'owner_id'  => $input['owner_id'],
             'is_public'  => $input['is_public'],
+            'license_id'  => array_key_exists('id', $license) ? $license['id'] : null,
             'project_photo_path' => array_key_exists('project_photo_path', $input) ? $input['project_photo_path'] : null,
             ])->save();
             
+            /* Update null License for child component */
+            if($license && array_key_exists('id', $license)){
+                $studies = $project->studies;
+                foreach($studies as $study){
+                    if($study->license_id == null){
+                        $study->license_id = $license['id'];
+                        $study->save();
+                        $datasets = $study->datasets;
+                        foreach($datasets as $dataset){
+                            if($dataset->license_id == null){
+                                $dataset->license_id = $license['id'];
+                                $dataset->save();
+                            }
+                        }
+                    }
+                }
+            }
             if(array_key_exists('tags', $input)){
                 $project->syncTagsWithType( $input['tags'], 'Project');
             }
