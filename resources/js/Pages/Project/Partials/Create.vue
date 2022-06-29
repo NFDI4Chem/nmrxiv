@@ -249,7 +249,7 @@
             </SwitchGroup>
           </div>
         </div>
-        <div class="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
+        <div class="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-1">
           <div>
             <select-rich label="License" v-model:selected="createProjectForm.license"
               :items="licenses"

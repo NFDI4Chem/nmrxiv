@@ -251,7 +251,7 @@
                         </fieldset>
                       </div>
                       <div v-if="editable" class="pt-4 pb-6">
-                        <div class="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
+                        <div class="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-1">
                         <div>
                           <select-rich label="License" v-model:selected="form.license"
                             :items="licenses"
@@ -612,7 +612,7 @@ export default defineComponent({
       linkAccess: this.project.access == "link",
     };
   },
-  mounted(){
+  beforeMount(){
     if(this.project.license_id){
     axios
       .get(route("console.license.getLicensebyId",this.project.license_id))
