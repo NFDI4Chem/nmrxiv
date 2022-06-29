@@ -33,6 +33,7 @@ class CreateStudiesTable extends Migration
             $table->foreignId('team_id')->nullable();
             $table->foreignId('owner_id')->nullable();
             $table->foreignId('project_id')->nullable();
+            $table->foreignId('license_id')->nullable();
             $table->foreignId('draft_id')->nullable();
             $table->foreignId('fs_id')->nullable();
             $table->timestamp('release_date')->nullable();
