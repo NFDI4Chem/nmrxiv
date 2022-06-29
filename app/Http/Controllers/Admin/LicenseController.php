@@ -30,7 +30,7 @@ class LicenseController extends Controller
      */
     public function getLicensebyId(Request $request, $id)
     {   
-        $license = License::select('id','title')->where('id', $id)->get();
+        $license = License::select('id','title','description')->where('id', $id)->get();
         return $license;
     }
 

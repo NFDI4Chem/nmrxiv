@@ -362,7 +362,7 @@
                                             </div>
                                             <div class="pt-4 pb-6">
                                                 <div
-                                                    class="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2"
+                                                    class="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-1"
                                                 >
                                                     <div>
                                                         <select-rich
@@ -798,6 +798,23 @@ export default {
             this.open = true;
         });
     },
+    beforeMount(){
+        if (this.study.license_id) {
+            axios
+                .get(
+                    route(
+                        "console.license.getLicensebyId",
+                        this.study.license_id
+                    )
+                )
+                .then((res) => {
+                    this.form.license = res.data[0];
+                });
+        }
+        axios.get(route("console.licenses")).then((res) => {
+            this.licenses = res.data;
+        });
+    },
     setup() {
         const activityDetailsElement = ref(null);
         return {
@@ -834,23 +851,6 @@ export default {
             )[0],
             linkAccess: this.study.access == "link",
         };
-    },
-    mounted() {
-        if (this.study.license_id) {
-            axios
-                .get(
-                    route(
-                        "console.license.getLicensebyId",
-                        this.study.license_id
-                    )
-                )
-                .then((res) => {
-                    this.form.license = res.data[0];
-                });
-        }
-        axios.get(route("console.licenses")).then((res) => {
-            this.licenses = res.data;
-        });
     },
     methods: {
         toggleDetails() {
