@@ -24,14 +24,12 @@ class FileSystemController extends Controller
     {
         $filePath = null;
 
-        $files = json_decode($request->get('draft_files'));
+        $files = json_decode($request->get('draft_files'), true);
 
         $filesURLs = [];
 
         foreach($files as $file){
             DB::transaction(function () use ($request, &$filePath, $file) {
-            
-
                 $destination = $request->get('destination');
     
                 $draft = Draft::find($request->get('draft_id'));
@@ -236,12 +234,13 @@ class FileSystemController extends Controller
                         ? $childFileSystemObject->id
                         : null,
                 ]);
-                
+
+
             }, 5);
 
             $bucket =
-            $request->input('bucket') ?:
-            config('filesystems.disks.minio.bucket');
+                $request->input('bucket') ?:
+                config('filesystems.disks.minio.bucket');
 
             $client = $this->storageClient();
 
@@ -262,7 +261,6 @@ class FileSystemController extends Controller
             ]);
         }
 
-        
         return response()->json(
             $filesURLs,
             201
