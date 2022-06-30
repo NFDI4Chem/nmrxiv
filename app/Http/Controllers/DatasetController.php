@@ -27,9 +27,15 @@ class DatasetController extends Controller
     public function nmriumInfo(Request $request, Dataset $dataset)
     {
         if($dataset){
-            $dataset->nmrium_info = json_encode($request->get('spectra'));
-            $dataset->save();
+            $spectra = $request->get('spectra');
+            $nmriumInfo = json_encode($spectra);
+            if($nmriumInfo){
+                $dataset->nmrium_info = $nmriumInfo;
+                $dataset->type = $spectra['info']['nucleus'];
+                $dataset->save();
+            }
         }
+        return $dataset->fresh();
     }
 
     public function download(Request $request, $code, Dataset $dataset, $filename)
