@@ -1584,7 +1584,7 @@ export default {
           dictDefaultMessage: document.querySelector("#submission-dropzone-message")
             .innerHTML,
           accept(file) {
-            if (vm.count > 99) {
+            if (vm.count > 9) {
               vm.processFilesDZL(vm, file);
             } else {
               vm.count += 1;
