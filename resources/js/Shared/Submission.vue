@@ -1379,8 +1379,7 @@ export default {
 
     const saveNMRiumUpdates = (e) => {
       if (
-        e.origin != "https://nmriumdev.nmrxiv.org" ||
-        e.data.data.actionType == "INITIATE"
+        e.origin != "https://nmriumdev.nmrxiv.org"
       ) {
         return;
       }
@@ -1388,8 +1387,10 @@ export default {
         this.selectedSpectraData = e.data.data.data.find(
           (d) => d.info.type == "NMR Spectrum"
         );
-        this.currentMolecules = e.data.data.molecules;
-        this.updateDataSet();
+        if(this.selectedSpectraData){
+          this.currentMolecules = e.data.data.molecules;
+          this.updateDataSet(e.data.data.actionType);
+        }
       }
       this.eventRegistered = true;
     };
@@ -1703,7 +1704,10 @@ export default {
         }
       }
     },
-    updateDataSet() {
+    updateDataSet(action) {
+      if(action == "INITIATE" && (this.selectedDataset && this.selectedDataset.type != null)){
+        return
+      }
       if (this.selectedSpectraData != null) {
         this.autoSaving = true;
         axios
@@ -1713,6 +1717,7 @@ export default {
           })
           .then((response) => {
             this.autoSaving = false;
+            this.selectedDataset = response.data
           });
       }
     },
@@ -1838,7 +1843,6 @@ export default {
         this.selectedStudy.sample.molecules.forEach((mol) => {
           totalCount += parseInt(mol.pivot.percentage_composition);
         });
-        console.log(totalCount);
         return 100 - totalCount;
       } else {
         return 100;
