@@ -332,10 +332,10 @@
           </div>
           <div class="-mx-6 -my-4" v-if="currentStep.id == '02'">
             <div style="height: 80vh">
-              <div class="flex-1 flex xl:overflow-hidden">
+              <div class="flex-1 flex md:overflow-hidden">
                 <nav
                   aria-label="Sections"
-                  class="hidden flex-shrink-0 w-64 bg-white border-r border-blue-gray-200 xl:flex xl:flex-col"
+                  class="hidden flex-shrink-0 w-64 bg-white border-r border-blue-gray-200 md:flex md:flex-col"
                 >
                   <div
                     class="border-gray-200 px-4 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider flex-shrink-0 border-b border-blue-gray-200 flex items-center"
@@ -1174,97 +1174,6 @@
                 </div>
               </div>
             </div>
-            <!-- <div style="height: 80vh; overflow: scroll !important">
-              <div class="mb-4 bg-white flex items-start justify-center">
-                <div class="relative z-0 inline-flex shadow-sm rounded-md">
-                  <Menu as="div" class="-ml-px relative block">
-                    <MenuButton
-                      class="relative rounded-l inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
-                    >
-                      <b>STUDY: {{ selectedStudy.name }}</b>
-                      <ChevronDownIcon class="h-5 w-5" aria-hidden="true" />
-                    </MenuButton>
-                    <transition
-                      enter-active-class="transition ease-out duration-100"
-                      enter-from-class="transform opacity-0 scale-95"
-                      enter-to-class="transform opacity-100 scale-100"
-                      leave-active-class="transition ease-in duration-75"
-                      leave-from-class="transform opacity-100 scale-100"
-                      leave-to-class="transform opacity-0 scale-95"
-                    >
-                      <MenuItems
-                        class="origin-top-right cursor-pointer absolute right-0 mt-2 -mr-1 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
-                      >
-                        <div class="py-1">
-                          <MenuItem
-                            v-for="study in studies"
-                            :key="study.slug"
-                            v-slot="{ active }"
-                          >
-                            <a
-                              @click="selectStudy(study)"
-                              :class="[
-                                active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
-                                'block px-4 py-2 text-sm',
-                              ]"
-                            >
-                              {{ study.name }}
-                            </a>
-                          </MenuItem>
-                        </div>
-                      </MenuItems>
-                    </transition>
-                  </Menu>
-                  <Menu as="div" class="-ml-px relative block">
-                    <MenuButton
-                      class="relative rounded-r inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500"
-                    >
-                      <b>Experiment: {{ selectedDataset.name }}</b>
-                      <ChevronDownIcon class="h-5 w-5" aria-hidden="true" />
-                    </MenuButton>
-                    <transition
-                      enter-active-class="transition ease-out duration-100"
-                      enter-from-class="transform opacity-0 scale-95"
-                      enter-to-class="transform opacity-100 scale-100"
-                      leave-active-class="transition ease-in duration-75"
-                      leave-from-class="transform opacity-100 scale-100"
-                      leave-to-class="transform opacity-0 scale-95"
-                    >
-                      <MenuItems
-                        class="origin-top-right cursor-pointer absolute right-0 mt-2 -mr-1 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
-                      >
-                        <div class="py-1">
-                          <MenuItem
-                            v-for="dataset in selectedStudy.datasets"
-                            :key="dataset.slug"
-                            v-slot="{ active }"
-                          >
-                            <a
-                              @click="selectDataset(dataset)"
-                              :class="[
-                                active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
-                                'block px-4 py-2 text-sm',
-                              ]"
-                            >
-                              {{ dataset.name }}
-                            </a>
-                          </MenuItem>
-                        </div>
-                      </MenuItems>
-                    </transition>
-                  </Menu>
-                </div>
-              </div>
-              <iframe
-                v-on:load="loadSpectra()"
-                name="submissionNMRiumIframe"
-                frameborder="0"
-                allowfullscreen
-                class="rounded-md border"
-                style="width: 100%; height: 75vh"
-                :src="nmriumURL"
-              ></iframe>
-            </div> -->
           </div>
           <div v-if="currentStep.id == '03'">Successful</div>
         </div>
@@ -1467,6 +1376,27 @@ export default {
         }
       });
     });
+
+    const saveNMRiumUpdates = (e) => {
+      if (
+        e.origin != "https://nmriumdev.nmrxiv.org" ||
+        e.data.data.actionType == "INITIATE"
+      ) {
+        return;
+      }
+      if (e.data.type == "nmr-wrapper:dataChange") {
+        this.selectedSpectraData = e.data.data.data.find(
+          (d) => d.info.type == "NMR Spectrum"
+        );
+        this.currentMolecules = e.data.data.molecules;
+        this.updateDataSet();
+      }
+      this.eventRegistered = true;
+    };
+
+    if (!this.eventRegistered) {
+      window.addEventListener("message", saveNMRiumUpdates);
+    }
   },
 
   onUpdated() {},
@@ -1497,6 +1427,7 @@ export default {
       file: null,
       editor: null,
       percentage: 1,
+      eventRegistered: false,
       smiles: "",
       createDatasetForm: this.$inertia.form({
         _method: "POST",
@@ -1557,6 +1488,7 @@ export default {
     loadDropZone() {
       this.$nextTick(() => {
         const vm = this;
+        vm.batchCount = 20;
         vm.count = 0;
         vm.processedBatchesCount = 0;
         vm.batchesCount = 0;
@@ -1584,8 +1516,8 @@ export default {
           dictDefaultMessage: document.querySelector("#submission-dropzone-message")
             .innerHTML,
           accept(file) {
-            if (vm.count > 23) {
-              vm.processFilesDZL(vm, file);
+            if (vm.count > vm.batchCount) {
+              vm.processFilesDZL(vm);
             } else {
               vm.count += 1;
             }
@@ -1604,6 +1536,12 @@ export default {
           vm.files.push(file);
           if (vm.count <= 100) {
             vm.filesBatch.push(file);
+          }
+        });
+
+        vm.dropzone.on("addedfiles", (files) => {
+          if (files.length < vm.batchCount) {
+            vm.batchCount = files.length;
           }
         });
         vm.dropzone.on("success", (file) => {
@@ -1635,7 +1573,7 @@ export default {
       });
       client
         .post(url, {
-          draft_files: JSON.stringify(vm.filesBatch),
+          draft_files: vm.filesBatch,
           destination: vm.$page.props.selectedFolder,
           draft_id: vm.currentDraft.id,
         })
@@ -1763,19 +1701,6 @@ export default {
           let data = { spectra: [JSON.parse(this.selectedDataset.nmrium_info)] };
           iframe.postMessage({ type: `nmr-wrapper:load`, data }, "*");
         }
-
-        window.addEventListener("message", (e) => {
-          if (e.origin != "https://nmriumdev.nmrxiv.org") {
-            return;
-          }
-          if (e.data.type == "nmr-wrapper:dataChange") {
-            this.selectedSpectraData = e.data.data.data.find(
-              (d) => d.info.type == "NMR Spectrum"
-            );
-            this.currentMolecules = e.data.data.molecules;
-            this.updateDataSet();
-          }
-        });
       }
     },
     updateDataSet() {
