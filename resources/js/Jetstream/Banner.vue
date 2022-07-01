@@ -25,7 +25,7 @@
 
 <script>
 import { XIcon } from "@heroicons/vue/outline";
-import Button from "@/Shared/Dropdown";
+import Button from "@/Shared/Dropdown.vue";
     export default {
         components: {
             XIcon,
