@@ -495,7 +495,7 @@ import { Head, Link } from "@inertiajs/inertia-vue3";
 import JetBanner from "@/Jetstream/Banner.vue";
 import JetDropdown from "@/Jetstream/Dropdown.vue";
 import JetDropdownLink from "@/Jetstream/DropdownLink.vue";
-import FlashMessages from "@/Shared/FlashMessages";
+import FlashMessages from "@/Shared/FlashMessages.vue";
 import AnnouncementBanner from "@/Shared/AnnouncementBanner.vue";
 import AppTour from "@/App/Tour.vue";
 import ProjectCreate from "@/Pages/Project/Partials/Create.vue";
