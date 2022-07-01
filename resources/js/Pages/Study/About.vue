@@ -389,7 +389,7 @@ import { inject } from "vue";
 import slider from "vue3-slider";
 import OCL from "openchemlib/full";
 import LoadingButton from "@/Shared/LoadingButton.vue";
-import ToolTip from "@/Shared/ToolTip";
+import ToolTip from "@/Shared/ToolTip.vue";
 export default {
   props: [
     "study",

@@ -49,11 +49,11 @@
 </template>
 
 <script>
-import Dropdown from '@/Shared/Dropdown'
-import FlashMessages from '@/Shared/FlashMessages'
-import Icon from '@/Shared/Icon'
-import Logo from '@/Shared/Logo'
-import MainMenu from '@/Shared/MainMenu'
+import Dropdown from '@/Shared/Dropdown.vue'
+import FlashMessages from '@/Shared/FlashMessages.vue'
+import Icon from '@/Shared/Icon.vue'
+import Logo from '@/Shared/Logo.vue'
+import MainMenu from '@/Shared/MainMenu.vue'
 import { computed } from 'vue'
 import { usePage } from '@inertiajs/inertia-vue3'
 

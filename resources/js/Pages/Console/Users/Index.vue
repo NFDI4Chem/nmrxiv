@@ -219,7 +219,7 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import throttle from "lodash/throttle";
 import mapValues from "lodash/mapValues";
 import pickBy from "lodash/pickBy";
-import SearchFilter from "@/Shared/SearchFilter";
+import SearchFilter from "@/Shared/SearchFilter.vue";
 import JetDialogModal from "@/Jetstream/DialogModal.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import JetButton from "@/Jetstream/Button.vue";
