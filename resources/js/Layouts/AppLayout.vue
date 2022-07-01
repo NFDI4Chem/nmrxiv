@@ -478,13 +478,7 @@
         </div>
       </div>
       <main class="flex-1 relative overflow-y-auto focus:outline-none">
-        <div class="bg-white border-b">
-          <div class="px-12">
-            <div class="flex flex-nowrap justify-between py-6">
-              <slot name="header"></slot>
-            </div>
-          </div>
-        </div>
+        <slot name="header"></slot>
         <slot></slot>
         <project-create></project-create>
         <submission></submission>
@@ -639,7 +633,7 @@ export default {
     FolderIcon,
     ViewGridIcon,
     StudyCreate,
-    Submission
+    Submission,
   },
   setup() {
     var collapseSidebarStatus = JSON.parse(localStorage.getItem("collapseSidebarStatus"));

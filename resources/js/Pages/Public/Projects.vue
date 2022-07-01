@@ -1,25 +1,36 @@
 <template>
   <app-layout title="Projects">
     <template #header>
-      <div>
-        <div
-          class="flex items-center text-sm text-gray-700 uppercase font-bold tracking-widest"
-        >
-          Projects
+      <div class="bg-white border-b">
+        <div class="px-12">
+          <div class="flex flex-nowrap justify-between py-6">
+            <div>
+              <div
+                class="flex items-center text-sm text-gray-700 uppercase font-bold tracking-widest"
+              >
+                Projects
+              </div>
+              <p>
+                Explore, analyze, and share raw spectral data and assignements. Learn more
+                about datasets.
+              </p>
+            </div>
+          </div>
         </div>
-        <p>
-          Explore, analyze, and share raw spectral data and assignements. Learn more about
-          datasets.
-        </p>
       </div>
     </template>
     <div class="px-12 mb-24 mx-auto">
       <div
         class="mt-12 mx-auto max-w-md grid gap-8 sm:max-w-lg lg:grid-cols-4 lg:max-w-7xl"
       >
-        <div v-for="project in projects.data" :key="project.id" class="flex flex-col rounded-lg shadow-lg overflow-hidden">
-          <div class="flex-shrink-0 h-32 bg-gradient-to-tl from-sky-400 to-cyan-300 opacity-60">
-          </div>
+        <div
+          v-for="project in projects.data"
+          :key="project.id"
+          class="flex flex-col rounded-lg shadow-lg overflow-hidden"
+        >
+          <div
+            class="flex-shrink-0 h-32 bg-gradient-to-tl from-sky-400 to-cyan-300 opacity-60"
+          ></div>
           <div class="flex-1 bg-white p-3 flex flex-col justify-between">
             <div class="flex-1">
               <a :href="'/projects/' + project.slug" class="block">
