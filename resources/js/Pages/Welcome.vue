@@ -726,7 +726,7 @@ import {
   XIcon,
 } from "@heroicons/vue/outline";
 import { ChevronDownIcon } from "@heroicons/vue/solid";
-import ToolTip from "@/Shared/ToolTip";
+import ToolTip from "@/Shared/ToolTip.vue";
 
 const Search = [
   {

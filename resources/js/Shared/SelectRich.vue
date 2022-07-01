@@ -33,7 +33,7 @@
 import { ref } from 'vue';
 import { Listbox, ListboxButton, ListboxLabel, ListboxOption, ListboxOptions } from '@headlessui/vue';
 import { CheckIcon, SelectorIcon } from '@heroicons/vue/solid';
-import ToolTip from "@/Shared/ToolTip";
+import ToolTip from "@/Shared/ToolTip.vue";
 
 export default{
     components:{
