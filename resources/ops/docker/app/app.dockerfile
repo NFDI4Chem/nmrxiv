@@ -1,4 +1,4 @@
-FROM php:8.0.13-fpm-alpine AS base
+FROM php:8.1.0alpha3-fpm-alpine AS base
 
 RUN apk add --update zlib-dev libpng-dev libzip-dev $PHPIZE_DEPS
 RUN apk add git
