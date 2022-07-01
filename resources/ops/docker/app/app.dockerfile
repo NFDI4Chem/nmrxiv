@@ -1,4 +1,4 @@
-FROM php:8.0.13-fpm-alpine AS base
+FROM php:8.1.7-fpm-alpine AS base
 
 RUN apk add --update zlib-dev libpng-dev libzip-dev $PHPIZE_DEPS
 RUN apk add git
@@ -30,7 +30,7 @@ FROM base AS build-fpm
 
 WORKDIR /var/www/html
 
-COPY --from=composer:2.2 /usr/bin/composer /usr/bin/composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 COPY /artisan artisan
 
 COPY /composer.json composer.json
