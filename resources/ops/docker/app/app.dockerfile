@@ -30,7 +30,7 @@ FROM base AS build-fpm
 
 WORKDIR /var/www/html
 
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 COPY /artisan artisan
 
 COPY /composer.json composer.json
