@@ -45,6 +45,7 @@ class CreateNewProject
                 'license_id'  => $license ? $license['id'] : null,
                 'is_public'  => $input['is_public'],
                 'project_photo_path' => array_key_exists('project_photo_path', $input) ? $input['project_photo_path'] : null,
+                'release_date'      => array_key_exists('release_date', $input) ? $input['release_date'] : null,
             ]), function (Project $project) use ($input)  {
                 $user = User::find($input['owner_id']);
                 if(!is_null($user)){
