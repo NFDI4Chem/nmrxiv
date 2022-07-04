@@ -58,4 +58,5 @@ RUN npm run build
 FROM build-fpm AS fpm
 
 COPY --from=build-fpm /var/www/html /var/www/html
-COPY --from=assets-build /var/www/html/public /var/www/html
+RUN true
+COPY --from=assets-build /var/www/html/public/build /var/www/html/build
