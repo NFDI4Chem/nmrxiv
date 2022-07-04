@@ -5,7 +5,6 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Project;
-use App\Http\Resources\ProjectCollection;
 use App\Http\Resources\ProjectResource;
 
 class ProjectController extends Controller
