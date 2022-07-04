@@ -40,13 +40,22 @@ COPY /app app
 COPY /config config
 COPY /routes routes
 
-
 COPY . /var/www/html
 
 RUN composer install
 
 RUN composer dump-autoload -o
 
+FROM node:15.5-alpine AS assets-build
+
+WORKDIR /var/www/html
+
+COPY . /var/www/html/
+
+RUN npm ci
+RUN npm run build
+
 FROM build-fpm AS fpm
 
 COPY --from=build-fpm /var/www/html /var/www/html
+COPY --from=assets-build /var/www/html/public /var/www/html
