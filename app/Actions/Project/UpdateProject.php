@@ -44,9 +44,10 @@ class UpdateProject
             'is_public'  => $input['is_public'],
             'license_id'  => array_key_exists('id', $license) ? $license['id'] : null,
             'project_photo_path' => array_key_exists('project_photo_path', $input) ? $input['project_photo_path'] : null,
+            'release_date'      => array_key_exists('release_date', $input) ? $input['release_date'] : null,
             ])->save();
             
-            /* Update null License for child component */
+            /* Update License for child component */
             if($license && array_key_exists('id', $license)){
                 $studies = $project->studies;
                 foreach($studies as $study){

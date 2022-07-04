@@ -1492,6 +1492,9 @@ select {
 .mb-24 {
 	margin-bottom: 6rem;
 }
+.ml-0 {
+	margin-left: 0px;
+}
 .-ml-8 {
 	margin-left: -2rem;
 }
@@ -1506,9 +1509,6 @@ select {
 }
 .ml-2\.5 {
 	margin-left: 0.625rem;
-}
-.ml-0 {
-	margin-left: 0px;
 }
 .block {
 	display: block;
@@ -1985,11 +1985,11 @@ select {
 .gap-y-8 {
 	row-gap: 2rem;
 }
-.gap-y-4 {
-	row-gap: 1rem;
-}
 .gap-y-6 {
 	row-gap: 1.5rem;
+}
+.gap-y-4 {
+	row-gap: 1rem;
 }
 .space-x-8 > :not([hidden]) ~ :not([hidden]) {
 	--tw-space-x-reverse: 0;
@@ -2045,6 +2045,11 @@ select {
 	--tw-space-x-reverse: 0;
 	margin-right: calc(1.25rem * var(--tw-space-x-reverse));
 	margin-left: calc(1.25rem * calc(1 - var(--tw-space-x-reverse)));
+}
+.space-y-8 > :not([hidden]) ~ :not([hidden]) {
+	--tw-space-y-reverse: 0;
+	margin-top: calc(2rem * calc(1 - var(--tw-space-y-reverse)));
+	margin-bottom: calc(2rem * var(--tw-space-y-reverse));
 }
 .space-y-5 > :not([hidden]) ~ :not([hidden]) {
 	--tw-space-y-reverse: 0;
@@ -3005,6 +3010,10 @@ select {
 	--tw-text-opacity: 1;
 	color: rgba(0, 0, 0, var(--tw-text-opacity));
 }
+.text-teal-900 {
+	--tw-text-opacity: 1;
+	color: rgba(1, 157, 187, var(--tw-text-opacity));
+}
 .text-yellow-800 {
 	--tw-text-opacity: 1;
 	color: rgba(146, 64, 14, var(--tw-text-opacity));
@@ -3653,6 +3662,10 @@ body.v-tour--active{pointer-events:none}
 	--tw-ring-opacity: 1;
 	--tw-ring-color: rgba(14, 165, 233, var(--tw-ring-opacity));
 }
+.focus\:ring-gray-500:focus {
+	--tw-ring-opacity: 1;
+	--tw-ring-color: rgba(107, 114, 128, var(--tw-ring-opacity));
+}
 .focus\:ring-indigo-600:focus {
 	--tw-ring-opacity: 1;
 	--tw-ring-color: rgba(79, 70, 229, var(--tw-ring-opacity));
@@ -3664,10 +3677,6 @@ body.v-tour--active{pointer-events:none}
 .focus\:ring-green-500:focus {
 	--tw-ring-opacity: 1;
 	--tw-ring-color: rgba(16, 185, 129, var(--tw-ring-opacity));
-}
-.focus\:ring-gray-500:focus {
-	--tw-ring-opacity: 1;
-	--tw-ring-color: rgba(107, 114, 128, var(--tw-ring-opacity));
 }
 .focus\:ring-opacity-50:focus {
 	--tw-ring-opacity: 0.5;
@@ -3753,12 +3762,20 @@ body.v-tour--active{pointer-events:none}
 		grid-column: span 2 / span 2;
 	}
 
-	.sm\:col-span-9 {
-		grid-column: span 9 / span 9;
+	.sm\:col-span-3 {
+		grid-column: span 3 / span 3;
 	}
 
 	.sm\:col-span-6 {
 		grid-column: span 6 / span 6;
+	}
+
+	.sm\:col-span-1 {
+		grid-column: span 1 / span 1;
+	}
+
+	.sm\:col-span-9 {
+		grid-column: span 9 / span 9;
 	}
 
 	.sm\:mx-0 {
