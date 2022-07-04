@@ -3,12 +3,8 @@ import laravel from 'laravel-vite-plugin';
 import vue from '@vitejs/plugin-vue';
 
 export default defineConfig({
-    build: {
-        manifest: true,
-    },
     plugins: [
         laravel([
-            'resources/css/app.css',
             'resources/js/app.js',
         ]),
         vue({
@@ -20,4 +16,9 @@ export default defineConfig({
             },
         }),
     ],
+    resolve: {
+        alias: {
+            '@': '/resources/js'
+        }
+    }
 });
