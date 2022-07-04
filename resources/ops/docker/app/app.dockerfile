@@ -59,4 +59,4 @@ FROM build-fpm AS fpm
 
 COPY --from=build-fpm /var/www/html /var/www/html
 RUN true
-COPY --from=assets-build /var/www/html/public/build /var/www/html/build
+COPY --from=assets-build /var/www/html/public/build /var/www/html/public/build
