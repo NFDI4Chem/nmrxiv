@@ -1554,7 +1554,7 @@ export default {
       if (e.origin != "https://nmriumdev.nmrxiv.org") {
         return;
       }
-      if (e.data.type == "nmr-wrapper:dataChange") {
+      if (e.data.type == "nmrium-wrapper:dataChange") {
         this.selectedSpectraData = e.data.data.data.find(
           (d) => d.info.type == "NMR Spectrum"
         );

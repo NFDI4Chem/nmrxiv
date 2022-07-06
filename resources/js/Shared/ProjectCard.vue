@@ -3,14 +3,14 @@
     <div class="hover:shadow-lg" v-if="project">
       <div class="flex flex-col rounded-lg shadow-lg">
         <div
-          class="rounded-t-lg flex-shrink-0 h-32 bg-gradient-to-tl from-sky-400 to-cyan-300 opacity-60 grid grid-cols-1 gap-4"
+          class="rounded-t-lg bg-gradient-to-tl from-sky-400 to-cyan-300 w-full h-36 bg-gray-200 overflow-hidden group-hover:opacity-75 lg:h-36 xl:h-36"
         >
           <img
-            class="h-32 object-cover border rounded sm:h-32 sm:w-96"
             :src="project.photo_url"
-            :alt="project.name"
+            alt=""
+            class="w-full h-full object-center object-cover"
           />
-          <div class="absolute place-self-end">
+          <div class="float-right place-self-end">
             <div class="p-2 flex items-center">
               <div class="flex-shrink-0">
                 <span
@@ -45,7 +45,8 @@
             </div>
           </div>
         </div>
-        <div class="flex-1 bg-white flex flex-col justify-between">
+
+        <div :class="[ mode != 'mini' ? '' : 'rounded-b-lg', 'flex-1 bg-white flex flex-col justify-between']">
           <div style="min-height: 150px; max-height: 168px" class="flex-1 p-3">
             <a :href="'/projects/' + project.slug" class="block">
               <p class="text-lg font-semibold text-gray-900 line-clamp-2">
