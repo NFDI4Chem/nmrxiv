@@ -19,13 +19,12 @@ class UpdateStudy
      */
     public function update(Study $study, array $input)
     {   
-        $license = $input['license'];
         Validator::make($input, [
             'name' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'min:20'],
         ])->validate();
 
-        return DB::transaction(function () use ($input, $study, $license) {
+        return DB::transaction(function () use ($input, $study) {
             $study->forceFill([
             'name' => $input['name'],
             'slug' => Str::slug($input['name'], '-'),
@@ -39,7 +38,7 @@ class UpdateStudy
             'access_type'  => array_key_exists('access_type', $input) ? $input['access_type'] : 'viewer',
             'is_public'  => array_key_exists('is_public', $input) ? $input['is_public'] : $study->is_public,
             'study_photo_path' => array_key_exists('study_photo_path', $input) ? $input['study_photo_path'] : $study->study_photo_path,
-            'license_id'  => $license ? $license['id'] : null,
+            'license_id'  => array_key_exists('license_id', $input) ? $input['license_id'] : null,
             ])->save();
 
             if(array_key_exists('tags', $input)){

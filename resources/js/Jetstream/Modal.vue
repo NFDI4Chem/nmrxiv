@@ -8,7 +8,7 @@
                         leave-active-class="ease-in duration-200"
                         leave-from-class="opacity-100"
                         leave-to-class="opacity-0">
-                    <div v-show="show" class="fixed inset-0 transform transition-all" @click="close">
+                    <div v-show="show" class="fixed inset-0 transform transition-all">
                         <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
                     </div>
                 </transition>
