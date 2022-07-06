@@ -34,8 +34,8 @@ class DatasetController extends Controller
                 $dataset->type = $spectra['info']['nucleus'];
                 $dataset->save();
             }
+            return $dataset->fresh();
         }
-        return $dataset->fresh();
     }
 
     public function download(Request $request, $code, Dataset $dataset, $filename)
