@@ -183,7 +183,7 @@ class DraftController extends Controller
                 $project = Project::create([
                     'name' => $draft->name,
                     'slug' => Str::slug($draft->name, '-'),
-                    'description' => $draft->name,
+                    'description' => $draft->description,
                     'url'  => Str::random(40),
                     'uuid'  => Str::uuid(),
                     'team_id'  => $team_id ? $team_id : null,
