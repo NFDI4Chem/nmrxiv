@@ -79,6 +79,11 @@ class Project extends Model implements Auditable
         return $this->belongsTo(Draft::class, 'draft_id');
     }
 
+    public function likes()
+    {
+        return  Like::count($this);
+    }
+
     /**
      * Get the owner of the project.
      *

@@ -64,6 +64,9 @@ Route::get('datasets', [DatasetController::class, 'publicDatasetsView'])
     ->name('public.datasets');
 
 Route::group(['middleware' => ['auth', 'verified']], function () {
+    Route::get('projects/{project}/toggleUpVote', [ProjectController::class, 'toggleUpVote'])
+            ->name('projects.toggle-upvote');
+
     Route::group([
         'prefix' => 'dashboard'
     ], function () {
@@ -93,8 +96,6 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
             ->name('dashboard.project.update');
         Route::get('projects/{project}/activity', [ProjectController::class, 'activity'])
             ->name('dashboard.project.activity');
-        Route::post('projects/{project}/toggleStarred', [ProjectController::class, 'toggleStarred'])
-            ->name('projects.toggle-starred');
 
         Route::post('projects/{project}/members', [ProjectMemberController::class, 'memberStore'])
             ->name('project-members.store');

@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use App\Models\Project;
 use App\Models\User;
 use App\Models\Study;
+use Maize\Markable\Models\Like;
 use Inertia\Inertia;
 use Auth;
 
@@ -34,8 +35,7 @@ class ProjectController extends Controller
         }
 
         return Inertia::render('Public/Project', [
-            'project' => $project,
-            'studies' => $project->studies
+            'project' => new ProjectResource($project)
         ]);
     }
 
@@ -50,6 +50,11 @@ class ProjectController extends Controller
             'projects' => $projects
         ]);
         
+    }
+
+    public function toggleUpVote(Request $request, Project $project)
+    {
+        return Like::toggle($project, $request->user());
     }
 
     public function show(Request $request, Project $project)
