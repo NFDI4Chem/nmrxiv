@@ -2,6 +2,7 @@
 
 namespace App\Actions\Project;
 
+use Illuminate\Support\Facades\Storage;
 use App\Models\Team;
 use App\Models\Project;
 use App\Models\Study;
@@ -26,9 +27,17 @@ class UpdateProject
             'description' => ['required', 'string', 'min:20'],
         ])->validate();
 
-        $license = $input['license'];
+        return DB::transaction(function () use ($input, $project) {
 
-        return DB::transaction(function () use ($input, $project, $license) {
+            if( array_key_exists('photo', $input) )
+            {
+                $image = $input['photo'];
+                $s3 = Storage::disk('minio_public');
+                $file_name = uniqid() .'.'. $image->getClientOriginalExtension();
+                $s3filePath = '/projects/' . $file_name;
+                $s3->put($s3filePath, file_get_contents($image), 'public');
+            }
+
             $project->forceFill([
             'name' => $input['name'],
             'slug' => Str::slug($input['name'], '-'),
@@ -42,21 +51,21 @@ class UpdateProject
             'team_id'  => $input['team_id'],
             'owner_id'  => $input['owner_id'],
             'is_public'  => $input['is_public'],
-            'license_id'  => array_key_exists('id', $license) ? $license['id'] : null,
-            'project_photo_path' => array_key_exists('project_photo_path', $input) ? $input['project_photo_path'] : null,
+            'license_id'  => array_key_exists('license_id', $input) ? $input['license_id'] : null,
+            'project_photo_path' => $s3filePath,
             ])->save();
             
             /* Update null License for child component */
-            if($license && array_key_exists('id', $license)){
+            if(array_key_exists('license_id', $input)){
                 $studies = $project->studies;
                 foreach($studies as $study){
                     if($study->license_id == null){
-                        $study->license_id = $license['id'];
+                        $study->license_id = $input['license_id'];
                         $study->save();
                         $datasets = $study->datasets;
                         foreach($datasets as $dataset){
                             if($dataset->license_id == null){
-                                $dataset->license_id = $license['id'];
+                                $dataset->license_id = $input['license_id'];
                                 $dataset->save();
                             }
                         }

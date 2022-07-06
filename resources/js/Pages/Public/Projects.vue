@@ -23,10 +23,9 @@
       <div
         class="mt-12 mx-auto max-w-md grid gap-8 sm:max-w-lg lg:grid-cols-4 lg:max-w-7xl"
       >
-      <span v-for="project in projects.data"
-          :key="project.id">
-        <project-card :project="project"></project-card>
-      </span>
+        <span v-for="project in projects.data" :key="project.id">
+          <project-card :project="project"></project-card>
+        </span>
       </div>
     </div>
   </app-layout>
@@ -39,7 +38,7 @@ import ProjectCard from "@/Shared/ProjectCard.vue";
 export default {
   components: {
     AppLayout,
-    ProjectCard
+    ProjectCard,
   },
   props: ["projects"],
 };

@@ -21,6 +21,7 @@ class LicenseResource extends JsonResource
             'url' => $this->url,
             'html_url' => $this->html_url,
             'permissions' => $this->permissions,
+            'description' => $this->description
         ];
     }
 }

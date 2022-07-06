@@ -177,6 +177,51 @@
                           </div>
                         </div>
                         <div v-if="editable">
+                          <input
+                            type="file"
+                            class="hidden"
+                            ref="photo"
+                            @change="updatePhotoPreview"
+                          />
+
+                          <div class="mt-2" v-show="!photoPreview">
+                            <img
+                              :src="project.project_photo_path"
+                              :alt="project.name"
+                              class="rounded-full h-24 w-72 rounded object-cover"
+                            />
+                          </div>
+
+                          <div class="mt-2" v-show="photoPreview">
+                            <span
+                              class="block h-24 w-72 rounded"
+                              :style="
+                                'background-size: cover; background-repeat: no-repeat; background-position: center center; background-image: url(\'' +
+                                photoPreview +
+                                '\');'
+                              "
+                            >
+                            </span>
+                          </div>
+
+                          <jet-secondary-button
+                            class="mt-2 mr-2"
+                            type="button"
+                            @click.prevent="selectNewPhoto"
+                          >
+                            Select A New Photo
+                          </jet-secondary-button>
+
+                          <jet-secondary-button
+                            type="button"
+                            class="mt-2"
+                            @click.prevent="deletePhoto"
+                            v-if="project.project_photo_path"
+                          >
+                            Remove Photo
+                          </jet-secondary-button>
+                        </div>
+                        <div v-if="editable">
                           <label
                             for="study-name"
                             class="block text-sm font-medium text-gray-900"
@@ -252,11 +297,13 @@
                       </div>
                       <div v-if="editable" class="pt-4 pb-6">
                         <div class="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-1">
-                        <div>
-                          <select-rich label="License" v-model:selected="form.license"
-                            :items="licenses"
-                          />
-                        </div>
+                          <div v-if="licenses">
+                            <select-rich
+                              label="License"
+                              v-model:selected="form.license"
+                              :items="licenses"
+                            />
+                          </div>
                         </div>
                       </div>
                       <div v-if="editable" class="pt-4 pb-6">
@@ -578,7 +625,7 @@ export default defineComponent({
     SelectRich,
     VueTagsInput,
   },
-  props: ["project", "role"], 
+  props: ["project", "role"],
   setup() {
     const activityDetailsElement = ref(null);
     return {
@@ -588,6 +635,7 @@ export default defineComponent({
   },
   data() {
     return {
+      photoPreview: null,
       form: this.$inertia.form({
         _method: "PUT",
         name: this.project.name,
@@ -601,8 +649,10 @@ export default defineComponent({
         access_type: this.project.access_type,
         is_public: this.project.is_public,
         license: null,
+        license_id: null,
         tag: "",
         tags: [],
+        photo: null,
       }),
       open: false,
       licenses: [],
@@ -612,23 +662,31 @@ export default defineComponent({
       linkAccess: this.project.access == "link",
     };
   },
-  beforeMount(){
-    if(this.project.license_id){
-    axios
-      .get(route("console.license.getLicensebyId",this.project.license_id))
-      .then((res) => {
-        this.form.license = res.data[0];
-      })
-    }
-    axios
-      .get(route("console.licenses"))
-      .then((res) => {
-        this.licenses = res.data;
-      })
-  },
   methods: {
+    clearPhotoFileInput() {
+      if (this.$refs.photo?.value) {
+        this.$refs.photo.value = null;
+      }
+    },
+    selectNewPhoto() {
+      this.$refs.photo.click();
+    },
+
+    updatePhotoPreview() {
+      const photo = this.$refs.photo.files[0];
+
+      if (!photo) return;
+
+      const reader = new FileReader();
+
+      reader.onload = (e) => {
+        this.photoPreview = e.target.result;
+      };
+
+      reader.readAsDataURL(photo);
+    },
     assignTags() {
-      if (this.study) {
+      if (this.project) {
         let tags = [];
         this.project.tags.forEach((t) => {
           tags.push({
@@ -639,13 +697,25 @@ export default defineComponent({
       }
     },
     toggleDetails() {
+      if (this.project) {
+        axios.get(route("console.licenses")).then((res) => {
+          this.licenses = res.data;
+          this.form.license = this.licenses.find((l) => l.id == this.project.license_id);
+        });
+      }
       this.open = !this.open;
       this.assignTags();
     },
     updateProject() {
+      if (this.$refs.photo) {
+        this.form.photo = this.$refs.photo.files[0];
+      }
+
       this.form.owner_id = this.project.owner_id;
       this.form.team_id = this.project.team_id;
       this.form.tags = this.form.tags.map((t) => t.text);
+
+      this.form.license_id = this.form.license.id;
       if (this.linkAccess) {
         this.form.access = "link";
         this.form.access_type = this.selectedAccessType.value;
@@ -656,10 +726,10 @@ export default defineComponent({
         preserveScroll: true,
         onSuccess: () => {
           this.open = false;
+          this.clearPhotoFileInput();
         },
         onError: (err) => console.error(err),
       });
-     
     },
     toggleActivityDetails() {
       this.activityDetailsElement.toggleDetails();
