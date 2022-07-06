@@ -5,7 +5,7 @@ WORKDIR /var/www/html
 COPY . /var/www/html/
 
 RUN npm ci
-RUN npm run production
+RUN npm run build
 
 FROM nginx:1.19-alpine AS nginx
 

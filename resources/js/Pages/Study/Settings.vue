@@ -1,11 +1,18 @@
 <template>
   <app-layout :title="study.name">
     <template #header>
-      <div>
-        <div
-          class="flex items-center text-sm text-gray-700 uppercase font-bold tracking-widest"
-        >
-          <Link :href="route('dashboard.studies', study.id)">{{ study.name }}</Link>&nbsp;/&nbsp;Settings
+      <div class="bg-white border-b">
+        <div class="px-12">
+          <div class="flex flex-nowrap justify-between py-6">
+            <div>
+              <div
+                class="flex items-center text-sm text-gray-700 uppercase font-bold tracking-widest"
+              >
+                <Link :href="route('dashboard.studies', study.id)">{{ study.name }}</Link
+                >&nbsp;/&nbsp;Settings
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </template>
@@ -26,7 +33,7 @@ export default {
   components: {
     Link,
     AppLayout,
-    StudyDelete
+    StudyDelete,
   },
   props: ["study"],
 };

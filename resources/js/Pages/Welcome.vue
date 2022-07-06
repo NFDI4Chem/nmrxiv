@@ -242,7 +242,9 @@
                     class="flex items-center justify-center px-4 py-3 border border-1 text-base font-medium rounded-md shadow-sm text-teal-700 bg-white hover:bg-teal-50 sm:px-8"
                   >
                     Submit data
-                    <ToolTip text="To submit data you will need an account with nmrXiv, so you will be redirected to our register page and once registered you can then go ahead and submit data. For more information please checkout our <a href='//docs.nmrxiv.org' class='text-gray-400' target='_blank'>documentation</a>."></ToolTip>
+                    <ToolTip
+                      text="To submit data you will need an account with nmrXiv, so you will be redirected to our register page and once registered you can then go ahead and submit data. For more information please checkout our <a href='//docs.nmrxiv.org' class='text-gray-400' target='_blank'>documentation</a>."
+                    ></ToolTip>
                   </a>
                   <a
                     href="/projects"
@@ -331,7 +333,11 @@
                     Submit spectral data to us
                   </h2>
                   <p class="mt-4 text-lg text-gray-500">
-                    nmrXiv offers you ready to use NMR data management platform to host your raw instrument data and processed files for free and also provides you with tools and services to analyse data. Added to that get expert opinion and support for any of your NMR spectra related queries from the community or provide one yourself. 
+                    nmrXiv offers you ready to use NMR data management platform to host
+                    your raw instrument data and processed files for free and also
+                    provides you with tools and services to analyse data. Added to that
+                    get expert opinion and support for any of your NMR spectra related
+                    queries from the community or provide one yourself.
                   </p>
                   <div class="mt-6">
                     <a
@@ -356,6 +362,49 @@
               </div>
             </div>
           </div>
+          <div class="my-5 py-10">
+            <div
+              class="lg:mx-auto lg:max-w-7xl lg:px-8 lg:grid lg:grid-cols-1 lg:grid-flow-col-dense lg:gap-24"
+            >
+              <div>
+                <div class="md:flex md:items-center md:justify-between">
+                  <h2 class="text-2xl font-extrabold tracking-tight text-gray-900">
+                    Trending projects
+                  </h2>
+                  <a
+                    href="/projects"
+                    class="hidden text-sm font-medium text-indigo-600 hover:text-indigo-500 md:block"
+                    >Explore more<span aria-hidden="true"> &rarr;</span></a
+                  >
+                </div>
+              </div>
+            </div>
+            <div
+              class="lg:mx-auto lg:max-w-7xl lg:px-8 lg:grid lg:grid-cols-1 lg:grid-flow-col-dense lg:gap-24"
+            >
+              <div>
+                <div class="max-w-7xl mx-auto py-3 px-0 sm:flex sm:items-center">
+                  <div class="mt-2 sm:mt-0">
+                    <div class="-m-1 flex flex-wrap items-center">
+                      <a href="/projects?filter=recent"
+                        class="m-1 inline-flex rounded-full border border-gray-200 items-center py-1.5 pl-3 pr-3 text-sm font-medium bg-white text-gray-900 hover:text-white hover:bg-black"
+                        ><span>Recent</span></a
+                      >
+                      <a href="/projects?filter=trending"
+                        class="m-1 inline-flex rounded-full border border-gray-200 items-center py-1.5 pl-3 pr-3 text-sm font-medium bg-white text-gray-900 hover:text-white hover:bg-black"
+                        ><span>Trending</span></a
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              class="lg:mx-auto lg:max-w-7xl lg:px-8 lg:grid lg:grid-cols-1 lg:grid-flow-col-dense lg:gap-24"
+            >
+              <Projects></Projects>
+            </div>
+          </div>
         </div>
         <div class="mt-24">
           <div
@@ -377,7 +426,9 @@
                     Develop tools with our API
                   </h2>
                   <p class="mt-4 text-lg text-gray-500">
-                    With our stable core platform, software programmers and data scientists can leverage our API to develop additional advanced tools/software utilising the data and rich metadata descriptions.
+                    With our stable core platform, software programmers and data
+                    scientists can leverage our API to develop additional advanced
+                    tools/software utilising the data and rich metadata descriptions.
                   </p>
                   <div class="mt-6">
                     <a
@@ -423,15 +474,19 @@
                     Review and analyse the spectral assignments
                   </h2>
                   <p class="mt-4 text-lg text-gray-500">
-                    Data deposited in nmrXiv requires original machine output files. With this original data, researchers can annotate missing assignments in the spectra and also reanalyse previous work to offer additional help. In a way sharing the knowledge and expertise to the next generation of spectroscopic analysts.
+                    Data deposited in nmrXiv requires original machine output files. With
+                    this original data, researchers can annotate missing assignments in
+                    the spectra and also reanalyse previous work to offer additional help.
+                    In a way sharing the knowledge and expertise to the next generation of
+                    spectroscopic analysts.
                   </p>
                   <div class="mt-6">
                     <a
                       href="#"
                       class="inline-flex bg-gradient-to-r from-indigo-600 to-teal-600 bg-origin-border px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white hover:from-indigo-700 hover:to-teal-700"
                     >
-                      Need help with structure ellucidation?
-                    </a><br/>
+                      Need help with structure ellucidation? </a
+                    ><br />
                     <a
                       href="#"
                       class="inline-flex bg-gradient-to-r from-indigo-600 to-teal-600 bg-origin-border px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white hover:from-indigo-700 hover:to-teal-700 mt-4"
@@ -707,6 +762,7 @@
 <script>
 import { Head, Link } from "@inertiajs/inertia-vue3";
 import JetApplicationLogo from "@/Jetstream/ApplicationLogo.vue";
+import Projects from "@/Shared/Projects.vue";
 import { defineComponent, h } from "vue";
 import { Popover, PopoverButton, PopoverGroup, PopoverPanel } from "@headlessui/vue";
 import {
@@ -726,18 +782,20 @@ import {
   XIcon,
 } from "@heroicons/vue/outline";
 import { ChevronDownIcon } from "@heroicons/vue/solid";
-import ToolTip from "@/Shared/ToolTip";
+import ToolTip from "@/Shared/ToolTip.vue";
 
 const Search = [
   {
     name: "Browse",
-    description: "Know more about the data deposited in nmrXiv by browsing projects and datasets. You can also learn more about our data schema on our documentation site.",
+    description:
+      "Know more about the data deposited in nmrXiv by browsing projects and datasets. You can also learn more about our data schema on our documentation site.",
     href: "#",
     icon: InboxIcon,
   },
   {
     name: "Advanced search",
-    description: "Search similar spectra by simple drag and drop of your machine output files or search spectra by structures. Need further guidance or found any missing information. Reach out to us or check out our documentation site.",
+    description:
+      "Search similar spectra by simple drag and drop of your machine output files or search spectra by structures. Need further guidance or found any missing information. Reach out to us or check out our documentation site.",
     href: "#",
     icon: QuestionMarkCircleIcon,
   },
@@ -745,50 +803,42 @@ const Search = [
 const features = [
   {
     name: "Advanced search",
-    description:
-      "",
+    description: "",
     icon: InboxIcon,
   },
   {
     name: "Open Source",
-    description:
-      "",
+    description: "",
     icon: UsersIcon,
   },
   {
     name: "Auto Assignments",
-    description:
-      "",
+    description: "",
     icon: TrashIcon,
   },
   {
     name: "Prediction",
-    description:
-      "",
+    description: "",
     icon: PencilAltIcon,
   },
   {
     name: "Schemas and MIChI",
-    description:
-      "",
+    description: "",
     icon: DocumentReportIcon,
   },
   {
     name: "Community challenges",
-    description:
-      "",
+    description: "",
     icon: ReplyIcon,
   },
   {
     name: "Docs & API",
-    description:
-      "",
+    description: "",
     icon: ChatAltIcon,
   },
   {
     name: "Backups",
-    description:
-      "",
+    description: "",
     icon: HeartIcon,
   },
 ];
@@ -829,7 +879,11 @@ const footerNavigation = {
     { name: "API Status", href: "https://docs.nmrxiv.org/docs/developer-guides/API" },
   ],
   About: [
-    { name: "Adivsory Board", href: "https://docs.nmrxiv.org/docs/contributing/contributors-and-steering-committee" },
+    {
+      name: "Adivsory Board",
+      href:
+        "https://docs.nmrxiv.org/docs/contributing/contributors-and-steering-committee",
+    },
     // { name: "Metrics", href: "#" },
     // { name: "Blog", href: "#" },
     // { name: "Press", href: "#" },
@@ -939,7 +993,8 @@ export default {
     PopoverGroup,
     PopoverPanel,
     ChevronDownIcon,
-    ToolTip
+    ToolTip,
+    Projects,
   },
 
   setup() {

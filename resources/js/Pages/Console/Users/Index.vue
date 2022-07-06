@@ -1,14 +1,20 @@
 <template>
   <app-layout title="Users & Permissions">
     <template #header>
-      <div>
-        <bread-crumbs :pages="pages" />
-        <div class="mt-2 md:flex md:items-center md:justify-between">
-          <div class="flex-1 min-w-0">
-            <div
-              class="flex items-center text-sm text-gray-700 uppercase font-bold tracking-widest mt-3"
-            >
-              Users & Permissions
+      <div class="bg-white border-b">
+        <div class="px-12">
+          <div class="flex flex-nowrap justify-between py-6">
+            <div>
+              <bread-crumbs :pages="pages" />
+              <div class="mt-2 md:flex md:items-center md:justify-between">
+                <div class="flex-1 min-w-0">
+                  <div
+                    class="flex items-center text-sm text-gray-700 uppercase font-bold tracking-widest mt-3"
+                  >
+                    Users & Permissions
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -213,7 +219,7 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import throttle from "lodash/throttle";
 import mapValues from "lodash/mapValues";
 import pickBy from "lodash/pickBy";
-import SearchFilter from "@/Shared/SearchFilter";
+import SearchFilter from "@/Shared/SearchFilter.vue";
 import JetDialogModal from "@/Jetstream/DialogModal.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import JetButton from "@/Jetstream/Button.vue";
@@ -263,7 +269,10 @@ export default {
       handler: throttle(function () {
         let query = pickBy(this.form);
         this.$inertia.replace(
-          this.route("console.users", Object.keys(query).length ? query : { remember: "forget" })
+          this.route(
+            "console.users",
+            Object.keys(query).length ? query : { remember: "forget" }
+          )
         );
       }, 150),
       deep: true,
@@ -284,13 +293,16 @@ export default {
       this.currentlyManagingRole = true;
     },
     updateRole() {
-      this.updateRoleForm.put(route("console.users.update-role", [this.managingRoleFor]), {
-        preserveScroll: true,
-        onSuccess: () => (this.currentlyManagingRole = false),
-        onError: (data) => {
-          this.updateRoleForm.error_message = data.error_message;
-        },
-      });
+      this.updateRoleForm.put(
+        route("console.users.update-role", [this.managingRoleFor]),
+        {
+          preserveScroll: true,
+          onSuccess: () => (this.currentlyManagingRole = false),
+          onError: (data) => {
+            this.updateRoleForm.error_message = data.error_message;
+          },
+        }
+      );
     },
   },
 };
