@@ -48,136 +48,6 @@
             </li>
           </ol>
         </nav>
-        <!-- <nav class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" aria-label="Progress">
-          <ol
-            role="list"
-            class="rounded-md overflow-hidden lg:flex lg:border-l lg:border-r lg:border-gray-200 lg:rounded-none"
-          >
-            <li
-              v-for="(step, stepIdx) in steps"
-              :key="step.id"
-              class="relative overflow-hidden lg:flex-1"
-            >
-              <div
-                :class="[
-                  stepIdx === 0 ? 'border-b-0 rounded-t-md' : '',
-                  stepIdx === steps.length - 1 ? 'border-t-0 rounded-b-md' : '',
-                  'border border-gray-200 overflow-hidden lg:border-0',
-                ]"
-              >
-                <a v-if="step.status === 'complete'" :href="step.href" class="group">
-                  <span
-                    class="absolute top-0 left-0 w-1 h-full bg-transparent group-hover:bg-gray-200 lg:w-full lg:h-1 lg:bottom-0 lg:top-auto"
-                    aria-hidden="true"
-                  />
-                  <span
-                    :class="[
-                      stepIdx !== 0 ? 'lg:pl-9' : '',
-                      'px-6 py-5 flex items-start text-sm font-medium',
-                    ]"
-                  >
-                    <span class="flex-shrink-0">
-                      <span
-                        class="w-10 h-10 flex items-center justify-center bg-teal-600 rounded-full"
-                      >
-                        <CheckIcon class="w-6 h-6 text-white" aria-hidden="true" />
-                      </span>
-                    </span>
-                    <span class="mt-0.5 ml-4 min-w-0 flex flex-col">
-                      <span class="text-xs font-semibold tracking-wide uppercase">{{
-                        step.name
-                      }}</span>
-                      <span class="text-sm font-medium text-gray-500">{{
-                        step.description
-                      }}</span>
-                    </span>
-                  </span>
-                </a>
-                <a
-                  v-else-if="step.status === 'current'"
-                  :href="step.href"
-                  aria-current="step"
-                >
-                  <span
-                    class="absolute top-0 left-0 w-1 h-full bg-teal-600 lg:w-full lg:h-1 lg:bottom-0 lg:top-auto"
-                    aria-hidden="true"
-                  />
-                  <span
-                    :class="[
-                      stepIdx !== 0 ? 'lg:pl-9' : '',
-                      'px-6 py-5 flex items-start text-sm font-medium',
-                    ]"
-                  >
-                    <span class="flex-shrink-0">
-                      <span
-                        class="w-10 h-10 flex items-center justify-center border-2 border-teal-600 rounded-full"
-                      >
-                        <span class="text-teal-600">{{ step.id }}</span>
-                      </span>
-                    </span>
-                    <span class="mt-0.5 ml-4 min-w-0 flex flex-col">
-                      <span
-                        class="text-xs font-semibold text-teal-600 tracking-wide uppercase"
-                        >{{ step.name }}</span
-                      >
-                      <span class="text-sm font-medium text-gray-500">{{
-                        step.description
-                      }}</span>
-                    </span>
-                  </span>
-                </a>
-                <a v-else :href="step.href" class="group">
-                  <span
-                    class="absolute top-0 left-0 w-1 h-full bg-transparent group-hover:bg-gray-200 lg:w-full lg:h-1 lg:bottom-0 lg:top-auto"
-                    aria-hidden="true"
-                  />
-                  <span
-                    :class="[
-                      stepIdx !== 0 ? 'lg:pl-9' : '',
-                      'px-6 py-5 flex items-start text-sm font-medium',
-                    ]"
-                  >
-                    <span class="flex-shrink-0">
-                      <span
-                        class="w-10 h-10 flex items-center justify-center border-2 border-gray-300 rounded-full"
-                      >
-                        <span class="text-gray-500">{{ step.id }}</span>
-                      </span>
-                    </span>
-                    <span class="mt-0.5 ml-4 min-w-0 flex flex-col">
-                      <span
-                        class="text-xs font-semibold text-gray-500 tracking-wide uppercase"
-                        >{{ step.name }}</span
-                      >
-                      <span class="text-sm font-medium text-gray-500">{{
-                        step.description
-                      }}</span>
-                    </span>
-                  </span>
-                </a>
-                <template v-if="stepIdx !== 0">
-                  <div
-                    class="hidden absolute top-0 left-0 w-3 inset-0 lg:block"
-                    aria-hidden="true"
-                  >
-                    <svg
-                      class="h-full w-full text-gray-300"
-                      viewBox="0 0 12 82"
-                      fill="none"
-                      preserveAspectRatio="none"
-                    >
-                      <path
-                        d="M0.5 0V31L10.5 41L0.5 51V82"
-                        stroke="currentcolor"
-                        vector-effect="non-scaling-stroke"
-                      />
-                    </svg>
-                  </div>
-                </template>
-              </div>
-            </li>
-          </ol>
-        </nav> -->
       </div>
     </template>
 
@@ -1175,7 +1045,314 @@
               </div>
             </div>
           </div>
-          <div v-if="currentStep.id == '03'">Successful</div>
+          <div v-if="currentStep.id == '03'">
+            <div
+              style="height: 80vh; overflow: scroll !important"
+              class="space-y-8 divide-y divide-gray-200"
+            >
+              <!-- Project Information -->
+              <div>
+                <div>
+                  <h3 class="text-lg leading-6 font-bold text-teal-900 align">
+                    Project {{ this.project.name }} created successfully.
+                  </h3>
+                  <h3 class="mt-2 text-lg leading-6 font-medium text-gray-900">
+                    Project Details
+                  </h3>
+                </div>
+
+                <div class="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                  <div class="sm:col-span-3">
+                    <label
+                      for="project-name"
+                      class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
+                    >
+                      Project name
+                    </label>
+                    <div class="mt-1">
+                      <input
+                        v-model="this.project.name"
+                        type="text"
+                        autocomplete="given-name"
+                        class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                      />
+                    </div>
+                    <jet-input-error
+                      :message="updateProjectForm.errors.name"
+                      class="mt-2"
+                    />
+                  </div>
+                  <div class="sm:col-span-6">
+                    <label
+                      for="description"
+                      class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
+                    >
+                      Description
+                    </label>
+                    <div class="mt-1">
+                      <textarea
+                        v-model="this.project.description"
+                        rows="3"
+                        class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border border-gray-300 rounded-md"
+                      />
+                    </div>
+                    <jet-input-error
+                      :message="updateProjectForm.errors.description"
+                      class="mt-2"
+                    />
+                  </div>
+                </div>
+              </div>
+              <!-- Study and Dataset Information -->
+              <div class="pt-6">
+                <div>
+                  <h3 class="text-lg leading-6 font-medium text-gray-900">
+                    Study and Dataset Details
+                  </h3>
+                </div>
+                <div class="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                  <div style="overflow: scroll !important" class="sm:col-span-6">
+                    <table class="min-w-full border divide-y divide-gray-300">
+                      <thead class="bg-gray-50">
+                        <tr>
+                          <th
+                            scope="col"
+                            class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 lg:pl-8"
+                          >
+                            Study
+                          </th>
+                          <th
+                            scope="col"
+                            class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                          >
+                            Datasets
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody class="divide-y divide-gray-200 bg-white">
+                        <tr
+                          v-for="study in this.project.studies"
+                          :key="study.id"
+                          :value="study.name"
+                        >
+                          <td
+                            class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8"
+                          >
+                            {{ study.name }}
+                          </td>
+                          <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                            <div v-for="dataset in study.datasets" :key="dataset.id">
+                              <span class="break-normal">
+                                {{ dataset.name }}
+                              </span>
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+              <!-- Share and Release info -->
+              <div class="pt-6">
+                <div>
+                  <div>
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">
+                      Share and Release
+                    </h3>
+                  </div>
+                  <div class="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                    <!-- Privacy -->
+                    <div class="sm:col-span-3">
+                      <fieldset>
+                        <legend class="text-sm font-medium text-gray-900">Privacy</legend>
+                        <div class="mt-2 space-y-5">
+                          <div class="relative flex items-start">
+                            <div class="absolute flex items-center h-5">
+                              <input
+                                :checked="this.updateProjectForm.is_public === true"
+                                v-model="this.updateProjectForm.is_public"
+                                id="privacy-public"
+                                name="privacy"
+                                value="true"
+                                aria-describedby="privacy-public-description"
+                                type="radio"
+                                class="focus:ring-gray-500 h-4 w-4 text-gray-600 border-gray-300"
+                              />
+                            </div>
+                            <div class="pl-7 text-sm">
+                              <label
+                                for="privacy-public"
+                                class="font-medium text-gray-900"
+                              >
+                                Public access
+                              </label>
+                              <p id="privacy-public-description" class="text-gray-500">
+                                Everyone with the link will see this project.
+                              </p>
+                            </div>
+                          </div>
+                          <div>
+                            <div class="relative flex items-start">
+                              <div class="absolute flex items-center h-5">
+                                <input
+                                  :checked="this.updateProjectForm.is_public === false"
+                                  v-model="this.updateProjectForm.is_public"
+                                  id="privacy-private-to-project"
+                                  name="privacy"
+                                  value="false"
+                                  aria-describedby="privacy-private-to-project-description"
+                                  type="radio"
+                                  class="focus:ring-gray-500 h-4 w-4 text-gray-600 border-gray-300"
+                                />
+                              </div>
+                              <div class="pl-7 text-sm">
+                                <label
+                                  for="privacy-private-to-project"
+                                  class="font-medium text-gray-900"
+                                >
+                                  Private to project members
+                                </label>
+                                <p
+                                  id="privacy-private-to-project-description"
+                                  class="text-gray-500"
+                                >
+                                  Only members of this project would be able to access.
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </fieldset>
+                    </div>
+                    <!-- Release date -->
+                    <div
+                      v-if="
+                        this.updateProjectForm.is_public == 'false' ||
+                        !this.updateProjectForm.is_public
+                      "
+                      class="sm:col-span-3"
+                    >
+                      <div>
+                        <label
+                          class="block text-sm font-medium text-gray-700, block text-sm font-medium text-gray-700"
+                        >
+                          Choose Release Date
+                        </label>
+                        <Datepicker v-model="updateProjectForm.releaseDate"></Datepicker>
+                        <p class="mt-1 text-sm text-gray-500">
+                          Choose release date to auto publish your project to public.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                    <!-- Share URL -->
+                    <div class="sm:col-span-3">
+                      <label
+                        for="share-url"
+                        class="block text-sm font-medium text-gray-700"
+                      >
+                        Share URL
+                      </label>
+                      <div class="mt-1">
+                        <input
+                          readonly
+                          v-if="
+                            this.updateProjectForm.is_public == 'false' ||
+                            !this.updateProjectForm.is_public
+                          "
+                          v-model="this.project.private_url"
+                          type="text"
+                          autocomplete="given-name"
+                          class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        />
+                        <input
+                          readonly
+                          v-else
+                          v-model="this.project.public_url"
+                          type="text"
+                          autocomplete="given-name"
+                          class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        />
+                      </div>
+                      <div class="mt-1"></div>
+                      <p class="mt-1 text-sm text-gray-500">
+                        The project and the underlying studies and datasets can be shared
+                        with others using this URL.
+                      </p>
+                    </div>
+
+                    <!-- License -->
+                    <div class="sm:col-span-3">
+                      <div>
+                        <select-rich
+                          label="License"
+                          v-model:selected="updateProjectForm.license"
+                          class="mt-0"
+                          :items="licenses"
+                        />
+                        <p class="mt-1 text-sm text-gray-500">
+                          Choosing license is recommended before releasing the project to
+                          public.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div class="sm:col-span-6">
+                      <div>
+                        <h3 class="text-sm leading-6 font-medium text-gray-700">
+                          Citation
+                        </h3>
+                        <p class="mt-1 text-sm text-gray-500">
+                          Author, 1., & Author, 2.. (2022). FAIR, consensus-driven NMR
+                          data repository and computational platform. The ultimate goal is
+                          to accelerate broader coordination and data sharing among
+                          natural product (NP) researchers by enabling storage,
+                          management, sharing and analysis of NMR data.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Download ptions -->
+                  <div class="mt-4 mb-4 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                    <div class="sm:col-span-1">
+                      <jet-button
+                        type="submit"
+                        class="ml-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                      >
+                        Download Zip
+                      </jet-button>
+                    </div>
+                    <div class="sm:col-span-1">
+                      <jet-button
+                        type="submit"
+                        class="ml-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                      >
+                        MD5 hashmap
+                      </jet-button>
+                    </div>
+                    <div class="sm:col-span-1">
+                      <jet-button
+                        type="submit"
+                        class="ml-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                      >
+                        Embed
+                      </jet-button>
+                    </div>
+                    <div class="sm:col-span-1">
+                      <jet-button
+                        type="submit"
+                        class="ml-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                      >
+                        Share
+                      </jet-button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       <div v-else>
@@ -1283,17 +1460,7 @@
         </jet-button>
       </span>
       <span v-if="currentStep.id == '03'">
-        <jet-button
-          class="ml-2 float-left"
-          @click="selectStep(2)"
-          :class="{ 'opacity-25': createDatasetForm.processing }"
-          :disabled="createDatasetForm.processing"
-        >
-          Back
-        </jet-button>
-        <jet-secondary-button @click="toggleCreateDatasetDialog">
-          Cancel
-        </jet-secondary-button>
+        <jet-button @click="updateProject"> Save and Finish </jet-button>
       </span>
     </template>
   </jet-dialog-modal>
@@ -1318,6 +1485,9 @@ import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import { ChevronLeftIcon, ChevronRightIcon, ChevronDownIcon } from "@heroicons/vue/solid";
 import slider from "vue3-slider";
 import VueTagsInput from "@sipec/vue3-tags-input";
+import Datepicker from "vue3-date-time-picker";
+import "vue3-date-time-picker/dist/main.css";
+import SelectRich from "@/Shared/SelectRich.vue";
 
 export default {
   components: {
@@ -1350,6 +1520,8 @@ export default {
     JetInputError,
     slider,
     VueTagsInput,
+    Datepicker,
+    SelectRich,
   },
 
   mounted() {
@@ -1357,6 +1529,7 @@ export default {
     emitter.on("openDatasetCreateDialog", (data) => {
       this.fetchDrafts().then((response) => {
         this.drafts = response.data.drafts;
+        this.loadLicenses()
         if (data.draft_id) {
           let selectedDraft = this.drafts.find((d) => d.id == data.draft_id);
           this.selectDraft(selectedDraft);
@@ -1378,16 +1551,14 @@ export default {
     });
 
     const saveNMRiumUpdates = (e) => {
-      if (
-        e.origin != "https://nmriumdev.nmrxiv.org"
-      ) {
+      if (e.origin != "https://nmriumdev.nmrxiv.org") {
         return;
       }
       if (e.data.type == "nmr-wrapper:dataChange") {
         this.selectedSpectraData = e.data.data.data.find(
           (d) => d.info.type == "NMR Spectrum"
         );
-        if(this.selectedSpectraData){
+        if (this.selectedSpectraData) {
           this.currentMolecules = e.data.data.molecules;
           this.updateDataSet(e.data.data.actionType);
         }
@@ -1404,6 +1575,17 @@ export default {
 
   data() {
     return {
+      updateProjectForm: this.$inertia.form({
+        _method: "PUT",
+        name: null,
+        description: null,
+        error_message: null,
+        is_public: false,
+        license: null,
+        owner_id: null,
+        team_id: null,
+        releaseDate: this.setReleaseDate(),
+      }),
       status: null,
       dropzone: null,
       selectedSpectraData: null,
@@ -1430,6 +1612,18 @@ export default {
       percentage: 1,
       eventRegistered: false,
       smiles: "",
+      license: [],
+      updateProjectForm: this.$inertia.form({
+        _method: "PUT",
+        name: null,
+        description: null,
+        error_message: null,
+        is_public: false,
+        license: null,
+        owner_id: null,
+        team_id: null,
+        releaseDate: this.setReleaseDate(),
+      }),
       createDatasetForm: this.$inertia.form({
         _method: "POST",
         name: "",
@@ -1478,6 +1672,31 @@ export default {
   props: [],
 
   methods: {
+    loadLicenses(){
+         axios.get(route("console.licenses")).then((res) => {
+            this.licenses = res.data;
+        });
+    },
+    updateProject() {
+      (this.updateProjectForm.name = this.project.name),
+        (this.updateProjectForm.owner_id = this.project.owner_id),
+        (this.updateProjectForm.team_id = this.project.team_id),
+        (this.updateProjectForm.description = this.project.description),
+        this.updateProjectForm.post(route("dashboard.project.update", this.project.id), {
+          preserveScroll: true,
+          onSuccess: () => {
+            this.open = false;
+            this.toggleCreateDatasetDialog();
+          },
+          onError: (err) => console.error(err),
+        });
+    },
+    setReleaseDate() {
+      var current_date = new Date();
+      var relase_date = new Date();
+      relase_date.setDate(current_date.getDate() + 7);
+      return relase_date;
+    },
     getSVGString(molecule) {
       if (molecule.MOL) {
         let mol = OCL.Molecule.fromMolfile("\n  " + molecule.MOL.replaceAll('"', ""));
@@ -1705,8 +1924,12 @@ export default {
       }
     },
     updateDataSet(action) {
-      if(action == "INITIATE" && (this.selectedDataset && this.selectedDataset.type != null)){
-        return
+      if (
+        action == "INITIATE" &&
+        this.selectedDataset &&
+        this.selectedDataset.type != null
+      ) {
+        return;
       }
       if (this.selectedSpectraData != null) {
         this.autoSaving = true;
@@ -1717,7 +1940,7 @@ export default {
           })
           .then((response) => {
             this.autoSaving = false;
-            this.selectedDataset = response.data
+            this.selectedDataset = response.data;
           });
       }
     },
