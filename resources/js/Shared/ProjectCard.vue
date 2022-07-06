@@ -46,7 +46,12 @@
           </div>
         </div>
 
-        <div :class="[ mode != 'mini' ? '' : 'rounded-b-lg', 'flex-1 bg-white flex flex-col justify-between']">
+        <div
+          :class="[
+            mode != 'mini' ? '' : 'rounded-b-lg',
+            'flex-1 bg-white flex flex-col justify-between',
+          ]"
+        >
           <div style="min-height: 150px; max-height: 168px" class="flex-1 p-3">
             <a :href="'/projects/' + project.slug" class="block">
               <p class="text-lg font-semibold text-gray-900 line-clamp-2">
