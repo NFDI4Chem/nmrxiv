@@ -46,42 +46,44 @@
                     leave-from-class="opacity-100 translate-y-0"
                     leave-to-class="opacity-0 translate-y-1"
                   >
-                    <PopoverPanel
-                      class="absolute z-10 -ml-4 mt-3 transform w-screen max-w-md lg:max-w-2xl lg:ml-0 lg:left-1/2 lg:-translate-x-1/2"
-                    >
-                      <div
-                        class="rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 overflow-hidden"
+                    <div>
+                      <PopoverPanel
+                        class="absolute z-10 -ml-4 mt-3 transform w-screen max-w-md lg:max-w-2xl lg:ml-0 lg:left-1/2 lg:-translate-x-1/2"
                       >
                         <div
-                          class="relative grid gap-6 bg-white px-5 py-6 sm:gap-8 sm:p-8 lg:grid-cols-2"
+                          class="rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 overflow-hidden"
                         >
-                          <a
-                            v-for="item in Search"
-                            :key="item.name"
-                            :href="item.href"
-                            class="-m-3 p-3 flex items-start rounded-lg hover:bg-gray-50"
+                          <div
+                            class="relative grid gap-6 bg-white px-5 py-6 sm:gap-8 sm:p-8 lg:grid-cols-2"
                           >
-                            <div
-                              class="flex-shrink-0 flex items-center justify-center h-10 w-10 rounded-md bg-gradient-to-r from-indigo-600 to-teal-600 text-white sm:h-12 sm:w-12"
+                            <a
+                              v-for="item in Search"
+                              :key="item.name"
+                              :href="item.href"
+                              class="-m-3 p-3 flex items-start rounded-lg hover:bg-gray-50"
                             >
-                              <component
-                                :is="item.icon"
-                                class="h-6 w-6"
-                                aria-hidden="true"
-                              />
-                            </div>
-                            <div class="ml-4">
-                              <p class="text-base font-medium text-gray-900">
-                                {{ item.name }}
-                              </p>
-                              <p class="mt-1 text-sm text-gray-500">
-                                {{ item.description }}
-                              </p>
-                            </div>
-                          </a>
+                              <div
+                                class="flex-shrink-0 flex items-center justify-center h-10 w-10 rounded-md bg-gradient-to-r from-indigo-600 to-teal-600 text-white sm:h-12 sm:w-12"
+                              >
+                                <component
+                                  :is="item.icon"
+                                  class="h-6 w-6"
+                                  aria-hidden="true"
+                                />
+                              </div>
+                              <div class="ml-4">
+                                <p class="text-base font-medium text-gray-900">
+                                  {{ item.name }}
+                                </p>
+                                <p class="mt-1 text-sm text-gray-500">
+                                  {{ item.description }}
+                                </p>
+                              </div>
+                            </a>
+                          </div>
                         </div>
-                      </div>
-                    </PopoverPanel>
+                      </PopoverPanel>
+                    </div>
                   </transition>
                 </Popover>
                 <a
@@ -128,91 +130,89 @@
               leave-from-class="opacity-100 scale-100"
               leave-to-class="opacity-0 scale-95"
             >
-              <PopoverPanel
-                focus
-                class="absolute z-30 top-0 inset-x-0 p-2 transition transform origin-top-right md:hidden"
-              >
-                <div
-                  class="rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 bg-white divide-y-2 divide-gray-50"
+              <div>
+                <PopoverPanel
+                  focus
+                  class="absolute z-30 top-0 inset-x-0 p-2 transition transform origin-top-right md:hidden"
                 >
-                  <div class="pt-5 pb-6 px-5">
-                    <div class="flex items-center justify-between">
-                      <div>
-                        <img
-                          class="h-8 w-auto"
-                          src="https://tailwindui.com/img/logos/workflow-mark-indigo-600-to-teal-600.svg"
-                          alt="Workflow"
-                        />
-                      </div>
-                      <div class="-mr-2">
-                        <PopoverButton
-                          class="bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-teal-500"
-                        >
-                          <span class="sr-only">Close menu</span>
-                          <XIcon class="h-6 w-6" aria-hidden="true" />
-                        </PopoverButton>
-                      </div>
-                    </div>
-                    <div class="mt-6">
-                      <nav class="grid grid-cols-1 gap-7">
-                        <a
-                          v-for="item in Search"
-                          :key="item.name"
-                          :href="item.href"
-                          class="-m-3 p-3 flex items-center rounded-lg hover:bg-gray-50"
-                        >
-                          <div
-                            class="flex-shrink-0 flex items-center justify-center h-10 w-10 rounded-md bg-gradient-to-r from-indigo-600 to-teal-600 text-white"
+                  <div
+                    class="rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 bg-white divide-y-2 divide-gray-50"
+                  >
+                    <div class="pt-5 pb-6 px-5">
+                      <div class="flex items-center justify-between">
+                        <div>
+                          <jet-application-logo class="block h-10 p-0.5 ml-1.5 w-auto" />
+                        </div>
+                        <div class="-mr-2">
+                          <PopoverButton
+                            class="bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-teal-500"
                           >
-                            <component
-                              :is="item.icon"
-                              class="h-6 w-6"
-                              aria-hidden="true"
-                            />
-                          </div>
-                          <div class="ml-4 text-base font-medium text-gray-900">
-                            {{ item.name }}
-                          </div>
+                            <span class="sr-only">Close menu</span>
+                            <XIcon class="h-6 w-6" aria-hidden="true" />
+                          </PopoverButton>
+                        </div>
+                      </div>
+                      <div class="mt-6">
+                        <nav class="grid grid-cols-1 gap-7">
+                          <a
+                            v-for="item in Search"
+                            :key="item.name"
+                            :href="item.href"
+                            class="-m-3 p-3 flex items-center rounded-lg hover:bg-gray-50"
+                          >
+                            <div
+                              class="flex-shrink-0 flex items-center justify-center h-10 w-10 rounded-md bg-gradient-to-r from-indigo-600 to-teal-600 text-white"
+                            >
+                              <component
+                                :is="item.icon"
+                                class="h-6 w-6"
+                                aria-hidden="true"
+                              />
+                            </div>
+                            <div class="ml-4 text-base font-medium text-gray-900">
+                              {{ item.name }}
+                            </div>
+                          </a>
+                        </nav>
+                      </div>
+                    </div>
+                    <div class="py-6 px-5">
+                      <div class="grid grid-cols-2 gap-4">
+                        <a
+                          href="/projects"
+                          class="text-base font-medium text-gray-900 hover:text-gray-700"
+                        >
+                          Projects
                         </a>
-                      </nav>
+                        <a
+                          href="/datasets"
+                          class="text-base font-medium text-gray-900 hover:text-gray-700"
+                        >
+                          Datasets
+                        </a>
+                        <a
+                          target="_blank"
+                          href="https://docs.nmrxiv.org"
+                          class="text-base font-medium text-gray-900 hover:text-gray-700"
+                        >
+                          Docs
+                        </a>
+                      </div>
+                      <div class="mt-6">
+                        <a
+                          href="/login"
+                          class="w-full flex items-center justify-center bg-gradient-to-r from-indigo-600 to-teal-600 bg-origin-border px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white hover:from-indigo-700 hover:to-teal-700"
+                        >
+                          Login
+                        </a>
+                        <p class="mt-6 text-center text-base font-medium text-gray-500">
+                          <a href="/register" class="text-gray-900"> Register </a>
+                        </p>
+                      </div>
                     </div>
                   </div>
-                  <div class="py-6 px-5">
-                    <div class="grid grid-cols-2 gap-4">
-                      <a
-                        href="/projects"
-                        class="text-base font-medium text-gray-900 hover:text-gray-700"
-                      >
-                        Projects
-                      </a>
-                      <a
-                        href="/datasets"
-                        class="text-base font-medium text-gray-900 hover:text-gray-700"
-                      >
-                        Datasets
-                      </a>
-                      <a
-                        target="_blank"
-                        href="https://docs.nmrxiv.org"
-                        class="text-base font-medium text-gray-900 hover:text-gray-700"
-                      >
-                        Docs
-                      </a>
-                    </div>
-                    <div class="mt-6">
-                      <a
-                        href="/login"
-                        class="w-full flex items-center justify-center bg-gradient-to-r from-indigo-600 to-teal-600 bg-origin-border px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white hover:from-indigo-700 hover:to-teal-700"
-                      >
-                        Login
-                      </a>
-                      <p class="mt-6 text-center text-base font-medium text-gray-500">
-                        <a href="/register" class="text-gray-900"> Register </a>
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </PopoverPanel>
+                </PopoverPanel>
+              </div>
             </transition>
           </Popover>
         </header>
@@ -242,7 +242,9 @@
                     class="flex items-center justify-center px-4 py-3 border border-1 text-base font-medium rounded-md shadow-sm text-teal-700 bg-white hover:bg-teal-50 sm:px-8"
                   >
                     Submit data
-                    <ToolTip text="To submit data you will need an account with nmrXiv, so you will be redirected to our register page and once registered you can then go ahead and submit data. For more information please checkout our <a href='//docs.nmrxiv.org' class='text-gray-400' target='_blank'>documentation</a>."></ToolTip>
+                    <ToolTip
+                      text="To submit data you will need an account with nmrXiv, so you will be redirected to our register page and once registered you can then go ahead and submit data. For more information please checkout our <a href='//docs.nmrxiv.org' class='text-gray-400' target='_blank'>documentation</a>."
+                    ></ToolTip>
                   </a>
                   <a
                     href="/projects"
@@ -265,46 +267,28 @@
           >
             <!-- Trusted by over 5 very average small businesses -->
           </p>
-          <div class="mt-6 grid grid-cols-2 gap-8 md:grid-cols-3 lg:grid-cols-3">
-            <div class="col-span-1 flex justify-center md:col-span-2 lg:col-span-1">
+          <div class="mt-6 grid grid-cols-3 gap-8">
+            <div class="col-span-3 md:col-span-1 flex justify-center">
               <img
                 class="h-12"
                 src="https://www.uni-jena.de/unijenamedia/universitaet/abteilung-hochschulkommunikation/marketing/wort-bildmarke-universitaet-jena.jpg?height=335&width=1000"
                 alt="FSU Jena"
               />
             </div>
-            <div class="col-span-1 flex justify-center md:col-span-2 lg:col-span-1">
+            <div class="col-span-3 md:col-span-1 flex justify-center">
               <img
                 class="h-12"
                 src="https://www.nfdi4chem.de/wp-content/uploads/2021/11/cropped-NFDI4Chem-Logo-Claim_mehrfarbig_schwarz-e1636478409489.png"
-                alt="Mirage"
+                alt="NFDI4Chem"
               />
             </div>
-            <div class="col-span-1 flex justify-center md:col-span-2 lg:col-span-1">
+            <div class="col-span-3 md:col-span-1 flex justify-center">
               <img
                 class="h-12"
                 src="https://www.nmrium.org/brand/nmrium-logo.svg"
-                alt="StaticKit"
+                alt="NMRium"
               />
             </div>
-            <!-- <div
-              class="col-span-1 flex justify-center md:col-span-2 md:col-start-2 lg:col-span-1"
-            >
-              <img
-                class="h-12"
-                src="https://tailwindui.com/img/logos/transistor-logo-gray-400.svg"
-                alt="Transistor"
-              />
-            </div>
-            <div
-              class="col-span-2 flex justify-center md:col-span-2 md:col-start-4 lg:col-span-1"
-            >
-              <img
-                class="h-12"
-                src="https://tailwindui.com/img/logos/workcation-logo-gray-400.svg"
-                alt="Workcation"
-              />
-            </div> -->
           </div>
         </div>
       </div>
@@ -331,7 +315,11 @@
                     Submit spectral data to us
                   </h2>
                   <p class="mt-4 text-lg text-gray-500">
-                    nmrXiv offers you ready to use NMR data management platform to host your raw instrument data and processed files for free and also provides you with tools and services to analyse data. Added to that get expert opinion and support for any of your NMR spectra related queries from the community or provide one yourself. 
+                    nmrXiv offers you ready to use NMR data management platform to host
+                    your raw instrument data and processed files for free and also
+                    provides you with tools and services to analyse data. Added to that
+                    get expert opinion and support for any of your NMR spectra related
+                    queries from the community or provide one yourself.
                   </p>
                   <div class="mt-6">
                     <a
@@ -356,6 +344,51 @@
               </div>
             </div>
           </div>
+          <div class="my-5 py-10">
+            <div
+              class="lg:mx-auto lg:max-w-7xl px-8 lg:grid lg:grid-cols-1 lg:grid-flow-col-dense lg:gap-24"
+            >
+              <div>
+                <div class="md:flex md:items-center md:justify-between">
+                  <h2 class="text-2xl font-extrabold tracking-tight text-gray-900">
+                    Trending projects
+                  </h2>
+                  <a
+                    href="/projects"
+                    class="hidden text-sm font-medium text-indigo-600 hover:text-indigo-500 md:block"
+                    >Explore more<span aria-hidden="true"> &rarr;</span></a
+                  >
+                </div>
+              </div>
+            </div>
+            <div
+              class="lg:mx-auto lg:max-w-7xl px-8 lg:grid lg:grid-cols-1 lg:grid-flow-col-dense lg:gap-24"
+            >
+              <div>
+                <div class="max-w-7xl mx-auto py-3 px-0 sm:flex sm:items-center">
+                  <div class="mt-2 sm:mt-0">
+                    <div class="-m-1 flex flex-wrap items-center">
+                      <a
+                        href="/projects?filter=recent"
+                        class="m-1 inline-flex rounded-full border border-gray-200 items-center py-1.5 pl-3 pr-3 text-sm font-medium bg-white text-gray-900 hover:text-white hover:bg-black"
+                        ><span>Recent</span></a
+                      >
+                      <a
+                        href="/projects?filter=trending"
+                        class="m-1 inline-flex rounded-full border border-gray-200 items-center py-1.5 pl-3 pr-3 text-sm font-medium bg-white text-gray-900 hover:text-white hover:bg-black"
+                        ><span>Trending</span></a
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              class="lg:mx-auto lg:max-w-7xl lg:px-8 md:grid grid-cols-1 grid-flow-col-dense lg:gap-24"
+            >
+              <Projects></Projects>
+            </div>
+          </div>
         </div>
         <div class="mt-24">
           <div
@@ -377,7 +410,9 @@
                     Develop tools with our API
                   </h2>
                   <p class="mt-4 text-lg text-gray-500">
-                    With our stable core platform, software programmers and data scientists can leverage our API to develop additional advanced tools/software utilising the data and rich metadata descriptions.
+                    With our stable core platform, software programmers and data
+                    scientists can leverage our API to develop additional advanced
+                    tools/software utilising the data and rich metadata descriptions.
                   </p>
                   <div class="mt-6">
                     <a
@@ -423,15 +458,19 @@
                     Review and analyse the spectral assignments
                   </h2>
                   <p class="mt-4 text-lg text-gray-500">
-                    Data deposited in nmrXiv requires original machine output files. With this original data, researchers can annotate missing assignments in the spectra and also reanalyse previous work to offer additional help. In a way sharing the knowledge and expertise to the next generation of spectroscopic analysts.
+                    Data deposited in nmrXiv requires original machine output files. With
+                    this original data, researchers can annotate missing assignments in
+                    the spectra and also reanalyse previous work to offer additional help.
+                    In a way sharing the knowledge and expertise to the next generation of
+                    spectroscopic analysts.
                   </p>
                   <div class="mt-6">
                     <a
                       href="#"
                       class="inline-flex bg-gradient-to-r from-indigo-600 to-teal-600 bg-origin-border px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white hover:from-indigo-700 hover:to-teal-700"
                     >
-                      Need help with structure ellucidation?
-                    </a><br/>
+                      Need help with structure ellucidation? </a
+                    ><br />
                     <a
                       href="#"
                       class="inline-flex bg-gradient-to-r from-indigo-600 to-teal-600 bg-origin-border px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white hover:from-indigo-700 hover:to-teal-700 mt-4"
@@ -707,6 +746,7 @@
 <script>
 import { Head, Link } from "@inertiajs/inertia-vue3";
 import JetApplicationLogo from "@/Jetstream/ApplicationLogo.vue";
+import Projects from "@/Shared/Projects.vue";
 import { defineComponent, h } from "vue";
 import { Popover, PopoverButton, PopoverGroup, PopoverPanel } from "@headlessui/vue";
 import {
@@ -731,13 +771,15 @@ import ToolTip from "@/Shared/ToolTip.vue";
 const Search = [
   {
     name: "Browse",
-    description: "Know more about the data deposited in nmrXiv by browsing projects and datasets. You can also learn more about our data schema on our documentation site.",
+    description:
+      "Know more about the data deposited in nmrXiv by browsing projects and datasets. You can also learn more about our data schema on our documentation site.",
     href: "#",
     icon: InboxIcon,
   },
   {
     name: "Advanced search",
-    description: "Search similar spectra by simple drag and drop of your machine output files or search spectra by structures. Need further guidance or found any missing information. Reach out to us or check out our documentation site.",
+    description:
+      "Search similar spectra by simple drag and drop of your machine output files or search spectra by structures. Need further guidance or found any missing information. Reach out to us or check out our documentation site.",
     href: "#",
     icon: QuestionMarkCircleIcon,
   },
@@ -745,50 +787,42 @@ const Search = [
 const features = [
   {
     name: "Advanced search",
-    description:
-      "",
+    description: "",
     icon: InboxIcon,
   },
   {
     name: "Open Source",
-    description:
-      "",
+    description: "",
     icon: UsersIcon,
   },
   {
     name: "Auto Assignments",
-    description:
-      "",
+    description: "",
     icon: TrashIcon,
   },
   {
     name: "Prediction",
-    description:
-      "",
+    description: "",
     icon: PencilAltIcon,
   },
   {
     name: "Schemas and MIChI",
-    description:
-      "",
+    description: "",
     icon: DocumentReportIcon,
   },
   {
     name: "Community challenges",
-    description:
-      "",
+    description: "",
     icon: ReplyIcon,
   },
   {
     name: "Docs & API",
-    description:
-      "",
+    description: "",
     icon: ChatAltIcon,
   },
   {
     name: "Backups",
-    description:
-      "",
+    description: "",
     icon: HeartIcon,
   },
 ];
@@ -829,7 +863,11 @@ const footerNavigation = {
     { name: "API Status", href: "https://docs.nmrxiv.org/docs/developer-guides/API" },
   ],
   About: [
-    { name: "Adivsory Board", href: "https://docs.nmrxiv.org/docs/contributing/contributors-and-steering-committee" },
+    {
+      name: "Adivsory Board",
+      href:
+        "https://docs.nmrxiv.org/docs/contributing/contributors-and-steering-committee",
+    },
     // { name: "Metrics", href: "#" },
     // { name: "Blog", href: "#" },
     // { name: "Press", href: "#" },
@@ -939,7 +977,8 @@ export default {
     PopoverGroup,
     PopoverPanel,
     ChevronDownIcon,
-    ToolTip
+    ToolTip,
+    Projects,
   },
 
   setup() {

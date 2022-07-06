@@ -1,14 +1,20 @@
 <template>
   <app-layout title="Users & Permissions">
     <template #header>
-      <div>
-        <bread-crumbs :pages="pages" />
-        <div class="mt-2 md:flex md:items-center md:justify-between">
-          <div class="flex-1 min-w-0">
-            <div
-              class="flex items-center text-sm text-gray-700 uppercase font-bold tracking-widest mt-3"
-            >
-              {{ edituser.first_name }} {{ edituser.last_name }}
+      <div class="bg-white border-b">
+        <div class="px-12">
+          <div class="flex flex-nowrap justify-between py-6">
+            <div>
+              <bread-crumbs :pages="pages" />
+              <div class="mt-2 md:flex md:items-center md:justify-between">
+                <div class="flex-1 min-w-0">
+                  <div
+                    class="flex items-center text-sm text-gray-700 uppercase font-bold tracking-widest mt-3"
+                  >
+                    {{ edituser.first_name }} {{ edituser.last_name }}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -29,8 +35,8 @@
 <script>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import BreadCrumbs from "../../../Jetstream/BreadCrumbs.vue";
-import UserProfile from '@/Pages/Console/Users/Partials/UserProfile.vue'
-import UserPassword from '@/Pages/Console/Users/Partials/UserPassword.vue'
+import UserProfile from "@/Pages/Console/Users/Partials/UserProfile.vue";
+import UserPassword from "@/Pages/Console/Users/Partials/UserPassword.vue";
 
 export default {
   metaInfo() {
@@ -53,7 +59,12 @@ export default {
       pages: [
         { name: "Console", route: "console", current: false },
         { name: "Users", route: "console.users", current: false },
-        { name: this.edituser.first_name + " " + this.edituser.last_name, route: "console.users.update", current: true, id: this.edituser.id }
+        {
+          name: this.edituser.first_name + " " + this.edituser.last_name,
+          route: "console.users.update",
+          current: true,
+          id: this.edituser.id,
+        },
       ],
     };
   },
@@ -62,7 +73,7 @@ export default {
       this.form.post(this.route("console.users.update", this.edituser.id), {
         onSuccess: () => this.form.reset("password", "photo"),
       });
-    }
+    },
   },
 };
 </script>

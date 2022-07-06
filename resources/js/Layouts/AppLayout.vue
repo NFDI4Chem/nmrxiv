@@ -57,6 +57,9 @@
               </Link>
             </div>
             <div class="mt-1 flex-1 h-0 overflow-y-auto">
+              <div class="my-4 mx-4">
+                <create mode="button"></create>
+              </div>
               <nav
                 v-for="item in filteredNavigation"
                 :key="item.name"
@@ -188,7 +191,7 @@
       <div class="sticky top-0 z-10 flex-shrink-0 flex h-16 bg-white shadow">
         <button
           type="button"
-          class="p-4 rounded mx-1 mr-3 border-gray-200 text-gray-500"
+          class="hidden md:inline-flex p-4 rounded mx-1 mr-3 border-red-200 text-gray-500"
           @click="toggleCollapseSidebar()"
         >
           <MenuIcon class="h-6 w-6" aria-hidden="true" />
@@ -478,13 +481,7 @@
         </div>
       </div>
       <main class="flex-1 relative overflow-y-auto focus:outline-none">
-        <div class="bg-white border-b">
-          <div class="px-12">
-            <div class="flex flex-nowrap justify-between py-6">
-              <slot name="header"></slot>
-            </div>
-          </div>
-        </div>
+        <slot name="header"></slot>
         <slot></slot>
         <project-create></project-create>
         <submission></submission>
@@ -639,7 +636,7 @@ export default {
     FolderIcon,
     ViewGridIcon,
     StudyCreate,
-    Submission
+    Submission,
   },
   setup() {
     var collapseSidebarStatus = JSON.parse(localStorage.getItem("collapseSidebarStatus"));

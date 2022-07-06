@@ -43,6 +43,7 @@ class Project extends Model implements Auditable
         'fs_id',
         'project_photo_path',
         'license_id',
+        'release_date',
     ];
 
     protected static $marks = [
@@ -77,6 +78,11 @@ class Project extends Model implements Auditable
     public function draft()
     {
         return $this->belongsTo(Draft::class, 'draft_id');
+    }
+
+    public function likes()
+    {
+        return  Like::count($this);
     }
 
     /**
