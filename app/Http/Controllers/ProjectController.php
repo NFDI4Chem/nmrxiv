@@ -11,11 +11,13 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Auth\Access\AuthorizationException;
 use App\Actions\Project\UpdateProject;
 use App\Actions\Project\DeleteProject;
+use App\Http\Resources\ProjectResource;
 use Laravel\Jetstream\Jetstream;
 use Illuminate\Http\Request;
 use App\Models\Project;
 use App\Models\User;
 use App\Models\Study;
+use Maize\Markable\Models\Like;
 use Inertia\Inertia;
 use Auth;
 
@@ -27,15 +29,13 @@ class ProjectController extends Controller
         $project = Project::where('slug', $slug)->firstOrFail();
 
         if(!$project->is_public){
-
             if (! Gate::forUser($request->user())->check('viewProject', $project)) {
                 throw new AuthorizationException;
             }
         }
 
         return Inertia::render('Public/Project', [
-            'project' => $project,
-            'studies' => $project->studies
+            'project' => new ProjectResource($project)
         ]);
     }
 
@@ -43,13 +43,18 @@ class ProjectController extends Controller
     {
         
         $projects = Cache::rememberForever('projects', function (){
-            return Project::where('is_public', TRUE)->simplePaginate(15);
+            return ProjectResource::collection(Project::where('is_public', true)->orderByDesc('updated_at')->paginate(15));
         });
 
         return Inertia::render('Public/Projects', [
             'projects' => $projects
         ]);
         
+    }
+
+    public function toggleUpVote(Request $request, Project $project)
+    {
+        return Like::toggle($project, $request->user());
     }
 
     public function show(Request $request, Project $project)
