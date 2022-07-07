@@ -345,7 +345,7 @@ export default {
             if (iframe) {
                 if (!this.selectedDataset.nmrium_info) {
                     let data = {
-                        urls: [
+                        data: [
                             this.url +
                                 "/download/asc/datasets/" +
                                 this.selectedDataset.id +
@@ -353,14 +353,17 @@ export default {
                                 this.selectedDataset.name +
                                 ".zip",
                         ],
+                        type: 'url'
                     };
+                    console.log(data)
                     iframe.postMessage(
-                        { type: `nmr-wrapper:loadURLs`, data },
+                        { type: `nmr-wrapper:load`, data },
                         "*"
                     );
                 } else {
                     let data = {
-                        spectra: [JSON.parse(this.selectedDataset.nmrium_info)],
+                        data: [JSON.parse(this.selectedDataset.nmrium_info)],
+                        type: 'nmrium'
                     };
                     iframe.postMessage({ type: `nmr-wrapper:load`, data }, "*");
                 }

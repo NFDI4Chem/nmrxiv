@@ -1114,89 +1114,91 @@
                 >
                   <div class="p-4 px-6 bg-gray-100 rounded-lg">
                     <div class="max-w-lg mx-auto lg:max-w-none">
-                    <h2 id="summary-heading" class="text-lg font-medium text-gray-900">
-                      Summary
-                    </h2>
-                  </div>
-                  <div class="mt-2">
-                    <h3 class="text-sm leading-6 font-medium text-gray-700">Citation</h3>
-                    <p class="mt-1 text-sm text-gray-500">
-                      Author, 1., & Author, 2.. (2022). FAIR, consensus-driven NMR data
-                      repository and computational platform. The ultimate goal is to
-                      accelerate broader coordination and data sharing among natural
-                      product (NP) researchers by enabling storage, management, sharing
-                      and analysis of NMR data.
-                    </p>
-                  </div>
-                  <div class="mt-5">
-                    <table class="min-w-full rounded border divide-y divide-gray-300">
-                      <thead class="bg-gray-50">
-                        <tr>
-                          <th
-                            scope="col"
-                            class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 lg:pl-8"
+                      <h2 id="summary-heading" class="text-lg font-medium text-gray-900">
+                        Summary
+                      </h2>
+                    </div>
+                    <div class="mt-2">
+                      <h3 class="text-sm leading-6 font-medium text-gray-700">
+                        Citation
+                      </h3>
+                      <p class="mt-1 text-sm text-gray-500">
+                        Author, 1., & Author, 2.. (2022). FAIR, consensus-driven NMR data
+                        repository and computational platform. The ultimate goal is to
+                        accelerate broader coordination and data sharing among natural
+                        product (NP) researchers by enabling storage, management, sharing
+                        and analysis of NMR data.
+                      </p>
+                    </div>
+                    <div class="mt-5">
+                      <table class="min-w-full rounded border divide-y divide-gray-300">
+                        <thead class="bg-gray-50">
+                          <tr>
+                            <th
+                              scope="col"
+                              class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 lg:pl-8"
+                            >
+                              Study
+                            </th>
+                            <th
+                              scope="col"
+                              class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                            >
+                              Datasets
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200 bg-white">
+                          <tr
+                            v-for="study in this.project.studies"
+                            :key="study.id"
+                            :value="study.name"
                           >
-                            Study
-                          </th>
-                          <th
-                            scope="col"
-                            class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                          >
-                            Datasets
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody class="divide-y divide-gray-200 bg-white">
-                        <tr
-                          v-for="study in this.project.studies"
-                          :key="study.id"
-                          :value="study.name"
-                        >
-                          <td
-                            class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8"
-                          >
-                            {{ study.name }}
-                          </td>
-                          <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            <div v-for="dataset in study.datasets" :key="dataset.id">
-                              <span class="break-normal">
-                                {{ dataset.name }}
-                              </span>
-                            </div>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                  <div class="my-5">
-                    <h3 class="text-sm leading-6 mb-2 font-medium text-gray-700">
-                      Quick links
-                    </h3>
-                    <jet-button
-                      type="submit"
-                      class="mr-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-                    >
-                      Download Zip
-                    </jet-button>
-                    <jet-button
-                      type="submit"
-                      class="mr-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-                    >
-                      MD5 hashmap
-                    </jet-button>
-                    <jet-button
-                      type="submit"
-                      class="mr-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-                    >
-                      Embed
-                    </jet-button>
-                    <jet-button
-                      type="submit"
-                      class="mr-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-                    >
-                      Share
-                    </jet-button>
-                  </div>
+                            <td
+                              class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8"
+                            >
+                              {{ study.name }}
+                            </td>
+                            <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                              <div v-for="dataset in study.datasets" :key="dataset.id">
+                                <span class="break-normal">
+                                  {{ dataset.name }}
+                                </span>
+                              </div>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <div class="my-5">
+                      <h3 class="text-sm leading-6 mb-2 font-medium text-gray-700">
+                        Quick links
+                      </h3>
+                      <jet-button
+                        type="submit"
+                        class="mr-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                      >
+                        Download Zip
+                      </jet-button>
+                      <jet-button
+                        type="submit"
+                        class="mr-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                      >
+                        MD5 hashmap
+                      </jet-button>
+                      <jet-button
+                        type="submit"
+                        class="mr-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                      >
+                        Embed
+                      </jet-button>
+                      <jet-button
+                        type="submit"
+                        class="mr-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                      >
+                        Share
+                      </jet-button>
+                    </div>
                   </div>
                 </section>
                 <div
@@ -1530,7 +1532,9 @@
           </jet-button>
         </span>
         <span v-else-if="currentStep.id == '03'">
-          <jet-button @click="toggleOpenCreateDatasetDialog"> Save and Finish </jet-button>
+          <jet-button @click="toggleOpenCreateDatasetDialog">
+            Save and Finish
+          </jet-button>
         </span>
       </span>
     </template>
@@ -1637,8 +1641,6 @@ export default {
       autoSaving: false,
       currentMolecules: [],
 
-      eventRegistered: false,
-
       smiles: "",
       percentage: 1,
       editor: null,
@@ -1667,10 +1669,10 @@ export default {
           let selectedDraft = this.drafts.find((d) => d.id == data.draft_id);
           this.selectDraft(selectedDraft);
           this.loading = false;
-          this.openCreateDatasetDialog = true;
+          this.toggleOpenCreateDatasetDialog();
         } else {
           this.defaultDraft = response.data.default;
-          this.openCreateDatasetDialog = true;
+          this.toggleOpenCreateDatasetDialog();
           if (this.drafts.length == 0) {
             this.currentDraft = this.defaultDraft;
             this.selectStep(1);
@@ -1681,28 +1683,7 @@ export default {
         }
       });
     });
-
-    const saveNMRiumUpdates = (e) => {
-      if (e.origin != "https://nmriumdev.nmrxiv.org") {
-        return;
-      }
-      if (e.data.type == "nmr-wrapper:dataChange") {
-        this.selectedSpectraData = e.data.data.data.find(
-          (d) => d.info.type == "NMR Spectrum"
-        );
-        if (this.selectedSpectraData) {
-          this.currentMolecules = e.data.data.molecules;
-          this.updateDataSet(e.data.data.actionType);
-        }
-      }
-      this.eventRegistered = true;
-    };
-
-    if (!this.eventRegistered) {
-      window.addEventListener("message", saveNMRiumUpdates);
-    }
   },
-  onUpdated() {},
   methods: {
     updateProject() {
       this.loadingStep = true;
@@ -1821,7 +1802,7 @@ export default {
           })
           .then((response) => {
             this.autoSaving = false;
-            // this.selectedDataset = response.data;
+            this.selectedDataset.nmrium_info = response.data.nmrium_info;
           });
       }
     },
@@ -1848,7 +1829,7 @@ export default {
       if (iframe) {
         if (!this.selectedDataset.nmrium_info) {
           let data = {
-            urls: [
+            data: [
               this.url +
                 "/download/asc/datasets/" +
                 this.selectedDataset.id +
@@ -1856,10 +1837,12 @@ export default {
                 this.selectedDataset.name +
                 ".zip",
             ],
+            type: 'url'
           };
-          iframe.postMessage({ type: `nmr-wrapper:loadURLs`, data }, "*");
+          iframe.postMessage({ type: `nmr-wrapper:load`, data }, "*");
         } else {
-          let data = { spectra: [JSON.parse(this.selectedDataset.nmrium_info)] };
+          console.log(JSON.parse(this.selectedDataset.nmrium_info))
+          let data = { data: JSON.parse(this.selectedDataset.nmrium_info), type: "nmrium" };
           iframe.postMessage({ type: `nmr-wrapper:load`, data }, "*");
         }
       }
@@ -2069,6 +2052,31 @@ export default {
     },
     toggleOpenCreateDatasetDialog() {
       this.openCreateDatasetDialog = !this.openCreateDatasetDialog;
+
+      if (this.openCreateDatasetDialog) {
+        const saveNMRiumUpdates = (e) => {
+          if (e.origin != "https://nmriumdev.nmrxiv.org") {
+            return;
+          }
+          if (e.data.type == "nmr-wrapper:dataChange") {
+            console.log(e.data.data.data)
+            this.selectedSpectraData = e.data.data.data.find(
+              (d) => d.info.type == "NMR Spectrum"
+            );
+            if (this.selectedSpectraData) {
+              this.currentMolecules = e.data.data.molecules;
+              this.updateDataSet(e.data.data.actionType);
+            }
+          }
+        };
+
+        if (!this.$props.eventRegistered) {
+          window.addEventListener("message", saveNMRiumUpdates);
+          this.$props.eventRegistered = true;
+        }
+      }else{
+        window.removeEventListener("message");
+      }
     },
     fetchDrafts() {
       this.loading = true;

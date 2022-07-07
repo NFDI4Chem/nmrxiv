@@ -4,12 +4,12 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Models\Project;
+use App\Models\FileSystemObject;
 use App\Http\Resources\StudyResource;
 use Illuminate\Support\Facades\Storage;
 
 class ProjectResource extends JsonResource
 {
-
     /**
      * Transform the resource into an array.
      *
@@ -25,16 +25,26 @@ class ProjectResource extends JsonResource
             'description' => $this->description,
             'team' => $this->when(!$this->team->personal_team, $this->team),
             'owner' => new UserResource($this->owner),
-            'photo_url' => $this->project_photo_path ? Storage::disk('minio_public')->url($this->project_photo_path) : '',
+            'photo_url' => $this->project_photo_path
+                ? Storage::disk('minio_public')->url($this->project_photo_path)
+                : '',
             'tags' => $this->tags,
             'license' => new LicenseResource($this->license),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            'users'    => UserResource::collection($this->allUsers()),
+            'users' => UserResource::collection($this->allUsers()),
             'studies' => StudyResource::collection($this->studies),
-            'stats'=> [
-                'likes' => $this->likes()
-            ]
+            'files' => [
+                'name' => '/',
+                'has_children' => true,
+                'children' => FileSystemObject::with('children')
+                    ->where([['project_id', $this->id]])
+                    ->orderBy('type')
+                    ->get(),
+            ],
+            'stats' => [
+                'likes' => $this->likes(),
+            ],
         ];
     }
 }

@@ -26,6 +26,7 @@ class StudyResource extends JsonResource
             'license' => new LicenseResource($this->license),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'sample'    => new SampleResource($this->sample),
             'users'    => UserResource::collection($this->allUsers()),
             'datasets' => DatasetResource::collection($this->datasets)
         ];
