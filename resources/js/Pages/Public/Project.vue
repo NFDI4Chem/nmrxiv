@@ -1301,8 +1301,9 @@ export default {
           };
           iframe.postMessage({ type: `nmr-wrapper:load`, data }, "*");
         } else {
-          let data = { data: JSON.parse(this.selectedDataset.nmrium_info), type: "nmrium" };
-          console.log(data)
+          let data = { data: {
+            spectra:[JSON.parse(this.selectedDataset.nmrium_info)]
+          }, type: "nmrium" };
 
           iframe.postMessage({ type: `nmr-wrapper:load`, data }, "*");
         }
