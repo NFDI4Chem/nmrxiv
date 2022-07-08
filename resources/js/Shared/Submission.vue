@@ -1105,7 +1105,8 @@
               </div>
             </div>
             <div v-if="currentStep.id == '03'">
-              <div
+              <div v-if="project.status == 'complete'">
+                <div
                 class="relative grid grid-cols-1 gap-x-16 max-w-7xl mx-auto lg:grid-cols-2"
               >
                 <section
@@ -1410,6 +1411,19 @@
                   </div>
                 </div>
               </div>
+              </div>
+              <div v-else>
+                <div class="py-16">
+                  <div class="text-center">
+                    <p class="text-sm font-semibold text-indigo-600 uppercase tracking-wide">{{ project.name }}</p>
+                    <h1 class="mt-2 text-4xl font-extrabold text-gray-900 tracking-tight sm:text-5xl">{{ project.status }}</h1>
+                    <p class="mt-2 text-base text-gray-500">Please allow some time for us to process your submission. You will also recieve an email once your submission is processed</p>
+                    <div class="mt-6">
+                      <a class="text-base font-medium text-indigo-600 hover:text-indigo-500">Go back home<span aria-hidden="true"> →</span></a>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1658,6 +1672,8 @@ export default {
       }),
 
       licenses: [],
+
+      project: null
     };
   },
   mounted() {
@@ -1816,13 +1832,21 @@ export default {
         })
         .then((response) => {
           this.project = response.data.project;
-          this.studies = response.data.studies;
-          if (this.project && this.studies.length > 0) {
+          if (this.project) {
             this.loadingStep = false;
             this.loadLicenses();
             this.selectStep(3);
+            this.trackProject()
           }
         });
+    },
+    trackProject(){
+      axios.get("/projects/" + this.project.id + "/status" ).then(response => {
+        this.project.status = response.data.status
+        if(this.project.status != 'complete'){
+          setTimeout(() => this.trackProject(), 20000);
+        }
+      })
     },
     loadSpectra() {
       const iframe = window.frames.submissionNMRiumIframe;
@@ -1842,7 +1866,9 @@ export default {
           iframe.postMessage({ type: `nmr-wrapper:load`, data }, "*");
         } else {
           console.log(JSON.parse(this.selectedDataset.nmrium_info))
-          let data = { data: JSON.parse(this.selectedDataset.nmrium_info), type: "nmrium" };
+          let data = { data: {
+            spectra:[JSON.parse(this.selectedDataset.nmrium_info)]
+          }, type: "nmrium" };
           iframe.postMessage({ type: `nmr-wrapper:load`, data }, "*");
         }
       }

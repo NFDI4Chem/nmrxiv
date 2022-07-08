@@ -65,7 +65,10 @@ Route::get('datasets', [DatasetController::class, 'publicDatasetsView'])
 
 Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::get('projects/{project}/toggleUpVote', [ProjectController::class, 'toggleUpVote'])
-            ->name('projects.toggle-upvote');
+            ->name('project.toggle-upvote');
+
+    Route::get('projects/{project}/status', [ProjectController::class, 'status'])
+            ->name('project.status');
 
     Route::group([
         'prefix' => 'dashboard'

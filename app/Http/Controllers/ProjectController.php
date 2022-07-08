@@ -57,6 +57,11 @@ class ProjectController extends Controller
         return Like::toggle($project, $request->user());
     }
 
+    public function status(Request $request, Project $project)
+    {
+        return response()->json(['status' => $project->status, 'logs' => $project->process_logs]);
+    }
+
     public function show(Request $request, Project $project)
     {
         if (! Gate::forUser($request->user())->check('viewProject', $project)) {
