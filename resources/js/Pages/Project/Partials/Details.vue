@@ -212,14 +212,14 @@
                             Select A New Photo
                           </jet-secondary-button>
 
-                          <jet-secondary-button
+                          <!-- <jet-secondary-button
                             type="button"
                             class="mt-2"
                             @click.prevent="deletePhoto"
                             v-if="project.project_photo_path"
                           >
                             Remove Photo
-                          </jet-secondary-button>
+                          </jet-secondary-button> -->
                         </div>
                         <div v-if="editable">
                           <label
@@ -652,6 +652,7 @@ export default defineComponent({
         license_id: null,
         tag: "",
         tags: [],
+        tags_array: [], 
         photo: null,
       }),
       open: false,
@@ -710,12 +711,12 @@ export default defineComponent({
       if (this.$refs.photo) {
         this.form.photo = this.$refs.photo.files[0];
       }
-
       this.form.owner_id = this.project.owner_id;
       this.form.team_id = this.project.team_id;
-      this.form.tags = this.form.tags.map((t) => t.text);
-
-      this.form.license_id = this.form.license.id;
+      this.form.tags_array = this.form.tags.map((t) => t.text);
+      if(this.form.license){
+        this.form.license_id = this.form.license.id;
+      }
       if (this.linkAccess) {
         this.form.access = "link";
         this.form.access_type = this.selectedAccessType.value;
@@ -725,10 +726,9 @@ export default defineComponent({
       this.form.post(route("dashboard.project.update", this.project.id), {
         preserveScroll: true,
         onSuccess: () => {
-          this.open = false;
           this.clearPhotoFileInput();
         },
-        onError: (err) => console.error(err),
+        onError: (err) => {},
       });
     },
     toggleActivityDetails() {

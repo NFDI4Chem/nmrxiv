@@ -48,7 +48,7 @@
                     Download
                   </a>
                   &emsp;
-                  <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">
+                  <a class="font-medium text-indigo-600 hover:text-indigo-500">
                     View
                   </a>
                 </div>
@@ -85,7 +85,9 @@ export default {
   methods: {},
   computed: {
     downloadURL() {
-      return this.url + "/asc/studies/" + this.study.id + "/file/" + this.file.name;
+      if(this.study){
+        return this.url + "/asc/studies/" + this.study.id + "/file/" + this.file.name;
+      }
     },
     url() {
       return String(this.$page.props.url);

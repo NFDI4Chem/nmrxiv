@@ -1,6 +1,6 @@
 <template>
   <span class="text-sm" v-if="file">
-    <nav class="flex-1 space-y-0 bg-white" aria-label="Sidebar">
+    <nav class="flex-1 space-y-0" aria-label="Sidebar">
       <Disclosure
         as="div"
         :defaultOpen="file.name == '/'"
@@ -13,7 +13,7 @@
             $page.props.selectedFileSystemObject &&
             $page.props.selectedFileSystemObject.relative_url == file.relative_url
               ? 'cursor-pointer bg-gray-100'
-              : 'cursor-pointer bg-white text-gray-600',
+              : 'cursor-pointer text-gray-600',
             'group w-full flex items-center pr-2 py-1 text-left font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500',
           ]"
         >
@@ -70,7 +70,7 @@
                 :class="[
                   sfile.current
                     ? 'text-gray-900'
-                    : 'cursor-pointer bg-white text-gray-600',
+                    : 'cursor-pointer text-gray-600',
                   'cursor-pointer group w-full flex items-center font-medium rounded-md',
                 ]"
               >
@@ -84,7 +84,7 @@
                           $page.props.selectedFileSystemObject.relative_url ==
                             sfile.relative_url
                             ? 'cursor-pointer bg-gray-100 text-gray-900'
-                            : 'cursor-pointer bg-white text-gray-600',
+                            : 'cursor-pointer text-gray-600',
                           'group w-full flex items-center pr-2 py-1 text-left font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500',
                         ]"
                       >

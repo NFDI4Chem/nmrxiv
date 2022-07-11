@@ -22,6 +22,8 @@ class CreateProjectsTable extends Migration
             $table->boolean('is_public')->nullable()->default(0);
             $table->boolean('is_deleted')->nullable()->default(0);
             $table->boolean('is_archived')->nullable()->default(0);
+            $table->string('status')->nullable();
+            $table->json('process_logs')->nullable();
             $table->string('location')->nullable();
             $table->string('url', 2048)->nullable();
             $table->longText('description')->nullable();
