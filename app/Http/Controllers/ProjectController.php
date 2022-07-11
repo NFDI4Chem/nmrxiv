@@ -35,13 +35,12 @@ class ProjectController extends Controller
         }
 
         return Inertia::render('Public/Project', [
-            'project' => new ProjectResource($project)
+            'project' => (new ProjectResource($project))->lite(false, ['users', 'studies'])
         ]);
     }
 
     public function publicProjectsView(Request $request)
     {
-        
         $projects = Cache::rememberForever('projects', function (){
             return ProjectResource::collection(Project::where('is_public', true)->orderByDesc('updated_at')->paginate(15));
         });
@@ -49,7 +48,6 @@ class ProjectController extends Controller
         return Inertia::render('Public/Projects', [
             'projects' => $projects
         ]);
-        
     }
 
     public function toggleUpVote(Request $request, Project $project)

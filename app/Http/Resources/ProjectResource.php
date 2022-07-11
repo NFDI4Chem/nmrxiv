@@ -10,6 +10,16 @@ use Illuminate\Support\Facades\Storage;
 
 class ProjectResource extends JsonResource
 {
+    private bool $lite = true;
+    private array $properties = ['users', 'studies', 'files', 'license'];
+
+    public function lite(bool $lite, array $properties): self
+    {
+        $this->lite = $lite;
+        $this->properties = $properties;
+        return $this;
+    }
+
     /**
      * Transform the resource into an array.
      *
@@ -29,19 +39,59 @@ class ProjectResource extends JsonResource
                 ? Storage::disk('minio_public')->url($this->project_photo_path)
                 : '',
             'tags' => $this->tags,
-            'license' => new LicenseResource($this->license),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            'users' => UserResource::collection($this->allUsers()),
-            'studies' => StudyResource::collection($this->studies),
-            'files' => [
-                'name' => '/',
-                'has_children' => true,
-                'children' => FileSystemObject::with('children')
-                    ->where([['project_id', $this->id]])
-                    ->orderBy('type')
-                    ->get(),
-            ],
+            $this->mergeWhen(!$this->lite, function () {
+                return [
+                    $this->mergeWhen(
+                        in_array('users', $this->properties),
+                        function () {
+                            return [
+                                'users' => UserResource::collection(
+                                    $this->allUsers()
+                                ),
+                            ];
+                        }
+                    ),
+                    $this->mergeWhen(
+                        in_array('studies', $this->properties),
+                        function () {
+                            return [
+                                'studies' => StudyResource::collection(
+                                    $this->studies
+                                ),
+                            ];
+                        }
+                    ),
+                    $this->mergeWhen(
+                        in_array('files', $this->properties),
+                        function () {
+                            return [
+                                'files' => [
+                                    'name' => '/',
+                                    'has_children' => true,
+                                    'children' => FileSystemObject::with(
+                                        'children'
+                                    )
+                                        ->where([['project_id', $this->id]])
+                                        ->orderBy('type')
+                                        ->get(),
+                                ],
+                            ];
+                        }
+                    ),
+                    $this->mergeWhen(
+                        in_array('license', $this->properties),
+                        function () {
+                            return [
+                                'license' => new LicenseResource(
+                                    $this->license
+                                ),
+                            ];
+                        }
+                    ),
+                ];
+            }),
             'stats' => [
                 'likes' => $this->likes(),
             ],

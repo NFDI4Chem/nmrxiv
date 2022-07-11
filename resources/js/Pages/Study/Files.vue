@@ -27,7 +27,7 @@
               <ol role="list" class="flex items-center space-x-2">
                 <li>
                   <div>
-                    <a href="#" class="text-gray-400 hover:text-gray-900">
+                    <a class="text-gray-400 hover:text-gray-900">
                       <HomeIcon class="flex-shrink-0 h-5 w-5" aria-hidden="true" />
                       <span class="sr-only">Home</span>
                     </a>

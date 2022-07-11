@@ -8,9 +8,9 @@
               class="flex justify-between items-center mx-auto px-4 py-6 sm:px-6 md:justify-start md:space-x-10 lg:px-8"
             >
               <div class="flex justify-start lg:w-0 lg:flex-1">
-                <a href="/">
+                <Link :href="'/'">
                   <jet-application-logo class="block h-10 p-0.5 ml-1.5 w-auto" />
-                </a>
+                </Link>
               </div>
               <div class="-mr-2 -my-2 md:hidden">
                 <PopoverButton
@@ -21,7 +21,7 @@
                 </PopoverButton>
               </div>
               <PopoverGroup as="nav" class="hidden md:flex space-x-10">
-                <Popover class="relative" v-slot="{ open }">
+                <!-- <Popover class="relative" v-slot="{ open }">
                   <PopoverButton
                     :class="[
                       open ? 'text-gray-900' : 'text-gray-500',
@@ -56,7 +56,7 @@
                           <div
                             class="relative grid gap-6 bg-white px-5 py-6 sm:gap-8 sm:p-8 lg:grid-cols-2"
                           >
-                            <a
+                            <Link
                               v-for="item in Search"
                               :key="item.name"
                               :href="item.href"
@@ -79,25 +79,25 @@
                                   {{ item.description }}
                                 </p>
                               </div>
-                            </a>
+                            </Link>
                           </div>
                         </div>
                       </PopoverPanel>
                     </div>
                   </transition>
-                </Popover>
-                <a
+                </Popover> -->
+                <Link
                   href="/projects"
                   class="text-base font-medium text-gray-500 hover:text-gray-900"
                 >
                   Projects
-                </a>
-                <a
+                </Link>
+                <Link
                   href="/datasets"
                   class="text-base font-medium text-gray-500 hover:text-gray-900"
                 >
                   Datasets
-                </a>
+                </Link>
                 <a
                   target="_blank"
                   href="https://docs.nmrxiv.org"
@@ -107,18 +107,18 @@
                 </a>
               </PopoverGroup>
               <div class="hidden md:flex items-center justify-end md:flex-1 lg:w-0">
-                <a
+                <Link
                   href="/login"
                   class="whitespace-nowrap text-base font-medium text-gray-500 hover:text-gray-900"
                 >
                   Login
-                </a>
-                <a
+                </Link>
+                <Link
                   href="/register"
                   class="ml-8 whitespace-nowrap inline-flex items-center justify-center bg-gradient-to-r from-indigo-600 to-teal-600 bg-origin-border px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white hover:from-indigo-700 hover:to-teal-700"
                 >
                   Register
-                </a>
+                </Link>
               </div>
             </div>
 
@@ -154,7 +154,7 @@
                       </div>
                       <div class="mt-6">
                         <nav class="grid grid-cols-1 gap-7">
-                          <a
+                          <Link
                             v-for="item in Search"
                             :key="item.name"
                             :href="item.href"
@@ -172,24 +172,24 @@
                             <div class="ml-4 text-base font-medium text-gray-900">
                               {{ item.name }}
                             </div>
-                          </a>
+                          </Link>
                         </nav>
                       </div>
                     </div>
                     <div class="py-6 px-5">
                       <div class="grid grid-cols-2 gap-4">
-                        <a
+                        <Link
                           href="/projects"
                           class="text-base font-medium text-gray-900 hover:text-gray-700"
                         >
                           Projects
-                        </a>
-                        <a
+                        </Link>
+                        <Link
                           href="/datasets"
                           class="text-base font-medium text-gray-900 hover:text-gray-700"
                         >
                           Datasets
-                        </a>
+                        </Link>
                         <a
                           target="_blank"
                           href="https://docs.nmrxiv.org"
@@ -199,14 +199,14 @@
                         </a>
                       </div>
                       <div class="mt-6">
-                        <a
+                        <Link
                           href="/login"
                           class="w-full flex items-center justify-center bg-gradient-to-r from-indigo-600 to-teal-600 bg-origin-border px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white hover:from-indigo-700 hover:to-teal-700"
                         >
                           Login
-                        </a>
+                        </Link>
                         <p class="mt-6 text-center text-base font-medium text-gray-500">
-                          <a href="/register" class="text-gray-900"> Register </a>
+                          <Link href="/register" class="text-gray-900"> Register </Link>
                         </p>
                       </div>
                     </div>
@@ -231,13 +231,13 @@
                 class="mt-6 max-w-lg mx-auto text-center text-xl text-dark-200 sm:max-w-3xl"
               >
                 We archive raw and processed NMR data, providing support for browsing,
-                searching, analyzing, and disseminating data worldwide.
+                search, analysis, and dissemination of NMR data worldwide.
               </p>
               <div class="mt-10 max-w-sm mx-auto sm:max-w-none sm:flex sm:justify-center">
                 <div
                   class="space-y-4 sm:space-y-0 sm:mx-auto sm:inline-grid sm:grid-cols-2 sm:gap-5"
                 >
-                  <a
+                  <Link
                     href="/register"
                     class="flex items-center justify-center px-4 py-3 border border-1 text-base font-medium rounded-md shadow-sm text-teal-700 bg-white hover:bg-teal-50 sm:px-8"
                   >
@@ -245,13 +245,13 @@
                     <ToolTip
                       text="To submit data you will need an account with nmrXiv, so you will be redirected to our register page and once registered you can then go ahead and submit data. For more information please checkout our <a href='//docs.nmrxiv.org' class='text-gray-400' target='_blank'>documentation</a>."
                     ></ToolTip>
-                  </a>
-                  <a
+                  </Link>
+                  <Link
                     href="/projects"
                     class="flex items-center justify-center px-4 py-3 border border-1 text-base font-medium rounded-md shadow-sm text-white bg-teal-500 sm:px-8"
                   >
                     Browse data
-                  </a>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -269,31 +269,35 @@
           </p>
           <div class="mt-6 grid grid-cols-3 gap-8">
             <div class="col-span-3 md:col-span-1 flex justify-center">
-              <img
-                class="h-12"
-                src="https://www.uni-jena.de/unijenamedia/universitaet/abteilung-hochschulkommunikation/marketing/wort-bildmarke-universitaet-jena.jpg?height=335&width=1000"
-                alt="FSU Jena"
-              />
+              <a target="_blank" href="https://cheminf.uni-jena.de/">
+                <img
+                  class="h-12"
+                  src="https://www.uni-jena.de/unijenamedia/universitaet/abteilung-hochschulkommunikation/marketing/wort-bildmarke-universitaet-jena.jpg?height=335&width=1000"
+                  alt="FSU Jena"
+                />
+              </a>
             </div>
             <div class="col-span-3 md:col-span-1 flex justify-center">
-              <img
-                class="h-12"
-                src="https://www.nfdi4chem.de/wp-content/uploads/2021/11/cropped-NFDI4Chem-Logo-Claim_mehrfarbig_schwarz-e1636478409489.png"
-                alt="NFDI4Chem"
-              />
+              <a target="_blank" href="https://www.nfdi4chem.de/">
+                <img
+                  class="h-12"
+                  src="https://www.nfdi4chem.de/wp-content/uploads/2021/11/cropped-NFDI4Chem-Logo-Claim_mehrfarbig_schwarz-e1636478409489.png"
+                  alt="NFDI4Chem"
+                />
+              </a>
             </div>
             <div class="col-span-3 md:col-span-1 flex justify-center">
-              <img
-                class="h-12"
-                src="https://www.nmrium.org/brand/nmrium-logo.svg"
-                alt="NMRium"
-              />
+              <a target="_blank" href="https://www.nmrium.org/">
+                <img
+                  class="h-12"
+                  src="https://www.nmrium.org/brand/nmrium-logo.svg"
+                  alt="NMRium"
+                />
+              </a>
             </div>
           </div>
         </div>
       </div>
-
-      <!-- Alternating Feature Sections -->
       <div class="relative pt-16 pb-32">
         <div>
           <div
@@ -318,16 +322,16 @@
                     nmrXiv offers you ready to use NMR data management platform to host
                     your raw instrument data and processed files for free and also
                     provides you with tools and services to analyse data. Added to that
-                    get expert opinion and support for any of your NMR spectra related
-                    queries from the community or provide one yourself.
+                    get community support for any of your NMR spectra related queries or
+                    provide one yourself.
                   </p>
                   <div class="mt-6">
-                    <a
-                      href="/"
+                    <Link
+                      href="/login"
                       class="inline-flex bg-gradient-to-r from-indigo-600 to-teal-600 bg-origin-border px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white hover:from-indigo-700 hover:to-teal-700"
                     >
                       Get started
-                    </a>
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -338,7 +342,7 @@
               >
                 <img
                   class="w-full rounded-xl shadow-xl ring-1 ring-black ring-opacity-5 lg:absolute lg:left-0 lg:h-full lg:w-auto lg:max-w-none"
-                  src="/img/s1.png"
+                  src="/img/s1.jpg"
                   alt=""
                 />
               </div>
@@ -353,11 +357,10 @@
                   <h2 class="text-2xl font-extrabold tracking-tight text-gray-900">
                     Trending projects
                   </h2>
-                  <a
+                  <Link
                     href="/projects"
                     class="hidden text-sm font-medium text-indigo-600 hover:text-indigo-500 md:block"
-                    >Explore more<span aria-hidden="true"> &rarr;</span></a
-                  >
+                    >Explore more<span aria-hidden="true"> &rarr;</span></Link>
                 </div>
               </div>
             </div>
@@ -368,23 +371,21 @@
                 <div class="max-w-7xl mx-auto py-3 px-0 sm:flex sm:items-center">
                   <div class="mt-2 sm:mt-0">
                     <div class="-m-1 flex flex-wrap items-center">
-                      <a
+                      <Link
                         href="/projects?filter=recent"
                         class="m-1 inline-flex rounded-full border border-gray-200 items-center py-1.5 pl-3 pr-3 text-sm font-medium bg-white text-gray-900 hover:text-white hover:bg-black"
-                        ><span>Recent</span></a
-                      >
-                      <a
+                        ><span>Recent</span></Link>
+                      <Link
                         href="/projects?filter=trending"
                         class="m-1 inline-flex rounded-full border border-gray-200 items-center py-1.5 pl-3 pr-3 text-sm font-medium bg-white text-gray-900 hover:text-white hover:bg-black"
-                        ><span>Trending</span></a
-                      >
+                        ><span>Trending</span></Link>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
             <div
-              class="lg:mx-auto lg:max-w-7xl lg:px-8 md:grid grid-cols-1 grid-flow-col-dense lg:gap-24"
+              class="lg:mx-auto lg:max-w-7xl lg:px-8 md:grid grid-cols-1 grid-flow-col-dense lg:gap-24 px-4"
             >
               <Projects></Projects>
             </div>
@@ -410,13 +411,14 @@
                     Develop tools with our API
                   </h2>
                   <p class="mt-4 text-lg text-gray-500">
-                    With our stable core platform, software programmers and data
-                    scientists can leverage our API to develop additional advanced
-                    tools/software utilising the data and rich metadata descriptions.
+                    Software programmers and data scientists can leverage nmrXiv API and
+                    its rich data / metadata descriptions to develop advanced tool
+                    set/software.
                   </p>
                   <div class="mt-6">
                     <a
-                      href="#"
+                      target="_blank"
+                      href="https://docs.nmrxiv.org/docs/developer-guides/API"
                       class="inline-flex bg-gradient-to-r from-indigo-600 to-teal-600 bg-origin-border px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white hover:from-indigo-700 hover:to-teal-700"
                     >
                       API Documentation
@@ -465,18 +467,17 @@
                     spectroscopic analysts.
                   </p>
                   <div class="mt-6">
-                    <a
+                    <Link
                       href="#"
                       class="inline-flex bg-gradient-to-r from-indigo-600 to-teal-600 bg-origin-border px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white hover:from-indigo-700 hover:to-teal-700"
                     >
-                      Need help with structure ellucidation? </a
-                    ><br />
-                    <a
+                      Need help with structure ellucidation?&emsp;<i><small> (coming soon)</small></i></Link><br />
+                    <Link
                       href="#"
                       class="inline-flex bg-gradient-to-r from-indigo-600 to-teal-600 bg-origin-border px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white hover:from-indigo-700 hover:to-teal-700 mt-4"
                     >
-                      Check out active challenges
-                    </a>
+                      Check out active challenges&emsp;<i><small> (coming soon)</small></i> 
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -487,7 +488,7 @@
               >
                 <img
                   class="w-full rounded-xl shadow-xl ring-1 ring-black ring-opacity-5 lg:absolute lg:left-0 lg:h-full lg:w-auto lg:max-w-none"
-                  src="/img/s1.png"
+                  src="/img/s1.jpg"
                   alt=""
                 />
               </div>
@@ -590,24 +591,24 @@
           class="max-w-4xl mx-auto py-16 px-4 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8 lg:flex lg:items-center lg:justify-between"
         >
           <h2 class="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-            <span class="block">Ready to submit?</span>
+            <span class="block">Want to submit data?</span>
             <span
               class="-mb-1 pb-1 block bg-gradient-to-r from-indigo-600 to-teal-600 bg-clip-text text-transparent"
               >Get in touch or create an account.</span
             >
           </h2>
           <div class="mt-6 space-y-4 sm:space-y-0 sm:flex sm:space-x-5">
-            <a
-              href="//docs.nmrxiv.org"
+            <Link
+              href="/login"
               class="flex items-center justify-center bg-gradient-to-r from-indigo-600 to-teal-600 bg-origin-border px-4 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white hover:from-indigo-700 hover:to-teal-700"
             >
-              Learn more
-            </a>
+              Get started
+            </Link>
             <a
-              href="/login"
-              class="flex items-center justify-center px-4 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-teal-800 bg-teal-50 hover:text-gray-900 hover:bg-teal-100"
+              href="//docs.nmrxiv.org"
+              class="flex items-center justify-center px-4 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-teal-800 bg-teal-50 hover:text-white hover:bg-teal-100"
             >
-              Submit data
+              Learn more
             </a>
           </div>
         </div>
@@ -620,18 +621,41 @@
         <div class="xl:grid xl:grid-cols-3 xl:gap-8">
           <div class="grid grid-cols-2 gap-8 xl:col-span-2">
             <div class="md:grid md:grid-cols-2 md:gap-8">
-              <div>
+              <!-- <div>
                 <h3 class="text-sm font-semibold text-gray-400 tracking-wider uppercase">
                   Search
                 </h3>
                 <ul role="list" class="mt-4 space-y-4">
                   <li v-for="item in footerNavigation.Search" :key="item.name">
-                    <a
+                    <Link
                       :href="item.href"
                       class="text-base text-gray-500 hover:text-gray-900"
                     >
                       {{ item.name }}
-                    </a>
+                    </Link>
+                  </li>
+                </ul>
+              </div> -->
+              <div>
+                <h3 class="text-sm font-semibold text-gray-400 tracking-wider uppercase">
+                  Quick links
+                </h3>
+                <ul role="list" class="mt-4 space-y-4">
+                  <li>
+                    <Link
+                      href="/projects"
+                      class="text-base text-gray-500 hover:text-gray-900"
+                    >
+                      Projects
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/datasets"
+                      class="text-base text-gray-500 hover:text-gray-900"
+                    >
+                      Datasets
+                    </Link>
                   </li>
                 </ul>
               </div>
@@ -641,12 +665,12 @@
                 </h3>
                 <ul role="list" class="mt-4 space-y-4">
                   <li v-for="item in footerNavigation.support" :key="item.name">
-                    <a
+                    <Link
                       :href="item.href"
                       class="text-base text-gray-500 hover:text-gray-900"
                     >
                       {{ item.name }}
-                    </a>
+                    </Link>
                   </li>
                 </ul>
               </div>
@@ -658,12 +682,12 @@
                 </h3>
                 <ul role="list" class="mt-4 space-y-4">
                   <li v-for="item in footerNavigation.About" :key="item.name">
-                    <a
+                    <Link
                       :href="item.href"
                       class="text-base text-gray-500 hover:text-gray-900"
                     >
                       {{ item.name }}
-                    </a>
+                    </Link>
                   </li>
                 </ul>
               </div>
@@ -673,12 +697,12 @@
                 </h3>
                 <ul role="list" class="mt-4 space-y-4">
                   <li v-for="item in footerNavigation.legal" :key="item.name">
-                    <a
+                    <Link
                       :href="item.href"
                       class="text-base text-gray-500 hover:text-gray-900"
                     >
                       {{ item.name }}
-                    </a>
+                    </Link>
                   </li>
                 </ul>
               </div>
@@ -724,7 +748,7 @@
           class="mt-12 border-t border-gray-200 pt-8 md:flex md:items-center md:justify-between lg:mt-16"
         >
           <div class="flex space-x-6 md:order-2">
-            <a
+            <Link
               v-for="item in footerNavigation.social"
               :key="item.name"
               :href="item.href"
@@ -732,7 +756,7 @@
             >
               <span class="sr-only">{{ item.name }}</span>
               <component :is="item.icon" class="h-6 w-6" aria-hidden="true" />
-            </a>
+            </Link>
           </div>
           <p class="mt-8 text-base text-gray-400 md:mt-0 md:order-1">
             &copy; 2022 nmrXiv, Inc. All rights reserved.
@@ -750,6 +774,8 @@ import Projects from "@/Shared/Projects.vue";
 import { defineComponent, h } from "vue";
 import { Popover, PopoverButton, PopoverGroup, PopoverPanel } from "@headlessui/vue";
 import {
+  ShareIcon,
+  ScaleIcon,
   AnnotationIcon,
   ChatAlt2Icon,
   ChatAltIcon,
@@ -758,12 +784,14 @@ import {
   InboxIcon,
   MenuIcon,
   PencilAltIcon,
-  QuestionMarkCircleIcon,
+  SearchIcon,
   ReplyIcon,
   SparklesIcon,
   TrashIcon,
   UsersIcon,
   XIcon,
+  DatabaseIcon,
+  DocumentTextIcon,
 } from "@heroicons/vue/outline";
 import { ChevronDownIcon } from "@heroicons/vue/solid";
 import ToolTip from "@/Shared/ToolTip.vue";
@@ -781,24 +809,24 @@ const Search = [
     description:
       "Search similar spectra by simple drag and drop of your machine output files or search spectra by structures. Need further guidance or found any missing information. Reach out to us or check out our documentation site.",
     href: "#",
-    icon: QuestionMarkCircleIcon,
+    icon: SearchIcon,
   },
 ];
 const features = [
   {
     name: "Advanced search",
     description: "",
-    icon: InboxIcon,
+    icon: SearchIcon,
   },
   {
     name: "Open Source",
     description: "",
-    icon: UsersIcon,
+    icon: ScaleIcon,
   },
   {
     name: "Auto Assignments",
     description: "",
-    icon: TrashIcon,
+    icon: ShareIcon,
   },
   {
     name: "Prediction",
@@ -813,17 +841,17 @@ const features = [
   {
     name: "Community challenges",
     description: "",
-    icon: ReplyIcon,
+    icon: ChatAltIcon,
   },
   {
     name: "Docs & API",
     description: "",
-    icon: ChatAltIcon,
+    icon: DocumentTextIcon,
   },
   {
     name: "Backups",
     description: "",
-    icon: HeartIcon,
+    icon: DatabaseIcon,
   },
 ];
 const metrics = [
@@ -853,10 +881,10 @@ const metrics = [
   },
 ];
 const footerNavigation = {
-  Search: [
-    { name: "Browse", href: "/projects" },
-    { name: "Advanced Search", href: "/projects" },
-  ],
+  // Search: [
+  //   { name: "Browse", href: "/projects" },
+  //   { name: "Advanced Search", href: "/projects" },
+  // ],
   support: [
     { name: "Documentation", href: "https://docs.nmrxiv.org" },
     { name: "Guides", href: "https://docs.nmrxiv.org/docs/submission-guides/overview" },
@@ -966,17 +994,20 @@ export default {
     InboxIcon,
     MenuIcon,
     PencilAltIcon,
-    QuestionMarkCircleIcon,
+    SearchIcon,
     ReplyIcon,
     SparklesIcon,
     TrashIcon,
+    ShareIcon,
     UsersIcon,
     XIcon,
+    ScaleIcon,
     Popover,
     PopoverButton,
     PopoverGroup,
     PopoverPanel,
     ChevronDownIcon,
+    DatabaseIcon,
     ToolTip,
     Projects,
   },
