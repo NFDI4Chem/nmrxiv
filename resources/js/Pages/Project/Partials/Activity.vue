@@ -82,13 +82,13 @@
                                   class="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4"
                                 >
                                   <div>
-                                    <a href="#" class="font-medium text-gray-900"
+                                    <a class="font-medium text-gray-900"
                                       >{{ log.user.first_name }}
                                       {{ log.user.last_name }}</a
                                     >
                                     <p class="text-sm text-gray-500">
                                       {{ log.event }}&nbsp;
-                                      <a href="#" class="font-medium text-gray-900">
+                                      <a class="font-medium text-gray-900">
                                         <span
                                           v-if="
                                             log.event == 'created' ||

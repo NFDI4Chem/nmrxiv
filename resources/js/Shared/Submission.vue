@@ -294,13 +294,26 @@
                               v-if="study.sample.molecules.length > 0"
                             >
                               <img
-                                class="flex-shrink-0 -mt-0.5 h-6 w-6 text-blue-gray-400"
+                                class="flex-shrink-0 -mt-0.5 mr-2 h-6 w-6 text-blue-gray-400"
                                 src="https://upload.wikimedia.org/wikipedia/sco/3/35/ChEBI_logo.png"
                                 alt=""
                               />
                             </span>
                           </p>
-                          <!-- <p class="mt-1 text-blue-gray-500">{{ item.description }}</p> -->
+                          <p class="mt-1 text-blue-gray-500">
+                            <span
+                              :class="[
+                                ds.nmrium_info
+                                  ? 'bg-green-100 text-gray-800'
+                                  : 'bg-gray-100 text-gray-800',
+                                'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium mr-1',
+                              ]"
+                              v-for="ds in study.datasets"
+                              :key="ds.id"
+                            >
+                              {{ ds.name }}
+                            </span>
+                          </p>
                         </div>
                       </a>
                     </div>
@@ -1105,305 +1118,375 @@
               </div>
             </div>
             <div v-if="currentStep.id == '03'">
-              <div
-                class="relative grid grid-cols-1 gap-x-16 max-w-7xl mx-auto lg:grid-cols-2"
-              >
-                <section
-                  aria-labelledby="summary-heading"
-                  class="bg-gray-50 pb-10 px-4 sm:px-6 lg:px-0 lg:pb-16 lg:bg-transparent lg:row-start-1 lg:col-start-2"
-                >
-                  <div class="p-4 px-6 bg-gray-100 rounded-lg">
-                    <div class="max-w-lg mx-auto lg:max-w-none">
-                    <h2 id="summary-heading" class="text-lg font-medium text-gray-900">
-                      Summary
-                    </h2>
-                  </div>
-                  <div class="mt-2">
-                    <h3 class="text-sm leading-6 font-medium text-gray-700">Citation</h3>
-                    <p class="mt-1 text-sm text-gray-500">
-                      Author, 1., & Author, 2.. (2022). FAIR, consensus-driven NMR data
-                      repository and computational platform. The ultimate goal is to
-                      accelerate broader coordination and data sharing among natural
-                      product (NP) researchers by enabling storage, management, sharing
-                      and analysis of NMR data.
-                    </p>
-                  </div>
-                  <div class="mt-5">
-                    <table class="min-w-full rounded border divide-y divide-gray-300">
-                      <thead class="bg-gray-50">
-                        <tr>
-                          <th
-                            scope="col"
-                            class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 lg:pl-8"
-                          >
-                            Study
-                          </th>
-                          <th
-                            scope="col"
-                            class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                          >
-                            Datasets
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody class="divide-y divide-gray-200 bg-white">
-                        <tr
-                          v-for="study in this.project.studies"
-                          :key="study.id"
-                          :value="study.name"
-                        >
-                          <td
-                            class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8"
-                          >
-                            {{ study.name }}
-                          </td>
-                          <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            <div v-for="dataset in study.datasets" :key="dataset.id">
-                              <span class="break-normal">
-                                {{ dataset.name }}
-                              </span>
-                            </div>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                  <div class="my-5">
-                    <h3 class="text-sm leading-6 mb-2 font-medium text-gray-700">
-                      Quick links
-                    </h3>
-                    <jet-button
-                      type="submit"
-                      class="mr-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-                    >
-                      Download Zip
-                    </jet-button>
-                    <jet-button
-                      type="submit"
-                      class="mr-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-                    >
-                      MD5 hashmap
-                    </jet-button>
-                    <jet-button
-                      type="submit"
-                      class="mr-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-                    >
-                      Embed
-                    </jet-button>
-                    <jet-button
-                      type="submit"
-                      class="mr-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-                    >
-                      Share
-                    </jet-button>
-                  </div>
-                  </div>
-                </section>
+              <div v-if="project.status == 'complete'">
                 <div
-                  class="pb-36 px-4 sm:px-6 lg:pb-16 lg:px-0 lg:row-start-1 lg:col-start-1"
+                  class="relative grid grid-cols-1 gap-x-16 max-w-7xl mx-auto lg:grid-cols-2"
                 >
-                  <div class="max-w-lg mx-auto lg:max-w-none">
-                    <section>
-                      <div>
-                        <div>
-                          <label
-                            for="project-name"
-                            class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
-                          >
-                            Project name
-                          </label>
-                          <div class="mt-1">
-                            <input
-                              v-model="this.project.name"
-                              type="text"
-                              autocomplete="given-name"
-                              class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                            />
-                          </div>
-                          <jet-input-error
-                            :message="updateProjectForm.errors.name"
-                            class="mt-2"
-                          />
-                        </div>
-                        <div class="mt-4">
-                          <label
-                            for="description"
-                            class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
-                          >
-                            Description
-                          </label>
-                          <div class="mt-1">
-                            <textarea
-                              v-model="this.project.description"
-                              rows="4"
-                              class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border border-gray-300 rounded-md"
-                            />
-                          </div>
-                          <jet-input-error
-                            :message="updateProjectForm.errors.description"
-                            class="mt-2"
-                          />
-                        </div>
+                  <section
+                    aria-labelledby="summary-heading"
+                    class="bg-gray-50 pb-10 px-4 sm:px-6 lg:px-0 lg:pb-16 lg:bg-transparent lg:row-start-1 lg:col-start-2"
+                  >
+                    <div class="p-4 px-6 bg-gray-100 rounded-lg">
+                      <div class="max-w-lg mx-auto lg:max-w-none">
+                        <h2
+                          id="summary-heading"
+                          class="text-lg font-medium text-gray-900"
+                        >
+                          Summary
+                        </h2>
                       </div>
-                    </section>
-
-                    <section class="mt-5">
-                      <h2
-                        id="contact-info-heading"
-                        class="text-lg font-medium text-gray-900"
-                      >
-                        Share and Release
-                      </h2>
-                      <div>
-                        <fieldset>
-                          <legend class="text-sm font-medium text-gray-900">
-                            Privacy
-                          </legend>
-                          <div class="mt-2 space-y-5">
-                            <div class="relative flex items-start">
-                              <div class="absolute flex items-center h-5">
-                                <input
-                                  :checked="this.updateProjectForm.is_public === true"
-                                  v-model="this.updateProjectForm.is_public"
-                                  id="privacy-public"
-                                  name="privacy"
-                                  value="true"
-                                  aria-describedby="privacy-public-description"
-                                  type="radio"
-                                  class="focus:ring-gray-500 h-4 w-4 text-gray-600 border-gray-300"
-                                />
-                              </div>
-                              <div class="pl-7 text-sm">
-                                <label
-                                  for="privacy-public"
-                                  class="font-medium text-gray-900"
-                                >
-                                  Public access
-                                </label>
-                                <p id="privacy-public-description" class="text-gray-500">
-                                  Everyone with the link will see this project.
-                                </p>
-                              </div>
+                      <div class="mt-2">
+                        <h3 class="text-sm leading-6 font-medium text-gray-700">
+                          Citation
+                        </h3>
+                        <p class="mt-1 text-sm text-gray-500">
+                          Author, 1., & Author, 2.. (2022). FAIR, consensus-driven NMR
+                          data repository and computational platform. The ultimate goal is
+                          to accelerate broader coordination and data sharing among
+                          natural product (NP) researchers by enabling storage,
+                          management, sharing and analysis of NMR data.
+                        </p>
+                      </div>
+                      <div class="mt-5">
+                        <table class="min-w-full rounded border divide-y divide-gray-300">
+                          <thead class="bg-gray-50">
+                            <tr>
+                              <th
+                                scope="col"
+                                class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 lg:pl-8"
+                              >
+                                Study
+                              </th>
+                              <th
+                                scope="col"
+                                class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                              >
+                                Datasets
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody class="divide-y divide-gray-200 bg-white">
+                            <tr
+                              v-for="study in this.project.studies"
+                              :key="study.id"
+                              :value="study.name"
+                            >
+                              <td
+                                class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8"
+                              >
+                                {{ study.name }}
+                              </td>
+                              <td
+                                class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"
+                              >
+                                <div v-for="dataset in study.datasets" :key="dataset.id">
+                                  <span class="break-normal">
+                                    {{ dataset.name }}
+                                  </span>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div class="my-5">
+                        <h3 class="text-sm leading-6 mb-2 font-medium text-gray-700">
+                          Quick links
+                        </h3>
+                        <jet-button
+                          type="submit"
+                          class="mr-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                        >
+                          Download Zip
+                        </jet-button>
+                        <jet-button
+                          type="submit"
+                          class="mr-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                        >
+                          MD5 hashmap
+                        </jet-button>
+                        <jet-button
+                          type="submit"
+                          class="mr-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                        >
+                          Embed
+                        </jet-button>
+                        <jet-button
+                          type="submit"
+                          class="mr-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                        >
+                          Share
+                        </jet-button>
+                      </div>
+                    </div>
+                  </section>
+                  <div
+                    class="pb-36 px-4 sm:px-6 lg:pb-16 lg:px-0 lg:row-start-1 lg:col-start-1"
+                  >
+                    <div class="max-w-lg mx-auto lg:max-w-none">
+                      <section>
+                        <div>
+                          <div>
+                            <label
+                              for="project-name"
+                              class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
+                            >
+                              Project name
+                            </label>
+                            <div class="mt-1">
+                              <input
+                                v-model="this.project.name"
+                                type="text"
+                                autocomplete="given-name"
+                                class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                              />
                             </div>
-                            <div>
+                            <jet-input-error
+                              :message="updateProjectForm.errors.name"
+                              class="mt-2"
+                            />
+                          </div>
+                          <div class="mt-4">
+                            <label
+                              for="description"
+                              class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
+                            >
+                              Description
+                            </label>
+                            <div class="mt-1">
+                              <textarea
+                                v-model="this.project.description"
+                                rows="4"
+                                class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border border-gray-300 rounded-md"
+                              />
+                            </div>
+                            <jet-input-error
+                              :message="updateProjectForm.errors.description"
+                              class="mt-2"
+                            />
+                          </div>
+                        </div>
+                      </section>
+
+                      <section class="mt-5">
+                        <h2
+                          id="contact-info-heading"
+                          class="text-lg font-medium text-gray-900"
+                        >
+                          Share and Release
+                        </h2>
+                        <div>
+                          <fieldset>
+                            <legend class="text-sm font-medium text-gray-900">
+                              Privacy
+                            </legend>
+                            <div class="mt-2 space-y-5">
                               <div class="relative flex items-start">
                                 <div class="absolute flex items-center h-5">
                                   <input
-                                    :checked="this.updateProjectForm.is_public === false"
+                                    :checked="this.updateProjectForm.is_public === true"
                                     v-model="this.updateProjectForm.is_public"
-                                    id="privacy-private-to-project"
+                                    id="privacy-public"
                                     name="privacy"
-                                    value="false"
-                                    aria-describedby="privacy-private-to-project-description"
+                                    value="true"
+                                    aria-describedby="privacy-public-description"
                                     type="radio"
                                     class="focus:ring-gray-500 h-4 w-4 text-gray-600 border-gray-300"
                                   />
                                 </div>
                                 <div class="pl-7 text-sm">
                                   <label
-                                    for="privacy-private-to-project"
+                                    for="privacy-public"
                                     class="font-medium text-gray-900"
                                   >
-                                    Private to project members
+                                    Public access
                                   </label>
                                   <p
-                                    id="privacy-private-to-project-description"
+                                    id="privacy-public-description"
                                     class="text-gray-500"
                                   >
-                                    Only members of this project would be able to access.
+                                    Everyone with the link will see this project.
                                   </p>
                                 </div>
                               </div>
+                              <div>
+                                <div class="relative flex items-start">
+                                  <div class="absolute flex items-center h-5">
+                                    <input
+                                      :checked="
+                                        this.updateProjectForm.is_public === false
+                                      "
+                                      v-model="this.updateProjectForm.is_public"
+                                      id="privacy-private-to-project"
+                                      name="privacy"
+                                      value="false"
+                                      aria-describedby="privacy-private-to-project-description"
+                                      type="radio"
+                                      class="focus:ring-gray-500 h-4 w-4 text-gray-600 border-gray-300"
+                                    />
+                                  </div>
+                                  <div class="pl-7 text-sm">
+                                    <label
+                                      for="privacy-private-to-project"
+                                      class="font-medium text-gray-900"
+                                    >
+                                      Private to project members
+                                    </label>
+                                    <p
+                                      id="privacy-private-to-project-description"
+                                      class="text-gray-500"
+                                    >
+                                      Only members of this project would be able to
+                                      access.
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
                             </div>
+                          </fieldset>
+                        </div>
+                        <div
+                          v-if="
+                            this.updateProjectForm.is_public == 'false' ||
+                            !this.updateProjectForm.is_public
+                          "
+                          class="mt-5"
+                        >
+                          <div>
+                            <label
+                              class="block text-sm font-medium text-gray-700, block text-sm font-medium text-gray-700"
+                            >
+                              Choose Release Date
+                            </label>
+                            <Datepicker
+                              v-model="updateProjectForm.releaseDate"
+                            ></Datepicker>
+                            <p class="mt-1 text-sm text-gray-500">
+                              Choose release date to auto publish your project to public.
+                            </p>
                           </div>
-                        </fieldset>
-                      </div>
-                      <div
-                        v-if="
-                          this.updateProjectForm.is_public == 'false' ||
-                          !this.updateProjectForm.is_public
-                        "
-                        class="mt-5"
-                      >
-                        <div>
+                        </div>
+
+                        <div class="mt-5">
                           <label
-                            class="block text-sm font-medium text-gray-700, block text-sm font-medium text-gray-700"
+                            for="share-url"
+                            class="block text-sm font-medium text-gray-700"
                           >
-                            Choose Release Date
+                            Share URL
                           </label>
-                          <Datepicker
-                            v-model="updateProjectForm.releaseDate"
-                          ></Datepicker>
+                          <div class="mt-1">
+                            <input
+                              readonly
+                              v-if="
+                                this.updateProjectForm.is_public == 'false' ||
+                                !this.updateProjectForm.is_public
+                              "
+                              v-model="this.project.private_url"
+                              type="text"
+                              autocomplete="given-name"
+                              class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                            />
+                            <input
+                              readonly
+                              v-else
+                              v-model="this.project.public_url"
+                              type="text"
+                              autocomplete="given-name"
+                              class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                            />
+                          </div>
+                          <div class="mt-1"></div>
                           <p class="mt-1 text-sm text-gray-500">
-                            Choose release date to auto publish your project to public.
+                            The project and the underlying studies and datasets can be
+                            shared with others using this URL.
                           </p>
                         </div>
-                      </div>
-
-                      <div class="mt-5">
-                        <label
-                          for="share-url"
-                          class="block text-sm font-medium text-gray-700"
-                        >
-                          Share URL
-                        </label>
-                        <div class="mt-1">
-                          <input
-                            readonly
-                            v-if="
-                              this.updateProjectForm.is_public == 'false' ||
-                              !this.updateProjectForm.is_public
-                            "
-                            v-model="this.project.private_url"
-                            type="text"
-                            autocomplete="given-name"
-                            class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                          />
-                          <input
-                            readonly
-                            v-else
-                            v-model="this.project.public_url"
-                            type="text"
-                            autocomplete="given-name"
-                            class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                          />
+                        <div class="mt-5">
+                          <div>
+                            <select-rich
+                              label="License"
+                              v-model:selected="updateProjectForm.license"
+                              class="mt-0"
+                              :items="licenses"
+                            />
+                            <p class="mt-1 text-sm text-gray-500">
+                              Choosing license is recommended before releasing the project
+                              to public.
+                            </p>
+                          </div>
                         </div>
-                        <div class="mt-1"></div>
-                        <p class="mt-1 text-sm text-gray-500">
-                          The project and the underlying studies and datasets can be
-                          shared with others using this URL.
+                      </section>
+
+                      <div
+                        class="mt-10 pt-6 border-t border-gray-200 sm:flex sm:items-center sm:justify-between"
+                      >
+                        <button
+                          @click="updateProject"
+                          class="w-full bg-teal-600 border border-transparent rounded-md shadow-sm py-2 px-4 text-sm font-medium text-white hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-teal-500 sm:ml-6 sm:order-last sm:w-auto"
+                        >
+                          Save
+                        </button>
+                        <p
+                          class="mt-4 text-center text-sm text-gray-500 sm:mt-0 sm:text-left"
+                        >
+                          <!-- lorem ipsum -->
                         </p>
                       </div>
-                      <div class="mt-5">
-                        <div>
-                          <select-rich
-                            label="License"
-                            v-model:selected="updateProjectForm.license"
-                            class="mt-0"
-                            :items="licenses"
-                          />
-                          <p class="mt-1 text-sm text-gray-500">
-                            Choosing license is recommended before releasing the project
-                            to public.
-                          </p>
-                        </div>
-                      </div>
-                    </section>
-
-                    <div
-                      class="mt-10 pt-6 border-t border-gray-200 sm:flex sm:items-center sm:justify-between"
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div v-else>
+                <div class="py-16">
+                  <div class="text-center">
+                    <p
+                      class="text-sm font-semibold text-indigo-600 uppercase tracking-wide"
                     >
-                      <button
-                        @click="updateProject"
-                        class="w-full bg-teal-600 border border-transparent rounded-md shadow-sm py-2 px-4 text-sm font-medium text-white hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-teal-500 sm:ml-6 sm:order-last sm:w-auto"
+                      {{ project.name }}
+                    </p>
+                    <span v-if="project.status == 'queued'">
+                      <span
+                        class="m-3 relative inline-flex border-dotted border-2 border-gray-300 rounded-lg"
+                        ><span
+                          class="inline-flex items-center px-4 py-2 font-semibold leading-6 text-sm rounded-md text-sky-500 bg-white dark:bg-slate-800 transition ease-in-out duration-150 cursor-not-allowed dark:ring-slate-200/20"
+                          disabled=""
+                          ><h1
+                            class="capitalize text-4xl font-extrabold text-gray-900 tracking-tight sm:text-5xl"
+                          >
+                            {{ project.status }}
+                          </h1></span
+                        ></span
                       >
-                        Save
-                      </button>
-                      <p
-                        class="mt-4 text-center text-sm text-gray-500 sm:mt-0 sm:text-left"
+                    </span>
+                    <span v-if="project.status == 'processing'">
+                      <span
+                        class="m-3 relative inline-flex border-dotted border-2 border-gray-300 rounded-lg"
+                        ><span
+                          class="inline-flex items-center px-4 py-2 font-semibold leading-6 text-sm rounded-md text-sky-500 bg-white dark:bg-slate-800 transition ease-in-out duration-150 cursor-not-allowed dark:ring-slate-200/20"
+                          disabled=""
+                          ><h1
+                            class="capitalize text-4xl font-extrabold text-gray-900 tracking-tight sm:text-5xl"
+                          >
+                            {{ project.status }}
+                          </h1></span
+                        ><span class="flex absolute h-3 w-3 top-0 right-0 -mt-1 -mr-1"
+                          ><span
+                            class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"
+                          ></span
+                          ><span
+                            class="relative inline-flex rounded-full h-3 w-3 bg-sky-500"
+                          ></span></span
+                      ></span>
+                    </span>
+                    <p class="mt-2 text-base text-gray-500">
+                      Please allow some time for us to process your submission. You will
+                      also recieve an email once your submission is processed
+                    </p>
+                    <div class="mt-6">
+                      <a
+                        class="text-base font-medium text-indigo-600 hover:text-indigo-500"
+                        >Go back home<span aria-hidden="true"> →</span></a
                       >
-                        <!-- lorem ipsum -->
-                      </p>
                     </div>
                   </div>
                 </div>
@@ -1530,7 +1613,9 @@
           </jet-button>
         </span>
         <span v-else-if="currentStep.id == '03'">
-          <jet-button @click="toggleOpenCreateDatasetDialog"> Save and Finish </jet-button>
+          <jet-button @click="toggleOpenCreateDatasetDialog">
+            Save and Finish
+          </jet-button>
         </span>
       </span>
     </template>
@@ -1637,8 +1722,6 @@ export default {
       autoSaving: false,
       currentMolecules: [],
 
-      eventRegistered: false,
-
       smiles: "",
       percentage: 1,
       editor: null,
@@ -1656,6 +1739,8 @@ export default {
       }),
 
       licenses: [],
+
+      project: null,
     };
   },
   mounted() {
@@ -1667,10 +1752,10 @@ export default {
           let selectedDraft = this.drafts.find((d) => d.id == data.draft_id);
           this.selectDraft(selectedDraft);
           this.loading = false;
-          this.openCreateDatasetDialog = true;
+          this.toggleOpenCreateDatasetDialog();
         } else {
           this.defaultDraft = response.data.default;
-          this.openCreateDatasetDialog = true;
+          this.toggleOpenCreateDatasetDialog();
           if (this.drafts.length == 0) {
             this.currentDraft = this.defaultDraft;
             this.selectStep(1);
@@ -1681,29 +1766,17 @@ export default {
         }
       });
     });
-
-    const saveNMRiumUpdates = (e) => {
-      if (e.origin != "https://nmriumdev.nmrxiv.org") {
-        return;
-      }
-      if (e.data.type == "nmr-wrapper:dataChange") {
-        this.selectedSpectraData = e.data.data.data.find(
-          (d) => d.info.type == "NMR Spectrum"
-        );
-        if (this.selectedSpectraData) {
-          this.currentMolecules = e.data.data.molecules;
-          this.updateDataSet(e.data.data.actionType);
-        }
-      }
-      this.eventRegistered = true;
-    };
-
-    if (!this.eventRegistered) {
-      window.addEventListener("message", saveNMRiumUpdates);
-    }
   },
-  onUpdated() {},
   methods: {
+    hasNMRiumInfo(study) {
+      let info = true;
+      study.datasets.forEach((ds) => {
+        if (ds.nmrium_info == null || !ds.nmrium_info) {
+          info = false;
+        }
+      });
+      return info;
+    },
     updateProject() {
       this.loadingStep = true;
       (this.updateProjectForm.name = this.project.name),
@@ -1821,7 +1894,7 @@ export default {
           })
           .then((response) => {
             this.autoSaving = false;
-            // this.selectedDataset = response.data;
+            this.selectedDataset.nmrium_info = response.data.nmrium_info;
           });
       }
     },
@@ -1835,20 +1908,28 @@ export default {
         })
         .then((response) => {
           this.project = response.data.project;
-          this.studies = response.data.studies;
-          if (this.project && this.studies.length > 0) {
+          if (this.project) {
             this.loadingStep = false;
             this.loadLicenses();
             this.selectStep(3);
+            this.trackProject();
           }
         });
+    },
+    trackProject() {
+      axios.get("/projects/" + this.project.id + "/status").then((response) => {
+        this.project.status = response.data.status;
+        if (this.project.status != "complete") {
+          setTimeout(() => this.trackProject(), 20000);
+        }
+      });
     },
     loadSpectra() {
       const iframe = window.frames.submissionNMRiumIframe;
       if (iframe) {
         if (!this.selectedDataset.nmrium_info) {
           let data = {
-            urls: [
+            data: [
               this.url +
                 "/download/asc/datasets/" +
                 this.selectedDataset.id +
@@ -1856,10 +1937,17 @@ export default {
                 this.selectedDataset.name +
                 ".zip",
             ],
+            type: "url",
           };
-          iframe.postMessage({ type: `nmr-wrapper:loadURLs`, data }, "*");
+          iframe.postMessage({ type: `nmr-wrapper:load`, data }, "*");
         } else {
-          let data = { spectra: [JSON.parse(this.selectedDataset.nmrium_info)] };
+          console.log(JSON.parse(this.selectedDataset.nmrium_info));
+          let data = {
+            data: {
+              spectra: [JSON.parse(this.selectedDataset.nmrium_info)],
+            },
+            type: "nmrium",
+          };
           iframe.postMessage({ type: `nmr-wrapper:load`, data }, "*");
         }
       }
@@ -2069,6 +2157,31 @@ export default {
     },
     toggleOpenCreateDatasetDialog() {
       this.openCreateDatasetDialog = !this.openCreateDatasetDialog;
+
+      if (this.openCreateDatasetDialog) {
+        const saveNMRiumUpdates = (e) => {
+          if (e.origin != "https://nmriumdev.nmrxiv.org") {
+            return;
+          }
+          if (e.data.type == "nmr-wrapper:dataChange") {
+            console.log(e.data.data.data);
+            this.selectedSpectraData = e.data.data.data.find(
+              (d) => d.info.type == "NMR Spectrum"
+            );
+            if (this.selectedSpectraData) {
+              this.currentMolecules = e.data.data.molecules;
+              this.updateDataSet(e.data.data.actionType);
+            }
+          }
+        };
+
+        if (!this.$props.eventRegistered) {
+          window.addEventListener("message", saveNMRiumUpdates);
+          this.$props.eventRegistered = true;
+        }
+      } else {
+        window.removeEventListener("message");
+      }
     },
     fetchDrafts() {
       this.loading = true;

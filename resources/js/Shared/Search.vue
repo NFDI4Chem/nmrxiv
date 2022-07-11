@@ -134,7 +134,7 @@
                                       active && 'bg-gray-900 bg-opacity-5 text-gray-900',
                                     ]"
                                   >
-                                   <a class="w-full" :href="'/projects/'+hit.slug">
+                                   <Link class="w-full" :href="'/projects/'+hit.slug">
                                       <FolderIcon
                                           :class="[
                                             'h-6 w-6 inline flex-none text-gray-900 text-opacity-40',
@@ -150,7 +150,7 @@
                                           class="ml-3 flex-none text-gray-500"
                                           >Jump to...</span
                                         >
-                                   </a>
+                                   </Link>
                                   </li>
                                 </ComboboxOption>
                               </ul>
@@ -229,6 +229,7 @@ import { defineComponent } from "vue";
 import { instantMeiliSearch } from "@meilisearch/instant-meilisearch";
 import { computed, ref } from "vue";
 import { SearchIcon } from "@heroicons/vue/solid";
+import { Link } from "@inertiajs/inertia-vue3";
 import {
   DocumentAddIcon,
   FolderIcon,
@@ -275,6 +276,7 @@ export default {
     SearchIcon,
     TransitionChild,
     TransitionRoot,
+    Link
   },
   data: function () {
     return {

@@ -53,14 +53,14 @@
           ]"
         >
           <div style="min-height: 150px; max-height: 168px" class="flex-1 p-3">
-            <a :href="'/projects/' + project.slug" class="block">
+            <Link :href="'/projects/' + project.slug" class="block cursor-pointer">
               <p class="text-lg font-semibold text-gray-900 line-clamp-2">
                 {{ project.name }}
               </p>
               <p class="mt-2 text-sm text-gray-900 line-clamp-3">
                 {{ project.description }}
               </p>
-            </a>
+            </Link>
           </div>
         </div>
         <div v-if="mode != 'mini'" class="p-3 rounded-b-lg bg-white border-t flex">
@@ -69,7 +69,7 @@
           </div>
           <div class="flex-auto pl-4">
             <p class="text-xs font-xs text-gray-900">
-              <a class="hover:underline">
+              <a>
                 {{ project.owner.first_name }} {{ project.owner.last_name }}</a
               >
             </p>
@@ -101,7 +101,6 @@
                   <div class="py-1">
                     <MenuItem class="border-b" v-slot="{ active }">
                       <a
-                        href="#"
                         :class="[
                           active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
                           'block px-4 py-2 text-sm',
@@ -138,9 +137,12 @@ import { MailIcon } from "@heroicons/vue/solid";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import { DotsVerticalIcon } from "@heroicons/vue/solid";
 import { Inertia } from "@inertiajs/inertia";
+import { Head, Link } from "@inertiajs/inertia-vue3";
 
 export default {
   components: {
+    Head,
+    Link,
     LockClosedIcon,
     LockOpenIcon,
     MailIcon,

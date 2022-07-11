@@ -101,7 +101,7 @@
             </div>
             <div class="min-w-0 flex-1">
               <div class="text-sm font-medium text-gray-900">
-                <a href="#">
+                <a>
                   <span class="absolute inset-0" aria-hidden="true"></span>
                   Get started! How to use nmrXiv?
                 </a>
@@ -155,7 +155,7 @@
             </div>
             <div class="min-w-0 flex-1">
               <div class="text-sm font-medium text-gray-900">
-                <a href="#">
+                <a>
                   <span class="absolute inset-0" aria-hidden="true"></span>
                   Public API Documentation
                 </a>
@@ -210,7 +210,7 @@
             </div>
             <div class="min-w-0 flex-1">
               <div class="text-sm font-medium text-gray-900">
-                <a href="#">
+                <a>
                   <span class="absolute inset-0" aria-hidden="true"></span>
                   Challenges
                 </a>
@@ -240,7 +240,7 @@
         </li>
       </ul>
       <div class="mt-6 flex">
-        <a href="#" class="text-sm font-medium text-indigo-600 hover:text-indigo-500"
+        <a class="text-sm font-medium text-indigo-600 hover:text-indigo-500"
           >Or get in touch<span aria-hidden="true"> &rarr;</span></a
         >
       </div>

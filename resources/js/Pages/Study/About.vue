@@ -237,7 +237,7 @@
                                   <div class="min-w-0 flex-1">
                                     <div>
                                       <div class="text-sm">
-                                        <a href="#" class="font-medium text-gray-900">{{
+                                        <a class="font-medium text-gray-900">{{
                                           molecule.STANDARD_INCHI
                                         }}</a>
                                       </div>

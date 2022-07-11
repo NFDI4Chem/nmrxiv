@@ -12,6 +12,7 @@ use App\Models\Project;
 use App\Models\Study;
 use App\Models\Dataset;
 use App\Models\Sample;
+use App\Jobs\ProcessDraft;
 use Auth;
 
 class DraftController extends Controller
@@ -89,58 +90,15 @@ class DraftController extends Controller
     public function complete(Request $request, Draft $draft){
         $project = Project::where('draft_id', $draft->id)->first();
 
-        $studies = $project->studies;
+        $project->status = 'queued';
 
-        $environment = env('APP_ENV', 'local');
-
-        $projectPath = preg_replace(
-            '~//+~',
-            '/',
-            $environment .
-            '/' .
-            $project->uuid
-        );
-
-        $projectFSObjects = FileSystemObject::with('children')
-            ->where([
-                ['draft_id', $draft->id],
-                ['project_id', $project->id]
-            ])
-            ->get();
-
-        foreach($projectFSObjects as $FSObject){
-            $this->moveFolder($FSObject, $draft, $projectPath);
-        }
-
-        $project->draft_id = null;
         $project->save();
 
-        $draft->delete();
-
-        $project = $project->fresh();
+        ProcessDraft::dispatch($draft);
         
         return response()->json([
-            'project' => $project,
-            'studies' => json_decode($project->studies->load(['datasets', 'sample.molecules', 'tags']))
+            'project' => $project->fresh()
         ]);
-    }
-
-    public function moveFolder($fsObject, $draft, $path){
-        $newPath = str_replace($draft->path, $path, $fsObject->path);
-        $fsObject->path = $newPath;
-        $fsObject->save();
-
-        $fsObjectChildren = $fsObject->children;
-        forEach($fsObjectChildren as $fsObjectChild){
-            if($fsObjectChild->type == 'file'){
-                $newPath = str_replace($draft->path, $path, $fsObjectChild->path);
-                Storage::disk('minio')->move($fsObjectChild->path, $newPath);
-                $fsObjectChild->path = $newPath;
-                $fsObjectChild->save();
-            }else{
-                $this->moveFolder($fsObjectChild, $draft, $path); 
-            }
-        }
     }
 
     public function process(Request $request, Draft $draft)

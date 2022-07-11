@@ -33,18 +33,18 @@
           ></div>
           <div class="flex-1 bg-white p-3 flex flex-col justify-between">
             <div class="flex-1">
-              <a :href="'/datasets/' + dataset.slug" class="block">
+              <Link :href="'/datasets/' + dataset.slug" class="block">
                 <p class="text-lg font-semibold text-gray-900 line-clamp-2">
                   {{ dataset.name }}
                 </p>
                 <p class="mt-2 text-sm text-gray-500 line-clamp-4">
                   {{ dataset.description }}
                 </p>
-              </a>
+              </Link>
             </div>
             <div class="mt-6 flex items-center">
               <div class="flex-shrink-0">
-                <a href="#">
+                <a>
                   <img
                     class="h-10 w-10 rounded-full"
                     src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
@@ -54,7 +54,7 @@
               </div>
               <div class="ml-3">
                 <p class="text-sm font-medium text-gray-900">
-                  <a href="#" class="hover:underline"> Roel Aufderehar </a>
+                  <a class="hover:underline"> Roel Aufderehar </a>
                 </p>
                 <div class="flex space-x-1 text-sm text-gray-500">
                   <time datetime="2020-03-16">{{ formatDate(dataset.created_at) }} </time>
@@ -72,10 +72,12 @@
 
 <script>
 import AppLayout from "@/Layouts/AppLayout.vue";
+import { Link } from "@inertiajs/inertia-vue3";
 
 export default {
   components: {
     AppLayout,
+    Link
   },
   props: ["datasets"],
 };

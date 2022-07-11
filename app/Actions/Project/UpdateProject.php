@@ -46,16 +46,16 @@ class UpdateProject
                     'description' => $input['description'],
                     'color' => array_key_exists('color', $input)
                         ? $input['color']
-                        : null,
+                        : $project->color,
                     'starred' => array_key_exists('starred', $input)
                         ? $input['starred']
-                        : null,
+                        : $project->starred,
                     'location' => array_key_exists('location', $input)
                         ? $input['location']
-                        : null,
+                        : $project->location,
                     'type' => array_key_exists('type', $input)
                         ? $input['type']
-                        : null,
+                        : $project->type,
                     'access' => array_key_exists('access', $input)
                         ? $input['access']
                         : 'restricted',
@@ -67,10 +67,10 @@ class UpdateProject
                     'is_public' => $input['is_public'],
                     'release_date' => array_key_exists('release_date', $input)
                         ? $input['release_date']
-                        : null,
+                        : $project->release_date,
                     'license_id' => array_key_exists('license_id', $input)
                         ? $input['license_id']
-                        : null,
+                        : $project->license_id,
                     'project_photo_path' => $s3filePath,
                 ])
                 ->save();
@@ -91,8 +91,8 @@ class UpdateProject
                     }
                 }
             }
-            if (array_key_exists('tags', $input)) {
-                $project->syncTagsWithType($input['tags'], 'Project');
+            if (array_key_exists('tags_array', $input)) {
+                $project->syncTagsWithType($input['tags_array'], 'Project');
             }
         });
     }
