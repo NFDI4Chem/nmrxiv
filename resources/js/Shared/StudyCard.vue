@@ -2,14 +2,14 @@
   <div v-if="study" class="flex flex-col rounded-lg shadow-lg transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-100 duration-300 overflow-hidden">
     <div style="min-height: 140px;" class="flex-1 bg-white p-3 flex flex-col justify-between">
       <div class="flex-1">
-        <a :href="'/studys/' + study.slug" class="block">
+        <Link :href="'/studys/' + study.slug" class="block">
           <p class="text-lg font-semibold text-gray-900 line-clamp-2">
             {{ study.name }}
           </p>
           <p class="mt-2 text-sm text-gray-500 line-clamp-4">
             {{ study.description }}
           </p>
-        </a>
+        </Link>
       </div>
     </div>
     <div class="-mt-px border-t flex divide-x divide-gray-200">
@@ -46,6 +46,7 @@ import { LockClosedIcon } from "@heroicons/vue/solid";
 import { LockOpenIcon } from "@heroicons/vue/solid";
 import { PencilIcon } from "@heroicons/vue/solid";
 import { MailIcon } from "@heroicons/vue/solid";
+import { Link } from "@inertiajs/inertia-vue3";
 
 export default {
   components: {
@@ -53,6 +54,7 @@ export default {
     LockOpenIcon,
     MailIcon,
     PencilIcon,
+    Link
   },
   setup() {},
   props: ["study"],

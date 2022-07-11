@@ -10,7 +10,7 @@
               :src="project.data.owner.profile_photo_url"
             />
             <p class="inline ml-3 text-xs font-bold text-gray-500 uppercase">
-              <a href="#" class="text-gray-900">{{
+              <a class="text-gray-900">{{
                 project.data.owner.first_name + " " + project.data.owner.last_name
               }}</a>
               updated on
@@ -1063,7 +1063,7 @@
                   <ol role="list" class="flex items-center space-x-2">
                     <li>
                       <div>
-                        <a href="#" class="text-gray-400 hover:text-gray-900">
+                        <a class="text-gray-400 hover:text-gray-900">
                           <HomeIcon class="flex-shrink-0 h-5 w-5" aria-hidden="true" />
                           <span class="sr-only">Home</span>
                         </a>
