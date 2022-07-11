@@ -64,6 +64,9 @@ Route::get('datasets', [DatasetController::class, 'publicDatasetsView'])
     ->name('public.datasets');
 
 Route::group(['middleware' => ['auth', 'verified']], function () {
+    Route::post('/onboarding/{status}', [DashboardController::class, 'onboardingStatus'])
+            ->name('onboarding.complete');
+    
     Route::get('projects/{project}/toggleUpVote', [ProjectController::class, 'toggleUpVote'])
             ->name('project.toggle-upvote');
 
