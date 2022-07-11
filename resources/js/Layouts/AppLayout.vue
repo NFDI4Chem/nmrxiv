@@ -654,6 +654,9 @@ export default {
       navigation,
     };
   },
+  mounted(){
+    
+  },
   methods: {
     switchToTeam(team) {
       this.$inertia.put(

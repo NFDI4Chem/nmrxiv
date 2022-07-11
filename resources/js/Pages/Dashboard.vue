@@ -101,7 +101,7 @@
             </div>
             <div class="min-w-0 flex-1">
               <div class="text-sm font-medium text-gray-900">
-                <a>
+                <a href="https://docs.nmrxiv.org/docs/introduction/intro" target="_blank">
                   <span class="absolute inset-0" aria-hidden="true"></span>
                   Get started! How to use nmrXiv?
                 </a>
@@ -155,7 +155,7 @@
             </div>
             <div class="min-w-0 flex-1">
               <div class="text-sm font-medium text-gray-900">
-                <a>
+                <a href="https://docs.nmrxiv.org/docs/developer-guides/API" target="_blank">
                   <span class="absolute inset-0" aria-hidden="true"></span>
                   Public API Documentation
                 </a>
@@ -210,7 +210,7 @@
             </div>
             <div class="min-w-0 flex-1">
               <div class="text-sm font-medium text-gray-900">
-                <a>
+                <a href="/">
                   <span class="absolute inset-0" aria-hidden="true"></span>
                   Challenges
                 </a>
@@ -240,11 +240,12 @@
         </li>
       </ul>
       <div class="mt-6 flex">
-        <a class="text-sm font-medium text-indigo-600 hover:text-indigo-500"
+        <a href="mailto:info@nmrxiv.org" class="text-sm font-medium text-indigo-600 hover:text-indigo-500"
           >Or get in touch<span aria-hidden="true"> &rarr;</span></a
         >
       </div>
     </div>
+    <onboarding></onboarding>
   </app-layout>
 </template>
 
@@ -252,14 +253,20 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import TeamProjects from "@/Pages/Project/Index.vue";
 import Create from "@/Shared/CreateButton.vue";
+import Onboarding from "@/App/Onboarding.vue";
 
 export default {
   components: {
     AppLayout,
     TeamProjects,
     Create,
+    Onboarding,
   },
   props: ["user", "team", "projects", "teamRole"],
+  mounted(){
+    if(!this.$page.props.user.onboarded){
+    }
+  },  
   computed: {
     editable() {
       if (this.teamRole && this.teamRole.name) {
