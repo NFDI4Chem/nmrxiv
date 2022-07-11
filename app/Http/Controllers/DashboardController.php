@@ -89,4 +89,19 @@ class DashboardController extends Controller
             'projects' => $projects,
         ]);
     }
+
+    public function onboardingStatus(Request $request, $status)
+    {
+        $user = $request->user();
+        
+        if($user){
+            if($status == 'complete'){
+                $user->onboarded = true;
+                $user->save();
+                return $user;
+            }
+        }
+    }
+
+    
 }
