@@ -431,86 +431,6 @@
                                     SAVE
                                   </button>
                                 </div>
-                                <h1 class="text-xl font-bold text-gray-900">
-                                  Sample Details
-                                </h1>
-                                <section
-                                  aria-labelledby="activity-title"
-                                  class="mt-2 xl:mt-2"
-                                >
-                                  <div>
-                                    <div class="pt-3">
-                                      <div>
-                                        <label
-                                          for="about"
-                                          class="block text-sm font-medium text-gray-700"
-                                        >
-                                          Sample Collection Protocol
-                                        </label>
-                                        <div class="mt-1">
-                                          <textarea
-                                            readonly
-                                            id="about"
-                                            name="about"
-                                            rows="3"
-                                            class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border border-gray-300 rounded-md"
-                                          ></textarea>
-                                        </div>
-                                        <p class="mt-2 text-sm text-gray-500">
-                                          Describe your sample collection protocol.
-                                          Protocol parameters can be provided below.
-                                        </p>
-                                      </div>
-                                      <!-- <div class="mt-3">
-                                        <h2 class="text-sm font-medium text-gray-500">
-                                          Sample Collection Parameters
-                                        </h2>
-                                        <ul role="list" class="mt-2 leading-8">
-                                          <li class="inline">
-                                            <a
-                                              href="#"
-                                              class="relative inline-flex items-center rounded-full border border-gray-300 px-3 py-0.5"
-                                            >
-                                              <div
-                                                class="absolute flex-shrink-0 flex items-center justify-center"
-                                              >
-                                                <span
-                                                  class="h-1.5 w-1.5 rounded-full bg-rose-500"
-                                                  aria-hidden="true"
-                                                ></span>
-                                              </div>
-                                              <div
-                                                class="ml-3.5 text-sm font-medium text-gray-900"
-                                              >
-                                                Bug
-                                              </div>
-                                            </a>
-                                          </li>
-                                          <li class="inline">
-                                            <a
-                                              href="#"
-                                              class="relative inline-flex items-center rounded-full border border-gray-300 px-3 py-0.5"
-                                            >
-                                              <div
-                                                class="absolute flex-shrink-0 flex items-center justify-center"
-                                              >
-                                                <span
-                                                  class="h-1.5 w-1.5 rounded-full bg-teal-500"
-                                                  aria-hidden="true"
-                                                ></span>
-                                              </div>
-                                              <div
-                                                class="ml-3.5 text-sm font-medium text-gray-900"
-                                              >
-                                                Accessibility
-                                              </div>
-                                            </a>
-                                          </li>
-                                        </ul>
-                                      </div> -->
-                                    </div>
-                                  </div>
-                                </section>
                               </div>
                             </div>
                             <div
@@ -873,25 +793,113 @@
                               </div>
                             </div>
                             <div
-                              v-if="currentTab.name == 'Chemical Composition'"
-                              class="px-4 sm:px-6"
+                              v-if="currentTab.name == 'Sample Info'"
+                              class="px-4 sm:px-6 pt-4"
                             >
-                              <div class="py-4 max-w-7xl mx-auto">
-                                <div
-                                  class="pb-3 border-b border-gray-200 sm:flex sm:items-center sm:justify-between"
-                                >
-                                  <h3 class="text-lg leading-6 font-medium text-gray-900">
-                                    Structures
-                                  </h3>
-                                  <!-- <div class="mt-3 sm:mt-0 sm:ml-4">
-                                    <button
-                                      type="button"
-                                      class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                                    >
-                                      Add new
-                                    </button>
-                                  </div> -->
+                              <h1 class="text-xl font-bold text-gray-900">
+                                Sample Details
+                              </h1>
+                              <section
+                                aria-labelledby="activity-title"
+                                class="mt-2 xl:mt-2"
+                              >
+                                <div>
+                                  <div class="pt-3">
+                                    <div>
+                                      <label
+                                        for="about"
+                                        class="block text-sm font-medium text-gray-700"
+                                      >
+                                        Sample Collection Protocol
+                                      </label>
+                                      <div class="mt-1">
+                                        <textarea
+                                          readonly
+                                          id="about"
+                                          name="about"
+                                          rows="3"
+                                          class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border border-gray-300 rounded-md"
+                                        ></textarea>
+                                      </div>
+                                      <p class="mt-2 text-sm text-gray-500">
+                                        Describe your sample collection protocol. Protocol
+                                        parameters can be provided below.
+                                      </p>
+                                    </div>
+                                    <!-- <div class="mt-3">
+                                        <h2 class="text-sm font-medium text-gray-500">
+                                          Sample Collection Parameters
+                                        </h2>
+                                        <ul role="list" class="mt-2 leading-8">
+                                          <li class="inline">
+                                            <a
+                                              href="#"
+                                              class="relative inline-flex items-center rounded-full border border-gray-300 px-3 py-0.5"
+                                            >
+                                              <div
+                                                class="absolute flex-shrink-0 flex items-center justify-center"
+                                              >
+                                                <span
+                                                  class="h-1.5 w-1.5 rounded-full bg-rose-500"
+                                                  aria-hidden="true"
+                                                ></span>
+                                              </div>
+                                              <div
+                                                class="ml-3.5 text-sm font-medium text-gray-900"
+                                              >
+                                                Bug
+                                              </div>
+                                            </a>
+                                          </li>
+                                          <li class="inline">
+                                            <a
+                                              href="#"
+                                              class="relative inline-flex items-center rounded-full border border-gray-300 px-3 py-0.5"
+                                            >
+                                              <div
+                                                class="absolute flex-shrink-0 flex items-center justify-center"
+                                              >
+                                                <span
+                                                  class="h-1.5 w-1.5 rounded-full bg-teal-500"
+                                                  aria-hidden="true"
+                                                ></span>
+                                              </div>
+                                              <div
+                                                class="ml-3.5 text-sm font-medium text-gray-900"
+                                              >
+                                                Accessibility
+                                              </div>
+                                            </a>
+                                          </li>
+                                        </ul>
+                                      </div> -->
+                                  </div>
                                 </div>
+                              </section>
+                              <div class="py-4 max-w-7xl mx-auto">
+                                <div class="sm:flex sm:items-center sm:justify-between">
+                                  <h3 class="text-xl font-bold text-gray-900">
+                                    Chemical composition (optional)
+                                  </h3>
+                                </div>
+                                <p
+                                  class="mt-2 pb-3 border-b border-gray-200 text-sm text-gray-500"
+                                >
+                                  Residual Complexity (RC) refers to the subtle but
+                                  significant convolution of major and minor ("hidden")
+                                  chemical species in materials that originate from
+                                  biochemical or synthetic reaction mixtures. Certain
+                                  levels of these chemical species (molecules) usually
+                                  remain present even after a number of purification
+                                  steps, and this RC is to some degree conserved even in
+                                  highly purified materials. In principle, RC affects all
+                                  "pure" materials, including synthetic compound, whenever
+                                  chromatographic or other purification steps are required
+                                  prior to their biological evaluation. Please report the
+                                  chemical composition (if known) of your sample. If
+                                  unknown please report the molecules that you expect to
+                                  be present the sample with our the composition.
+                                </p>
                               </div>
 
                               <div class="grid grid-cols-2 gap-2">
@@ -1685,7 +1693,7 @@ export default {
 
       tabs: [
         { name: "Experiments (Spectra)", current: true },
-        { name: "Chemical Composition", current: false },
+        { name: "Sample Info", current: false },
         { name: "Meta Data", current: false },
       ],
 
@@ -2074,6 +2082,7 @@ export default {
           dictDefaultMessage: document.querySelector("#submission-dropzone-message")
             .innerHTML,
           accept() {
+            vm.loadingStep = true;
             if (vm.count > vm.batchCount) {
               vm.processFilesDZL(vm);
             } else {
@@ -2113,6 +2122,7 @@ export default {
           ) {
             vm.status = "UPLOAD COMPLETE";
             vm.$page.props.selectedFileSystemObject = this.files[0];
+            vm.loadingStep = false;
             vm.annotate();
           }
         });
