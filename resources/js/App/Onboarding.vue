@@ -37,9 +37,9 @@
                       fill="none"
                       viewBox="0 0 404 404"
                       role="img"
-                      aria-labelledby="svg-workcation"
+                      aria-labelledby="svg-nmrxiv"
                     >
-                      <title id="svg-workcation">Workcation</title>
+                      <title id="svg-nmrxiv">nmrxiv</title>
                       <defs>
                         <pattern
                           id="ad119f34-7694-4c31-947f-5c9d249b21f3"
@@ -86,9 +86,7 @@
                 </section>
               </div>
               <div v-if="currentStep == 2">
-                <section
-                  class="h-1/2 overflow-hidden py-12 bg-gray-50 overflow-hidden md:py-20 lg:py-24"
-                >
+                <section class="h-1/2 overflow-hidden py-12">
                   <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <svg
                       class="absolute top-full right-full transform translate-x-1/3 -translate-y-1/4 lg:translate-x-1/2 xl:-translate-y-1/2"
@@ -97,8 +95,9 @@
                       fill="none"
                       viewBox="0 0 404 404"
                       role="img"
-                      aria-labelledby="svg-workcation"
+                      aria-labelledby="svg-nmrxiv"
                     >
+                      <title id="svg-nmrxiv">nmrxiv</title>
                       <defs>
                         <pattern
                           id="ad119f34-7694-4c31-947f-5c9d249b21f3"
@@ -124,8 +123,34 @@
                         fill="url(#ad119f34-7694-4c31-947f-5c9d249b21f3)"
                       />
                     </svg>
-
-                    <div class="relative">sds</div>
+                    <div class="relative text-center">
+                      <div class="flex justify-center">
+                        <img
+                          class="rounded-md"
+                          style="height: 200px"
+                          src="/img/illustration1.jpg"
+                        />
+                      </div>
+                      <blockquote class="mt-10">
+                        <div
+                          class="max-w-3xl mx-auto text-center text-xl leading-9 font-medium text-gray-900"
+                        >
+                          <p class="mt-3 text-lg">
+                            Welcome! Lorem ipsum dolor sit amet consectetur adipisicing
+                            elit. Nemo expedita voluptas culpa sapiente alias molestiae.
+                            Numquam corrupti in laborum sed rerum et corporis.&rdquo;
+                          </p>
+                        </div>
+                      </blockquote>
+                      <small
+                        ><i
+                          ><a href="https://www.freepik.com/vectors/science-research"
+                            >Science research vector created by storyset -
+                            www.freepik.com</a
+                          ></i
+                        ></small
+                      >
+                    </div>
                   </div>
                 </section>
               </div>
@@ -134,7 +159,7 @@
                   class="h-1/2 bg-gray-50 overflow-hidden max-w-7xl mx-auto text-center py-12 px-4 sm:px-6"
                 >
                   <h2 class="text-base font-semibold uppercase tracking-wider">
-                    Award winning support
+                    SUPPORT
                   </h2>
                   <p class="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">
                     We’re here to help
@@ -148,10 +173,11 @@
                   <div class="mt-8">
                     <div class="inline-flex rounded-md shadow">
                       <a
-                        href="#"
+                        target="_blank"
+                        href="https://docs.nmrxiv.org"
                         class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-gray-900 bg-white hover:bg-gray-50"
                       >
-                        Visit the help center
+                        Visit the docs
                         <ExternalLinkIcon
                           class="-mr-1 ml-3 h-5 w-5 text-gray-400"
                           aria-hidden="true"
@@ -168,24 +194,24 @@
                   <h2
                     class="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl"
                   >
-                    <span class="block">Ready to dive in?</span>
-                    <span class="block">Start your free trial today.</span>
+                    <span class="block text-gray-500">All set to get started!</span>
+                    <span class="block">Start uploading your spectral data today.</span>
                   </h2>
                   <div class="mt-8 flex justify-center">
                     <div class="inline-flex rounded-md shadow">
                       <a
                         @click="onboardingComplete"
-                        class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+                        class="cursor-pointer inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
                       >
                         Get started
                       </a>
                     </div>
                     <div class="ml-3 inline-flex">
                       <a
-                        href="#"
-                        class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200"
+                        @click="onboardAndStartTour"
+                        class="cursor-pointer inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200"
                       >
-                        Learn more
+                        Dashboard Tour
                       </a>
                     </div>
                   </div>
@@ -216,7 +242,12 @@
                       <p class="ml-2">Prev</p>
                     </div>
                   </button>
-                  <button type="button" class="py-2 px-3 border rounded-md" v-else>
+                  <button
+                    @click="onboardingComplete"
+                    type="button"
+                    class="py-2 px-3 border rounded-md"
+                    v-else
+                  >
                     <div class="flex flex-row align-middle">
                       <p class="mx-2">Skip</p>
                     </div>
@@ -322,10 +353,11 @@ import {
   FolderIcon,
   FolderAddIcon,
   HashtagIcon,
+  ExternalLinkIcon,
   TagIcon,
 } from "@heroicons/vue/outline";
-import axios from 'axios';
-import { Inertia } from '@inertiajs/inertia'
+import axios from "axios";
+import { Inertia } from "@inertiajs/inertia";
 
 export default {
   components: {
@@ -346,6 +378,7 @@ export default {
     FolderAddIcon,
     HashtagIcon,
     TagIcon,
+    ExternalLinkIcon,
   },
   props: [],
   data() {
@@ -360,8 +393,8 @@ export default {
     };
   },
   mounted() {
-    if(!this.$page.props.user.onboarded){
-        this.open = true
+    if (!this.$page.props.user.onboarded) {
+      this.open = true;
     }
   },
   methods: {
@@ -376,18 +409,21 @@ export default {
         }
       });
     },
+    onboardingComplete() {
+      this.open = false;
+      axios.post("/onboarding/complete").then((resp) => {
+        Inertia.reload({ only: ["user"] });
+      });
+    },
+    onboardAndStartTour() {
+      this.onboardingComplete();
+      this.$tours["appTour"].start();
+    },
   },
   computed: {
     currentStep() {
       return this.steps.find((s) => s.status == "current").id;
     },
-    onboardingComplete(){
-        this.open = false
-        axios.post("/onboarding/complete").then(resp =>{
-            console.log(resp)
-            Inertia.reload({ only: ['user'] })
-        })
-    }
   },
 };
 </script>
