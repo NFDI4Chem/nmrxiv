@@ -360,7 +360,8 @@
                   <Link
                     href="/projects"
                     class="hidden text-sm font-medium text-indigo-600 hover:text-indigo-500 md:block"
-                    >Explore more<span aria-hidden="true"> &rarr;</span></Link>
+                    >Explore more<span aria-hidden="true"> &rarr;</span></Link
+                  >
                 </div>
               </div>
             </div>
@@ -374,11 +375,13 @@
                       <Link
                         href="/projects?filter=recent"
                         class="m-1 inline-flex rounded-full border border-gray-200 items-center py-1.5 pl-3 pr-3 text-sm font-medium bg-white text-gray-900 hover:text-white hover:bg-black"
-                        ><span>Recent</span></Link>
+                        ><span>Recent</span></Link
+                      >
                       <Link
                         href="/projects?filter=trending"
                         class="m-1 inline-flex rounded-full border border-gray-200 items-center py-1.5 pl-3 pr-3 text-sm font-medium bg-white text-gray-900 hover:text-white hover:bg-black"
-                        ><span>Trending</span></Link>
+                        ><span>Trending</span></Link
+                      >
                     </div>
                   </div>
                 </div>
@@ -471,12 +474,17 @@
                       href="#"
                       class="inline-flex bg-gradient-to-r from-indigo-600 to-teal-600 bg-origin-border px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white hover:from-indigo-700 hover:to-teal-700"
                     >
-                      Need help with structure ellucidation?&emsp;<i><small> (coming soon)</small></i></Link><br />
+                      Need help with structure ellucidation?&emsp;<i
+                        ><small> (coming soon)</small></i
+                      ></Link
+                    ><br />
                     <Link
                       href="#"
                       class="inline-flex bg-gradient-to-r from-indigo-600 to-teal-600 bg-origin-border px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white hover:from-indigo-700 hover:to-teal-700 mt-4"
                     >
-                      Check out active challenges&emsp;<i><small> (coming soon)</small></i> 
+                      Check out active challenges&emsp;<i
+                        ><small> (coming soon)</small></i
+                      >
                     </Link>
                   </div>
                 </div>

@@ -16,11 +16,7 @@ export default {
             title: "Get Started",
           },
           content: `Click to create project, <br/> study or dataset!`,
-        },
-        {
-          target: "#v-step-1",
-          content: "Click to create project",
-        },
+        }
       ],
     };
   },
