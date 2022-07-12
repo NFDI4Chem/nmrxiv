@@ -33,10 +33,7 @@ module.exports = {
           900: '#019DBB',
         },
       },
-    },
-    minHeight: {
-      '1/2': '50%',
-    },
+    }
   },
 
   plugins: [
