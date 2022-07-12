@@ -1,7 +1,7 @@
 <template>
     <Head title="Forgot Password" />
 
-    <jet-authentication-card>
+    <jet-authentication-card class="index_beams">
         <template #logo>
             <jet-authentication-card-logo />
         </template>
