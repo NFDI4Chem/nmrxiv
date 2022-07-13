@@ -1277,7 +1277,9 @@ export default {
         });
       });
       this.studyTags = tags;
-      this.selectDataset(this.selectedStudy.datasets[0]);
+      if(this.selectedStudy.datasets && this.selectedStudy.datasets.length > 0){
+        this.selectDataset(this.selectedStudy.datasets[0]);
+      }
     },
     selectDataset(dataset) {
       this.selectedDataset = dataset;

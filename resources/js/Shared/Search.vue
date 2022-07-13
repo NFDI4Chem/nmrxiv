@@ -134,7 +134,7 @@
                                       active && 'bg-gray-900 bg-opacity-5 text-gray-900',
                                     ]"
                                   >
-                                   <Link class="w-full" :href="'/projects/'+hit.slug">
+                                   <a class="w-full" :href="'/projects/'+hit.slug">
                                       <FolderIcon
                                           :class="[
                                             'h-6 w-6 inline flex-none text-gray-900 text-opacity-40',
@@ -150,7 +150,7 @@
                                           class="ml-3 flex-none text-gray-500"
                                           >Jump to...</span
                                         >
-                                   </Link>
+                                   </a>
                                   </li>
                                 </ComboboxOption>
                               </ul>
@@ -185,7 +185,7 @@
                           >
                             <li
                               :class="[
-                                'flex cursor-default select-none items-center rounded-md px-3 py-2',
+                                'flex cursor-pointer select-none items-center rounded-md px-3 py-2',
                                 active && 'bg-gray-900 bg-opacity-5 text-gray-900',
                               ]"
                             >
@@ -256,8 +256,8 @@ const projects = [
 const recent = [];
 // [projects[0]];
 const quickActions = [
-  { name: "Ask a question...", icon: DocumentAddIcon, shortcut: "N", url: "#" },
-  { name: "Learn Spectral analysis...", icon: TagIcon, shortcut: "F", url: "#" },
+  { name: "Ask a question...", icon: DocumentAddIcon, shortcut: "N", url: "mailto:info@nmrxiv.org" },
+  { name: "Learn Spectral analysis...", icon: TagIcon, shortcut: "F", url: "https://docs.nmrxiv.org" },
   //   { name: "Add hashtag...", icon: HashtagIcon, shortcut: "H", url: "#" },
   //   { name: "Add label...", icon: TagIcon, shortcut: "L", url: "#" },
 ];
