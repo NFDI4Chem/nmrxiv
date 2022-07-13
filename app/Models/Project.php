@@ -82,7 +82,7 @@ class Project extends Model implements Auditable
 
     public function likes()
     {
-        return  Like::count($this);
+        return Like::count($this);
     }
 
     /**
@@ -165,10 +165,10 @@ class Project extends Model implements Auditable
     {
         $user = $this->userWithEmail($email);
 
-        if($user){
-            if($user['projectMembership']){
+        if ($user) {
+            if ($user['projectMembership']) {
                 return $user['projectMembership']['role'];
-            }elseIf($this->owner_id == $user->id){
+            } elseif ($this->owner_id == $user->id) {
                 return 'owner';
             }
         }
@@ -224,5 +224,15 @@ class Project extends Model implements Auditable
     public function license()
     {
         return $this->belongsTo(License::class, 'license_id');
+    }
+
+    /**
+     * Determine if the model should be searchable.
+     *
+     * @return bool
+     */
+    public function shouldBeSearchable()
+    {
+        return $this->is_public;
     }
 }
