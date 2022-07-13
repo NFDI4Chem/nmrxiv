@@ -29,11 +29,22 @@ class DatasetController extends Controller
         if($dataset){
             $spectra = $request->get('spectra');
             $nmriumInfo = json_encode($spectra);
-            if($nmriumInfo){
-                $dataset->nmrium_info = $nmriumInfo;
-                $dataset->type = $spectra['info']['nucleus'];
-                $dataset->save();
+            $molecules = $request->get('molecules');
+            $molecularInfo = json_encode($molecules);
+            if($dataset->nmriumInfo){
+                $nmriumData = $dataset->nmriumInfo;
+            }else{
+                $nmriumData = [];
             }
+            if($nmriumInfo){
+                $nmriumData['spectra'] = $nmriumInfo;
+            }
+            if($molecularInfo){
+                $nmriumData['molecules'] = $molecularInfo;
+            }
+            $dataset->nmrium_info = $nmriumData;
+            $dataset->type = $spectra['info']['nucleus'];
+            $dataset->save();
             return $dataset->fresh();
         }
     }
