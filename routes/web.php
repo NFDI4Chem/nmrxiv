@@ -52,8 +52,6 @@ Route::get('download/{code}/datasets/{dataset}/{filename}', [DatasetController::
 Route::get('{code}/studies/{study}/file/{filename}', [StudyController::class, 'file'])
     ->name('study.file');
 
-Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
-
 Route::get('projects/{slug}', [ProjectController::class, 'publicProjectView'])
     ->name('public.project');
 Route::get('projects', [ProjectController::class, 'publicProjectsView'])
@@ -73,9 +71,13 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::get('projects/{project}/status', [ProjectController::class, 'status'])
             ->name('project.status');
 
+    Route::get('dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
+
     Route::group([
         'prefix' => 'dashboard'
     ], function () {
+        Route::get('ssubmission', [DashboardController::class, 'dashboard'])
+            ->name('submission');
         Route::get('shared-with-me', [DashboardController::class, 'sharedWithMe'])
             ->name('shared-with-me');
         Route::get('starred', [DashboardController::class, 'starred'])

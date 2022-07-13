@@ -479,7 +479,7 @@
                                 <div v-if="currentMolecules.length > 0">
                                   <ul
                                     role="list"
-                                    class="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8"
+                                    class="flex gap-x-4 gap-y-8 sm:gap-x-6 xl:gap-x-8"
                                   >
                                     <li
                                       v-for="molecule in currentMolecules"
@@ -487,20 +487,12 @@
                                       class="relative"
                                     >
                                       <div
-                                        class="group block w-full aspect-w-10 aspect-h-7 rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 focus-within:ring-teal-500 overflow-hidden"
+                                        class="group flex justify-center block w-full aspect-w-10 aspect-h-7 rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 focus-within:ring-teal-500 overflow-hidden"
                                       >
                                         <div
-                                          class="object-cover pointer-events-none group-hover:opacity-75"
+                                          class="p-4 object-cover pointer-events-none group-hover:opacity-75"
                                           v-html="molecule.svg"
                                         ></div>
-                                        <button
-                                          type="button"
-                                          class="absolute inset-0 focus:outline-none"
-                                        >
-                                          <span class="sr-only"
-                                            >View details for {{ file.title }}</span
-                                          >
-                                        </button>
                                       </div>
                                       <p
                                         class="mt-2 block text-sm font-medium text-gray-900 truncate pointer-events-none"
@@ -1743,6 +1735,7 @@ export default {
         license: null,
         owner_id: null,
         team_id: null,
+        license_id: null,
         releaseDate: this.setReleaseDate(),
       }),
 
@@ -1787,10 +1780,11 @@ export default {
     },
     updateProject() {
       this.loadingStep = true;
-      (this.updateProjectForm.name = this.project.name),
-        (this.updateProjectForm.owner_id = this.project.owner_id),
-        (this.updateProjectForm.team_id = this.project.team_id),
-        (this.updateProjectForm.description = this.project.description),
+      this.updateProjectForm.name = this.project.name
+      this.updateProjectForm.owner_id = this.project.owner_id
+      this.updateProjectForm.license_id = this.updateProjectForm.license.id
+      this.updateProjectForm.team_id = this.project.team_id
+      this.updateProjectForm.description = this.project.description
         this.updateProjectForm.post(route("dashboard.project.update", this.project.id), {
           preserveScroll: true,
           onSuccess: () => {
@@ -1884,28 +1878,6 @@ export default {
         }
       });
     },
-    updateDataSet(action) {
-      if (
-        action == "" ||
-        (action == "INITIATE" &&
-          this.selectedDataset &&
-          this.selectedDataset.type != null)
-      ) {
-        return;
-      }
-      if (this.selectedSpectraData != null) {
-        this.autoSaving = true;
-        axios
-          .post("/dashboard/datasets/" + this.selectedDataset.id + "/nmriumInfo", {
-            spectra: this.selectedSpectraData,
-            molecules: this.currentMolecules,
-          })
-          .then((response) => {
-            this.autoSaving = false;
-            this.selectedDataset.nmrium_info = response.data.nmrium_info;
-          });
-      }
-    },
     closeDraft() {
       this.loadingStep = true;
       axios
@@ -1934,6 +1906,7 @@ export default {
     },
     loadSpectra() {
       const iframe = window.frames.submissionNMRiumIframe;
+      this.currentMolecules = [];
       if (iframe) {
         if (!this.selectedDataset.nmrium_info) {
           let data = {
@@ -1949,10 +1922,18 @@ export default {
           };
           iframe.postMessage({ type: `nmr-wrapper:load`, data }, "*");
         } else {
-          console.log(JSON.parse(this.selectedDataset.nmrium_info));
+          let nmrium_info = JSON.parse(this.selectedDataset.nmrium_info);
+          let mols = JSON.parse(nmrium_info.molecules);
+          if (mols) {
+            this.currentMolecules = mols;
+          }
+          mols.forEach((mol) => {
+            mol.molfile = "\n" + mol.molfile + "\n";
+          });
           let data = {
             data: {
-              spectra: [JSON.parse(this.selectedDataset.nmrium_info)],
+              spectra: [JSON.parse(nmrium_info.spectra)],
+              molecules: mols,
             },
             type: "nmrium",
           };
@@ -2174,14 +2155,28 @@ export default {
             return;
           }
           if (e.data.type == "nmr-wrapper:dataChange") {
-            console.log(e.data.data.data);
+            let actionType = e.data.data.actionType;
+
+            if (
+              actionType == "" ||
+              (actionType == "INITIATE" &&
+                this.selectedDataset &&
+                this.selectedDataset.type != null)
+            ) {
+              return;
+            }
+
             this.selectedSpectraData = e.data.data.data.find(
               (d) => d.info.type == "NMR Spectrum"
             );
-            if (this.selectedSpectraData) {
+            if (
+              actionType == "ADD_MOLECULE" ||
+              actionType == "DELETE_MOLECULE" ||
+              e.data.data.molecules
+            ) {
               this.currentMolecules = e.data.data.molecules;
-              this.updateDataSet(e.data.data.actionType);
             }
+            this.updateDataSet();
           }
         };
 
@@ -2191,6 +2186,20 @@ export default {
         }
       } else {
         window.removeEventListener("message");
+      }
+    },
+    updateDataSet() {
+      if (this.selectedSpectraData != null) {
+        this.autoSaving = true;
+        axios
+          .post("/dashboard/datasets/" + this.selectedDataset.id + "/nmriumInfo", {
+            spectra: this.selectedSpectraData,
+            molecules: this.currentMolecules,
+          })
+          .then((response) => {
+            this.autoSaving = false;
+            this.selectedDataset.nmrium_info = response.data.nmrium_info;
+          });
       }
     },
     fetchDrafts() {
