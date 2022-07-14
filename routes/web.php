@@ -62,6 +62,12 @@ Route::get('datasets', [DatasetController::class, 'publicDatasetsView'])
     ->name('public.datasets');
 
 Route::group(['middleware' => ['auth', 'verified']], function () {
+    // License
+    Route::get('licenses', [LicenseController::class, 'index'])
+                ->name('licenses');
+    Route::get('licenses/{id}', [LicenseController::class, 'getLicensebyId'])
+                ->name('license');
+
     Route::post('/onboarding/{status}', [DashboardController::class, 'onboardingStatus'])
             ->name('onboarding.complete');
     
@@ -215,16 +221,6 @@ Route::group([
 
             Route::delete('announcements/{announcement}', [AnnouncementController::class, 'destroy'])
             ->name('console.announcements.destroy');
-        });
-
-        // Adding routes for licenses section
-        Route::group(['middleware' => ['auth', 'permission:manage roles|manage platform']], function () {
-            // License
-            Route::get('licenses', [LicenseController::class, 'index'])
-            ->name('console.licenses');
-
-            Route::get('licenses/{id}', [LicenseController::class, 'getLicensebyId'])
-            ->name('console.license.getLicensebyId');
         });
     });
 });
