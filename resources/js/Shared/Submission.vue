@@ -1797,7 +1797,7 @@ export default {
     },
 
     loadLicenses() {
-      axios.get(route("console.licenses")).then((res) => {
+      axios.get(route("licenses")).then((res) => {
         this.licenses = res.data;
       });
     },
@@ -2185,7 +2185,7 @@ export default {
           this.$props.eventRegistered = true;
         }
       } else {
-        window.removeEventListener("message");
+        window.removeEventListener("message", saveNMRiumUpdates);
       }
     },
     updateDataSet() {
