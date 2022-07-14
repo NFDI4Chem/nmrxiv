@@ -699,7 +699,7 @@ export default defineComponent({
     },
     toggleDetails() {
       if (this.project) {
-        axios.get(route("console.licenses")).then((res) => {
+        axios.get(route("licenses")).then((res) => {
           this.licenses = res.data;
           this.form.license = this.licenses.find((l) => l.id == this.project.license_id);
         });

@@ -803,7 +803,7 @@ export default {
             axios
                 .get(
                     route(
-                        "console.license.getLicensebyId",
+                        "license",
                         this.study.license_id
                     )
                 )
@@ -811,7 +811,7 @@ export default {
                     this.form.license = res.data[0];
                 });
         }
-        axios.get(route("console.licenses")).then((res) => {
+        axios.get(route("licenses")).then((res) => {
             this.licenses = res.data;
         });
     },
