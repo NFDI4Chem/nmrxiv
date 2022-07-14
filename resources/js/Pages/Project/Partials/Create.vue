@@ -321,7 +321,7 @@ export default {
       this.createProjectDialog = true;
     });
     axios
-      .get(route("console.licenses"))
+      .get(route("licenses"))
       .then((res) => {
         this.licenses = res.data;
       })
