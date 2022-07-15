@@ -231,7 +231,7 @@
                 class="mt-6 max-w-lg mx-auto text-center text-xl text-dark-200 sm:max-w-3xl"
               >
                 We archive raw and processed NMR data, providing support for browsing,
-                search, analysis, and dissemination of NMR data worldwide. test
+                search, analysis, and dissemination of NMR data worldwide.
               </p>
               <div class="mt-10 max-w-sm mx-auto sm:max-w-none sm:flex sm:justify-center">
                 <div
