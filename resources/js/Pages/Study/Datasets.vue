@@ -241,7 +241,7 @@ export default {
     if (this.study.license_id) {
       this.loading = true;
       axios
-        .get(route("console.license.getLicensebyId", this.study.license_id))
+        .get(route("license", this.study.license_id))
         .then((res) => {
           this.license = res.data[0].title;
         })
