@@ -53,14 +53,16 @@
               </svg>
             </span>
           </DisclosureButton>
-          <span v-html="composeIcon(file)" v-if="file.type == 'directory'"></span>
-          <span v-else>
-            <FolderIcon
-              class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700"
-              aria-hidden="true"
-            />
+          <span @contextmenu.prevent.stop="handleClick1($event, item)">
+            <span v-html="composeIcon(file)" v-if="file.type == 'directory'"></span>
+            <span v-else>
+              <FolderIcon
+                class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700"
+                aria-hidden="true"
+              />
+            </span>
+            {{ file.name }}
           </span>
-          {{ file.name }} 
         </div>
         <DisclosurePanel class="space-y-1">
           <span v-for="sfile in file.children" :key="sfile.name">
@@ -68,9 +70,7 @@
               <div
                 @click.stop="displaySelected(sfile)"
                 :class="[
-                  sfile.current
-                    ? 'text-gray-900'
-                    : 'cursor-pointer text-gray-600',
+                  sfile.current ? 'text-gray-900' : 'cursor-pointer text-gray-600',
                   'cursor-pointer group w-full flex items-center font-medium rounded-md',
                 ]"
               >
@@ -124,16 +124,21 @@
                             </svg>
                           </span>
                         </DisclosureButton>
-                        <span>
-                          <span v-html="composeIcon(sfile)" v-if="sfile.type == 'directory'">  
+                        <span @contextmenu.prevent.stop="handleClick1($event, item)">
+                          <span>
+                            <span
+                              v-html="composeIcon(sfile)"
+                              v-if="sfile.type == 'directory'"
+                            >
+                            </span>
+                            <span v-else>
+                              <DocumentTextIcon
+                                class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700"
+                                aria-hidden="true"
+                              />
+                            </span>
+                            {{ sfile.name }}
                           </span>
-                          <span v-else>
-                            <DocumentTextIcon
-                              class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700"
-                              aria-hidden="true"
-                            />
-                          </span>
-                          {{ sfile.name }}
                         </span>
                       </div>
                       <DisclosurePanel class="space-y-0">
@@ -197,6 +202,13 @@
         </DisclosurePanel>
       </Disclosure>
     </nav>
+    <vue-simple-context-menu
+      element-id="myFirstMenu"
+      :options="optionsArray1"
+      ref="vueSimpleContextMenu1"
+      @option-clicked="optionClicked1"
+    >
+    </vue-simple-context-menu>
   </span>
 </template>
 
@@ -219,27 +231,51 @@ export default {
     return {};
   },
   data() {
-    return {};
+    return {
+      optionsArray1: [
+        {
+          name: "Duplicate",
+          slug: "duplicate",
+        },
+        {
+          type: "divider",
+        },
+        {
+          name: "Edit",
+          slug: "edit",
+        },
+        {
+          name: "<em>Delete</em>",
+          slug: "delete",
+        },
+      ],
+    };
   },
   mounted() {},
   methods: {
-    composeIcon(file){
-      if(file.instrument_type){
-        if(file.instrument_type == 'bruker'){
+    optionClicked1(event) {
+      window.alert(JSON.stringify(event));
+    },
+    handleClick1(event, item) {
+      this.$refs.vueSimpleContextMenu1.showMenu(event, item);
+    },
+    composeIcon(file) {
+      if (file.instrument_type) {
+        if (file.instrument_type == "bruker") {
           return '<img class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700 border rounded-md" src="https://pbs.twimg.com/profile_images/649199086424473600/zo-TVJZH_400x400.jpg" alt=""/>';
-        }else if(file.instrument_type == 'varian'){
+        } else if (file.instrument_type == "varian") {
           return '<img class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700 border rounded-md" src="https://upload.wikimedia.org/wikipedia/en/5/58/Varian-inc-logo.JPG" alt=""/>';
-        }else if(file.instrument_type == 'joel'){
+        } else if (file.instrument_type == "joel") {
           return '<img class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700 border rounded-md" src="https://pbs.twimg.com/profile_images/907699108214972418/gpdCRCaS_400x400.jpg" alt=""/>';
         }
       }
 
-      if(file.model_type == 'study'){
-        return '<span class="relative inline-flex"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700"><path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path></svg><span class="flex absolute h-2 w-2 top-0 right-0"><span class="absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-sky-500"></span></span></span>'
+      if (file.model_type == "study") {
+        return '<span class="relative inline-flex"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700"><path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path></svg><span class="flex absolute h-2 w-2 top-0 right-0"><span class="absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-sky-500"></span></span></span>';
       }
 
-      return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700"><path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path></svg>'
-    },  
+      return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700"><path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path></svg>';
+    },
     displaySelected(file) {
       this.$page.props.selectedFileSystemObject = file;
       let sFolder = "/";

@@ -29,7 +29,10 @@ class FileSystemController extends Controller
         $filesURLs = [];
 
         foreach($files as $file){
-            DB::transaction(function () use ($request, &$filePath, $file) {
+
+            $relativefilePath = null;
+
+            DB::transaction(function () use ($request, &$filePath, $file, &$relativefilePath) {
                 $destination = $request->get('destination');
     
                 $draft = Draft::find($request->get('draft_id'));
@@ -53,6 +56,7 @@ class FileSystemController extends Controller
                 $relativefilePath = $path ? $path : $filename;
     
                 $relativefilePath = $destination . '/' . $relativefilePath;
+
                 $path = $destination . '/' . $path;
     
                 $environment = env('APP_ENV', 'local');
@@ -255,7 +259,9 @@ class FileSystemController extends Controller
                 'uuid' => $uuid,
                 'bucket' => $bucket,
                 'key' => $key,
-                'fullPath' => $file['fullPath'],
+                'fullPath' => array_key_exists('fullPath', $file) ? $file['fullPath'] : preg_replace(
+                                    '~//+~',
+                                    '/', $relativefilePath),
                 'url' => (string) $signedRequest->getUri(),
                 'headers' => $this->headers($request, $signedRequest),
             ]);

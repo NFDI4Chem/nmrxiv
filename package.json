@@ -32,6 +32,8 @@
         "@tailwindcss/line-clamp": "^0.3.1",
         "@types/marked": "^4.0.1",
         "@vue-hero-icons/outline": "^1.7.2",
+        "@vuepic/vue-datepicker": "^3.3.1",
+        "autoprefixer": "10.4.5",
         "axios-retry": "^3.2.5",
         "dropzone": "^6.0.0-beta.2",
         "marked": "^4.0.4",
@@ -39,9 +41,9 @@
         "openchemlib": "^7.4.3",
         "popper.js": "^1.16.1",
         "vue-instantsearch": "^4.3.3",
+        "vue-simple-context-menu": "^4.0.4",
         "vue3-clipboard": "^1.0.0",
         "vue3-colorpicker": "^2.0.4",
-        "vue3-date-time-picker": "^2.3.6",
         "vue3-slider": "^1.7.0",
         "vue3-tour": "^0.2.0"
     }

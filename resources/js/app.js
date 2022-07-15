@@ -11,6 +11,9 @@ import InstantSearch from 'vue-instantsearch/vue3/es';
 import Vue3Tour from 'vue3-tour';
 import mitt from 'mitt';
 
+import VueSimpleContextMenu from 'vue-simple-context-menu';
+import 'vue-simple-context-menu/dist/vue-simple-context-menu.css';
+
 
 const appName = window.document.getElementsByTagName('title')[0]?.innerText || 'Laravel';
 const emitter = mitt();
@@ -22,6 +25,7 @@ createInertiaApp({
         return createApp({ render: () => h(app, props) })
             .use(plugin)
             .component('Children', Children)
+            .component('vue-simple-context-menu', VueSimpleContextMenu)
             .mixin({ methods: { route } })
             .mixin(helpers)
             .use(InstantSearch)

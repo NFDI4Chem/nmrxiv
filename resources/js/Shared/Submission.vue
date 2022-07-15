@@ -158,7 +158,13 @@
                     for="description"
                     class="block text-sm font-medium text-gray-700"
                   >
-                    Project Description
+                    <span
+                      @click="
+                        draftDescription =
+                          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore'
+                      "
+                      >Project Description</span
+                    >
                   </label>
                   <div class="mt-1">
                     <textarea
@@ -175,10 +181,12 @@
                     for="description"
                     class="block text-sm font-medium text-gray-700"
                   >
-                    Tags
+                    Keywords
                   </label>
                   <div>
                     <vue-tags-input
+                      placeholder="Type and press enter"
+                      :separators="[';', ',']"
                       v-model="draftTag"
                       max-width="100%"
                       :tags="draftTags"
@@ -188,65 +196,14 @@
                 </div>
                 <div>
                   <div>
-                    <small class="cursor-pointer" @click="annotate()"
-                      >Draft ID: {{ currentDraft.key }}</small
-                    >
-                    <form class="py-2 mb-3">
-                      <div id="submission-dropzone-message" class="text-center">
-                        <div
-                          type="button"
-                          class="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-4 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                        >
-                          <svg
-                            class="mx-auto h-12 w-12 text-gray-400"
-                            xmlns="http://www.w3.org/2000/svg"
-                            stroke="currentColor"
-                            fill="none"
-                            viewBox="0 0 48 48"
-                            aria-hidden="true"
-                          >
-                            <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
-                              d="M8 14v20c0 4.418 7.163 8 16 8 1.381 0 2.721-.087 4-.252M8 14c0 4.418 7.163 8 16 8s16-3.582 16-8M8 14c0-4.418 7.163-8 16-8s16 3.582 16 8m0 0v14m0-4c0 4.418-7.163 8-16 8S8 28.418 8 24m32 10v6m0 0v6m0-6h6m-6 0h-6"
-                            />
-                          </svg>
-                          <span class="mt-2 block text-sm font-medium text-gray-900">
-                            Drop Files or Folders to upload to
-                            <span v-if="$page.props.selectedFolder"
-                              >"{{ $page.props.selectedFolder }}"</span
-                            >
-                            folder
-                          </span>
-                          <div v-if="dropzone" class="relative mt-5">
-                            <div
-                              class="overflow-hidden h-2 text-xs flex rounded bg-gray-200"
-                            >
-                              <div
-                                :style="
-                                  'width: ' +
-                                  precentageUpload(dropzone.files.length, uploadedFiles) +
-                                  '%'
-                                "
-                                class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-green-500"
-                              ></div>
-                            </div>
-                            <span
-                              v-if="status"
-                              class="mt-2 block text-sm font-medium text-gray-900"
-                            >
-                              {{ status }}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </form>
-                    <div
-                      v-if="file != null"
-                      style="height: 40vh; overflow: scroll !important"
-                    >
-                      <children :file="file"></children>
+                    <small class="cursor-pointer">Draft ID: {{ currentDraft.key }}</small>
+                    <div style="height: 40vh; overflow: scroll !important">
+                      <file-system-browser
+                        @loading="updateLoadingStatus"
+                        :readonly="false"
+                        ref="fsbRef"
+                        :draft="currentDraft"
+                      ></file-system-browser>
                     </div>
                   </div>
                 </div>
@@ -1627,14 +1584,13 @@ import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import JetButton from "@/Jetstream/Button.vue";
 import VueTagsInput from "@sipec/vue3-tags-input";
 import { inject, ref } from "vue";
-import { Dropzone } from "dropzone";
-import axiosRetry from "axios-retry";
 import slider from "vue3-slider";
 import OCL from "openchemlib/full";
-import Datepicker from "vue3-date-time-picker";
-import "vue3-date-time-picker/dist/main.css";
+import Datepicker from "@vuepic/vue-datepicker";
+import "@vuepic/vue-datepicker/dist/main.css";
 import SelectRich from "@/Shared/SelectRich.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
+import FileSystemBrowser from "./FileSystemBrowser.vue";
 
 export default {
   components: {
@@ -1646,6 +1602,7 @@ export default {
     SelectRich,
     Datepicker,
     JetInputError,
+    FileSystemBrowser,
   },
   props: [],
   data() {
@@ -1707,8 +1664,6 @@ export default {
       draftTags: [],
       draftTag: "",
 
-      dropzone: null,
-      uploadedFiles: 0,
       status: null,
 
       selectedStudy: null,
@@ -1769,6 +1724,9 @@ export default {
     });
   },
   methods: {
+    updateLoadingStatus(status){
+      this.loadingStep = status
+    },
     hasNMRiumInfo(study) {
       let info = true;
       study.datasets.forEach((ds) => {
@@ -1780,20 +1738,20 @@ export default {
     },
     updateProject() {
       this.loadingStep = true;
-      this.updateProjectForm.name = this.project.name
-      this.updateProjectForm.owner_id = this.project.owner_id
-      this.updateProjectForm.license_id = this.updateProjectForm.license.id
-      this.updateProjectForm.team_id = this.project.team_id
-      this.updateProjectForm.description = this.project.description
-        this.updateProjectForm.post(route("dashboard.project.update", this.project.id), {
-          preserveScroll: true,
-          onSuccess: () => {
-            this.loadingStep = false;
-          },
-          onError: (err) => {
-            this.loadingStep = false;
-          },
-        });
+      this.updateProjectForm.name = this.project.name;
+      this.updateProjectForm.owner_id = this.project.owner_id;
+      this.updateProjectForm.license_id = this.updateProjectForm.license.id;
+      this.updateProjectForm.team_id = this.project.team_id;
+      this.updateProjectForm.description = this.project.description;
+      this.updateProjectForm.post(route("dashboard.project.update", this.project.id), {
+        preserveScroll: true,
+        onSuccess: () => {
+          this.loadingStep = false;
+        },
+        onError: (err) => {
+          this.loadingStep = false;
+        },
+      });
     },
 
     loadLicenses() {
@@ -1835,6 +1793,7 @@ export default {
         console.log(molecule);
       }
     },
+
     saveMolecule() {
       let mol = this.editor.getMolFile();
       axios
@@ -1878,6 +1837,7 @@ export default {
         }
       });
     },
+
     closeDraft() {
       this.loadingStep = true;
       axios
@@ -1896,6 +1856,7 @@ export default {
           }
         });
     },
+
     trackProject() {
       axios.get("/projects/" + this.project.id + "/status").then((response) => {
         this.project.status = response.data.status;
@@ -1904,6 +1865,7 @@ export default {
         }
       });
     },
+
     loadSpectra() {
       const iframe = window.frames.submissionNMRiumIframe;
       this.currentMolecules = [];
@@ -1941,13 +1903,16 @@ export default {
         }
       }
     },
+
     openSelectDraftsView() {
       this.currentDraft = null;
     },
+
     selectDataset(dataset) {
       this.selectedDataset = dataset;
       this.loadSpectra();
     },
+
     selectStudy(study) {
       this.selectedStudy = study;
       this.studyName = this.selectedStudy.name;
@@ -1961,157 +1926,11 @@ export default {
       this.studyTags = tags;
       this.selectDataset(this.selectedStudy.datasets[0]);
     },
-    loadFiles(updateStatus) {
-      if (updateStatus) {
-        this.status = "REFRESHING FILES";
-        this.loadDropZone();
-      }
-      axios
-        .get("/dashboard/drafts/" + this.currentDraft.id + "/files")
-        .then((response) => {
-          this.file = response.data.file;
-          this.loadingStep = false;
-          if (updateStatus) {
-            this.status = "UPLOAD COMPLETE";
-            setTimeout(() => {
-              this.status = null;
-            }, 5000);
-          }
-        });
-    },
-    annotate() {
-      this.status = "PROCESSING FILES";
-      axios.get("/dashboard/drafts/" + this.currentDraft.id + "/annotate").then(() => {
-        this.loadFiles(true);
-      });
-    },
-    precentageUpload(a, b) {
-      return (parseInt(b) / parseInt(a)) * 100;
-    },
-    processFilesDZL(vm) {
-      vm.batchesCount += 1;
-      const url = "/dashboard/storage/signed-draft-storage-url";
-      const client = axios.create({ baseURL: window.location.origin });
-      axiosRetry(client, {
-        retries: 3,
-        retryCondition: (error) => {
-          return error.response.status === 500;
-        },
-      });
-      client
-        .post(url, {
-          draft_files: vm.filesBatch,
-          destination: vm.$page.props.selectedFolder,
-          draft_id: vm.currentDraft.id,
-        })
-        .catch((err) => {
-          if (err.response.status !== 200 || err.response.status !== 201) {
-            throw new Error(
-              `API call failed with status code: ${err.response.status} after multiple attempts`
-            );
-          }
-        })
-        .then(function (response) {
-          vm.processedBatchesCount += 1;
-          let data = response.data;
-          data.forEach((u) => {
-            let cFile = vm.files.find((f) => f.fullPath == u.fullPath);
-            if (cFile) {
-              let headers = u.headers;
-              if ("Host" in headers) {
-                delete headers.Host;
-              }
-              cFile.uploadURL = u.url;
-              setTimeout(() => vm.dropzone.processFile(cFile));
-            }
-          });
-        });
-      vm.filesBatch = [];
-      vm.count = 0;
-    },
-    loadDropZone() {
-      this.$nextTick(() => {
-        const vm = this;
 
-        vm.$page.props.selectedFileSystemObject = vm.file;
-        vm.$page.props.selectedFolder = "/";
-
-        vm.batchCount = 20;
-        vm.count = 0;
-        vm.processedBatchesCount = 0;
-        vm.batchesCount = 0;
-        vm.filesBatch = [];
-        vm.refreshing = false;
-        vm.files = [];
-        vm.lastStep = false;
-
-        let options = {
-          url: "/",
-          method: "put",
-          sending(file, xhr) {
-            let _send = xhr.send;
-            xhr.send = () => {
-              _send.call(xhr, file);
-            };
-          },
-          autoProcessQueue: false,
-          uploadMultiple: true,
-          disablePreviews: true,
-          parallelUploads: 100,
-          autoQueue: false,
-          maxFiles: 100,
-          dictDefaultMessage: document.querySelector("#submission-dropzone-message")
-            .innerHTML,
-          accept() {
-            vm.loadingStep = true;
-            if (vm.count > vm.batchCount) {
-              vm.processFilesDZL(vm);
-            } else {
-              vm.count += 1;
-            }
-            vm.processedCount += 1;
-          },
-          totaluploadprogress: function (progress) {
-            vm.progress = Math.ceil(progress);
-          },
-        };
-        vm.dropzone = new Dropzone("#submission-dropzone", options);
-        vm.dropzone.on("processing", (file) => {
-          vm.dropzone.options.url = file.uploadURL;
-          vm.status = "UPLOAD IN PROGRESS";
-        });
-        vm.dropzone.on("addedfile", (file) => {
-          vm.files.push(file);
-          if (vm.count <= 100) {
-            vm.filesBatch.push(file);
-          }
-        });
-        vm.dropzone.on("addedfiles", (files) => {
-          if (files.length < vm.batchCount) {
-            vm.batchCount = files.length;
-          }
-        });
-        vm.dropzone.on("success", () => {
-          vm.uploadedFiles += 1;
-          if (vm.batchesCount == vm.processedBatchesCount && vm.filesBatch.length > 0) {
-            vm.lastStep = true;
-            vm.processFilesDZL(vm);
-          }
-          if (
-            vm.batchesCount == vm.processedBatchesCount &&
-            vm.uploadedFiles == vm.dropzone.files.length
-          ) {
-            vm.status = "UPLOAD COMPLETE";
-            vm.$page.props.selectedFileSystemObject = this.files[0];
-            vm.loadingStep = false;
-            vm.annotate();
-          }
-        });
-      });
-    },
     createNewDraft() {
       this.selectDraft(this.defaultDraft);
     },
+
     process() {
       this.loadingStep = true;
       axios
@@ -2131,6 +1950,7 @@ export default {
           }
         });
     },
+
     selectStep(id) {
       this.steps.forEach((step) => {
         if (parseInt(step.id) < id) {
@@ -2142,52 +1962,58 @@ export default {
         }
       });
       if (id == 1) {
-        this.loadingStep = true;
-        this.annotate();
+        // this.loadingStep = true;
+        this.$nextTick(function () {
+          // console.log("hjih")
+          // console.log(this.$refs)
+          this.$refs.fsbRef.annotate();
+        });
       }
     },
+
     toggleOpenCreateDatasetDialog() {
       this.openCreateDatasetDialog = !this.openCreateDatasetDialog;
+      const saveNMRiumUpdates = (e) => {
+        if (e.origin != "https://nmriumdev.nmrxiv.org") {
+          return;
+        }
+        if (e.data.type == "nmr-wrapper:dataChange") {
+          let actionType = e.data.data.actionType;
 
-      if (this.openCreateDatasetDialog) {
-        const saveNMRiumUpdates = (e) => {
-          if (e.origin != "https://nmriumdev.nmrxiv.org") {
+          if (
+            actionType == "" ||
+            (actionType == "INITIATE" &&
+              this.selectedDataset &&
+              this.selectedDataset.type != null)
+          ) {
             return;
           }
-          if (e.data.type == "nmr-wrapper:dataChange") {
-            let actionType = e.data.data.actionType;
 
-            if (
-              actionType == "" ||
-              (actionType == "INITIATE" &&
-                this.selectedDataset &&
-                this.selectedDataset.type != null)
-            ) {
-              return;
-            }
-
-            this.selectedSpectraData = e.data.data.data.find(
-              (d) => d.info.type == "NMR Spectrum"
-            );
-            if (
-              actionType == "ADD_MOLECULE" ||
-              actionType == "DELETE_MOLECULE" ||
-              e.data.data.molecules
-            ) {
-              this.currentMolecules = e.data.data.molecules;
-            }
-            this.updateDataSet();
+          this.selectedSpectraData = e.data.data.data.find(
+            (d) => d.info.type == "NMR Spectrum"
+          );
+          if (
+            actionType == "ADD_MOLECULE" ||
+            actionType == "DELETE_MOLECULE" ||
+            e.data.data.molecules
+          ) {
+            this.currentMolecules = e.data.data.molecules;
           }
-        };
+          this.updateDataSet();
+        }
+      };
 
+      if (this.openCreateDatasetDialog) {
         if (!this.$props.eventRegistered) {
           window.addEventListener("message", saveNMRiumUpdates);
           this.$props.eventRegistered = true;
         }
       } else {
         window.removeEventListener("message", saveNMRiumUpdates);
+        this.$props.eventRegistered = false;
       }
     },
+
     updateDataSet() {
       if (this.selectedSpectraData != null) {
         this.autoSaving = true;
@@ -2202,10 +2028,12 @@ export default {
           });
       }
     },
+
     fetchDrafts() {
       this.loading = true;
       return axios.get("/dashboard/drafts");
     },
+
     selectDraft(draft) {
       this.currentDraft = draft;
       this.draftName = this.currentDraft.name;
@@ -2227,17 +2055,21 @@ export default {
     currentStep() {
       return this.steps.filter((s) => s.status == "current")[0];
     },
+
     currentTab() {
       return this.tabs.find((t) => t.current);
     },
+
     nmriumURL() {
       return this.$page.props.nmriumURL
         ? String(this.$page.props.nmriumURL + "?workspace=embedded&id=" + Math.random())
         : "http://nmriumdev.nmrxiv.org?workspace=embedded&id=" + Math.random();
     },
+
     url() {
       return String(this.$page.props.url);
     },
+
     getMax() {
       if (this.selectedStudy) {
         let totalCount = 0;
