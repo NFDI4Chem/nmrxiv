@@ -613,6 +613,7 @@
               Get started
             </Link>
             <a
+              target="_blank"
               href="//docs.nmrxiv.org"
               class="flex items-center justify-center px-4 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-teal-800 bg-teal-50 hover:text-white hover:bg-teal-100"
             >
@@ -673,12 +674,13 @@
                 </h3>
                 <ul role="list" class="mt-4 space-y-4">
                   <li v-for="item in footerNavigation.support" :key="item.name">
-                    <Link
+                    <a
+                      target="_blank"
                       :href="item.href"
                       class="text-base text-gray-500 hover:text-gray-900"
                     >
                       {{ item.name }}
-                    </Link>
+                    </a>
                   </li>
                 </ul>
               </div>
@@ -690,12 +692,13 @@
                 </h3>
                 <ul role="list" class="mt-4 space-y-4">
                   <li v-for="item in footerNavigation.About" :key="item.name">
-                    <Link
+                    <a
+                      target="_blank"
                       :href="item.href"
                       class="text-base text-gray-500 hover:text-gray-900"
                     >
                       {{ item.name }}
-                    </Link>
+                    </a>
                   </li>
                 </ul>
               </div>
@@ -756,7 +759,7 @@
           class="mt-12 border-t border-gray-200 pt-8 md:flex md:items-center md:justify-between lg:mt-16"
         >
           <div class="flex space-x-6 md:order-2">
-            <Link
+            <a
               v-for="item in footerNavigation.social"
               :key="item.name"
               :href="item.href"
@@ -764,7 +767,7 @@
             >
               <span class="sr-only">{{ item.name }}</span>
               <component :is="item.icon" class="h-6 w-6" aria-hidden="true" />
-            </Link>
+            </a>
           </div>
           <p class="mt-8 text-base text-gray-400 md:mt-0 md:order-1">
             &copy; 2022 nmrXiv, Inc. All rights reserved.
