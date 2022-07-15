@@ -308,7 +308,7 @@ export default {
       })
     if(this.project.license_id){
       axios
-      .get(route("console.license.getLicensebyId",this.project.license_id))
+      .get(route("license",this.project.license_id))
       .then((res) => {
         this.createStudyForm.license = res.data[0];
       })
