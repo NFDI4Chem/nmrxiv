@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\StudyInvitation;
 use App\Actions\Study\AddStudyMember;
+use App\Models\StudyInvitation;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
 class StudyInvitationController extends Controller

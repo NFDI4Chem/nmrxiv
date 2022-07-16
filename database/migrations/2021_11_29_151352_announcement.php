@@ -13,7 +13,7 @@ class Announcement extends Migration
      */
     public function up()
     {
-        Schema::create('announcements', function(Blueprint $table) {
+        Schema::create('announcements', function (Blueprint $table) {
             $table->id();
             $table->string('title');
             $table->text('message');

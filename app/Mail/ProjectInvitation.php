@@ -2,12 +2,12 @@
 
 namespace App\Mail;
 
+use App\Models\ProjectInvitation as ProjectInvitationModel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\URL;
-use App\Models\ProjectInvitation as ProjectInvitationModel;
 
 class ProjectInvitation extends Mailable implements ShouldQueue
 {

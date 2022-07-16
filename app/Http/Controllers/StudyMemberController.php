@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Study;
 use App\Actions\Study\InviteStudyMember;
-use App\Actions\Study\UpdateStudyMemberRole;
 use App\Actions\Study\RemoveStudyMember;
+use App\Actions\Study\UpdateStudyMemberRole;
+use App\Models\Study;
 use App\Models\User;
+use Illuminate\Http\Request;
 
 class StudyMemberController extends Controller
 {
@@ -29,7 +29,7 @@ class StudyMemberController extends Controller
             $request->role,
             $request->message
         );
-    
+
         return back(303);
     }
 

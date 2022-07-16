@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use Aws\S3\S3Client;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Http\Request;
+use App\Models\Draft;
 use App\Models\FileSystemObject;
-use Illuminate\Support\Facades\DB;
 use App\Models\Project;
 use App\Models\Study;
-use App\Models\Draft;
+use Aws\S3\S3Client;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class FileSystemController extends Controller
 {
@@ -28,49 +28,48 @@ class FileSystemController extends Controller
 
         $filesURLs = [];
 
-        foreach($files as $file){
-
+        foreach ($files as $file) {
             $relativefilePath = null;
 
             DB::transaction(function () use ($request, &$filePath, $file, &$relativefilePath) {
                 $destination = $request->get('destination');
-    
+
                 $draft = Draft::find($request->get('draft_id'));
-    
+
                 $path = null;
-    
+
                 if (array_key_exists('fullPath', $file)) {
                     $path = $file['fullPath'];
                 }
-    
-                $hasDirectories = $path || $destination != '/' ? true : false;
-    
-                $filename = "/" . $file['upload']['filename'];
-    
-                $user = $request->user();
-    
-                $level = 0;
-    
-                $currentLevel = $level;
-    
-                $relativefilePath = $path ? $path : $filename;
-    
-                $relativefilePath = $destination . '/' . $relativefilePath;
 
-                $path = $destination . '/' . $path;
-    
+                $hasDirectories = $path || $destination != '/' ? true : false;
+
+                $filename = '/'.$file['upload']['filename'];
+
+                $user = $request->user();
+
+                $level = 0;
+
+                $currentLevel = $level;
+
+                $relativefilePath = $path ? $path : $filename;
+
+                $relativefilePath = $destination.'/'.$relativefilePath;
+
+                $path = $destination.'/'.$path;
+
                 $environment = env('APP_ENV', 'local');
-    
+
                 $filePath = preg_replace(
                     '~//+~',
                     '/',
-                        '/' .
-                        $draft->path .
+                        '/'.
+                        $draft->path.
                         '/'
                         .
                         $relativefilePath
                 );
-    
+
                 if ($hasDirectories) {
                     $directories = array_values(
                         array_filter(
@@ -83,7 +82,7 @@ class FileSystemController extends Controller
                             $currentLevel < $level + count($directories) - 1;
                             $currentLevel++
                         ) {
-                            $dPath = join(
+                            $dPath = implode(
                                 '/',
                                 array_slice($directories, 0, $currentLevel)
                             );
@@ -91,9 +90,9 @@ class FileSystemController extends Controller
                                 preg_replace(
                                     '~//+~',
                                     '/',
-                                    '/' .
-                                        $dPath .
-                                        '/' .
+                                    '/'.
+                                        $dPath.
+                                        '/'.
                                         $directories[$currentLevel]
                                 ),
                                 '/'
@@ -110,8 +109,8 @@ class FileSystemController extends Controller
                                     'path' => preg_replace(
                                         '~//+~',
                                         '/',
-                                            '/' .
-                                            $draft->path .
+                                            '/'.
+                                            $draft->path.
                                             '/'
                                             .
                                             $rURL
@@ -123,8 +122,8 @@ class FileSystemController extends Controller
                                     'level' => $currentLevel,
                                 ]
                             );
-    
-                            $dPath = join(
+
+                            $dPath = implode(
                                 '/',
                                 array_slice($directories, 0, $currentLevel + 1)
                             );
@@ -132,13 +131,13 @@ class FileSystemController extends Controller
                                 preg_replace(
                                     '~//+~',
                                     '/',
-                                    '/' .
-                                        $dPath .
-                                        '/' .
+                                    '/'.
+                                        $dPath.
+                                        '/'.
                                         $directories[$currentLevel + 1]
                                 ),
                                 '/'
-                            ); 
+                            );
                             $childFileSystemObject = FileSystemObject::firstOrCreate(
                                 [
                                     'name' => $directories[$currentLevel + 1],
@@ -146,14 +145,13 @@ class FileSystemController extends Controller
                                         $directories[$currentLevel + 1],
                                         '-'
                                     ),
-                                    'description' =>
-                                        $directories[$currentLevel + 1],
+                                    'description' => $directories[$currentLevel + 1],
                                     'relative_url' => $rURL,
                                     'path' => preg_replace(
                                         '~//+~',
                                         '/',
-                                            '/' .
-                                            $draft->path .
+                                            '/'.
+                                            $draft->path.
                                             '/'
                                             .
                                             $rURL
@@ -165,7 +163,7 @@ class FileSystemController extends Controller
                                     'level' => $currentLevel + 1,
                                 ]
                             );
-                            if (!$childFileSystemObject->parent_id) {
+                            if (! $childFileSystemObject->parent_id) {
                                 $childFileSystemObject->parent_id =
                                     $parentFileSystemObject->id;
                                 $childFileSystemObject->save();
@@ -174,7 +172,7 @@ class FileSystemController extends Controller
                             }
                         }
                     } else {
-                        $dPath = join(
+                        $dPath = implode(
                             '/',
                             array_slice($directories, 0, $currentLevel)
                         );
@@ -182,7 +180,7 @@ class FileSystemController extends Controller
                             preg_replace(
                                 '~//+~',
                                 '/',
-                                '/' . $dPath . '/' . $directories[$currentLevel]
+                                '/'.$dPath.'/'.$directories[$currentLevel]
                             ),
                             '/'
                         );
@@ -191,11 +189,11 @@ class FileSystemController extends Controller
                             'slug' => Str::slug($directories[$currentLevel], '-'),
                             'description' => $directories[$currentLevel],
                             'relative_url' => $rURL,
-                            'path' =>  preg_replace(
+                            'path' => preg_replace(
                                 '~//+~',
                                 '/',
-                                    '/' .
-                                    $draft->path .
+                                    '/'.
+                                    $draft->path.
                                     '/'
                                     .
                                     $rURL
@@ -208,18 +206,18 @@ class FileSystemController extends Controller
                         ]);
                     }
                 }
-    
+
                 if ($hasDirectories) {
                     $childFileSystemObject->has_children = 1;
                     $childFileSystemObject->save();
                 }
-    
+
                 $filename = preg_replace(
                     '~/~',
                     '',
                     $filename
                 );
-    
+
                 $fileFileSystemObject = FileSystemObject::firstOrCreate([
                     'name' => $filename,
                     'slug' => Str::slug($filename, '-'),
@@ -238,8 +236,6 @@ class FileSystemController extends Controller
                         ? $childFileSystemObject->id
                         : null,
                 ]);
-
-
             }, 5);
 
             $bucket =
@@ -281,11 +277,9 @@ class FileSystemController extends Controller
      */
     public function signedStorageURL(Request $request)
     {
-
         $filePath = null;
 
         DB::transaction(function () use ($request, &$filePath) {
-            
             $file = $request->get('file');
 
             $destination = $request->get('destination');
@@ -302,7 +296,7 @@ class FileSystemController extends Controller
 
             $hasDirectories = $path || $destination != '/' ? true : false;
 
-            $filename = "/" . $file['upload']['filename'];
+            $filename = '/'.$file['upload']['filename'];
 
             $user = $request->user();
 
@@ -312,19 +306,19 @@ class FileSystemController extends Controller
 
             $relativefilePath = $path ? $path : $filename;
 
-            $relativefilePath = $destination . '/' . $relativefilePath;
-            $path = $destination . '/' . $path;
+            $relativefilePath = $destination.'/'.$relativefilePath;
+            $path = $destination.'/'.$path;
 
             $environment = env('APP_ENV', 'local');
 
             $filePath = preg_replace(
                 '~//+~',
                 '/',
-                $environment .
-                    '/' .
-                    $project->uuid .
-                    '/' .
-                    $study->uuid .
+                $environment.
+                    '/'.
+                    $project->uuid.
+                    '/'.
+                    $study->uuid.
                     $relativefilePath
             );
 
@@ -340,7 +334,7 @@ class FileSystemController extends Controller
                         $currentLevel < $level + count($directories) - 1;
                         $currentLevel++
                     ) {
-                        $dPath = join(
+                        $dPath = implode(
                             '/',
                             array_slice($directories, 0, $currentLevel)
                         );
@@ -356,9 +350,9 @@ class FileSystemController extends Controller
                                     preg_replace(
                                         '~//+~',
                                         '/',
-                                        '/' .
-                                            $dPath .
-                                            '/' .
+                                        '/'.
+                                            $dPath.
+                                            '/'.
                                             $directories[$currentLevel]
                                     ),
                                     '/'
@@ -372,7 +366,7 @@ class FileSystemController extends Controller
                             ]
                         );
 
-                        $dPath = join(
+                        $dPath = implode(
                             '/',
                             array_slice($directories, 0, $currentLevel + 1)
                         );
@@ -383,15 +377,14 @@ class FileSystemController extends Controller
                                     $directories[$currentLevel + 1],
                                     '-'
                                 ),
-                                'description' =>
-                                    $directories[$currentLevel + 1],
+                                'description' => $directories[$currentLevel + 1],
                                 'relative_url' => rtrim(
                                     preg_replace(
                                         '~//+~',
                                         '/',
-                                        '/' .
-                                            $dPath .
-                                            '/' .
+                                        '/'.
+                                            $dPath.
+                                            '/'.
                                             $directories[$currentLevel + 1]
                                     ),
                                     '/'
@@ -404,7 +397,7 @@ class FileSystemController extends Controller
                                 'level' => $currentLevel + 1,
                             ]
                         );
-                        if (!$childFileSystemObject->parent_id) {
+                        if (! $childFileSystemObject->parent_id) {
                             $childFileSystemObject->parent_id =
                                 $parentFileSystemObject->id;
                             $childFileSystemObject->save();
@@ -413,7 +406,7 @@ class FileSystemController extends Controller
                         }
                     }
                 } else {
-                    $dPath = join(
+                    $dPath = implode(
                         '/',
                         array_slice($directories, 0, $currentLevel)
                     );
@@ -425,7 +418,7 @@ class FileSystemController extends Controller
                             preg_replace(
                                 '~//+~',
                                 '/',
-                                '/' . $dPath . '/' . $directories[$currentLevel]
+                                '/'.$dPath.'/'.$directories[$currentLevel]
                             ),
                             '/'
                         ),
@@ -529,8 +522,7 @@ class FileSystemController extends Controller
     protected function headers(Request $request, $signedRequest)
     {
         return array_merge($signedRequest->getHeaders(), [
-            'Content-Type' =>
-                $request->input('content_type') ?: 'application/octet-stream',
+            'Content-Type' => $request->input('content_type') ?: 'application/octet-stream',
         ]);
     }
 

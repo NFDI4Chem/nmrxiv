@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ProjectInvitation;
 use App\Actions\Project\AddProjectMember;
+use App\Models\ProjectInvitation;
 use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class ProjectInvitationController extends Controller
 {

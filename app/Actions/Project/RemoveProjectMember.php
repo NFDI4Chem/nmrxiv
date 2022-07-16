@@ -2,11 +2,11 @@
 
 namespace App\Actions\Project;
 
+use App\Events\ProjectMemberRemoved;
+use App\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
-use App\Events\ProjectMemberRemoved;
-use App\Models\User;
 
 class RemoveProjectMember
 {

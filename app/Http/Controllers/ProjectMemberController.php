@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Actions\Project\InviteProjectMember;
-use App\Actions\Project\UpdateProjectMemberRole;
 use App\Actions\Project\RemoveProjectMember;
+use App\Actions\Project\UpdateProjectMemberRole;
 use App\Models\Project;
 use App\Models\User;
+use Illuminate\Http\Request;
 
 class ProjectMemberController extends Controller
 {
@@ -29,7 +29,7 @@ class ProjectMemberController extends Controller
             $request->role,
             $request->message
         );
-    
+
         return back(303);
     }
 

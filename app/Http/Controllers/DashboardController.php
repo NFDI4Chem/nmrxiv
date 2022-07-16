@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Project;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class DashboardController extends Controller
@@ -13,10 +13,10 @@ class DashboardController extends Controller
         $user = $request->user();
         $team = $user->currentTeam;
         $projects = [];
-        
+
         if ($team) {
             $team->users = $team->allUsers();
-            if (!$team->personal_team) {
+            if (! $team->personal_team) {
                 $projects = Project::with('users', 'owner')->where('team_id', $team->id)->get();
             } else {
                 $projects = Project::with('users', 'owner')->where('owner_id', $user->id)
@@ -28,7 +28,7 @@ class DashboardController extends Controller
         return Inertia::render('Dashboard', [
             'team' => $team,
             'projects' => $projects,
-            'teamRole' => $user->teamRole($team)
+            'teamRole' => $user->teamRole($team),
         ]);
     }
 
@@ -76,7 +76,7 @@ class DashboardController extends Controller
 
         $projects = $user->projects->load('owner');
 
-        foreach($user->allTeams() as $team){
+        foreach ($user->allTeams() as $team) {
             $projects = $projects->concat($team->projects->load('owner'));
         }
 
@@ -93,15 +93,14 @@ class DashboardController extends Controller
     public function onboardingStatus(Request $request, $status)
     {
         $user = $request->user();
-        
-        if($user){
-            if($status == 'complete'){
+
+        if ($user) {
+            if ($status == 'complete') {
                 $user->onboarded = true;
                 $user->save();
+
                 return $user;
             }
         }
     }
-
-    
 }

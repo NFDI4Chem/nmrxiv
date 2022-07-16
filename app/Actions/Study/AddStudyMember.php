@@ -2,10 +2,10 @@
 
 namespace App\Actions\Study;
 
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Validator;
 use App\Events\AddingStudyMember;
 use App\Events\StudyMemberAdded;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Validator;
 use Laravel\Jetstream\Jetstream;
 use Laravel\Jetstream\Rules\Role;
 
@@ -33,7 +33,7 @@ class AddStudyMember
         $study->users()->attach(
             $newStudyMember, ['role' => $role]
         );
-        
+
         StudyMemberAdded::dispatch($study, $newStudyMember);
     }
 

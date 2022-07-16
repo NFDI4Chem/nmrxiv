@@ -136,7 +136,7 @@
         <div v-else>
           <div v-if="currentStep">
             <div id="submission-dropzone" v-if="currentStep.id == '01'">
-              <div style="height: 75vh; overflow-y: scroll" v-if="currentDraft">
+              <div v-if="currentDraft">
                 <div class="mb-3">
                   <label
                     for="project-name"
@@ -197,7 +197,7 @@
                 <div>
                   <div>
                     <small class="cursor-pointer">Draft ID: {{ currentDraft.key }}</small>
-                    <div style="height: 40vh; overflow: scroll !important">
+                    <div>
                       <file-system-browser
                         @loading="updateLoadingStatus"
                         :readonly="false"
@@ -1104,8 +1104,8 @@
                           management, sharing and analysis of NMR data.
                         </p>
                       </div>
-                      <div class="mt-5">
-                        <table class="min-w-full rounded border divide-y divide-gray-300">
+                      <div class="mt-5 overflow-auto">
+                        <table class="min-w-full rounded border divide-y divide-gray-300 ">
                           <thead class="bg-gray-50">
                             <tr>
                               <th

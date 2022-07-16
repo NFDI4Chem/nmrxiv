@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Dataset;
 use App\Models\FileSystemObject;
-use Inertia\Inertia;
 use Aws\S3\S3Client;
-use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
 use ZipStream;
 
 class DatasetController extends Controller
@@ -26,25 +25,26 @@ class DatasetController extends Controller
 
     public function nmriumInfo(Request $request, Dataset $dataset)
     {
-        if($dataset){
+        if ($dataset) {
             $spectra = $request->get('spectra');
             $nmriumInfo = json_encode($spectra);
             $molecules = $request->get('molecules');
             $molecularInfo = json_encode($molecules);
-            if($dataset->nmriumInfo){
+            if ($dataset->nmriumInfo) {
                 $nmriumData = $dataset->nmriumInfo;
-            }else{
+            } else {
                 $nmriumData = [];
             }
-            if($nmriumInfo){
+            if ($nmriumInfo) {
                 $nmriumData['spectra'] = $nmriumInfo;
             }
-            if($molecularInfo){
+            if ($molecularInfo) {
                 $nmriumData['molecules'] = $molecularInfo;
             }
             $dataset->nmrium_info = $nmriumData;
             $dataset->type = $spectra['info']['nucleus'];
             $dataset->save();
+
             return $dataset->fresh();
         }
     }
@@ -65,7 +65,7 @@ class DatasetController extends Controller
 
         $command = $s3Client->getCommand('ListObjects');
         $command['Bucket'] = $bucket;
-        $command['Prefix'] = $path . '/';
+        $command['Prefix'] = $path.'/';
 
         $result = $s3Client->execute($command);
 
@@ -78,7 +78,7 @@ class DatasetController extends Controller
         $s3Client->registerStreamWrapper();
 
         return response()->stream(
-            function () use ($s3keys, $s3Client, $bucket, $fsObj, $dataset) {
+            function () use ($s3keys, $bucket, $fsObj, $dataset) {
                 $options = new \ZipStream\Option\Archive();
                 $options->setContentType('application/octet-stream');
                 $options->setZeroHeader(true);
@@ -88,11 +88,11 @@ class DatasetController extends Controller
 
                 foreach ($s3keys as $key) {
                     $fileName = basename($key);
-                    $s3path = 's3://' . $bucket . '/' . $key;
+                    $s3path = 's3://'.$bucket.'/'.$key;
                     if ($streamRead = fopen($s3path, 'r')) {
-                        $zip->addFileFromStream($fsObj->key . '/' . explode( '/' . $dataset->study->name . '/' . $fsObj->key . '/', $key)[1], $streamRead);
+                        $zip->addFileFromStream($fsObj->key.'/'.explode('/'.$dataset->study->name.'/'.$fsObj->key.'/', $key)[1], $streamRead);
                     } else {
-                        die('Could not open stream for reading');
+                        exit('Could not open stream for reading');
                     }
                 }
 
@@ -101,7 +101,7 @@ class DatasetController extends Controller
             200,
             [
                 'Access-Control-Allow-Origin' => '*',
-                'Content-Disposition' => 'attachment;filename="'. $dataset->name .'.zip"',
+                'Content-Disposition' => 'attachment;filename="'.$dataset->name.'.zip"',
                 'Content-Type' => 'application/octet-stream',
             ]
         );

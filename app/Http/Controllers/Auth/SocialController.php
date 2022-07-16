@@ -2,16 +2,14 @@
 
 namespace App\Http\Controllers\Auth;
 
-use DB;
-use Illuminate\Support\Facades\Auth;
-use App\Models\User;
-use App\Models\Team;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Laravel\Socialite\Facades\Socialite;
-use Illuminate\Auth\Events\Registered;
 use App\Models\LinkedSocialAccount;
+use App\Models\Team;
+use App\Models\User;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\InvalidStateException;
 
 class SocialController extends Controller
@@ -23,9 +21,9 @@ class SocialController extends Controller
      */
     public function redirectToProvider($service)
     {
-        if($service == 'orcid'){
-            return Socialite::driver('orcid')->scopes(['/authenticate','openid','/read-limited'])->redirect();
-        }else{
+        if ($service == 'orcid') {
+            return Socialite::driver('orcid')->scopes(['/authenticate', 'openid', '/read-limited'])->redirect();
+        } else {
             return Socialite::driver($service)->redirect();
         }
     }
@@ -54,14 +52,14 @@ class SocialController extends Controller
         } else {
             if ($email = $providerUser->getEmail()) {
                 $user = User::where('email', $email)->first();
-            }else{
+            } else {
                 return Redirect::route('login')->with('message', 'We require your email id to communicate. Please enable email sharing on your ORCID account and try again.');
             }
-            if (!$user) {
+            if (! $user) {
                 $user = tap(User::create([
-                    'first_name' =>  explode(' ', $providerUser->getName(), 2)[0],
-                    'last_name' =>  explode(' ', $providerUser->getName(), 2)[1],
-                    'email' => $providerUser->getEmail()
+                    'first_name' => explode(' ', $providerUser->getName(), 2)[0],
+                    'last_name' => explode(' ', $providerUser->getName(), 2)[1],
+                    'email' => $providerUser->getEmail(),
                 ]), function (User $user) {
                     $user->ownedTeams()->save(Team::forceCreate([
                         'user_id' => $user->id,
@@ -77,6 +75,7 @@ class SocialController extends Controller
             event(new Registered($user));
         }
         Auth::login($user);
+
         return redirect('/dashboard');
     }
 }

@@ -20,7 +20,7 @@ class FileSystemObject extends Model
         'compressionInfo',
         'kernelSessionInfo',
         'color',
-        'starred', 
+        'starred',
         'is_public',
         'is_deleted',
         'is_archived',
@@ -40,7 +40,7 @@ class FileSystemObject extends Model
         'settings',
         'info',
         'level',
-        'has_children'
+        'has_children',
     ];
 
     public function children()
