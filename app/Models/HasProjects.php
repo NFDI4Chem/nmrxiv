@@ -2,9 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Str;
-use Laravel\Sanctum\HasApiTokens;
-
 trait HasProjects
 {
     /**
@@ -34,9 +31,8 @@ trait HasProjects
      */
     public function recentProjects()
     {
-        return $this->projects()->orderBy('updated_at','DESC');
+        return $this->projects()->orderBy('updated_at', 'DESC');
     }
-
 
     /**
      * Determine if the user belongs to the given project.
@@ -50,7 +46,7 @@ trait HasProjects
             return false;
         }
 
-        return ($this->hasProjectRole($project, 'creator') || $this->hasProjectRole($project, 'owner') || $this->hasProjectRole($project, 'collaborator') || $this->hasProjectRole($project, 'reviewer'));
+        return $this->hasProjectRole($project, 'creator') || $this->hasProjectRole($project, 'owner') || $this->hasProjectRole($project, 'collaborator') || $this->hasProjectRole($project, 'reviewer');
     }
 
     /**
@@ -64,7 +60,7 @@ trait HasProjects
         if (is_null($project)) {
             return false;
         }
-        
+
         return $this->id == $project->owner_id;
     }
 
@@ -95,8 +91,7 @@ trait HasProjects
             return false;
         }
 
-
-        return ($this->hasProjectRole($project, 'owner') || $this->hasProjectRole($project, 'collaborator'));
+        return $this->hasProjectRole($project, 'owner') || $this->hasProjectRole($project, 'collaborator');
     }
 
     /**
@@ -112,42 +107,40 @@ trait HasProjects
             return false;
         }
 
-        if($role == 'owner'){
-            if($this->isProjectCreator($project)){
+        if ($role == 'owner') {
+            if ($this->isProjectCreator($project)) {
                 return true;
             }
         }
 
-        $id = $this->id; 
+        $id = $this->id;
 
         $projectUser = $project->users->first(function ($u) use ($id) {
             return $u->id === $id;
         });
 
-        if (!is_null($projectUser)){
-            if($projectUser->projectMembership->role == $role){
+        if (! is_null($projectUser)) {
+            if ($projectUser->projectMembership->role == $role) {
                 return true;
-            }else{
+            } else {
                 return false;
             }
         }
 
         $team = $project->team;
 
-        if(!$team->personal_team){
-        
+        if (! $team->personal_team) {
             $teamUser = $team->allUsers()->first(function ($u) use ($id) {
                 return $u->id === $id;
             });
-        
-            if (!is_null($teamUser)){
-                if($teamUser->projectMembership->role == $role){
+
+            if (! is_null($teamUser)) {
+                if ($teamUser->projectMembership->role == $role) {
                     return true;
-                }else{
+                } else {
                     return false;
                 }
             }
-
         }
 
         return false;

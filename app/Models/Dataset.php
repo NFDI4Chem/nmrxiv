@@ -9,7 +9,6 @@ use OwenIt\Auditing\Contracts\Auditable;
 class Dataset extends Model implements Auditable
 {
     use HasFactory;
-
     use \OwenIt\Auditing\Auditable;
 
     protected $fillable = [
@@ -23,7 +22,7 @@ class Dataset extends Model implements Auditable
         'description',
         'type',
         'uuid',
-        'access', 
+        'access',
         'access_type',
         'team_id',
         'owner_id',
@@ -33,7 +32,7 @@ class Dataset extends Model implements Auditable
         'fs_id',
         'dataset_photo_path',
         'nmrium_info',
-        'license_id'
+        'license_id',
     ];
 
     /**
@@ -48,12 +47,12 @@ class Dataset extends Model implements Auditable
 
     protected function getPublicUrlAttribute()
     {
-        return  env('APP_URL', null)."/datasets/".urlencode($this->slug);
+        return  env('APP_URL', null).'/datasets/'.urlencode($this->slug);
     }
 
     protected function getPrivateUrlAttribute()
     {
-        return  env('APP_URL', null)."/datasets/".urlencode($this->url);
+        return  env('APP_URL', null).'/datasets/'.urlencode($this->url);
     }
 
     public function study()
@@ -80,6 +79,7 @@ class Dataset extends Model implements Auditable
     {
         return $this->belongsTo(Team::class, 'Team_id');
     }
+
     /**
      * Get the license of the dataset.
      *

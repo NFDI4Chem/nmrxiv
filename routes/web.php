@@ -1,40 +1,38 @@
 <?php
 
 use App\Http\Controllers\Admin\AnnouncementController;
-use App\Http\Controllers\Auth\SocialController;
 use App\Http\Controllers\Admin\ConsoleController;
-use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\Admin\LicenseController;
+use App\Http\Controllers\Admin\UsersController;
+use App\Http\Controllers\Auth\SocialController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DatasetController;
+use App\Http\Controllers\DraftController;
+use App\Http\Controllers\FileSystemController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectInvitationController;
 use App\Http\Controllers\ProjectMemberController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\DatasetController;
-use App\Http\Controllers\FileSystemController;
 use App\Http\Controllers\StudyController;
 use App\Http\Controllers\StudyInvitationController;
 use App\Http\Controllers\StudyMemberController;
-use App\Http\Controllers\DraftController;
 use Illuminate\Foundation\Application;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Project;
+use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::group([
-    'prefix' => 'auth'
+    'prefix' => 'auth',
 ], function () {
     Route::get('/login/{service}', [SocialController::class, 'redirectToProvider']);
-    Route::get('/login/{service}/callback', [SocialController::class, 'handleProviderCallback']);    
+    Route::get('/login/{service}/callback', [SocialController::class, 'handleProviderCallback']);
     Route::get('/checkPassword', [UsersController::class, 'checkPassword'])
-        ->name('auth.checkPassword'); 
+        ->name('auth.checkPassword');
 });
 
 Route::get('/', function () {
     if (Auth::check()) {
         return redirect()->route('dashboard');
-    }else{
+    } else {
         return Inertia::render('Welcome', [
             'canLogin' => Route::has('login'),
             'canRegister' => Route::has('register'),
@@ -70,7 +68,7 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
 
     Route::post('/onboarding/{status}', [DashboardController::class, 'onboardingStatus'])
             ->name('onboarding.complete');
-    
+
     Route::get('projects/{project}/toggleUpVote', [ProjectController::class, 'toggleUpVote'])
             ->name('project.toggle-upvote');
 
@@ -80,7 +78,7 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::get('dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
 
     Route::group([
-        'prefix' => 'dashboard'
+        'prefix' => 'dashboard',
     ], function () {
         Route::get('ssubmission', [DashboardController::class, 'dashboard'])
             ->name('submission');
@@ -92,12 +90,12 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
             ->name('trashed');
         Route::get('recent', [DashboardController::class, 'recent'])
             ->name('recent');
-            
-        Route::post('/storage/signed-draft-storage-url',  [FileSystemController::class, 'signedDraftStorageURL']);
-        Route::post('/storage/signed-storage-url',  [FileSystemController::class, 'signedStorageURL']);
 
-        Route::get('/drafts',  [DraftController::class, 'all']);
-        
+        Route::post('/storage/signed-draft-storage-url', [FileSystemController::class, 'signedDraftStorageURL']);
+        Route::post('/storage/signed-storage-url', [FileSystemController::class, 'signedStorageURL']);
+
+        Route::get('/drafts', [DraftController::class, 'all']);
+
         Route::get('projects/{project}', [ProjectController::class, 'show'])
             ->name('dashboard.projects');
         Route::get('projects/{project}/settings', [ProjectController::class, 'settings'])
@@ -123,7 +121,7 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
             ->name('project-invitations.accept');
         Route::delete('/project-invitations/{invitation}', [ProjectInvitationController::class, 'destroyInvitation'])
             ->name('project-invitations.destroy');
-        
+
         Route::get('studies/{study}', [StudyController::class, 'show'])
             ->name('dashboard.studies');
         Route::get('studies/{study}/files', [StudyController::class, 'files'])
@@ -157,7 +155,6 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
         Route::delete('/study-invitations/{invitation}', [StudyInvitationController::class, 'destroyInvitation'])
             ->name('study-invitations.destroy');
 
-
         Route::post('datasets/{dataset}/nmriumInfo', [DatasetController::class, 'nmriumInfo'])
             ->name('dashboard.datasets.nmriumInfo');
 
@@ -167,16 +164,15 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
             ->name('dashboard.draft.annotate');
         Route::post('drafts/{draft}/process', [DraftController::class, 'process'])
             ->name('dashboard.draft.process');
-            Route::post('drafts/{draft}/complete', [DraftController::class, 'complete'])
+        Route::post('drafts/{draft}/complete', [DraftController::class, 'complete'])
             ->name('dashboard.draft.complete');
     });
 });
 
 Route::group([
-    'prefix' => 'admin'
+    'prefix' => 'admin',
 ], function () {
     Route::group(['middleware' => ['auth', 'permission:manage roles|view statistics|manage platform']], function () {
-    
         Route::get('console', [ConsoleController::class, 'index'])
         ->name('console');
 
@@ -184,7 +180,7 @@ Route::group([
             // Users
             Route::get('users', [UsersController::class, 'index'])
             ->name('console.users');
-        
+
             Route::get('users/create', [UsersController::class, 'create'])
             ->name('console.users.create');
 
@@ -212,7 +208,7 @@ Route::group([
             // Announcements
             Route::get('announcements', [AnnouncementController::class, 'index'])
             ->name('console.announcements');
-            
+
             Route::post('announcements/create', [AnnouncementController::class, 'create'])
             ->name('console.announcements.create');
 

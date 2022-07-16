@@ -28,7 +28,7 @@ class Team extends JetstreamTeam
      */
     protected $fillable = [
         'name',
-        'personal_team'
+        'personal_team',
     ];
 
     /**
@@ -51,7 +51,7 @@ class Team extends JetstreamTeam
         'deleted' => TeamDeleted::class,
     ];
 
-     /**
+    /**
      * Get the default team profile photo URL if no profile photo has been uploaded.
      *
      * @return string

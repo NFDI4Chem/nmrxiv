@@ -7,12 +7,14 @@ use Illuminate\Http\Resources\Json\JsonResource;
 class StudyResource extends JsonResource
 {
     private bool $lite = true;
+
     private array $properties = ['sample', 'users', 'license'];
 
     public function lite(bool $lite, array $properties): self
     {
         $this->lite = $lite;
         $this->properties = $properties;
+
         return $this;
     }
 
@@ -29,12 +31,12 @@ class StudyResource extends JsonResource
             'name' => $this->name,
             'slug' => $this->slug,
             'description' => $this->description,
-            'team' => $this->when(!$this->team->personal_team, $this->team),
+            'team' => $this->when(! $this->team->personal_team, $this->team),
             'photo_url' => $this->study_photo_path,
             'tags' => $this->tags,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            $this->mergeWhen(!$this->lite, function () {
+            $this->mergeWhen(! $this->lite, function () {
                 return [
                     $this->mergeWhen(
                         in_array('owner', $this->properties),
@@ -43,10 +45,10 @@ class StudyResource extends JsonResource
                                 'owner' => new UserResource($this->owner),
                             ];
                         }
-                    )
+                    ),
                 ];
             }),
-            $this->mergeWhen(!$this->lite, function () {
+            $this->mergeWhen(! $this->lite, function () {
                 return [
                     $this->mergeWhen(
                         in_array('sample', $this->properties),
@@ -55,43 +57,43 @@ class StudyResource extends JsonResource
                                 'sample' => new SampleResource($this->sample),
                             ];
                         }
-                    )
+                    ),
                 ];
             }),
-            $this->mergeWhen(!$this->lite, function () {
+            $this->mergeWhen(! $this->lite, function () {
                 return [
                     $this->mergeWhen(
                         in_array('users', $this->properties),
                         function () {
                             return [
-                                'users' =>  UserResource::collection($this->allUsers()),
+                                'users' => UserResource::collection($this->allUsers()),
                             ];
                         }
-                    )
+                    ),
                 ];
             }),
-            $this->mergeWhen(!$this->lite, function () {
+            $this->mergeWhen(! $this->lite, function () {
                 return [
                     $this->mergeWhen(
                         in_array('datasets', $this->properties),
                         function () {
                             return [
-                                'datasets' =>  DatasetResource::collection($this->datasets),
+                                'datasets' => DatasetResource::collection($this->datasets),
                             ];
                         }
-                    )
+                    ),
                 ];
             }),
-            $this->mergeWhen(!$this->lite, function () {
+            $this->mergeWhen(! $this->lite, function () {
                 return [
                     $this->mergeWhen(
                         in_array('license', $this->properties),
                         function () {
                             return [
-                                'license' =>  new LicenseResource($this->license),
+                                'license' => new LicenseResource($this->license),
                             ];
                         }
-                    )
+                    ),
                 ];
             }),
         ];

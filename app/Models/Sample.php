@@ -17,7 +17,7 @@ class Sample extends Model
         'source',
         'isa',
         'study_id',
-        'project_id'
+        'project_id',
     ];
 
     public function molecules()
