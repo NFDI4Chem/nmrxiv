@@ -2,22 +2,22 @@
 
 namespace App\Models;
 
+use App\Traits\CacheClear;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use OwenIt\Auditing\Contracts\Auditable;
 use Laravel\Scout\Searchable;
-use App\Models\ProjectInvitation;
 use Maize\Markable\Markable;
-use Maize\Markable\Models\Like;
-use Maize\Markable\Models\Favorite;
 use Maize\Markable\Models\Bookmark;
+use Maize\Markable\Models\Favorite;
+use Maize\Markable\Models\Like;
 use Maize\Markable\Models\Reaction;
-use App\Traits\CacheClear;
+use OwenIt\Auditing\Contracts\Auditable;
 use Spatie\Tags\HasTags;
 
 class Project extends Model implements Auditable
 {
     use CacheClear;
+
     // use Searchable;
     use Markable;
     use HasFactory;
@@ -209,13 +209,14 @@ class Project extends Model implements Auditable
 
     protected function getPublicUrlAttribute()
     {
-        return env('APP_URL', null) . '/projects/' . urlencode($this->slug);
+        return env('APP_URL', null).'/projects/'.urlencode($this->slug);
     }
 
     protected function getPrivateUrlAttribute()
     {
-        return env('APP_URL', null) . '/projects/' . urlencode($this->url);
+        return env('APP_URL', null).'/projects/'.urlencode($this->url);
     }
+
     /**
      * Get the license of the project.
      *

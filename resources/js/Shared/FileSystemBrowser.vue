@@ -44,15 +44,93 @@
         </div>
       </form>
     </div>
-    <children :file="file"></children>
+    <div class="min-w-0 flex-1 border-t border-gray-200 lg:flex">
+      <aside style="height: 40vh !important" class="h-1/2 py-3 px-2 lg:block lg:flex-shrink-0 lg:order-first overflow-y-scroll">
+        <children :file="file"></children>
+      </aside>
+      <section
+        style="height: 40vh !important"
+        class="min-w-0 p-6 h-1/2 flex-1 flex flex-col overflow-y-scroll lg:order-last"
+      >
+        <div
+          class="mb-3"
+          v-if="
+            $page.props.selectedFileSystemObject &&
+            $page.props.selectedFileSystemObject.has_children
+          "
+        >
+          <ul
+            role="list"
+            class="mb-3 grid grid-cols-1 gap-5 sm:gap-6 sm:grid-cols-2 lg:grid-cols-4"
+          >
+            <li
+              v-for="file in $page.props.selectedFileSystemObject.children"
+              :key="file.key"
+              class="relative shadow rounded-lg"
+            >
+              <div
+                class="group block w-full aspect-w-10 aspect-h-7 py-4 bg-gray-100 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 focus-within:ring-indigo-500 overflow-hidden"
+              >
+                <span v-if="file.type == 'directory'">
+                  <FolderIcon
+                    @dblclick.stop="displaySelected(file)"
+                    class="cursor-pointer h-28 w-28 text-gray-400 flex-shrink-0 mx-auto"
+                    aria-hidden="true"
+                  />
+                </span>
+                <span v-else>
+                  <DocumentTextIcon
+                    class="h-28 w-28 text-gray-400 flex-shrink-0 mx-auto"
+                    aria-hidden="true"
+                  />
+                </span>
+              </div>
+              <p
+                class="mt-2 px-2 py-1 block text-sm font-medium text-gray-900 pointer-events-none"
+              >
+                {{ file.name }}
+              </p>
+              <p class="block text-sm font-medium text-gray-500 pointer-events-none">
+                {{ file.size }}
+              </p>
+            </li>
+          </ul>
+        </div>
+        <div v-else>
+          <div class="">
+            <span
+              v-if="
+                $page.props.selectedFileSystemObject &&
+                $page.props.selectedFileSystemObject.type == 'file'
+              "
+            >
+              <File-details :file="$page.props.selectedFileSystemObject"></File-details>
+            </span>
+          </div>
+        </div>
+      </section>
+    </div>
   </div>
 </template>
 <script>
 import { Dropzone } from "dropzone";
 import axiosRetry from "axios-retry";
+import FileDetails from "@/Shared/FileDetails.vue";
+import {
+  FolderIcon,
+  DocumentTextIcon,
+  ChevronRightIcon,
+  HomeIcon,
+} from "@heroicons/vue/solid";
 
 export default {
-  components: {},
+  components: {
+    FolderIcon,
+    DocumentTextIcon,
+    ChevronRightIcon,
+    HomeIcon,
+    FileDetails
+  },
   data() {
     return {
       status: "",
@@ -72,21 +150,21 @@ export default {
     }
   },
   methods: {
-    updateBusyStatus(status){
-      this.busy = status
-      this.$emit('loading', this.busy);
+    updateBusyStatus(status) {
+      this.busy = status;
+      this.$emit("loading", this.busy);
     },
     loadFiles() {
-      this.updateBusyStatus(true)
+      this.updateBusyStatus(true);
       axios.get(this.url).then((response) => {
-        this.updateBusyStatus(false)
+        this.updateBusyStatus(false);
         this.file = response.data.file;
       });
     },
     annotate() {
-      this.updateBusyStatus(true)
+      this.updateBusyStatus(true);
       axios.get("/dashboard/drafts/" + this.draft.id + "/annotate").then(() => {
-        this.updateBusyStatus(false)
+        this.updateBusyStatus(false);
         this.loadFiles();
       });
     },
@@ -181,7 +259,7 @@ export default {
           vm.selectedFSO.push(file);
         });
         vm.dropzone.on("addedfiles", (files) => {
-          this.updateBusyStatus(true)
+          this.updateBusyStatus(true);
           setTimeout(() => {
             var timer = setInterval(function () {
               if (vm.totalFilesCount === vm.selectedFSO.length) {
@@ -205,7 +283,7 @@ export default {
           vm.totalFilesCount = 0;
           vm.uploadedFilesCount = 0;
           vm.status = "UPLOAD COMPLETE";
-          this.updateBusyStatus(false)
+          this.updateBusyStatus(false);
           setTimeout(() => {
             vm.status = null;
           }, 5000);

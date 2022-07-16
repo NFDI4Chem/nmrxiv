@@ -2,9 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Str;
-use Laravel\Sanctum\HasApiTokens;
-
 trait HasStudies
 {
     /**
@@ -34,9 +31,8 @@ trait HasStudies
      */
     public function recentStudies()
     {
-        return $this->studies()->orderBy('updated_at','DESC');
+        return $this->studies()->orderBy('updated_at', 'DESC');
     }
-
 
     /**
      * Determine if the user belongs to the given study.
@@ -50,7 +46,7 @@ trait HasStudies
             return false;
         }
 
-        return ($this->hasStudyRole($study, 'creator') || $this->hasStudyRole($study, 'owner') || $this->hasStudyRole($study, 'collaborator') || $this->hasStudyRole($study, 'reviewer'));
+        return $this->hasStudyRole($study, 'creator') || $this->hasStudyRole($study, 'owner') || $this->hasStudyRole($study, 'collaborator') || $this->hasStudyRole($study, 'reviewer');
     }
 
     /**
@@ -64,7 +60,7 @@ trait HasStudies
         if (is_null($study)) {
             return false;
         }
-        
+
         return $this->id == $study->owner_id;
     }
 
@@ -95,8 +91,7 @@ trait HasStudies
             return false;
         }
 
-
-        return ($this->hasStudyRole($study, 'owner') || $this->hasStudyRole($study, 'collaborator'));
+        return $this->hasStudyRole($study, 'owner') || $this->hasStudyRole($study, 'collaborator');
     }
 
     /**
@@ -112,22 +107,22 @@ trait HasStudies
             return false;
         }
 
-        if($role == 'owner'){
-            if($this->isStudyCreator($study)){
+        if ($role == 'owner') {
+            if ($this->isStudyCreator($study)) {
                 return true;
             }
         }
 
-        $id = $this->id; 
+        $id = $this->id;
 
         $studyUser = $study->users->first(function ($u) use ($id) {
             return $u->id === $id;
         });
 
-        if (!is_null($studyUser)){
-            if($studyUser->studyMembership->role == $role){
+        if (! is_null($studyUser)) {
+            if ($studyUser->studyMembership->role == $role) {
                 return true;
-            }else{
+            } else {
                 return false;
             }
         }
@@ -136,30 +131,28 @@ trait HasStudies
             return $u->id === $id;
         });
 
-        if (!is_null($projectUser)){
-            if($projectUser->projectMembership->role == $role){
+        if (! is_null($projectUser)) {
+            if ($projectUser->projectMembership->role == $role) {
                 return true;
-            }else{
+            } else {
                 return false;
             }
         }
 
         $team = $study->team;
 
-        if(!$team->personal_team){
-        
+        if (! $team->personal_team) {
             $teamUser = $team->allUsers()->first(function ($u) use ($id) {
                 return $u->id === $id;
             });
-        
-            if (!is_null($teamUser)){
-                if($teamUser->studyMembership->role == $role){
+
+            if (! is_null($teamUser)) {
+                if ($teamUser->studyMembership->role == $role) {
                     return true;
-                }else{
+                } else {
                     return false;
                 }
             }
-
         }
 
         return false;

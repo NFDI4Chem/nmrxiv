@@ -2,13 +2,9 @@
 
 namespace App\Actions\Project;
 
-use Illuminate\Support\Facades\Storage;
-use App\Models\Team;
 use App\Models\Project;
-use App\Models\Study;
-use App\Models\Dataset;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
@@ -34,8 +30,8 @@ class UpdateProject
                 $image = $input['photo'];
                 $s3 = Storage::disk('minio_public');
                 $file_name =
-                    uniqid() . '.' . $image->getClientOriginalExtension();
-                $s3filePath = '/projects/' . $file_name;
+                    uniqid().'.'.$image->getClientOriginalExtension();
+                $s3filePath = '/projects/'.$file_name;
                 $s3->put($s3filePath, file_get_contents($image), 'public');
             }
 

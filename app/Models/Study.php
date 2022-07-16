@@ -2,11 +2,10 @@
 
 namespace App\Models;
 
+use App\Traits\CacheClear;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use OwenIt\Auditing\Contracts\Auditable;
-use App\Models\StudyInvitation;
-use App\Traits\CacheClear;
 use Spatie\Tags\HasTags;
 
 class Study extends Model implements Auditable
@@ -27,7 +26,7 @@ class Study extends Model implements Auditable
         'description',
         'type',
         'uuid',
-        'access', 
+        'access',
         'access_type',
         'team_id',
         'draft_id',
@@ -35,7 +34,7 @@ class Study extends Model implements Auditable
         'project_id',
         'fs_id',
         'study_photo_path',
-        'license_id'
+        'license_id',
     ];
 
     /**
@@ -55,12 +54,12 @@ class Study extends Model implements Auditable
 
     protected function getPublicUrlAttribute()
     {
-        return  env('APP_URL', null)."/projects/".urlencode($this->slug);
+        return  env('APP_URL', null).'/projects/'.urlencode($this->slug);
     }
 
     protected function getPrivateUrlAttribute()
     {
-        return  env('APP_URL', null)."/projects/".urlencode($this->url);
+        return  env('APP_URL', null).'/projects/'.urlencode($this->url);
     }
 
     public function draft()
@@ -92,12 +91,12 @@ class Study extends Model implements Auditable
     public function userStudyRole(string $email)
     {
         $user = $this->userWithEmail($email);
-        if($user){
-            if($user['studyMembership']){
+        if ($user) {
+            if ($user['studyMembership']) {
                 return $user['studyMembership']['role'];
-            }elseIf($user['projectMembership']){
+            } elseif ($user['projectMembership']) {
                 return $user['projectMembership']['role'];
-            }elseIf($this->owner_id == $user->id){
+            } elseif ($this->owner_id == $user->id) {
                 return 'owner';
             }
         }
@@ -187,6 +186,7 @@ class Study extends Model implements Auditable
             ->withTimestamps()
             ->as('studyMembership');
     }
+
     /**
      * Get the license of the study.
      *

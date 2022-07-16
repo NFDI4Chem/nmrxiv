@@ -19,7 +19,7 @@ class SampleResource extends JsonResource
             'name' => $this->name,
             'slug' => $this->slug,
             'description' => $this->description,
-            'molecules' => $this->molecules
+            'molecules' => $this->molecules,
         ];
     }
 }

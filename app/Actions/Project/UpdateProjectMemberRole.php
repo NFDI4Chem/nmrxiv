@@ -2,10 +2,10 @@
 
 namespace App\Actions\Project;
 
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Validator;
 use App\Events\ProjectMemberUpdated;
 use App\Models\User;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Validator;
 use Laravel\Jetstream\Rules\Role;
 
 class UpdateProjectMemberRole

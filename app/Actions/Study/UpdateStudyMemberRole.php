@@ -2,10 +2,10 @@
 
 namespace App\Actions\Study;
 
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Validator;
 use App\Events\StudyMemberUpdated;
 use App\Models\User;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Validator;
 use Laravel\Jetstream\Rules\Role;
 
 class UpdateStudyMemberRole

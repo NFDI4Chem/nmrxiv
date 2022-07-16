@@ -2,18 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
-use App\Models\FileSystemObject;
-use App\Models\Draft;
-use App\Models\Project;
-use App\Models\Study;
-use App\Models\Dataset;
-use App\Models\Sample;
 use App\Jobs\ProcessDraft;
+use App\Models\Dataset;
+use App\Models\Draft;
+use App\Models\FileSystemObject;
+use App\Models\Project;
+use App\Models\Sample;
+use App\Models\Study;
 use Auth;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class DraftController extends Controller
 {
@@ -40,21 +39,21 @@ class DraftController extends Controller
             ->where('owner_id', $user_id)
             ->first();
 
-        if (!$defaultDraft) {
+        if (! $defaultDraft) {
             $id = Str::uuid();
             $environment = env('APP_ENV', 'local');
             $path = preg_replace(
                 '~//+~',
                 '/',
-                $environment . '/' . $user_id . '/drafts/' . $id
+                $environment.'/'.$user_id.'/drafts/'.$id
             );
 
             $defaultDraft = Draft::create([
-                'name' => "Untitled Project",
+                'name' => 'Untitled Project',
                 'slug' => Str::slug('"Untitled Project"'),
                 'description' => '',
                 'relative_url' => rtrim(
-                    preg_replace('~//+~', '/', '/' . $id),
+                    preg_replace('~//+~', '/', '/'.$id),
                     '/'
                 ),
                 'path' => $path,
@@ -83,11 +82,12 @@ class DraftController extends Controller
                         ])
                         ->orderBy('type')
                         ->get(),
-             ],
+                ],
             ]);
     }
 
-    public function complete(Request $request, Draft $draft){
+    public function complete(Request $request, Draft $draft)
+    {
         $project = Project::where('draft_id', $draft->id)->first();
 
         $project->status = 'queued';
@@ -95,9 +95,9 @@ class DraftController extends Controller
         $project->save();
 
         ProcessDraft::dispatch($draft);
-        
+
         return response()->json([
-            'project' => Project::with(['studies.datasets'])->where('draft_id', $draft->id)->first()
+            'project' => Project::with(['studies.datasets'])->where('draft_id', $draft->id)->first(),
         ]);
     }
 
@@ -131,22 +131,21 @@ class DraftController extends Controller
             $user_id = $team->user_id;
         }
 
-
-        return DB::transaction(function () use ($draft, $draftFolders, $user, $user_id, $team_id, $request) {
+        return DB::transaction(function () use ($draft, $user, $user_id, $team_id, $request) {
 
             // create a project corresponding to the draft
             $project = Project::where('draft_id', $draft->id)->first();
 
-            if(!$project){
+            if (! $project) {
                 $project = Project::create([
                     'name' => $draft->name,
                     'slug' => Str::slug($draft->name, '-'),
                     'description' => $draft->description,
-                    'url'  => Str::random(40),
-                    'uuid'  => Str::uuid(),
-                    'team_id'  => $team_id ? $team_id : null,
-                    'owner_id'  => $user_id,
-                    'draft_id'  => $draft->id,
+                    'url' => Str::random(40),
+                    'uuid' => Str::uuid(),
+                    'team_id' => $team_id ? $team_id : null,
+                    'owner_id' => $user_id,
+                    'draft_id' => $draft->id,
                 ]);
 
                 $project->users()->attach(
@@ -154,7 +153,7 @@ class DraftController extends Controller
                 );
 
                 $project->syncTagsWithType($request->get('tags'), 'Project');
-            }else{
+            } else {
                 $project->name = $draft->name;
                 $project->description = $draft->description;
                 $project->syncTagsWithType($request->get('tags'), 'Project');
@@ -162,7 +161,7 @@ class DraftController extends Controller
             }
 
             // get all the folders with mode_type study
-                // create all the studies and associate with the project
+            // create all the studies and associate with the project
 
             $folders = FileSystemObject::with('children')
                 ->where([
@@ -171,9 +170,9 @@ class DraftController extends Controller
                 ])
                 ->orderBy('type')
                 ->get();
-            
-            // loop through studies and then create datasets corresponding to the instrument_type folders 
-            foreach($folders as $folder){
+
+            // loop through studies and then create datasets corresponding to the instrument_type folders
+            foreach ($folders as $folder) {
                 $folder->project_id = $project->id;
 
                 $study = Study::where([
@@ -181,24 +180,24 @@ class DraftController extends Controller
                     ['fs_id', $folder->id],
                 ])->first();
 
-                if(!$study){
+                if (! $study) {
                     $study = Study::create([
                         'name' => $folder->name,
                         'slug' => Str::slug($folder->name, '-'),
                         'description' => $folder->name,
-                        'url'  => Str::random(40),
-                        'uuid'  => Str::uuid(),
-                        'team_id'  => $team_id ? $team_id : null,
-                        'owner_id'  => $user_id,
-                        'draft_id'  => $draft->id,
-                        'project_id'  => $project->id,
-                        'fs_id'  => $folder->id
+                        'url' => Str::random(40),
+                        'uuid' => Str::uuid(),
+                        'team_id' => $team_id ? $team_id : null,
+                        'owner_id' => $user_id,
+                        'draft_id' => $draft->id,
+                        'project_id' => $project->id,
+                        'fs_id' => $folder->id,
                     ]);
-                    
+
                     $sample = Sample::create([
-                        'name' => $study->name . '_sample',
-                        'slug' => Str::slug($study->name . '_sample', '-'),
-                        'study_id' =>  $study->id,
+                        'name' => $study->name.'_sample',
+                        'slug' => Str::slug($study->name.'_sample', '-'),
+                        'study_id' => $study->id,
                         'project_id' => $study->project->id,
                     ]);
                     $study->sample()->save($sample);
@@ -209,8 +208,8 @@ class DraftController extends Controller
 
                 $sChildren = $folder->children;
 
-                foreach($sChildren as $sChild){
-                    if($sChild->instrument_type != null){
+                foreach ($sChildren as $sChild) {
+                    if ($sChild->instrument_type != null) {
                         // associate all children with the study_id, project_id, dataset_id
                         // create samples
                         // create assays
@@ -220,20 +219,19 @@ class DraftController extends Controller
                             ['fs_id', $sChild->id],
                         ])->first();
 
-
-                        if(!$ds){
+                        if (! $ds) {
                             $ds = Dataset::create([
                                 'name' => $sChild->name,
                                 'slug' => Str::slug($sChild->name, '-'),
                                 'description' => $sChild->name,
-                                'url'  => Str::random(40),
-                                'uuid'  => Str::uuid(),
-                                'team_id'  => $team_id ? $team_id : null,
-                                'owner_id'  => $user_id,
-                                'draft_id'  => $draft->id,
-                                'project_id'  => $project->id,
-                                'study_id'  => $study->id,
-                                'fs_id'  => $sChild->id
+                                'url' => Str::random(40),
+                                'uuid' => Str::uuid(),
+                                'team_id' => $team_id ? $team_id : null,
+                                'owner_id' => $user_id,
+                                'draft_id' => $draft->id,
+                                'project_id' => $project->id,
+                                'study_id' => $study->id,
+                                'fs_id' => $sChild->id,
                             ]);
 
                             $sChild->dataset_id = $ds->id;
@@ -251,26 +249,26 @@ class DraftController extends Controller
                 ->whereIn('instrument_type', ['bruker', 'joel', 'varian'])
                 ->orderBy('type')
                 ->get();
-            
-            foreach($folders as $folder){
-                if($folder->study_id == null){
+
+            foreach ($folders as $folder) {
+                if ($folder->study_id == null) {
                     $study = Study::create([
-                        'name' => "Untitled",
+                        'name' => 'Untitled',
                         'slug' => Str::slug('Untitled', '-'),
-                        'description' => 'Untitled study for the dataset - ' . $folder->name,
-                        'url'  => Str::random(40),
-                        'uuid'  => Str::uuid(),
-                        'team_id'  => $team_id ? $team_id : null,
-                        'owner_id'  => $user_id,
-                        'draft_id'  => $draft->id,
-                        'project_id'  => $project->id,
-                        'fs_id'  => $folder->id
+                        'description' => 'Untitled study for the dataset - '.$folder->name,
+                        'url' => Str::random(40),
+                        'uuid' => Str::uuid(),
+                        'team_id' => $team_id ? $team_id : null,
+                        'owner_id' => $user_id,
+                        'draft_id' => $draft->id,
+                        'project_id' => $project->id,
+                        'fs_id' => $folder->id,
                     ]);
-                    
+
                     $sample = Sample::create([
-                        'name' => $study->name . '_sample',
-                        'slug' => Str::slug($study->name . '_sample', '-'),
-                        'study_id' =>  $study->id,
+                        'name' => $study->name.'_sample',
+                        'slug' => Str::slug($study->name.'_sample', '-'),
+                        'study_id' => $study->id,
                         'project_id' => $study->project->id,
                     ]);
                     $study->sample()->save($sample);
@@ -278,27 +276,25 @@ class DraftController extends Controller
                     $folder->study_id = $study->id;
                     $folder->save();
 
-
                     $ds = Dataset::where([
                         ['draft_id', $draft->id],
                         ['study_id', $study->id],
                         ['fs_id', $folder->id],
                     ])->first();
 
-
-                    if(!$ds){
+                    if (! $ds) {
                         $ds = Dataset::create([
                             'name' => $folder->name,
                             'slug' => Str::slug($folder->name, '-'),
                             'description' => $folder->name,
-                            'url'  => Str::random(40),
-                            'uuid'  => Str::uuid(),
-                            'team_id'  => $team_id ? $team_id : null,
-                            'owner_id'  => $user_id,
-                            'draft_id'  => $draft->id,
-                            'project_id'  => $project->id,
-                            'study_id'  => $study->id,
-                            'fs_id'  => $folder->id
+                            'url' => Str::random(40),
+                            'uuid' => Str::uuid(),
+                            'team_id' => $team_id ? $team_id : null,
+                            'owner_id' => $user_id,
+                            'draft_id' => $draft->id,
+                            'project_id' => $project->id,
+                            'study_id' => $study->id,
+                            'fs_id' => $folder->id,
                         ]);
 
                         $folder->dataset_id = $ds->id;
@@ -309,7 +305,7 @@ class DraftController extends Controller
 
             return response()->json([
                 'project' => $project,
-                'studies' => json_decode($project->studies->load(['datasets', 'sample.molecules', 'tags']))
+                'studies' => json_decode($project->studies->load(['datasets', 'sample.molecules', 'tags'])),
             ]);
         });
     }
@@ -326,34 +322,37 @@ class DraftController extends Controller
         $this->processFolder($draftFolders);
     }
 
-    public function processFolder($folders){
-        foreach($folders as $folder){
-            if($folder->type == 'directory'){
-                if($this->isBruker($folder)){
+    public function processFolder($folders)
+    {
+        foreach ($folders as $folder) {
+            if ($folder->type == 'directory') {
+                if ($this->isBruker($folder)) {
                     $this->saveInstrumentType($folder, 'bruker');
                     $this->saveModelType($folder->parent);
-                }elseif($this->isJOEL($folder)){
+                } elseif ($this->isJOEL($folder)) {
                     $this->saveInstrumentType($folder, 'joel');
                     $this->saveModelType($folder->parent);
-                }elseif($this->isVarian($folder)){
+                } elseif ($this->isVarian($folder)) {
                     $this->saveInstrumentType($folder, 'varian');
                     $this->saveModelType($folder->parent);
-                }else{
+                } else {
                     $this->processFolder($folder->children);
                 }
             }
         }
     }
 
-    public function saveModelType($folder){
-        if($folder){
+    public function saveModelType($folder)
+    {
+        if ($folder) {
             $folder->model_type = 'study';
             $folder->save();
         }
     }
 
-    public function saveInstrumentType($folder, $type){
-        $folder->instrument_type =  $type;
+    public function saveInstrumentType($folder, $type)
+    {
+        $folder->instrument_type = $type;
         $folder->save();
     }
 
@@ -365,6 +364,7 @@ class DraftController extends Controller
         if (array_intersect($fileTypes, $names) == $fileTypes) {
             return true;
         }
+
         return false;
     }
 
@@ -376,6 +376,7 @@ class DraftController extends Controller
         if (array_intersect($fileTypes, $names) == $fileTypes) {
             return true;
         }
+
         return false;
     }
 
@@ -384,10 +385,11 @@ class DraftController extends Controller
         $fileTypes = ['jdf'];
         $children = $folder->children;
         $names = $children->pluck('name')->toArray();
-        $extensions = array_map(fn($s) => substr("$s", (strrpos($s,'.') + 1)), $names);
+        $extensions = array_map(fn ($s) => substr("$s", (strrpos($s, '.') + 1)), $names);
         if (array_intersect($fileTypes, $extensions) == $fileTypes) {
             return true;
         }
+
         return false;
     }
-}   
+}

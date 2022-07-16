@@ -47,7 +47,7 @@ class Molecule extends Model
         'MULTIPLICITY_3',
         'VIEWS',
         'DOI',
-        'MOL'
+        'MOL',
     ];
 
     public function samples()
