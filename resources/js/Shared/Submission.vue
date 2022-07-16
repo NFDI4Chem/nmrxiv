@@ -1104,8 +1104,8 @@
                           management, sharing and analysis of NMR data.
                         </p>
                       </div>
-                      <div class="mt-5">
-                        <table class="min-w-full rounded border divide-y divide-gray-300">
+                      <div class="mt-5 overflow-auto">
+                        <table class="min-w-full rounded border divide-y divide-gray-300 ">
                           <thead class="bg-gray-50">
                             <tr>
                               <th
