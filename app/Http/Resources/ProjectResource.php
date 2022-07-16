@@ -2,21 +2,21 @@
 
 namespace App\Http\Resources;
 
-use Illuminate\Http\Resources\Json\JsonResource;
-use App\Models\Project;
 use App\Models\FileSystemObject;
-use App\Http\Resources\StudyResource;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Storage;
 
 class ProjectResource extends JsonResource
 {
     private bool $lite = true;
+
     private array $properties = ['users', 'studies', 'files', 'license'];
 
     public function lite(bool $lite, array $properties): self
     {
         $this->lite = $lite;
         $this->properties = $properties;
+
         return $this;
     }
 
@@ -33,7 +33,7 @@ class ProjectResource extends JsonResource
             'name' => $this->name,
             'slug' => $this->slug,
             'description' => $this->description,
-            'team' => $this->when(!$this->team->personal_team, $this->team),
+            'team' => $this->when(! $this->team->personal_team, $this->team),
             'owner' => new UserResource($this->owner),
             'photo_url' => $this->project_photo_path
                 ? Storage::disk('minio_public')->url($this->project_photo_path)
@@ -41,7 +41,7 @@ class ProjectResource extends JsonResource
             'tags' => $this->tags,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            $this->mergeWhen(!$this->lite, function () {
+            $this->mergeWhen(! $this->lite, function () {
                 return [
                     $this->mergeWhen(
                         in_array('users', $this->properties),

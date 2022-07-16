@@ -2,15 +2,15 @@
 
 namespace App\Models;
 
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Laravel\Fortify\TwoFactorAuthenticatable;
 use Illuminate\Notifications\Notifiable;
-use Spatie\Permission\Traits\HasRoles;
+use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
-use Laravel\Sanctum\HasApiTokens;
 use Laravel\Jetstream\HasTeams;
+use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -30,7 +30,7 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var array
      */
     protected $fillable = [
-        'name', 'first_name', 'last_name' , 'email', 'password', 'onboarded'
+        'name', 'first_name', 'last_name', 'email', 'password', 'onboarded',
     ];
 
     /**
@@ -75,7 +75,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     /**
      * Get the announcements created by the user
-     * 
+     *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function announcements()
@@ -100,7 +100,9 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function scopeWhereRole($query, $role)
     {
-        return $query->whereHas("roles", function($q) use($role) { $q->where("name", $role); });
+        return $query->whereHas('roles', function ($q) use ($role) {
+        $q->where('name', $role);
+        });
     }
 
     public function scopeFilter($query, array $filters)

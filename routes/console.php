@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 
 /*
@@ -14,5 +13,5 @@ use Illuminate\Support\Facades\Artisan;
 |
 */
 Artisan::command('nmrxiv', function () {
-    $this->comment("Welcome to nmrXiv v0.1 Alpha");
+    $this->comment('Welcome to nmrXiv v0.1 Alpha');
 })->purpose('Display nmrxiv info');

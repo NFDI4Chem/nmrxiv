@@ -40,7 +40,6 @@ class CreateProjectsTable extends Migration
             $table->timestamp('release_date')->nullable();
             $table->string('project_photo_path', 2048)->nullable();
             $table->timestamps();
-            
         });
     }
 

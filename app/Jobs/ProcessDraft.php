@@ -2,17 +2,17 @@
 
 namespace App\Jobs;
 
+use App\Models\Draft;
+use App\Models\FileSystemObject;
+use App\Models\Project;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use App\Models\Draft;
-use App\Models\Project;
-use App\Models\FileSystemObject;
+use Illuminate\Support\Facades\Storage;
 
 class ProcessDraft implements ShouldQueue, ShouldBeUnique
 {
@@ -59,7 +59,7 @@ class ProcessDraft implements ShouldQueue, ShouldBeUnique
             $projectPath = preg_replace(
                 '~//+~',
                 '/',
-                $environment . '/' . $project->uuid
+                $environment.'/'.$project->uuid
             );
 
             $projectFSObjects = FileSystemObject::with('children')
@@ -73,18 +73,18 @@ class ProcessDraft implements ShouldQueue, ShouldBeUnique
                 $this->moveFolder($FSObject, $this->draft, $projectPath);
             }
 
-            $logs = $logs . '<br/> Moving files complete <br/> Deleteing draft';
+            $logs = $logs.'<br/> Moving files complete <br/> Deleteing draft';
 
             $this->draft->delete();
 
-            $process_log = array(Carbon::now()->timestamp => $logs);
+            $process_log = [Carbon::now()->timestamp => $logs];
 
             $process_logs = json_decode($project->process_logs);
 
-            if(!is_null($process_logs)){
+            if (! is_null($process_logs)) {
                 array_push($process_logs, $process_log);
-            }else{
-                $process_logs =  $process_log;
+            } else {
+                $process_logs = $process_log;
             }
 
             $project->process_logs = $process_log;

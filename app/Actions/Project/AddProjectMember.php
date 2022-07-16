@@ -2,10 +2,10 @@
 
 namespace App\Actions\Project;
 
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Validator;
 use App\Events\AddingProjectMember;
 use App\Events\ProjectMemberAdded;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Validator;
 use Laravel\Jetstream\Jetstream;
 use Laravel\Jetstream\Rules\Role;
 
@@ -33,7 +33,7 @@ class AddProjectMember
         $project->users()->attach(
             $newProjectMember, ['role' => $role]
         );
-        
+
         ProjectMemberAdded::dispatch($project, $newProjectMember);
     }
 

@@ -1,30 +1,32 @@
 <?php
+
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Contracts\Auth\StatefulGuard;
-use Laravel\Fortify\Actions\ConfirmPassword;
-use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Response;
 use App\Actions\Study\CreateNewStudy;
 use App\Actions\Study\UpdateStudy;
-use Laravel\Jetstream\Jetstream;
 use App\Models\FileSystemObject;
-use Illuminate\Support\Str;
-use Illuminate\Http\Request;
-use App\Models\Study;
-use App\Models\Sample;
 use App\Models\Molecule;
-use Illuminate\Http\JsonResponse;
-use Inertia\Inertia;
+use App\Models\Sample;
+use App\Models\Study;
 use Auth;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Contracts\Auth\StatefulGuard;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Inertia\Inertia;
+use Laravel\Fortify\Actions\ConfirmPassword;
+use Laravel\Jetstream\Jetstream;
 
 class StudyController extends Controller
 {
     public function store(Request $request, CreateNewStudy $creator)
     {
         $study = $creator->create($request->all());
+
         return $request->wantsJson()
             ? new JsonResponse('', 200)
             : back()->with('success', 'Study created successfully');
@@ -33,6 +35,7 @@ class StudyController extends Controller
     public function update(Request $request, UpdateStudy $updater, Study $study)
     {
         $updater->update($study, $request->all());
+
         return $request->wantsJson()
             ? new JsonResponse($study->fresh(), 200)
             : back()->with('success', 'Study updated successfully');
@@ -44,7 +47,7 @@ class StudyController extends Controller
             throw new AuthorizationException;
         }
 
-        $project = $study->project; 
+        $project = $study->project;
         $team = $project->nonPersonalTeam;
 
         return Inertia::render('Study/About', [
@@ -75,7 +78,7 @@ class StudyController extends Controller
             throw new AuthorizationException;
         }
 
-        $project = $study->project; 
+        $project = $study->project;
         $team = $project->nonPersonalTeam;
 
         return Inertia::render('Study/Datasets', [
@@ -92,30 +95,32 @@ class StudyController extends Controller
         ]);
     }
 
-    public function moleculeStore(Request $request, Study $study){
+    public function moleculeStore(Request $request, Study $study)
+    {
         $sample = $study->sample;
-        if(!$sample){
+        if (! $sample) {
             $sample = Sample::create([
-                'name' => $study->name . '_sample',
-                'slug' => Str::slug($study->name . '_sample', '-'),
-                'study_id' =>  $study->id,
+                'name' => $study->name.'_sample',
+                'slug' => Str::slug($study->name.'_sample', '-'),
+                'study_id' => $study->id,
                 'project_id' => $study->project->id,
             ]);
             $study->sample()->save($sample);
         }
         $inchi = $request->get('InChI');
         $molecule = $sample->molecules->where('STANDARD_INCHI', $inchi)->first();
-        if(is_null($molecule)){
+        if (is_null($molecule)) {
             $molecule = Molecule::firstOrCreate([
                 'STANDARD_INCHI' => $inchi,
-            ],[
+            ], [
                 'FORMULA' => $request->get('formula'),
                 'INCHI_KEY' => $request->get('InChIKey'),
-                'MOL' => $request->get('mol')
+                'MOL' => $request->get('mol'),
             ]);
             $sample->molecules()->syncWithPivotValues([$molecule->id], ['percentage_composition' => $request->get('percentage')], false);
         }
-        $sample = $sample->fresh(); 
+        $sample = $sample->fresh();
+
         return $sample->molecules;
     }
 
@@ -125,7 +130,7 @@ class StudyController extends Controller
             throw new AuthorizationException;
         }
 
-        $project = $study->project; 
+        $project = $study->project;
         $team = $project->nonPersonalTeam;
 
         return Inertia::render('Study/Files', [
@@ -163,13 +168,13 @@ class StudyController extends Controller
         $path = preg_replace(
             '~//+~',
             '/',
-            '/' .
-                $environment .
-                '/' .
-                $file->project->uuid .
-                '/' .
-                $file->study->uuid .
-                '/' .
+            '/'.
+                $environment.
+                '/'.
+                $file->project->uuid.
+                '/'.
+                $file->study->uuid.
+                '/'.
                 $file->relative_url
         );
 
@@ -183,8 +188,10 @@ class StudyController extends Controller
                     $newFileName
                 ),
             ];
+
             return Response::make($data, 200, $headers);
         }
+
         return Response::make(null, 404);
     }
 
@@ -231,7 +238,7 @@ class StudyController extends Controller
             $request->password
         );
 
-        if (!$confirmed) {
+        if (! $confirmed) {
             throw ValidationException::withMessages([
                 'password' => __('The password is incorrect.'),
             ]);

@@ -22,7 +22,7 @@ class Draft extends Model
         'owner_id',
         'team_id',
         'settings',
-        'info'
+        'info',
     ];
 
     public function files()
