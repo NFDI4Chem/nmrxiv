@@ -1702,6 +1702,7 @@ export default {
   mounted() {
     const emitter = inject("emitter");
     emitter.on("openDatasetCreateDialog", (data) => {
+      this.currentDraft = null;
       this.fetchDrafts().then((response) => {
         this.drafts = response.data.drafts;
         if (data.draft_id) {
@@ -1905,6 +1906,9 @@ export default {
     },
 
     openSelectDraftsView() {
+      this.steps.forEach( s => {
+        s.status = "upcoming"
+      })
       this.currentDraft = null;
     },
 
@@ -1964,8 +1968,6 @@ export default {
       if (id == 1) {
         // this.loadingStep = true;
         this.$nextTick(function () {
-          // console.log("hjih")
-          // console.log(this.$refs)
           this.$refs.fsbRef.annotate();
         });
       }
