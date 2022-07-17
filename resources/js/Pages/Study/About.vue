@@ -57,7 +57,7 @@
                   </div>
                   <div class="relative flex items-center justify-between">
                     <span class="pr-3 text-lg bg-white font-medium text-gray-500">
-                      Tags
+                      Keywords
                     </span>
                     <button
                       type="button"
