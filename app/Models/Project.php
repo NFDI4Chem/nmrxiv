@@ -54,17 +54,24 @@ class Project extends Model implements Auditable
         Favorite::class,
     ];
 
-    public function getProjectPhotoPathAttribute()
-    {
-        return  $this->attributes['project_photo_path'] ? Storage::disk('minio_public')->url($this->attributes['project_photo_path']) : '';
-    }
-
     /**
      * The accessors to append to the model's array form.
      *
      * @var array
      */
-    protected $appends = ['public_url', 'private_url'];
+    protected $appends = ['public_url', 'private_url', 'project_photo_url'];
+
+    /**
+     * Get the URL to the project's profile photo.
+     *
+     * @return string
+     */
+    public function getProjectPhotoUrlAttribute()
+    {
+        return $this->project_photo_path
+                    ? Storage::disk('minio_public')->url($this->project_photo_path)
+                    : '';
+    }
 
     public function studies()
     {

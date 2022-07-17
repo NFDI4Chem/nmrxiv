@@ -188,7 +188,11 @@
 
                           <div class="mt-2" v-show="!photoPreview">
                             <img
-                              :src="project.project_photo_path ? project.project_photo_path : 'https://via.placeholder.com/400x200'"
+                              :src="
+                                project.project_photo_url
+                                  ? project.project_photo_url
+                                  : 'https://via.placeholder.com/400x200'
+                              "
                               :alt="project.name"
                               class="h-24 w-72 rounded-md object-cover"
                             />
@@ -654,7 +658,7 @@ export default defineComponent({
         license_id: null,
         tag: "",
         tags: [],
-        tags_array: [], 
+        tags_array: [],
         photo: null,
       }),
       open: false,
@@ -715,8 +719,7 @@ export default defineComponent({
       }
       this.form.owner_id = this.project.owner_id;
       this.form.team_id = this.project.team_id;
-      this.form.tags_array = this.form.tags.map((t) => t.text);
-      if(this.form.license){
+      if (this.form.license) {
         this.form.license_id = this.form.license.id;
       }
       if (this.linkAccess) {
@@ -725,9 +728,19 @@ export default defineComponent({
       } else {
         this.form.access = "restricted";
       }
+      this.form.tags_array = this.form.tags.map((t) => t.text);
+      if (this.form.tag != "") {
+        let tags = this.form.tag.split(",")
+        if(tags.length > 0){
+          this.form.tags_array = this.form.tags_array.concat(tags);
+        }
+      }
+      this.form.tags_array = [...new Set(this.form.tags_array)];
+
       this.form.post(route("dashboard.project.update", this.project.id), {
         preserveScroll: true,
         onSuccess: () => {
+          this.form.tag = ''
           this.clearPhotoFileInput();
         },
         onError: (err) => {},
