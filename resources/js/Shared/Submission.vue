@@ -368,7 +368,7 @@
                                     for="description"
                                     class="block text-sm font-medium text-gray-700"
                                   >
-                                    Tags
+                                    Keywords
                                   </label>
                                   <div>
                                     <vue-tags-input
