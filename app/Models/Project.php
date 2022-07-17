@@ -13,6 +13,7 @@ use Maize\Markable\Models\Like;
 use Maize\Markable\Models\Reaction;
 use OwenIt\Auditing\Contracts\Auditable;
 use Spatie\Tags\HasTags;
+use Storage;
 
 class Project extends Model implements Auditable
 {
@@ -52,6 +53,11 @@ class Project extends Model implements Auditable
         Reaction::class,
         Favorite::class,
     ];
+
+    public function getProjectPhotoPathAttribute()
+    {
+        return  $this->attributes['project_photo_path'] ? Storage::disk('minio_public')->url($this->attributes['project_photo_path']) : '';
+    }
 
     /**
      * The accessors to append to the model's array form.

@@ -233,6 +233,8 @@
                                                     </label>
                                                     <div>
                                                         <vue-tags-input
+                                                            placeholder="Type a keyword or keywords separated by comma (,) and press enter"
+                                                            :separators="[';', ',']"
                                                             v-model="form.tag"
                                                             max-width="100%"
                                                             :tags="form.tags"
