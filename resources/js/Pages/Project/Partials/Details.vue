@@ -169,6 +169,8 @@
                           </label>
                           <div>
                             <vue-tags-input
+                              placeholder="Type a keyword or keywords separated by comma (,) and press enter"
+                              :separators="[';', ',']"
                               v-model="form.tag"
                               max-width="100%"
                               :tags="form.tags"
@@ -186,9 +188,9 @@
 
                           <div class="mt-2" v-show="!photoPreview">
                             <img
-                              :src="project.project_photo_path"
+                              :src="project.project_photo_path ? project.project_photo_path : 'https://via.placeholder.com/400x200'"
                               :alt="project.name"
-                              class="rounded-full h-24 w-72 rounded object-cover"
+                              class="h-24 w-72 rounded-md object-cover"
                             />
                           </div>
 

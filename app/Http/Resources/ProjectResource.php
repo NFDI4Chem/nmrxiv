@@ -35,9 +35,7 @@ class ProjectResource extends JsonResource
             'description' => $this->description,
             'team' => $this->when(! $this->team->personal_team, $this->team),
             'owner' => new UserResource($this->owner),
-            'photo_url' => $this->project_photo_path
-                ? Storage::disk('minio_public')->url($this->project_photo_path)
-                : '',
+            'photo_url' => $this->project_photo_path,
             'tags' => $this->tags,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
