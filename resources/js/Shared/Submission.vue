@@ -1562,8 +1562,8 @@
           </jet-button>
         </span>
         <span v-else-if="currentStep.id == '03'">
-          <jet-button @click="toggleOpenCreateDatasetDialog">
-            Save and Finish
+          <jet-button @click="UpdateAndClose">
+            Finish
           </jet-button>
         </span>
       </span>
@@ -2043,6 +2043,11 @@ export default {
         this.draftTags = tags;
       }
       this.selectStep(1);
+    },
+
+    UpdateAndClose(){
+      this.updateProject();
+      this.toggleOpenCreateDatasetDialog()
     },
   },
   computed: {

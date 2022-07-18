@@ -34,12 +34,11 @@ class UpdateProject
                 $s3filePath = '/projects/'.$file_name;
                 $s3->put($s3filePath, file_get_contents($image), 'public');
             }
-
             $project
                 ->forceFill([
                     'name' => $input['name'],
                     'slug' => Str::slug($input['name'], '-'),
-                    'description' => $input['description'],
+                    'description' => $input['description'] ? $input['description'] : $project->description,
                     'color' => array_key_exists('color', $input)
                         ? $input['color']
                         : $project->color,
