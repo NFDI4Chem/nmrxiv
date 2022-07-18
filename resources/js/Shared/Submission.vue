@@ -1973,7 +1973,7 @@ export default {
         if (e.origin != "https://nmriumdev.nmrxiv.org") {
           return;
         }
-        if (e.data.type == "nmr-wrapper:dataChange") {
+        if (e.data.type == "nmr-wrapper:data-change") {
           let actionType = e.data.data.actionType;
 
           if (
