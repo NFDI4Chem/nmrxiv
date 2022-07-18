@@ -4,7 +4,6 @@ namespace App\Http\Resources;
 
 use App\Models\FileSystemObject;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\Storage;
 
 class ProjectResource extends JsonResource
 {
