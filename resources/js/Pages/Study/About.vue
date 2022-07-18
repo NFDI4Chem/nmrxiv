@@ -437,7 +437,7 @@ export default {
       axios
         .get(
           route(
-            "console.license.getLicensebyId",
+            "license",
               this.study.license_id
               )
             )
