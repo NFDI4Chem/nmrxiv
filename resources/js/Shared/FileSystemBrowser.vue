@@ -1,114 +1,182 @@
 <template>
-  <div id="fs-dropzone" class="mt-3">
-    <div v-if="!readonly">
-      <form class="py-2 mb-3">
-        <div id="fs-dropzone-message" class="text-center">
-          <div
-            type="button"
-            class="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-4 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-          >
+  <div
+    id="fs-dropzone"
+    :class="[
+      fullScreen ? 'fixed w-screen h-screen -ml-4 -mt-6 sm:ml-0 md:-ml-0 md:w-auto inset-0' : '',
+      'mt-3 bg-white',
+    ]"
+  >
+    <div>
+      <div :class="[fullScreen ? 'px-6 py-4' : '', 'flex justify-end']">
+        <button class="right" @click="toggleFullScreen">
+          <span v-if="fullScreen">
             <svg
-              class="mx-auto h-12 w-12 text-gray-400"
-              xmlns="http://www.w3.org/2000/svg"
-              stroke="currentColor"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
               fill="none"
-              viewBox="0 0 48 48"
-              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M9 19V15M9 15H5M9 15L4 20"
+                stroke="black"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M15 5V9M15 9H19M15 9L20 4"
+                stroke="black"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M9 5V9M9 9H5M9 9L4 4"
+                stroke="black"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M15 19V15M15 15H19M15 15L20 20"
+                stroke="black"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </span>
+          <span v-else>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
             >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                stroke-width="2"
-                d="M8 14v20c0 4.418 7.163 8 16 8 1.381 0 2.721-.087 4-.252M8 14c0 4.418 7.163 8 16 8s16-3.582 16-8M8 14c0-4.418 7.163-8 16-8s16 3.582 16 8m0 0v14m0-4c0 4.418-7.163 8-16 8S8 28.418 8 24m32 10v6m0 0v6m0-6h6m-6 0h-6"
+                d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
               />
             </svg>
-            <span class="mt-2 block text-sm font-medium text-gray-900">
-              Drop Files or Folders to upload to
-              <span v-if="$page.props.selectedFolder"
-                >"{{ $page.props.selectedFolder }}"</span
+          </span>
+        </button>
+      </div>
+      <div :class="[fullScreen ? 'px-6 py-4' : '', '']" v-if="!readonly">
+        <form class="py-2 mb-3">
+          <div id="fs-dropzone-message" class="text-center">
+            <div
+              type="button"
+              class="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-4 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+            >
+              <svg
+                class="mx-auto h-12 w-12 text-gray-400"
+                xmlns="http://www.w3.org/2000/svg"
+                stroke="currentColor"
+                fill="none"
+                viewBox="0 0 48 48"
+                aria-hidden="true"
               >
-              folder
-            </span>
-            <div v-if="dropzone" class="relative mt-5">
-              <div class="overflow-hidden h-2 text-xs flex rounded bg-gray-200">
-                <div
-                  :style="'width: ' + precentageUpload + '%'"
-                  class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-green-500"
-                ></div>
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M8 14v20c0 4.418 7.163 8 16 8 1.381 0 2.721-.087 4-.252M8 14c0 4.418 7.163 8 16 8s16-3.582 16-8M8 14c0-4.418 7.163-8 16-8s16 3.582 16 8m0 0v14m0-4c0 4.418-7.163 8-16 8S8 28.418 8 24m32 10v6m0 0v6m0-6h6m-6 0h-6"
+                />
+              </svg>
+              <span class="mt-2 block text-sm font-medium text-gray-900">
+                Drop Files or Folders to upload to
+                <span v-if="$page.props.selectedFolder"
+                  >"{{ $page.props.selectedFolder }}"</span
+                >
+                folder
+              </span>
+              <div v-if="dropzone" class="relative mt-5">
+                <div class="overflow-hidden h-2 text-xs flex rounded bg-gray-200">
+                  <div
+                    :style="'width: ' + precentageUpload + '%'"
+                    class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-green-500"
+                  ></div>
+                </div>
+                <span v-if="status" class="mt-2 block text-sm font-medium text-gray-900">
+                  {{ status }}
+                </span>
               </div>
-              <span v-if="status" class="mt-2 block text-sm font-medium text-gray-900">
-                {{ status }}
+            </div>
+          </div>
+        </form>
+      </div>
+      <div
+        :class="[
+          fullScreen ? 'overflow-scroll h-full relative px-6 py-4' : '',
+          'min-w-0 flex-1 bg-white border-t border-gray-200 lg:flex',
+        ]"
+      >
+        <aside class="py-3 px-2 lg:block lg:flex-shrink-0 lg:order-first overflow-scroll">
+          <children :file="file"></children>
+        </aside>
+        <section class="p-6 flex-1 flex flex-col lg:order-last">
+          <div
+            class="mb-3"
+            v-if="
+              $page.props.selectedFileSystemObject &&
+              $page.props.selectedFileSystemObject.has_children
+            "
+          >
+            <ul
+              role="list"
+              class="mb-3 grid grid-cols-1 gap-5 sm:gap-6 sm:grid-cols-2 lg:grid-cols-4"
+            >
+              <li
+                v-for="file in $page.props.selectedFileSystemObject.children"
+                :key="file.key"
+                class="relative shadow rounded-lg"
+              >
+                <div
+                  class="group block w-full aspect-w-10 aspect-h-7 py-4 bg-gray-100 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 focus-within:ring-indigo-500 overflow-hidden"
+                >
+                  <span v-if="file.type == 'directory'">
+                    <FolderIcon
+                      @dblclick.stop="displaySelected(file)"
+                      class="cursor-pointer h-28 w-28 text-gray-400 flex-shrink-0 mx-auto"
+                      aria-hidden="true"
+                    />
+                  </span>
+                  <span v-else>
+                    <DocumentTextIcon
+                      class="h-28 w-28 text-gray-400 flex-shrink-0 mx-auto"
+                      aria-hidden="true"
+                    />
+                  </span>
+                </div>
+                <p
+                  class="mt-2 px-2 py-1 block text-sm font-medium text-gray-900 pointer-events-none"
+                >
+                  {{ file.name }}
+                </p>
+                <p class="block text-sm font-medium text-gray-500 pointer-events-none">
+                  {{ file.size }}
+                </p>
+              </li>
+            </ul>
+          </div>
+          <div v-else>
+            <div class="">
+              <span
+                v-if="
+                  $page.props.selectedFileSystemObject &&
+                  $page.props.selectedFileSystemObject.type == 'file'
+                "
+              >
+                <File-details :file="$page.props.selectedFileSystemObject"></File-details>
               </span>
             </div>
           </div>
-        </div>
-      </form>
-    </div>
-    <div class="min-w-0 flex-1 border-t border-gray-200 lg:flex">
-      <aside style="height: 40vh !important" class="h-1/2 py-3 px-2 lg:block lg:flex-shrink-0 lg:order-first overflow-y-scroll">
-        <children :file="file"></children>
-      </aside>
-      <section
-        style="height: 40vh !important"
-        class="min-w-0 p-6 h-1/2 flex-1 flex flex-col overflow-y-scroll lg:order-last"
-      >
-        <div
-          class="mb-3"
-          v-if="
-            $page.props.selectedFileSystemObject &&
-            $page.props.selectedFileSystemObject.has_children
-          "
-        >
-          <ul
-            role="list"
-            class="mb-3 grid grid-cols-1 gap-5 sm:gap-6 sm:grid-cols-2 lg:grid-cols-4"
-          >
-            <li
-              v-for="file in $page.props.selectedFileSystemObject.children"
-              :key="file.key"
-              class="relative shadow rounded-lg"
-            >
-              <div
-                class="group block w-full aspect-w-10 aspect-h-7 py-4 bg-gray-100 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 focus-within:ring-indigo-500 overflow-hidden"
-              >
-                <span v-if="file.type == 'directory'">
-                  <FolderIcon
-                    @dblclick.stop="displaySelected(file)"
-                    class="cursor-pointer h-28 w-28 text-gray-400 flex-shrink-0 mx-auto"
-                    aria-hidden="true"
-                  />
-                </span>
-                <span v-else>
-                  <DocumentTextIcon
-                    class="h-28 w-28 text-gray-400 flex-shrink-0 mx-auto"
-                    aria-hidden="true"
-                  />
-                </span>
-              </div>
-              <p
-                class="mt-2 px-2 py-1 block text-sm font-medium text-gray-900 pointer-events-none"
-              >
-                {{ file.name }}
-              </p>
-              <p class="block text-sm font-medium text-gray-500 pointer-events-none">
-                {{ file.size }}
-              </p>
-            </li>
-          </ul>
-        </div>
-        <div v-else>
-          <div class="">
-            <span
-              v-if="
-                $page.props.selectedFileSystemObject &&
-                $page.props.selectedFileSystemObject.type == 'file'
-              "
-            >
-              <File-details :file="$page.props.selectedFileSystemObject"></File-details>
-            </span>
-          </div>
-        </div>
-      </section>
+        </section>
+      </div>
     </div>
   </div>
 </template>
@@ -129,12 +197,13 @@ export default {
     DocumentTextIcon,
     ChevronRightIcon,
     HomeIcon,
-    FileDetails
+    FileDetails,
   },
   data() {
     return {
       status: "",
       dropzone: null,
+      fullScreen: false,
       precentageUpload: 0,
       busy: false,
       file: null,
@@ -150,6 +219,9 @@ export default {
     }
   },
   methods: {
+    toggleFullScreen() {
+      this.fullScreen = !this.fullScreen;
+    },
     updateBusyStatus(status) {
       this.busy = status;
       this.$emit("loading", this.busy);
@@ -159,6 +231,8 @@ export default {
       axios.get(this.url).then((response) => {
         this.updateBusyStatus(false);
         this.file = response.data.file;
+        this.file.has_children = true;
+        this.$page.props.selectedFileSystemObject = this.file;
       });
     },
     annotate() {

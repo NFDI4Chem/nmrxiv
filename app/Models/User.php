@@ -101,7 +101,7 @@ class User extends Authenticatable implements MustVerifyEmail
     public function scopeWhereRole($query, $role)
     {
         return $query->whereHas('roles', function ($q) use ($role) {
-        $q->where('name', $role);
+            $q->where('name', $role);
         });
     }
 

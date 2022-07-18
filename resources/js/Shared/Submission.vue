@@ -185,7 +185,7 @@
                   </label>
                   <div>
                     <vue-tags-input
-                      placeholder="Type and press enter"
+                      placeholder="Type a keyword or keywords separated by comma (,) and press enter"
                       :separators="[';', ',']"
                       v-model="draftTag"
                       max-width="100%"
@@ -368,10 +368,12 @@
                                     for="description"
                                     class="block text-sm font-medium text-gray-700"
                                   >
-                                    Tags
+                                    Keywords
                                   </label>
                                   <div>
                                     <vue-tags-input
+                                      placeholder="Type a keyword or keywords separated by comma (,) and press enter"
+                                      :separators="[';', ',']"
                                       v-model="studyTag"
                                       max-width="100%"
                                       :tags="studyTags"
@@ -451,16 +453,6 @@
                                           v-html="molecule.svg"
                                         ></div>
                                       </div>
-                                      <p
-                                        class="mt-2 block text-sm font-medium text-gray-900 truncate pointer-events-none"
-                                      >
-                                        {{ file.title }}
-                                      </p>
-                                      <p
-                                        class="block text-sm font-medium text-gray-500 pointer-events-none"
-                                      >
-                                        {{ file.size }}
-                                      </p>
                                     </li>
                                   </ul>
                                 </div>
@@ -1105,7 +1097,7 @@
                         </p>
                       </div>
                       <div class="mt-5 overflow-auto">
-                        <table class="min-w-full rounded border divide-y divide-gray-300 ">
+                        <table class="min-w-full rounded border divide-y divide-gray-300">
                           <thead class="bg-gray-50">
                             <tr>
                               <th
@@ -1702,6 +1694,7 @@ export default {
   mounted() {
     const emitter = inject("emitter");
     emitter.on("openDatasetCreateDialog", (data) => {
+      this.currentDraft = null;
       this.fetchDrafts().then((response) => {
         this.drafts = response.data.drafts;
         if (data.draft_id) {
@@ -1724,8 +1717,8 @@ export default {
     });
   },
   methods: {
-    updateLoadingStatus(status){
-      this.loadingStep = status
+    updateLoadingStatus(status) {
+      this.loadingStep = status;
     },
     hasNMRiumInfo(study) {
       let info = true;
@@ -1740,7 +1733,9 @@ export default {
       this.loadingStep = true;
       this.updateProjectForm.name = this.project.name;
       this.updateProjectForm.owner_id = this.project.owner_id;
-      this.updateProjectForm.license_id = this.updateProjectForm.license.id;
+      this.updateProjectForm.license_id = this.updateProjectForm.license
+        ? this.updateProjectForm.license.id
+        : null;
       this.updateProjectForm.team_id = this.project.team_id;
       this.updateProjectForm.description = this.project.description;
       this.updateProjectForm.post(route("dashboard.project.update", this.project.id), {
@@ -1905,6 +1900,9 @@ export default {
     },
 
     openSelectDraftsView() {
+      this.steps.forEach((s) => {
+        s.status = "upcoming";
+      });
       this.currentDraft = null;
     },
 
@@ -1964,8 +1962,6 @@ export default {
       if (id == 1) {
         // this.loadingStep = true;
         this.$nextTick(function () {
-          // console.log("hjih")
-          // console.log(this.$refs)
           this.$refs.fsbRef.annotate();
         });
       }
@@ -1989,9 +1985,7 @@ export default {
             return;
           }
 
-          this.selectedSpectraData = e.data.data.data.find(
-            (d) => d.info.type == "NMR Spectrum"
-          );
+          this.selectedSpectraData = e.data.data.spectra[0];
           if (
             actionType == "ADD_MOLECULE" ||
             actionType == "DELETE_MOLECULE" ||
