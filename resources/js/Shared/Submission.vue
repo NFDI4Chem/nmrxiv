@@ -453,16 +453,6 @@
                                           v-html="molecule.svg"
                                         ></div>
                                       </div>
-                                      <p
-                                        class="mt-2 block text-sm font-medium text-gray-900 truncate pointer-events-none"
-                                      >
-                                        {{ file.title }}
-                                      </p>
-                                      <p
-                                        class="block text-sm font-medium text-gray-500 pointer-events-none"
-                                      >
-                                        {{ file.size }}
-                                      </p>
                                     </li>
                                   </ul>
                                 </div>
@@ -1995,9 +1985,7 @@ export default {
             return;
           }
 
-          this.selectedSpectraData = e.data.data.data.find(
-            (d) => d.info.type == "NMR Spectrum"
-          );
+          this.selectedSpectraData = e.data.data.spectra[0];
           if (
             actionType == "ADD_MOLECULE" ||
             actionType == "DELETE_MOLECULE" ||
