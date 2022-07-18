@@ -999,6 +999,7 @@ export default defineComponent({
                 preserveScroll: true,
                 onSuccess: () => {
                     this.form.tag = "";
+                    this.open = false;
                     this.clearPhotoFileInput();
                 },
                 onError: (err) => {},
