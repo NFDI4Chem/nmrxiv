@@ -1107,7 +1107,7 @@
                         </p>
                       </div>
                       <div class="mt-5 overflow-auto">
-                        <table class="min-w-full rounded border divide-y divide-gray-300 ">
+                        <table class="min-w-full rounded border divide-y divide-gray-300">
                           <thead class="bg-gray-50">
                             <tr>
                               <th
@@ -1727,8 +1727,8 @@ export default {
     });
   },
   methods: {
-    updateLoadingStatus(status){
-      this.loadingStep = status
+    updateLoadingStatus(status) {
+      this.loadingStep = status;
     },
     hasNMRiumInfo(study) {
       let info = true;
@@ -1743,7 +1743,9 @@ export default {
       this.loadingStep = true;
       this.updateProjectForm.name = this.project.name;
       this.updateProjectForm.owner_id = this.project.owner_id;
-      this.updateProjectForm.license_id = this.updateProjectForm.license ?  this.updateProjectForm.license.id : null;
+      this.updateProjectForm.license_id = this.updateProjectForm.license
+        ? this.updateProjectForm.license.id
+        : null;
       this.updateProjectForm.team_id = this.project.team_id;
       this.updateProjectForm.description = this.project.description;
       this.updateProjectForm.post(route("dashboard.project.update", this.project.id), {
@@ -1908,9 +1910,9 @@ export default {
     },
 
     openSelectDraftsView() {
-      this.steps.forEach( s => {
-        s.status = "upcoming"
-      })
+      this.steps.forEach((s) => {
+        s.status = "upcoming";
+      });
       this.currentDraft = null;
     },
 
