@@ -2,7 +2,7 @@
   <div
     id="fs-dropzone"
     :class="[
-      fullScreen ? 'fixed w-screen h-screen md:-mt-6 md:-ml-20 inset-0' : '',
+      fullScreen ? 'fixed w-screen h-screen -ml-4 -mt-6 sm:ml-0 md:-ml-0 md:w-auto inset-0' : '',
       'mt-3 bg-white',
     ]"
   >
@@ -231,6 +231,8 @@ export default {
       axios.get(this.url).then((response) => {
         this.updateBusyStatus(false);
         this.file = response.data.file;
+        this.file.has_children = true;
+        this.$page.props.selectedFileSystemObject = this.file;
       });
     },
     annotate() {
