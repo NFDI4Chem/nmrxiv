@@ -67,7 +67,7 @@ class UpdateProject
                     'license_id' => array_key_exists('license_id', $input)
                         ? $input['license_id']
                         : $project->license_id,
-                    'project_photo_path' => $s3filePath,
+                    'project_photo_path' => $s3filePath ? $s3filePath : $project->project_photo_path,
                 ])
                 ->save();
 

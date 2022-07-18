@@ -13,6 +13,7 @@ use Maize\Markable\Models\Like;
 use Maize\Markable\Models\Reaction;
 use OwenIt\Auditing\Contracts\Auditable;
 use Spatie\Tags\HasTags;
+use Storage;
 
 class Project extends Model implements Auditable
 {
@@ -58,7 +59,19 @@ class Project extends Model implements Auditable
      *
      * @var array
      */
-    protected $appends = ['public_url', 'private_url'];
+    protected $appends = ['public_url', 'private_url', 'project_photo_url'];
+
+    /**
+     * Get the URL to the project's profile photo.
+     *
+     * @return string
+     */
+    public function getProjectPhotoUrlAttribute()
+    {
+        return $this->project_photo_path
+                    ? Storage::disk('minio_public')->url($this->project_photo_path)
+                    : '';
+    }
 
     public function studies()
     {
