@@ -73,6 +73,19 @@
                 <jet-input id="email" type="email" class="mt-1 block w-full" v-model="form.email" />
                 <jet-input-error :message="form.errors.email" class="mt-2" />
             </div>
+
+            <!-- Username -->
+            <div class="col-span-6 sm:col-span-4">
+              <jet-label for="username" value="Username" />
+              <jet-input
+                id="username"
+                type="text"
+                class="mt-1 block w-full"
+                v-model="form.username"
+                autocomplete="username"
+              />
+              <jet-input-error :message="form.errors.username" class="mt-2" />
+            </div>
         </template>
 
         <template #actions>
@@ -116,6 +129,7 @@
                     first_name: this.user.first_name,
                     last_name: this.user.last_name,
                     email: this.user.email,
+                    username: this.user.username,
                     photo: null,
                 }),
 

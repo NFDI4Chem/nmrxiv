@@ -222,7 +222,7 @@ class Project extends Model implements Auditable
 
     protected function getPublicUrlAttribute()
     {
-        return env('APP_URL', null).'/projects/'.urlencode($this->slug);
+        return env('APP_URL', null).'/projects/'. $this->owner->username .'/'.urlencode($this->slug);
     }
 
     protected function getPrivateUrlAttribute()
