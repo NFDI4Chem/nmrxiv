@@ -22,9 +22,11 @@ use Maize\Markable\Models\Like;
 
 class ProjectController extends Controller
 {
-    public function publicProjectView(Request $request, $slug)
+    public function publicProjectView(Request $request, $owner, $slug)
     {
-        $project = Project::where('slug', $slug)->firstOrFail();
+        $user = User::where('username', $owner)->firstOrFail();
+
+        $project = Project::where([['slug', $slug], ['owner_id', $user->id]])->firstOrFail();
 
         if (! $project->is_public) {
             if (! Gate::forUser($request->user())->check('viewProject', $project)) {

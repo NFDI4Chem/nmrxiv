@@ -50,7 +50,7 @@ Route::get('download/{code}/datasets/{dataset}/{filename}', [DatasetController::
 Route::get('{code}/studies/{study}/file/{filename}', [StudyController::class, 'file'])
     ->name('study.file');
 
-Route::get('projects/{slug}', [ProjectController::class, 'publicProjectView'])
+Route::get('projects/{owner}/{slug}', [ProjectController::class, 'publicProjectView'])
     ->name('public.project');
 Route::get('projects', [ProjectController::class, 'publicProjectsView'])
     ->name('public.projects');
