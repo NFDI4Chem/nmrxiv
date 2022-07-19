@@ -705,47 +705,43 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div
-                                                        class="mt-6 flex text-sm"
-                                                    >
-                                                        <a
-                                                            target="_blank"
-                                                            href="https://docs.nmrxiv.org/docs/submission-guides/sharing"
-                                                            class="group inline-flex items-center text-gray-500 hover:text-gray-900"
-                                                        >
-                                                            <QuestionMarkCircleIcon
-                                                                class="h-5 w-5 text-gray-400 group-hover:text-gray-500"
-                                                                aria-hidden="true"
-                                                            />
-                                                            <span class="ml-2">
-                                                                Learn more about
-                                                                sharing
-                                                            </span>
-                                                        </a>
-                                                    </div>
-                                                    <div
-                                                        class="mt-4 flex text-sm"
-                                                    >
-                                                        <a
-                                                            @click="
-                                                                toggleActivityDetails
-                                                            "
-                                                            class="cursor-pointer group inline-flex items-center text-gray-500 hover:text-gray-900"
-                                                        >
-                                                            <ExclamationCircleIcon
-                                                                class="h-5 w-5 text-gray-400 group-hover:text-gray-500"
-                                                                aria-hidden="true"
-                                                            />
-                                                            <span class="ml-2">
-                                                                Activity
-                                                            </span>
-                                                        </a>
-                                                    </div>
-                                                    <project-activity
-                                                        :project="project"
-                                                        ref="activityDetailsElement"
-                                                    ></project-activity>
                                                 </div>
+                                                <div class="mt-6 flex text-sm">
+                                                    <a
+                                                        target="_blank"
+                                                        href="https://docs.nmrxiv.org/docs/submission-guides/sharing"
+                                                        class="group inline-flex items-center text-gray-500 hover:text-gray-900"
+                                                    >
+                                                        <QuestionMarkCircleIcon
+                                                            class="h-5 w-5 text-gray-400 group-hover:text-gray-500"
+                                                            aria-hidden="true"
+                                                        />
+                                                        <span class="ml-2">
+                                                            Learn more about
+                                                            sharing
+                                                        </span>
+                                                    </a>
+                                                </div>
+                                                <div class="mt-4 flex text-sm">
+                                                    <a
+                                                        @click="
+                                                            toggleActivityDetails
+                                                        "
+                                                        class="cursor-pointer group inline-flex items-center text-gray-500 hover:text-gray-900"
+                                                    >
+                                                        <ExclamationCircleIcon
+                                                            class="h-5 w-5 text-gray-400 group-hover:text-gray-500"
+                                                            aria-hidden="true"
+                                                        />
+                                                        <span class="ml-2">
+                                                            Activity
+                                                        </span>
+                                                    </a>
+                                                </div>
+                                                <project-activity
+                                                    :project="project"
+                                                    ref="activityDetailsElement"
+                                                ></project-activity>
                                             </div>
                                         </div>
                                     </div>
