@@ -26,7 +26,7 @@ class UpdateStudy
             $study->forceFill([
                 'name' => $input['name'],
                 'slug' => Str::slug($input['name'], '-'),
-                'description' => $input['description'],
+                'description' => $input['description'] ? $input['description'] : $study->description,
                 'color' => array_key_exists('color', $input) ? $input['color'] : $study->color,
                 'starred' => array_key_exists('starred', $input) ? $input['starred'] : $study->starred,
                 'location' => array_key_exists('location', $input) ? $input['location'] : $study->location,
@@ -36,11 +36,11 @@ class UpdateStudy
                 'access_type' => array_key_exists('access_type', $input) ? $input['access_type'] : 'viewer',
                 'is_public' => array_key_exists('is_public', $input) ? $input['is_public'] : $study->is_public,
                 'study_photo_path' => array_key_exists('study_photo_path', $input) ? $input['study_photo_path'] : $study->study_photo_path,
-                'license_id' => array_key_exists('license_id', $input) ? $input['license_id'] : null,
+                'license_id' => array_key_exists('license_id', $input) ? $input['license_id'] : $study->license_id,
             ])->save();
 
-            if (array_key_exists('tags', $input)) {
-                $study->syncTagsWithType($input['tags'], 'Study');
+            if (array_key_exists('tags_array', $input)) {
+                $study->syncTagsWithType($input['tags_array'], 'Study');
             }
         });
     }
