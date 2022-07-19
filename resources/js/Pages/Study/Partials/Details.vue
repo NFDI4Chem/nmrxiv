@@ -840,6 +840,7 @@ export default {
                 access: this.study.access,
                 access_type: this.study.access_type,
                 license: null,
+                license_id: null,
                 tag: "",
                 tags_array: [],
                 tags: [],
@@ -880,7 +881,9 @@ export default {
             this.form.owner_id = this.study.owner_id;
             this.form.team_id = this.study.team_id;
             this.form.project_id = this.study.project_id;
-            this.form.tags = this.form.tags.map((t) => t.text);
+            if (this.form.license) {
+                this.form.license_id = this.form.license.id;
+            }
             if (this.linkAccess) {
                 this.form.access = "link";
                 this.form.access_type = this.selectedAccessType.value;
