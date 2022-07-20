@@ -10,8 +10,10 @@ export default {
       return this.checkIfValueExists(permissions, 'permissions')
     },
     checkIfValueExists(queryArray, type) {
-      let allValues = Array.from(this.$page.props.user[type])
-      return queryArray.some((r) => allValues.indexOf(r) >= 0)
+      if(this.$page.props.user && this.$page.props.user[type]){
+        let allValues = Array.from(this.$page.props.user[type])
+        return queryArray.some((r) => allValues.indexOf(r) >= 0)
+      }
     },
     formatDate(timestamp) {
       const date = new Date(timestamp)
