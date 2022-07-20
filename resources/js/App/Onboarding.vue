@@ -412,7 +412,7 @@ export default {
     onboardingComplete() {
       this.open = false;
       axios.post("/onboarding/complete").then((resp) => {
-        Inertia.reload({ only: ["user"] });
+        Inertia.reload({ only: ["user", "user.permissions", "user.roles"] });
       });
     },
     onboardAndStartTour() {
