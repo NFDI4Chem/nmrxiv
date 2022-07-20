@@ -840,6 +840,10 @@ export default {
                 access: this.study.access,
                 access_type: this.study.access_type,
                 license: null,
+                license_id: null,
+                tag: "",
+                tags_array: [],
+                tags: [],
             }),
             open: false,
             licenses: [],
@@ -859,6 +863,7 @@ export default {
     methods: {
         toggleDetails() {
             this.open = !this.open;
+            this.getTags();
         },
         getTags() {
             if (this.study && this.study.tags) {
@@ -876,28 +881,31 @@ export default {
             this.form.owner_id = this.study.owner_id;
             this.form.team_id = this.study.team_id;
             this.form.project_id = this.study.project_id;
-            this.form.tags = this.form.tags.map((t) => t.text);
+            if (this.form.license) {
+                this.form.license_id = this.form.license.id;
+            }
             if (this.linkAccess) {
                 this.form.access = "link";
                 this.form.access_type = this.selectedAccessType.value;
             } else {
                 this.form.access = "restricted";
             }
+            this.form.tags_array = this.form.tags.map((t) => t.text);
+            if (this.form.tag != "") {
+                let tags = this.form.tag.split(",");
+                if (tags.length > 0) {
+                    this.form.tags_array = this.form.tags_array.concat(tags);
+                }
+            }
+            this.form.tags_array = [...new Set(this.form.tags_array)];
+            
             this.form.post(route("dashboard.study.update", this.study.id), {
                 preserveScroll: true,
                 onSuccess: () => {
                     this.open = false;
-                    this.form.tags = this.getTags();
+                    this.form.tag = "";
                 },
-                onError: (err) => {
-                    let tags = [];
-                    this.form.tags.forEach((t) => {
-                        tags.push({
-                            text: t,
-                        });
-                    });
-                    this.form.tags = tags;
-                },
+                onError: (err) => {},
             });
         },
         toggleActivityDetails() {
