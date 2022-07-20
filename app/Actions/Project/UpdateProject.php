@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class UpdateProject
 {
@@ -19,7 +20,8 @@ class UpdateProject
     public function update(Project $project, array $input)
     {
         Validator::make($input, [
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255',  Rule::unique('projects')
+            ->where('owner_id', $input['owner_id'])->ignore($project->id), ],
             'description' => ['required', 'string', 'min:20'],
         ])->validate();
 
