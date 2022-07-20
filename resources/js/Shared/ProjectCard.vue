@@ -53,7 +53,7 @@
           ]"
         >
           <div style="min-height: 150px; max-height: 168px" class="flex-1 p-3">
-            <Link :href="'/projects/' + project.slug" class="block cursor-pointer">
+            <Link :href="'/projects/' + project.owner.username + '/' + project.slug" class="block cursor-pointer">
               <p class="text-lg font-semibold text-gray-900 line-clamp-2">
                 {{ project.name }}
               </p>

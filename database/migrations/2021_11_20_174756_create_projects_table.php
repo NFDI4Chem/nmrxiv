@@ -39,6 +39,7 @@ class CreateProjectsTable extends Migration
             $table->foreignId('fs_id')->nullable();
             $table->timestamp('release_date')->nullable();
             $table->string('project_photo_path', 2048)->nullable();
+            $table->unique(['name', 'owner_id']);
             $table->timestamps();
         });
     }

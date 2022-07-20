@@ -23,6 +23,7 @@ class UsersSeeder extends Seeder
         $admin = User::create([
             'first_name' => 'Super admin',
             'last_name' => 'User',
+            'username' => 'superadmin',
             'email' => $email,
             'password' => bcrypt($password),
             'email_verified_at' => Carbon::now(),
