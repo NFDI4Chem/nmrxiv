@@ -72,7 +72,7 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::get('projects/{project}/toggleUpVote', [ProjectController::class, 'toggleUpVote'])
             ->name('project.toggle-upvote');
 
-    Route::get('projects/{project}/status', [ProjectController::class, 'status'])
+    Route::get('projects/{project}/queue/status', [ProjectController::class, 'status'])
             ->name('project.status');
 
     Route::get('dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
