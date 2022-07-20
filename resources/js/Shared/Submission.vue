@@ -2537,7 +2537,7 @@ export default {
 
         trackProject() {
             axios
-                .get("/projects/" + this.project.id + "/status")
+                .get("/projects/" + this.project.id + "/queue/status")
                 .then((response) => {
                     this.project.status = response.data.status;
                     if (this.project.status != "complete") {
