@@ -150,7 +150,7 @@
                                                                             "
                                                                             id="description"
                                                                             name="description"
-                                                                            placeholder="Description"
+                                                                            placeholder="Describe this study"
                                                                             rows="3"
                                                                             class="shadow-sm focus:ring-gray-500 focus:border-gray-500 block w-full sm:text-sm border-gray-300 rounded-md"
                                                                         />
