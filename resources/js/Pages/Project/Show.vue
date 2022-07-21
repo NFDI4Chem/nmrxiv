@@ -6,7 +6,7 @@
           <div class="flex flex-nowrap justify-between py-6">
             <div class="">
               <div
-                class="flex pr-20 items-center text-sm text-gray-700 uppercase font-bold tracking-widest"
+                class="flex pr-20 items-center text-xl text-gray-700 font-bold"
               >
                 <StarIcon
                   @click="toogleStarred"
