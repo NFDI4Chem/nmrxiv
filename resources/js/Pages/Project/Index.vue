@@ -82,7 +82,7 @@
           >
             <div class="flex-grow">
               <div class="flex justify-between items-baseline">
-                <div class="font-semibold text-md text-gray-600 uppercase tracking-wider">
+                <div class="font-bold text-lg text-gray-600">
                   <div class="flex items-center">
                     <span class="flex max-w-2xl break-words block">
                       {{ project.name }}
