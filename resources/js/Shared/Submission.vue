@@ -1686,7 +1686,7 @@
                                                                     this.project
                                                                         .description
                                                                 "
-                                                                placeholder="Should not be less than 20 characters."
+                                                                placeholder="Describe this project"
                                                                 rows="4"
                                                                 class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border border-gray-300 rounded-md"
                                                             />
