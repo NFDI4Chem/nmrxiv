@@ -58,7 +58,7 @@
                       v-model="createStudyForm.description"
                       id="description"
                       name="description"
-                      placeholder="Should not be less than 20 characters."
+                      placeholder="Describe this study"
                       rows="3"
                       class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
                     />
