@@ -206,7 +206,7 @@
                                         <textarea
                                             id="description"
                                             name="description"
-                                            placeholder="Should not be less than 20 characters."
+                                            placeholder="Describe this project"
                                             v-model="draftDescription"
                                             rows="3"
                                             class="block w-full shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm border border-gray-300 rounded-md"
