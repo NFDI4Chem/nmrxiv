@@ -7,9 +7,9 @@
           <div class="py-6 px-4 sm:p-6 lg:pb-8">
             <div>
               <h2 class="text-lg leading-6 font-medium text-gray-900">Notifications</h2>
-              <p class="mt-1 text-sm text-gray-500">
+              <!-- <p class="mt-1 text-sm text-gray-500">
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod.
-              </p>
+              </p> -->
             </div>
           </div>
         </div>
