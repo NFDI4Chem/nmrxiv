@@ -145,15 +145,15 @@
                               target="_blank"
                               href="https://www.chemotion.net/chemotionsaurus/index.html"
                               >Chemotion</a
-                            >
+                            > (Electronic Lab Notebook)
                             or
                             <a
                               href="https://github.com/NFDI4Chem/nmrxiv-cli"
                               class="text-indigo-600"
                               target="_blank"
-                              >CLI</a
-                            >
-                            for seamless integration into your Lab infrastructure.
+                              >nmrXiv&nbsp;CLI </a
+                            >(Command Line Interface)
+                            for a seamless integration into your Lab infrastructure.
                           </p>
                         </div>
                       </blockquote>
@@ -203,7 +203,8 @@
                       <p class="mt-3 text-lg">
                         <span class="text-xl">nmr<b>Xiv</b></span> is 100% open source, so
                         you’re free to dig through the source to see exactly how it works.
-                        See something that needs to be improved? Just send us a request.
+                        See something that needs to be improved? Just send us a request.<br/>
+                        <small>Chat bubble is on the bottom left corner or email us at <a href="mailto:info@nmrxiv.org">info@nmrxiv.org</a></small>
                       </p>
                       <div class="mt-8">
                         <div class="inline-flex">
@@ -242,7 +243,7 @@
                   <h2 class="text-base font-semibold uppercase tracking-wider">
                     All set to get started!
                   </h2>
-                  <p class="mt-2 font-bold tracking-tight sm:text-2xl">
+                  <p class="my-2 font-bold tracking-tight sm:text-2xl">
                     Start uploading your spectral data today.
                   </p>
                   <p>
