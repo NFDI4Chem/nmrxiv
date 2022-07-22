@@ -17,13 +17,13 @@
     >
       <path d="m19 19-3.5-3.5"></path>
       <circle cx="11" cy="11" r="6"></circle></svg
-    ><span class="flex-auto">Search...</span
-    >
-    <!-- <kbd class="font-sans font-semibold dark:text-slate-500"
+    ><span class="flex-auto">Search...</span>
+    <kbd class="font-sans text-gray-300 font-semibold dark:text-slate-500"
       ><abbr title="Command" class="no-underline text-slate-300 dark:text-slate-500"
         >⌘</abbr
       >
-      K</kbd> -->
+      K</kbd
+    >
   </button>
   <ais-instant-search :index-name="index" :search-client="searchClient">
     <ais-autocomplete>
@@ -105,7 +105,7 @@
                             >
                             for help.
                           </div> -->
-                        <div
+                          <div
                             class="flex flex-wrap items-center bg-gray-50 py-2.5 px-4 text-xs text-gray-700"
                           >
                             Type to search projects or datasets or click below for help.
@@ -134,23 +134,23 @@
                                       active && 'bg-gray-900 bg-opacity-5 text-gray-900',
                                     ]"
                                   >
-                                   <a class="w-full" :href="'/projects/'+hit.slug">
+                                    <a class="w-full" :href="'/projects/' + hit.slug">
                                       <FolderIcon
-                                          :class="[
-                                            'h-6 w-6 inline flex-none text-gray-900 text-opacity-40',
-                                            active && 'text-opacity-100',
-                                          ]"
-                                          aria-hidden="true"
-                                        />
-                                        <span class="ml-3 flex-auto truncate">{{
-                                          hit.name
-                                        }}</span>
-                                        <span
-                                          v-if="active"
-                                          class="ml-3 flex-none text-gray-500"
-                                          >Jump to...</span
-                                        >
-                                   </a>
+                                        :class="[
+                                          'h-6 w-6 inline flex-none text-gray-900 text-opacity-40',
+                                          active && 'text-opacity-100',
+                                        ]"
+                                        aria-hidden="true"
+                                      />
+                                      <span class="ml-3 flex-auto truncate">{{
+                                        hit.name
+                                      }}</span>
+                                      <span
+                                        v-if="active"
+                                        class="ml-3 flex-none text-gray-500"
+                                        >Jump to...</span
+                                      >
+                                    </a>
                                   </li>
                                 </ComboboxOption>
                               </ul>
@@ -222,19 +222,15 @@
   </ais-instant-search>
 </template>
 
-<style scoped></style>
-
 <script>
-import { defineComponent } from "vue";
 import { instantMeiliSearch } from "@meilisearch/instant-meilisearch";
-import { computed, ref } from "vue";
+import { ref, watchEffect } from "vue";
 import { SearchIcon } from "@heroicons/vue/solid";
 import { Link } from "@inertiajs/inertia-vue3";
+import { useMagicKeys } from "@vueuse/core";
 import {
   DocumentAddIcon,
   FolderIcon,
-  FolderAddIcon,
-  HashtagIcon,
   TagIcon,
 } from "@heroicons/vue/outline";
 import {
@@ -256,11 +252,24 @@ const projects = [
 const recent = [];
 // [projects[0]];
 const quickActions = [
-  { name: "Ask a question...", icon: DocumentAddIcon, shortcut: "N", url: "mailto:info@nmrxiv.org" },
-  { name: "Learn Spectral analysis...", icon: TagIcon, shortcut: "F", url: "https://docs.nmrxiv.org" },
+  {
+    name: "Ask a question...",
+    icon: DocumentAddIcon,
+    shortcut: "N",
+    url: "mailto:info@nmrxiv.org",
+  },
+  {
+    name: "Learn Spectral analysis...",
+    icon: TagIcon,
+    shortcut: "F",
+    url: "https://docs.nmrxiv.org",
+  },
   //   { name: "Add hashtag...", icon: HashtagIcon, shortcut: "H", url: "#" },
   //   { name: "Add label...", icon: TagIcon, shortcut: "L", url: "#" },
 ];
+
+const { meta, k } = useMagicKeys();
+const open = ref(false);
 
 export default {
   props: ["akey", "host"],
@@ -276,7 +285,7 @@ export default {
     SearchIcon,
     TransitionChild,
     TransitionRoot,
-    Link
+    Link,
   },
   data: function () {
     return {
@@ -288,7 +297,11 @@ export default {
     };
   },
   setup() {
-    const open = ref(false);
+    watchEffect(() => {
+      if (meta.value && k.value) {
+        open.value = true;
+      }
+    });
 
     return {
       open,

@@ -77,10 +77,10 @@
                   Share with users
                 </h3>
                 <div class="mt-2 max-w-xl text-sm text-gray-500">
-                  <p>
+                  <!-- <p>
                     Lorem ipsum dolor sit amet consectetur adipisicing elit. Recusandae
                     voluptatibus corrupti atque repudiandae nam.
-                  </p>
+                  </p> -->
                 </div>
               </div>
               <div class="mt-5 sm:mt-0 sm:ml-6 sm:flex-shrink-0 sm:flex sm:items-center">

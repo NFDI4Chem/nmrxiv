@@ -75,9 +75,10 @@
                           class="max-w-3xl mx-auto text-center text-xl leading-9 font-medium text-gray-900"
                         >
                           <p class="mt-3 text-lg">
-                            Welcome! Lorem ipsum dolor sit amet consectetur adipisicing
-                            elit. Nemo expedita voluptas culpa sapiente alias molestiae.
-                            Numquam corrupti in laborum sed rerum et corporis.&rdquo;
+                            Welcome! <span class="text-xl">nmr<b>Xiv</b></span> support
+                            scientists in their efforts to collect, store, process,
+                            analyse, disclose and re-use Nuclear Magnetic Resonance
+                            Spectroscopy research data. Ready to get started?
                           </p>
                         </div>
                       </blockquote>
@@ -124,82 +125,134 @@
                       />
                     </svg>
                     <div class="relative text-center">
-                      <div class="flex justify-center">
-                        <img
-                          class="rounded-md"
-                          style="height: 200px"
-                          src="/img/illustration1.jpg"
-                        />
-                      </div>
                       <blockquote class="mt-10">
                         <div
                           class="max-w-3xl mx-auto text-center text-xl leading-9 font-medium text-gray-900"
                         >
                           <p class="mt-3 text-lg">
-                            Welcome! Lorem ipsum dolor sit amet consectetur adipisicing
-                            elit. Nemo expedita voluptas culpa sapiente alias molestiae.
-                            Numquam corrupti in laborum sed rerum et corporis.&rdquo;
+                            <span class="text-xl">nmr<b>Xiv</b></span> as a part of
+                            <a
+                              class="text-indigo-600 font-bold"
+                              href="https://nfdi4chem.de"
+                              target="_blank"
+                              >NFDI4Chem</a
+                            >, focuses on the implementation and adaptation of existing
+                            and new infrastructure, necessary to capture data early in the
+                            life cycle​ and to further manage, analyse and store
+                            associated information. Checkout
+                            <a
+                              class="text-indigo-600"
+                              target="_blank"
+                              href="https://www.chemotion.net/chemotionsaurus/index.html"
+                              >Chemotion</a
+                            > (Electronic Lab Notebook)
+                            or
+                            <a
+                              href="https://github.com/NFDI4Chem/nmrxiv-cli"
+                              class="text-indigo-600"
+                              target="_blank"
+                              >nmrXiv&nbsp;CLI </a
+                            >(Command Line Interface)
+                            for a seamless integration into your Lab infrastructure.
                           </p>
                         </div>
                       </blockquote>
-                      <small
-                        ><i
-                          ><a href="https://www.freepik.com/vectors/science-research"
-                            >Science research vector created by storyset -
-                            www.freepik.com</a
-                          ></i
-                        ></small
-                      >
                     </div>
                   </div>
                 </section>
               </div>
               <div v-if="currentStep == 3">
-                <div
-                  class="h-1/2 bg-gray-50 overflow-hidden max-w-7xl mx-auto text-center py-12 px-4 sm:px-6"
-                >
-                  <h2 class="text-base font-semibold uppercase tracking-wider">
-                    SUPPORT
-                  </h2>
-                  <p class="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">
-                    We’re here to help
-                  </p>
-                  <p class="mt-3 text-lg">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Et, egestas
-                    tempus tellus etiam sed. Quam a scelerisque amet ullamcorper eu enim
-                    et fermentum, augue. Aliquet amet volutpat quisque ut interdum
-                    tincidunt duis.
-                  </p>
-                  <div class="mt-8">
-                    <div class="inline-flex rounded-md shadow">
-                      <a
-                        target="_blank"
-                        href="https://docs.nmrxiv.org"
-                        class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-gray-900 bg-white hover:bg-gray-50"
-                      >
-                        Visit the docs
-                        <ExternalLinkIcon
-                          class="-mr-1 ml-3 h-5 w-5 text-gray-400"
-                          aria-hidden="true"
-                        />
-                      </a>
+                <section class="h-1/2 overflow-hidden py-12">
+                  <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <svg
+                      class="absolute top-full right-full transform translate-x-1/3 -translate-y-1/4 lg:translate-x-1/2 xl:-translate-y-1/2"
+                      width="404"
+                      height="404"
+                      fill="none"
+                      viewBox="0 0 404 404"
+                      role="img"
+                      aria-labelledby="svg-nmrxiv"
+                    >
+                      <title id="svg-nmrxiv">nmrxiv</title>
+                      <defs>
+                        <pattern
+                          id="ad119f34-7694-4c31-947f-5c9d249b21f3"
+                          x="0"
+                          y="0"
+                          width="20"
+                          height="20"
+                          patternUnits="userSpaceOnUse"
+                        >
+                          <rect
+                            x="0"
+                            y="0"
+                            width="4"
+                            height="4"
+                            class="text-gray-200"
+                            fill="currentColor"
+                          />
+                        </pattern>
+                      </defs>
+                      <rect
+                        width="404"
+                        height="404"
+                        fill="url(#ad119f34-7694-4c31-947f-5c9d249b21f3)"
+                      />
+                    </svg>
+                    <div class="relative text-center">
+                      <p class="mt-3 text-lg">
+                        <span class="text-xl">nmr<b>Xiv</b></span> is 100% open source, so
+                        you’re free to dig through the source to see exactly how it works.
+                        See something that needs to be improved? Just send us a request.<br/>
+                        <small>Chat bubble is on the bottom left corner or email us at <a href="mailto:info@nmrxiv.org">info@nmrxiv.org</a></small>
+                      </p>
+                      <div class="mt-8">
+                        <div class="inline-flex">
+                          <a
+                            target="_blank"
+                            href="https://github.com/NFDI4Chem/nmrxiv"
+                            class="inline-flex mr-4 items-center justify-center px-5 py-3 border text-base font-medium rounded-md text-gray-900 bg-white hover:bg-gray-50"
+                          >
+                            Source code
+                            <ExternalLinkIcon
+                              class="-mr-1 ml-3 h-5 w-5 text-gray-400"
+                              aria-hidden="true"
+                            />
+                          </a>
+                          <a
+                            target="_blank"
+                            href="https://docs.nmrxiv.org"
+                            class="inline-flex items-center justify-center px-5 py-3 border text-base font-medium rounded-md text-gray-900 bg-white hover:bg-gray-50"
+                          >
+                            Visit the docs
+                            <ExternalLinkIcon
+                              class="-mr-1 ml-3 h-5 w-5 text-gray-400"
+                              aria-hidden="true"
+                            />
+                          </a>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
+                </section>
               </div>
               <div v-if="currentStep == 4">
                 <div
                   class="max-w-7xl mx-auto text-center py-12 px-4 sm:px-6 lg:py-16 lg:px-8"
                 >
-                  <h2
-                    class="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl"
-                  >
-                    <span class="block text-gray-500">All set to get started!</span>
-                    <span class="block">Start uploading your spectral data today.</span>
+                  <h2 class="text-base font-semibold uppercase tracking-wider">
+                    All set to get started!
                   </h2>
+                  <p class="my-2 font-bold tracking-tight sm:text-2xl">
+                    Start uploading your spectral data today.
+                  </p>
+                  <p>
+                    Click "Get started" and upload your data or if you want a guided tour of the dashboard press the "Dashboard Tour" button below.
+                  </p>
                   <div class="mt-8 flex justify-center">
                     <div class="inline-flex rounded-md shadow">
                       <a
+                        refs="next"
                         @click="onboardingComplete"
                         class="cursor-pointer inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
                       >
@@ -224,11 +277,11 @@
                     @click="selectStep(currentStep - 1)"
                     v-if="currentStep != 1"
                     type="button"
-                    class="py-2 px-3"
+                    class="py-2 px-3 border rounded-md"
                   >
                     <div class="flex flex-row align-middle">
                       <svg
-                        class="w-5 mr-2"
+                        class="w-5 mr-1"
                         fill="currentColor"
                         viewBox="0 0 20 20"
                         xmlns="http://www.w3.org/2000/svg"
@@ -269,7 +322,7 @@
                           <span
                             v-if="step.status === 'complete'"
                             :href="step.href"
-                            class="block w-2.5 h-2.5 bg-indigo-600 rounded-full hover:bg-indigo-900"
+                            class="block w-2.5 h-2.5 bg-indigo-600 rounded-full hover:bg-indigo-600"
                           >
                             <span class="sr-only">{{ step.name }}</span>
                           </span>
@@ -301,28 +354,57 @@
                   </nav>
                 </div>
                 <div class="p-4 py-4 text-right">
-                  <button
-                    v-if="currentStep < steps.length"
-                    @click="selectStep(currentStep + 1)"
-                    type="button"
-                    class="py-2 px-3"
-                  >
-                    <div class="flex flex-row align-middle">
-                      <span class="mr-2">Next</span>
-                      <svg
-                        class="w-5 ml-2"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg"
+                  <div v-if="currentStep < steps.length">
+                    <div v-if="currentStep == 1">
+                      <button
+                        @click="selectStep(currentStep + 1)"
+                        type="button"
+                        class="py-2 px-3 bg-indigo-600 text-white rounded-md"
+                        autofocus
                       >
-                        <path
-                          fill-rule="evenodd"
-                          d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z"
-                          clip-rule="evenodd"
-                        ></path>
-                      </svg>
+                        <div class="flex flex-row align-middle">
+                          <span class="mr-1">Let's&nbsp;go</span>
+                          <svg
+                            class="w-5 ml-2"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              fill-rule="evenodd"
+                              d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z"
+                              clip-rule="evenodd"
+                            ></path>
+                          </svg>
+                        </div>
+                      </button>
                     </div>
-                  </button>
+                    <div v-else>
+                      <button
+                        @click="selectStep(currentStep + 1)"
+                        type="button"
+                        class="py-2 px-3 bg-indigo-600 text-white rounded-md"
+                        ref="next"
+                        autofocus
+                      >
+                        <div class="flex flex-row align-middle">
+                          <span class="mr-1">Next</span>
+                          <svg
+                            class="w-5 ml-2"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              fill-rule="evenodd"
+                              d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z"
+                              clip-rule="evenodd"
+                            ></path>
+                          </svg>
+                        </div>
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -404,6 +486,10 @@ export default {
           step.status = "complete";
         } else if (parseInt(step.id) == id) {
           step.status = "current";
+
+          this.$nextTick(() => {
+            this.$refs.next.focus();
+          });
         } else {
           step.status = "upcoming";
         }
