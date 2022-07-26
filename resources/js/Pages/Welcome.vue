@@ -222,7 +222,7 @@
               <h1
                 class="text-center text-2xl font-extrabold tracking-tight sm:text-5xl lg:text-4xl"
               >
-                <span class="block text-dark">Open, FAIR and Consensus-Driven</span>
+                <span class="block text-teal-900">Open, FAIR and Consensus-Driven</span>
                 <span class="block text-teal-200"
                   >NMR spectroscopy data repository and analysis platform.</span
                 >
