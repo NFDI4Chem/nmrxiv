@@ -20,9 +20,16 @@ use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Laravel\Fortify\Actions\ConfirmPassword;
 use Laravel\Jetstream\Jetstream;
+use App\Http\Controllers\Admin\LicenseController;
 
 class StudyController extends Controller
 {
+    protected $LicenseController;
+    public function __construct(LicenseController $LicenseController)
+    {
+        $this->LicenseController = $LicenseController;
+    }
+
     public function store(Request $request, CreateNewStudy $creator)
     {
         $study = $creator->create($request->all());
@@ -49,7 +56,10 @@ class StudyController extends Controller
 
         $project = $study->project;
         $team = $project->nonPersonalTeam;
-
+        $license = null;
+        if($study->license_id){
+            $license = $this->LicenseController->getLicensebyId($request, $study->license_id );
+        }
         return Inertia::render('Study/About', [
             'study' => $study->load('users', 'owner', 'studyInvitations', 'tags', 'sample.molecules'),
             'team' => $team ? $team->load('users', 'owner') : null,
@@ -57,6 +67,7 @@ class StudyController extends Controller
             'members' => $study->allUsers(),
             'availableRoles' => array_values(Jetstream::$roles),
             'studyRole' => $study->userStudyRole(Auth::user()->email),
+            'license'  => $license ? $license[0] : null,
             'studyPermissions' => [
                 'canDeleteStudy' => Gate::check('deleteStudy', $study),
                 'canUpdateStudy' => Gate::check('updateStudy', $study),
@@ -261,4 +272,5 @@ class StudyController extends Controller
                 ->get(),
         ]);
     }
+
 }
