@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AnnouncementController;
 use App\Http\Controllers\Admin\ConsoleController;
 use App\Http\Controllers\Admin\LicenseController;
+use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\Auth\SocialController;
 use App\Http\Controllers\DashboardController;
@@ -65,6 +66,12 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
                 ->name('licenses');
     Route::get('licenses/{id}', [LicenseController::class, 'getLicensebyId'])
                 ->name('license');
+
+    // Authors
+    Route::get('authors', [AuthorController::class, 'getDetailsbyDOI'])
+                ->name('get-details-by-DOI');
+    Route::post('authors/{project}', [AuthorController::class, 'addAuthor'])
+                ->name('add-author');
 
     Route::post('/onboarding/{status}', [DashboardController::class, 'onboardingStatus'])
             ->name('onboarding.complete');

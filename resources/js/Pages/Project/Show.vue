@@ -123,6 +123,11 @@
                   ref="projectDetailsElement"
                   :project="project"
                 />
+                <add-author
+                  ref="addAuthorElement"
+                  :project="project"
+
+                />
                 <span
                   class="capitalize inline-flex pr-4 ml-7 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
                 >
@@ -197,6 +202,7 @@
     </template>
     <div class="p-12">
       <div>
+        <!-- Description -->
         <div class="mb-4">
           <div class="relative">
             <div class="absolute inset-0 flex items-center" aria-hidden="true">
@@ -209,7 +215,7 @@
               <button
                 type="button"
                 @click="toggleDetails"
-                class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -232,6 +238,33 @@
             </p>
           </dd>
         </div>
+        <!-- Author -->
+        <div class="mb-4">
+          <div class="relative">
+            <div class="absolute inset-0 flex items-center" aria-hidden="true">
+              <div class="w-full border-t border-gray-300"></div>
+            </div>
+            <div class="relative flex items-center justify-between">
+              <span class="pr-3 text-lg bg-gray-100 font-medium text-gray-500">
+                Author
+              </span>
+              <button
+                type="button"
+                @click="toggleAddAuthor"
+                class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+              >
+                <PlusIcon class="w-5 h-5 mr-1 text-gray-600" />
+                <span>Add</span>
+              </button>
+            </div>
+          </div>
+          <dd class="mt-1 text-md text-gray-900 space-y-5">
+            <p>
+              {{ project.authors }}
+            </p>
+          </dd>
+        </div>
+        <!-- Keywords -->
         <div class="mb-4">
           <div class="relative">
             <div class="absolute inset-0 flex items-center" aria-hidden="true">
@@ -244,7 +277,7 @@
               <button
                 type="button"
                 @click="toggleDetails"
-                class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -298,7 +331,8 @@ import { Link } from "@inertiajs/inertia-vue3";
 import StudyIndex from "@/Pages/Study/Index.vue";
 import ProjectDetails from "./Partials/Details.vue";
 import { ref } from "vue";
-import { StarIcon } from "@heroicons/vue/solid";
+import { StarIcon,PlusIcon } from "@heroicons/vue/solid";
+import AddAuthor from "@/Shared/AddAuthor.vue";
 
 export default {
   components: {
@@ -307,7 +341,9 @@ export default {
     StudyIndex,
     ProjectDetails,
     StarIcon,
+    PlusIcon,
     AccessDialogue,
+    AddAuthor,
   },
   props: [
     "project",
@@ -323,8 +359,10 @@ export default {
   },
   setup() {
     const projectDetailsElement = ref(null);
+    const addAuthorElement = ref(null);
     return {
       projectDetailsElement,
+      addAuthorElement,
     };
   },
   methods: {
@@ -334,6 +372,9 @@ export default {
     toggleDetails() {
       this.projectDetailsElement.toggleDetails();
     },
+    toggleAddAuthor(){
+      this.addAuthorElement.toggleAddAuthorDialog();
+    }
   },
   computed: {
     canDeleteProject() {
