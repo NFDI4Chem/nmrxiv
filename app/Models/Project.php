@@ -249,4 +249,13 @@ class Project extends Model implements Auditable
     {
         return $this->is_public;
     }
+    /**
+     * Authors that belongs to project. 
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\belongsToMany
+     */
+    public function authors()
+    {
+        return $this->belongsToMany(Author::class);
+    }
 }

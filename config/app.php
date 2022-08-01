@@ -238,5 +238,6 @@ return [
     ],
 
     'github_license_url' => env('GITHUB_LICENSE_URL', 'https://api.github.com/licenses'),
+    'get_details_by_DOI_api' => env('GET_DETAILS_BY_DOI_API', 'https://api.crossref.org/works/'),
 
 ];

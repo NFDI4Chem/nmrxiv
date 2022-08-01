@@ -93,4 +93,11 @@ class UpdateProject
             }
         });
     }
+
+    public function updateAuthor(Project $project, array $input){
+        $project->authors()->attach(
+            $input
+        );
+    }
+
 }
