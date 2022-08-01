@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     branches:
-      - development
+      - dev-helm-deploy
 
 env:
   PACKAGE_NAME: nmrxiv
