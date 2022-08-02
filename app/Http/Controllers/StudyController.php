@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\Study\CreateNewStudy;
 use App\Actions\Study\UpdateStudy;
+use App\Actions\License\GetLicense;
 use App\Models\FileSystemObject;
 use App\Models\Molecule;
 use App\Models\Sample;
@@ -20,15 +21,10 @@ use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Laravel\Fortify\Actions\ConfirmPassword;
 use Laravel\Jetstream\Jetstream;
-use App\Http\Controllers\Admin\LicenseController;
+
 
 class StudyController extends Controller
 {
-    protected $LicenseController;
-    public function __construct(LicenseController $LicenseController)
-    {
-        $this->LicenseController = $LicenseController;
-    }
 
     public function store(Request $request, CreateNewStudy $creator)
     {
@@ -48,7 +44,7 @@ class StudyController extends Controller
             : back()->with('success', 'Study updated successfully');
     }
 
-    public function show(Request $request, Study $study)
+    public function show(Request $request, Study $study, GetLicense $getLicense)
     {
         if (! Gate::forUser($request->user())->check('viewStudy', $study)) {
             throw new AuthorizationException;
@@ -58,7 +54,7 @@ class StudyController extends Controller
         $team = $project->nonPersonalTeam;
         $license = null;
         if($study->license_id){
-            $license = $this->LicenseController->getLicensebyId($request, $study->license_id );
+            $license = $getLicense->getLicensebyId($study->license_id );
         }
         return Inertia::render('Study/About', [
             'study' => $study->load('users', 'owner', 'studyInvitations', 'tags', 'sample.molecules'),
