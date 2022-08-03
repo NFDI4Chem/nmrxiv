@@ -83,20 +83,25 @@ export default {
   computed: {
     downloadURL() {
       if (this.study || this.project) {
+        let project = null;
         if (this.study && !this.project) {
-          this.project = this.study.project;
+          project = this.study.project;
+        } else {
+          project = this.project;
         }
-        return (
-          this.url +
-          "/" +
-          this.project.owner.username +
-          "/download/" +
-          this.project.slug +
-          "?key=" +
-          this.file.key +
-          "&uuid=" +
-          this.file.uuid
-        );
+        if (project) {
+          return (
+            this.url +
+            "/" +
+            project.owner.username +
+            "/download/" +
+            project.slug +
+            "?key=" +
+            this.file.key +
+            "&uuid=" +
+            this.file.uuid
+          );
+        }
       }
     },
     url() {
