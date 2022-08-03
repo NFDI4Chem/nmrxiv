@@ -36,6 +36,7 @@ class StudyResource extends JsonResource
             'tags' => $this->tags,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'study_preview_urls' => $this->study_preview_urls,
             $this->mergeWhen(! $this->lite, function () {
                 return [
                     $this->mergeWhen(

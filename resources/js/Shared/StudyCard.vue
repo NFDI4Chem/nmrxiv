@@ -21,7 +21,7 @@
             </span>
 
             <div
-              class="absolute w-full py-2.5 bottom-0 inset-x-0 bg-gradient-to-t from-gray-500 pl-4 text-white text-xs text-center leading-4"
+              class="absolute w-full py-2.5 bottom-0 inset-x-0 pl-4 text-white text-xs text-center leading-4"
             >
               <div>
                 <ol role="list" class="flex items-center space-x-2">
