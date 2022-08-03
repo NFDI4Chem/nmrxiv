@@ -1849,7 +1849,7 @@ export default {
         .put("/dashboard/studies/" + this.selectedStudy.id + "/update", {
           name: this.studyName,
           description: this.studyDescription,
-          tags: this.studyTags.map((a) => a.text),
+          tags_array: this.studyTags.map((a) => a.text),
         })
         .catch((error) => {
           this.loadingStep = false;
