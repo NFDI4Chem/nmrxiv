@@ -325,6 +325,7 @@
                           "
                         >
                           <File-details
+                            :project="project.data"
                             :file="$page.props.selectedFileSystemObject"
                           ></File-details>
                         </span>
