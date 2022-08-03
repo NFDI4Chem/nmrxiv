@@ -13,7 +13,6 @@ use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
 class DraftController extends Controller
@@ -112,10 +111,18 @@ class DraftController extends Controller
     public function process(Request $request, Draft $draft)
     {
         $input = $request->all();
+        $project = Project::where('draft_id', $draft->id)->first();
+        if ($project) {
+            $rule = Rule::unique('projects')
+        ->where('owner_id', $input['owner_id'])->ignore($project->id);
+        } else {
+            $rule = Rule::unique('projects')
+        ->where('owner_id', $input['owner_id']);
+        }
+
         $validation = $request->validate([
             'name' => ['required', 'string', 'max:255',  Rule::unique('drafts')
-            ->where('owner_id', $input['owner_id'])->ignore($draft->id), Rule::unique('projects')
-            ->where('owner_id', $input['owner_id'])],
+            ->where('owner_id', $input['owner_id'])->ignore($draft->id), $rule, ],
             'description' => ['required', 'string', 'min:20'],
         ]);
 
@@ -146,9 +153,7 @@ class DraftController extends Controller
             $team_id = $user->current_team_id;
         }
 
-        return DB::transaction(function () use ($draft, $user, $user_id, $team_id, $request) {
-            $project = Project::where('draft_id', $draft->id)->first();
-
+        return DB::transaction(function () use ($draft, $user, $user_id, $team_id, $request, $project) {
             if (! $project) {
                 $project = Project::create([
                     'name' => $draft->name,
@@ -323,7 +328,7 @@ class DraftController extends Controller
 
             return response()->json([
                 'project' => $project,
-                'studies' => $studies
+                'studies' => $studies,
             ]);
         });
     }
