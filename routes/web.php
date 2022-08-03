@@ -59,10 +59,14 @@ Route::get('{code}/studies/{study}/file/{filename}', [StudyController::class, 'f
 
 Route::get('projects/{owner}/{slug}', [ProjectController::class, 'publicProjectView'])
     ->name('public.project');
+Route::get('projects/{owner}/{slug}/{study}', [ProjectController::class, 'publicProjectView'])
+    ->name('public.study');
+Route::get('projects/{owner}/{slug}/{study}/{dataset}', [ProjectController::class, 'publicProjectView'])
+    ->name('public.dataset');
+
 Route::get('projects', [ProjectController::class, 'publicProjectsView'])
     ->name('public.projects');
-Route::get('datasets/{slug}', [DatasetController::class, 'publicDatasetView'])
-    ->name('public.dataset');
+
 Route::get('datasets', [DatasetController::class, 'publicDatasetsView'])
     ->name('public.datasets');
 
