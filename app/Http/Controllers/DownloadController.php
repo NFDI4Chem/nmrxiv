@@ -117,13 +117,13 @@ class DownloadController extends Controller
                         }
                         $zip->finish();
                     },
-                200,
-                [
-                    'Access-Control-Allow-Origin' => '*',
-                    'Content-Disposition' => 'attachment;filename="'.$fsObj->name.'.zip"',
-                    'Content-Type' => 'application/octet-stream',
-                ]
-            );
+                    200,
+                    [
+                        'Access-Control-Allow-Origin' => '*',
+                        'Content-Disposition' => 'attachment;filename="'.$fsObj->name.'.zip"',
+                        'Content-Type' => 'application/octet-stream',
+                    ]
+                );
             }
         }
 
