@@ -1932,13 +1932,20 @@ export default {
     loadSpectra() {
       const iframe = window.frames.submissionNMRiumIframe;
       this.currentMolecules = [];
-      let url = this.url + "/" + this.$page.props.team.owner.username + '/datasets/' + this.project.slug + '/' + this.selectedStudy.slug + "/" + this.selectedDataset.slug
+      let url =
+        this.url +
+        "/" +
+        this.$page.props.team.owner.username +
+        "/datasets/" +
+        this.project.slug +
+        "/" +
+        this.selectedStudy.slug +
+        "/" +
+        this.selectedDataset.slug;
       if (iframe) {
         if (!this.selectedDataset.nmrium_info) {
           let data = {
-            data: [
-              url,
-            ],
+            data: [url],
             type: "url",
           };
           iframe.postMessage({ type: `nmr-wrapper:load`, data }, "*");

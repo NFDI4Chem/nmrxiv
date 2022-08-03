@@ -385,26 +385,22 @@ export default {
         this.$page.props.selectedFileSystemObject &&
         this.$page.props.selectedFileSystemObject.key.indexOf(".mol") > -1
       ) {
-        this.loadMol(this.$page.props.selectedFileSystemObject);
+        this.loadMol();
       }
       const iframe = window.frames.crossDomainIframe;
       if (iframe) {
         let data = {
           urls: [
-            this.url +
-              "/asc/studies/" +
-              this.study.id +
-              "/file/" +
-              this.$page.props.selectedFileSystemObject.name,
+            this.downloadURL
           ],
         };
         iframe.postMessage({ type: `nmr-wrapper:loadURLs`, data }, "*");
       }
     },
-    loadMol(file) {
+    loadMol() {
       this.svgString = null;
       axios
-        .get(this.url + "/asc/studies/" + this.study.id + "/file/" + file.name)
+        .get(this.downloadURL)
         .then((response) => {
           if (response && response.data != "") {
             let mol = OCL.Molecule.fromMolfile(response.data);
