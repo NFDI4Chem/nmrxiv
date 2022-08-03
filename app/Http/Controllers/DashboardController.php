@@ -26,6 +26,7 @@ class DashboardController extends Controller
         }
 
         return Inertia::render('Dashboard', [
+            'filters' => $request->all('action', 'draft_id'),
             'team' => $team,
             'projects' => $projects,
             'teamRole' => $user->teamRole($team),

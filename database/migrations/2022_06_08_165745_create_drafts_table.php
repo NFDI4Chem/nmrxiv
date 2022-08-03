@@ -20,6 +20,7 @@ return new class extends Migration
             $table->longText('description')->nullable();
             $table->string('relative_url', 2048)->nullable();
             $table->string('path', 2048)->nullable();
+            $table->integer('current_step')->default('1');
             $table->string('key');
             $table->boolean('is_deleted')->default(0);
             $table->foreignId('owner_id')->nullable();
