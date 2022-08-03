@@ -67,6 +67,8 @@ Route::get('projects/{owner}/{slug}', [ProjectController::class, 'publicProjectV
 Route::get('projects', [ProjectController::class, 'publicProjectsView'])
     ->name('public.projects');
 
+Route::get('datasets/{owner}/{slug}', [DatasetController::class, 'publicDatasetView'])
+    ->name('public.dataset');
 Route::get('datasets', [DatasetController::class, 'publicDatasetsView'])
     ->name('public.datasets');
 
@@ -168,6 +170,8 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
 
         Route::post('datasets/{dataset}/nmriumInfo', [DatasetController::class, 'nmriumInfo'])
             ->name('dashboard.datasets.nmriumInfo');
+        Route::post('datasets/{dataset}/preview', [DatasetController::class, 'preview'])
+            ->name('dashboard.dataset.preview');
 
         Route::get('drafts/{draft}/files', [DraftController::class, 'files'])
             ->name('dashboard.draft.files');

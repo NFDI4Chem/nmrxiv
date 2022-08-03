@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Dataset;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Storage;
 
 class DatasetController extends Controller
 {
@@ -53,5 +54,17 @@ class DatasetController extends Controller
         return Inertia::render('Public/Datasets', [
             'datasets' => $datasets,
         ]);
+    }
+
+    public function preview(Request $request, Dataset $dataset)
+    {
+        $content = $request->get('img');
+        $study = $dataset->study;
+        if ($content) {
+            $path = '/projects/'.$study->project->uuid.'/'.$study->uuid.'/'.$dataset->slug.'.svg';
+            Storage::disk('minio_public')->put($path, $content);
+            $dataset->dataset_photo_path = $path;
+            $dataset->save();
+        }
     }
 }
