@@ -114,7 +114,8 @@ class DraftController extends Controller
         $input = $request->all();
         $validation = $request->validate([
             'name' => ['required', 'string', 'max:255',  Rule::unique('drafts')
-            ->where('owner_id', $input['owner_id'])->ignore($draft->id)],
+            ->where('owner_id', $input['owner_id'])->ignore($draft->id), Rule::unique('projects')
+            ->where('owner_id', $input['owner_id'])],
             'description' => ['required', 'string', 'min:20'],
         ]);
 

@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\License\GetLicense;
 use App\Actions\Study\CreateNewStudy;
 use App\Actions\Study\UpdateStudy;
-use App\Actions\License\GetLicense;
 use App\Models\FileSystemObject;
 use App\Models\Molecule;
 use App\Models\Sample;
@@ -22,10 +22,8 @@ use Inertia\Inertia;
 use Laravel\Fortify\Actions\ConfirmPassword;
 use Laravel\Jetstream\Jetstream;
 
-
 class StudyController extends Controller
 {
-
     public function store(Request $request, CreateNewStudy $creator)
     {
         $study = $creator->create($request->all());
@@ -53,9 +51,10 @@ class StudyController extends Controller
         $project = $study->project;
         $team = $project->nonPersonalTeam;
         $license = null;
-        if($study->license_id){
-            $license = $getLicense->getLicensebyId($study->license_id );
+        if ($study->license_id) {
+            $license = $getLicense->getLicensebyId($study->license_id);
         }
+
         return Inertia::render('Study/About', [
             'study' => $study->load('users', 'owner', 'studyInvitations', 'tags', 'sample.molecules'),
             'team' => $team ? $team->load('users', 'owner') : null,
@@ -63,7 +62,7 @@ class StudyController extends Controller
             'members' => $study->allUsers(),
             'availableRoles' => array_values(Jetstream::$roles),
             'studyRole' => $study->userStudyRole(Auth::user()->email),
-            'license'  => $license ? $license[0] : null,
+            'license' => $license ? $license[0] : null,
             'studyPermissions' => [
                 'canDeleteStudy' => Gate::check('deleteStudy', $study),
                 'canUpdateStudy' => Gate::check('updateStudy', $study),
@@ -268,5 +267,4 @@ class StudyController extends Controller
                 ->get(),
         ]);
     }
-
 }
