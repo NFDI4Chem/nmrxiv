@@ -2,7 +2,7 @@
 <template>
   <div class="bg-white shadow overflow-hidden sm:rounded-lg">
     <div class="px-4 py-5 sm:px-6">
-      <h3 class="text-lg leading-6 font-medium text-gray-900">{{ file.name }}</h3>
+      <h3 class="text-lg leading-6 text-xl font-bold text-gray-900">{{ file.name }}</h3>
       <p class="mt-1 max-w-2xl text-sm text-gray-500">File information</p>
     </div>
     <div class="border-t border-gray-200 px-4 py-5 sm:p-0">
@@ -13,6 +13,7 @@
             {{ formatDateTime(file.created_at) }}
           </dd>
         </div>
+        <div></div>
         <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
           <dt class="text-sm font-medium text-gray-500">Content</dt>
           <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
@@ -46,10 +47,6 @@
                     class="font-medium text-indigo-600 hover:text-indigo-500"
                   >
                     Download
-                  </a>
-                  &emsp;
-                  <a class="font-medium text-indigo-600 hover:text-indigo-500">
-                    View
                   </a>
                 </div>
               </li>
@@ -85,8 +82,16 @@ export default {
   methods: {},
   computed: {
     downloadURL() {
-      if(this.study){
-        return this.url + "/asc/studies/" + this.study.id + "/file/" + this.file.name;
+      if (this.study) {
+        return (
+          this.url +
+          "/" +
+          this.study.owner.username +
+          "/download/" +
+          this.study.project.slug +
+          "?key="  +
+          this.file.key + "&uuid=" + this.file.uuid
+        );
       }
     },
     url() {

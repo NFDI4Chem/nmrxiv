@@ -24,6 +24,7 @@ class CreateFileSystemObjectsTable extends Migration
             $table->string('model_type')->nullable();
             $table->string('instrument_type')->nullable();
             $table->string('key');
+            $table->uuid('uuid')->unique();
             $table->string('compressionInfo')->nullable();
             $table->string('kernelSessionInfo')->nullable();
             $table->string('color')->nullable()->default('#fff');
