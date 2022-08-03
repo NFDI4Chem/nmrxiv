@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\Auth\SocialController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DatasetController;
+use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\DraftController;
 use App\Http\Controllers\FileSystemController;
 use App\Http\Controllers\ProjectController;
@@ -44,8 +45,14 @@ Route::get('/', function () {
 
 Route::supportBubble();
 
-Route::get('download/{code}/datasets/{dataset}/{filename}', [DatasetController::class, 'download'])
-    ->name('dataset.download');
+Route::get('{username}/download/{project}/{key?}', [DownloadController::class, 'downloadFromProject'])
+    ->name('download');
+
+Route::get('{username}/datasets/{project}/{study?}/{dataset?}', [DownloadController::class, 'downloadSet'])
+    ->name('download.set');
+
+// Route::get('{username}/download/{project}/{study}/{filename}', [DownloadController::class, 'download'])
+//     ->name('dataset.download');
 
 Route::get('{code}/studies/{study}/file/{filename}', [StudyController::class, 'file'])
     ->name('study.file');

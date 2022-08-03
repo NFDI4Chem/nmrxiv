@@ -120,6 +120,8 @@ class FileSystemController extends Controller
                                     'is_root' => $currentLevel == 0 ? 1 : 0,
                                     'draft_id' => $draft->id,
                                     'level' => $currentLevel,
+                                ], [
+                                    'uuid' => Str::uuid(),
                                 ]
                             );
 
@@ -161,6 +163,8 @@ class FileSystemController extends Controller
                                     'is_root' => $currentLevel + 1 == 0 ? 1 : 0,
                                     'draft_id' => $draft->id,
                                     'level' => $currentLevel + 1,
+                                ], [
+                                    'uuid' => Str::uuid(),
                                 ]
                             );
                             if (! $childFileSystemObject->parent_id) {
@@ -203,6 +207,8 @@ class FileSystemController extends Controller
                             'is_root' => $currentLevel == 0 ? 1 : 0,
                             'draft_id' => $draft->id,
                             'level' => $currentLevel,
+                        ], [
+                            'uuid' => Str::uuid(),
                         ]);
                     }
                 }
@@ -235,6 +241,8 @@ class FileSystemController extends Controller
                     'parent_id' => $hasDirectories
                         ? $childFileSystemObject->id
                         : null,
+                ], [
+                    'uuid' => Str::uuid(),
                 ]);
             }, 5);
 
@@ -363,6 +371,8 @@ class FileSystemController extends Controller
                                 'project_id' => $project->id,
                                 'study_id' => $study->id,
                                 'level' => $currentLevel,
+                            ], [
+                                'uuid' => Str::uuid(),
                             ]
                         );
 
@@ -395,6 +405,8 @@ class FileSystemController extends Controller
                                 'project_id' => $project->id,
                                 'study_id' => $study->id,
                                 'level' => $currentLevel + 1,
+                            ], [
+                                'uuid' => Str::uuid(),
                             ]
                         );
                         if (! $childFileSystemObject->parent_id) {
@@ -428,6 +440,8 @@ class FileSystemController extends Controller
                         'project_id' => $request->get('project_id'),
                         'study_id' => $request->get('study_id'),
                         'level' => $currentLevel,
+                    ], [
+                        'uuid' => Str::uuid(),
                     ]);
                 }
             }
@@ -460,6 +474,8 @@ class FileSystemController extends Controller
                 'parent_id' => $hasDirectories
                     ? $childFileSystemObject->id
                     : null,
+            ], [
+                'uuid' => Str::uuid(),
             ]);
         }, 5);
 

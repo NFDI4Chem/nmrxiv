@@ -155,7 +155,10 @@
             </div>
             <div class="min-w-0 flex-1">
               <div class="text-sm font-medium text-gray-900">
-                <a href="https://docs.nmrxiv.org/docs/developer-guides/API" target="_blank">
+                <a
+                  href="https://docs.nmrxiv.org/docs/developer-guides/API"
+                  target="_blank"
+                >
                   <span class="absolute inset-0" aria-hidden="true"></span>
                   Public API Documentation
                 </a>
@@ -240,7 +243,9 @@
         </li>
       </ul>
       <div class="mt-6 flex">
-        <a href="mailto:info@nmrxiv.org" class="text-sm font-medium text-indigo-600 hover:text-indigo-500"
+        <a
+          href="mailto:info@nmrxiv.org"
+          class="text-sm font-medium text-indigo-600 hover:text-indigo-500"
           >Or get in touch<span aria-hidden="true"> &rarr;</span></a
         >
       </div>
@@ -254,6 +259,10 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import TeamProjects from "@/Pages/Project/Index.vue";
 import Create from "@/Shared/CreateButton.vue";
 import Onboarding from "@/App/Onboarding.vue";
+import { inject, watchEffect } from "vue";
+import { useMagicKeys } from "@vueuse/core";
+
+const { meta, u } = useMagicKeys();
 
 export default {
   components: {
@@ -262,11 +271,31 @@ export default {
     Create,
     Onboarding,
   },
-  props: ["user", "team", "projects", "teamRole"],
-  mounted(){
-    if(!this.$page.props.user.onboarded){
+  props: ["user", "team", "projects", "teamRole", "filters"],
+  setup() {
+    const openDatasetCreateDialog = (data) => {
+      emitter.emit("openDatasetCreateDialog", data);
+    };
+    const emitter = inject("emitter"); // Inject `emitter`
+    watchEffect(() => {
+      if (meta.value && u.value) {
+        openDatasetCreateDialog({
+          'draft_id' : null
+        });
+      }
+    });
+
+    return {
+      openDatasetCreateDialog,
+    };
+  },
+  mounted() {
+    if (this.filters.action == "submission") {
+      this.openDatasetCreateDialog({
+        draft_id: this.filters.draft_id,
+      });
     }
-  },  
+  },
   computed: {
     editable() {
       if (this.teamRole && this.teamRole.name) {
