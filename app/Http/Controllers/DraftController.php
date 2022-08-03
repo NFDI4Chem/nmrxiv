@@ -28,12 +28,14 @@ class DraftController extends Controller
             $user_id = $user->id;
             $team_id = $team->id;
         } else {
+            $team_id = $user->current_team_id;
             $user_id = $team->user_id;
         }
 
         $drafts = Draft::with('Tags')
             ->whereHas('files')
             ->Where('owner_id', $user_id)
+            ->Where('team_id', $team_id)
             ->orderBy('updated_at', 'DESC')
             ->get();
 
@@ -140,6 +142,7 @@ class DraftController extends Controller
             $team_id = $team->id;
         } else {
             $user_id = $team->user_id;
+            $team_id = $user->current_team_id;
         }
 
         return DB::transaction(function () use ($draft, $user, $user_id, $team_id, $request) {

@@ -1935,16 +1935,12 @@ export default {
     loadSpectra() {
       const iframe = window.frames.submissionNMRiumIframe;
       this.currentMolecules = [];
+      let url = this.url + "/" + this.$page.props.team.owner.username + '/datasets/' + this.project.slug + '/' + this.selectedStudy.slug + "/" + this.selectedDataset.slug
       if (iframe) {
         if (!this.selectedDataset.nmrium_info) {
           let data = {
             data: [
-              this.url +
-                "/download/asc/datasets/" +
-                this.selectedDataset.id +
-                "/" +
-                this.selectedDataset.name +
-                ".zip",
+              url,
             ],
             type: "url",
           };
@@ -2004,28 +2000,35 @@ export default {
       this.loadingStep = true;
       this.draftForm.owner_id = this.$page.props.user.id;
       (this.draftForm.tags_array = this.draftForm.tags.map((a) => a.text)),
-        axios.post("/dashboard/drafts/" + this.currentDraft.id + "/process", this.draftForm).then(response => {
-          this.project = response.data.project;
-            this.studies = response.data.studies;
-            if (this.project && this.studies.length > 0) {
-              this.selectStudy(this.studies[0]);
-              this.selectedDataset = this.selectedStudy.datasets[0];
-              this.loadingStep = false;
-              this.selectStep(2);
-            } else {
-              if (this.studies.length == 0) {
+        axios
+          .post("/dashboard/drafts/" + this.currentDraft.id + "/process", this.draftForm)
+          .then(
+            (response) => {
+              this.project = response.data.project;
+              this.studies = response.data.studies;
+              if (this.project && this.studies.length > 0) {
+                this.selectStudy(this.studies[0]);
+                this.selectedDataset = this.selectedStudy.datasets[0];
                 this.loadingStep = false;
+                this.selectStep(2);
+              } else {
+                if (this.studies.length == 0) {
+                  this.loadingStep = false;
+                }
               }
+            },
+            (error) => {
+              this.loadingStep = false;
+              Object.keys(error.response.data.errors).forEach((key) => {
+                error.response.data.errors[key] = error.response.data.errors[key].join(
+                  ", "
+                );
+              });
+              this.draftForm.errors = error.response.data.errors;
+              this.draftForm.error_message = error.response.data.message;
+              this.draftForm.hasErrors = true;
             }
-        }, error => {
-          this.loadingStep = false;
-          Object.keys(error.response.data.errors).forEach( key => {
-              error.response.data.errors[key] = error.response.data.errors[key].join(', ')
-          })
-          this.draftForm.errors = error.response.data.errors
-          this.draftForm.error_message = error.response.data.message
-          this.draftForm.hasErrors = true
-        })
+          );
     },
 
     selectStep(id) {
@@ -2041,7 +2044,7 @@ export default {
       if (id == 1) {
         // this.loadingStep = true;
         this.$nextTick(function () {
-          if(this.$refs.fsbRef){
+          if (this.$refs.fsbRef) {
             this.$refs.fsbRef.annotate();
           }
         });
