@@ -41,7 +41,7 @@
                     {{ file.name }}
                   </span>
                 </div>
-                <div class="ml-4 flex-shrink-0">
+                <div v-if="downloadURL" class="ml-4 flex-shrink-0">
                   <a
                     :href="downloadURL"
                     class="font-medium text-indigo-600 hover:text-indigo-500"
@@ -68,7 +68,7 @@
 import { PaperClipIcon } from "@heroicons/vue/solid";
 
 export default {
-  props: ["file", "study"],
+  props: ["file", "project", "study"],
   components: {
     PaperClipIcon,
   },
@@ -82,15 +82,20 @@ export default {
   methods: {},
   computed: {
     downloadURL() {
-      if (this.study) {
+      if (this.study || this.project) {
+        if (this.study && !this.project) {
+          this.project = this.study.project;
+        }
         return (
           this.url +
           "/" +
-          this.study.owner.username +
+          this.project.owner.username +
           "/download/" +
-          this.study.project.slug +
-          "?key="  +
-          this.file.key + "&uuid=" + this.file.uuid
+          this.project.slug +
+          "?key=" +
+          this.file.key +
+          "&uuid=" +
+          this.file.uuid
         );
       }
     },
