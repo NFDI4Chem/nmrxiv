@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use OwenIt\Auditing\Contracts\Auditable;
 use Spatie\Tags\HasTags;
+use Storage;
 
 class Study extends Model implements Auditable
 {
@@ -45,7 +46,38 @@ class Study extends Model implements Auditable
     protected $appends = [
         'public_url',
         'private_url',
+        'study_photo_url',
+        'study_preview_urls',
     ];
+
+    /**
+     * Get the URL to the study's profile photo.
+     *
+     * @return string
+     */
+    public function getStudyPhotoUrlAttribute()
+    {
+        return $this->study_photo_path
+                    ? Storage::disk('minio_public')->url($this->study_photo_path)
+                    : '';
+    }
+
+    /**
+     * Get the URL to the study's datasets preview.
+     *
+     * @return string
+     */
+    public function getStudyPreviewUrlsAttribute()
+    {
+        $dataset_urls = $this->datasets->pluck('dataset_photo_url');
+        $urls = [];
+        foreach($dataset_urls as $dataset_url){
+            if($dataset_url){
+                array_push($urls, $dataset_url);
+            }
+        }
+        return $urls;
+    }
 
     public function project()
     {

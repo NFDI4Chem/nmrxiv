@@ -77,10 +77,11 @@
       v-else
       class="mt-8 mx-auto max-w-md grid gap-8 sm:max-w-lg lg:grid-cols-3 lg:max-w-7xl"
     >
-      <div :key="study.uuid" v-for="study in studies">
-        <Link :href="route('dashboard.studies', [study.id])">
-          <study-card :study="study" />
-        </Link>
+      <div
+        :key="study.uuid"
+        v-for="study in studies.sort((a, b) => (a.name > b.name ? 1 : -1))"
+      >
+        <study-card :study="study" />
       </div>
     </div>
     <study-create :project="project"></study-create>
