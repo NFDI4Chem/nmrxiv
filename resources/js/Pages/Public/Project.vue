@@ -147,10 +147,6 @@
                   <div class="pt-8 gap-y-6 sm:grid-cols-6 sm:gap-x-6">
                     <div class="sm:col-span-6">
                       <h2 class="text-xl font-medium text-blue-gray-900">Submitter(s)</h2>
-                      <!-- <p class="mt-1 text-sm text-blue-gray-500">
-                      This information will be displayed publicly so be careful what you
-                      share.
-                    </p> -->
                     </div>
                     <div class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-2">
                       <div
@@ -183,36 +179,17 @@
                       <h2 class="text-xl font-medium text-blue-gray-900">
                         Studies ({{ project.data.studies.length }})
                       </h2>
-                      <p class="mt-1 text-sm text-blue-gray-500 mb-4">
+                      <!-- <p class="mt-1 text-sm text-blue-gray-500 mb-4">
                         This information will be displayed publicly so be careful what you
                         share.
-                      </p>
+                      </p> -->
                     </div>
                     <div class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                      <div
-                        :key="study.id"
-                        v-for="study in project.data.studies"
-                        class="relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm flex items-center space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-pink-500"
+                       <div
+                        :key="study.uuid"
+                        v-for="study in project.data.studies.sort((a, b) => (a.name > b.name ? 1 : -1))"
                       >
-                        <div class="flex-shrink-0"></div>
-                        <div class="flex-1 min-w-0">
-                          <a class="focus:outline-none">
-                            <span class="absolute inset-0" aria-hidden="true"></span>
-                            <p class="text-md font-bold text-gray-900">
-                              {{ study.name }}
-                            </p>
-                            <div class="-m-1 mt-2 flex flex-wrap items-center">
-                              <a
-                                :key="dataset.id"
-                                v-for="dataset in study.datasets"
-                                target="_blank"
-                                :href="'/datasets/' + dataset.slug"
-                                class="mr-1 inline-flex rounded-full border border-gray-200 items-center py-1.5 pl-3 pr-3 text-sm font-medium bg-white text-gray-900 hover:text-white hover:bg-black"
-                                ><span>{{ dataset.name }}</span></a
-                              >
-                            </div>
-                          </a>
-                        </div>
+                        <study-card :study="study" />
                       </div>
                     </div>
                   </div>
@@ -368,6 +345,7 @@ import {
   ChevronRightIcon,
   HomeIcon,
 } from "@heroicons/vue/solid";
+import StudyCard from "@/Shared/StudyCard.vue";
 
 export default {
   components: {
@@ -377,6 +355,7 @@ export default {
     DocumentTextIcon,
     ChevronRightIcon,
     HomeIcon,
+    StudyCard
   },
   props: ["project"],
   data() {

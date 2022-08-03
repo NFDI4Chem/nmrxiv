@@ -438,7 +438,7 @@
                   <div class="block px-4 pt-2 text-xs text-gray-400">Manage Account</div>
 
                   <jet-dropdown-link :href="route('profile.show')">
-                    Profile
+                    Account
                   </jet-dropdown-link>
 
                   <jet-dropdown-link
