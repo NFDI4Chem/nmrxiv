@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use OwenIt\Auditing\Contracts\Auditable;
+use Storage;
 
 class Dataset extends Model implements Auditable
 {
@@ -43,7 +44,20 @@ class Dataset extends Model implements Auditable
     protected $appends = [
         'public_url',
         'private_url',
+        'dataset_photo_url',
     ];
+
+    /**
+     * Get the URL to the dataset's profile photo.
+     *
+     * @return string
+     */
+    public function getDatasetPhotoUrlAttribute()
+    {
+        return $this->dataset_photo_path
+                    ? Storage::disk('minio_public')->url($this->dataset_photo_path)
+                    : '';
+    }
 
     protected function getPublicUrlAttribute()
     {
