@@ -319,11 +319,7 @@
                     Submit spectral data to us
                   </h2>
                   <p class="mt-4 text-lg text-gray-500">
-                    nmrXiv offers you ready to use NMR data management platform to host
-                    your raw instrument data and processed files for free and also
-                    provides you with tools and services to analyse data. Added to that
-                    get community support for any of your NMR spectra related queries or
-                    provide one yourself.
+                    nmrXiv offers a ready-to-use NMR data management platform to host your raw instrument data and processed files for free and provides you with tools and services to analyse data. Additionally, get community support for any of your NMR spectra-related queries or provide one yourself.
                   </p>
                   <div class="mt-6">
                     <Link
@@ -414,9 +410,7 @@
                     Develop tools with our API
                   </h2>
                   <p class="mt-4 text-lg text-gray-500">
-                    Software programmers and data scientists can leverage nmrXiv API and
-                    its rich data / metadata descriptions to develop advanced tool
-                    set/software.
+                    Software programmers and data scientists can leverage nmrXiv API and its rich data/metadata descriptions to develop advanced toolsets/software.
                   </p>
                   <div class="mt-6">
                     <a
@@ -463,11 +457,7 @@
                     Review and analyse the spectral assignments
                   </h2>
                   <p class="mt-4 text-lg text-gray-500">
-                    Data deposited in nmrXiv requires original machine output files. With
-                    this original data, researchers can annotate missing assignments in
-                    the spectra and also reanalyse previous work to offer additional help.
-                    In a way sharing the knowledge and expertise to the next generation of
-                    spectroscopic analysts.
+                    Data deposited in nmrXiv requires original machine output files or processed raw data. With this data, researchers can annotate the missing assignments in the spectra, reanalyse previous work and offer additional help there by sharing their knowledge and expertise.
                   </p>
                   <div class="mt-6">
                     <Link

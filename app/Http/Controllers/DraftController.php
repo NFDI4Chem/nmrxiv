@@ -13,6 +13,8 @@ use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class DraftController extends Controller
 {
@@ -26,12 +28,14 @@ class DraftController extends Controller
             $user_id = $user->id;
             $team_id = $team->id;
         } else {
+            $team_id = $user->current_team_id;
             $user_id = $team->user_id;
         }
 
         $drafts = Draft::with('Tags')
             ->whereHas('files')
             ->Where('owner_id', $user_id)
+            ->Where('team_id', $team_id)
             ->orderBy('updated_at', 'DESC')
             ->get();
 
@@ -94,6 +98,10 @@ class DraftController extends Controller
 
         $project->save();
 
+        $draft->current_step = 3;
+
+        $draft->save();
+
         ProcessDraft::dispatch($draft);
 
         return response()->json([
@@ -103,6 +111,13 @@ class DraftController extends Controller
 
     public function process(Request $request, Draft $draft)
     {
+        $input = $request->all();
+        $validation = $request->validate([
+            'name' => ['required', 'string', 'max:255',  Rule::unique('drafts')
+            ->where('owner_id', $input['owner_id'])->ignore($draft->id)],
+            'description' => ['required', 'string', 'min:20'],
+        ]);
+
         $draftFolders = FileSystemObject::with('children')
             ->where([
                 ['level', 0],
@@ -111,11 +126,9 @@ class DraftController extends Controller
             ->orderBy('type')
             ->get();
 
-        // Update title and description of the draft and project
-
         $draft->name = $request->get('name');
         $draft->description = $request->get('description');
-        $draft->syncTagsWithType($request->get('tags'), 'Draft');
+        $draft->syncTagsWithType($request->get('tags_array'), 'Draft');
         $draft->save();
 
         $this->processFolder($draftFolders);
@@ -129,11 +142,10 @@ class DraftController extends Controller
             $team_id = $team->id;
         } else {
             $user_id = $team->user_id;
+            $team_id = $user->current_team_id;
         }
 
         return DB::transaction(function () use ($draft, $user, $user_id, $team_id, $request) {
-
-            // create a project corresponding to the draft
             $project = Project::where('draft_id', $draft->id)->first();
 
             if (! $project) {
@@ -152,16 +164,13 @@ class DraftController extends Controller
                     $user, ['role' => 'creator']
                 );
 
-                $project->syncTagsWithType($request->get('tags'), 'Project');
+                $project->syncTagsWithType($request->get('tags_array'), 'Project');
             } else {
                 $project->name = $draft->name;
                 $project->description = $draft->description;
-                $project->syncTagsWithType($request->get('tags'), 'Project');
+                $project->syncTagsWithType($request->get('tags_array'), 'Project');
                 $project->save();
             }
-
-            // get all the folders with mode_type study
-            // create all the studies and associate with the project
 
             $folders = FileSystemObject::with('children')
                 ->where([
@@ -171,7 +180,6 @@ class DraftController extends Controller
                 ->orderBy('type')
                 ->get();
 
-            // loop through studies and then create datasets corresponding to the instrument_type folders
             foreach ($folders as $folder) {
                 $folder->project_id = $project->id;
 
@@ -303,9 +311,18 @@ class DraftController extends Controller
                 }
             }
 
+            $draft->current_step = 2;
+            $draft->save();
+
+            $studies = json_decode($project->studies->load(['datasets', 'sample.molecules', 'tags']));
+
+            if (count($studies) == 0) {
+                return redirect()->back()->withErrors(['studies' => 'nmrXiv requires raw or processed raw instrument output files. If you data is from a single sample organise all the files in one folder and click proceed. If you have multiple samples, group your data in subfolders with each subfolder corresponding to a sample. Thank you.']);
+            }
+
             return response()->json([
                 'project' => $project,
-                'studies' => json_decode($project->studies->load(['datasets', 'sample.molecules', 'tags'])),
+                'studies' => $studies
             ]);
         });
     }
