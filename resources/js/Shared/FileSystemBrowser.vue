@@ -153,7 +153,7 @@
                   </span>
                 </div>
                 <p
-                  class="mt-2 px-2 py-1 block text-sm font-medium text-gray-900 pointer-events-none"
+                  class="mt-2 px-2 py-1 block text-sm font-medium truncate text-gray-900 pointer-events-none"
                 >
                   {{ file.name }}
                 </p>
@@ -171,7 +171,7 @@
                   $page.props.selectedFileSystemObject.type == 'file'
                 "
               >
-                <File-details :file="$page.props.selectedFileSystemObject"></File-details>
+                <File-details  :file="$page.props.selectedFileSystemObject"></File-details>
               </span>
             </div>
           </div>

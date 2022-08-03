@@ -129,7 +129,7 @@
                 </div>
                 <loading-button :loading="this.loading" />
                 <div>
-                <dd v-if="!this.loading" class="text-md text-gray-900 space-y-5">
+                <dd v-if="this.license" class="text-md text-gray-900 space-y-5">
                   <p>
                     {{ license.title }}
                     <ToolTip v-if="this.study.license_id" class="inline h-4 w-4 ml-0" :text="license.description"></ToolTip>
@@ -399,6 +399,7 @@ export default {
     "availableRoles",
     "studyPermissions",
     "studyRole",
+    "license",
   ],
   components: {
     LoadingButton,
@@ -412,8 +413,6 @@ export default {
       smiles: "",
       percentage: 1,
       editor: "",
-      license: {},
-      loading: false,
     };
   },
   setup() {
@@ -429,25 +428,6 @@ export default {
     this.$nextTick(() => {
       this.editor = OCL.StructureEditor.createSVGEditor("structureSearchEditor", 1);
     });
-  },
-  beforeMount(){
-    this.license.title = 'No license selected';
-    if (this.study.license_id) {
-      this.loading = true;
-      axios
-        .get(
-          route(
-            "license",
-              this.study.license_id
-              )
-            )
-            .then((res) => {
-              this.license = res.data[0];
-            })
-            .finally(() => {
-              this.loading = false;
-            });
-    }
   },
   methods: {
     loadSmiles() {

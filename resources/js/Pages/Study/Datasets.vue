@@ -283,16 +283,10 @@ export default {
         if (!this.selectedDataset.nmrium_info) {
           let data = {
             data: [
-              this.url +
-                "/download/asc/datasets/" +
-                this.selectedDataset.id +
-                "/" +
-                this.selectedDataset.name +
-                ".zip",
+              this.url + "/" + this.$page.props.user.username +  "/datasets/" + this.project.slug + "/" + this.study.slug  + "/" + this.selectedDataset.slug
             ],
             type: "url",
           };
-          console.log(data);
           iframe.postMessage({ type: `nmr-wrapper:load`, data }, "*");
         } else {
           let data = {

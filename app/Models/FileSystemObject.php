@@ -11,6 +11,7 @@ class FileSystemObject extends Model
 
     protected $fillable = [
         'name',
+        'uuid',
         'slug',
         'description',
         'relative_url',
