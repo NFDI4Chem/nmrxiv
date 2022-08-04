@@ -253,15 +253,31 @@
                 @click="toggleAddAuthor"
                 class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
               >
-                <PlusIcon class="w-5 h-5 mr-1 text-gray-600" />
-                <span>Add</span>
+                <PencilIcon class="w-4 h-4 mr-1 text-gray-600" />
+                <span>Edit</span>
               </button>
             </div>
           </div>
-          <dd class="mt-1 text-md text-gray-900 space-y-5">
-            <p>
-              {{ project.authors }}
-            </p>
+          <dd class="mt-2 text-md text-gray-900 space-y-5">
+            <div class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-3">
+                      <div
+                        :key="author.id"
+                        v-for="author in project.authors"
+                        class="relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm flex items-center space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-pink-500"
+                      >
+                        <div class="flex-1 min-w-0">
+                          <a class="focus:outline-none">
+                            <span class="absolute inset-0" aria-hidden="true"></span>
+                            <p class="text-sm font-medium text-gray-900">
+                              {{ author.family_name + " " + author.given_name }}
+                            </p>
+                            <p class="text-sm text-gray-500">{{ author.affiliation }}
+                            <a :href="author.orcid_id" v-if="author.orcid_id" class="text-teal-500">ORCID ID - {{author.orcid_id}}</a>
+                            </p>
+                          </a>
+                        </div>
+                      </div>
+                    </div>
           </dd>
         </div>
         <!-- Keywords -->
@@ -331,7 +347,7 @@ import { Link } from "@inertiajs/inertia-vue3";
 import StudyIndex from "@/Pages/Study/Index.vue";
 import ProjectDetails from "./Partials/Details.vue";
 import { ref } from "vue";
-import { StarIcon,PlusIcon } from "@heroicons/vue/solid";
+import { StarIcon,PencilIcon } from "@heroicons/vue/solid";
 import AddAuthor from "@/Shared/AddAuthor.vue";
 
 export default {
@@ -341,7 +357,7 @@ export default {
     StudyIndex,
     ProjectDetails,
     StarIcon,
-    PlusIcon,
+    PencilIcon,
     AccessDialogue,
     AddAuthor,
   },

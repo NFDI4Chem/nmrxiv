@@ -177,7 +177,38 @@
                       </div>
                     </div>
                   </div>
-
+                  <div class="pt-8 gap-y-6 sm:grid-cols-6 sm:gap-x-6">
+                    <div class="sm:col-span-6">
+                      <h2 class="text-xl font-medium text-blue-gray-900">Author(s)</h2>
+                      <!-- <p class="mt-1 text-sm text-blue-gray-500">
+                      This information will be displayed publicly so be careful what you
+                      share.
+                    </p> -->
+                    </div>
+                    <div class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                      <div
+                        :key="author.id"
+                        v-for="author in project.data.authors"
+                        class="relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm flex items-center space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-pink-500"
+                      >
+                        <div class="flex-1 min-w-0">
+                          <a class="focus:outline-none">
+                            <span class="absolute inset-0" aria-hidden="true"></span>
+                            <p v-if="author.title" class="text-sm font-medium text-gray-900">
+                              {{ author.title + " " + author.family_name + " " + author.given_name }}
+                            </p>
+                            <p v-else class="text-sm font-medium text-gray-900">
+                              {{ author.family_name + " " + author.given_name }}
+                            </p>
+                            <p class="text-sm text-gray-500">{{ author.affiliation }}
+                              <br>
+                            <a :href="author.orcid_id" v-if="author.orcid_id" class="text-teal-500">ORCID ID - {{author.orcid_id}}</a>
+                            </p>
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                   <div class="pt-8 gap-y-6 sm:grid-cols-6 sm:gap-x-6">
                     <div class="sm:col-span-6">
                       <h2 class="text-xl font-medium text-blue-gray-900">
@@ -418,11 +449,14 @@ export default {
   mounted() {
     if (this.project) {
       this.$page.props.selectedFileSystemObject = this.project.data.files;
+      console.log("This project..");
+      console.log(this.project);
     }
   },
   methods: {
     selectTab(tab) {
       this.selectedTab = tab.name;
+      
     },
   },
   computed: {
