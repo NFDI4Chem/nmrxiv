@@ -71,11 +71,12 @@ class Study extends Model implements Auditable
     {
         $dataset_urls = $this->datasets->pluck('dataset_photo_url');
         $urls = [];
-        foreach($dataset_urls as $dataset_url){
-            if($dataset_url){
+        foreach ($dataset_urls as $dataset_url) {
+            if ($dataset_url) {
                 array_push($urls, $dataset_url);
             }
         }
+
         return $urls;
     }
 

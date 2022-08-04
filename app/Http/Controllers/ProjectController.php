@@ -36,7 +36,7 @@ class ProjectController extends Controller
 
         return Inertia::render('Public/Project', [
             'project' => (new ProjectResource($project))->lite(false, ['users', 'studies', 'license', 'files', 'authors']),
-            //dd((new ProjectResource($project))->lite(false, ['users', 'studies', 'license', 'files', 'authors']) ),
+
         ]);
     }
 

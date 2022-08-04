@@ -21,6 +21,7 @@ class Author extends Model
         'email_id',
         'affiliation',
     ];
+
     public function projects()
     {
         return $this->belongsToMany(Project::class);
