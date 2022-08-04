@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('given_name');
             $table->string('family_name');
             $table->string('email_id')->nullable();
-            $table->longText('affiliation')->nullable();
+            $table->longText('affiliation');
             $table->timestamps();
         });
     }
