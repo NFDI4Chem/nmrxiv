@@ -59,6 +59,22 @@
     </template>
     <template #content>
       <div
+        v-if="errorMessage != null && errorMessage != ''"
+        class="rounded-md bg-red-50 p-4 mb-2"
+      >
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <XCircleIcon class="h-5 w-5 text-red-400" aria-hidden="true" />
+          </div>
+          <div class="ml-3">
+            <h3 class="text-sm font-medium text-red-400">
+              There were errors with your submission
+            </h3>
+            <div v-html="errorMessage" class="mt-2 text-sm text-red-900"></div>
+          </div>
+        </div>
+      </div>
+      <div
         class="absolute inset-0 flex justify-center items-center z-10 bg-white rounded bg-opacity-70"
         v-if="loadingStep"
       >
@@ -424,7 +440,9 @@
                                   >
                                     <option
                                       :value="dataset"
-                                      v-for="dataset in selectedStudy.datasets"
+                                      v-for="dataset in selectedStudy.datasets.sort(
+                                        (a, b) => (a.name > b.name ? 1 : -1)
+                                      )"
                                       :key="dataset.slug"
                                     >
                                       {{ dataset.name }}
@@ -441,6 +459,7 @@
                                     style="width: 100%; height: 75vh; max-height: 600px"
                                     :src="nmriumURL"
                                   ></iframe>
+                                  <img id="image" />
                                 </div>
                                 <div v-if="currentMolecules.length > 0">
                                   <ul
@@ -1123,7 +1142,9 @@
                           </thead>
                           <tbody class="divide-y divide-gray-200 bg-white">
                             <tr
-                              v-for="study in this.project.studies"
+                              v-for="study in this.project.studies.sort((a, b) =>
+                                a.name > b.name ? 1 : -1
+                              )"
                               :key="study.id"
                               :value="study.name"
                             >
@@ -1135,7 +1156,12 @@
                               <td
                                 class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"
                               >
-                                <div v-for="dataset in study.datasets" :key="dataset.id">
+                                <div
+                                  v-for="dataset in study.datasets.sort((a, b) =>
+                                    a.name > b.name ? 1 : -1
+                                  )"
+                                  :key="dataset.id"
+                                >
                                   <span class="break-normal">
                                     {{ dataset.name }}
                                   </span>
@@ -1492,8 +1518,7 @@
                       ></span>
                     </span>
                     <p class="mt-2 text-base text-gray-500">
-                      Please allow some time for us to process your submission. You will
-                      also recieve an email once your submission is processed
+                      Please allow some time to process your submission. You will recieve an email once your submission is processed.
                     </p>
                     <div class="mt-6">
                       <a
@@ -1642,7 +1667,11 @@ import "@vuepic/vue-datepicker/dist/main.css";
 import SelectRich from "@/Shared/SelectRich.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import FileSystemBrowser from "./FileSystemBrowser.vue";
-import { ClipboardCopyIcon, QuestionMarkCircleIcon } from "@heroicons/vue/solid";
+import {
+  XCircleIcon,
+  ClipboardCopyIcon,
+  QuestionMarkCircleIcon,
+} from "@heroicons/vue/solid";
 import { Link } from "@inertiajs/inertia-vue3";
 
 export default {
@@ -1655,6 +1684,7 @@ export default {
     slider,
     SelectRich,
     Datepicker,
+    XCircleIcon,
     JetInputError,
     FileSystemBrowser,
     ClipboardCopyIcon,
@@ -1667,6 +1697,7 @@ export default {
       loading: false,
       loadingStep: false,
       currentDraft: null,
+      errorMessage: null,
 
       draftForm: this.$inertia.form({
         _method: "POST",
@@ -1836,10 +1867,9 @@ export default {
         .put("/dashboard/studies/" + this.selectedStudy.id + "/update", {
           name: this.studyName,
           description: this.studyDescription,
-          tags: this.studyTags.map((a) => a.text),
+          tags_array: this.studyTags.map((a) => a.text),
         })
         .catch((error) => {
-          console.log(error);
           this.loadingStep = false;
         })
         .then((response) => {
@@ -1852,8 +1882,6 @@ export default {
       if (molecule.MOL) {
         let mol = OCL.Molecule.fromMolfile("\n  " + molecule.MOL.replaceAll('"', ""));
         return mol.toSVG(200, 200);
-      } else {
-        console.log(molecule);
       }
     },
 
@@ -1906,7 +1934,6 @@ export default {
       axios
         .post("/dashboard/drafts/" + this.currentDraft.id + "/complete", {})
         .catch((error) => {
-          console.log(error);
           this.loadingStep = false;
         })
         .then((response) => {
@@ -1921,7 +1948,7 @@ export default {
     },
 
     trackProject() {
-      axios.get("/projects/" + this.project.id + "/queue/status").then((response) => {
+      axios.get("/projects/status/" + this.project.id + "/queue").then((response) => {
         this.project.status = response.data.status;
         if (this.project.status != "complete") {
           setTimeout(() => this.trackProject(), 10000);
@@ -1997,20 +2024,23 @@ export default {
     },
 
     createNewDraft() {
+      this.defaultDraft.name = "Untitled Project - " + new Date().toLocaleString();
       this.selectDraft(this.defaultDraft);
     },
 
     process() {
-      this.loadingStep = true;
-      this.draftForm.owner_id = this.$page.props.user.id;
-      (this.draftForm.tags_array = this.draftForm.tags.map((a) => a.text)),
+      this.errorMessage = null;
+      if (this.$refs.fsbRef.file && this.$refs.fsbRef.file.children.length > 0) {
+        this.loadingStep = true;
+        this.draftForm.owner_id = this.$page.props.user.id;
+        this.draftForm.tags_array = this.draftForm.tags.map((a) => a.text);
         axios
           .post("/dashboard/drafts/" + this.currentDraft.id + "/process", this.draftForm)
           .then(
             (response) => {
               this.project = response.data.project;
               this.studies = response.data.studies;
-              if (this.project && this.studies.length > 0) {
+              if (this.project && this.studies && this.studies.length > 0) {
                 this.selectStudy(this.studies[0]);
                 this.selectedDataset = this.selectedStudy.datasets[0];
                 this.loadingStep = false;
@@ -2023,6 +2053,7 @@ export default {
             },
             (error) => {
               this.loadingStep = false;
+
               Object.keys(error.response.data.errors).forEach((key) => {
                 error.response.data.errors[key] = error.response.data.errors[key].join(
                   ", "
@@ -2031,8 +2062,28 @@ export default {
               this.draftForm.errors = error.response.data.errors;
               this.draftForm.error_message = error.response.data.message;
               this.draftForm.hasErrors = true;
+              Object.keys(this.draftForm.errors).forEach((key) => {
+                if (!this.errorMessage) {
+                  this.errorMessage =
+                    "<b class='capitalize'>" +
+                    key +
+                    "</b>: " +
+                    this.draftForm.errors[key] +
+                    "<br/>";
+                } else {
+                  this.errorMessage +=
+                    "<b class='capitalize'>" +
+                    key +
+                    "</b>: " +
+                    this.draftForm.errors[key] +
+                    "<br/>";
+                }
+              });
             }
           );
+      } else {
+        this.errorMessage = "Please upload spectral data to proceed.";
+      }
     },
 
     selectStep(id) {
@@ -2061,6 +2112,12 @@ export default {
         if (e.origin != "https://nmriumdev.nmrxiv.org") {
           return;
         }
+        if (e.data.type == "nmr-wrapper:action-response") {
+          let actionType = e.data.data.type;
+          if (actionType == "exportSpectraViewerAsBlob") {
+            this.saveStudyPreview(e.data.data.data);
+          }
+        }
         if (e.data.type == "nmr-wrapper:data-change") {
           let actionType = e.data.data.actionType;
 
@@ -2081,6 +2138,20 @@ export default {
           ) {
             this.currentMolecules = e.data.data.molecules;
           }
+
+          if (this.selectedStudy && this.selectedDataset) {
+            if (this.selectedDataset.dataset_photo_url == "") {
+              console.log("Saving spectra preview");
+              const iframe = window.frames.submissionNMRiumIframe;
+              if (iframe) {
+                let data = {
+                  type: "exportSpectraViewerAsBlob",
+                };
+                iframe.postMessage({ type: `nmr-wrapper:action-request`, data }, "*");
+              }
+            }
+          }
+
           this.updateDataSet();
         }
       };
@@ -2094,6 +2165,17 @@ export default {
         window.removeEventListener("message", saveNMRiumUpdates);
         this.$props.eventRegistered = false;
       }
+    },
+
+    saveStudyPreview(data) {
+      const reader = new FileReader();
+      reader.addEventListener("loadend", () => {
+        let svg = reader.result;
+        axios.post("/dashboard/datasets/" + this.selectedDataset.id + "/preview", {
+          img: svg,
+        });
+      });
+      reader.readAsText(data.blob);
     },
 
     updateDataSet() {
