@@ -119,7 +119,7 @@
                     <div class="sm:col-span-6">
                         <label for="about" class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"> Affiliation </label>
                         <div class="mt-1">
-                        <textarea v-model="manualAddAuthorForm.affiliation" id="affiliation" name="affiliation" rows="3" class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border border-gray-300 rounded-md" placeholder="Name and address of affiliated University and Department." />
+                        <textarea v-model="manualAddAuthorForm.affiliation" id="affiliation" name="affiliation" rows="3" class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border border-gray-300 rounded-md" placeholder="Name and address of affiliated University and Department. e.g. Institut für Anorganische und Analytische Chemie,Friedrich-Schiller-Universität,Schloßgasse 10, 07743 Jena" />
                         </div>
                         <jet-input-error :message="manualAddAuthorForm.errors.affiliation" class="mt-2" />
                     </div>
@@ -134,77 +134,62 @@
       </div>
       <!-- Added Author Summary -->
       <div v-if="this.selectedAuthorsList.length>0">
-            <div class="ml-2 mt-2 overflow-y-scroll h-auto">
-                <table class="min-w-full rounded border divide-y divide-gray-300">
-                <thead class="bg-gray-50 border-1 border-gray-200 sticky top-0">
-                    <tr>
-                    <th
-                        scope="col"
-                        class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 lg:pl-8"
-                    >
-                        Name
-                    </th>
-                    <th
-                        scope="col"
-                        class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 "
-                    >
-                        Affiliation
-                    </th>
-                    <th
-                        scope="col"
-                        class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                    >
-                        ORCID ID
-                    </th>
-                    <th
-                        scope="col"
-                        class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                    >
-                    </th>
-                    <th
-                        scope="col"
-                        class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                    >
-                    </th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-200 bg-white">
-                    <tr v-for="author in selectedAuthorsList" :key="author.given">
-                    <td
-                        class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-600 sm:pl-6 lg:pl-8"
-                    >
+        <div class="ml-2 mt-2 overflow-y-scroll h-64">
+            <table class="divide-y divide-gray-200 w-full table-fixed overflow-y-scroll">
+              <thead class="bg-gray-50 sticky top-0">
+                <tr>
+                  <th
+                    colspan="3"
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Author
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr v-for="author in selectedAuthorsList" :key="author.id">
+                  <td colspan="3" class="py-4">
+                    <div class="ml-4">
+                      <h3 class="text-sm leading-6 font-medium text-gray-900">
                         {{ author.title }} {{ author.given_name }}
                         {{ author.family_name }}
-                    </td>
-                    <td
-                        class="break-normal py-2 pl-2 pr-1 text-sm font-medium text-gray-600 sm:pl-4 lg:pl-2 "
-                    >
+                      </h3>
+                      <p class="mt-1 text-xs font-small text-blue-gray-900 break-words">
                         {{ author.affiliation }}
-                    </td>
-                    <td class="whitespace-nowrap px-3 py-4 text-sm text-teal-600">
+                      </p>
+                      <p class="mt-1 text-sm text-teal  -900">
                         <a :href="author.orcid_id">{{author.orcid_id}}</a>
-                    </td>
-                    <td class="whitespace-nowrap px-3 py-4 text-sm text-teal-600">
+                      </p>
+                    </div>
+                  </td>
+                  <td
+                    class="px-6 py-4 text-sm leading-5 text-gray-500 whitespace-no-wrap border-gray-200"
+                  >
                       <button
                         type="button"
                         class="inline-flex items-center p-1 border border-transparent"
                         @click="editAuthor(author)"
                       >
-                        <PencilIcon class="w-4 h-4 mr-1 text-gray-600" />
+                        <PencilIcon class="w-5 h-5 mr-1 text-gray-600" />
                       </button>
-                    </td>
-                    <td class="whitespace-nowrap px-3 py-4 text-sm text-teal-600">
                       <button
                         type="button"
                         class="inline-flex items-center p-1 border border-transparent"
                         @click="deleteAuthor(author.id)"
                       >
-                        <TrashIcon class="w-4 h-4 mr-1 text-gray-600" />
+                        <TrashIcon class="w-5 h-5 mr-1 text-gray-600" />
                       </button>
-                    </td>
-                    </tr>
-                </tbody>
-                </table>
+                  </td>
+                </tr>
+              </tbody>
+            </table>    
         </div>
      </div>
     </template>
@@ -315,6 +300,7 @@ export default {
             );
             this.manualAddAuthorForm = this.$inertia.form({});
         },
+        /*Edit author */
         editAuthor(object){
           console.log('Deleting author for id..' + object.id);
           for(var i=0; i<this.selectedAuthorsList.length; i++){
@@ -325,15 +311,15 @@ export default {
           this.manualAddAuthorForm = JSON.parse(JSON.stringify(object));
           this.manualAddAuthorForm.errors = {};
         },
-        /*Method to delete authors from the tmp list*/
+        /*Delete authors from the temp list*/
         deleteAuthor(id){
-          
           for(var i=0; i<this.selectedAuthorsList.length; i++){
               if(this.selectedAuthorsList[i].id == id){
                 this.selectedAuthorsList.splice(i,1);
               }
           }
         },
+        /*Update the database*/
         updateAuthor(){
             this.addAuthorForm.reset();
             for(var i=0; i<this.selectedAuthorsList.length; i++){
@@ -348,6 +334,7 @@ export default {
                 onError: (err) => console.error(err),
             });
         },
+        /*Reset forms and local variables*/
         resetData(){
           this.addAuthorForm.reset();
           this.doiSelectedAuthorList = [];
