@@ -244,7 +244,7 @@
                   ></path></svg
               ></a>
             </div>
-            <div class="ml-5">
+            <div v-if="$page.props.user.first_name != null" class="ml-5">
               <a class="cursor-pointer text-gray-600" @click="startTour" target="_blank"
                 ><svg
                   xmlns="http://www.w3.org/2000/svg"
