@@ -2,9 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use App\Models\Author;
+use Illuminate\Database\Seeder;
 
 class AuthorSeeder extends Seeder
 {
@@ -20,7 +19,7 @@ class AuthorSeeder extends Seeder
             'given_name' => 'Super',
             'family_name' => 'admin',
             'email_id' => 'superadmin@email.com',
-            'affiliation' => ''
+            'affiliation' => '',
 
         ]);
     }

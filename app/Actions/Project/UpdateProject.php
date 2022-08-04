@@ -94,10 +94,10 @@ class UpdateProject
         });
     }
 
-    public function updateAuthor(Project $project, $authors){
+    public function updateAuthor(Project $project, $authors)
+    {
         $project->authors()->sync(
             $authors
         );
     }
-
 }

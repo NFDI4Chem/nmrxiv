@@ -3,9 +3,9 @@
 use App\Http\Controllers\Admin\AnnouncementController;
 use App\Http\Controllers\Admin\ConsoleController;
 use App\Http\Controllers\Admin\LicenseController;
-use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\Auth\SocialController;
+use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DatasetController;
 use App\Http\Controllers\DownloadController;
