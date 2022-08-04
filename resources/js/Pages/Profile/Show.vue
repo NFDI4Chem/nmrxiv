@@ -4,7 +4,7 @@
       <div class="bg-white border-b">
         <div class="px-12">
           <div class="flex flex-nowrap justify-between py-6">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Profile</h2>
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Account</h2>
           </div>
         </div>
       </div>

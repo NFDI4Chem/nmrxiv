@@ -63,11 +63,11 @@ class FileSystemController extends Controller
                 $filePath = preg_replace(
                     '~//+~',
                     '/',
-                        '/'.
-                        $draft->path.
-                        '/'
-                        .
-                        $relativefilePath
+                    '/'.
+                    $draft->path.
+                    '/'
+                    .
+                    $relativefilePath
                 );
 
                 if ($hasDirectories) {
@@ -109,11 +109,11 @@ class FileSystemController extends Controller
                                     'path' => preg_replace(
                                         '~//+~',
                                         '/',
-                                            '/'.
-                                            $draft->path.
-                                            '/'
-                                            .
-                                            $rURL
+                                        '/'.
+                                        $draft->path.
+                                        '/'
+                                        .
+                                        $rURL
                                     ),
                                     'type' => 'directory',
                                     'key' => $directories[$currentLevel],
@@ -152,11 +152,11 @@ class FileSystemController extends Controller
                                     'path' => preg_replace(
                                         '~//+~',
                                         '/',
-                                            '/'.
-                                            $draft->path.
-                                            '/'
-                                            .
-                                            $rURL
+                                        '/'.
+                                        $draft->path.
+                                        '/'
+                                        .
+                                        $rURL
                                     ),
                                     'type' => 'directory',
                                     'key' => $directories[$currentLevel + 1],
@@ -196,11 +196,11 @@ class FileSystemController extends Controller
                             'path' => preg_replace(
                                 '~//+~',
                                 '/',
-                                    '/'.
-                                    $draft->path.
-                                    '/'
-                                    .
-                                    $rURL
+                                '/'.
+                                $draft->path.
+                                '/'
+                                .
+                                $rURL
                             ),
                             'type' => 'directory',
                             'key' => $directories[$currentLevel],
@@ -264,8 +264,8 @@ class FileSystemController extends Controller
                 'bucket' => $bucket,
                 'key' => $key,
                 'fullPath' => array_key_exists('fullPath', $file) ? $file['fullPath'] : preg_replace(
-                                    '~//+~',
-                                    '/', $relativefilePath),
+                    '~//+~',
+                    '/', $relativefilePath),
                 'url' => (string) $signedRequest->getUri(),
                 'headers' => $this->headers($request, $signedRequest),
             ]);
