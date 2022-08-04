@@ -13,6 +13,9 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Storage;
+use App\Events\DraftProcessed;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\DraftProcessedNotification;
 
 class ProcessDraft implements ShouldQueue, ShouldBeUnique
 {
@@ -94,6 +97,8 @@ class ProcessDraft implements ShouldQueue, ShouldBeUnique
             $project->status = 'complete';
 
             $project->save();
+
+            Notification::send($project->owner, new DraftProcessedNotification($project));
         }
     }
 
