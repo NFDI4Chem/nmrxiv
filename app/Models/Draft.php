@@ -29,4 +29,14 @@ class Draft extends Model
     {
         return $this->hasMany(FileSystemObject::class);
     }
+
+    /**
+     * Get the owner of the draft.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function owner()
+    {
+        return $this->belongsTo(User::class, 'owner_id');
+    }
 }
