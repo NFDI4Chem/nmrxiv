@@ -67,7 +67,13 @@
                             </jet-secondary-button>
                         </div>
                         <div
-                            v-if="authorsListDOI.length > 0"
+                            v-if="this.loading && this.importAuthorsForm.doi"
+                            class="sm:col-span-9 mt-4 align-centre"
+                        >
+                            <loading-button :loading="this.loading" />
+                        </div>
+                        <div
+                            v-if="authorsListDOI.length > 0 && !this.loading"
                             class="sm:col-span-9 mt-4"
                         >
                             <author-checkbox
@@ -180,11 +186,19 @@
                                 <div class="mt-1">
                                     <input
                                         v-model="manualAddAuthorForm.email_id"
+                                        @blur="validateEmail"
                                         id="email"
                                         name="email"
                                         type="email"
                                         autocomplete="email"
                                         class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                                    />
+                                    <jet-input-error
+                                        :message="
+                                            this.manualAddAuthorForm.errors
+                                                .email_id
+                                        "
+                                        class="mt-2"
                                     />
                                 </div>
                             </div>
@@ -286,11 +300,27 @@
                                         >
                                             {{ author.affiliation }}
                                         </p>
-                                        <p class="mt-1 text-sm text-teal -900">
-                                            <a :href="author.orcid_id">{{
-                                                author.orcid_id
-                                            }}</a>
-                                        </p>
+                                        <div
+                                            v-if="author.orcid_id"
+                                            class="text-xs leading-6 font-medium text-gray-900"
+                                        >
+                                            <p>
+                                                Orcid Id -
+                                                <a
+                                                    :href="author.orcid_id"
+                                                    class="text-teal-900"
+                                                    >{{ author.orcid_id }}</a
+                                                >
+                                            </p>
+                                        </div>
+                                        <div
+                                            v-if="author.email_id"
+                                            class="text-xs leading-6 font-medium text-gray-900"
+                                        >
+                                            <p>
+                                                Email Id - {{ author.email_id }}
+                                            </p>
+                                        </div>
                                     </div>
                                 </td>
                                 <td
@@ -339,6 +369,7 @@ import JetButton from "@/Jetstream/Button.vue";
 import AuthorCheckbox from "@/Shared/AuthorCheckbox.vue";
 import { TrashIcon, PencilIcon } from "@heroicons/vue/solid";
 import JetInputError from "@/Jetstream/InputError.vue";
+import LoadingButton from "@/Shared/LoadingButton.vue";
 export default {
     components: {
         JetDialogModal,
@@ -348,6 +379,7 @@ export default {
         PencilIcon,
         TrashIcon,
         JetInputError,
+        LoadingButton,
     },
 
     data() {
@@ -361,7 +393,7 @@ export default {
                 errors: {},
             }),
             importAuthorsForm: this.$inertia.form({
-                doi: "",
+                doi: "10.1021%2Facs.orglett.0c01297",
                 orcid: "",
                 errors: {},
             }),
@@ -369,6 +401,8 @@ export default {
             authorsListDOI: [],
             doiSelectedAuthorList: [],
             selectedAuthorsList: [],
+            getDetailsbyDOIApi: null,
+            loading: false,
         };
     },
 
@@ -394,39 +428,37 @@ export default {
         },
         /*Import authors from DOI or ORCID ID.*/
         importAuthors() {
+            this.loading = true;
+            this.authorsListDOI = [];
+            this.getDetailsbyDOIApi = this.$page.props.getDetailsbyDOIApi;
             this.importAuthorsForm.errors = {};
             if (!this.importAuthorsForm.doi) {
                 this.importAuthorsForm.errors.doi =
                     "The DOI field is required.";
             } else {
+                this.getDetailsbyDOIApi =
+                    this.getDetailsbyDOIApi + "/" + this.importAuthorsForm.doi;
                 axios
-                    .get(
-                        route("get-authors-by-DOI", {
-                            doi: this.importAuthorsForm.doi,
-                        })
-                    )
+                    .get(this.getDetailsbyDOIApi)
                     .then((res) => {
-                        this.authorsListDOI = res.data;
+                        this.authorsListDOI = this.formatAuthorResponse(
+                            res.data
+                        );
+                    })
+                    .catch((error) => {
+                        this.importAuthorsForm.errors.doi = "Invalid DOI.";
+                    })
+                    .finally(() => {
+                        this.loading = false;
                     });
             }
         },
         /*Add authors to the temp list either added Manually or selected from imported list*/
         addAuthor(source) {
-            this.manualAddAuthorForm.errors = {};
             if (source == "Manual") {
                 //Added Manually.
-                if (!this.manualAddAuthorForm.given_name) {
-                    this.manualAddAuthorForm.errors.given_name =
-                        "The given name field is required.";
-                }
-                if (!this.manualAddAuthorForm.family_name) {
-                    this.manualAddAuthorForm.errors.family_name =
-                        "The family name field is required.";
-                }
-                if (!this.manualAddAuthorForm.affiliation) {
-                    this.manualAddAuthorForm.errors.affiliation =
-                        "The affiliation field is required.";
-                } else {
+                this.validateForm();
+                if (!this.manualAddAuthorForm.hasError) {
                     if (!this.manualAddAuthorForm.id) {
                         this.manualAddAuthorForm.id = (
                             this.manualAddAuthorForm.family_name +
@@ -487,7 +519,7 @@ export default {
                     this.selectedAuthorsList[i]
                 );
             }
-            this.addAuthorForm.post(route("add-author", this.project.id), {
+            this.addAuthorForm.post(route("update-author", this.project.id), {
                 preserveScroll: true,
                 onSuccess: () => {
                     this.addAuthorDialog = false;
@@ -495,6 +527,67 @@ export default {
                 },
                 onError: (err) => console.error(err),
             });
+        },
+        /*Format the response*/
+        formatAuthorResponse(response) {
+            var authorsList = [];
+            var author = {};
+            if (response && response["status"] == "ok") {
+                var authors = response["message"]["author"];
+                authors.forEach((item) => {
+                    author["given_name"] = item.hasOwnProperty("given")
+                        ? item["given"]
+                        : null;
+                    author["family_name"] = item.hasOwnProperty("family")
+                        ? item["family"]
+                        : null;
+                    author["affiliation"] = item.hasOwnProperty("affiliation")
+                        ? item["affiliation"][0]["name"]
+                        : null;
+                    author["orcid_id"] = item.hasOwnProperty("ORCID")
+                        ? item["ORCID"]
+                        : null;
+                    authorsList.push(author);
+                    author = {};
+                });
+            }
+            return authorsList;
+        },
+        /*Validating form*/
+        validateForm() {
+            this.manualAddAuthorForm.errors = {};
+            this.manualAddAuthorForm.hasError = false;
+            var hasError = false;
+            if (this.manualAddAuthorForm.email_id) {
+                if (!this.validEmail(this.manualAddAuthorForm.email_id))
+                    this.manualAddAuthorForm.errors.email_id =
+                        "Valid email required.";
+                hasError = true;
+            }
+            if (!this.manualAddAuthorForm.given_name) {
+                this.manualAddAuthorForm.errors.given_name =
+                    "The given name field is required.";
+                hasError = true;
+            }
+            if (!this.manualAddAuthorForm.family_name) {
+                this.manualAddAuthorForm.errors.family_name =
+                    "The family name field is required.";
+                hasError = true;
+            }
+            if (!this.manualAddAuthorForm.affiliation) {
+                this.manualAddAuthorForm.errors.affiliation =
+                    "The affiliation field is required.";
+                hasError = true;
+            }
+            if (hasError) {
+                this.manualAddAuthorForm.hasError = true;
+            }
+        },
+        /*Validating email*/
+        validEmail(email) {
+            var re =
+                /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            return re.test(email);
         },
         /*Reset forms and local variables*/
         resetData() {
@@ -504,6 +597,7 @@ export default {
             this.manualAddAuthorForm = this.$inertia.form({});
             this.importAuthorsForm.reset();
             this.selectedAuthorsList = [];
+            this.loading = false;
         },
     },
 };

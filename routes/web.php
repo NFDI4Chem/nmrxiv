@@ -81,10 +81,8 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
                 ->name('license');
 
     // Authors
-    Route::get('authors', [AuthorController::class, 'getAuthorsbyDOI'])
-                ->name('get-authors-by-DOI');
-    Route::post('authors/{project}', [AuthorController::class, 'addAuthor'])
-                ->name('add-author');
+    Route::post('authors/{project}', [AuthorController::class, 'updateAuthor'])
+                ->name('update-author');
 
     Route::post('/onboarding/{status}', [DashboardController::class, 'onboardingStatus'])
             ->name('onboarding.complete');

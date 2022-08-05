@@ -428,8 +428,6 @@ export default {
   mounted() {
     if (this.project) {
       this.$page.props.selectedFileSystemObject = this.project.data.files;
-      console.log("This project..");
-      console.log(this.project);
     }
   },
   methods: {
