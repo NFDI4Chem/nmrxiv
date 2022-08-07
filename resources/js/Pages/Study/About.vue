@@ -25,6 +25,7 @@
                       Description
                     </span>
                     <button
+                      v-if="canUpdateStudy"
                       type="button"
                       @click="openStudyDetailsPane"
                       class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
@@ -60,6 +61,7 @@
                       Keywords
                     </span>
                     <button
+                      v-if="canUpdateStudy"
                       type="button"
                       @click="openStudyDetailsPane"
                       class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
@@ -108,6 +110,7 @@
                       License
                     </span>
                     <button
+                      v-if="canUpdateStudy"
                       type="button"
                       @click="openStudyDetailsPane"
                       class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
@@ -147,6 +150,7 @@
                       Sample details
                     </span>
                     <button
+                      v-if="canUpdateStudy"
                       type="button"
                       @click="openStudyDetailsPane"
                       class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
@@ -281,7 +285,7 @@
                           </div>
                         </div>
                       </div>
-                      <div class="pl-2">
+                      <div v-if="canUpdateStudy" class="pl-2">
                         <div class="sm:col-span-4">
                           <label
                             for="email"
@@ -480,6 +484,9 @@ export default {
       } else {
         return 100;
       }
+    },
+    canUpdateStudy(){
+      return this.studyPermissions ? this.studyPermissions.canUpdateStudy : false;
     },
   },
 };

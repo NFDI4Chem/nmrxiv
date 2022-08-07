@@ -202,7 +202,7 @@
                       {{ studyRole }}
                     </span>
                   </div>
-                  <study-details ref="studyDetailsElement" :study="study" />
+                  <study-details ref="studyDetailsElement" :study="study" :role="studyRole" />
                 </div>
               </div>
             </div>

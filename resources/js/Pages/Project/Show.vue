@@ -207,6 +207,7 @@
                 Description
               </span>
               <button
+                v-if="canUpdateProject"
                 type="button"
                 @click="toggleDetails"
                 class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
@@ -242,6 +243,7 @@
                 Keywords
               </span>
               <button
+                v-if="canUpdateProject"
                 type="button"
                 @click="toggleDetails"
                 class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
@@ -337,11 +339,16 @@ export default {
   },
   computed: {
     canDeleteProject() {
-      if(this.projectRole == "owner" || this.projectRole == "creator"){
-        return true;
-      }else {
-        return false;
+      if(this.projectRole){
+        if(this.projectRole == "owner" || this.projectRole == "creator"){
+          return true;
+        }else {
+          return false;
+        }
       }
+    },
+    canUpdateProject(){
+      return this.projectPermissions ? this.projectPermissions.canUpdateProject : false;
     },
     editable() {
       if (this.projectRole) {
