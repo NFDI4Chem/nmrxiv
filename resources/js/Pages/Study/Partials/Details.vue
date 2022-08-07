@@ -73,6 +73,7 @@
                                                         <input
                                                             v-model="form.name"
                                                             type="text"
+                                                            :readonly="!editable"
                                                             name="study-name"
                                                             id="study-name"
                                                             class="block w-full shadow-sm sm:text-sm focus:ring-gray-500 focus:border-gray-500 border-gray-300 rounded-md"
@@ -148,6 +149,7 @@
                                                                             v-model="
                                                                                 form.description
                                                                             "
+                                                                            :readonly="!editable"
                                                                             id="description"
                                                                             name="description"
                                                                             placeholder="Describe this study"
@@ -236,6 +238,7 @@
                                                             placeholder="Type a keyword or keywords separated by comma (,) and press enter"
                                                             :separators="[';', ',']"
                                                             v-model="form.tag"
+                                                            :disabled="!editable"
                                                             max-width="100%"
                                                             :tags="form.tags"
                                                             @tags-changed="
@@ -246,7 +249,7 @@
                                                         />
                                                     </div>
                                                 </div>
-                                                <div>
+                                                <div v-if="editable">
                                                     <label
                                                         for="study-name"
                                                         class="block text-sm font-medium text-gray-900"
@@ -280,6 +283,7 @@
                                                                     v-model="
                                                                         form.is_public
                                                                     "
+                                                                    :disabled="!editable"
                                                                     id="privacy-public"
                                                                     name="privacy"
                                                                     value="true"
@@ -325,6 +329,7 @@
                                                                         v-model="
                                                                             form.is_public
                                                                         "
+                                                                        :disabled="!editable"
                                                                         id="privacy-private-to-study"
                                                                         name="privacy"
                                                                         value="false"
@@ -372,6 +377,7 @@
                                                             v-model:selected="
                                                                 form.license
                                                             "
+                                                            :disabled="!editable"
                                                             :items="licenses"
                                                         />
                                                     </div>
@@ -679,6 +685,7 @@
                                         Cancel
                                     </jet-secondary-button>
                                     <jet-button
+                                        v-if="editable"
                                         type="submit"
                                         class="ml-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
                                         @click="updateStudy"
@@ -795,7 +802,7 @@ export default {
         SelectRich,
         VueTagsInput,
     },
-    props: ["study"],
+    props: ["study","role"],
     mounted() {
         const emitter = inject("emitter");
         emitter.on("openStudyDetails", (data) => {
@@ -912,5 +919,18 @@ export default {
             this.activityDetailsElement.toggleDetails();
         },
     },
+    computed: {
+        editable() {
+            if (this.role) {
+                return (
+                    this.role == "creator" ||
+                    this.role == "owner" ||
+                    this.role == "collaborator"
+                );
+            } else {
+                return false;
+            }
+        },
+    }
 };
 </script>

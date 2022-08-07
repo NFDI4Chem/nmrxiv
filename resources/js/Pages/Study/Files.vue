@@ -68,7 +68,7 @@
               <section
                 class="min-w-0 p-6 flex-1 h-full flex flex-col overflow-y-auto lg:order-last"
               >
-                <div>
+                <div v-if="canUpdateFiles">
                   <form class="dropzone py-2 mb-3">
                     <div id="dropzone-message" class="text-center">
                       <div
@@ -422,7 +422,10 @@ export default {
     },
     downloadURL(){
       return this.url + "/" + this.project.owner.username + '/download/' + this.project.slug + "?key=" + this.$page.props.selectedFileSystemObject.name + "&uuid=" + this.$page.props.selectedFileSystemObject.uuid
-    }
-  },
+    },
+    canUpdateFiles(){
+      return this.studyPermissions ? this.studyPermissions.canUpdateStudy : false;
+    },
+},
 };
 </script>
