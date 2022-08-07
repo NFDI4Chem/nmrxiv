@@ -337,7 +337,11 @@ export default {
   },
   computed: {
     canDeleteProject() {
-      return this.projectRole == "owner";
+      if(this.projectRole == "owner" || this.projectRole == "creator"){
+        return true;
+      }else {
+        return false;
+      }
     },
     editable() {
       if (this.projectRole) {
