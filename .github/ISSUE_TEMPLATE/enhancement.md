@@ -1,10 +1,7 @@
 ---
 name: Enhancement
 about: Suggestion for enhancing any feature.
-title: ''
+title: ""
 labels: enhancement
-assignees: ''
-
+assignees: ""
 ---
-
-
