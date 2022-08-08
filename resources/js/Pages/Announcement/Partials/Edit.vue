@@ -20,15 +20,18 @@
                         </label>
                         <div class="mt-1 flex rounded-md shadow-sm">
                             <input
+                                id="name"
                                 v-model="editAnnouncementForm.title"
                                 type="text"
                                 name="name"
-                                id="name"
                                 autocomplete="off"
                                 class="flex-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full min-w-0 rounded sm:text-sm border-gray-300"
                             />
                         </div>
-                         <jet-input-error :message="editAnnouncementForm.errors.title" class="mt-2" />
+                        <jet-input-error
+                            :message="editAnnouncementForm.errors.title"
+                            class="mt-2"
+                        />
                     </div>
                     <div class="sm:col-span-6">
                         <label
@@ -39,8 +42,8 @@
                         </label>
                         <div mt-1 flex rounded-md shadow-sm>
                             <textarea
-                                v-model="editAnnouncementForm.message"
                                 id="description"
+                                v-model="editAnnouncementForm.message"
                                 name="description"
                                 placeholder="Message to the users.."
                                 rows="3"
@@ -72,7 +75,10 @@
                         <Datepicker
                             v-model="editAnnouncementForm.start_time"
                         ></Datepicker>
-                        <jet-input-error :message="editAnnouncementForm.errors.start_time" class="mt-2" />
+                        <jet-input-error
+                            :message="editAnnouncementForm.errors.start_time"
+                            class="mt-2"
+                        />
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700">
@@ -81,7 +87,10 @@
                         <Datepicker
                             v-model="editAnnouncementForm.end_time"
                         ></Datepicker>
-                        <jet-input-error :message="editAnnouncementForm.errors.end_time" class="mt-2" />
+                        <jet-input-error
+                            :message="editAnnouncementForm.errors.end_time"
+                            class="mt-2"
+                        />
                     </div>
                 </div>
             </div>
@@ -94,9 +103,9 @@
 
             <jet-button
                 class="ml-2"
-                @click="editAnnouncement"
                 :class="{ 'opacity-25': editAnnouncementForm.processing }"
                 :disabled="editAnnouncementForm.processing"
+                @click="editAnnouncement"
             >
                 Update
             </jet-button>
@@ -119,8 +128,8 @@ import {
     SwitchGroup,
     SwitchLabel,
 } from "@headlessui/vue";
-import Datepicker from '@vuepic/vue-datepicker';
-import '@vuepic/vue-datepicker/dist/main.css';
+import Datepicker from "@vuepic/vue-datepicker";
+import "@vuepic/vue-datepicker/dist/main.css";
 
 export default {
     components: {
@@ -142,6 +151,8 @@ export default {
         ToggleButton,
     },
 
+    props: [],
+
     data() {
         return {
             selectedAnnouncement: null,
@@ -160,13 +171,14 @@ export default {
         };
     },
 
-    props: [],
-
     methods: {
         editAnnouncement() {
             //this.editAnnouncementForm.creator_id = this.$page.props.user.id;
             this.editAnnouncementForm.post(
-                route("console.announcements.edit", this.editAnnouncementForm.id),
+                route(
+                    "console.announcements.edit",
+                    this.editAnnouncementForm.id
+                ),
                 {
                     preserveScroll: true,
                     onSuccess: () => {
@@ -182,10 +194,12 @@ export default {
             this.editAnnouncementForm.id = announcement.id;
             this.editAnnouncementForm.title = announcement.title;
             this.editAnnouncementForm.message = announcement.message;
-            if(announcement.status == 'active' || announcement.status == 'Active')
-              this.editAnnouncementForm.enabled = true; 
-            else 
-              this.editAnnouncementForm.enabled = false;
+            if (
+                announcement.status == "active" ||
+                announcement.status == "Active"
+            )
+                this.editAnnouncementForm.enabled = true;
+            else this.editAnnouncementForm.enabled = false;
             this.editAnnouncementForm.start_time = announcement.start_time;
             this.editAnnouncementForm.end_time = announcement.end_time;
             this.editAnnouncementDialog = !this.editAnnouncementDialog;

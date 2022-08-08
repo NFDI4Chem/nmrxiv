@@ -1,105 +1,120 @@
 <template>
-  <app-layout title="Dashboard">
-    <template #header>
-      <div class="bg-white border-b">
-        <div class="px-12">
-          <div class="flex flex-nowrap justify-between py-6">
-            <div>
-              <div class="flex flex-nowrap justify-between">
-                <div class="lg:flex lg:items-center lg:justify-between">
-                  <div class="flex-1 min-w-0">
-                    <nav class="flex" aria-label="Breadcrumb">
-                      <ol role="list" class="flex items-center space-x-4">
-                        <li>
-                          <div class="flex">
-                            <a
-                              class="text-sm font-medium text-gray-500 hover:text-gray-700"
-                              >Dashboard</a
-                            >
-                          </div>
-                        </li>
-                        <li>
-                          <div class="flex items-center">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              viewBox="0 0 20 20"
-                              fill="currentColor"
-                              aria-hidden="true"
-                              class="flex-shrink-0 h-5 w-5 text-gray-400"
-                            >
-                              <path
-                                fill-rule="evenodd"
-                                d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                                clip-rule="evenodd"
-                              ></path></svg
-                            ><a
-                              class="ml-4 text-sm font-medium text-gray-500 hover:text-gray-700"
-                              >Shared With Me</a
-                            >
-                          </div>
-                        </li>
-                      </ol>
-                    </nav>
-                    <h2
-                      class="mt-2 text-2xl font-bold break-words leading-7 text-gray-900 sm:text-3xl"
-                    >
-                      Shared With Me
-                    </h2>
-                  </div>
+    <app-layout title="Dashboard">
+        <template #header>
+            <div class="bg-white border-b">
+                <div class="px-12">
+                    <div class="flex flex-nowrap justify-between py-6">
+                        <div>
+                            <div class="flex flex-nowrap justify-between">
+                                <div
+                                    class="lg:flex lg:items-center lg:justify-between"
+                                >
+                                    <div class="flex-1 min-w-0">
+                                        <nav
+                                            class="flex"
+                                            aria-label="Breadcrumb"
+                                        >
+                                            <ol
+                                                role="list"
+                                                class="flex items-center space-x-4"
+                                            >
+                                                <li>
+                                                    <div class="flex">
+                                                        <a
+                                                            class="text-sm font-medium text-gray-500 hover:text-gray-700"
+                                                            >Dashboard</a
+                                                        >
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <div
+                                                        class="flex items-center"
+                                                    >
+                                                        <svg
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            viewBox="0 0 20 20"
+                                                            fill="currentColor"
+                                                            aria-hidden="true"
+                                                            class="flex-shrink-0 h-5 w-5 text-gray-400"
+                                                        >
+                                                            <path
+                                                                fill-rule="evenodd"
+                                                                d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                                                                clip-rule="evenodd"
+                                                            ></path></svg
+                                                        ><a
+                                                            class="ml-4 text-sm font-medium text-gray-500 hover:text-gray-700"
+                                                            >Shared With Me</a
+                                                        >
+                                                    </div>
+                                                </li>
+                                            </ol>
+                                        </nav>
+                                        <h2
+                                            class="mt-2 text-2xl font-bold break-words leading-7 text-gray-900 sm:text-3xl"
+                                        >
+                                            Shared With Me
+                                        </h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-              </div>
             </div>
-          </div>
+        </template>
+        <div class="px-12 py-8 mx-auto max-w-4xl">
+            <team-projects :mode="'listing'" :projects="projects">
+                <template #emptyText
+                    ><div class="text-center py-12">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="mx-auto h-24 w-24 text-gray-400"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                            />
+                        </svg>
+                        <h3 class="mt-2 text-sm font-medium text-gray-900">
+                            No Projects Shared.
+                        </h3>
+                        <p class="mt-1 text-sm text-gray-500">
+                            When projects are shared you will receive an email
+                            with the invitation. Once accepted the project will
+                            be added to your account. Team projects are
+                            automatically added to the members.
+                        </p>
+                    </div></template
+                >
+            </team-projects>
         </div>
-      </div>
-    </template>
-    <div class="px-12 py-8 mx-auto max-w-4xl">
-      <team-projects :mode="'listing'" :projects="projects">
-        <template #emptyText
-          ><div class="text-center py-12">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="mx-auto h-24 w-24 text-gray-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-              />
-            </svg>
-            <h3 class="mt-2 text-sm font-medium text-gray-900">No Projects Shared.</h3>
-            <p class="mt-1 text-sm text-gray-500">
-              When projects are shared you will receive an email with the invitation. Once
-              accepted the project will be added to your account. Team projects are
-              automatically added to the members.
-            </p>
-          </div></template
-        >
-      </team-projects>
-    </div>
-    <div class="px-12 border-t py-8 mx-auto max-w-4xl">
-      <div>
-        <h2 class="text-lg">Studies</h2>
-      </div>
-      <div class="flex items-baseline justify-between">
-        <div class="py-8 mx-auto max-w-4xl">
-          <div
-            class="mx-auto max-w-md grid gap-8 sm:max-w-lg lg:grid-cols-3 lg:max-w-7xl"
-          >
-            <div :key="study.uuid" v-for="study in studies">
-              <Link :href="route('dashboard.studies', [study.id])">
-                <study-card :study="study" />
-              </Link>
+        <div class="px-12 border-t py-8 mx-auto max-w-4xl">
+            <div>
+                <h2 class="text-lg">Studies</h2>
             </div>
-          </div>
+            <div class="flex items-baseline justify-between">
+                <div class="py-8 mx-auto max-w-4xl">
+                    <div
+                        class="mx-auto max-w-md grid gap-8 sm:max-w-lg lg:grid-cols-3 lg:max-w-7xl"
+                    >
+                        <div v-for="study in studies" :key="study.uuid">
+                            <Link
+                                :href="route('dashboard.studies', [study.id])"
+                            >
+                                <study-card :study="study" />
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  </app-layout>
+    </app-layout>
 </template>
 
 <script>
@@ -109,12 +124,12 @@ import StudyCard from "@/Shared/StudyCard.vue";
 import { Link } from "@inertiajs/inertia-vue3";
 
 export default {
-  components: {
-    AppLayout,
-    TeamProjects,
-    StudyCard,
-    Link,
-  },
-  props: ["user", "team", "projects", "studies"],
+    components: {
+        AppLayout,
+        TeamProjects,
+        StudyCard,
+        Link,
+    },
+    props: ["user", "team", "projects", "studies"],
 };
 </script>

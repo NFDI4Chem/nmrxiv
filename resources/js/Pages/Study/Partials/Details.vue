@@ -14,7 +14,7 @@
                         leave-from="translate-x-0"
                         leave-to="translate-x-full"
                     >
-                        <div class="w-screen max-w-md">
+                        <div class="w-screen max-w-2xl">
                             <div
                                 class="h-full divide-y divide-gray-200 flex flex-col bg-white shadow-xl"
                             >
@@ -73,6 +73,9 @@
                                                         <input
                                                             v-model="form.name"
                                                             type="text"
+                                                            :readonly="
+                                                                !editable
+                                                            "
                                                             name="study-name"
                                                             id="study-name"
                                                             class="block w-full shadow-sm sm:text-sm focus:ring-gray-500 focus:border-gray-500 border-gray-300 rounded-md"
@@ -147,6 +150,9 @@
                                                                         <textarea
                                                                             v-model="
                                                                                 form.description
+                                                                            "
+                                                                            :readonly="
+                                                                                !editable
                                                                             "
                                                                             id="description"
                                                                             name="description"
@@ -234,8 +240,14 @@
                                                     <div>
                                                         <vue-tags-input
                                                             placeholder="Type a keyword or keywords separated by comma (,) and press enter"
-                                                            :separators="[';', ',']"
+                                                            :separators="[
+                                                                ';',
+                                                                ',',
+                                                            ]"
                                                             v-model="form.tag"
+                                                            :disabled="
+                                                                !editable
+                                                            "
                                                             max-width="100%"
                                                             :tags="form.tags"
                                                             @tags-changed="
@@ -246,7 +258,7 @@
                                                         />
                                                     </div>
                                                 </div>
-                                                <div>
+                                                <div v-if="editable">
                                                     <label
                                                         for="study-name"
                                                         class="block text-sm font-medium text-gray-900"
@@ -279,6 +291,9 @@
                                                                     "
                                                                     v-model="
                                                                         form.is_public
+                                                                    "
+                                                                    :disabled="
+                                                                        !editable
                                                                     "
                                                                     id="privacy-public"
                                                                     name="privacy"
@@ -324,6 +339,9 @@
                                                                         "
                                                                         v-model="
                                                                             form.is_public
+                                                                        "
+                                                                        :disabled="
+                                                                            !editable
                                                                         "
                                                                         id="privacy-private-to-study"
                                                                         name="privacy"
@@ -371,6 +389,9 @@
                                                             label="License"
                                                             v-model:selected="
                                                                 form.license
+                                                            "
+                                                            :disabled="
+                                                                !editable
                                                             "
                                                             :items="licenses"
                                                         />
@@ -679,6 +700,7 @@
                                         Cancel
                                     </jet-secondary-button>
                                     <jet-button
+                                        v-if="editable"
                                         type="submit"
                                         class="ml-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
                                         @click="updateStudy"
@@ -795,25 +817,18 @@ export default {
         SelectRich,
         VueTagsInput,
     },
-    props: ["study"],
+    props: ["study", "role"],
     mounted() {
         const emitter = inject("emitter");
         emitter.on("openStudyDetails", (data) => {
             this.open = true;
         });
     },
-    beforeMount(){
+    beforeMount() {
         if (this.study.license_id) {
-            axios
-                .get(
-                    route(
-                        "license",
-                        this.study.license_id
-                    )
-                )
-                .then((res) => {
-                    this.form.license = res.data[0];
-                });
+            axios.get(route("license", this.study.license_id)).then((res) => {
+                this.form.license = res.data[0];
+            });
         }
         axios.get(route("licenses")).then((res) => {
             this.licenses = res.data;
@@ -898,7 +913,7 @@ export default {
                 }
             }
             this.form.tags_array = [...new Set(this.form.tags_array)];
-            
+
             this.form.post(route("dashboard.study.update", this.study.id), {
                 preserveScroll: true,
                 onSuccess: () => {
