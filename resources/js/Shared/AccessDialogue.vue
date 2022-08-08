@@ -85,7 +85,7 @@
               </div>
               <div class="mt-5 sm:mt-0 sm:ml-6 sm:flex-shrink-0 sm:flex sm:items-center">
                 <button
-                  v-if="!addUser && role != 'reviewer'"
+                  v-if="!addUser && canChangeRole"
                   @click="addUser = true"
                   type="button"
                   class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none sm:text-sm"
@@ -106,7 +106,7 @@
                   >&nbsp; SHARE
                 </button>
                 <button
-                  v-if="addUser && role != 'reviewer'"
+                  v-if="addUser && canChangeRole"
                   @click="addUser = false"
                   type="button"
                   class="inline-flex items-center px-4 py-2 border shadow-sm font-medium rounded-md text-dark bg-white-600 hover:bg-white-700 focus:outline-none sm:text-sm"
@@ -176,7 +176,7 @@
                         </div>
                       </div>
                       <div class="-mt-4">
-                        <div v-if="role && role != 'reviewer'">
+                        <div v-if="role && canChangeRole">
                           <div
                             v-if="
                               personRole(person) &&
@@ -653,7 +653,17 @@ export default {
     },
     modelInvitations(){
       return this.modelObject[this.model+'_invitations']
+    },
+    canChangeRole(){
+      if (this.role) {
+        return (
+            this.role == "creator" ||
+            this.role == "owner"
+        );
+      } else {
+        return true;
+      }
     }
   },
-};
+}
 </script>
