@@ -132,6 +132,120 @@
                     class="py-3 px-2 lg:block lg:flex-shrink-0 lg:order-first overflow-scroll"
                 >
                     <children :file="file"></children>
+                    <div
+                        v-if="Object.keys(logs).length > 0"
+                        @click="showLogsDialog = true"
+                        class="mt-4 text-sm cursor-pointer text-gray-400"
+                    >
+                        <InformationCircleIcon
+                            class="h-5 w-5 inline text-gray-400 flex-shrink-0 mx-auto"
+                            aria-hidden="true"
+                        />
+                        View logs
+                    </div>
+                    <jet-dialog-modal
+                        :show="showLogsDialog"
+                        @close="showLogsDialog = false"
+                    >
+                        <template #title>
+                            <div class="block">
+                                File logs
+                                <div class="inline float-right">
+                                    <select
+                                        v-model="logFilter"
+                                        class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                                    >
+                                        <option
+                                            v-for="filter in logFilters"
+                                            :key="filter"
+                                            :value="filter"
+                                        >
+                                            {{ filter }}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </template>
+
+                        <template #content>
+                            <div
+                                class="relative h-[74vh] overflow-x-scroll z-0 mt-1 rounded-lg cursor-pointer"
+                            >
+                                <ul
+                                    v-if="Object.keys(filteredLogs).length > 0"
+                                    role="list"
+                                    class="divide-y divide-gray-200"
+                                >
+                                    <li
+                                        v-for="file in Object.keys(
+                                            filteredLogs
+                                        )"
+                                        :key="file"
+                                        class="py-4 flex"
+                                    >
+                                        <CheckIcon
+                                            v-if="
+                                                logs[file].status == 'Success'
+                                            "
+                                            class="h-5 w-5 inline text-green-400"
+                                            aria-hidden="true"
+                                        />
+                                        <UploadIcon
+                                            v-if="
+                                                logs[file].status ==
+                                                'Inprogress'
+                                            "
+                                            class="h-5 w-5 inline text-yellow-400"
+                                            aria-hidden="true"
+                                        />
+                                        <DotsVerticalIcon
+                                            v-if="
+                                                logs[file].status ==
+                                                'Inprogress'
+                                            "
+                                            class="h-5 w-5 inline text-gray-400"
+                                            aria-hidden="true"
+                                        />
+                                        <ExclamationCircleIcon
+                                            v-if="logs[file].status == 'Error'"
+                                            class="h-5 w-5 inline text-red-400"
+                                            aria-hidden="true"
+                                        />
+                                        <div class="ml-3">
+                                            <p
+                                                class="text-sm font-medium text-gray-900"
+                                            >
+                                                {{ file }}
+                                            </p>
+                                            <p
+                                                v-for="message in logs[file]
+                                                    .messages"
+                                                :key="message"
+                                                class="text-sm text-gray-400"
+                                            >
+                                                {{ message }}
+                                            </p>
+                                        </div>
+                                    </li>
+                                </ul>
+                                <div class="mt-10" v-else>
+                                    <i class="text-gray-400"
+                                        >No logs with the status
+                                        {{ logFilter }}</i
+                                    >
+                                </div>
+                            </div>
+                        </template>
+
+                        <template #footer>
+                            <jet-secondary-button
+                                class="cursor-pointer"
+                                @click="toggleShowLogsDialog"
+                            >
+                                Close
+                            </jet-secondary-button>
+                        </template>
+                    </jet-dialog-modal>
                 </aside>
                 <section class="p-6 flex-1 flex flex-col lg:order-last">
                     <div
@@ -204,14 +318,23 @@
     </div>
 </template>
 <script>
+import JetDialogModal from "@/Jetstream/DialogModal.vue";
+import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import { Dropzone } from "dropzone";
 import axiosRetry from "axios-retry";
 import FileDetails from "@/Shared/FileDetails.vue";
+import SelectInput from "@/Shared/SelectInput.vue";
+
 import {
     FolderIcon,
     DocumentTextIcon,
     ChevronRightIcon,
     HomeIcon,
+    InformationCircleIcon,
+    DotsVerticalIcon,
+    UploadIcon,
+    CheckIcon,
+    ExclamationCircleIcon,
 } from "@heroicons/vue/solid";
 
 export default {
@@ -219,8 +342,16 @@ export default {
         FolderIcon,
         DocumentTextIcon,
         ChevronRightIcon,
+        InformationCircleIcon,
         HomeIcon,
         FileDetails,
+        JetDialogModal,
+        JetSecondaryButton,
+        DotsVerticalIcon,
+        ExclamationCircleIcon,
+        UploadIcon,
+        CheckIcon,
+        SelectInput,
     },
     props: ["draft", "readonly"],
     data() {
@@ -232,12 +363,11 @@ export default {
             busy: false,
             file: null,
             url: null,
+            logs: {},
+            logFilter: "Error",
+            logFilters: ["Error", "Success", "Queued", "Inprogress"],
+            showLogsDialog: false,
         };
-    },
-    computed: {
-        baseURL() {
-            return String(this.$page.props.url);
-        },
     },
     mounted() {
         if (this.draft) {
@@ -250,6 +380,9 @@ export default {
     methods: {
         toggleFullScreen() {
             this.fullScreen = !this.fullScreen;
+        },
+        toggleShowLogsDialog() {
+            this.showLogsDialog = !this.showLogsDialog;
         },
         updateBusyStatus(status) {
             this.busy = status;
@@ -280,6 +413,7 @@ export default {
             axiosRetry(client, {
                 retries: 3,
                 retryCondition: (error) => {
+                    console.log("retring failed upload requests - Signed storage URL")
                     return error.response.status === 500;
                 },
             });
@@ -290,14 +424,14 @@ export default {
                     draft_id: vm.draft.id,
                 })
                 .catch((err) => {
-                    if (
-                        err.response.status !== 200 ||
-                        err.response.status !== 201
-                    ) {
-                        throw new Error(
-                            `API call failed with status code: ${err.response.status} after multiple attempts`
-                        );
-                    }
+                    // if (
+                    //     err.response.status !== 200 ||
+                    //     err.response.status !== 201
+                    // ) {
+                    //     throw new Error(
+                    //         `API call failed with status code: ${err.response.status}`
+                    //     );
+                    // }
                 })
                 .then(function (response) {
                     let data = response.data;
@@ -309,6 +443,17 @@ export default {
                                 return "/" + f.name == u.fullPath;
                             }
                         });
+
+                        let message =
+                            "Presigned Upload URL receieved.  Starting Upload.";
+                        if (cFile.fullPath) {
+                            vm.logs[cFile.fullPath].status = "Inprogress";
+                            vm.logs[cFile.fullPath].messages.push(message);
+                        } else {
+                            vm.logs[cFile.name].status = "Inprogress";
+                            vm.logs[cFile.name].messages.push(message);
+                        }
+
                         if (cFile) {
                             let headers = u.headers;
                             if ("Host" in headers) {
@@ -362,12 +507,42 @@ export default {
                     vm.status = "UPLOAD IN PROGRESS";
                 });
                 vm.dropzone.on("success", (file) => {
+                    let message = "Upload complete";
+                    if (file.fullPath) {
+                        vm.logs[file.fullPath].status = "Success";
+                        vm.logs[file.fullPath].messages.push(message);
+                    } else {
+                        vm.logs[file.name].status = "Success";
+                        vm.logs[file.name].messages.push(message);
+                    }
                     vm.uploadedFilesCount += 1;
                     vm.precentageUpload =
                         (vm.uploadedFilesCount / vm.totalFilesCount) * 100;
                 });
+                vm.dropzone.on("error", (file) => {
+                    console.log(file)
+                    let message = "Upload failed";
+                    if (file.fullPath) {
+                        vm.logs[file.fullPath].status = "Failed";
+                        vm.logs[file.fullPath].messages.push(message);
+                    } else {
+                        vm.logs[file.name].status = "Failed";
+                        vm.logs[file.name].messages.push(message);
+                    }
+                });
                 vm.dropzone.on("addedfile", (file) => {
                     vm.selectedFSO.push(file);
+                    if (file.fullPath) {
+                        vm.logs[file.fullPath] = {
+                            status: "Queued",
+                            messages: [],
+                        };
+                    } else {
+                        vm.logs[file.name] = {
+                            status: "Queued",
+                            messages: [],
+                        };
+                    }
                 });
                 vm.dropzone.on("addedfiles", (files) => {
                     this.updateBusyStatus(true);
@@ -407,6 +582,19 @@ export default {
                     }, 5000);
                 });
             });
+        },
+    },
+    computed: {
+        baseURL() {
+            return String(this.$page.props.url);
+        },
+        filteredLogs() {
+            let logsClone = JSON.parse(JSON.stringify(this.logs));
+            Object.keys(logsClone).forEach((key) => {
+                if (logsClone[key].status != this.logFilter)
+                    delete logsClone[key];
+            });
+            return logsClone;
         },
     },
 };
