@@ -25,6 +25,7 @@
                   :team="team"
                   :members="members"
                   :project="project"
+                  calledFrom=projectView
                   model="project"
                 />
                 <a
