@@ -245,6 +245,9 @@
                                                                 ',',
                                                             ]"
                                                             v-model="form.tag"
+                                                            :disabled="
+                                                                !editable
+                                                            "
                                                             max-width="100%"
                                                             :tags="form.tags"
                                                             @tags-changed="
@@ -1003,19 +1006,6 @@ export default defineComponent({
         },
         toggleActivityDetails() {
             this.activityDetailsElement.toggleDetails();
-        },
-    },
-    computed: {
-        editable() {
-            if (this.role) {
-                return (
-                    this.role == "creator" ||
-                    this.role == "owner" ||
-                    this.role == "collaborator"
-                );
-            } else {
-                return false;
-            }
         },
     },
 });
