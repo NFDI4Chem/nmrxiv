@@ -426,6 +426,6 @@ export default {
     canUpdateFiles(){
       return this.studyPermissions ? this.studyPermissions.canUpdateStudy : false;
     },
-},
+  },
 };
 </script>
