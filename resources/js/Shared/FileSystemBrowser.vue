@@ -413,7 +413,9 @@ export default {
             axiosRetry(client, {
                 retries: 3,
                 retryCondition: (error) => {
-                    console.log("retring failed upload requests - Signed storage URL")
+                    console.log(
+                        "retring failed upload requests - Signed storage URL"
+                    );
                     return error.response.status === 500;
                 },
             });
@@ -520,7 +522,7 @@ export default {
                         (vm.uploadedFilesCount / vm.totalFilesCount) * 100;
                 });
                 vm.dropzone.on("error", (file) => {
-                    console.log(file)
+                    console.log(file);
                     let message = "Upload failed";
                     if (file.fullPath) {
                         vm.logs[file.fullPath].status = "Failed";
