@@ -1,17 +1,17 @@
-name: Release
+# name: Release
 
-on:
-  push:
-    branches:
-      - dev-helm-deploy
-jobs:
-  release-please:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: google-github-actions/release-please-action@v3
-        with:
-          release-type: php
-          package-name: nmrxiv
+# on:
+#   push:
+#     branches:
+#       - dev-helm-deploy
+# jobs:
+#   release-please:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: google-github-actions/release-please-action@v3
+#         with:
+#           release-type: php
+#           package-name: nmrxiv
 
 
 # name: Release
