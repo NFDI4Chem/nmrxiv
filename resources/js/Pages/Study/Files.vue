@@ -6,9 +6,9 @@
             :study="study"
             :team="team"
             :members="members"
-            :available-roles="availableRoles"
-            :study-permissions="studyPermissions"
-            :study-role="studyRole"
+            :availableRoles="availableRoles"
+            :studyPermissions="studyPermissions"
+            :studyRole="studyRole"
             current="Files"
         >
             <template #study-section>
@@ -74,17 +74,17 @@
                                     class="h-full relative flex flex-col w-64 border-r border-gray-200 overflow-y-auto"
                                 >
                                     <children
+                                        @reload-nmrium="loadSpectra()"
                                         :file="file"
                                         :study="study"
                                         :project="project"
-                                        @reload-nmrium="loadSpectra()"
                                     ></children>
                                 </div>
                             </aside>
                             <section
                                 class="min-w-0 p-6 flex-1 h-full flex flex-col overflow-y-auto lg:order-last"
                             >
-                                <div>
+                                <div v-if="canUpdateFiles">
                                     <form class="dropzone py-2 mb-3">
                                         <div
                                             id="dropzone-message"
@@ -158,12 +158,12 @@
                                     </form>
                                 </div>
                                 <div
+                                    class="mb-3"
                                     v-if="
                                         $page.props.selectedFileSystemObject &&
                                         $page.props.selectedFileSystemObject
                                             .has_children
                                     "
-                                    class="mb-3"
                                 >
                                     <div class="py-2 mb-2 block">
                                         <p class="font-bold text-xl">
@@ -200,13 +200,13 @@
                                                     "
                                                 >
                                                     <FolderIcon
-                                                        class="cursor-pointer h-28 w-28 text-gray-400 flex-shrink-0 mx-auto"
-                                                        aria-hidden="true"
                                                         @dblclick.stop="
                                                             displaySelected(
                                                                 file
                                                             )
                                                         "
+                                                        class="cursor-pointer h-28 w-28 text-gray-400 flex-shrink-0 mx-auto"
+                                                        aria-hidden="true"
                                                     />
                                                 </span>
                                                 <span v-else>
@@ -241,6 +241,7 @@
                                             "
                                         >
                                             <div
+                                                class="mb-4"
                                                 v-if="
                                                     $page.props.selectedFileSystemObject.key.indexOf(
                                                         '.dx'
@@ -255,9 +256,9 @@
                                                         '.json'
                                                     ) > -1
                                                 "
-                                                class="mb-4"
                                             >
                                                 <iframe
+                                                    v-on:load="loadSpectra()"
                                                     name="crossDomainIframe"
                                                     frameborder="0"
                                                     allowfullscreen
@@ -267,12 +268,11 @@
                                                         height: 500px;
                                                     "
                                                     :src="nmriumURL"
-                                                    @load="loadSpectra()"
                                                 ></iframe>
                                             </div>
                                             <div
-                                                v-if="svgString"
                                                 class="rounded-md border my-3 flex justify-center items-center"
+                                                v-if="svgString"
                                             >
                                                 <span v-html="svgString"></span>
                                             </div>
@@ -311,6 +311,16 @@ import {
 } from "@heroicons/vue/solid";
 import { Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/vue";
 export default {
+    props: [
+        "study",
+        "project",
+        "file",
+        "team",
+        "members",
+        "availableRoles",
+        "studyPermissions",
+        "studyRole",
+    ],
     components: {
         StudyContent,
         Disclosure,
@@ -322,16 +332,6 @@ export default {
         ChevronRightIcon,
         HomeIcon,
     },
-    props: [
-        "study",
-        "project",
-        "file",
-        "team",
-        "members",
-        "availableRoles",
-        "studyPermissions",
-        "studyRole",
-    ],
     setup() {
         return {};
     },
@@ -342,29 +342,6 @@ export default {
             selectedFileSystemObject: null,
             svgString: null,
         };
-    },
-    computed: {
-        url() {
-            return String(this.$page.props.url);
-        },
-        nmriumURL() {
-            return this.$page.props.nmriumURL
-                ? String(this.$page.props.nmriumURL)
-                : "//nmriumdev.nmrxiv.org";
-        },
-        downloadURL() {
-            return (
-                this.url +
-                "/" +
-                this.project.owner.username +
-                "/download/" +
-                this.project.slug +
-                "?key=" +
-                this.$page.props.selectedFileSystemObject.name +
-                "&uuid=" +
-                this.$page.props.selectedFileSystemObject.uuid
-            );
-        },
     },
     mounted() {
         const vm = this;
@@ -519,6 +496,34 @@ export default {
                     }
                 }
             });
+        },
+    },
+    computed: {
+        url() {
+            return String(this.$page.props.url);
+        },
+        nmriumURL() {
+            return this.$page.props.nmriumURL
+                ? String(this.$page.props.nmriumURL)
+                : "//nmriumdev.nmrxiv.org";
+        },
+        downloadURL() {
+            return (
+                this.url +
+                "/" +
+                this.project.owner.username +
+                "/download/" +
+                this.project.slug +
+                "?key=" +
+                this.$page.props.selectedFileSystemObject.name +
+                "&uuid=" +
+                this.$page.props.selectedFileSystemObject.uuid
+            );
+        },
+        canUpdateFiles() {
+            return this.studyPermissions
+                ? this.studyPermissions.canUpdateStudy
+                : false;
         },
     },
 };

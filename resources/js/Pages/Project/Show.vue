@@ -9,6 +9,7 @@
                                 class="flex pr-20 items-center text-xl text-gray-700 font-bold"
                             >
                                 <StarIcon
+                                    @click="toogleStarred"
                                     :class="[
                                         project.starred
                                             ? 'text-yellow-400'
@@ -16,7 +17,6 @@
                                         'h-5 w-5 flex-shrink-0 -ml-1 mr-1',
                                     ]"
                                     aria-hidden="true"
-                                    @click="toogleStarred"
                                 />
                                 {{ project.name }}
                             </div>
@@ -27,11 +27,12 @@
                                     :team="team"
                                     :members="members"
                                     :project="project"
+                                    calledFrom="projectView"
                                     model="project"
                                 />
                                 <a
-                                    class="cursor-pointer hover:text-teal-900 inline-flex items-center ml-7"
                                     @click="toggleDetails"
+                                    class="cursor-pointer hover:text-teal-900 inline-flex items-center ml-7"
                                     ><svg
                                         xmlns="http://www.w3.org/2000/svg"
                                         viewBox="0 0 24 24"
@@ -83,9 +84,9 @@
                                         class="inline-flex ml-7 items-center"
                                     >
                                         <svg
-                                            id="Capa_1"
                                             class="h-3 w-3 text-gray-400 inline"
                                             version="1.1"
+                                            id="Capa_1"
                                             xmlns="http://www.w3.org/2000/svg"
                                             xmlns:xlink="http://www.w3.org/1999/xlink"
                                             x="0px"
@@ -130,8 +131,8 @@
                                     </span></a
                                 >
                                 <project-details
-                                    ref="projectDetailsElement"
                                     :role="projectRole"
+                                    ref="projectDetailsElement"
                                     :project="project"
                                 />
                                 <span
@@ -233,9 +234,10 @@
                                 Description
                             </span>
                             <button
+                                v-if="canUpdateProject"
                                 type="button"
-                                class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                 @click="toggleDetails"
+                                class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                             >
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -273,9 +275,10 @@
                                 Keywords
                             </span>
                             <button
+                                v-if="canUpdateProject"
                                 type="button"
-                                class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                 @click="toggleDetails"
+                                class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                             >
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -295,9 +298,9 @@
                     <dd class="mt-1 text-md text-gray-900 space-y-5">
                         <p>
                             <span
+                                class="mr-2"
                                 v-for="tag in project.tags"
                                 :key="tag.id"
-                                class="mr-2"
                             >
                                 <span
                                     class="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-indigo-100 text-indigo-800"
@@ -360,18 +363,42 @@ export default {
         "projectPermissions",
         "projectRole",
     ],
+    data() {
+        return {};
+    },
     setup() {
         const projectDetailsElement = ref(null);
         return {
             projectDetailsElement,
         };
     },
-    data() {
-        return {};
+    methods: {
+        toogleStarred() {
+            axios
+                .post(route("projects.toggle-starred", project))
+                .then((res) => {});
+        },
+        toggleDetails() {
+            this.projectDetailsElement.toggleDetails();
+        },
     },
     computed: {
         canDeleteProject() {
-            return this.projectRole == "owner";
+            if (this.projectRole) {
+                if (
+                    this.projectRole == "owner" ||
+                    this.projectRole == "creator"
+                ) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        },
+        canUpdateProject() {
+            return this.projectPermissions
+                ? this.projectPermissions.canUpdateProject
+                : false;
         },
         editable() {
             if (this.projectRole) {
@@ -385,16 +412,6 @@ export default {
                     return false;
                 }
             }
-        },
-    },
-    methods: {
-        toogleStarred() {
-            axios
-                .post(route("projects.toggle-starred", project))
-                .then((res) => {});
-        },
-        toggleDetails() {
-            this.projectDetailsElement.toggleDetails();
         },
     },
 };
