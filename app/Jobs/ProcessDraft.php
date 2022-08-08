@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Models\Draft;
 use App\Models\FileSystemObject;
 use App\Models\Project;
+use App\Notifications\DraftProcessedNotification;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -12,10 +13,8 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Storage;
-use App\Events\DraftProcessed;
 use Illuminate\Support\Facades\Notification;
-use App\Notifications\DraftProcessedNotification;
+use Illuminate\Support\Facades\Storage;
 
 class ProcessDraft implements ShouldQueue, ShouldBeUnique
 {
