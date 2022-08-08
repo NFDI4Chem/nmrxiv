@@ -14,7 +14,7 @@
                         leave-from="translate-x-0"
                         leave-to="translate-x-full"
                     >
-                        <div class="w-screen max-w-md">
+                        <div class="w-screen max-w-2xl">
                             <div
                                 class="h-full divide-y divide-gray-200 flex flex-col bg-white shadow-xl"
                             >
