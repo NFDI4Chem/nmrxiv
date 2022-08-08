@@ -5,12 +5,12 @@
 </template>
 
 <script>
-    import { Link } from '@inertiajs/inertia-vue3';
-    import JetApplicationLogo from '@/Jetstream/ApplicationLogo.vue'
-    export default {
-        components: {
-            Link,
-            JetApplicationLogo
-        },
-    }
+import { Link } from "@inertiajs/inertia-vue3";
+import JetApplicationLogo from "@/Jetstream/ApplicationLogo.vue";
+export default {
+    components: {
+        Link,
+        JetApplicationLogo,
+    },
+};
 </script>
