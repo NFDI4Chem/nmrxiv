@@ -24,9 +24,9 @@
             >
                 <template #title> Delete Project </template>
                 <template #content>
-                    <loading-button :loading="this.loading" />
+                    <loading-button :loading="loading" />
                     <!-- header -->
-                    <template v-if="!this.loading">
+                    <template v-if="!loading">
                         <span v-if="hasPassword">
                             Are you sure you want to delete your project? Once
                             your project is deleted, all of its resources and
@@ -36,11 +36,11 @@
 
                             <div class="mt-4">
                                 <jet-input
+                                    ref="password"
+                                    v-model="form.password"
                                     type="password"
                                     class="mt-1 block w-3/4"
                                     placeholder="Password"
-                                    ref="password"
-                                    v-model="form.password"
                                     @keyup.enter="deleteProject"
                                 />
                                 <jet-input-error
@@ -56,7 +56,7 @@
                     </template>
                 </template>
                 <!-- footer -->
-                <template v-if="!this.loading" #footer>
+                <template v-if="!loading" #footer>
                     <jet-secondary-button @click="closeModal">
                         Cancel
                     </jet-secondary-button>
@@ -64,9 +64,9 @@
                     <jet-danger-button
                         v-if="hasPassword"
                         class="ml-2"
-                        @click="deleteProject"
                         :class="{ 'opacity-25': form.processing }"
                         :disabled="form.processing"
+                        @click="deleteProject"
                     >
                         Delete Project
                     </jet-danger-button>
@@ -98,6 +98,8 @@ export default {
         Link,
     },
 
+    props: ["project"],
+
     data() {
         return {
             loading: false,
@@ -111,8 +113,6 @@ export default {
             hasPassword: false,
         };
     },
-
-    props: ["project"],
 
     methods: {
         confirmProjectDeletion() {

@@ -18,24 +18,27 @@
 
         <form @submit.prevent="submit">
             <div>
-                <div v-if= "$page.props.environment.toLowerCase() != 'production' " class="pb-4">
+                <div
+                    v-if="$page.props.environment.toLowerCase() != 'production'"
+                    class="pb-4"
+                >
                     <div
                         class="border border-teal-500 rounded px-4 py-3 mt-3 max-w-2xl text-sm text-gray-700 font-bold"
                     >
                         <p>
                             Warning: This site is for demonstration purpose
                             only. You can test most of the nmrXiv features but
-                            DO NOT use the current site for your work. All the data
-                            stored here can be reset anytime.
+                            DO NOT use the current site for your work. All the
+                            data stored here can be reset anytime.
                         </p>
                     </div>
                 </div>
                 <jet-label for="email" value="Email" />
                 <jet-input
                     id="email"
+                    v-model="form.email"
                     type="email"
                     class="mt-1 block w-full"
-                    v-model="form.email"
                     required
                     autofocus
                 />
@@ -45,9 +48,9 @@
                 <jet-label for="password" value="Password" />
                 <jet-input
                     id="password"
+                    v-model="form.password"
                     type="password"
                     class="mt-1 block w-full"
-                    v-model="form.password"
                     required
                     autocomplete="current-password"
                 />
@@ -57,8 +60,8 @@
                 <div class="flex items-center">
                     <label class="flex items-center">
                         <jet-checkbox
-                            name="remember"
                             v-model:checked="form.remember"
+                            name="remember"
                         />
                         <span class="ml-2 text-sm text-gray-600"
                             >Remember me</span
