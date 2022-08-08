@@ -1,5 +1,5 @@
 <template>
-    <div class="mt-6" v-show="hasSingleSingOn">
+    <div v-show="hasSingleSingOn" class="mt-6">
         <div class="relative">
             <div class="absolute inset-0 flex items-center">
                 <div class="w-full border-t border-gray-300"></div>
@@ -12,7 +12,7 @@
         </div>
 
         <div class="flex mt-3">
-            <div class="flex-1 w-64 px-1" v-if="hasOrcidClientID">
+            <div v-if="hasOrcidClientID" class="flex-1 w-64 px-1">
                 <a
                     href="/auth/login/orcid"
                     class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium hover:bg-gray-50"
@@ -26,7 +26,7 @@
                     />
                 </a>
             </div>
-            <div class="flex-1 w-64 px-1" v-if="hasTwitterClientID">
+            <div v-if="hasTwitterClientID" class="flex-1 w-64 px-1">
                 <a
                     href="/auth/login/twitter"
                     class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-sky-500 hover:bg-gray-50"

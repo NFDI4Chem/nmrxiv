@@ -14,11 +14,11 @@
 </template>
 
 <script>
-    import JetSectionTitle from './SectionTitle.vue'
+import JetSectionTitle from "./SectionTitle.vue";
 
-    export default {
-        components: {
-            JetSectionTitle,
-        }
-    }
+export default {
+    components: {
+        JetSectionTitle,
+    },
+};
 </script>
