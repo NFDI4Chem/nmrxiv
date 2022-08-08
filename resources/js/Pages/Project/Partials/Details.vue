@@ -71,13 +71,13 @@
                                                     </label>
                                                     <div class="mt-1">
                                                         <input
-                                                            id="project-name"
                                                             v-model="form.name"
                                                             type="text"
                                                             :readonly="
                                                                 !editable
                                                             "
                                                             name="project-name"
+                                                            id="project-name"
                                                             class="block w-full shadow-sm sm:text-sm focus:ring-gray-500 focus:border-gray-500 border-gray-300 rounded-md"
                                                         />
                                                     </div>
@@ -101,10 +101,10 @@
                                                                 class="flex items-center"
                                                             >
                                                                 <Tab
+                                                                    as="template"
                                                                     v-slot="{
                                                                         selected,
                                                                     }"
-                                                                    as="template"
                                                                 >
                                                                     <button
                                                                         :class="[
@@ -118,10 +118,10 @@
                                                                     </button>
                                                                 </Tab>
                                                                 <Tab
+                                                                    as="template"
                                                                     v-slot="{
                                                                         selected,
                                                                     }"
-                                                                    as="template"
                                                                 >
                                                                     <button
                                                                         :class="[
@@ -148,10 +148,10 @@
                                                                     >
                                                                     <div>
                                                                         <textarea
-                                                                            id="description"
                                                                             v-model="
                                                                                 form.description
                                                                             "
+                                                                            id="description"
                                                                             :readonly="
                                                                                 !editable
                                                                             "
@@ -172,11 +172,11 @@
                                                                             class="mx-px mt-px px-3 pt-2 pb-12"
                                                                         >
                                                                             <span
+                                                                                class="text-gray-400 text-sm font-medium"
                                                                                 v-if="
                                                                                     form.description ==
                                                                                     ''
                                                                                 "
-                                                                                class="text-gray-400 text-sm font-medium"
                                                                             >
                                                                                 Nothing
                                                                                 to
@@ -239,12 +239,15 @@
                                                     </label>
                                                     <div>
                                                         <vue-tags-input
-                                                            v-model="form.tag"
                                                             placeholder="Type a keyword or keywords separated by comma (,) and press enter"
                                                             :separators="[
                                                                 ';',
                                                                 ',',
                                                             ]"
+                                                            v-model="form.tag"
+                                                            :disabled="
+                                                                !editable
+                                                            "
                                                             max-width="100%"
                                                             :tags="form.tags"
                                                             @tags-changed="
@@ -257,17 +260,17 @@
                                                 </div>
                                                 <div v-if="editable">
                                                     <input
-                                                        ref="photo"
                                                         type="file"
                                                         class="hidden"
+                                                        ref="photo"
                                                         @change="
                                                             updatePhotoPreview
                                                         "
                                                     />
 
                                                     <div
-                                                        v-show="!photoPreview"
                                                         class="mt-2"
+                                                        v-show="!photoPreview"
                                                     >
                                                         <img
                                                             :src="
@@ -281,8 +284,8 @@
                                                     </div>
 
                                                     <div
-                                                        v-show="photoPreview"
                                                         class="mt-2"
+                                                        v-show="photoPreview"
                                                     >
                                                         <span
                                                             class="block h-24 w-72 rounded"
@@ -341,17 +344,17 @@
                                                                 class="absolute flex items-center h-5"
                                                             >
                                                                 <input
-                                                                    id="privacy-public"
-                                                                    v-model="
-                                                                        form.is_public
-                                                                    "
                                                                     :checked="
                                                                         form.is_public ===
                                                                         true
                                                                     "
+                                                                    v-model="
+                                                                        form.is_public
+                                                                    "
                                                                     :disabled="
                                                                         !editable
                                                                     "
+                                                                    id="privacy-public"
                                                                     name="privacy"
                                                                     value="true"
                                                                     aria-describedby="privacy-public-description"
@@ -389,17 +392,17 @@
                                                                     class="absolute flex items-center h-5"
                                                                 >
                                                                     <input
-                                                                        id="privacy-private-to-project"
-                                                                        v-model="
-                                                                            form.is_public
-                                                                        "
                                                                         :checked="
                                                                             form.is_public ===
                                                                             false
                                                                         "
+                                                                        v-model="
+                                                                            form.is_public
+                                                                        "
                                                                         :disabled="
                                                                             !editable
                                                                         "
+                                                                        id="privacy-private-to-project"
                                                                         name="privacy"
                                                                         value="false"
                                                                         aria-describedby="privacy-private-to-project-description"
@@ -446,10 +449,10 @@
                                                 >
                                                     <div v-if="licenses">
                                                         <select-rich
+                                                            label="License"
                                                             v-model:selected="
                                                                 form.license
                                                             "
-                                                            label="License"
                                                             :items="licenses"
                                                         />
                                                     </div>
@@ -478,29 +481,29 @@
                                                             class="relative flex items-stretch flex-grow focus-within:z-10"
                                                         >
                                                             <input
-                                                                id="projectPublicURLCopy"
-                                                                v-model="
-                                                                    project.public_url
+                                                                @focus="
+                                                                    $event.target.select()
                                                                 "
                                                                 :readonly="
                                                                     !editable
                                                                 "
+                                                                id="projectPublicURLCopy"
+                                                                v-model="
+                                                                    project.public_url
+                                                                "
                                                                 type="text"
                                                                 class="rounded-l-md focus:ring-gray-500 focus:border-gray-500 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300"
-                                                                @focus="
-                                                                    $event.target.select()
-                                                                "
                                                             />
                                                         </div>
                                                         <button
-                                                            type="button"
-                                                            class="-ml-px relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500"
                                                             @click="
                                                                 copyToClipboard(
                                                                     project.public_url,
                                                                     'projectPublicURLCopy'
                                                                 )
                                                             "
+                                                            type="button"
+                                                            class="-ml-px relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500"
                                                         >
                                                             <span
                                                                 ><ClipboardCopyIcon
@@ -543,6 +546,9 @@
                                                                     class="flex-grow"
                                                                 >
                                                                     <input
+                                                                        @focus="
+                                                                            $event.target.select()
+                                                                        "
                                                                         id="projectPrivateURLCopy"
                                                                         readonly
                                                                         type="text"
@@ -550,20 +556,17 @@
                                                                             project.private_url
                                                                         "
                                                                         class="rounded-l-md focus:ring-gray-500 focus:border-gray-500 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300"
-                                                                        @focus="
-                                                                            $event.target.select()
-                                                                        "
                                                                     />
                                                                 </div>
                                                                 <button
-                                                                    type="button"
-                                                                    class="-ml-px relative inline-flex items-center space-x-2 px-2 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500"
                                                                     @click="
                                                                         copyToClipboard(
                                                                             project.private_url,
                                                                             'projectPrivateURLCopy'
                                                                         )
                                                                     "
+                                                                    type="button"
+                                                                    class="-ml-px relative inline-flex items-center space-x-2 px-2 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500"
                                                                 >
                                                                     <span
                                                                         ><ClipboardCopyIcon
@@ -574,10 +577,10 @@
                                                             </div>
                                                             <div class="mt-3">
                                                                 <Listbox
+                                                                    as="div"
                                                                     v-model="
                                                                         selectedAccessType
                                                                     "
-                                                                    as="div"
                                                                 >
                                                                     <div
                                                                         class="relative"
@@ -629,18 +632,18 @@
                                                                                 class="origin-top-right absolute z-10 left-0 mt-2 w-72 rounded-md shadow-lg overflow-hidden bg-white divide-y divide-gray-200 ring-1 ring-black ring-opacity-5 focus:outline-none"
                                                                             >
                                                                                 <ListboxOption
+                                                                                    as="template"
                                                                                     v-for="option in publishingOptions"
                                                                                     :key="
                                                                                         option.title
+                                                                                    "
+                                                                                    :value="
+                                                                                        option
                                                                                     "
                                                                                     v-slot="{
                                                                                         active,
                                                                                         selectedAccessType,
                                                                                     }"
-                                                                                    as="template"
-                                                                                    :value="
-                                                                                        option
-                                                                                    "
                                                                                 >
                                                                                     <li
                                                                                         :class="[
@@ -724,10 +727,10 @@
                                                 </div>
                                                 <div class="mt-4 flex text-sm">
                                                     <a
-                                                        class="cursor-pointer group inline-flex items-center text-gray-500 hover:text-gray-900"
                                                         @click="
                                                             toggleActivityDetails
                                                         "
+                                                        class="cursor-pointer group inline-flex items-center text-gray-500 hover:text-gray-900"
                                                     >
                                                         <ExclamationCircleIcon
                                                             class="h-5 w-5 text-gray-400 group-hover:text-gray-500"
@@ -739,8 +742,8 @@
                                                     </a>
                                                 </div>
                                                 <project-activity
-                                                    ref="activityDetailsElement"
                                                     :project="project"
+                                                    ref="activityDetailsElement"
                                                 ></project-activity>
                                             </div>
                                         </div>
@@ -920,19 +923,6 @@ export default defineComponent({
             )[0],
             linkAccess: this.project.access == "link",
         };
-    },
-    computed: {
-        editable() {
-            if (this.role) {
-                return (
-                    this.role == "creator" ||
-                    this.role == "owner" ||
-                    this.role == "collaborator"
-                );
-            } else {
-                return false;
-            }
-        },
     },
     methods: {
         clearPhotoFileInput() {

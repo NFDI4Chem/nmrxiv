@@ -10,15 +10,15 @@
             alt=""
         />
         <img
-            v-for="user in members"
             :key="user.id"
+            v-for="user in members"
             class="w-8 h-8 -mr-2 rounded-full border-2 border-white"
             :src="user.profile_photo_url"
             :alt="user.first_name"
         />
         <img
-            v-for="user in team ? team.users : []"
             :key="user.id"
+            v-for="user in team ? team.users : []"
             class="w-8 h-8 -mr-2 rounded-full border-2 border-white"
             :src="user.profile_photo_url"
             :alt="user.first_name"
@@ -47,7 +47,7 @@
             </button>
         </span>
     </div>
-    <TransitionRoot :show="open" as="template" appear @after-leave="query = ''">
+    <TransitionRoot :show="open" as="template" @after-leave="query = ''" appear>
         <Dialog as="div" class="relative z-10 p-4" @close="open = false">
             <TransitionChild
                 as="template"
@@ -96,10 +96,10 @@
                                 class="mt-5 sm:mt-0 sm:ml-6 sm:flex-shrink-0 sm:flex sm:items-center"
                             >
                                 <button
-                                    v-if="!addUser && role != 'reviewer'"
+                                    v-if="!addUser && canChangeRole"
+                                    @click="addUser = true"
                                     type="button"
                                     class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none sm:text-sm"
-                                    @click="addUser = true"
                                 >
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
@@ -117,10 +117,10 @@
                                     >&nbsp; SHARE
                                 </button>
                                 <button
-                                    v-if="addUser && role != 'reviewer'"
+                                    v-if="addUser && canChangeRole"
+                                    @click="addUser = false"
                                     type="button"
                                     class="inline-flex items-center px-4 py-2 border shadow-sm font-medium rounded-md text-dark bg-white-600 hover:bg-white-700 focus:outline-none sm:text-sm"
-                                    @click="addUser = false"
                                 >
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
@@ -218,7 +218,8 @@
                                                 <div
                                                     v-if="
                                                         role &&
-                                                        role != 'reviewer'
+                                                        canChangeRole &&
+                                                        !isProjectAlreadyShared
                                                     "
                                                 >
                                                     <div
@@ -239,12 +240,12 @@
                                                     </div>
                                                     <div v-else>
                                                         <button
-                                                            class="cursor-pointer mr-3 text-sm text-red-500 hover:text-red-700"
                                                             @click="
                                                                 removeModelMember(
                                                                     person
                                                                 )
                                                             "
+                                                            class="cursor-pointer mr-3 text-sm text-red-500 hover:text-red-700"
                                                         >
                                                             Remove
                                                         </button>
@@ -288,6 +289,12 @@
                                                                             "
                                                                         >
                                                                             <MenuItem
+                                                                                @click="
+                                                                                    updateRole(
+                                                                                        role,
+                                                                                        person
+                                                                                    )
+                                                                                "
                                                                                 v-if="
                                                                                     person[
                                                                                         model +
@@ -299,12 +306,6 @@
                                                                                 v-slot="{
                                                                                     active,
                                                                                 }"
-                                                                                @click="
-                                                                                    updateRole(
-                                                                                        role,
-                                                                                        person
-                                                                                    )
-                                                                                "
                                                                             >
                                                                                 <a
                                                                                     href="#"
@@ -509,8 +510,8 @@
                                 </div>
                             </span>
                             <div
-                                v-if="modelInvitations.length > 0"
                                 class="pb-5"
+                                v-if="modelInvitations.length > 0"
                             >
                                 <jet-modal-form-section class="mt-10 sm:mt-0">
                                     <template #form>
@@ -532,9 +533,9 @@
                                         </div>
                                         <div class="space-y-3 col-span-12 mb-3">
                                             <div
+                                                class="flex px-4 items-center justify-between"
                                                 v-for="invitation in modelInvitations"
                                                 :key="invitation.id"
-                                                class="flex px-4 items-center justify-between"
                                             >
                                                 <div class="text-gray-600">
                                                     {{ invitation.email }}
@@ -575,9 +576,9 @@
                                         <jet-label for="email" value="Email" />
                                         <jet-input
                                             id="email"
-                                            v-model="addMemberForm.email"
                                             type="email"
                                             class="mt-1 block w-full"
+                                            v-model="addMemberForm.email"
                                         />
                                         <jet-input-error
                                             :message="
@@ -587,8 +588,8 @@
                                         />
                                     </div>
                                     <div
-                                        v-if="availableRoles.length > 0"
                                         class="col-span-12"
+                                        v-if="availableRoles.length > 0"
                                     >
                                         <jet-label for="roles" value="Role" />
                                         <jet-input-error
@@ -599,10 +600,6 @@
                                             class="relative z-0 mt-1 border border-gray-200 rounded-lg cursor-pointer"
                                         >
                                             <button
-                                                v-for="(
-                                                    role, i
-                                                ) in availableRoles"
-                                                :key="role.key"
                                                 type="button"
                                                 class="relative px-4 py-3 inline-flex w-full rounded-lg focus:z-10 focus:outline-none focus:border-blue-300 focus:ring focus:ring-blue-200"
                                                 :class="{
@@ -619,6 +616,10 @@
                                                     addMemberForm.role =
                                                         role.key
                                                 "
+                                                v-for="(
+                                                    role, i
+                                                ) in availableRoles"
+                                                :key="role.key"
                                             >
                                                 <div
                                                     :class="{
@@ -675,9 +676,9 @@
                                         />
                                         <jet-text-area
                                             id="message"
-                                            v-model="addMemberForm.message"
                                             :rows="3"
                                             class="mt-1 block w-full"
+                                            v-model="addMemberForm.message"
                                         />
                                         <jet-input-error
                                             :message="
@@ -743,6 +744,17 @@ import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import { ChevronDownIcon } from "@heroicons/vue/solid";
 
 export default {
+    props: {
+        members: Object,
+        project: Object,
+        study: Object,
+        dataset: Object,
+        team: Object,
+        availableRoles: Object,
+        role: String,
+        model: String,
+        calledFrom: String,
+    },
     components: {
         Menu,
         MenuButton,
@@ -772,16 +784,6 @@ export default {
         JetSectionBorder,
         JetTextArea,
     },
-    props: {
-        members: Object,
-        project: Object,
-        study: Object,
-        dataset: Object,
-        team: Object,
-        availableRoles: Object,
-        role: String,
-        model: String,
-    },
     setup() {
         const open = ref(false);
         const addUser = ref(false);
@@ -802,18 +804,6 @@ export default {
             }),
             removeModelMemberForm: this.$inertia.form(),
         };
-    },
-    computed: {
-        modelObject() {
-            if (this.model == "study") {
-                return this.study;
-            } else if (this.model == "project") {
-                return this.project;
-            }
-        },
-        modelInvitations() {
-            return this.modelObject[this.model + "_invitations"];
-        },
     },
     methods: {
         personRole(person) {
@@ -876,6 +866,42 @@ export default {
                     onSuccess: () => {},
                 }
             );
+        },
+    },
+    computed: {
+        modelObject() {
+            if (this.model == "study") {
+                return this.study;
+            } else if (this.model == "project") {
+                return this.project;
+            }
+        },
+        modelInvitations() {
+            return this.modelObject[this.model + "_invitations"];
+        },
+        isProjectAlreadyShared() {
+            var count = 0;
+            var isShared = false;
+            if (this.calledFrom == "studyView") {
+                if (this.members) {
+                    this.members.forEach((member) => {
+                        if (member.hasOwnProperty("project_membership")) {
+                            count = count + 1;
+                        }
+                    });
+                    if (count > 1) {
+                        isShared = true;
+                    }
+                }
+            }
+            return isShared;
+        },
+        canChangeRole() {
+            if (this.role) {
+                return this.role == "creator" || this.role == "owner";
+            } else {
+                return true;
+            }
         },
     },
 };

@@ -6,9 +6,9 @@
             :study="study"
             :team="team"
             :members="members"
-            :available-roles="availableRoles"
-            :study-permissions="studyPermissions"
-            :study-role="studyRole"
+            :availableRoles="availableRoles"
+            :studyPermissions="studyPermissions"
+            :studyRole="studyRole"
             current="About"
         >
             <template #study-section>
@@ -34,9 +34,10 @@
                                             Description
                                         </span>
                                         <button
+                                            v-if="canUpdateStudy"
                                             type="button"
-                                            class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                             @click="openStudyDetailsPane"
+                                            class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                         >
                                             <svg
                                                 xmlns="http://www.w3.org/2000/svg"
@@ -80,9 +81,10 @@
                                             Keywords
                                         </span>
                                         <button
+                                            v-if="canUpdateStudy"
                                             type="button"
-                                            class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                             @click="openStudyDetailsPane"
+                                            class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                         >
                                             <svg
                                                 xmlns="http://www.w3.org/2000/svg"
@@ -104,9 +106,9 @@
                                 >
                                     <p>
                                         <span
+                                            class="mr-2"
                                             v-for="tag in study.tags"
                                             :key="tag.id"
-                                            class="mr-2"
                                         >
                                             <span
                                                 class="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-indigo-100 text-indigo-800"
@@ -147,9 +149,10 @@
                                             License
                                         </span>
                                         <button
+                                            v-if="canUpdateStudy"
                                             type="button"
-                                            class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                             @click="openStudyDetailsPane"
+                                            class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                         >
                                             <svg
                                                 xmlns="http://www.w3.org/2000/svg"
@@ -166,16 +169,16 @@
                                         </button>
                                     </div>
                                 </div>
-                                <loading-button :loading="loading" />
+                                <loading-button :loading="this.loading" />
                                 <div>
                                     <dd
-                                        v-if="license"
+                                        v-if="this.license"
                                         class="text-md text-gray-900 space-y-5"
                                     >
                                         <p>
                                             {{ license.title }}
                                             <ToolTip
-                                                v-if="study.license_id"
+                                                v-if="this.study.license_id"
                                                 class="inline h-4 w-4 ml-0"
                                                 :text="license.description"
                                             ></ToolTip>
@@ -202,9 +205,10 @@
                                             Sample details
                                         </span>
                                         <button
+                                            v-if="canUpdateStudy"
                                             type="button"
-                                            class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                             @click="openStudyDetailsPane"
+                                            class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                         >
                                             <svg
                                                 xmlns="http://www.w3.org/2000/svg"
@@ -241,8 +245,8 @@
                                                     </label>
                                                     <div class="mt-1">
                                                         <textarea
-                                                            id="about"
                                                             readonly
+                                                            id="about"
                                                             name="about"
                                                             rows="3"
                                                             class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border border-gray-300 rounded-md"
@@ -399,7 +403,10 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="pl-2">
+                                            <div
+                                                v-if="canUpdateStudy"
+                                                class="pl-2"
+                                            >
                                                 <div class="sm:col-span-4">
                                                     <label
                                                         for="email"
@@ -409,12 +416,12 @@
                                                     </label>
                                                     <div class="mt-1 mb-2">
                                                         <input
+                                                            @blur="loadSmiles"
                                                             id="smiles"
-                                                            v-model="smiles"
                                                             name="smiles"
+                                                            v-model="smiles"
                                                             type="text"
                                                             class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                                                            @blur="loadSmiles"
                                                         />
                                                     </div>
                                                 </div>
@@ -438,9 +445,9 @@
                                                     </div>
                                                 </div>
                                                 <div
-                                                    id="structureSearchEditor"
                                                     class="w-full border my-4 rounded-md"
                                                     style="height: 400px"
+                                                    id="structureSearchEditor"
                                                 />
                                                 <div class="mt-1 mb-6">
                                                     <label
@@ -451,18 +458,18 @@
                                                         ({{ percentage }}%)
                                                     </label>
                                                     <slider
-                                                        v-model="percentage"
                                                         :min="0"
                                                         :max="getMax"
                                                         :height="10"
+                                                        v-model="percentage"
                                                         color="#000"
                                                         track-color="#999"
                                                     />
                                                 </div>
                                                 <button
+                                                    @click="saveMolecule"
                                                     type="button"
                                                     class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                                                    @click="saveMolecule"
                                                 >
                                                     SAVE
                                                 </button>
@@ -533,13 +540,6 @@ import OCL from "openchemlib/full";
 import LoadingButton from "@/Shared/LoadingButton.vue";
 import ToolTip from "@/Shared/ToolTip.vue";
 export default {
-    components: {
-        LoadingButton,
-        StudyContent,
-        ToolTip,
-        PlusSmIcon,
-        slider,
-    },
     props: [
         "study",
         "project",
@@ -550,14 +550,12 @@ export default {
         "studyRole",
         "license",
     ],
-    setup() {
-        const emitter = inject("emitter");
-        const openStudyDetailsPane = () => {
-            emitter.emit("openStudyDetails", {});
-        };
-        return {
-            openStudyDetailsPane,
-        };
+    components: {
+        LoadingButton,
+        StudyContent,
+        ToolTip,
+        PlusSmIcon,
+        slider,
     },
     data() {
         return {
@@ -566,19 +564,14 @@ export default {
             editor: "",
         };
     },
-    computed: {
-        getMax() {
-            if (this.study) {
-                let totalCount = 0;
-                this.study.sample.molecules.forEach((mol) => {
-                    totalCount += parseInt(mol.pivot.percentage_composition);
-                });
-                console.log(totalCount);
-                return 100 - totalCount;
-            } else {
-                return 100;
-            }
-        },
+    setup() {
+        const emitter = inject("emitter");
+        const openStudyDetailsPane = () => {
+            emitter.emit("openStudyDetails", {});
+        };
+        return {
+            openStudyDetailsPane,
+        };
     },
     mounted() {
         this.$nextTick(() => {
@@ -635,6 +628,25 @@ export default {
                             this.editor.setSmiles("");
                         });
                 });
+        },
+    },
+    computed: {
+        getMax() {
+            if (this.study) {
+                let totalCount = 0;
+                this.study.sample.molecules.forEach((mol) => {
+                    totalCount += parseInt(mol.pivot.percentage_composition);
+                });
+                console.log(totalCount);
+                return 100 - totalCount;
+            } else {
+                return 100;
+            }
+        },
+        canUpdateStudy() {
+            return this.studyPermissions
+                ? this.studyPermissions.canUpdateStudy
+                : false;
         },
     },
 };
