@@ -10,24 +10,27 @@
 
         <form @submit.prevent="submit">
             <div>
-                <div v-if= "$page.props.environment.toLowerCase() != 'production' " class="pb-4">
+                <div
+                    v-if="$page.props.environment.toLowerCase() != 'production'"
+                    class="pb-4"
+                >
                     <div
                         class="border border-teal-500 rounded px-4 py-3 mt-3 max-w-2xl text-sm text-gray-700 font-bold"
                     >
                         <p>
                             Warning: This site is for demonstration purpose
                             only. You can test most of the nmrXiv features but
-                            DO NOT use the current site for your work. All the data
-                            stored here can be reset anytime.
+                            DO NOT use the current site for your work. All the
+                            data stored here can be reset anytime.
                         </p>
                     </div>
                 </div>
                 <jet-label for="first_name" value="First Name" />
                 <jet-input
                     id="first_name"
+                    v-model="form.first_name"
                     type="text"
                     class="mt-1 block w-full"
-                    v-model="form.first_name"
                     required
                     autofocus
                     autocomplete="first_name"
@@ -38,9 +41,9 @@
                 <jet-label for="last_name" value="Last Name" />
                 <jet-input
                     id="last_name"
+                    v-model="form.last_name"
                     type="text"
                     class="mt-1 block w-full"
-                    v-model="form.last_name"
                     required
                     autofocus
                     autocomplete="last_name"
@@ -51,9 +54,9 @@
                 <jet-label for="email" value="Email" />
                 <jet-input
                     id="email"
+                    v-model="form.email"
                     type="email"
                     class="mt-1 block w-full"
-                    v-model="form.email"
                     required
                 />
             </div>
@@ -62,9 +65,9 @@
                 <jet-label for="username" value="Username" />
                 <jet-input
                     id="username"
+                    v-model="form.username"
                     type="text"
                     class="mt-1 block w-full"
-                    v-model="form.username"
                     required
                 />
             </div>
@@ -73,9 +76,9 @@
                 <jet-label for="password" value="Password" />
                 <jet-input
                     id="password"
+                    v-model="form.password"
                     type="password"
                     class="mt-1 block w-full"
-                    v-model="form.password"
                     required
                     autocomplete="new-password"
                 />
@@ -88,24 +91,24 @@
                 />
                 <jet-input
                     id="password_confirmation"
+                    v-model="form.password_confirmation"
                     type="password"
                     class="mt-1 block w-full"
-                    v-model="form.password_confirmation"
                     required
                     autocomplete="new-password"
                 />
             </div>
 
             <div
-                class="mt-4"
                 v-if="$page.props.jetstream.hasTermsAndPrivacyPolicyFeature"
+                class="mt-4"
             >
                 <jet-label for="terms">
                     <div class="flex items-center">
                         <jet-checkbox
-                            name="terms"
                             id="terms"
                             v-model:checked="form.terms"
+                            name="terms"
                         />
 
                         <div class="ml-2">

@@ -245,7 +245,9 @@
                                                                 ',',
                                                             ]"
                                                             v-model="form.tag"
-                                                            :disabled="!editable"
+                                                            :disabled="
+                                                                !editable
+                                                            "
                                                             max-width="100%"
                                                             :tags="form.tags"
                                                             @tags-changed="
