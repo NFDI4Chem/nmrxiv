@@ -83,15 +83,15 @@ export default {
   },
   computed: {
     editable() {
-        if (this.role) {
-            return (
-                this.role == "creator" ||
-                this.role == "owner" ||
-                this.role == "collaborator"
-            );
-        } else {
-            return false;
-        }
+      if (this.role) {
+          return (
+              this.role == "creator" ||
+              this.role == "owner" ||
+              this.role == "collaborator"
+          );
+      } else {
+          return false;
+      }
     },
   }
 }
