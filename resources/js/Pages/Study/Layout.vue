@@ -56,6 +56,7 @@
                       :members="members"
                       :project="project"
                       :model="model"
+                      calledFrom=studyView
                     />
                     <div class="ml-3">
                       <span v-if="study.is_public" class="inline-flex items-center">

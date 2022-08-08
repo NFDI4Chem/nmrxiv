@@ -176,7 +176,7 @@
                         </div>
                       </div>
                       <div class="-mt-4">
-                        <div v-if="role && canChangeRole">
+                        <div v-if="role && canChangeRole && !isProjectAlreadyShared">
                           <div
                             v-if="
                               personRole(person) &&
@@ -540,7 +540,8 @@ export default {
     team: Object,
     availableRoles: Object,
     role: String,
-    model: String
+    model: String,
+    calledFrom: String
   },
   components: {
     Menu,
@@ -653,6 +654,23 @@ export default {
     },
     modelInvitations(){
       return this.modelObject[this.model+'_invitations']
+    },
+    isProjectAlreadyShared(){
+      var count = 0;
+      var isShared = false;
+      if(this.calledFrom == "studyView"){
+        if(this.members){
+          this.members.forEach(member => {
+            if(member.hasOwnProperty('project_membership')){
+              count = count+1;
+            }
+          });
+          if(count > 1) {
+            isShared = true;
+          }
+        }
+      } 
+      return isShared;
     },
     canChangeRole(){
       if (this.role) {
