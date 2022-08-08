@@ -18,15 +18,18 @@
                         </label>
                         <div class="mt-1 flex rounded-md shadow-sm">
                             <input
+                                id="name"
                                 v-model="createAnnouncementForm.title"
                                 type="text"
                                 name="name"
-                                id="name"
                                 autocomplete="off"
                                 class="flex-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full min-w-0 rounded sm:text-sm border-gray-300"
                             />
                         </div>
-                    <jet-input-error :message="createAnnouncementForm.errors.title" class="mt-2" />
+                        <jet-input-error
+                            :message="createAnnouncementForm.errors.title"
+                            class="mt-2"
+                        />
                     </div>
                     <div class="sm:col-span-6">
                         <label
@@ -37,15 +40,18 @@
                         </label>
                         <div>
                             <textarea
-                                v-model="createAnnouncementForm.message"
                                 id="description"
+                                v-model="createAnnouncementForm.message"
                                 name="description"
                                 placeholder="Type your message.."
                                 rows="3"
                                 class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
                             />
                         </div>
-                        <jet-input-error :message="createAnnouncementForm.errors.message" class="mt-2" />
+                        <jet-input-error
+                            :message="createAnnouncementForm.errors.message"
+                            class="mt-2"
+                        />
                     </div>
                 </div>
                 <div class="py-2">
@@ -54,7 +60,9 @@
                     >
                         Status
                     </label>
-                    <toggle-button v-model:enabled="createAnnouncementForm.enabled" />
+                    <toggle-button
+                        v-model:enabled="createAnnouncementForm.enabled"
+                    />
                 </div>
 
                 <div class="sm grid grid-cols-2 gap-4 pt-1">
@@ -67,9 +75,12 @@
                         <Datepicker
                             v-model="createAnnouncementForm.start_time"
                         ></Datepicker>
-                        <jet-input-error :message="createAnnouncementForm.errors.start_time" class="mt-2" />
+                        <jet-input-error
+                            :message="createAnnouncementForm.errors.start_time"
+                            class="mt-2"
+                        />
                     </div>
-                    
+
                     <div>
                         <label
                             class="block text-sm font-medium text-gray-700, block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
@@ -79,7 +90,10 @@
                         <Datepicker
                             v-model="createAnnouncementForm.end_time"
                         ></Datepicker>
-                        <jet-input-error :message="createAnnouncementForm.errors.end_time" class="mt-2" />
+                        <jet-input-error
+                            :message="createAnnouncementForm.errors.end_time"
+                            class="mt-2"
+                        />
                     </div>
                 </div>
             </div>
@@ -92,9 +106,9 @@
 
             <jet-button
                 class="ml-2"
-                @click="createAnnouncement"
                 :class="{ 'opacity-25': createAnnouncementForm.processing }"
                 :disabled="createAnnouncementForm.processing"
+                @click="createAnnouncement"
             >
                 Create
             </jet-button>
@@ -118,8 +132,8 @@ import {
     SwitchGroup,
     SwitchLabel,
 } from "@headlessui/vue";
-import Datepicker from '@vuepic/vue-datepicker';
-import '@vuepic/vue-datepicker/dist/main.css';
+import Datepicker from "@vuepic/vue-datepicker";
+import "@vuepic/vue-datepicker/dist/main.css";
 
 export default {
     components: {
@@ -141,6 +155,8 @@ export default {
         JetInputError,
     },
 
+    props: [],
+
     data() {
         return {
             createAnnouncementForm: this.$inertia.form({
@@ -157,8 +173,6 @@ export default {
         };
     },
 
-    props: [],
-
     methods: {
         setEndTime() {
             var start_time = new Date();
@@ -168,14 +182,17 @@ export default {
         },
         createAnnouncement() {
             this.createAnnouncementForm.creator_id = this.$page.props.user.id;
-            this.createAnnouncementForm.post(route("console.announcements.create"), {
-                preserveScroll: true,
-                onSuccess: () => {
-                    this.createAnnouncementDialog = false;
-                    this.createAnnouncementForm.reset();
-                },
-                onError: (err) => console.error(err),
-            });
+            this.createAnnouncementForm.post(
+                route("console.announcements.create"),
+                {
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        this.createAnnouncementDialog = false;
+                        this.createAnnouncementForm.reset();
+                    },
+                    onError: (err) => console.error(err),
+                }
+            );
         },
         toggleCreateAnnouncementDialog() {
             this.createAnnouncementDialog = !this.createAnnouncementDialog;
