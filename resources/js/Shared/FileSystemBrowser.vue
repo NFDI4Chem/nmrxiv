@@ -508,35 +508,39 @@ export default {
                     // }
                 })
                 .then(function (response) {
-                    let data = response.data;
-                    data.forEach((u) => {
-                        let cFile = vm.dropzone.files.find((f) => {
-                            if (f.fullPath) {
-                                return f.fullPath == u.fullPath;
+                    if (response) {
+                        let data = response.data;
+                        data.forEach((u) => {
+                            let cFile = vm.dropzone.files.find((f) => {
+                                if (f.fullPath) {
+                                    return f.fullPath == u.fullPath;
+                                } else {
+                                    return "/" + f.name == u.fullPath;
+                                }
+                            });
+
+                            let message =
+                                "Presigned Upload URL receieved.  Starting Upload.";
+                            if (cFile.fullPath) {
+                                vm.logs[cFile.fullPath].status = "Inprogress";
+                                vm.logs[cFile.fullPath].messages.push(message);
                             } else {
-                                return "/" + f.name == u.fullPath;
+                                vm.logs[cFile.name].status = "Inprogress";
+                                vm.logs[cFile.name].messages.push(message);
+                            }
+
+                            if (cFile) {
+                                let headers = u.headers;
+                                if ("Host" in headers) {
+                                    delete headers.Host;
+                                }
+                                cFile.uploadURL = u.url;
+                                setTimeout(() =>
+                                    vm.dropzone.processFile(cFile)
+                                );
                             }
                         });
-
-                        let message =
-                            "Presigned Upload URL receieved.  Starting Upload.";
-                        if (cFile.fullPath) {
-                            vm.logs[cFile.fullPath].status = "Inprogress";
-                            vm.logs[cFile.fullPath].messages.push(message);
-                        } else {
-                            vm.logs[cFile.name].status = "Inprogress";
-                            vm.logs[cFile.name].messages.push(message);
-                        }
-
-                        if (cFile) {
-                            let headers = u.headers;
-                            if ("Host" in headers) {
-                                delete headers.Host;
-                            }
-                            cFile.uploadURL = u.url;
-                            setTimeout(() => vm.dropzone.processFile(cFile));
-                        }
-                    });
+                    }
                 });
         },
         loadDropZone() {
