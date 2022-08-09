@@ -243,6 +243,11 @@ class FileSystemController extends Controller
                         : null,
                 ], [
                     'uuid' => Str::uuid(),
+                    'info' => json_encode(
+                        [
+                            "size" => $file['upload']['total']
+                        ]
+                    )
                 ]);
             }, 5);
 
