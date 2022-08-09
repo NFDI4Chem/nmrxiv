@@ -494,6 +494,10 @@ export default {
                     draft_id: vm.draft.id,
                 })
                 .catch((err) => {
+                    console.log(
+                        "Error retrieving signed storage URLS",
+                        err.response
+                    );
                     // if (
                     //     err.response.status !== 200 ||
                     //     err.response.status !== 201
