@@ -243,23 +243,17 @@ export default {
         Link,
     },
     props: ["projects", "mode", "teamRole", "team"],
-    setup() {
-        const emitter = inject("emitter");
-        const openProjectCreateDialog = () => {
-            emitter.emit("openProjectCreateDialog", 100);
-        };
-        const openDatasetCreateDialog = (data) => {
-            emitter.emit("openDatasetCreateDialog", data);
-        };
-        return {
-            openProjectCreateDialog,
-            openDatasetCreateDialog,
-        };
-    },
+    setup() {},
     data() {
         return {};
     },
     methods: {
+        openDatasetCreateDialog(data) {
+            this.emitter.emit("openDatasetCreateDialog", data);
+        },
+        openProjectCreateDialog(data) {
+            this.emitter.emit("openProjectCreateDialog", data);
+        },
         getLink(project) {
             if (project) {
                 if (project.draft_id == null) {
