@@ -368,7 +368,7 @@ export default {
 
     mounted() {
         const emitter = inject("emitter");
-        emitter.all.clear()
+
         emitter.on("openStudyCreateDialog", () => {
             this.createStudyDialog = true;
         });

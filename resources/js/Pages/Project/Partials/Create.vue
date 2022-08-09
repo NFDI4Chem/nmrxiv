@@ -378,7 +378,6 @@ export default {
 
     mounted() {
         const emitter = inject("emitter");
-        emitter.all.clear()
         emitter.on("openProjectCreateDialog", () => {
             this.createProjectDialog = true;
         });
