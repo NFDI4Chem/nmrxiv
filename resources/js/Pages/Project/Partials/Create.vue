@@ -76,7 +76,7 @@
                                                 createProjectForm.description
                                             "
                                             name="description"
-                                            placeholder="Describe this project"
+                                            placeholder="Describe this project in atleast 20 characters."
                                             rows="3"
                                             class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
                                         />
@@ -288,6 +288,10 @@
                             v-model:selected="createProjectForm.license"
                             label="License"
                             :items="licenses"
+                        />
+                        <jet-input-error
+                            :message="createProjectForm.errors.license"
+                            class="mt-2"
                         />
                     </div>
                 </div>
