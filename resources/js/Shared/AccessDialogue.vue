@@ -217,7 +217,6 @@
                                             <div class="-mt-4">
                                                 <div
                                                     v-if="
-                                                        role &&
                                                         canChangeRole &&
                                                         !isProjectAlreadyShared
                                                     "
@@ -879,6 +878,7 @@ export default {
         modelInvitations() {
             return this.modelObject[this.model + "_invitations"];
         },
+        //Check if project is already shared for when called from Study view.
         isProjectAlreadyShared() {
             var count = 0;
             var isShared = false;

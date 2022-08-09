@@ -126,16 +126,16 @@
                                     aria-label="Tabs"
                                 >
                                     <a
-                                        v-for="tab in tabs"
-                                        :key="tab.name"
+                                        @click="selectTab(tab)"
                                         :class="[
                                             selectedTab == tab.name
                                                 ? 'border-pink-500 text-gray-900'
                                                 : '',
                                             'cursor-pointer text-gray-900 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm',
                                         ]"
+                                        :key="tab.name"
+                                        v-for="tab in tabs"
                                         aria-current="page"
-                                        @click="selectTab(tab)"
                                     >
                                         {{ tab.name }}
                                     </a>
@@ -173,8 +173,8 @@
                                         </div>
                                         <div>
                                             <a
-                                                v-for="tag in project.data.tags"
                                                 :key="tag.id"
+                                                v-for="tag in project.data.tags"
                                                 target="_blank"
                                                 :href="
                                                     '/projects?tag=' +
@@ -202,9 +202,9 @@
                                             class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-2"
                                         >
                                             <div
+                                                :key="user.email"
                                                 v-for="user in project.data
                                                     .users"
-                                                :key="user.email"
                                                 class="relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm flex items-center space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-pink-500"
                                             >
                                                 <div class="flex-shrink-0">
@@ -239,7 +239,85 @@
                                             </div>
                                         </div>
                                     </div>
-
+                                    <div
+                                        class="pt-8 gap-y-6 sm:grid-cols-6 sm:gap-x-6"
+                                    >
+                                        <div class="sm:col-span-6">
+                                            <h2
+                                                class="text-xl font-medium text-blue-gray-900"
+                                            >
+                                                Author(s)
+                                            </h2>
+                                            <!-- <p class="mt-1 text-sm text-blue-gray-500">
+                      This information will be displayed publicly so be careful what you
+                      share.
+                    </p> -->
+                                        </div>
+                                        <div
+                                            class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-2"
+                                        >
+                                            <div
+                                                :key="author.id"
+                                                v-for="author in project.data
+                                                    .authors"
+                                                class="relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm flex items-center space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-pink-500"
+                                            >
+                                                <div class="flex-1 min-w-0">
+                                                    <a
+                                                        class="focus:outline-none"
+                                                    >
+                                                        <span
+                                                            class="absolute inset-0"
+                                                            aria-hidden="true"
+                                                        ></span>
+                                                        <p
+                                                            v-if="author.title"
+                                                            class="text-sm font-medium text-gray-900"
+                                                        >
+                                                            {{
+                                                                author.title +
+                                                                " " +
+                                                                author.family_name +
+                                                                " " +
+                                                                author.given_name
+                                                            }}
+                                                        </p>
+                                                        <p
+                                                            v-else
+                                                            class="text-sm font-medium text-gray-900"
+                                                        >
+                                                            {{
+                                                                author.family_name +
+                                                                " " +
+                                                                author.given_name
+                                                            }}
+                                                        </p>
+                                                        <p
+                                                            class="text-sm text-gray-500"
+                                                        >
+                                                            {{
+                                                                author.affiliation
+                                                            }}
+                                                            <br />
+                                                            <a
+                                                                :href="
+                                                                    author.orcid_id
+                                                                "
+                                                                v-if="
+                                                                    author.orcid_id
+                                                                "
+                                                                class="text-teal-500"
+                                                                >ORCID ID -
+                                                                {{
+                                                                    author.orcid_id
+                                                                }}</a
+                                                            >
+                                                        </p>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div
                                         class="pt-8 gap-y-6 sm:grid-cols-6 sm:gap-x-6"
                                     >
@@ -260,11 +338,11 @@
                                             class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-2"
                                         >
                                             <div
+                                                :key="study.uuid"
                                                 v-for="study in project.data.studies.sort(
                                                     (a, b) =>
                                                         a.name > b.name ? 1 : -1
                                                 )"
-                                                :key="study.uuid"
                                             >
                                                 <study-card :study="study" />
                                             </div>
@@ -275,8 +353,8 @@
                         </div>
                         <div v-if="selectedTab == 'Files'">
                             <div
-                                v-if="project.data.files"
                                 class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+                                v-if="project.data.files"
                             >
                                 <nav
                                     v-if="$page.props.selectedFolder"
@@ -349,6 +427,7 @@
                                         class="min-w-0 p-6 flex-1 h-full flex flex-col overflow-y-auto lg:order-last"
                                     >
                                         <div
+                                            class="mb-3"
                                             v-if="
                                                 $page.props
                                                     .selectedFileSystemObject &&
@@ -356,7 +435,6 @@
                                                     .selectedFileSystemObject
                                                     .has_children
                                             "
-                                            class="mb-3"
                                         >
                                             <ul
                                                 role="list"
@@ -379,13 +457,13 @@
                                                             "
                                                         >
                                                             <FolderIcon
-                                                                class="cursor-pointer h-28 w-28 text-gray-400 flex-shrink-0 mx-auto"
-                                                                aria-hidden="true"
                                                                 @dblclick.stop="
                                                                     displaySelected(
                                                                         file
                                                                     )
                                                                 "
+                                                                class="cursor-pointer h-28 w-28 text-gray-400 flex-shrink-0 mx-auto"
+                                                                aria-hidden="true"
                                                             />
                                                         </span>
                                                         <span v-else>
@@ -528,11 +606,6 @@ export default {
             ],
         };
     },
-    computed: {
-        url() {
-            return String(this.$page.props.url);
-        },
-    },
     mounted() {
         if (this.project) {
             this.$page.props.selectedFileSystemObject = this.project.data.files;
@@ -541,6 +614,11 @@ export default {
     methods: {
         selectTab(tab) {
             this.selectedTab = tab.name;
+        },
+    },
+    computed: {
+        url() {
+            return String(this.$page.props.url);
         },
     },
 };

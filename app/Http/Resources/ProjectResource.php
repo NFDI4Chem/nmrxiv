@@ -9,7 +9,7 @@ class ProjectResource extends JsonResource
 {
     private bool $lite = true;
 
-    private array $properties = ['users', 'studies', 'files', 'license'];
+    private array $properties = ['users', 'studies', 'files', 'license', 'authors'];
 
     public function lite(bool $lite, array $properties): self
     {
@@ -83,6 +83,16 @@ class ProjectResource extends JsonResource
                             return [
                                 'license' => new LicenseResource(
                                     $this->license
+                                ),
+                            ];
+                        }
+                    ),
+                    $this->mergeWhen(
+                        in_array('authors', $this->properties),
+                        function () {
+                            return [
+                                'authors' => AuthorResource::collection(
+                                    $this->authors
                                 ),
                             ];
                         }
