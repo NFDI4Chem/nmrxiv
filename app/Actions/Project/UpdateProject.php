@@ -19,9 +19,9 @@ class UpdateProject
      */
     public function update(Project $project, array $input)
     {
-        $errorMessages = array(
+        $errorMessages = [
             'license.required_if' => 'The license field is required when the project is made public.',
-        );
+        ];
         Validator::make($input, [
             'name' => ['required', 'string', 'max:255',  Rule::unique('projects')
             ->where('owner_id', $input['owner_id'])->ignore($project->id), ],
