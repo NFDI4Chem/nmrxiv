@@ -17,10 +17,14 @@ class UpdateStudy
      */
     public function update(Study $study, array $input)
     {
+        $errorMessages = [
+            'license.required_if' => 'The license field is required when the study is made public.',
+        ];
         Validator::make($input, [
             'name' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'min:20'],
-        ])->validate();
+            'license' => ['required_if:is_public,"true"'],
+        ], $errorMessages)->validate();
 
         return DB::transaction(function () use ($input, $study) {
             $study->forceFill([
