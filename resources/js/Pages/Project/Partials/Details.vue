@@ -457,6 +457,12 @@
                                                         />
                                                     </div>
                                                 </div>
+                                                <jet-input-error
+                                                    :message="
+                                                        form.errors.license
+                                                    "
+                                                    class="mt-2"
+                                                />
                                             </div>
                                             <div
                                                 v-if="editable"

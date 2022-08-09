@@ -20,11 +20,15 @@ class CreateNewStudy
     public function create(array $input)
     {
         $license = $input['license'];
+        $errorMessages = array(
+            'license.required_if' => 'The license field is required when the study is made public.',
+        );
         Validator::make($input, [
             'name' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'min:20'],
             'project_id' => ['required'],
-        ])->validate();
+            'license' => ['required_if:is_public,"true"'],
+        ],$errorMessages)->validate();
 
         return DB::transaction(function () use ($input, $license) {
             return tap(Study::create([
