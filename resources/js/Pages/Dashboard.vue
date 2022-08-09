@@ -42,7 +42,7 @@
         <div v-if="projects.length > 0" class="px-12 py-8 mx-auto max-w-4xl">
             <team-projects
                 :team="team"
-                :editable="editable"
+                :team-role="teamRole"
                 :mode="'create'"
                 :projects="projects"
             ></team-projects>
@@ -294,40 +294,9 @@ export default {
         Onboarding,
     },
     props: ["user", "team", "projects", "teamRole", "filters"],
-    setup() {
-        const openDatasetCreateDialog = (data) => {
-            emitter.emit("openDatasetCreateDialog", data);
-        };
-        const emitter = inject("emitter"); // Inject `emitter`
-        watchEffect(() => {
-            if (meta.value && u.value) {
-                openDatasetCreateDialog({
-                    draft_id: null,
-                });
-            }
-        });
-
-        return {
-            openDatasetCreateDialog,
-        };
-    },
-    computed: {
-        editable() {
-            if (this.teamRole && this.teamRole.name) {
-                if (
-                    this.teamRole.key == "owner" ||
-                    this.teamRole.key == "collaborator"
-                ) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        },
-    },
     mounted() {
         if (this.filters.action == "submission") {
-            this.openDatasetCreateDialog({
+            this.emitter.emit("openDatasetCreateDialog", {
                 draft_id: this.filters.draft_id,
             });
         }

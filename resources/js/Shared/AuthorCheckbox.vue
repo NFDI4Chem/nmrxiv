@@ -15,17 +15,17 @@
                         {{ item.affiliation }}
                     </p>
                     <a
-                        :href="item.orcid_id"
                         v-if="item.orcid_id"
+                        :href="item.orcid_id"
                         class="text-teal-500"
                         >ORCID ID - {{ item.orcid_id }}</a
                     >
                 </div>
                 <div class="ml-3 flex items-center h-5">
                     <input
-                        :value="item"
-                        v-model="proxyChecked"
                         id="items"
+                        v-model="proxyChecked"
+                        :value="item"
                         aria-describedby="items-description"
                         name="items"
                         type="checkbox"
@@ -39,8 +39,6 @@
 
 <script>
 export default {
-    emits: ["update:checked"],
-
     props: {
         items: [],
         checked: {
@@ -51,6 +49,7 @@ export default {
             default: null,
         },
     },
+    emits: ["update:checked"],
     computed: {
         proxyChecked: {
             get() {

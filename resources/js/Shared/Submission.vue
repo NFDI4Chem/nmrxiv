@@ -2044,6 +2044,13 @@
                                                             project to public.
                                                         </p>
                                                     </div>
+                                                    <jet-input-error
+                                                        :message="
+                                                            updateProjectForm
+                                                                .errors.license
+                                                        "
+                                                        class="mt-2"
+                                                    />
                                                 </div>
                                             </section>
 
@@ -2401,6 +2408,7 @@ export default {
             licenses: [],
 
             project: null,
+            initialised: false,
         };
     },
     computed: {
@@ -2440,10 +2448,7 @@ export default {
         },
     },
     mounted() {
-        const emitter = inject("emitter");
-        emitter.all.clear()
-        emitter.on("openDatasetCreateDialog", (data) => {
-            console.log("triggered")
+        const initialise = (data) => {
             this.fetchDrafts().then((response) => {
                 this.drafts = response.data.drafts;
                 if (data.draft_id) {
@@ -2465,8 +2470,10 @@ export default {
                     }
                 }
             });
-        });
+        };
+        this.emitter.all.set("openDatasetCreateDialog", [initialise]);
     },
+    unmounted() {},
     methods: {
         updateLoadingStatus(status) {
             this.loadingStep = status;
@@ -2481,6 +2488,7 @@ export default {
             return info;
         },
         updateProject() {
+            this.updateProjectForm.clearErrors();
             this.loadingStep = true;
             this.updateProjectForm.name = this.project.name;
             this.updateProjectForm.owner_id = this.project.owner_id;

@@ -96,5 +96,17 @@ export default {
                 return false;
             }
         },
+        editableTeamRole() {
+            if (this.teamRole && this.teamRole.name) {
+                if (
+                    this.teamRole.key == "owner" ||
+                    this.teamRole.key == "collaborator"
+                ) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        },
     },
 };

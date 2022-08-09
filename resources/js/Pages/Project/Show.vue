@@ -9,7 +9,6 @@
                                 class="flex pr-20 items-center text-xl text-gray-700 font-bold"
                             >
                                 <StarIcon
-                                    @click="toogleStarred"
                                     :class="[
                                         project.starred
                                             ? 'text-yellow-400'
@@ -17,6 +16,7 @@
                                         'h-5 w-5 flex-shrink-0 -ml-1 mr-1',
                                     ]"
                                     aria-hidden="true"
+                                    @click="toogleStarred"
                                 />
                                 {{ project.name }}
                             </div>
@@ -27,12 +27,12 @@
                                     :team="team"
                                     :members="members"
                                     :project="project"
-                                    calledFrom="projectView"
+                                    called-from="projectView"
                                     model="project"
                                 />
                                 <a
-                                    @click="toggleDetails"
                                     class="cursor-pointer hover:text-teal-900 inline-flex items-center ml-7"
+                                    @click="toggleDetails"
                                     ><svg
                                         xmlns="http://www.w3.org/2000/svg"
                                         viewBox="0 0 24 24"
@@ -84,9 +84,9 @@
                                         class="inline-flex ml-7 items-center"
                                     >
                                         <svg
+                                            id="Capa_1"
                                             class="h-3 w-3 text-gray-400 inline"
                                             version="1.1"
-                                            id="Capa_1"
                                             xmlns="http://www.w3.org/2000/svg"
                                             xmlns:xlink="http://www.w3.org/1999/xlink"
                                             x="0px"
@@ -131,8 +131,8 @@
                                     </span></a
                                 >
                                 <project-details
-                                    :role="role"
                                     ref="projectDetailsElement"
+                                    :role="role"
                                     :project="project"
                                 />
                                 <add-author
@@ -239,8 +239,8 @@
                             <button
                                 v-if="canUpdateProject"
                                 type="button"
-                                @click="toggleDetails"
                                 class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                @click="toggleDetails"
                             >
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -281,8 +281,8 @@
                             <button
                                 v-if="canUpdateProject"
                                 type="button"
-                                @click="toggleAddAuthor"
                                 class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                @click="toggleAddAuthor"
                             >
                                 <PencilIcon
                                     class="w-4 h-4 mr-1 text-gray-600"
@@ -294,8 +294,8 @@
                     <dd class="mt-2 text-md text-gray-900 space-y-5">
                         <div class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-3">
                             <div
-                                :key="author.id"
                                 v-for="author in project.authors"
+                                :key="author.id"
                                 class="relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm flex items-center space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-pink-500"
                             >
                                 <div class="flex-1 min-w-0">
@@ -316,8 +316,8 @@
                                         <p class="text-sm text-gray-500">
                                             {{ author.affiliation }}
                                             <a
-                                                :href="author.orcid_id"
                                                 v-if="author.orcid_id"
+                                                :href="author.orcid_id"
                                                 class="text-teal-500"
                                                 >ORCID ID -
                                                 {{ author.orcid_id }}</a
@@ -347,8 +347,8 @@
                             <button
                                 v-if="canUpdateProject"
                                 type="button"
-                                @click="toggleDetails"
                                 class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                @click="toggleDetails"
                             >
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -368,9 +368,9 @@
                     <dd class="mt-1 text-md text-gray-900 space-y-5">
                         <p>
                             <span
-                                class="mr-2"
                                 v-for="tag in project.tags"
                                 :key="tag.id"
+                                class="mr-2"
                             >
                                 <span
                                     class="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-indigo-100 text-indigo-800"
@@ -436,9 +436,6 @@ export default {
         "projectPermissions",
         "role",
     ],
-    data() {
-        return {};
-    },
     setup() {
         const projectDetailsElement = ref(null);
         const addAuthorElement = ref(null);
@@ -447,18 +444,8 @@ export default {
             addAuthorElement,
         };
     },
-    methods: {
-        toogleStarred() {
-            axios
-                .post(route("projects.toggle-starred", project))
-                .then((res) => {});
-        },
-        toggleDetails() {
-            this.projectDetailsElement.toggleDetails();
-        },
-        toggleAddAuthor() {
-            this.addAuthorElement.toggleAddAuthorDialog();
-        },
+    data() {
+        return {};
     },
     computed: {
         canDeleteProject() {
@@ -474,6 +461,19 @@ export default {
             return this.projectPermissions
                 ? this.projectPermissions.canUpdateProject
                 : false;
+        },
+    },
+    methods: {
+        toogleStarred() {
+            axios
+                .post(route("projects.toggle-starred", project))
+                .then((res) => {});
+        },
+        toggleDetails() {
+            this.projectDetailsElement.toggleDetails();
+        },
+        toggleAddAuthor() {
+            this.addAuthorElement.toggleAddAuthorDialog();
         },
     },
 };
