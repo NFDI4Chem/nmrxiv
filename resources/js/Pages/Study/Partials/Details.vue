@@ -397,6 +397,12 @@
                                                         />
                                                     </div>
                                                 </div>
+                                                <jet-input-error
+                                                    :message="
+                                                        form.errors.license
+                                                    "
+                                                    class="mt-2"
+                                                />
                                             </div>
                                             <div class="pt-4 pb-6">
                                                 <div
