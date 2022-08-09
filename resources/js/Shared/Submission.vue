@@ -2441,9 +2441,8 @@ export default {
     },
     mounted() {
         const emitter = inject("emitter");
-        emitter.all.clear()
+
         emitter.on("openDatasetCreateDialog", (data) => {
-            console.log("triggered")
             this.fetchDrafts().then((response) => {
                 this.drafts = response.data.drafts;
                 if (data.draft_id) {
