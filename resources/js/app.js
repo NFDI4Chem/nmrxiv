@@ -26,7 +26,7 @@ createInertiaApp({
             import.meta.glob("./Pages/**/*.vue")
         ),
     setup({ el, app, props, plugin }) {
-        return createApp({ render: () => h(app, props) })
+        const application = createApp({ render: () => h(app, props) })
             .use(plugin)
             .component("Children", Children)
             .component("vue-simple-context-menu", VueSimpleContextMenu)
@@ -34,8 +34,10 @@ createInertiaApp({
             .mixin(helpers)
             .use(InstantSearch)
             .use(Vue3Tour)
-            .provide("emitter", emitter)
-            .mount(el);
+            .provide("emitter", emitter);
+        application.config.globalProperties.emitter = emitter;
+        application.mount(el);
+        return application;
     },
 });
 

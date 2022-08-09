@@ -377,13 +377,10 @@ export default {
     },
 
     mounted() {
-        const emitter = inject("emitter");
-        emitter.on("openProjectCreateDialog", () => {
-            this.createProjectDialog = true;
-        });
-        axios.get(route("licenses")).then((res) => {
-            this.licenses = res.data;
-        });
+        const initialise = () => {
+            this.toggleCreateProjectDialog();
+        };
+        this.emitter.all.set("openProjectCreateDialog", [initialise]);
     },
 
     methods: {
@@ -403,6 +400,9 @@ export default {
         toggleCreateProjectDialog() {
             this.createProjectDialog = !this.createProjectDialog;
             this.createProjectForm.clearErrors();
+            axios.get(route("licenses")).then((res) => {
+                this.licenses = res.data;
+            });
         },
     },
 };

@@ -111,18 +111,13 @@ export default {
         JetButton,
     },
     props: ["studies", "project", "editable"],
-    setup() {
-        const emitter = inject("emitter"); // Inject `emitter`
-        const openStudyCreateDialog = () => {
-            emitter.emit("openStudyCreateDialog", 100);
-        };
-        return {
-            openStudyCreateDialog,
-        };
-    },
     data() {
         return {};
     },
-    methods: {},
+    methods: {
+        openStudyCreateDialog() {
+            this.emitter.emit("openStudyCreateDialog", {});
+        },
+    },
 };
 </script>

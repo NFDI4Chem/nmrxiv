@@ -71,13 +71,13 @@
                                                     </label>
                                                     <div class="mt-1">
                                                         <input
+                                                            id="study-name"
                                                             v-model="form.name"
                                                             type="text"
                                                             :readonly="
                                                                 !editable
                                                             "
                                                             name="study-name"
-                                                            id="study-name"
                                                             class="block w-full shadow-sm sm:text-sm focus:ring-gray-500 focus:border-gray-500 border-gray-300 rounded-md"
                                                         />
                                                     </div>
@@ -101,10 +101,10 @@
                                                                 class="flex items-center"
                                                             >
                                                                 <Tab
-                                                                    as="template"
                                                                     v-slot="{
                                                                         selected,
                                                                     }"
+                                                                    as="template"
                                                                 >
                                                                     <button
                                                                         :class="[
@@ -118,10 +118,10 @@
                                                                     </button>
                                                                 </Tab>
                                                                 <Tab
-                                                                    as="template"
                                                                     v-slot="{
                                                                         selected,
                                                                     }"
+                                                                    as="template"
                                                                 >
                                                                     <button
                                                                         :class="[
@@ -148,13 +148,13 @@
                                                                     >
                                                                     <div>
                                                                         <textarea
+                                                                            id="description"
                                                                             v-model="
                                                                                 form.description
                                                                             "
                                                                             :readonly="
                                                                                 !editable
                                                                             "
-                                                                            id="description"
                                                                             name="description"
                                                                             placeholder="Describe this study"
                                                                             rows="3"
@@ -172,11 +172,11 @@
                                                                             class="mx-px mt-px px-3 pt-2 pb-12"
                                                                         >
                                                                             <span
-                                                                                class="text-gray-400 text-sm font-medium"
                                                                                 v-if="
                                                                                     form.description ==
                                                                                     ''
                                                                                 "
+                                                                                class="text-gray-400 text-sm font-medium"
                                                                             >
                                                                                 Nothing
                                                                                 to
@@ -239,12 +239,12 @@
                                                     </label>
                                                     <div>
                                                         <vue-tags-input
+                                                            v-model="form.tag"
                                                             placeholder="Type a keyword or keywords separated by comma (,) and press enter"
                                                             :separators="[
                                                                 ';',
                                                                 ',',
                                                             ]"
-                                                            v-model="form.tag"
                                                             :disabled="
                                                                 !editable
                                                             "
@@ -285,17 +285,17 @@
                                                                 class="absolute flex items-center h-5"
                                                             >
                                                                 <input
+                                                                    id="privacy-public"
+                                                                    v-model="
+                                                                        form.is_public
+                                                                    "
                                                                     :checked="
                                                                         form.is_public ===
                                                                         true
                                                                     "
-                                                                    v-model="
-                                                                        form.is_public
-                                                                    "
                                                                     :disabled="
                                                                         !editable
                                                                     "
-                                                                    id="privacy-public"
                                                                     name="privacy"
                                                                     value="true"
                                                                     aria-describedby="privacy-public-description"
@@ -333,17 +333,17 @@
                                                                     class="absolute flex items-center h-5"
                                                                 >
                                                                     <input
+                                                                        id="privacy-private-to-study"
+                                                                        v-model="
+                                                                            form.is_public
+                                                                        "
                                                                         :checked="
                                                                             form.is_public ===
                                                                             false
                                                                         "
-                                                                        v-model="
-                                                                            form.is_public
-                                                                        "
                                                                         :disabled="
                                                                             !editable
                                                                         "
-                                                                        id="privacy-private-to-study"
                                                                         name="privacy"
                                                                         value="false"
                                                                         aria-describedby="privacy-private-to-study-description"
@@ -386,10 +386,10 @@
                                                 >
                                                     <div>
                                                         <select-rich
-                                                            label="License"
                                                             v-model:selected="
                                                                 form.license
                                                             "
+                                                            label="License"
                                                             :disabled="
                                                                 !editable
                                                             "
@@ -418,26 +418,26 @@
                                                             class="relative flex items-stretch flex-grow focus-within:z-10"
                                                         >
                                                             <input
-                                                                @focus="
-                                                                    $event.target.select()
-                                                                "
                                                                 id="studyPublicURLCopy"
                                                                 v-model="
                                                                     study.public_url
                                                                 "
                                                                 type="text"
                                                                 class="rounded-l-md focus:ring-gray-500 focus:border-gray-500 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300"
+                                                                @focus="
+                                                                    $event.target.select()
+                                                                "
                                                             />
                                                         </div>
                                                         <button
+                                                            type="button"
+                                                            class="-ml-px relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500"
                                                             @click="
                                                                 copyToClipboard(
                                                                     study.public_url,
                                                                     'studyPublicURLCopy'
                                                                 )
                                                             "
-                                                            type="button"
-                                                            class="-ml-px relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500"
                                                         >
                                                             <span
                                                                 ><ClipboardCopyIcon
@@ -480,9 +480,6 @@
                                                                     class="flex-grow"
                                                                 >
                                                                     <input
-                                                                        @focus="
-                                                                            $event.target.select()
-                                                                        "
                                                                         id="studyPrivateURLCopy"
                                                                         readonly
                                                                         type="text"
@@ -490,17 +487,20 @@
                                                                             study.private_url
                                                                         "
                                                                         class="rounded-l-md focus:ring-gray-500 focus:border-gray-500 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300"
+                                                                        @focus="
+                                                                            $event.target.select()
+                                                                        "
                                                                     />
                                                                 </div>
                                                                 <button
+                                                                    type="button"
+                                                                    class="-ml-px relative inline-flex items-center space-x-2 px-2 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500"
                                                                     @click="
                                                                         copyToClipboard(
                                                                             study.private_url,
                                                                             'studyPrivateURLCopy'
                                                                         )
                                                                     "
-                                                                    type="button"
-                                                                    class="-ml-px relative inline-flex items-center space-x-2 px-2 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500"
                                                                 >
                                                                     <span
                                                                         ><ClipboardCopyIcon
@@ -511,10 +511,10 @@
                                                             </div>
                                                             <div class="mt-3">
                                                                 <Listbox
-                                                                    as="div"
                                                                     v-model="
                                                                         selectedAccessType
                                                                     "
+                                                                    as="div"
                                                                 >
                                                                     <div
                                                                         class="relative"
@@ -566,18 +566,18 @@
                                                                                 class="origin-top-right absolute z-10 left-0 mt-2 w-72 rounded-md shadow-lg overflow-hidden bg-white divide-y divide-gray-200 ring-1 ring-black ring-opacity-5 focus:outline-none"
                                                                             >
                                                                                 <ListboxOption
-                                                                                    as="template"
                                                                                     v-for="option in publishingOptions"
                                                                                     :key="
                                                                                         option.title
-                                                                                    "
-                                                                                    :value="
-                                                                                        option
                                                                                     "
                                                                                     v-slot="{
                                                                                         active,
                                                                                         selectedAccessType,
                                                                                     }"
+                                                                                    as="template"
+                                                                                    :value="
+                                                                                        option
+                                                                                    "
                                                                                 >
                                                                                     <li
                                                                                         :class="[
@@ -661,10 +661,10 @@
                                                 </div>
                                                 <div class="mt-4 flex text-sm">
                                                     <a
+                                                        class="cursor-pointer group inline-flex items-center text-gray-500 hover:text-gray-900"
                                                         @click="
                                                             toggleActivityDetails
                                                         "
-                                                        class="cursor-pointer group inline-flex items-center text-gray-500 hover:text-gray-900"
                                                     >
                                                         <ExclamationCircleIcon
                                                             class="h-5 w-5 text-gray-400 group-hover:text-gray-500"
@@ -676,8 +676,8 @@
                                                     </a>
                                                 </div>
                                                 <study-activity
-                                                    :study="study"
                                                     ref="activityDetailsElement"
+                                                    :study="study"
                                                 ></study-activity>
                                             </div>
                                         </div>
@@ -818,23 +818,6 @@ export default {
         VueTagsInput,
     },
     props: ["study", "role"],
-    mounted() {
-        const emitter = inject("emitter");
-
-        emitter.on("openStudyDetails", (data) => {
-            this.open = true;
-        });
-    },
-    beforeMount() {
-        if (this.study.license_id) {
-            axios.get(route("license", this.study.license_id)).then((res) => {
-                this.form.license = res.data[0];
-            });
-        }
-        axios.get(route("licenses")).then((res) => {
-            this.licenses = res.data;
-        });
-    },
     setup() {
         const activityDetailsElement = ref(null);
         return {
@@ -875,6 +858,22 @@ export default {
             )[0],
             linkAccess: this.study.access == "link",
         };
+    },
+    mounted() {
+        const initialise = () => {
+            this.open = true;
+        };
+        this.emitter.all.set("openStudyDetails", [initialise]);
+    },
+    beforeMount() {
+        if (this.study.license_id) {
+            axios.get(route("license", this.study.license_id)).then((res) => {
+                this.form.license = res.data[0];
+            });
+        }
+        axios.get(route("licenses")).then((res) => {
+            this.licenses = res.data;
+        });
     },
     methods: {
         toggleDetails() {

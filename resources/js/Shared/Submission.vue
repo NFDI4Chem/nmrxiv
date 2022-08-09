@@ -2401,6 +2401,7 @@ export default {
             licenses: [],
 
             project: null,
+            initialised: false,
         };
     },
     computed: {
@@ -2440,9 +2441,7 @@ export default {
         },
     },
     mounted() {
-        const emitter = inject("emitter");
-
-        emitter.on("openDatasetCreateDialog", (data) => {
+        const initialise = (data) => {
             this.fetchDrafts().then((response) => {
                 this.drafts = response.data.drafts;
                 if (data.draft_id) {
@@ -2464,8 +2463,10 @@ export default {
                     }
                 }
             });
-        });
+        };
+        this.emitter.all.set("openDatasetCreateDialog", [initialise]);
     },
+    unmounted() {},
     methods: {
         updateLoadingStatus(status) {
             this.loadingStep = status;
