@@ -342,7 +342,6 @@ export default {
             });
         },
         confirmAnnouncementDeletion(id) {
-            console.log("confirm method called for " + id);
             this.announcementId = id;
             this.confirmingAnnouncementDeletion = true;
         },

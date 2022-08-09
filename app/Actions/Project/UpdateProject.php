@@ -93,4 +93,11 @@ class UpdateProject
             }
         });
     }
+
+    public function updateAuthors(Project $project, $authors)
+    {
+        $project->authors()->sync(
+            $authors
+        );
+    }
 }
