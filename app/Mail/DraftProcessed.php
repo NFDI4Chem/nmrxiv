@@ -3,7 +3,6 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
@@ -31,7 +30,7 @@ class DraftProcessed extends Mailable
     public function build()
     {
         return $this->markdown('vendor.mail.draft-processed', [
-            'url' => url(config('app.url') . '/dashboard/projects/' . $this->project->id)
-        ])->subject(__('Submission Processed' . ' - ' . $this->project->name));
+            'url' => url(config('app.url').'/dashboard/projects/'.$this->project->id),
+        ])->subject(__('Submission Processed'.' - '.$this->project->name));
     }
 }

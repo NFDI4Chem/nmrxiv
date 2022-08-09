@@ -18,7 +18,6 @@ class DownloadController extends Controller
     public function downloadSet(Request $request, $username, $project, $study = null, $dataset = null)
     {
         $user = User::where('username', $username)->firstOrFail();
-
         if ($project) {
             $project = Project::where([['slug', $project], ['owner_id', $user->id]])->firstOrFail();
 

@@ -255,9 +255,27 @@
                         "
                         class="mb-3"
                     >
+                        <div class="py-2 mb-2 block border-b pb-4">
+                            <p class="font-bold text-xl">
+                                {{ $page.props.selectedFileSystemObject.name }}
+                                <a
+                                    v-if="
+                                        $page.props.selectedFileSystemObject.id
+                                    "
+                                    @click="deleteFSO"
+                                    class="ml-4 cursor-pointer relative inline-flex items-center px-4 py-1 rounded-full border border-gray-300 bg-white text-sm font-black text-dark hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 float-right"
+                                >
+                                    <TrashIcon
+                                        class="cursor-pointer h-4 w-4 text-gray-900 mr-2"
+                                        aria-hidden="true"
+                                    />
+                                    Delete
+                                </a>
+                            </p>
+                        </div>
                         <ul
                             role="list"
-                            class="mb-3 grid grid-cols-1 gap-5 sm:gap-6 sm:grid-cols-2 lg:grid-cols-4"
+                            class="mb-3 mt-6 grid grid-cols-1 gap-5 sm:gap-6 sm:grid-cols-2 lg:grid-cols-4"
                         >
                             <li
                                 v-for="file in $page.props
@@ -298,7 +316,25 @@
                         </ul>
                     </div>
                     <div v-else>
-                        <div class="">
+                        <div
+                            v-if="$page.props.selectedFileSystemObject"
+                            class="py-2 mb-2 block border-b pb-4"
+                        >
+                            <p class="font-bold text-xl">
+                                {{ $page.props.selectedFileSystemObject.name }}
+                                <a
+                                    @click="deleteFSO"
+                                    class="ml-4 cursor-pointer relative inline-flex items-center px-4 py-1 rounded-full border border-gray-300 bg-white text-sm font-black text-dark hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 float-right"
+                                >
+                                    <TrashIcon
+                                        class="cursor-pointer h-4 w-4 text-gray-900 mr-2"
+                                        aria-hidden="true"
+                                    />
+                                    Delete
+                                </a>
+                            </p>
+                        </div>
+                        <div class="pt-5">
                             <span
                                 v-if="
                                     $page.props.selectedFileSystemObject &&
@@ -335,12 +371,15 @@ import {
     UploadIcon,
     CheckIcon,
     ExclamationCircleIcon,
+    TrashIcon,
+    DownloadIcon,
 } from "@heroicons/vue/solid";
 
 export default {
     components: {
         FolderIcon,
         DocumentTextIcon,
+        DownloadIcon,
         ChevronRightIcon,
         InformationCircleIcon,
         HomeIcon,
@@ -352,6 +391,7 @@ export default {
         UploadIcon,
         CheckIcon,
         SelectInput,
+        TrashIcon,
     },
     props: ["draft", "readonly"],
     data() {
@@ -378,6 +418,21 @@ export default {
         }
     },
     methods: {
+        deleteFSO() {
+            if (this.$page.props.selectedFileSystemObject.id) {
+                this.updateBusyStatus(true);
+                axios
+                    .delete(
+                        "/dashboard/drafts/" +
+                            this.draft.id +
+                            "/files/" +
+                            this.$page.props.selectedFileSystemObject.id
+                    )
+                    .then((response) => {
+                        this.annotate();
+                    });
+            }
+        },
         toggleFullScreen() {
             this.fullScreen = !this.fullScreen;
         },
@@ -395,6 +450,7 @@ export default {
                 this.file = response.data.file;
                 this.file.has_children = true;
                 this.$page.props.selectedFileSystemObject = this.file;
+                this.$page.props.selectedFolder = "/";
             });
         },
         annotate() {
