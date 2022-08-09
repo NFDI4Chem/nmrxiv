@@ -68,7 +68,7 @@
                                             :members="members"
                                             :project="project"
                                             :model="model"
-                                            calledFrom="studyView"
+                                            called-from="studyView"
                                         />
                                         <div class="ml-3">
                                             <span
@@ -101,9 +101,9 @@
                                                 class="inline-flex items-center"
                                             >
                                                 <svg
+                                                    id="Capa_1"
                                                     class="h-3 w-3 text-gray-400 inline"
                                                     version="1.1"
-                                                    id="Capa_1"
                                                     xmlns="http://www.w3.org/2000/svg"
                                                     xmlns:xlink="http://www.w3.org/1999/xlink"
                                                     x="0px"
@@ -164,8 +164,8 @@
                                         class="mt-2 flex items-center text-sm text-gray-500"
                                     >
                                         <a
-                                            @click="toggleDetails"
                                             class="cursor-pointer inline-flex items-center"
+                                            @click="toggleDetails"
                                             ><ExclamationCircleIcon
                                                 class="h-5 w-5 text-gray-400 group-hover:text-gray-500"
                                                 aria-hidden="true"
@@ -314,14 +314,14 @@ export default {
         "studyRole",
         "model",
     ],
-    data() {
-        return {};
-    },
     setup() {
         const studyDetailsElement = ref(null);
         return {
             studyDetailsElement,
         };
+    },
+    data() {
+        return {};
     },
     methods: {
         toggleDetails() {

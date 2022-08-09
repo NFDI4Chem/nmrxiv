@@ -76,7 +76,7 @@
                                                 createProjectForm.description
                                             "
                                             name="description"
-                                            placeholder="Describe this project"
+                                            placeholder="Describe this project in atleast 20 characters."
                                             rows="3"
                                             class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
                                         />
@@ -289,6 +289,10 @@
                             label="License"
                             :items="licenses"
                         />
+                        <jet-input-error
+                            :message="createProjectForm.errors.license"
+                            class="mt-2"
+                        />
                     </div>
                 </div>
             </div>
@@ -377,14 +381,10 @@ export default {
     },
 
     mounted() {
-        const emitter = inject("emitter");
-        emitter.all.clear()
-        emitter.on("openProjectCreateDialog", () => {
-            this.createProjectDialog = true;
-        });
-        axios.get(route("licenses")).then((res) => {
-            this.licenses = res.data;
-        });
+        const initialise = () => {
+            this.toggleCreateProjectDialog();
+        };
+        this.emitter.all.set("openProjectCreateDialog", [initialise]);
     },
 
     methods: {
@@ -404,6 +404,9 @@ export default {
         toggleCreateProjectDialog() {
             this.createProjectDialog = !this.createProjectDialog;
             this.createProjectForm.clearErrors();
+            axios.get(route("licenses")).then((res) => {
+                this.licenses = res.data;
+            });
         },
     },
 };

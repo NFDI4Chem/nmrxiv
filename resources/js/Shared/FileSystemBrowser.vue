@@ -134,8 +134,8 @@
                     <children :file="file"></children>
                     <div
                         v-if="Object.keys(logs).length > 0"
-                        @click="showLogsDialog = true"
                         class="mt-4 text-sm cursor-pointer text-gray-400"
+                        @click="showLogsDialog = true"
                     >
                         <InformationCircleIcon
                             class="h-5 w-5 inline text-gray-400 flex-shrink-0 mx-auto"
@@ -228,7 +228,7 @@
                                         </div>
                                     </li>
                                 </ul>
-                                <div class="mt-10" v-else>
+                                <div v-else class="mt-10">
                                     <i class="text-gray-400"
                                         >No logs with the status
                                         {{ logFilter }}</i
@@ -262,8 +262,8 @@
                                     v-if="
                                         $page.props.selectedFileSystemObject.id
                                     "
-                                    @click="deleteFSO"
                                     class="ml-4 cursor-pointer relative inline-flex items-center px-4 py-1 rounded-full border border-gray-300 bg-white text-sm font-black text-dark hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 float-right"
+                                    @click="deleteFSO"
                                 >
                                     <TrashIcon
                                         class="cursor-pointer h-4 w-4 text-gray-900 mr-2"
@@ -323,8 +323,8 @@
                             <p class="font-bold text-xl">
                                 {{ $page.props.selectedFileSystemObject.name }}
                                 <a
-                                    @click="deleteFSO"
                                     class="ml-4 cursor-pointer relative inline-flex items-center px-4 py-1 rounded-full border border-gray-300 bg-white text-sm font-black text-dark hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 float-right"
+                                    @click="deleteFSO"
                                 >
                                     <TrashIcon
                                         class="cursor-pointer h-4 w-4 text-gray-900 mr-2"
@@ -409,11 +409,23 @@ export default {
             showLogsDialog: false,
         };
     },
+    computed: {
+        baseURL() {
+            return String(this.$page.props.url);
+        },
+        filteredLogs() {
+            let logsClone = JSON.parse(JSON.stringify(this.logs));
+            Object.keys(logsClone).forEach((key) => {
+                if (logsClone[key].status != this.logFilter)
+                    delete logsClone[key];
+            });
+            return logsClone;
+        },
+    },
     mounted() {
         if (this.draft) {
             this.url =
                 this.baseURL + "/dashboard/drafts/" + this.draft.id + "/files";
-            this.loadFiles();
             this.loadDropZone();
         }
     },
@@ -482,6 +494,10 @@ export default {
                     draft_id: vm.draft.id,
                 })
                 .catch((err) => {
+                    console.log(
+                        "Error retrieving signed storage URLS",
+                        err.response
+                    );
                     // if (
                     //     err.response.status !== 200 ||
                     //     err.response.status !== 201
@@ -640,19 +656,6 @@ export default {
                     }, 5000);
                 });
             });
-        },
-    },
-    computed: {
-        baseURL() {
-            return String(this.$page.props.url);
-        },
-        filteredLogs() {
-            let logsClone = JSON.parse(JSON.stringify(this.logs));
-            Object.keys(logsClone).forEach((key) => {
-                if (logsClone[key].status != this.logFilter)
-                    delete logsClone[key];
-            });
-            return logsClone;
         },
     },
 };

@@ -47,10 +47,10 @@
                                 </label>
                                 <div class="mt-1 flex rounded-md shadow-sm">
                                     <input
-                                        v-model="this.importAuthorsForm.doi"
+                                        id="name"
+                                        v-model="importAuthorsForm.doi"
                                         type="text"
                                         name="name"
-                                        id="name"
                                         autocomplete="off"
                                         class="flex-1 focus:ring-teal-500 focus:border-teal-500 block w-full min-w-0 rounded sm:text-sm border-gray-300"
                                     />
@@ -67,22 +67,22 @@
                             </jet-secondary-button>
                         </div>
                         <div
-                            v-if="this.loading && this.importAuthorsForm.doi"
+                            v-if="loading && importAuthorsForm.doi"
                             class="sm:col-span-9 mt-4 align-centre"
                         >
-                            <loading-button :loading="this.loading" />
+                            <loading-button :loading="loading" />
                         </div>
                         <div
-                            v-if="authorsListDOI.length > 0 && !this.loading"
+                            v-if="authorsListDOI.length > 0 && !loading"
                             class="sm:col-span-9 mt-4"
                         >
                             <author-checkbox
-                                :items="authorsListDOI"
                                 v-model:checked="doiSelectedAuthorList"
+                                :items="authorsListDOI"
                             />
                         </div>
                         <div
-                            v-if="this.authorsListDOI.length > 0"
+                            v-if="authorsListDOI.length > 0"
                             class="sm:col-span-6 pt-3"
                         >
                             <jet-secondary-button
@@ -114,10 +114,10 @@
                                 </label>
                                 <div class="mt-1">
                                     <input
+                                        id="title"
                                         v-model="manualAddAuthorForm.title"
                                         type="text"
                                         name="title"
-                                        id="title"
                                         autocomplete="title"
                                         class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md"
                                     />
@@ -132,20 +132,19 @@
                                 </label>
                                 <div class="mt-1">
                                     <input
+                                        id="family-name"
                                         v-model="
                                             manualAddAuthorForm.family_name
                                         "
                                         type="text"
                                         name="family-name"
-                                        id="family-name"
                                         autocomplete="family-name"
                                         class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md"
                                     />
                                 </div>
                                 <jet-input-error
                                     :message="
-                                        this.manualAddAuthorForm.errors
-                                            .family_name
+                                        manualAddAuthorForm.errors.family_name
                                     "
                                     class="mt-2"
                                 />
@@ -160,18 +159,17 @@
                                 </label>
                                 <div class="mt-1">
                                     <input
+                                        id="given-name"
                                         v-model="manualAddAuthorForm.given_name"
                                         type="text"
                                         name="given-name"
-                                        id="given-name"
                                         autocomplete="given-name"
                                         class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md"
                                     />
                                 </div>
                                 <jet-input-error
                                     :message="
-                                        this.manualAddAuthorForm.errors
-                                            .given_name
+                                        manualAddAuthorForm.errors.given_name
                                     "
                                     class="mt-2"
                                 />
@@ -185,18 +183,17 @@
                                 </label>
                                 <div class="mt-1">
                                     <input
-                                        v-model="manualAddAuthorForm.email_id"
-                                        @blur="validateEmail"
                                         id="email"
+                                        v-model="manualAddAuthorForm.email_id"
                                         name="email"
                                         type="email"
                                         autocomplete="email"
                                         class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                                        @blur="validateEmail"
                                     />
                                     <jet-input-error
                                         :message="
-                                            this.manualAddAuthorForm.errors
-                                                .email_id
+                                            manualAddAuthorForm.errors.email_id
                                         "
                                         class="mt-2"
                                     />
@@ -211,8 +208,8 @@
                                 </label>
                                 <div class="mt-1">
                                     <input
-                                        v-model="manualAddAuthorForm.orcid_id"
                                         id="orcid"
+                                        v-model="manualAddAuthorForm.orcid_id"
                                         name="orcid"
                                         autocomplete="orcid"
                                         type="text"
@@ -229,10 +226,10 @@
                                 </label>
                                 <div class="mt-1">
                                     <textarea
+                                        id="affiliation"
                                         v-model="
                                             manualAddAuthorForm.affiliation
                                         "
-                                        id="affiliation"
                                         name="affiliation"
                                         rows="3"
                                         class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border border-gray-300 rounded-md"
@@ -259,7 +256,7 @@
                 </div>
             </div>
             <!-- Added Author Summary -->
-            <div v-if="this.selectedAuthorsList.length > 0">
+            <div v-if="selectedAuthorsList.length > 0">
                 <div class="ml-2 mt-2 overflow-y-scroll h-64">
                     <table
                         class="divide-y divide-gray-200 w-full table-fixed overflow-y-scroll"
@@ -412,6 +409,8 @@ export default {
         LoadingButton,
     },
 
+    props: ["project"],
+
     data() {
         return {
             form: this.$inertia.form({}),
@@ -438,8 +437,6 @@ export default {
             authorId: null,
         };
     },
-
-    props: ["project"],
     methods: {
         toggleAddAuthorDialog() {
             this.addAuthorDialog = !this.addAuthorDialog;
