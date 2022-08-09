@@ -23,7 +23,7 @@
                             <div class="inline-flex items-center mt-3">
                                 <access-dialogue
                                     :available-roles="availableRoles"
-                                    :role="projectRole"
+                                    :role="role"
                                     :team="team"
                                     :members="members"
                                     :project="project"
@@ -131,7 +131,7 @@
                                     </span></a
                                 >
                                 <project-details
-                                    :role="projectRole"
+                                    :role="role"
                                     ref="projectDetailsElement"
                                     :project="project"
                                 />
@@ -142,7 +142,7 @@
                                 <span
                                     class="capitalize inline-flex pr-4 ml-7 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
                                 >
-                                    <span v-if="projectRole == 'reviewer'">
+                                    <span v-if="role == 'reviewer'">
                                         <svg
                                             xmlns="http://www.w3.org/2000/svg"
                                             class="h-6 w-6 py-1 mr-1"
@@ -163,7 +163,7 @@
                                             />
                                         </svg>
                                     </span>
-                                    <span v-if="projectRole == 'collaborator'">
+                                    <span v-if="role == 'collaborator'">
                                         <svg
                                             xmlns="http://www.w3.org/2000/svg"
                                             class="h-6 w-6 py-1 mr-1"
@@ -181,8 +181,7 @@
                                     </span>
                                     <span
                                         v-if="
-                                            projectRole == 'owner' ||
-                                            projectRole == 'creator'
+                                            role == 'owner' || role == 'creator'
                                         "
                                     >
                                         <svg
@@ -200,7 +199,7 @@
                                             />
                                         </svg>
                                     </span>
-                                    {{ projectRole }}
+                                    {{ role }}
                                 </span>
                             </div>
                         </div>
@@ -280,6 +279,7 @@
                                 Author
                             </span>
                             <button
+                                v-if="canUpdateProject"
                                 type="button"
                                 @click="toggleAddAuthor"
                                 class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
@@ -434,7 +434,7 @@ export default {
         "members",
         "availableRoles",
         "projectPermissions",
-        "projectRole",
+        "role",
     ],
     data() {
         return {};
@@ -462,11 +462,8 @@ export default {
     },
     computed: {
         canDeleteProject() {
-            if (this.projectRole) {
-                if (
-                    this.projectRole == "owner" ||
-                    this.projectRole == "creator"
-                ) {
+            if (this.role) {
+                if (this.role == "owner" || this.role == "creator") {
                     return true;
                 } else {
                     return false;
@@ -477,19 +474,6 @@ export default {
             return this.projectPermissions
                 ? this.projectPermissions.canUpdateProject
                 : false;
-        },
-        editable() {
-            if (this.projectRole) {
-                if (
-                    this.projectRole == "creator" ||
-                    this.projectRole == "owner" ||
-                    this.projectRole == "collaborator"
-                ) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
         },
     },
 };
