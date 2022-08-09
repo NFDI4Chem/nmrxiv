@@ -113,8 +113,31 @@
                                     v-if="status"
                                     class="mt-2 block text-sm font-medium text-gray-900"
                                 >
-                                    {{ status }}
+                                    {{ status }} -
+                                    <div v-if="uploadBatchErrors.length > 0">
+                                        <a
+                                            @click="
+                                                showErrorBatchLogs =
+                                                    !showErrorBatchLogs
+                                            "
+                                            class="text-red-700 cursor-pointer"
+                                            >View logs</a
+                                        >
+                                    </div>
                                 </span>
+                                <div
+                                    v-if="showErrorBatchLogs"
+                                    class="mt-2 block text-sm font-medium text-gray-900"
+                                >
+                                    <div
+                                        class="rounded-md"
+                                        v-for="(
+                                            error, $index
+                                        ) in uploadBatchErrors"
+                                        :key="$index"
+                                        v-html="error"
+                                    ></div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -406,6 +429,8 @@ export default {
             logs: {},
             logFilter: "Error",
             logFilters: ["Error", "Success", "Queued", "Inprogress"],
+            uploadBatchErrors: [],
+            showErrorBatchLogs: false,
             showLogsDialog: false,
         };
     },
@@ -481,9 +506,9 @@ export default {
             axiosRetry(client, {
                 retries: 3,
                 retryCondition: (error) => {
-                    console.log(
-                        "retring failed upload requests - Signed storage URL"
-                    );
+                    // console.log(
+                    //     "retring failed upload requests - Signed storage URL"
+                    // );
                     return error.response.status === 500;
                 },
             });
@@ -494,10 +519,38 @@ export default {
                     draft_id: vm.draft.id,
                 })
                 .catch((err) => {
-                    console.log(
-                        "Error retrieving signed storage URLS",
-                        err.response
-                    );
+                    this.processedBatches += 1;
+                    if (this.processedBatches == this.batches) {
+                        if (this.dropzone.files.length > 0) {
+                            this.status = "ERROR UPLOADING FILES";
+                            this.updateBusyStatus(false);
+                            this.dropzone.files.forEach((file) => {
+                                let message = "Upload failed";
+                                if (file.fullPath) {
+                                    vm.logs[file.fullPath].status = "Error";
+                                    vm.logs[file.fullPath].messages.push(
+                                        message +
+                                            " (API call failed with status code:" +
+                                            err.response.status +
+                                            ") "
+                                    );
+                                } else {
+                                    vm.logs[file.name].status = "Error";
+                                    vm.logs[file.name].messages.push(
+                                        message +
+                                            "(API call failed with status code:" +
+                                            err.response.status +
+                                            ")"
+                                    );
+                                }
+                            });
+                        }
+                    }
+                    this.uploadBatchErrors.push(err.response.data);
+                    // console.log(
+                    //     "Error retrieving signed storage URLS",
+                    //     err.response
+                    // );
                     // if (
                     //     err.response.status !== 200 ||
                     //     err.response.status !== 201
@@ -507,9 +560,10 @@ export default {
                     //     );
                     // }
                 })
-                .then(function (response) {
+                .then((response) => {
                     if (response) {
                         let data = response.data;
+                        this.processedBatches += 1;
                         data.forEach((u) => {
                             let cFile = vm.dropzone.files.find((f) => {
                                 if (f.fullPath) {
@@ -551,6 +605,8 @@ export default {
                 vm.uploadedFilesCount = 0;
                 vm.batchCount = 100;
                 vm.count = 0;
+                vm.batches = 0;
+                vm.processedBatches = 0;
 
                 vm.$page.props.selectedFileSystemObject = vm.file;
                 vm.$page.props.selectedFolder = "/";
@@ -598,13 +654,12 @@ export default {
                         (vm.uploadedFilesCount / vm.totalFilesCount) * 100;
                 });
                 vm.dropzone.on("error", (file) => {
-                    console.log(file);
                     let message = "Upload failed";
                     if (file.fullPath) {
-                        vm.logs[file.fullPath].status = "Failed";
+                        vm.logs[file.fullPath].status = "Error";
                         vm.logs[file.fullPath].messages.push(message);
                     } else {
-                        vm.logs[file.name].status = "Failed";
+                        vm.logs[file.name].status = "Error";
                         vm.logs[file.name].messages.push(message);
                     }
                 });
@@ -638,6 +693,7 @@ export default {
                                         i,
                                         i + vm.batchCount
                                     );
+                                    vm.batches += 1;
                                     vm.processFilesDZL(vm, filesBatch);
                                 }
                             } else {
