@@ -75,7 +75,7 @@ class ProjectController extends Controller
             'members' => $project->allUsers(),
             'availableRoles' => array_values(Jetstream::$roles),
             'studies' => $project->studies,
-            'projectRole' => $project->userProjectRole(Auth::user()->email),
+            'role' => $project->userProjectRole(Auth::user()->email),
             'projectPermissions' => [
                 'canDeleteProject' => Gate::check('deleteProject', $project),
                 'canUpdateProject' => Gate::check('updateProject', $project),

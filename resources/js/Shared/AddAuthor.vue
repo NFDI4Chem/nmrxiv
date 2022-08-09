@@ -338,7 +338,9 @@
                                     <button
                                         type="button"
                                         class="inline-flex items-center p-1 border border-transparent"
-                                        @click="deleteAuthor(author.id)"
+                                        @click="
+                                            confirmAuthorDeletion(author.id)
+                                        "
                                     >
                                         <TrashIcon
                                             class="w-5 h-5 mr-1 text-gray-600"
@@ -350,6 +352,32 @@
                     </table>
                 </div>
             </div>
+            <jet-dialog-modal
+                :show="confirmingAuthorDeletion"
+                @close="closeModal"
+            >
+                <template #title> Delete Author </template>
+
+                <template #content>
+                    Are you sure you want to delete this author?
+                    <div class="mt-4"></div>
+                </template>
+
+                <template #footer>
+                    <jet-secondary-button @click="closeModal">
+                        Cancel
+                    </jet-secondary-button>
+
+                    <jet-danger-button
+                        class="ml-2"
+                        :class="{ 'opacity-25': form.processing }"
+                        :disabled="form.processing"
+                        @click="deleteAuthor(authorId)"
+                    >
+                        Delete Author
+                    </jet-danger-button>
+                </template>
+            </jet-dialog-modal>
         </template>
 
         <template #footer>
@@ -370,10 +398,12 @@ import AuthorCheckbox from "@/Shared/AuthorCheckbox.vue";
 import { TrashIcon, PencilIcon } from "@heroicons/vue/solid";
 import JetInputError from "@/Jetstream/InputError.vue";
 import LoadingButton from "@/Shared/LoadingButton.vue";
+import JetDangerButton from "@/Jetstream/DangerButton.vue";
 export default {
     components: {
         JetDialogModal,
         JetSecondaryButton,
+        JetDangerButton,
         JetButton,
         AuthorCheckbox,
         PencilIcon,
@@ -384,6 +414,7 @@ export default {
 
     data() {
         return {
+            form: this.$inertia.form({}),
             addAuthorForm: this.$inertia.form({
                 _method: "POST",
                 selectedAuthorsList: [],
@@ -393,7 +424,7 @@ export default {
                 errors: {},
             }),
             importAuthorsForm: this.$inertia.form({
-                doi: "10.1021%2Facs.orglett.0c01297",
+                doi: "",
                 orcid: "",
                 errors: {},
             }),
@@ -403,11 +434,12 @@ export default {
             selectedAuthorsList: [],
             getDetailsbyDOIApi: null,
             loading: false,
+            confirmingAuthorDeletion: false,
+            authorId: null,
         };
     },
 
     props: ["project"],
-
     methods: {
         toggleAddAuthorDialog() {
             this.addAuthorDialog = !this.addAuthorDialog;
@@ -510,6 +542,7 @@ export default {
                     this.selectedAuthorsList.splice(i, 1);
                 }
             }
+            this.closeModal();
         },
         /*Update the database*/
         updateAuthor() {
@@ -583,11 +616,20 @@ export default {
                 this.manualAddAuthorForm.hasError = true;
             }
         },
+        /*Open confirm dialog box*/
+        confirmAuthorDeletion(id) {
+            this.authorId = id;
+            this.confirmingAuthorDeletion = true;
+        },
         /*Validating email*/
         validEmail(email) {
             var re =
                 /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
             return re.test(email);
+        },
+        closeModal() {
+            this.confirmingAuthorDeletion = false;
+            this.authorId = null;
         },
         /*Reset forms and local variables*/
         resetData() {
@@ -598,6 +640,7 @@ export default {
             this.importAuthorsForm.reset();
             this.selectedAuthorsList = [];
             this.loading = false;
+            this.authorId = null;
         },
     },
 };
