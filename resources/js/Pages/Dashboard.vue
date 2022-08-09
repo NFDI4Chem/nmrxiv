@@ -42,7 +42,7 @@
         <div v-if="projects.length > 0" class="px-12 py-8 mx-auto max-w-4xl">
             <team-projects
                 :team="team"
-                :editable="editable"
+                :teamRole="teamRole"
                 :mode="'create'"
                 :projects="projects"
             ></team-projects>
@@ -310,20 +310,6 @@ export default {
         return {
             openDatasetCreateDialog,
         };
-    },
-    computed: {
-        editable() {
-            if (this.teamRole && this.teamRole.name) {
-                if (
-                    this.teamRole.key == "owner" ||
-                    this.teamRole.key == "collaborator"
-                ) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        },
     },
     mounted() {
         if (this.filters.action == "submission") {
