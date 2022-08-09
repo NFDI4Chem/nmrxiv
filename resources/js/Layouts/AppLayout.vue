@@ -171,8 +171,14 @@
                         <div
                             v-for="item in filteredNavigation"
                             :key="item.name"
-                            :class="[item.auth ? 'pb-2 border-b' : '']"
+                            :class="[item.auth ? 'border-t' : '']"
                         >
+                            <div
+                                class="p-2 bg-gray-100 text-gray-500 text-sm border-b"
+                                v-if="item.prefix"
+                            >
+                                {{ item.prefix }}
+                            </div>
                             <Link
                                 :href="item.href"
                                 :class="[
@@ -689,9 +695,24 @@ const secondaryNavigation = [
 
 const navigation = [
     {
+        auth: false,
+        name: "Projects",
+        href: "/projects",
+        icon: FolderIcon,
+        bg: "bg-white",
+    },
+    {
+        auth: false,
+        name: "Datasets",
+        href: "/datasets",
+        icon: ViewGridIcon,
+        bg: "bg-white",
+    },
+    {
         auth: true,
         name: "Dashboard",
         href: "/dashboard",
+        prefix: "Your Work",
         icon: HomeIcon,
         bg: "bg-gray-50",
         children: [
@@ -718,26 +739,12 @@ const navigation = [
             },
             {
                 auth: false,
-                name: "Trashed",
+                name: "Trash",
                 href: "/dashboard/trashed",
                 icon: TrashIcon,
                 bg: "bg-white",
             },
         ],
-    },
-    {
-        auth: false,
-        name: "Projects",
-        href: "/projects",
-        icon: FolderIcon,
-        bg: "bg-white",
-    },
-    {
-        auth: false,
-        name: "Datasets",
-        href: "/datasets",
-        icon: ViewGridIcon,
-        bg: "bg-white",
     },
 ];
 
