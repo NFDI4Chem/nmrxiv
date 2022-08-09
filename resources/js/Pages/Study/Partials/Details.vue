@@ -65,7 +65,7 @@
                                                 <div>
                                                     <label
                                                         for="study-name"
-                                                        class="block text-sm font-medium text-gray-900"
+                                                        class="block text-sm font-medium text-gray-900 after:content-['*'] after:ml-0.5 after:text-red-500"
                                                     >
                                                         Study name
                                                     </label>
@@ -91,7 +91,7 @@
                                                 <div>
                                                     <label
                                                         for="description"
-                                                        class="block text-sm font-medium text-gray-900"
+                                                        class="block text-sm font-medium text-gray-900 after:content-['*'] after:ml-0.5 after:text-red-500"
                                                     >
                                                         Description
                                                     </label>
@@ -397,6 +397,12 @@
                                                         />
                                                     </div>
                                                 </div>
+                                                <jet-input-error
+                                                    :message="
+                                                        form.errors.license
+                                                    "
+                                                    class="mt-2"
+                                                />
                                             </div>
                                             <div class="pt-4 pb-6">
                                                 <div

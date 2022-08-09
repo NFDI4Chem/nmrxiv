@@ -2044,6 +2044,13 @@
                                                             project to public.
                                                         </p>
                                                     </div>
+                                                    <jet-input-error
+                                                        :message="
+                                                            updateProjectForm
+                                                                .errors.license
+                                                        "
+                                                        class="mt-2"
+                                                    />
                                                 </div>
                                             </section>
 
@@ -2480,6 +2487,7 @@ export default {
             return info;
         },
         updateProject() {
+            this.updateProjectForm.clearErrors();
             this.loadingStep = true;
             this.updateProjectForm.name = this.project.name;
             this.updateProjectForm.owner_id = this.project.owner_id;
