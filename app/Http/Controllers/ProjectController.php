@@ -35,7 +35,8 @@ class ProjectController extends Controller
         }
 
         return Inertia::render('Public/Project', [
-            'project' => (new ProjectResource($project))->lite(false, ['users', 'studies', 'license', 'files']),
+            'project' => (new ProjectResource($project))->lite(false, ['users', 'studies', 'license', 'files', 'authors']),
+
         ]);
     }
 
@@ -69,12 +70,12 @@ class ProjectController extends Controller
         $team = $project->nonPersonalTeam;
 
         return Inertia::render('Project/Show', [
-            'project' => $project->load('projectInvitations', 'tags'),
+            'project' => $project->load('projectInvitations', 'tags', 'authors'),
             'team' => $team ? $team->load('users', 'owner') : null,
             'members' => $project->allUsers(),
             'availableRoles' => array_values(Jetstream::$roles),
             'studies' => $project->studies,
-            'projectRole' => $project->userProjectRole(Auth::user()->email),
+            'role' => $project->userProjectRole(Auth::user()->email),
             'projectPermissions' => [
                 'canDeleteProject' => Gate::check('deleteProject', $project),
                 'canUpdateProject' => Gate::check('updateProject', $project),
