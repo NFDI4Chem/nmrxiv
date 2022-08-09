@@ -72,11 +72,11 @@ return [
         ],
 
         'rabbitmq' => [
-    
+
             'driver' => 'rabbitmq',
             'queue' => env('RABBITMQ_QUEUE', 'default'),
             'connection' => PhpAmqpLib\Connection\AMQPLazyConnection::class,
-        
+
             'hosts' => [
                 [
                     'host' => env('RABBITMQ_HOST', '127.0.0.1'),
@@ -86,7 +86,7 @@ return [
                     'vhost' => env('RABBITMQ_VHOST', '/'),
                 ],
             ],
-        
+
             'options' => [
                 'ssl_options' => [
                     'cafile' => env('RABBITMQ_SSL_CAFILE', null),
@@ -99,13 +99,13 @@ return [
                     'job' => VladimirYuldashev\LaravelQueueRabbitMQ\Queue\Jobs\RabbitMQJob::class,
                 ],
             ],
-        
+
             /*
              * Set to "horizon" if you wish to use Laravel Horizon.
              */
             'worker' => env('RABBITMQ_WORKER', 'default'),
-             
-         ],
+
+        ],
     ],
 
     /*
