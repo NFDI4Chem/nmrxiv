@@ -820,6 +820,7 @@ export default {
     props: ["study", "role"],
     mounted() {
         const emitter = inject("emitter");
+        emitter.all.clear()
         emitter.on("openStudyDetails", (data) => {
             this.open = true;
         });
