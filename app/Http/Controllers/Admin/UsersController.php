@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Laravel\Fortify\Contracts\UpdatesUserProfileInformation;
-use App\Actions\Fortify\PasswordValidationRules;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Auth\Events\Registered;
 use App\Actions\Fortify\CreateNewUser;
+use App\Actions\Fortify\PasswordValidationRules;
 use App\Http\Controllers\Controller;
+use App\Models\User;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Spatie\Permission\Models\Role;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
-use App\Models\User;
+use Laravel\Fortify\Contracts\UpdatesUserProfileInformation;
+use Spatie\Permission\Models\Role;
 
 class UsersController extends Controller
 {
@@ -26,7 +26,7 @@ class UsersController extends Controller
             'users' => User::orderBy('name')
                 ->filter($request->only('search', 'owner', 'role', 'trashed'))
                 ->get()
-                ->transform(function ($user) {  
+                ->transform(function ($user) {
                     return [
                         'id' => $user->id,
                         'first_name' => $user->first_name,
@@ -46,12 +46,12 @@ class UsersController extends Controller
 
     public function create()
     {
-        return Inertia::render('Console/Users/Create',[
+        return Inertia::render('Console/Users/Create', [
             'roles' => Role::orderBy('name')
                 ->get()
                 ->map
                 ->only('id', 'name'),
-            ]
+        ]
         );
     }
 
@@ -59,7 +59,8 @@ class UsersController extends Controller
     {
         $user = $creator->create($request->all());
         event(new Registered($user));
-        return redirect::route('users.edit', [$user]);
+
+        return redirect()->route('console.users')->with('success', 'User created successfully');
     }
 
     public function edit(User $user)
@@ -70,7 +71,7 @@ class UsersController extends Controller
                 'first_name' => $user->first_name,
                 'last_name' => $user->last_name,
                 'email' => $user->email,
-                'profile_photo_url' => $user->profile_photo_url
+                'profile_photo_url' => $user->profile_photo_url,
             ],
         ]);
     }
@@ -79,7 +80,7 @@ class UsersController extends Controller
     {
         $updater->update($user, $request->all());
 
-        return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('status', 'profile-information-updated');
+        return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('success', 'Profile updated succesfully');
     }
 
     public function updatePassword(User $user, Request $request)
@@ -92,7 +93,7 @@ class UsersController extends Controller
             'password' => Hash::make($request['password']),
         ])->save();
 
-        return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('status', 'profile-information-updated');
+        return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('success', 'Profile updated succesfully');
     }
 
     public function updateRole(User $user, Request $request)
@@ -100,20 +101,33 @@ class UsersController extends Controller
         Validator::make($request->all(), [
             'role' => 'required',
         ]);
-        
-        if (Auth::user()->id == $user->id ) {
+
+        if (Auth::user()->id == $user->id) {
             return $request->wantsJson() ? new JsonResponse('', 405) : back()->withErrors([
-                'error_message' => 'Updating currently logged in user role is not allowed.'
+                'error_message' => 'Updating currently logged in user role is not allowed.',
             ]);
         }
-        
+
         $role = $request->get('role');
-        
-        if($user && $role){
+
+        if ($user && $role) {
             $user->syncRoles([$role]);
         }
 
-        return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('status', 'profile-information-updated');
+        return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('success', 'Profile updated succesfully');
+    }
+
+    public function checkPassword(Request $request)
+    {
+        $user = $request->user();
+        $hasPassword = false;
+        if ($user->password) {
+            $hasPassword = true;
+        }
+
+        return response()->json([
+            'hasPassword' => $hasPassword,
+        ]);
     }
 
     public function destroyPhoto(User $user, Request $request)

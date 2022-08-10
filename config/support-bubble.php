@@ -30,10 +30,10 @@ return [
      * the views of this package.
      */
     'classes' => [
-        'container' => 'text-base items-end z-30 flex-col m-4 gap-3',
-        'bubble' => 'hidden sm:block | bg-purple-400 rounded-full shadow-lg w-14 h-14 text-white p-4',
+        'container' => 'text-base left-0 items-start z-30 flex-col m-4 gap-3',
+        'bubble' => 'hidden sm:block | bg-teal-500 rounded-full shadow-lg w-14 h-14 text-white p-4',
         'input' => 'bg-gray-100 border border-gray-200 w-full max-w-full p-2 rounded-sm shadow-input text-gray-800 text-base',
-        'button' => 'inline-flex place-center px-4 py-3 h-10 border-0 bg-purple-500 hover:bg-purple-600 active:bg-purple-600 overflow-hidden rounded-sm text-white leading-none no-underline',
+        'button' => 'inline-flex place-center px-4 py-3 h-10 border-0 bg-teal-500 hover:bg-teal-600 active:bg-teal-600 overflow-hidden rounded-sm text-white leading-none no-underline',
     ],
 
     /*
@@ -42,11 +42,11 @@ return [
      */
     'form_action_route' => 'supportBubble.submit',
 
-     /**
+    /**
      * The positioning of the bubble and the form, change this between `right-to-left` and `left-to-right`.
      * If you want to use RTL, you must have your layout set to RTL like this
      * <html lang="ar-TN" dir="rtl">
      * By default, the value of this is `left-to-right`.
      */
-    'direction' => 'left-to-right'
+    'direction' => 'left-to-right',
 ];

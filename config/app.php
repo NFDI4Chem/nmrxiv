@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Laravel'),
+    'name' => env('APP_NAME', 'Repository'),
 
     /*
     |--------------------------------------------------------------------------
@@ -173,12 +173,14 @@ return [
         App\Providers\AuthServiceProvider::class,
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
+        App\Providers\HorizonServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         App\Providers\FortifyServiceProvider::class,
         App\Providers\JetstreamServiceProvider::class,
 
         \SocialiteProviders\Manager\ServiceProvider::class,
         OwenIt\Auditing\AuditingServiceProvider::class,
+        App\Providers\MinioStorageServiceProvider::class,
     ],
 
     /*
@@ -235,4 +237,5 @@ return [
 
     ],
 
+    'github_license_url' => env('GITHUB_LICENSE_URL', 'https://api.github.com/licenses'),
 ];

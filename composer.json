@@ -2,34 +2,48 @@
     "name": "laravel/laravel",
     "type": "project",
     "description": "The Laravel Framework.",
-    "keywords": ["framework", "laravel"],
+    "keywords": [
+        "framework",
+        "laravel"
+    ],
     "license": "MIT",
     "require": {
-        "php": "^7.3|^8.0",
+        "php": "^7.3|^8.1",
+        "aws/aws-sdk-php": "^3.208",
         "doctrine/dbal": "^3.1",
         "fruitcake/laravel-cors": "^2.0",
-        "guzzlehttp/guzzle": "^7.0.1",
-        "inertiajs/inertia-laravel": "^0.4.3",
-        "laravel/framework": "^8.73.2",
+        "guzzlehttp/guzzle": "^7.4",
+        "http-interop/http-factory-guzzle": "^1.2",
+        "inertiajs/inertia-laravel": "^0.5.4",
+        "laravel/framework": "^9.22.1",
+        "laravel/horizon": "^5.9",
         "laravel/jetstream": "^2.3",
         "laravel/sanctum": "^2.6",
-        "laravel/socialite": "^5.2",
+        "laravel/scout": "^9.4",
         "laravel/tinker": "^2.5",
+        "league/flysystem-aws-s3-v3": "^3.0",
+        "league/flysystem-ziparchive": "^3.0",
+        "maennchen/zipstream-php": "^2.2",
+        "maize-tech/laravel-markable": "^1.0",
+        "meilisearch/meilisearch-php": "^0.23.2",
+        "nfdi4chem/orcid": "master",
         "owen-it/laravel-auditing": "^12.0",
         "predis/predis": "^1.1",
-        "socialiteproviders/orcid": "^5.0",
-        "spatie/laravel-cookie-consent": "^2.12",
+        "spatie/laravel-cookie-consent": "^3.2.1",
         "spatie/laravel-permission": "^5.1",
         "spatie/laravel-support-bubble": "^1.2",
-        "tightenco/ziggy": "^1.0"
+        "tightenco/ziggy": "^1.0",
+        "spatie/laravel-tags": "^4.3"
     },
     "require-dev": {
-        "facade/ignition": "^2.5",
         "fakerphp/faker": "^1.9.1",
-        "laravel/sail": "^1.0.1",
+        "laravel/pint": "^1.0",
+        "laravel/sail": "^1.15",
+        "laravel/telescope": "^4.9",
         "mockery/mockery": "^1.4.2",
-        "nunomaduro/collision": "^5.0",
-        "phpunit/phpunit": "^9.3.3"
+        "nunomaduro/collision": "^6.1",
+        "phpunit/phpunit": "^9.3.3",
+        "spatie/laravel-ignition": "^1.0"
     },
     "autoload": {
         "psr-4": {
@@ -49,7 +63,8 @@
             "@php artisan package:discover --ansi"
         ],
         "post-update-cmd": [
-            "@php artisan vendor:publish --tag=laravel-assets --ansi"
+            "@php artisan vendor:publish --tag=laravel-assets --ansi",
+            "@php artisan telescope:publish --ansi"
         ],
         "post-root-package-install": [
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
@@ -60,7 +75,9 @@
     },
     "extra": {
         "laravel": {
-            "dont-discover": []
+            "dont-discover": [
+                "laravel/telescope"
+            ]
         }
     },
     "config": {
@@ -69,5 +86,11 @@
         "sort-packages": true
     },
     "minimum-stability": "dev",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "repositories": [
+        {
+            "url": "https://github.com/NFDI4Chem/Orcid.git",
+            "type": "git"
+        }
+    ]
 }

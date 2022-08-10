@@ -2,7 +2,7 @@
 
 ## About nmrXiv
 
-New, highly visible, and consensus-driven NMR data repository and computational platform. The ultimate goal is to accelerate broader coordination and data sharing among natural product (NP) researchers by enabling storage, management, sharing and analysis of NMR data.
+New, Open & FAIR, and consensus-driven NMR data repository and computational platform. The ultimate goal is to accelerate broader coordination and data sharing among natural product (NP) researchers by enabling storage, management, sharing and analysis of NMR data.
 
 ## User Documentation
 
@@ -19,3 +19,5 @@ To raise request for any new feature or report any bug please add it to our [Git
 ## License
 
 Licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+![Alt](https://repobeats.axiom.co/api/embed/5c87933e128e7f9b2a73abba45104de51b4c7b4c.svg "Repobeats analytics image")
