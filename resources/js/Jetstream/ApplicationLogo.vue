@@ -1,6 +1,6 @@
 <template>
     <svg
-        width="231"
+        width="180"
         height="61"
         viewBox="0 0 231 61"
         fill="none"
@@ -23,4 +23,11 @@
             fill="black"
         />
     </svg>
+    <a
+        style="font-size: 0.7em"
+        target="_blank"
+        href="https://github.com/NFDI4Chem/nmrxiv/milestones"
+        class="float-left font-bold border-red-900 text-red-900 absolute top-0 left-0 mx-1 my-1 text-xs border px-1 rounded-md"
+        >Pre Beta</a
+    >
 </template>
