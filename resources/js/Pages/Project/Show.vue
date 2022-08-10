@@ -232,7 +232,7 @@
                         </div>
                         <div class="relative flex items-center justify-between">
                             <span
-                                class="pr-3 text-lg bg-gray-100 font-medium text-gray-500"
+                                class="px-3 rounded text-sm bg-gray-100 font-medium text-gray-500"
                             >
                                 Description
                             </span>
@@ -274,7 +274,7 @@
                         </div>
                         <div class="relative flex items-center justify-between">
                             <span
-                                class="pr-3 text-lg bg-gray-100 font-medium text-gray-500"
+                                class="px-3 rounded text-sm bg-gray-100 font-medium text-gray-500"
                             >
                                 Author
                             </span>
@@ -340,7 +340,7 @@
                         </div>
                         <div class="relative flex items-center justify-between">
                             <span
-                                class="pr-3 text-lg bg-gray-100 font-medium text-gray-500"
+                                class="px-3 rounded text-sm bg-gray-100 font-medium text-gray-500"
                             >
                                 Keywords
                             </span>

@@ -1,7 +1,7 @@
 <template>
     <div
         v-if="study"
-        class="flex flex-col rounded-lg shadow-lg transition ease-in-out delay-150 duration-300 overflow-hidden"
+        class="flex flex-col border rounded-lg shadow-lg transition ease-in-out delay-150 duration-300 overflow-hidden"
     >
         <div class="pt-5 px-5 bg-gray-200">
             <span

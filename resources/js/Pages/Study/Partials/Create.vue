@@ -371,9 +371,7 @@ export default {
     },
 
     mounted() {
-        const emitter = inject("emitter");
-
-        emitter.on("openStudyCreateDialog", () => {
+        this.emitter.on("openStudyCreateDialog", () => {
             this.createStudyDialog = true;
         });
         axios.get(route("licenses")).then((res) => {
