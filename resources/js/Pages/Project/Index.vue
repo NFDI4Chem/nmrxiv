@@ -85,7 +85,7 @@
             <div v-for="project in projects" :key="project.uuid" class="mt-8">
                 <a class="cursor-pointer" @click="getLink(project)">
                     <div
-                        class="flex justify-between items-center bg-white shadow-md rounded-lg px-6 py-6 hover:drop-shadow-xl cursor-pointer"
+                        class="flex justify-between items-center bg-white shadow-md border rounded-lg px-6 py-6 hover:drop-shadow-xl cursor-pointer"
                     >
                         <div class="flex-grow">
                             <div class="flex justify-between items-baseline">
@@ -96,10 +96,22 @@
                                         >
                                             {{ project.name }}
                                             <span
-                                                v-if="project.draft_id != null"
+                                                v-if="
+                                                    project.draft_id != null &&
+                                                    project.status == null
+                                                "
                                                 class="ml-4 inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800"
                                             >
                                                 Draft
+                                            </span>
+                                            <span
+                                                v-if="
+                                                    project.status != null &&
+                                                    project.status != 'complete'
+                                                "
+                                                class="ml-4 inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-blue-100 text-blue-800 capitalize"
+                                            >
+                                                {{ project.status }}
                                             </span>
                                         </span>
                                     </div>
@@ -237,7 +249,6 @@
 </template>
 <script>
 import { Link } from "@inertiajs/inertia-vue3";
-import { inject } from "vue";
 export default {
     components: {
         Link,
@@ -260,7 +271,8 @@ export default {
                     return this.$inertia.visit(
                         this.route("dashboard.projects", [project.id])
                     );
-                } else {
+                }
+                if (project.draft_id && project.status == null) {
                     this.openDatasetCreateDialog({
                         draft_id: project.draft_id,
                     });

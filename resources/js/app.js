@@ -33,8 +33,7 @@ createInertiaApp({
             .mixin({ methods: { route } })
             .mixin(helpers)
             .use(InstantSearch)
-            .use(Vue3Tour)
-            .provide("emitter", emitter);
+            .use(Vue3Tour);
         application.config.globalProperties.emitter = emitter;
         application.mount(el);
         return application;

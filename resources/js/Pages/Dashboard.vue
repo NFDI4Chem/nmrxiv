@@ -80,7 +80,7 @@
         <div class="px-12 py-8 mx-auto max-w-4xl">
             <ul
                 role="list"
-                class="mt-6 border-t border-b border-gray-200 divide-y divide-gray-200"
+                class="mt-6 border-b border-gray-200 divide-y divide-gray-200"
             >
                 <li>
                     <div class="relative group py-4 flex items-start space-x-3">
@@ -281,9 +281,9 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import TeamProjects from "@/Pages/Project/Index.vue";
 import Create from "@/Shared/CreateButton.vue";
 import Onboarding from "@/App/Onboarding.vue";
-import { inject, watchEffect } from "vue";
 import { useMagicKeys } from "@vueuse/core";
-
+import { getCurrentInstance } from "vue";
+import { watchEffect } from "vue";
 const { meta, u } = useMagicKeys();
 
 export default {
@@ -294,6 +294,27 @@ export default {
         Onboarding,
     },
     props: ["user", "team", "projects", "teamRole", "filters"],
+    setup() {
+        const app = getCurrentInstance();
+        const openDatasetCreateDialog = (data) => {
+            app.appContext.config.globalProperties.emitter.emit(
+                "openDatasetCreateDialog",
+                data
+            );
+        };
+        watchEffect(() => {
+            if (meta.value && u.value) {
+                openDatasetCreateDialog({
+                    draft_id: null,
+                });
+            }
+        });
+
+        return {
+            openDatasetCreateDialog,
+        };
+    },
+
     mounted() {
         if (this.filters.action == "submission") {
             this.emitter.emit("openDatasetCreateDialog", {
