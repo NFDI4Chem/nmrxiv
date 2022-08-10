@@ -302,7 +302,7 @@
                                         <div
                                             class="border-gray-200 px-4 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider flex-shrink-0 border-b border-blue-gray-200 flex items-center"
                                         >
-                                            STUDY
+                                            STUDY ({{ studies.length }})
                                         </div>
                                         <div
                                             style="
@@ -311,7 +311,9 @@
                                             "
                                         >
                                             <a
-                                                v-for="study in studies"
+                                                v-for="(
+                                                    study, $index
+                                                ) in studies"
                                                 :key="study.slug"
                                                 :class="[
                                                     selectedStudy.id == study.id
@@ -319,7 +321,9 @@
                                                         : 'hover:bg-gray-200 hover:bg-opacity-50',
                                                     'cursor-pointer flex p-4 border-b border-blue-gray-200',
                                                 ]"
-                                                @click="selectStudy(study)"
+                                                @click="
+                                                    selectStudy(study, $index)
+                                                "
                                             >
                                                 <svg
                                                     xmlns="http://www.w3.org/2000/svg"
@@ -486,11 +490,19 @@
                                                                     >
                                                                         <input
                                                                             v-model="
-                                                                                studyName
+                                                                                studyForm.name
                                                                             "
                                                                             type="text"
                                                                             name="study-name"
                                                                             class="block w-full shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm border-gray-300 rounded-md"
+                                                                        />
+                                                                        <jet-input-error
+                                                                            :message="
+                                                                                studyForm
+                                                                                    .errors
+                                                                                    .name
+                                                                            "
+                                                                            class="mt-2"
                                                                         />
                                                                     </div>
                                                                 </div>
@@ -510,12 +522,20 @@
                                                                         <textarea
                                                                             id="study-description"
                                                                             v-model="
-                                                                                studyDescription
+                                                                                studyForm.description
                                                                             "
                                                                             name="study-description"
                                                                             rows="3"
                                                                             class="block w-full shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm border border-gray-300 rounded-md"
                                                                         ></textarea>
+                                                                        <jet-input-error
+                                                                            :message="
+                                                                                studyForm
+                                                                                    .errors
+                                                                                    .description
+                                                                            "
+                                                                            class="mt-2"
+                                                                        />
                                                                     </div>
                                                                 </div>
                                                                 <div
@@ -530,7 +550,7 @@
                                                                     <div>
                                                                         <vue-tags-input
                                                                             v-model="
-                                                                                studyTag
+                                                                                studyForm.tag
                                                                             "
                                                                             placeholder="Type a keyword or keywords separated by comma (,) and press enter"
                                                                             :separators="[
@@ -539,15 +559,23 @@
                                                                             ]"
                                                                             max-width="100%"
                                                                             :tags="
-                                                                                studyTags
+                                                                                studyForm.tags
                                                                             "
                                                                             @tags-changed="
                                                                                 (
                                                                                     newTags
                                                                                 ) =>
-                                                                                    (studyTags =
+                                                                                    (studyForm.tags =
                                                                                         newTags)
                                                                             "
+                                                                        />
+                                                                        <jet-input-error
+                                                                            :message="
+                                                                                studyForm
+                                                                                    .errors
+                                                                                    .tags
+                                                                            "
+                                                                            class="mt-2"
                                                                         />
                                                                     </div>
                                                                 </div>
@@ -645,14 +673,12 @@
                                                                             loadSpectra()
                                                                         "
                                                                     ></iframe>
-                                                                    <img
-                                                                        id="image"
-                                                                    />
                                                                 </div>
                                                                 <div
                                                                     v-if="
+                                                                        currentMolecules &&
                                                                         currentMolecules.length >
-                                                                        0
+                                                                            0
                                                                     "
                                                                 >
                                                                     <ul
@@ -667,6 +693,9 @@
                                                                             class="relative"
                                                                         >
                                                                             <div
+                                                                                v-if="
+                                                                                    molecule.svg
+                                                                                "
                                                                                 class="group flex justify-center block w-full aspect-w-10 aspect-h-7 rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 focus-within:ring-teal-500 overflow-hidden"
                                                                             >
                                                                                 <div
@@ -675,6 +704,21 @@
                                                                                         molecule.svg
                                                                                     "
                                                                                 ></div>
+                                                                            </div>
+                                                                            <div
+                                                                                v-else
+                                                                            >
+                                                                                <div
+                                                                                    class="rounded-md border my-3 flex justify-center items-center"
+                                                                                >
+                                                                                    <span
+                                                                                        v-html="
+                                                                                            loadMol(
+                                                                                                molecule.molfile
+                                                                                            )
+                                                                                        "
+                                                                                    ></span>
+                                                                                </div>
                                                                             </div>
                                                                         </li>
                                                                     </ul>
@@ -746,6 +790,40 @@
                                                                                             }}
                                                                                         </td>
                                                                                     </tr>
+                                                                                    <tr>
+                                                                                        <td
+                                                                                            class="whitespace-nowrap py-2 pl-2 pr-3 text-sm font-medium text-gray-900 sm:pl-6 bg-gray-100 lg:pl-8"
+                                                                                            colspan="2"
+                                                                                        >
+                                                                                            Meta
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                    <tr
+                                                                                        v-for="key in Object.keys(
+                                                                                            selectedSpectraData.meta
+                                                                                        )"
+                                                                                        :key="
+                                                                                            key
+                                                                                        "
+                                                                                    >
+                                                                                        <td
+                                                                                            class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8"
+                                                                                        >
+                                                                                            {{
+                                                                                                key
+                                                                                            }}
+                                                                                        </td>
+                                                                                        <td
+                                                                                            class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"
+                                                                                        >
+                                                                                            {{
+                                                                                                selectedSpectraData
+                                                                                                    .meta[
+                                                                                                    key
+                                                                                                ]
+                                                                                            }}
+                                                                                        </td>
+                                                                                    </tr>
                                                                                 </tbody>
                                                                             </table>
                                                                         </div>
@@ -753,7 +831,7 @@
                                                                     <div
                                                                         class="p-1 pr-2"
                                                                     >
-                                                                        <div
+                                                                        <!-- <div
                                                                             class="px-4 py-5 sm:p-6"
                                                                         >
                                                                             <div>
@@ -793,55 +871,7 @@
                                                                                             below.
                                                                                         </p>
                                                                                     </div>
-                                                                                    <!-- <div class="mt-3">
-                                            <h2 class="text-sm font-medium text-gray-500">
-                                              Extraction Protocol Parameters
-                                            </h2>
-                                            <ul role="list" class="mt-2 leading-8">
-                                              <li class="inline">
-                                                <a
-                                                  href="#"
-                                                  class="relative inline-flex items-center rounded-full border border-gray-300 px-3 py-0.5"
-                                                >
-                                                  <div
-                                                    class="absolute flex-shrink-0 flex items-center justify-center"
-                                                  >
-                                                    <span
-                                                      class="h-1.5 w-1.5 rounded-full bg-rose-500"
-                                                      aria-hidden="true"
-                                                    ></span>
-                                                  </div>
-                                                  <div
-                                                    class="ml-3.5 text-sm font-medium text-gray-900"
-                                                  >
-                                                    Bug
-                                                  </div>
-                                                </a>
-                                                
-                                              </li>
-                                              <li class="inline">
-                                                <a
-                                                  href="#"
-                                                  class="relative inline-flex items-center rounded-full border border-gray-300 px-3 py-0.5"
-                                                >
-                                                  <div
-                                                    class="absolute flex-shrink-0 flex items-center justify-center"
-                                                  >
-                                                    <span
-                                                      class="h-1.5 w-1.5 rounded-full bg-teal-500"
-                                                      aria-hidden="true"
-                                                    ></span>
-                                                  </div>
-                                                  <div
-                                                    class="ml-3.5 text-sm font-medium text-gray-900"
-                                                  >
-                                                    Accessibility
-                                                  </div>
-                                                </a>
-                                                
-                                              </li>
-                                            </ul>
-                                          </div> -->
+                                                            
                                                                                 </div>
                                                                                 <div
                                                                                     class="mt-3"
@@ -882,55 +912,6 @@
                                                                                         below.
                                                                                     </p>
                                                                                 </div>
-                                                                                <!-- <div class="mt-3">
-                                          <h2 class="text-sm font-medium text-gray-500">
-                                            Extraction Protocol Parameters
-                                          </h2>
-                                          <ul role="list" class="mt-2 leading-8">
-                                            <li class="inline">
-                                              <a
-                                                href="#"
-                                                class="relative inline-flex items-center rounded-full border border-gray-300 px-3 py-0.5"
-                                              >
-                                                <div
-                                                  class="absolute flex-shrink-0 flex items-center justify-center"
-                                                >
-                                                  <span
-                                                    class="h-1.5 w-1.5 rounded-full bg-rose-500"
-                                                    aria-hidden="true"
-                                                  ></span>
-                                                </div>
-                                                <div
-                                                  class="ml-3.5 text-sm font-medium text-gray-900"
-                                                >
-                                                  Bug
-                                                </div>
-                                              </a>
-                                              
-                                            </li>
-                                            <li class="inline">
-                                              <a
-                                                href="#"
-                                                class="relative inline-flex items-center rounded-full border border-gray-300 px-3 py-0.5"
-                                              >
-                                                <div
-                                                  class="absolute flex-shrink-0 flex items-center justify-center"
-                                                >
-                                                  <span
-                                                    class="h-1.5 w-1.5 rounded-full bg-teal-500"
-                                                    aria-hidden="true"
-                                                  ></span>
-                                                </div>
-                                                <div
-                                                  class="ml-3.5 text-sm font-medium text-gray-900"
-                                                >
-                                                  Accessibility
-                                                </div>
-                                              </a>
-                                              
-                                            </li>
-                                          </ul>
-                                        </div> -->
                                                                             </div>
                                                                             <div
                                                                                 class="mt-3"
@@ -971,57 +952,9 @@
                                                                                         below.
                                                                                     </p>
                                                                                 </div>
-                                                                                <!-- <div class="mt-3">
-                                          <h2 class="text-sm font-medium text-gray-500">
-                                            Data transformation Protocol Parameters
-                                          </h2>
-                                          <ul role="list" class="mt-2 leading-8">
-                                            <li class="inline">
-                                              <a
-                                                href="#"
-                                                class="relative inline-flex items-center rounded-full border border-gray-300 px-3 py-0.5"
-                                              >
-                                                <div
-                                                  class="absolute flex-shrink-0 flex items-center justify-center"
-                                                >
-                                                  <span
-                                                    class="h-1.5 w-1.5 rounded-full bg-rose-500"
-                                                    aria-hidden="true"
-                                                  ></span>
-                                                </div>
-                                                <div
-                                                  class="ml-3.5 text-sm font-medium text-gray-900"
-                                                >
-                                                  Bug
-                                                </div>
-                                              </a>
-                                              
-                                            </li>
-                                            <li class="inline">
-                                              <a
-                                                href="#"
-                                                class="relative inline-flex items-center rounded-full border border-gray-300 px-3 py-0.5"
-                                              >
-                                                <div
-                                                  class="absolute flex-shrink-0 flex items-center justify-center"
-                                                >
-                                                  <span
-                                                    class="h-1.5 w-1.5 rounded-full bg-teal-500"
-                                                    aria-hidden="true"
-                                                  ></span>
-                                                </div>
-                                                <div
-                                                  class="ml-3.5 text-sm font-medium text-gray-900"
-                                                >
-                                                  Accessibility
-                                                </div>
-                                              </a>
-                                              
-                                            </li>
-                                          </ul>
-                                        </div> -->
+                                                                                
                                                                             </div>
-                                                                        </div>
+                                                                        </div> -->
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -1038,7 +971,7 @@
                                                             >
                                                                 Sample Details
                                                             </h1>
-                                                            <section
+                                                            <!-- <section
                                                                 aria-labelledby="activity-title"
                                                                 class="mt-2 xl:mt-2"
                                                             >
@@ -1082,7 +1015,7 @@
                                                                                 below.
                                                                             </p>
                                                                         </div>
-                                                                        <!-- <div class="mt-3">
+                                                                       <div class="mt-3">
                                         <h2 class="text-sm font-medium text-gray-500">
                                           Sample Collection Parameters
                                         </h2>
@@ -1128,10 +1061,10 @@
                                             </a>
                                           </li>
                                         </ul>
-                                      </div> -->
+                                      </div> 
                                                                     </div>
                                                                 </div>
-                                                            </section>
+                                                            </section> -->
                                                             <div
                                                                 class="py-4 max-w-7xl mx-auto"
                                                             >
@@ -2279,7 +2212,7 @@ import JetDialogModal from "@/Jetstream/DialogModal.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import JetButton from "@/Jetstream/Button.vue";
 import VueTagsInput from "@sipec/vue3-tags-input";
-import { inject, ref } from "vue";
+import { ref } from "vue";
 import slider from "vue3-slider";
 import OCL from "openchemlib/full";
 import Datepicker from "@vuepic/vue-datepicker";
@@ -2378,6 +2311,7 @@ export default {
             status: null,
 
             selectedStudy: null,
+            selectedStudyIndex: 0,
             studyName: "",
             studyDescription: "",
             studyTags: [],
@@ -2403,6 +2337,16 @@ export default {
                 team_id: null,
                 license_id: null,
                 releaseDate: this.setReleaseDate(),
+            }),
+
+            studyForm: this.$inertia.form({
+                _method: "POST",
+                name: "",
+                description: "",
+                error_message: null,
+                tags: [],
+                tag: "",
+                tags_array: [],
             }),
 
             licenses: [],
@@ -2475,9 +2419,19 @@ export default {
     },
     unmounted() {},
     methods: {
+        loadMol(molFile) {
+            let svgString = null;
+            let mol = OCL.Molecule.fromMolfile(molFile);
+            if (mol.toIsomericSmiles() != "") {
+                svgString = mol.toSVG(300, 300);
+            }
+            return svgString;
+        },
+
         updateLoadingStatus(status) {
             this.loadingStep = status;
         },
+
         hasNMRiumInfo(study) {
             let info = true;
             study.datasets.forEach((ds) => {
@@ -2487,6 +2441,7 @@ export default {
             });
             return info;
         },
+
         updateProject() {
             this.updateProjectForm.clearErrors();
             this.loadingStep = true;
@@ -2526,21 +2481,32 @@ export default {
 
         saveStudyDetails() {
             this.loadingStep = true;
+            this.studyForm.tags_array = this.studyForm.tags.map((a) => a.text);
+
             axios
                 .put(
                     "/dashboard/studies/" + this.selectedStudy.id + "/update",
-                    {
-                        name: this.studyName,
-                        description: this.studyDescription,
-                        tags_array: this.studyTags.map((a) => a.text),
-                    }
+                    this.studyForm
                 )
                 .catch((error) => {
                     this.loadingStep = false;
+                    Object.keys(error.response.data.errors).forEach((key) => {
+                        error.response.data.errors[key] =
+                            error.response.data.errors[key].join(", ");
+                    });
+                    this.studyForm.errors = error.response.data.errors;
+                    this.studyForm.error_message = error.response.data.message;
+                    this.studyForm.hasErrors = true;
                 })
                 .then((response) => {
-                    this.loadingStep = false;
-                    this.currentStudy = response;
+                    if (response) {
+                        this.loadingStep = false;
+                        this.selectStudy(
+                            response.data,
+                            this.selectedStudyIndex
+                        );
+                        this.studyForm.hasErrors = false;
+                    }
                 });
         },
 
@@ -2666,6 +2632,7 @@ export default {
                     let nmrium_info = JSON.parse(
                         this.selectedDataset.nmrium_info
                     );
+                    let spectra = JSON.parse(nmrium_info.spectra);
                     let mols = JSON.parse(nmrium_info.molecules);
                     if (mols) {
                         this.currentMolecules = mols;
@@ -2675,12 +2642,13 @@ export default {
                     });
                     let data = {
                         data: {
-                            spectra: [JSON.parse(nmrium_info.spectra)],
+                            spectra: [spectra],
                             molecules: mols,
                         },
                         type: "nmrium",
                     };
                     iframe.postMessage({ type: `nmr-wrapper:load`, data }, "*");
+                    this.selectedSpectraData = spectra;
                 }
             }
         },
@@ -2697,17 +2665,20 @@ export default {
             this.loadSpectra();
         },
 
-        selectStudy(study) {
+        selectStudy(study, index) {
+            this.selectedStudyIndex = index;
+            console.log(index);
+            this.studies[index] = study;
             this.selectedStudy = study;
-            this.studyName = this.selectedStudy.name;
-            this.studyDescription = this.selectedStudy.description;
+            this.studyForm.name = this.selectedStudy.name;
+            this.studyForm.description = this.selectedStudy.description;
             let tags = [];
             this.selectedStudy.tags.forEach((t) => {
                 tags.push({
                     text: t.name["en"],
                 });
             });
-            this.studyTags = tags;
+            this.studyForm.tags = tags;
             this.selectDataset(this.selectedStudy.datasets[0]);
         },
 
@@ -2744,7 +2715,7 @@ export default {
                                 this.studies &&
                                 this.studies.length > 0
                             ) {
-                                this.selectStudy(this.studies[0]);
+                                this.selectStudy(this.studies[0], 0);
                                 this.selectedDataset =
                                     this.selectedStudy.datasets[0];
                                 this.loadingStep = false;
@@ -2851,7 +2822,7 @@ export default {
 
                     if (this.selectedStudy && this.selectedDataset) {
                         if (this.selectedDataset.dataset_photo_url == "") {
-                            console.log("Saving spectra preview");
+                            console.info("Saving spectra preview");
                             const iframe = window.frames.submissionNMRiumIframe;
                             if (iframe) {
                                 let data = {
