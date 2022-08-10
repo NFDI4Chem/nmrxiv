@@ -712,7 +712,7 @@ const navigation = [
         auth: true,
         name: "Dashboard",
         href: "/dashboard",
-        prefix: "Your Work",
+        prefix: "Your Space",
         icon: HomeIcon,
         bg: "bg-gray-50",
         children: [
