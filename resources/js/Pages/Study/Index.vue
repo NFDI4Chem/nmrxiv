@@ -102,7 +102,6 @@ import { Link } from "@inertiajs/inertia-vue3";
 import StudyCreate from "@/Pages/Study/Partials/Create.vue";
 import StudyCard from "@/Shared/StudyCard.vue";
 import JetButton from "@/Jetstream/Button.vue";
-import { inject } from "vue";
 export default {
     components: {
         Link,

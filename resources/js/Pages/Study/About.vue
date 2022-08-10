@@ -519,7 +519,6 @@
 <script>
 import { PlusSmIcon } from "@heroicons/vue/solid";
 import StudyContent from "@/Pages/Study/Content.vue";
-import { inject } from "vue";
 import slider from "vue3-slider";
 import OCL from "openchemlib/full";
 import LoadingButton from "@/Shared/LoadingButton.vue";
