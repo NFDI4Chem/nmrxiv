@@ -20,6 +20,12 @@
                     >
                         {{ formatDateTime(file.created_at) }}
                     </dd>
+                    <dt class="text-sm font-medium text-gray-500">File size</dt>
+                    <dd
+                        class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"
+                    >
+                        {{ bytesToSize(JSON.parse(file.info).size) }}
+                    </dd>
                 </div>
                 <div></div>
                 <div
