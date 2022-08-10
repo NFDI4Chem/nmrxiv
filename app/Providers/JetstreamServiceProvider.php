@@ -60,18 +60,24 @@ class JetstreamServiceProvider extends ServiceProvider
             'study:read',
             'study:update',
             'study:delete',
-        ])->description('Can read and/or update including delete the project.');
-        
+            'dataset:read',
+            'dataset:update',
+            'dataset:delete',
+        ])->description('Can read and/or update including delete the project, study and dataset.');
+
         Jetstream::role('collaborator', 'Collaborator', [
             'project:read',
             'project:update',
             'study:read',
             'study:update',
-        ])->description('Can read and/or update project information.');
+            'dataset:read',
+            'dataset:update',
+        ])->description('Can read and/or update project, study and dataset information.');
 
         Jetstream::role('reviewer', 'Reviewer', [
             'project:read',
             'study:read',
-        ])->description('Can only read project information.');
+            'dataset:read',
+        ])->description('Can only read project, study and dataset information.');
     }
 }

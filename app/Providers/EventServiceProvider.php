@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Events\DraftProcessed;
+use App\Listeners\SendDraftProcessedNotification;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -18,9 +20,12 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],
+        DraftProcessed::class => [
+            SendDraftProcessedNotification::class,
+        ],
         \SocialiteProviders\Manager\SocialiteWasCalled::class => [
             // add your listeners (aka providers) here
-            'SocialiteProviders\\Orcid\\OrcidExtendSocialite@handle',
+            \SocialiteProviders\Orcid\OrcidExtendSocialite::class.'@handle',
         ],
     ];
 

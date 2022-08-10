@@ -1,9 +1,17 @@
 <template>
     <app-layout title="Create Team">
         <template #header>
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Create Team
-            </h2>
+            <div class="bg-white border-b">
+                <div class="px-12">
+                    <div class="flex flex-nowrap justify-between py-6">
+                        <h2
+                            class="font-semibold text-xl text-gray-800 leading-tight"
+                        >
+                            Create Team
+                        </h2>
+                    </div>
+                </div>
+            </div>
         </template>
 
         <div>
@@ -15,13 +23,13 @@
 </template>
 
 <script>
-    import AppLayout from '@/Layouts/AppLayout.vue'
-    import CreateTeamForm from '@/Pages/Teams/Partials/CreateTeamForm.vue'
+import AppLayout from "@/Layouts/AppLayout.vue";
+import CreateTeamForm from "@/Pages/Teams/Partials/CreateTeamForm.vue";
 
-    export default {
-        components: {
-            AppLayout,
-            CreateTeamForm,
-        },
-    }
+export default {
+    components: {
+        AppLayout,
+        CreateTeamForm,
+    },
+};
 </script>

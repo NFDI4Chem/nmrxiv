@@ -37,6 +37,8 @@ class InviteTeamMember implements InvitesTeamMembers
         ]);
 
         Mail::to($email)->send(new TeamInvitation($invitation));
+
+        return redirect()->route('dashboard')->with('success', 'Invitation sent successfully');
     }
 
     /**
