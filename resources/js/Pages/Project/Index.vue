@@ -8,7 +8,7 @@
                 <!-- </div> -->
             </div>
             <div class="flex-shrink-0 ml-4">
-                <button
+                <!-- <button
                     v-if="mode == 'create' && editableTeamRole"
                     id="v-step-1"
                     type="button"
@@ -16,7 +16,7 @@
                     @click="openProjectCreateDialog"
                 >
                     New Project
-                </button>
+                </button> -->
             </div>
         </div>
         <span v-if="projects.length <= 0">
@@ -49,7 +49,7 @@
                         receives its very own URL. To learn more, check out our
                         documentation.
                     </div>
-                    <button
+                    <!-- <button
                         type="button"
                         class="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 mt-6 focus:ring-offset-2 focus:ring-indigo-500"
                         @click="openProjectCreateDialog()"
@@ -74,7 +74,7 @@
                         >
                             Create a new project
                         </span>
-                    </button>
+                    </button> -->
                 </div>
             </div>
             <div v-else>
