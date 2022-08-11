@@ -2102,7 +2102,12 @@
         </template>
         <template #footer>
             <span v-if="!currentStep">
-                <Link :href="route('dashboard')"> Cancel </Link>
+                <Link
+                    class="inline-flex items-center px-2.5 py-1 border border-gray-300 shadow-sm text-md font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                    :href="route('dashboard')"
+                >
+                    Cancel
+                </Link>
             </span>
             <span v-else>
                 <span v-if="currentStep.id == '01'">
@@ -2115,7 +2120,12 @@
                     >
                         Drafts
                     </jet-secondary-button>
-                    <Link :href="route('dashboard')"> Cancel </Link>
+                    <Link
+                        class="inline-flex items-center px-2.5 py-1 border border-gray-300 shadow-sm text-md font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                        :href="route('dashboard')"
+                    >
+                        Cancel
+                    </Link>
                     <jet-button
                         class="ml-2"
                         :class="{ 'opacity-25': createDatasetForm.processing }"
@@ -2160,11 +2170,12 @@
                     >
                         Back
                     </jet-button>
-                    <jet-secondary-button
-                        @click="toggleOpenCreateDatasetDialog"
+                    <Link
+                        :href="route('dashboard')"
+                        class="inline-flex items-center px-2.5 py-1 border border-gray-300 shadow-sm text-md font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                     >
                         Cancel
-                    </jet-secondary-button>
+                    </Link>
                     <jet-button
                         class="ml-2"
                         :class="{ 'opacity-25': createDatasetForm.processing }"

@@ -10,7 +10,7 @@
           </div> -->
                 </div>
             </div>
-            <div class="flex-shrink-0 ml-4">
+            <!-- <div class="flex-shrink-0 ml-4">
                 <button
                     v-if="editable"
                     type="button"
@@ -19,7 +19,7 @@
                 >
                     New Study
                 </button>
-            </div>
+            </div> -->
         </div>
         <div v-if="studies.length <= 0 && editable">
             <div class="mt-4 px-12 py-8 mx-auto max-w-4xl">
@@ -93,7 +93,7 @@
                 <study-card :study="study" />
             </div>
         </div>
-        <study-create :project="project"></study-create>
+        <!-- <study-create :project="project"></study-create> -->
     </div>
 </template>
 
