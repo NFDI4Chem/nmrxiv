@@ -109,7 +109,7 @@ class DownloadController extends Controller
                         foreach ($s3keys as $key) {
                             $s3path = 's3://'.$bucket.'/'.$key;
                             if ($streamRead = fopen($s3path, 'r')) {
-                                $zip->addFileFromStream($fsObj->key.'/'.explode('/'.$fsObj->key.'/', $key)[1], $streamRead);
+                                $zip->addFileFromStream($fsObj->key.'/'.explode($fsObj->relative_url, $key)[1], $streamRead);
                             } else {
                                 exit('Could not open stream for reading');
                             }

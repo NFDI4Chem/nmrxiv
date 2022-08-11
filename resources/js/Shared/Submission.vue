@@ -2678,7 +2678,6 @@ export default {
 
         selectStudy(study, index) {
             this.selectedStudyIndex = index;
-            console.log(index);
             this.studies[index] = study;
             this.selectedStudy = study;
             this.studyForm.name = this.selectedStudy.name;
@@ -2833,7 +2832,7 @@ export default {
 
                     if (this.selectedStudy && this.selectedDataset) {
                         if (this.selectedDataset.dataset_photo_url == "") {
-                            console.info("Saving spectra preview");
+                            // console.info("Saving spectra preview");
                             const iframe = window.frames.submissionNMRiumIframe;
                             if (iframe) {
                                 let data = {
@@ -2866,24 +2865,26 @@ export default {
         },
 
         saveStudyPreview(data) {
-            const reader = new FileReader();
-            reader.addEventListener("loadend", () => {
-                let svg = reader.result;
-                axios.post(
-                    "/dashboard/datasets/" +
-                        this.selectedDataset.id +
-                        "/preview",
-                    {
-                        img: svg,
-                    }
-                );
-            });
-            reader.readAsText(data.blob);
+            if (this.selectedDataset) {
+                const reader = new FileReader();
+                reader.addEventListener("loadend", () => {
+                    let svg = reader.result;
+                    axios.post(
+                        "/dashboard/datasets/" +
+                            this.selectedDataset.id +
+                            "/preview",
+                        {
+                            img: svg,
+                        }
+                    );
+                });
+                reader.readAsText(data.blob);
+            }
         },
 
         updateDataSet() {
             if (this.selectedSpectraData != null) {
-                this.autoSaving = true;
+                this.updateLoadingStatus(true);
                 axios
                     .post(
                         "/dashboard/datasets/" +
@@ -2894,7 +2895,12 @@ export default {
                             molecules: this.currentMolecules,
                         }
                     )
+                    .catch((err) => {
+                        this.updateLoadingStatus(false);
+                        this.autoSaving = false;
+                    })
                     .then((response) => {
+                        this.updateLoadingStatus(false);
                         this.autoSaving = false;
                         this.selectedDataset.nmrium_info =
                             response.data.nmrium_info;
