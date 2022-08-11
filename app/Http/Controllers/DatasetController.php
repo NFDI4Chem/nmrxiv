@@ -40,7 +40,10 @@ class DatasetController extends Controller
                 $nmriumData['molecules'] = $molecularInfo;
             }
             $dataset->nmrium_info = $nmriumData;
-            $dataset->type = $spectra['info']['nucleus'];
+            foreach ($spectra as $spectrum) {
+                $dataset->type = $spectrum['info']['nucleus'].', '.$dataset->type;
+            }
+
             $dataset->save();
 
             return $dataset->fresh();

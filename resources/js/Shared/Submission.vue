@@ -300,6 +300,7 @@
                                         class="hidden flex-shrink-0 w-64 bg-white border-r border-blue-gray-200 md:flex md:flex-col"
                                     >
                                         <div
+                                            @click="autoImport()"
                                             class="border-gray-200 px-4 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider flex-shrink-0 border-b border-blue-gray-200 flex items-center"
                                         >
                                             STUDY ({{ studies.length }})
@@ -741,6 +742,10 @@
                                                                             class="overflow-hidden ring-1 mt-3 ring-black ring-opacity-5 md:rounded-lg"
                                                                         >
                                                                             <table
+                                                                                v-for="spectra in selectedSpectraData"
+                                                                                :key="
+                                                                                    spectra.id
+                                                                                "
                                                                                 class="min-w-full border divide-y divide-gray-300"
                                                                             >
                                                                                 <thead
@@ -766,7 +771,7 @@
                                                                                 >
                                                                                     <tr
                                                                                         v-for="key in Object.keys(
-                                                                                            selectedSpectraData.info
+                                                                                            spectra.info
                                                                                         )"
                                                                                         :key="
                                                                                             key
@@ -783,7 +788,7 @@
                                                                                             class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"
                                                                                         >
                                                                                             {{
-                                                                                                selectedSpectraData
+                                                                                                spectra
                                                                                                     .info[
                                                                                                     key
                                                                                                 ]
@@ -800,7 +805,7 @@
                                                                                     </tr>
                                                                                     <tr
                                                                                         v-for="key in Object.keys(
-                                                                                            selectedSpectraData.meta
+                                                                                            spectra.meta
                                                                                         )"
                                                                                         :key="
                                                                                             key
@@ -817,7 +822,7 @@
                                                                                             class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"
                                                                                         >
                                                                                             {{
-                                                                                                selectedSpectraData
+                                                                                                spectra
                                                                                                     .meta[
                                                                                                     key
                                                                                                 ]
@@ -2329,6 +2334,7 @@ export default {
             studyTag: "",
 
             selectedDataset: null,
+            selectedDSIndex: 0,
             selectedSpectraData: null,
             autoSaving: false,
             currentMolecules: [],
@@ -2364,6 +2370,8 @@ export default {
 
             project: null,
             initialised: false,
+
+            autoimportList: [],
         };
     },
     computed: {
@@ -2653,7 +2661,7 @@ export default {
                     });
                     let data = {
                         data: {
-                            spectra: [spectra],
+                            spectra: spectra,
                             molecules: mols,
                         },
                         type: "nmrium",
@@ -2676,7 +2684,7 @@ export default {
             this.loadSpectra();
         },
 
-        selectStudy(study, index) {
+        selectStudy(study, index, dsindex) {
             this.selectedStudyIndex = index;
             this.studies[index] = study;
             this.selectedStudy = study;
@@ -2689,7 +2697,15 @@ export default {
                 });
             });
             this.studyForm.tags = tags;
-            this.selectDataset(this.selectedStudy.datasets[0]);
+            if (dsindex) {
+                this.selectedDSIndex = dsindex;
+                this.selectDataset(
+                    this.selectedStudy.datasets[this.selectedDSIndex]
+                );
+            } else {
+                this.selectedDSIndex = 0;
+                this.selectDataset(this.selectedStudy.datasets[0]);
+            }
         },
 
         createNewDraft() {
@@ -2812,16 +2828,16 @@ export default {
                 if (e.data.type == "nmr-wrapper:data-change") {
                     let actionType = e.data.data.actionType;
 
-                    if (
-                        actionType == "" ||
-                        (actionType == "INITIATE" &&
-                            this.selectedDataset &&
-                            this.selectedDataset.type != null)
-                    ) {
-                        return;
-                    }
+                    // if (
+                    //     actionType == "" ||
+                    //     (actionType == "INITIATE" &&
+                    //         this.selectedDataset &&
+                    //         this.selectedDataset.type != null)
+                    // ) {
+                    //     return;
+                    // }
 
-                    this.selectedSpectraData = e.data.data.spectra[0];
+                    this.selectedSpectraData = e.data.data.spectra;
                     if (
                         actionType == "ADD_MOLECULE" ||
                         actionType == "DELETE_MOLECULE" ||
@@ -2904,8 +2920,43 @@ export default {
                         this.autoSaving = false;
                         this.selectedDataset.nmrium_info =
                             response.data.nmrium_info;
+
+                        if (
+                            this.$page.props.autoimport &&
+                            this.$page.props.autoimport == true
+                        ) {
+                            if (
+                                this.selectedDSIndex + 1 <
+                                this.studies[this.selectedStudyIndex].datasets
+                                    .length
+                            ) {
+                                this.selectStudy(
+                                    this.studies[this.selectedStudyIndex],
+                                    this.selectedStudyIndex,
+                                    this.selectedDSIndex + 1
+                                );
+                            } else {
+                                if (
+                                    this.selectedStudyIndex + 1 <=
+                                    this.studies.length - 1
+                                ) {
+                                    this.selectStudy(
+                                        this.studies[
+                                            this.selectedStudyIndex + 1
+                                        ],
+                                        this.selectedStudyIndex + 1
+                                    );
+                                }
+                            }
+                        }
                     });
             }
+        },
+
+        autoImport() {
+            this.$page.props.autoimport = true;
+            console.log("autoimporting");
+            this.selectStudy(this.studies[0], 0);
         },
 
         fetchDrafts() {
