@@ -754,6 +754,23 @@
                                                                                     <tr>
                                                                                         <th
                                                                                             scope="col"
+                                                                                            colspan="2"
+                                                                                            class="py-3.5 pl-4 pr-3 text-left text-sm font-bold text-blue-900 sm:pl-6 lg:pl-8"
+                                                                                        >
+                                                                                            Spectra
+                                                                                            ::
+                                                                                            {{
+                                                                                                spectra.id
+                                                                                            }}
+                                                                                        </th>
+                                                                                    </tr>
+                                                                                </thead>
+                                                                                <thead
+                                                                                    class="bg-gray-50"
+                                                                                >
+                                                                                    <tr>
+                                                                                        <th
+                                                                                            scope="col"
                                                                                             class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 lg:pl-8"
                                                                                         >
                                                                                             Field
@@ -1159,8 +1176,9 @@
                                                                     molecules
                                                                     that you
                                                                     expect to be
-                                                                    present in your
-                                                                    sample with-out the
+                                                                    present in
+                                                                    your sample
+                                                                    with-out the
                                                                     composition.
                                                                 </p>
                                                             </div>
@@ -2945,6 +2963,8 @@ export default {
                                         ],
                                         this.selectedStudyIndex + 1
                                     );
+                                } else {
+                                    this.$page.props.autoimport = false;
                                 }
                             }
                         }
