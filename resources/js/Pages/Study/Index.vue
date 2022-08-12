@@ -84,10 +84,7 @@
             v-else
             class="mt-8 mx-auto max-w-md grid gap-8 sm:max-w-lg lg:grid-cols-3 lg:max-w-7xl"
         >
-            <div
-                v-for="study in studies"
-                :key="study.uuid"
-            >
+            <div v-for="study in studies" :key="study.uuid">
                 <study-card :study="study" />
             </div>
         </div>
