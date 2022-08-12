@@ -123,7 +123,8 @@
                                     class="overflow-hidden ring-1 mt-3 ring-black ring-opacity-5 md:rounded-lg"
                                 >
                                     <table
-                                        v-for="spectra in selectedSpectraData" :key="spectra.id"
+                                        v-for="spectra in selectedSpectraData"
+                                        :key="spectra.id"
                                         class="min-w-full border divide-y divide-gray-300"
                                     >
                                         <thead class="bg-gray-50">
@@ -133,7 +134,8 @@
                                                     colspan="2"
                                                     class="py-3.5 pl-4 pr-3 text-left text-sm border-b font-semibold text-gray-900 sm:pl-6 lg:pl-8"
                                                 >
-                                                    Spectra Id :: {{ spectra.id }}
+                                                    Spectra Id ::
+                                                    {{ spectra.id }}
                                                 </th>
                                             </tr>
                                             <tr>
@@ -168,10 +170,7 @@
                                                 <td
                                                     class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"
                                                 >
-                                                    {{
-                                                        spectra
-                                                            .info[key]
-                                                    }}
+                                                    {{ spectra.info[key] }}
                                                 </td>
                                             </tr>
                                         </tbody>

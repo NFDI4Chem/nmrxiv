@@ -32,7 +32,7 @@ class ProjectResource extends JsonResource
             'name' => $this->name,
             'slug' => $this->slug,
             'description' => $this->description,
-            'team' => $this->when(($this->team && !$this->team->personal_team), $this->team),
+            'team' => $this->when(($this->team && ! $this->team->personal_team), $this->team),
             'owner' => new UserResource($this->owner),
             'photo_url' => $this->project_photo_url,
             'tags' => $this->tags,
