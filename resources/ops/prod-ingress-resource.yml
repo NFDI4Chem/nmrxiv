@@ -4,16 +4,24 @@ metadata:
   name: ingress-resource-prod
   annotations:
     kubernetes.io/ingress.class: "nginx"
-    #kubernetes.io/ingress.global-static-ip-name: nmrxiv-dev-ip-address
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: 200M
+    nginx.ingress.kubernetes.io/client-body-buffer-size: 200M
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: 600s
+    nginx.ingress.kubernetes.io/proxy-read-timeout: 600s
     cert-manager.io/issuer: "letsencrypt-prod"
 
 spec:
   tls:
   - hosts:
       - nmrxiv.org
-    # This secret must exist beforehand
     secretName: nmrxiv-app-prod-tls
+  - hosts:
+      - nmrium.nmrxiv.org
+    secretName: nmrxiv-prod-nmrium-tls
+  - hosts:
+      - ms.nmrxiv.org
+    secretName: nmrxiv-prod-ms-tls
   rules:
   - host: nmrxiv.org
     http:
@@ -25,3 +33,23 @@ spec:
             name: nmrxiv-nmrxiv-app
             port:
               number: 80
+  - host: nmrium.nmrxiv.org
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: nmrxiv-nmrium
+            port:
+              number: 80
+  - host: ms.nmrxiv.org
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: nmrxiv-meilisearch
+            port:
+              number: 7700
