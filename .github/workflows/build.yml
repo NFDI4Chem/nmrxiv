@@ -9,6 +9,7 @@ env:
   GKE_CLUSTER: nmrxiv-prod
   GKE_ZONE: europe-west3-a
   DEPLOYMENT_NAME: nmrxiv-nmrxiv-app
+  WORKER_DEPLOYMENT_NAME: nmrxiv-worker
   REPOSITORY_NAME: nmrxiv-prod
   APP_IMAGE: nmrxiv-app
   NGINX_IMAGE: nmrxiv-nginx
@@ -56,11 +57,11 @@ jobs:
           --build-arg GITHUB_REF="$GITHUB_REF" \
           .
     # Push the Docker image to Google Container Registry
-    - name: Push App Image to GCR
+    - name: Publish App Image to GCR
       run: |-
         docker push "europe-west3-docker.pkg.dev/$PROJECT_ID/$REPOSITORY_NAME/$APP_IMAGE:latest"
 
-    - name: Push Nginx Image to GCR
+    - name: Publish Nginx Image to GCR
       run: |-
         docker push "europe-west3-docker.pkg.dev/$PROJECT_ID/$REPOSITORY_NAME/$NGINX_IMAGE:latest"
 
@@ -74,4 +75,5 @@ jobs:
       run: |-
         kubectl rollout restart deployment/$DEPLOYMENT_NAME
         kubectl rollout status deployment/$DEPLOYMENT_NAME --timeout=300s
+        kubectl rollout restart deployment/$WORKER_DEPLOYMENT_NAME
         kubectl get services -o wide
