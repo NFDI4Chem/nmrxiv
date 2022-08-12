@@ -29,7 +29,10 @@
             <div
                 class="mt-12 mx-auto max-w-md grid gap-8 sm:max-w-lg lg:grid-cols-4 lg:max-w-7xl"
             >
-                <span v-for="project in projects.data" :key="project.id">
+                <span
+                    v-for="project in projects.data.filter((p) => p.owner)"
+                    :key="project.id"
+                >
                     <project-card :project="project"></project-card>
                 </span>
             </div>
