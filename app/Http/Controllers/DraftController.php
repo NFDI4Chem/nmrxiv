@@ -378,14 +378,19 @@ class DraftController extends Controller
                 if ($this->isBruker($folder)) {
                     $this->saveInstrumentType($folder, 'bruker');
                     $this->saveModelType($folder->parent);
-                } elseif ($this->isJOEL($folder)) {
-                    $this->saveInstrumentType($folder, 'joel');
-                    $this->saveModelType($folder->parent);
                 } elseif ($this->isVarian($folder)) {
                     $this->saveInstrumentType($folder, 'varian');
                     $this->saveModelType($folder->parent);
                 } else {
                     $this->processFolder($folder->children);
+                }
+            } else {
+                if ($this->isJOEL($folder)) {
+                    $this->saveInstrumentType($folder, 'joel');
+                    $this->saveModelType($folder->parent);
+                } elseif ($this->isJcampDX($folder)) {
+                    $this->saveInstrumentType($folder, 'jcamp');
+                    $this->saveModelType($folder->parent);
                 }
             }
         }
@@ -429,11 +434,37 @@ class DraftController extends Controller
         return false;
     }
 
+    public function isJcampDX($folder)
+    {
+        $fileTypes = ['jdx'];
+        // $children = $folder->children;
+        // $names = $children->pluck('name')->toArray();
+        $names = [$folder->name];
+        $extensions = array_map(fn ($s) => substr("$s", (strrpos($s, '.') + 1)), $names);
+        $isJDX = false;
+        if (array_intersect($fileTypes, $extensions) == $fileTypes) {
+            $isJDX = true;
+        }
+
+        $fileTypes = ['dx'];
+        $isDX = false;
+        if (array_intersect($fileTypes, $extensions) == $fileTypes) {
+            $isDX = true;
+        }
+
+        if ($isJDX || $isDX) {
+            return true;
+        }
+
+        return false;
+    }
+
     public function isJOEL($folder)
     {
         $fileTypes = ['jdf'];
-        $children = $folder->children;
-        $names = $children->pluck('name')->toArray();
+        // $children = $folder->children;
+        // $names = $children->pluck('name')->toArray();
+        $names = [$folder->name];
         $extensions = array_map(fn ($s) => substr("$s", (strrpos($s, '.') + 1)), $names);
         if (array_intersect($fileTypes, $extensions) == $fileTypes) {
             return true;
