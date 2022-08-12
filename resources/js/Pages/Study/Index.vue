@@ -85,9 +85,7 @@
             class="mt-8 mx-auto max-w-md grid gap-8 sm:max-w-lg lg:grid-cols-3 lg:max-w-7xl"
         >
             <div
-                v-for="study in studies.sort((a, b) =>
-                    a.name > b.name ? 1 : -1
-                )"
+                v-for="study in studies"
                 :key="study.uuid"
             >
                 <study-card :study="study" />
@@ -109,7 +107,7 @@ export default {
         StudyCard,
         JetButton,
     },
-    props: ["studies", "project", "editable"],
+    props: ["studies", "project"],
     data() {
         return {};
     },
