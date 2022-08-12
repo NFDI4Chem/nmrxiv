@@ -1159,9 +1159,8 @@
                                                                     molecules
                                                                     that you
                                                                     expect to be
-                                                                    present the
-                                                                    sample with
-                                                                    our the
+                                                                    present in your
+                                                                    sample with-out the
                                                                     composition.
                                                                 </p>
                                                             </div>
