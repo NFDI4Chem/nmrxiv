@@ -2234,7 +2234,40 @@
                     </jet-button>
                 </span>
                 <span v-else-if="currentStep.id == '03'">
-                    <jet-button @click="UpdateAndClose"> Finish </jet-button>
+                    <div v-if="this.updateProjectForm.is_public == 'true'">
+                        <div class="flex-shrink-0 flex justify-left">
+                            <div class="flex items-center h-5">
+                                <input
+                                    v-model="this.confirmPublicAccess"
+                                    id="confirm"
+                                    aria-describedby="confirm-description"
+                                    name="confirm"
+                                    type="checkbox"
+                                    class="focus:ring-teal-500 h-4 w-4 text-teal-600 border-gray-300 rounded"
+                                />
+                            </div>
+                            <div class="ml-3 text-sm">
+                                <label
+                                    for="confirm"
+                                    class="font-small text-red-700"
+                                    >I understand, if the project is made public
+                                    then all the underlying studies and dataset
+                                    will also be made public.</label
+                                >
+                            </div>
+                        </div>
+                        <jet-button
+                            :disabled="!confirmPublicAccess"
+                            @click="UpdateAndClose"
+                        >
+                            Finish
+                        </jet-button>
+                    </div>
+                    <div v-else>
+                        <jet-button @click="UpdateAndClose">
+                            Finish
+                        </jet-button>
+                    </div>
                 </span>
             </span>
         </template>
@@ -2389,6 +2422,7 @@ export default {
             initialised: false,
 
             autoimportList: [],
+            confirmPublicAccess: false,
         };
     },
     computed: {
