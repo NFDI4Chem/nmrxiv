@@ -95,6 +95,18 @@ class UpdateProject
             if (array_key_exists('tags_array', $input)) {
                 $project->syncTagsWithType($input['tags_array'], 'Project');
             }
+            if ($input['is_public']) {
+                $studies = $project->studies;
+                foreach ($studies as $study) {
+                    $study->is_public = $input['is_public'];
+                    $study->save();
+                    $datasets = $study->datasets;
+                    foreach ($datasets as $dataset) {
+                        $dataset->is_public = $input['is_public'];
+                        $dataset->save();
+                    }
+                }
+            }
         });
     }
 
