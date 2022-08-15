@@ -18,7 +18,6 @@ use Storage;
 class Project extends Model implements Auditable
 {
     use CacheClear;
-
     use Searchable;
     use Markable;
     use HasFactory;

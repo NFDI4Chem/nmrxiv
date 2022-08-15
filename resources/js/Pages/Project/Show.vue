@@ -324,6 +324,58 @@
                         </p>
                     </dd>
                 </div>
+                <!--License -->
+                <div class="mb-4">
+                    <div class="relative">
+                        <div
+                            class="absolute inset-0 flex items-center"
+                            aria-hidden="true"
+                        >
+                            <div class="w-full border-t border-gray-300"></div>
+                        </div>
+                        <div class="relative flex items-center justify-between">
+                            <span
+                                class="px-3 -ml-4 rounded text-sm bg-gray-100 font-medium text-gray-500"
+                            >
+                                License
+                            </span>
+                            <button
+                                v-if="canUpdateProject"
+                                type="button"
+                                class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                @click="toggleDetails"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
+                                    aria-hidden="true"
+                                    class="w-4 h-4 mr-2 text-gray-600"
+                                >
+                                    <path
+                                        d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"
+                                    ></path>
+                                </svg>
+                                <span>Edit</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div>
+                        <dd v-if="license" class="mt-1 text-gray-900 space-y-5">
+                            <p
+                                style="max-width: 100ch !important"
+                                class="prose mt-1 text-sm text-blue-gray-500"
+                            >
+                                {{ license.title }}
+                                <ToolTip
+                                    v-if="project.license_id"
+                                    class="inline h-4 w-4 ml-0"
+                                    :text="license.description"
+                                ></ToolTip>
+                            </p>
+                        </dd>
+                    </div>
+                </div>
                 <!-- Author -->
                 <div class="mb-8">
                     <div class="relative">
@@ -418,6 +470,7 @@ import ProjectDetails from "./Partials/Details.vue";
 import { ref } from "vue";
 import { StarIcon, PencilIcon } from "@heroicons/vue/solid";
 import AddAuthor from "@/Shared/AddAuthor.vue";
+import ToolTip from "@/Shared/ToolTip.vue";
 
 export default {
     components: {
@@ -429,6 +482,7 @@ export default {
         PencilIcon,
         AccessDialogue,
         AddAuthor,
+        ToolTip,
     },
     props: [
         "project",
@@ -438,6 +492,7 @@ export default {
         "availableRoles",
         "projectPermissions",
         "role",
+        "license",
     ],
     setup() {
         const projectDetailsElement = ref(null);
