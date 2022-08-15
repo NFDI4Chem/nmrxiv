@@ -57,6 +57,7 @@ class SocialController extends Controller
             }
             if (! $user) {
                 $user = tap(User::create([
+                    'name' => $providerUser->getName(),
                     'first_name' => explode(' ', $providerUser->getName(), 2)[0],
                     'last_name' => explode(' ', $providerUser->getName(), 2)[1],
                     'email' => $providerUser->getEmail(),
