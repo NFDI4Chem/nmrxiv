@@ -169,7 +169,6 @@
                                         </button>
                                     </div>
                                 </div>
-                                <loading-button :loading="loading" />
                                 <div>
                                     <dd
                                         v-if="license"
@@ -521,11 +520,9 @@ import { PlusSmIcon } from "@heroicons/vue/solid";
 import StudyContent from "@/Pages/Study/Content.vue";
 import slider from "vue3-slider";
 import OCL from "openchemlib/full";
-import LoadingButton from "@/Shared/LoadingButton.vue";
 import ToolTip from "@/Shared/ToolTip.vue";
 export default {
     components: {
-        LoadingButton,
         StudyContent,
         ToolTip,
         PlusSmIcon,

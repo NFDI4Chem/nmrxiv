@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\License\GetLicense;
 use App\Actions\Project\CreateNewProject;
 use App\Actions\Project\DeleteProject;
 use App\Actions\Project\UpdateProject;
@@ -61,13 +62,17 @@ class ProjectController extends Controller
         return response()->json(['status' => $project->status, 'logs' => $project->process_logs]);
     }
 
-    public function show(Request $request, Project $project)
+    public function show(Request $request, Project $project, GetLicense $getLicense)
     {
         if (! Gate::forUser($request->user())->check('viewProject', $project)) {
             throw new AuthorizationException;
         }
 
         $team = $project->nonPersonalTeam;
+        $license = null;
+        if ($project->license_id) {
+            $license = $getLicense->getLicensebyId($project->license_id);
+        }
 
         return Inertia::render('Project/Show', [
             'project' => $project->load('projectInvitations', 'tags', 'authors'),
@@ -76,6 +81,7 @@ class ProjectController extends Controller
             'availableRoles' => array_values(Jetstream::$roles),
             'studies' => $project->studies,
             'role' => $project->userProjectRole(Auth::user()->email),
+            'license' => $license ? $license[0] : null,
             'projectPermissions' => [
                 'canDeleteProject' => Gate::check('deleteProject', $project),
                 'canUpdateProject' => Gate::check('updateProject', $project),

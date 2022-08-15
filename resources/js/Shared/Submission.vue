@@ -2423,6 +2423,8 @@ export default {
 
             autoimportList: [],
             confirmPublicAccess: false,
+
+            studiesExist: false,
         };
     },
     computed: {
@@ -2765,6 +2767,17 @@ export default {
             this.selectDraft(this.defaultDraft);
         },
 
+        hasStudies(file) {
+            if (file.model_type == "study") {
+                this.studiesExist = true;
+            }
+            if (file.has_children && file.children) {
+                file.children.forEach((fso) => {
+                    this.hasStudies(fso);
+                });
+            }
+        },
+
         process() {
             this.errorMessage = null;
             let foldersExist = false;
@@ -2773,10 +2786,14 @@ export default {
                     foldersExist = true;
                 }
             });
+
+            this.hasStudies(this.$refs.fsbRef.file);
+
             if (
                 this.$refs.fsbRef.file &&
                 this.$refs.fsbRef.file.children.length > 0 &&
-                foldersExist
+                foldersExist &&
+                this.studiesExist
             ) {
                 this.loadingStep = true;
                 this.draftForm.owner_id = this.$page.props.user.id;
@@ -2854,6 +2871,9 @@ export default {
                     this.errorMessage =
                         "Spectra files needs to be organised into folders. Please create a folder corresponding to each sample and add all your NMR spectroscopic experiment output files are added to the corresponding folders";
                 } else if (this.$refs.fsbRef.file.children.length <= 0) {
+                    this.errorMessage =
+                        "Please upload spectral data to proceed.";
+                } else if (!this.studiesExist) {
                     this.errorMessage =
                         "Please upload spectral data to proceed.";
                 } else {
