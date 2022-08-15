@@ -5,8 +5,8 @@ namespace App\Models;
 use App\Traits\CacheClear;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use OwenIt\Auditing\Contracts\Auditable;
 use Laravel\Scout\Searchable;
+use OwenIt\Auditing\Contracts\Auditable;
 use Spatie\Tags\HasTags;
 use Storage;
 
