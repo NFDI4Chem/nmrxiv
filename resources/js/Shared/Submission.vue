@@ -2773,10 +2773,18 @@ export default {
                     foldersExist = true;
                 }
             });
+            let studiesExist = false;
+            this.$refs.fsbRef.file.children.forEach((fso) => {
+                if (fso.model_type == "study") {
+                    studiesExist = true;
+                }
+            });
+            console.log(studiesExist);
             if (
                 this.$refs.fsbRef.file &&
                 this.$refs.fsbRef.file.children.length > 0 &&
-                foldersExist
+                foldersExist &&
+                studiesExist
             ) {
                 this.loadingStep = true;
                 this.draftForm.owner_id = this.$page.props.user.id;
@@ -2854,6 +2862,9 @@ export default {
                     this.errorMessage =
                         "Spectra files needs to be organised into folders. Please create a folder corresponding to each sample and add all your NMR spectroscopic experiment output files are added to the corresponding folders";
                 } else if (this.$refs.fsbRef.file.children.length <= 0) {
+                    this.errorMessage =
+                        "Please upload spectral data to proceed.";
+                } else if (!studiesExist) {
                     this.errorMessage =
                         "Please upload spectral data to proceed.";
                 } else {
