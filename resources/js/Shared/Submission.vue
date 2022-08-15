@@ -2081,7 +2081,7 @@
                                             email once your submission is
                                             processed.
                                         </p>
-                                        <div class="mt-6">
+                                        <!-- <div class="mt-6">
                                             <a
                                                 class="text-base font-medium text-indigo-600 hover:text-indigo-500"
                                                 >Go back home<span
@@ -2090,7 +2090,7 @@
                                                     →</span
                                                 ></a
                                             >
-                                        </div>
+                                        </div> -->
                                     </div>
                                 </div>
                             </div>
