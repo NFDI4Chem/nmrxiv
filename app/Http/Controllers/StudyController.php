@@ -37,8 +37,12 @@ class StudyController extends Controller
     {
         $updater->update($study, $request->all());
 
+        $study = $study->fresh();
+
+        $study->load(['datasets', 'sample.molecules', 'tags']);
+
         return $request->wantsJson()
-            ? new JsonResponse($study->fresh(), 200)
+            ? new JsonResponse($study, 200)
             : back()->with('success', 'Study updated successfully');
     }
 

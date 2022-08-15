@@ -27,6 +27,9 @@ class DownloadController extends Controller
                 $study = Study::where([['project_id', $project->id], ['slug', $study],  ['owner_id', $user->id]])->firstOrFail();
                 $dataset = Dataset::where([['project_id', $project->id], ['study_id', $study->id], ['slug', $dataset], ['owner_id', $user->id]])->first();
                 $fsObject = FileSystemObject::where([['id', $dataset->fs_id], ['type', 'directory']])->first();
+                if (! $fsObject) {
+                    $fsObject = FileSystemObject::where([['id', $dataset->fs_id], ['type', 'file']])->first();
+                }
                 $request->merge(['uuid' => $fsObject->uuid]);
 
                 return $this->downloadFromProject($request, $username, $project, $fsObject->key);
@@ -65,65 +68,61 @@ class DownloadController extends Controller
         if ($fsObj->key == $key) {
             $path = $fsObj->path;
 
+            $s3Client = $this->storageClient();
+
+            $bucket = $request->input('bucket') ?: config('filesystems.disks.minio.bucket');
+
+            $s3keys = [];
+
             if ($fsObj->type == 'file') {
                 $environment = env('APP_ENV', 'local');
                 if (Storage::has($path)) {
-                    $data = Storage::get($path);
-                    $newFileName = $fsObj->name;
-                    $headers = [
-                        'Access-Control-Allow-Origin' => '*',
-                        'Content-Disposition' => sprintf(
-                            'attachment; filename="%s"',
-                            $newFileName
-                        ),
-                    ];
-
-                    return Response::make($data, 200, $headers);
+                    array_push($s3keys, substr($fsObj->path, 1));
                 }
             } else {
-                $s3Client = $this->storageClient();
-
-                $bucket = $request->input('bucket') ?: config('filesystems.disks.minio.bucket');
-
                 $command = $s3Client->getCommand('ListObjects');
                 $command['Bucket'] = $bucket;
                 $command['Prefix'] = $path.'/';
 
                 $result = $s3Client->execute($command);
 
-                $s3keys = [];
-
                 foreach ($result['Contents'] as $file) {
                     array_push($s3keys, $file['Key']);
                 }
-
-                $s3Client->registerStreamWrapper();
-
-                return response()->stream(
-                    function () use ($s3keys, $bucket, $fsObj) {
-                        $options = new \ZipStream\Option\Archive();
-                        $options->setContentType('application/octet-stream');
-                        $options->setZeroHeader(true);
-                        $options->setComment($fsObj->name);
-                        $zip = new ZipStream\ZipStream($fsObj->name, $options);
-                        foreach ($s3keys as $key) {
-                            $s3path = 's3://'.$bucket.'/'.$key;
-                            if ($streamRead = fopen($s3path, 'r')) {
-                                $zip->addFileFromStream($fsObj->key.'/'.explode('/'.$fsObj->key.'/', $key)[1], $streamRead);
-                            } else {
-                                exit('Could not open stream for reading');
-                            }
-                        }
-                        $zip->finish();
-                    },
-                    200,
-                    [
-                        'Access-Control-Allow-Origin' => '*',
-                        'Content-Disposition' => 'attachment;filename="'.$fsObj->name.'.zip"',
-                        'Content-Type' => 'application/octet-stream',
-                    ]
-                );
             }
+
+            $s3Client->registerStreamWrapper();
+
+            return response()->stream(
+                function () use ($s3keys, $bucket, $fsObj) {
+                    $options = new \ZipStream\Option\Archive();
+                    $options->setContentType('application/octet-stream');
+                    $options->setZeroHeader(true);
+                    $options->setComment($fsObj->name);
+                    $zip = new ZipStream\ZipStream($fsObj->name, $options);
+                    foreach ($s3keys as $key) {
+                        $s3path = 's3://'.$bucket.'/'.$key;
+                        if ($streamRead = fopen($s3path, 'r')) {
+                            $sPath = explode($fsObj->relative_url, $key)[1];
+                            if ($sPath != '') {
+                                $sPath = $fsObj->key.'/'.explode($fsObj->relative_url, $key)[1];
+                            } else {
+                                $sPath = $fsObj->key;
+                            }
+                            $zip->addFileFromStream($sPath, $streamRead);
+                        } else {
+                            exit('Could not open stream for reading');
+                        }
+                    }
+                    $zip->finish();
+                },
+                200,
+                [
+                    'Access-Control-Allow-Origin' => '*',
+                    'Content-Disposition' => 'attachment;filename="'.$fsObj->name.'.zip"',
+                    'Content-Type' => 'application/octet-stream',
+                ]
+            );
         }
 
         return Response::make(null, 404);

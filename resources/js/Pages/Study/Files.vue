@@ -240,7 +240,7 @@
                                                     .type == 'file'
                                             "
                                         >
-                                            <div
+                                            <!-- <div
                                                 v-if="
                                                     $page.props.selectedFileSystemObject.key.indexOf(
                                                         '.dx'
@@ -269,13 +269,13 @@
                                                     :src="nmriumURL"
                                                     @load="loadSpectra()"
                                                 ></iframe>
-                                            </div>
-                                            <div
+                                            </div> -->
+                                            <!-- <div
                                                 v-if="svgString"
                                                 class="rounded-md border my-3 flex justify-center items-center"
                                             >
                                                 <span v-html="svgString"></span>
-                                            </div>
+                                            </div> -->
                                             <File-details
                                                 :study="study"
                                                 :file="
@@ -507,11 +507,13 @@ export default {
                 this.loadMol();
             }
             const iframe = window.frames.crossDomainIframe;
+            let url = this.downloadURL;
             if (iframe) {
                 let data = {
-                    urls: [this.downloadURL],
+                    data: [url],
+                    type: "url",
                 };
-                iframe.postMessage({ type: `nmr-wrapper:loadURLs`, data }, "*");
+                iframe.postMessage({ type: `nmr-wrapper:load`, data }, "*");
             }
         },
         loadMol() {
