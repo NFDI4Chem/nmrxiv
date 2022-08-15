@@ -487,7 +487,7 @@ export default {
             if (source == "Manual") {
                 //Added Manually.
                 this.validateForm();
-                if (!this.manualAddAuthorForm.hasError) {
+                if (!this.manualAddAuthorForm.hasErrors) {
                     if (!this.manualAddAuthorForm.id) {
                         this.manualAddAuthorForm.id = (
                             this.manualAddAuthorForm.family_name +
@@ -586,31 +586,32 @@ export default {
         /*Validating form*/
         validateForm() {
             this.manualAddAuthorForm.errors = {};
-            this.manualAddAuthorForm.hasError = false;
-            var hasError = false;
+            this.manualAddAuthorForm.hasErrors = false;
+            var hasErrors = false;
             if (this.manualAddAuthorForm.email_id) {
-                if (!this.validEmail(this.manualAddAuthorForm.email_id))
+                if (!this.validEmail(this.manualAddAuthorForm.email_id)) {
                     this.manualAddAuthorForm.errors.email_id =
                         "Valid email required.";
-                hasError = true;
+                    hasErrors = true;
+                }
             }
             if (!this.manualAddAuthorForm.given_name) {
                 this.manualAddAuthorForm.errors.given_name =
                     "The given name field is required.";
-                hasError = true;
+                hasErrors = true;
             }
             if (!this.manualAddAuthorForm.family_name) {
                 this.manualAddAuthorForm.errors.family_name =
                     "The family name field is required.";
-                hasError = true;
+                hasErrors = true;
             }
             if (!this.manualAddAuthorForm.affiliation) {
                 this.manualAddAuthorForm.errors.affiliation =
                     "The affiliation field is required.";
-                hasError = true;
+                hasErrors = true;
             }
-            if (hasError) {
-                this.manualAddAuthorForm.hasError = true;
+            if (hasErrors) {
+                this.manualAddAuthorForm.hasErrors = true;
             }
         },
         /*Open confirm dialog box*/

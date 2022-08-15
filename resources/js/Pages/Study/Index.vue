@@ -10,7 +10,7 @@
           </div> -->
                 </div>
             </div>
-            <div class="flex-shrink-0 ml-4">
+            <!-- <div class="flex-shrink-0 ml-4">
                 <button
                     v-if="editable"
                     type="button"
@@ -19,7 +19,7 @@
                 >
                     New Study
                 </button>
-            </div>
+            </div> -->
         </div>
         <div v-if="studies.length <= 0 && editable">
             <div class="mt-4 px-12 py-8 mx-auto max-w-4xl">
@@ -84,16 +84,11 @@
             v-else
             class="mt-8 mx-auto max-w-md grid gap-8 sm:max-w-lg lg:grid-cols-3 lg:max-w-7xl"
         >
-            <div
-                v-for="study in studies.sort((a, b) =>
-                    a.name > b.name ? 1 : -1
-                )"
-                :key="study.uuid"
-            >
+            <div v-for="study in studies" :key="study.uuid">
                 <study-card :study="study" />
             </div>
         </div>
-        <study-create :project="project"></study-create>
+        <!-- <study-create :project="project"></study-create> -->
     </div>
 </template>
 
@@ -109,7 +104,7 @@ export default {
         StudyCard,
         JetButton,
     },
-    props: ["studies", "project", "editable"],
+    props: ["studies", "project"],
     data() {
         return {};
     },

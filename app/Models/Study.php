@@ -6,11 +6,13 @@ use App\Traits\CacheClear;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use OwenIt\Auditing\Contracts\Auditable;
+use Laravel\Scout\Searchable;
 use Spatie\Tags\HasTags;
 use Storage;
 
 class Study extends Model implements Auditable
 {
+    use Searchable;
     use CacheClear;
     use HasFactory;
     use HasTags;
@@ -205,6 +207,16 @@ class Study extends Model implements Auditable
     public function molecules()
     {
         return $this->sample()->molecules();
+    }
+
+    /**
+     * Determine if the model should be searchable.
+     *
+     * @return bool
+     */
+    public function shouldBeSearchable()
+    {
+        return $this->is_public;
     }
 
     /**

@@ -154,22 +154,21 @@
                                     About project
                                 </h3>
                                 <div
-                                    class="mt-6 space-y-8 divide-y divide-y-blue-gray-200"
+                                    class="mt-2 space-y-8 divide-y divide-y-blue-gray-200"
                                 >
                                     <div
                                         class="grid grid-cols-1 gap-y-6 sm:grid-cols-6 sm:gap-x-6"
                                     >
                                         <div class="sm:col-span-6">
-                                            <h2
-                                                class="text-xl font-medium text-blue-gray-900"
-                                            >
-                                                Description
-                                            </h2>
                                             <p
-                                                class="mt-1 text-sm text-blue-gray-500"
-                                            >
-                                                {{ project.data.description }}
-                                            </p>
+                                                style="
+                                                    max-width: 100ch !important;
+                                                "
+                                                class="prose mt-1 text-sm text-blue-gray-500"
+                                                v-html="
+                                                    md(project.data.description)
+                                                "
+                                            ></p>
                                         </div>
                                         <div>
                                             <a

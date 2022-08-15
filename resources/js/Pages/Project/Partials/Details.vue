@@ -755,8 +755,9 @@
                                         </div>
                                     </div>
                                 </div>
-
+                                <!--Footer-->
                                 <div
+                                    v-if="this.form.is_public != 'true'"
                                     class="flex-shrink-0 px-4 py-4 flex justify-end"
                                 >
                                     <jet-action-message
@@ -775,6 +776,50 @@
                                     <jet-button
                                         v-if="editable"
                                         type="submit"
+                                        class="ml-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                                        @click="updateProject"
+                                    >
+                                        Save
+                                    </jet-button>
+                                </div>
+                                <!--Footer with confirmation-->
+                                <div
+                                    v-if="
+                                        this.form.is_public == 'true' &&
+                                        editable
+                                    "
+                                    class="flex-shrink-0 px-4 py-4 flex justify-end"
+                                >
+                                    <div class="flex items-center h-5">
+                                        <input
+                                            v-model="this.confirmPublicAccess"
+                                            id="confirm"
+                                            aria-describedby="confirm-description"
+                                            name="confirm"
+                                            type="checkbox"
+                                            class="focus:ring-teal-500 h-4 w-4 text-teal-600 border-gray-300 rounded"
+                                        />
+                                    </div>
+                                    <div class="ml-3 text-xs">
+                                        <label
+                                            for="confirm"
+                                            class="font-small text-red-700"
+                                            >I understand, if the project is
+                                            made public then all the underlying
+                                            studies and dataset will also be
+                                            made public.</label
+                                        >
+                                    </div>
+                                    <jet-secondary-button
+                                        type="button"
+                                        class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                                        @click="open = false"
+                                    >
+                                        Cancel
+                                    </jet-secondary-button>
+                                    <jet-button
+                                        type="submit"
+                                        :disabled="!confirmPublicAccess"
                                         class="ml-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
                                         @click="updateProject"
                                     >
@@ -928,6 +973,7 @@ export default defineComponent({
                 (option) => option.value == this.project.access_type
             )[0],
             linkAccess: this.project.access == "link",
+            confirmPublicAccess: false,
         };
     },
     methods: {
