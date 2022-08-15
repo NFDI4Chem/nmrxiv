@@ -60,6 +60,7 @@ class SocialController extends Controller
                     'first_name' => explode(' ', $providerUser->getName(), 2)[0],
                     'last_name' => explode(' ', $providerUser->getName(), 2)[1],
                     'email' => $providerUser->getEmail(),
+                    'username' => strstr($providerUser->getEmail(), '@', true),
                 ]), function (User $user) {
                     $user->ownedTeams()->save(Team::forceCreate([
                         'user_id' => $user->id,
