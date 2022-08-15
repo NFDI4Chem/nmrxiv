@@ -2423,6 +2423,8 @@ export default {
 
             autoimportList: [],
             confirmPublicAccess: false,
+
+            studiesExist: false,
         };
     },
     computed: {
@@ -2765,6 +2767,17 @@ export default {
             this.selectDraft(this.defaultDraft);
         },
 
+        hasStudies(file) {
+            if (file.model_type == "study") {
+                this.studiesExist = true;
+            }
+            if (file.has_children && file.children) {
+                file.children.forEach((fso) => {
+                    this.hasStudies(fso);
+                });
+            }
+        },
+
         process() {
             this.errorMessage = null;
             let foldersExist = false;
@@ -2773,18 +2786,14 @@ export default {
                     foldersExist = true;
                 }
             });
-            let studiesExist = false;
-            this.$refs.fsbRef.file.children.forEach((fso) => {
-                if (fso.model_type == "study") {
-                    studiesExist = true;
-                }
-            });
-            console.log(studiesExist);
+
+            this.hasStudies(this.$refs.fsbRef.file);
+
             if (
                 this.$refs.fsbRef.file &&
                 this.$refs.fsbRef.file.children.length > 0 &&
                 foldersExist &&
-                studiesExist
+                this.studiesExist
             ) {
                 this.loadingStep = true;
                 this.draftForm.owner_id = this.$page.props.user.id;
@@ -2864,7 +2873,7 @@ export default {
                 } else if (this.$refs.fsbRef.file.children.length <= 0) {
                     this.errorMessage =
                         "Please upload spectral data to proceed.";
-                } else if (!studiesExist) {
+                } else if (!this.studiesExist) {
                     this.errorMessage =
                         "Please upload spectral data to proceed.";
                 } else {
