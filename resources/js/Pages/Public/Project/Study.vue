@@ -238,9 +238,9 @@ export default {
                         data: [
                             this.url +
                                 "/" +
-                                this.project.owner.username +
+                                this.project.data.owner.username +
                                 "/datasets/" +
-                                this.project.slug +
+                                this.project.data.slug +
                                 "/" +
                                 this.study.slug +
                                 "/" +
