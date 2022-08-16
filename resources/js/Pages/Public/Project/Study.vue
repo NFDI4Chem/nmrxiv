@@ -222,6 +222,9 @@ export default {
                 : "http://nmriumdev.nmrxiv.org?workspace=embedded&id=" +
                       Math.random();
         },
+        url() {
+            return String(this.$page.props.url);
+        },
     },
     mounted() {},
     methods: {
