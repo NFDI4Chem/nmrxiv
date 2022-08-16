@@ -189,7 +189,7 @@
                                                                             class="w-full"
                                                                             :href="
                                                                                 '/projects/' +
-                                                                                hit.slug
+                                                                                hit.owner.username + '/' + hit.slug
                                                                             "
                                                                         >
                                                                             <FolderIcon
