@@ -35,6 +35,7 @@ class ProjectResource extends JsonResource
             'team' => $this->when(($this->team && ! $this->team->personal_team), $this->team),
             'owner' => new UserResource($this->owner),
             'photo_url' => $this->project_photo_url,
+            'is_public' => $this->is_public,
             'tags' => $this->tags,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
