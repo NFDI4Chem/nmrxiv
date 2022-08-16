@@ -186,7 +186,7 @@
                                 </div>
                             </div>
                             <div class="mb-4">
-                                <div class="relative">
+                                <!-- <div class="relative">
                                     <div
                                         class="absolute inset-0 flex items-center"
                                         aria-hidden="true"
@@ -226,9 +226,9 @@
                                             <span>Save</span>
                                         </button>
                                     </div>
-                                </div>
+                                </div> -->
                                 <div>
-                                    <section
+                                    <!-- <section
                                         aria-labelledby="activity-title"
                                         class="mt-2 xl:mt-2"
                                     >
@@ -262,7 +262,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </section>
+                                    </section> -->
                                     <div>
                                         <div class="py-4 max-w-7xl mx-auto">
                                             <div
