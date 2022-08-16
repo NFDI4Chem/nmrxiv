@@ -35,6 +35,7 @@ class StudyResource extends JsonResource
             'photo_url' => $this->study_photo_path,
             'tags' => $this->tags,
             'created_at' => $this->created_at,
+            'is_public' => $this->is_public,
             'updated_at' => $this->updated_at,
             'study_preview_urls' => $this->study_preview_urls,
             $this->mergeWhen(! $this->lite, function () {
