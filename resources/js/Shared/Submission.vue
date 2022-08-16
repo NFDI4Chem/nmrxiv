@@ -70,28 +70,6 @@
         </template>
         <template #content>
             <div
-                v-if="errorMessage != null && errorMessage != ''"
-                class="rounded-md bg-red-50 p-4 mb-2"
-            >
-                <div class="flex">
-                    <div class="flex-shrink-0">
-                        <XCircleIcon
-                            class="h-5 w-5 text-red-400"
-                            aria-hidden="true"
-                        />
-                    </div>
-                    <div class="ml-3">
-                        <h3 class="text-sm font-medium text-red-400">
-                            There were errors with your submission
-                        </h3>
-                        <div
-                            class="mt-2 text-sm text-red-900"
-                            v-html="errorMessage"
-                        ></div>
-                    </div>
-                </div>
-            </div>
-            <div
                 v-if="loadingStep"
                 class="absolute inset-0 flex justify-center items-center z-10 bg-white rounded bg-opacity-70"
             >
@@ -2121,6 +2099,28 @@
                 </svg>
                 Loading...
             </div>
+            <div
+                v-if="errorMessage != null && errorMessage != ''"
+                class="rounded-md bg-red-50 p-4 mb-2"
+            >
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <ExclamationIcon
+                            class="h-5 w-5 text-red-400"
+                            aria-hidden="true"
+                        />
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-red-400">
+                            There were errors with your submission
+                        </h3>
+                        <div
+                            class="mt-2 text-sm text-red-900"
+                            v-html="errorMessage"
+                        ></div>
+                    </div>
+                </div>
+            </div>
         </template>
         <template #footer>
             <span v-if="!currentStep">
@@ -2290,6 +2290,7 @@ import {
     XCircleIcon,
     ClipboardCopyIcon,
     QuestionMarkCircleIcon,
+    ExclamationIcon,
 } from "@heroicons/vue/solid";
 import { Link } from "@inertiajs/inertia-vue3";
 
@@ -2308,6 +2309,7 @@ export default {
         FileSystemBrowser,
         ClipboardCopyIcon,
         QuestionMarkCircleIcon,
+        ExclamationIcon,
     },
     props: [],
     data() {

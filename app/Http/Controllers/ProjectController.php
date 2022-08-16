@@ -8,6 +8,7 @@ use App\Actions\Project\DeleteProject;
 use App\Actions\Project\UpdateProject;
 use App\Http\Resources\ProjectResource;
 use App\Models\Project;
+use App\Models\Study;
 use App\Models\User;
 use Auth;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -35,10 +36,43 @@ class ProjectController extends Controller
             }
         }
 
-        return Inertia::render('Public/Project', [
-            'project' => (new ProjectResource($project))->lite(false, ['users', 'studies', 'license', 'files', 'authors']),
+        $tab = $request->get('tab');
 
-        ]);
+        if ($tab == 'info') {
+            return Inertia::render('Public/Project/Show', [
+                'project' => (new ProjectResource($project))->lite(false, ['users', 'authors']),
+                'tab' => $tab,
+            ]);
+        } elseif ($tab == 'studies') {
+            return Inertia::render('Public/Project/Studies', [
+                'project' => (new ProjectResource($project))->lite(false, ['studies']),
+                'tab' => $tab,
+            ]);
+        } elseif ($tab == 'files') {
+            return Inertia::render('Public/Project/Files', [
+                'project' => (new ProjectResource($project))->lite(false, ['files']),
+                'tab' => $tab,
+            ]);
+        } elseif ($tab == 'license') {
+            return Inertia::render('Public/Project/License', [
+                'project' => (new ProjectResource($project))->lite(false, ['license']),
+                'tab' => $tab,
+            ]);
+        } elseif ($tab == 'study') {
+            $studyId = $request->get('id');
+            $study = Study::where([['slug', $studyId], ['owner_id', $user->id],  ['project_id', $project->id]])->firstOrFail();
+
+            return Inertia::render('Public/Project/Study', [
+                'project' => (new ProjectResource($project))->lite(false, []),
+                'tab' => $tab,
+                'study' => $study->load('tags'),
+            ]);
+        } else {
+            return Inertia::render('Public/Project/Show', [
+                'project' => (new ProjectResource($project))->lite(false, ['users', 'authors']),
+                'tab' => 'info',
+            ]);
+        }
     }
 
     public function publicProjectsView(Request $request)
@@ -76,7 +110,7 @@ class ProjectController extends Controller
 
         return Inertia::render('Project/Show', [
             'project' => $project->load('projectInvitations', 'tags', 'authors'),
-            'team' => $team ? $team->load('users', 'owner') : null,
+            'team' => $team ? $team->load('users') : null,
             'members' => $project->allUsers(),
             'availableRoles' => array_values(Jetstream::$roles),
             'studies' => $project->studies,
