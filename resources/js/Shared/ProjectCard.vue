@@ -2,15 +2,18 @@
     <div>
         <div v-if="project" class="hover:shadow-lg">
             <div class="flex flex-col rounded-lg shadow-lg">
-                <div
-                    class="rounded-t-lg bg-gradient-to-tl from-sky-400 to-cyan-300 w-full h-36 bg-gray-200 overflow-hidden group-hover:opacity-75 lg:h-36 xl:h-36"
-                >
+                <div class="relative rounded-t-lg lg:h-36 xl:h-36">
                     <img
+                        v-if="project.photo_url && project.photo_url != ''"
                         :src="project.photo_url"
                         alt=""
-                        class="w-full h-full object-center object-cover"
+                        class="w-full h-full object-center rounded-t-lg object-cover"
                     />
-                    <div class="float-right place-self-end">
+                    <div
+                        v-else
+                        class="flex-shrink-0 lg:h-36 xl:h-36 pattern-diagonal-lines pattern-gray-400 pattern-bg-white pattern-size-2 pattern-opacity-20 border-b border-gray-400"
+                    ></div>
+                    <div class="absolute top-0 right-0">
                         <div class="p-2 flex items-center">
                             <div class="flex-shrink-0">
                                 <span
