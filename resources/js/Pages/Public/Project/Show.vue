@@ -99,9 +99,9 @@
                                             {{
                                                 author.title +
                                                 " " +
-                                                author.family_name +
+                                                author.given_name +
                                                 " " +
-                                                author.given_name
+                                                author.family_name
                                             }}
                                         </p>
                                         <p
@@ -109,9 +109,9 @@
                                             class="text-sm font-medium text-gray-900"
                                         >
                                             {{
-                                                author.family_name +
+                                                author.given_name +
                                                 " " +
-                                                author.given_name
+                                                author.family_name
                                             }}
                                         </p>
                                         <p class="text-sm text-gray-500">
