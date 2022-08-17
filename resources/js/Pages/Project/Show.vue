@@ -454,7 +454,7 @@
                 <study-index
                     :editable="editable"
                     :project="project"
-                    :studies="studies"
+                    :role="role"
                 />
             </div>
         </div>
@@ -486,7 +486,6 @@ export default {
     },
     props: [
         "project",
-        "studies",
         "team",
         "members",
         "availableRoles",
@@ -502,6 +501,7 @@ export default {
             addAuthorElement,
         };
     },
+    mounted() {},
     data() {
         return {};
     },

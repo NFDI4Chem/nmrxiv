@@ -58,6 +58,9 @@ Route::get('{username}/datasets/{project}/{study?}/{dataset?}', [DownloadControl
 Route::get('{code}/studies/{study}/file/{filename}', [StudyController::class, 'file'])
     ->name('study.file');
 
+Route::get('projects/{project}/toggleUpVote', [ProjectController::class, 'toggleUpVote'])
+    ->name('project.toggle-upvote');
+
 Route::get('projects/{owner}/{slug}', [ProjectController::class, 'publicProjectView'])
     ->name('public.project');
 
@@ -82,9 +85,6 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
 
     Route::post('/onboarding/{status}', [DashboardController::class, 'onboardingStatus'])
             ->name('onboarding.complete');
-
-    Route::get('projects/{project}/toggleUpVote', [ProjectController::class, 'toggleUpVote'])
-            ->name('project.toggle-upvote');
 
     Route::get('projects/status/{project}/queue', [ProjectController::class, 'status'])
             ->name('project.status');
@@ -114,6 +114,8 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
             ->name('dashboard.projects');
         Route::get('projects/{project}/settings', [ProjectController::class, 'settings'])
             ->name('dashboard.project.settings');
+        Route::get('projects/{project}/studies', [ProjectController::class, 'studies'])
+            ->name('dashboard.project.studies');
         Route::delete('projects/{project}', [ProjectController::class, 'destroy'])
             ->name('dashboard.project.destroy');
         Route::post('projects/create', [ProjectController::class, 'store'])

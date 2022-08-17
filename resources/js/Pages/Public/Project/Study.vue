@@ -231,7 +231,19 @@ export default {
         loadSpectra() {
             this.selectedSpectraData = null;
             if (this.selectedDataset == null) {
-                this.selectedDataset = this.study.datasets[0];
+                const urlSearchParams = new URLSearchParams(
+                    window.location.search
+                );
+                const params = Object.fromEntries(urlSearchParams.entries());
+                let dsId = params["dsid"];
+                this.study.datasets.forEach((ds) => {
+                    if (ds.slug == dsId) {
+                        this.selectedDataset = ds;
+                    }
+                });
+                if (!this.selectedDataset) {
+                    this.selectedDataset = this.study.datasets[0];
+                }
             }
             const iframe = window.frames.datasetNMRiumPublicIframe;
             this.currentMolecules = [];
