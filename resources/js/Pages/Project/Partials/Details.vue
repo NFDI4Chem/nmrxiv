@@ -1011,9 +1011,15 @@ export default defineComponent({
             }
         },
         toggleDetails() {
-            if (this.project) {
+            if (this.$page.props.licenses) {
+                this.licenses = this.$page.props.licenses;
+                this.form.license = this.licenses.find(
+                    (l) => l.id == this.project.license_id
+                );
+            } else {
                 axios.get(route("licenses")).then((res) => {
                     this.licenses = res.data;
+                    this.$page.props.licenses = res.data;
                     this.form.license = this.licenses.find(
                         (l) => l.id == this.project.license_id
                     );

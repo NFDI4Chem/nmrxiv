@@ -2537,9 +2537,14 @@ export default {
         },
 
         loadLicenses() {
-            axios.get(route("licenses")).then((res) => {
-                this.licenses = res.data;
-            });
+            if (this.$page.props.licenses) {
+                this.licenses = this.$page.props.licenses;
+            } else {
+                axios.get(route("licenses")).then((res) => {
+                    this.licenses = res.data;
+                    this.$page.props.licenses = res.data;
+                });
+            }
         },
 
         setReleaseDate() {
