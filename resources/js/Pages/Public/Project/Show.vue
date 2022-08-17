@@ -70,7 +70,13 @@
                             </div>
                         </div>
                     </div>
-                    <div class="pt-8 gap-y-6 sm:grid-cols-6 sm:gap-x-6">
+                    <div
+                        v-if="
+                            project.data.authors &&
+                            project.data.authors.length > 0
+                        "
+                        class="pt-8 gap-y-6 sm:grid-cols-6 sm:gap-x-6"
+                    >
                         <div class="sm:col-span-6">
                             <h2 class="text-xl font-medium text-blue-gray-900">
                                 Author(s)
