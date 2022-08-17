@@ -39,6 +39,9 @@ class ProjectResource extends JsonResource
             'tags' => $this->tags,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'stats' => [
+                'likes' => $this->likes(),
+            ],
             $this->mergeWhen(! $this->lite, function () {
                 return [
                     $this->mergeWhen(
@@ -100,9 +103,6 @@ class ProjectResource extends JsonResource
                     ),
                 ];
             }),
-            'stats' => [
-                'likes' => $this->likes(),
-            ],
         ];
     }
 }

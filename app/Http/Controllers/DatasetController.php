@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\DatasetResource;
 use App\Models\Dataset;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 use Storage;
 
@@ -25,9 +27,10 @@ class DatasetController extends Controller
     {
         if ($dataset) {
             $spectra = $request->get('spectra');
-            $nmriumInfo = json_encode($spectra);
+            $nmriumInfo = $spectra;
             $molecules = $request->get('molecules');
-            $molecularInfo = json_encode($molecules);
+            $molecularInfo = $molecules;
+
             if ($dataset->nmriumInfo) {
                 $nmriumData = $dataset->nmriumInfo;
             } else {
@@ -56,7 +59,9 @@ class DatasetController extends Controller
 
     public function publicDatasetsView(Request $request)
     {
-        $datasets = Dataset::where('is_public', true)->simplePaginate(15);
+        $datasets = Cache::rememberForever('datasets', function () {
+            return DatasetResource::collection(Dataset::with('project')->where('is_public', true)->orderByDesc('updated_at')->paginate(15));
+        });
 
         return Inertia::render('Public/Datasets', [
             'datasets' => $datasets,
