@@ -29,14 +29,14 @@
                                         class="relative flex items-center justify-between"
                                     >
                                         <span
-                                            class="pr-3 text-lg bg-white font-medium text-gray-500"
+                                            class="px-3 -ml-4 rounded text-sm bg-gray-100 font-medium text-gray-500"
                                         >
                                             Description
                                         </span>
                                         <button
                                             v-if="canUpdateStudy"
                                             type="button"
-                                            class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                            class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                                             @click="openStudyDetailsPane"
                                         >
                                             <svg
@@ -57,9 +57,11 @@
                                 <dd
                                     class="mt-1 text-md text-gray-900 space-y-5"
                                 >
-                                    <p>
-                                        {{ study.description }}
-                                    </p>
+                        <p
+                            style="max-width: 100ch !important"
+                            class="prose mt-1 text-sm text-blue-gray-500"
+                            v-html="md(study.description)"
+                        ></p>
                                 </dd>
                             </div>
                             <div class="mb-4">
@@ -76,14 +78,14 @@
                                         class="relative flex items-center justify-between"
                                     >
                                         <span
-                                            class="pr-3 text-lg bg-white font-medium text-gray-500"
+                                            class="px-3 -ml-4 rounded text-sm bg-gray-100 font-medium text-gray-500"
                                         >
                                             Keywords
                                         </span>
                                         <button
                                             v-if="canUpdateStudy"
                                             type="button"
-                                            class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                            class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                                             @click="openStudyDetailsPane"
                                         >
                                             <svg
@@ -144,14 +146,14 @@
                                         class="relative flex items-center justify-between"
                                     >
                                         <span
-                                            class="pr-3 text-lg bg-white font-medium text-gray-500"
+                                            class="px-3 -ml-4 rounded text-sm bg-gray-100 font-medium text-gray-500"
                                         >
                                             License
                                         </span>
                                         <button
                                             v-if="canUpdateStudy"
                                             type="button"
-                                            class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                            class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                                             @click="openStudyDetailsPane"
                                         >
                                             <svg
@@ -174,7 +176,10 @@
                                         v-if="license"
                                         class="text-md text-gray-900 space-y-5"
                                     >
-                                        <p>
+                            <p
+                                style="max-width: 100ch !important"
+                                class="prose mt-1 text-sm text-blue-gray-500"
+                            >
                                             {{ license.title }}
                                             <ToolTip
                                                 v-if="study.license_id"
@@ -206,7 +211,7 @@
                                         <button
                                             v-if="canUpdateStudy"
                                             type="button"
-                                            class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                            class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                                             @click="openStudyDetailsPane"
                                         >
                                             <svg
@@ -404,7 +409,7 @@
                                                             v-model="smiles"
                                                             name="smiles"
                                                             type="text"
-                                                            class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                                                            class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md"
                                                             @blur="loadSmiles"
                                                         />
                                                     </div>
