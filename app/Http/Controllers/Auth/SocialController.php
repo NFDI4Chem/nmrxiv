@@ -50,18 +50,28 @@ class SocialController extends Controller
         if ($linkedSocialAccount) {
             $user = $linkedSocialAccount->user;
         } else {
-            if ($email = $providerUser->getEmail()) {
+            $email = $providerUser->getEmail();
+            $name = $providerUser->getName();
+            if ($name) {
+                $nameArray = explode(' ', $name, 2);
+                $firstname = array_key_exists(0, $nameArray) ? $nameArray[0] : '';
+                $lastname = array_key_exists(1, $nameArray) ? $nameArray[1] : '';
+            } else {
+                return Redirect::route('login')->with('message', 'We require your name. Please provide your name in your '.$service.' account and try again.');
+            }
+            if ($email) {
                 $user = User::where('email', $email)->first();
             } else {
                 return Redirect::route('login')->with('message', 'We require your email id to communicate. Please enable email sharing on your ORCID account and try again.');
             }
+
             if (! $user) {
                 $user = tap(User::create([
-                    'name' => $providerUser->getName(),
-                    'first_name' => explode(' ', $providerUser->getName(), 2)[0],
-                    'last_name' => explode(' ', $providerUser->getName(), 2)[1],
-                    'email' => $providerUser->getEmail(),
-                    'username' => strstr($providerUser->getEmail(), '@', true),
+                    'name' => $name,
+                    'first_name' => $firstname,
+                    'last_name' => $lastname ? $lastname : '',
+                    'email' => $email,
+                    'username' => strstr($email, '@', true),
                 ]), function (User $user) {
                     $user->ownedTeams()->save(Team::forceCreate([
                         'user_id' => $user->id,

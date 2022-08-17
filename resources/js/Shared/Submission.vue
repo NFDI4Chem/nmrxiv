@@ -1616,7 +1616,7 @@
                                                 >
                                                     Download Zip
                                                 </jet-button>
-                                                <jet-button
+                                                <!-- <jet-button
                                                     type="submit"
                                                     class="mr-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
                                                 >
@@ -1633,7 +1633,7 @@
                                                     class="mr-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
                                                 >
                                                     Share
-                                                </jet-button>
+                                                </jet-button> -->
                                             </div>
                                         </div>
                                     </section>
@@ -1986,12 +1986,58 @@
                                                     />
                                                 </div>
                                             </section>
+                                            <div
+                                                class="mt-10 pt-2 border-t border-gray-200 sm:flex sm:items-center sm:justify-between"
+                                                v-if="
+                                                    this.updateProjectForm
+                                                        .is_public == 'true'
+                                                "
+                                            >
+                                                <div class="justify-left">
+                                                    <div class="text-sm">
+                                                        <label
+                                                            for="confirm"
+                                                            class="font-small float-left inline break-normal text-sm text-gray-700"
+                                                        >
+                                                            <input
+                                                                v-model="
+                                                                    this
+                                                                        .confirmPublicAccess
+                                                                "
+                                                                id="confirm"
+                                                                aria-describedby="confirm-description"
+                                                                name="confirm"
+                                                                type="checkbox"
+                                                                class="focus:ring-teal-500 mr-3 h-4 w-4 text-teal-600 border-gray-300 rounded"
+                                                            />
+                                                            I understand, if the
+                                                            project is made
+                                                            public then all the
+                                                            underlying studies
+                                                            and dataset will
+                                                            also be made public.
+                                                        </label>
+                                                        <jet-button
+                                                            class="mt-3"
+                                                            :disabled="
+                                                                !confirmPublicAccess
+                                                            "
+                                                            @click="
+                                                                updateProject
+                                                            "
+                                                        >
+                                                            Save
+                                                        </jet-button>
+                                                    </div>
+                                                </div>
+                                            </div>
 
                                             <div
-                                                class="mt-10 pt-6 border-t border-gray-200 sm:flex sm:items-center sm:justify-between"
+                                                v-else
+                                                class="mt-10 pt-6 border-t border-gray-200 sm:flex"
                                             >
                                                 <button
-                                                    class="w-full bg-teal-600 border border-transparent rounded-md shadow-sm py-2 px-4 text-sm font-medium text-white hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-teal-500 sm:ml-6 sm:order-last sm:w-auto"
+                                                    class="w-full float-left bg-teal-600 border border-transparent rounded-md shadow-sm py-2 px-4 text-sm font-medium text-white hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-teal-500 sm:order-last sm:w-auto"
                                                     @click="updateProject"
                                                 >
                                                     Save
@@ -2234,40 +2280,12 @@
                     </jet-button>
                 </span>
                 <span v-else-if="currentStep.id == '03'">
-                    <div v-if="this.updateProjectForm.is_public == 'true'">
-                        <div class="flex-shrink-0 flex justify-left">
-                            <div class="flex items-center h-5">
-                                <input
-                                    v-model="this.confirmPublicAccess"
-                                    id="confirm"
-                                    aria-describedby="confirm-description"
-                                    name="confirm"
-                                    type="checkbox"
-                                    class="focus:ring-teal-500 h-4 w-4 text-teal-600 border-gray-300 rounded"
-                                />
-                            </div>
-                            <div class="ml-3 text-sm">
-                                <label
-                                    for="confirm"
-                                    class="font-small text-red-700"
-                                    >I understand, if the project is made public
-                                    then all the underlying studies and dataset
-                                    will also be made public.</label
-                                >
-                            </div>
-                        </div>
-                        <jet-button
-                            :disabled="!confirmPublicAccess"
-                            @click="UpdateAndClose"
-                        >
-                            Finish
-                        </jet-button>
-                    </div>
-                    <div v-else>
-                        <jet-button @click="UpdateAndClose">
-                            Finish
-                        </jet-button>
-                    </div>
+                    <Link
+                        class="inline-flex items-center px-2.5 py-1 border border-gray-300 shadow-sm text-md font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                        :href="route('dashboard')"
+                    >
+                        Finish
+                    </Link>
                 </span>
             </span>
         </template>
@@ -2701,24 +2719,45 @@ export default {
                 "/" +
                 this.selectedDataset.slug;
             if (iframe) {
-                if (!this.selectedDataset.nmrium_info) {
+                let spectra = [];
+                let nmrium_info = null;
+                if (
+                    this.selectedDataset &&
+                    this.selectedDataset.nmrium_info &&
+                    this.selectedDataset.nmrium_info != ""
+                ) {
+                    nmrium_info = JSON.parse(this.selectedDataset.nmrium_info);
+                }
+
+                if (nmrium_info && nmrium_info["spectra"]) {
+                    if (this.isString(nmrium_info["spectra"])) {
+                        spectra = JSON.parse(nmrium_info.spectra);
+                    } else {
+                        spectra = nmrium_info.spectra;
+                    }
+                }
+
+                if (spectra && spectra.length <= 0) {
                     let data = {
                         data: [url],
                         type: "url",
                     };
                     iframe.postMessage({ type: `nmr-wrapper:load`, data }, "*");
                 } else {
-                    let nmrium_info = JSON.parse(
-                        this.selectedDataset.nmrium_info
-                    );
-                    let spectra = JSON.parse(nmrium_info.spectra);
-                    let mols = JSON.parse(nmrium_info.molecules);
-                    if (mols) {
-                        this.currentMolecules = mols;
+                    let mols = [];
+                    if (this.isString(nmrium_info.molecules)) {
+                        mols = JSON.parse(nmrium_info.molecules);
+                    } else {
+                        mols = nmrium_info.molecules;
                     }
-                    mols.forEach((mol) => {
-                        mol.molfile = "\n" + mol.molfile + "\n";
-                    });
+
+                    if (mols && mols.length > 0) {
+                        this.currentMolecules = mols;
+                        mols.forEach((mol) => {
+                            mol.molfile = "\n" + mol.molfile + "\n";
+                        });
+                    }
+
                     let data = {
                         data: {
                             spectra: spectra,
@@ -2925,14 +2964,20 @@ export default {
                 if (e.data.type == "nmr-wrapper:data-change") {
                     let actionType = e.data.data.actionType;
 
-                    // if (
-                    //     actionType == "" ||
-                    //     (actionType == "INITIATE" &&
-                    //         this.selectedDataset &&
-                    //         this.selectedDataset.type != null)
-                    // ) {
-                    //     return;
-                    // }
+                    if (
+                        this.$page.props.autoimport &&
+                        !this.$page.props.autoimport
+                    ) {
+                        if (
+                            actionType == "" ||
+                            (actionType == "INITIATE" &&
+                                this.selectedDataset &&
+                                this.selectedDataset.type != null)
+                        ) {
+                            console.log("stopping here");
+                            return;
+                        }
+                    }
 
                     this.selectedSpectraData = e.data.data.spectra;
                     if (
@@ -2945,7 +2990,7 @@ export default {
 
                     if (this.selectedStudy && this.selectedDataset) {
                         if (this.selectedDataset.dataset_photo_url == "") {
-                            // console.info("Saving spectra preview");
+                            console.info("Saving spectra preview");
                             const iframe = window.frames.submissionNMRiumIframe;
                             if (iframe) {
                                 let data = {
@@ -2960,18 +3005,19 @@ export default {
                                 );
                             }
                         }
+                        this.updateDataSet();
                     }
-
-                    this.updateDataSet();
                 }
             };
 
             if (this.openCreateDatasetDialog) {
                 if (!this.$props.eventRegistered) {
+                    console.log("registering");
                     window.addEventListener("message", saveNMRiumUpdates);
                     this.$props.eventRegistered = true;
                 }
             } else {
+                console.log("deregistering");
                 window.removeEventListener("message", saveNMRiumUpdates);
                 this.$props.eventRegistered = false;
             }
@@ -2996,7 +3042,7 @@ export default {
         },
 
         updateDataSet() {
-            if (this.selectedSpectraData != null) {
+            if (this.selectedDataset != null) {
                 this.updateLoadingStatus(true);
                 axios
                     .post(
@@ -3027,22 +3073,28 @@ export default {
                                 this.studies[this.selectedStudyIndex].datasets
                                     .length
                             ) {
-                                this.selectStudy(
-                                    this.studies[this.selectedStudyIndex],
-                                    this.selectedStudyIndex,
-                                    this.selectedDSIndex + 1
-                                );
+                                setTimeout(() => {
+                                    this.selectStudy(
+                                        this.studies[this.selectedStudyIndex],
+                                        this.selectedStudyIndex,
+                                        this.selectedDSIndex + 1
+                                    );
+                                }, 2000);
                             } else {
                                 if (
                                     this.selectedStudyIndex + 1 <=
                                     this.studies.length - 1
                                 ) {
-                                    this.selectStudy(
-                                        this.studies[
-                                            this.selectedStudyIndex + 1
-                                        ],
-                                        this.selectedStudyIndex + 1
-                                    );
+                                    setTimeout(() => {
+                                        this.selectedDSIndex = 0;
+                                        this.selectStudy(
+                                            this.studies[
+                                                this.selectedStudyIndex + 1
+                                            ],
+                                            this.selectedStudyIndex + 1,
+                                            0
+                                        );
+                                    }, 2000);
                                 } else {
                                     this.$page.props.autoimport = false;
                                 }

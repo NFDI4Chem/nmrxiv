@@ -113,7 +113,6 @@ class ProjectController extends Controller
             'team' => $team ? $team->load('users') : null,
             'members' => $project->allUsers(),
             'availableRoles' => array_values(Jetstream::$roles),
-            'studies' => $project->studies,
             'role' => $project->userProjectRole(Auth::user()->email),
             'license' => $license ? $license[0] : null,
             'projectPermissions' => [
@@ -121,6 +120,22 @@ class ProjectController extends Controller
                 'canUpdateProject' => Gate::check('updateProject', $project),
             ],
         ]);
+    }
+
+    public function studies(Request $request, Project $project)
+    {
+        if (! Gate::forUser($request->user())->check('viewProject', $project)) {
+            throw new AuthorizationException;
+        }
+
+        $q = $request->get('query');
+
+        $q = ($q) ? $q : '';
+
+        return response()->json(['studies' => Study::where('project_id', $project->id)->where(function ($query) use ($q) {
+            $query->where('name', 'LIKE', '%'.$q.'%')
+                ->orWhere('description', 'LIKE', '%'.$q.'%');
+        })->orderByDesc('updated_at')->paginate(9)->withQueryString()])->withCallback($request->input('callback'));
     }
 
     public function settings(Request $request, Project $project)

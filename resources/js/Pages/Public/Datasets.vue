@@ -32,17 +32,37 @@
                 <div
                     v-for="dataset in datasets.data"
                     :key="dataset.id"
-                    class="flex flex-col rounded-lg shadow-lg overflow-hidden"
+                    class="flex flex-col border rounded-lg shadow-lg overflow-hidden"
                 >
                     <div
-                        class="flex-shrink-0 h-32 bg-gradient-to-tl from-sky-400 to-cyan-300 opacity-60"
+                        v-if="dataset.dataset_photo_url"
+                        class="flex-shrink-0 h-32 p-3 border-b border-gray-200"
+                    >
+                        <img
+                            :src="dataset.dataset_photo_url"
+                            alt=""
+                            class="w-full h-full object-center object-cover"
+                        />
+                    </div>
+                    <div
+                        v-else
+                        class="flex-shrink-0 h-32 pattern-diagonal-lines pattern-gray-400 pattern-bg-white pattern-size-2 pattern-opacity-20 border-b border-gray-400"
                     ></div>
                     <div
                         class="flex-1 bg-white p-3 flex flex-col justify-between"
                     >
                         <div class="flex-1">
                             <Link
-                                :href="'/datasets/' + dataset.slug"
+                                :href="
+                                    '/projects/' +
+                                    dataset.owner.username +
+                                    '/' +
+                                    dataset.project +
+                                    '?tab=study&id=' +
+                                    dataset.study +
+                                    '&dsid=' +
+                                    dataset.slug
+                                "
                                 class="block"
                             >
                                 <p
@@ -50,37 +70,41 @@
                                 >
                                     {{ dataset.name }}
                                 </p>
-                                <p
+                                <!-- <p
                                     class="mt-2 text-sm text-gray-500 line-clamp-4"
                                 >
                                     {{ dataset.description }}
-                                </p>
+                                </p> -->
                             </Link>
                         </div>
-                        <div class="mt-6 flex items-center">
+                        <div class="mt-2 flex items-center">
                             <div class="flex-shrink-0">
                                 <a>
                                     <img
-                                        class="h-10 w-10 rounded-full"
-                                        src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                                        alt="Roel Aufderehar"
+                                        class="h-7 w-7 rounded-full"
+                                        :src="dataset.owner.profile_photo_url"
+                                        :alt="
+                                            dataset.owner.first_name +
+                                            '' +
+                                            dataset.owner.last_name
+                                        "
                                     />
                                 </a>
                             </div>
                             <div class="ml-3">
                                 <p class="text-sm font-medium text-gray-900">
                                     <a class="hover:underline">
-                                        Roel Aufderehar
+                                        {{ dataset.owner.first_name }}
+                                        {{ dataset.owner.last_name }}
                                     </a>
                                 </p>
                                 <div
-                                    class="flex space-x-1 text-sm text-gray-500"
+                                    class="flex space-x-1 text-xs text-gray-500"
                                 >
                                     <time datetime="2020-03-16"
                                         >{{ formatDate(dataset.created_at) }}
                                     </time>
                                     <span aria-hidden="true"> &middot; </span>
-                                    <!-- <span> 6 min read </span> -->
                                 </div>
                             </div>
                         </div>

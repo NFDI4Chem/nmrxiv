@@ -43,6 +43,14 @@
                                 </option>
                             </select>
                         </div>
+                        <div class="text-sm my-2">
+                            <button
+                                class="cursort-pointer"
+                                @click.stop="loadFromURL()"
+                            >
+                                Reset
+                            </button>
+                        </div>
                         <div class="my-7">
                             <iframe
                                 name="datasetNMRiumIframe"
@@ -273,6 +281,7 @@
 <script>
 import StudyContent from "@/Pages/Study/Content.vue";
 import LoadingButton from "@/Shared/LoadingButton.vue";
+
 export default {
     components: {
         StudyContent,
@@ -325,7 +334,6 @@ export default {
             if (e.data.type == "nmr-wrapper:action-response") {
                 let actionType = e.data.data.type;
                 if (actionType == "exportSpectraViewerAsBlob") {
-                    console.log("hihi");
                     this.saveStudyPreview(e.data.data.data);
                 }
             }
@@ -338,10 +346,14 @@ export default {
                         this.selectedDataset &&
                         this.selectedDataset.type != null)
                 ) {
+                    if (this.selectedSpectraData == null) {
+                        this.selectedSpectraData = e.data.data.spectra;
+                    }
+                    // console.log("stopping here");
                     return;
                 }
 
-                this.selectedSpectraData = e.data.data.spectra[0];
+                this.selectedSpectraData = e.data.data.spectra;
                 if (
                     actionType == "ADD_MOLECULE" ||
                     actionType == "DELETE_MOLECULE" ||
@@ -350,26 +362,33 @@ export default {
                     this.currentMolecules = e.data.data.molecules;
                 }
 
-                if (this.selectedDataset) {
+                if (this.study && this.selectedDataset) {
                     if (this.selectedDataset.dataset_photo_url == "") {
-                        console.log("Saving spectra preview");
-                        const iframe = window.frames.datasetNMRiumIframe;
+                        console.info("Saving spectra preview");
+                        let iframe = window.frames.submissionNMRiumIframe;
                         if (iframe) {
                             let data = {
                                 type: "exportSpectraViewerAsBlob",
                             };
                             iframe.postMessage(
-                                { type: `nmr-wrapper:action-request`, data },
+                                {
+                                    type: `nmr-wrapper:action-request`,
+                                    data,
+                                },
                                 "*"
                             );
                         }
                     }
+                    this.updateDataSet();
                 }
-
-                this.updateDataSet();
             }
         };
-        window.addEventListener("message", saveNMRiumUpdates);
+
+        if (!this.$page.props.dsEventRegistered) {
+            // console.log("registering");
+            window.addEventListener("message", saveNMRiumUpdates);
+            this.$page.props.dsEventRegistered = true;
+        }
     },
     beforeMount() {
         if (this.study.license_id) {
@@ -401,61 +420,82 @@ export default {
             reader.readAsText(data.blob);
         },
         updateDataSet() {
-            if (this.selectedSpectraData != null) {
-                this.autoSaving = true;
-                axios
-                    .post(
-                        "/dashboard/datasets/" +
-                            this.selectedDataset.id +
-                            "/nmriumInfo",
-                        {
-                            spectra: this.selectedSpectraData,
-                            molecules: this.currentMolecules,
-                        }
-                    )
-                    .then((response) => {
-                        this.autoSaving = false;
-                    });
+            if (this.selectedDataset) {
+                // console.log("saving");
+                if (this.selectedSpectraData != null) {
+                    this.autoSaving = true;
+                    axios
+                        .post(
+                            "/dashboard/datasets/" +
+                                this.selectedDataset.id +
+                                "/nmriumInfo",
+                            {
+                                spectra: this.selectedSpectraData,
+                                molecules: this.currentMolecules,
+                            }
+                        )
+                        .catch((error) => {
+                            console.log(error.data);
+                        })
+                        .then((response) => {
+                            let i = 0;
+                            this.study.datasets.forEach((ds) => {
+                                if (ds.id == response.data.id) {
+                                    this.study.datasets[i] = response.data;
+                                    this.selectedDataset =
+                                        this.study.datasets[i];
+                                    this.selectedSpectraData = null;
+                                }
+                                i = i + 1;
+                            });
+                            this.autoSaving = false;
+                        });
+                }
             }
         },
         loadSpectra() {
             if (this.selectedDataset == null) {
                 this.selectedDataset = this.study.datasets[0];
             }
-            const iframe = window.frames.datasetNMRiumIframe;
+
             this.currentMolecules = [];
+            const iframe = window.frames.datasetNMRiumIframe;
             if (iframe) {
-                if (!this.selectedDataset.nmrium_info) {
-                    console.log("Loading spectra from file");
-                    let data = {
-                        data: [
-                            this.url +
-                                "/" +
-                                this.$page.props.user.username +
-                                "/datasets/" +
-                                this.project.slug +
-                                "/" +
-                                this.study.slug +
-                                "/" +
-                                this.selectedDataset.slug,
-                        ],
-                        type: "url",
-                    };
-                    iframe.postMessage({ type: `nmr-wrapper:load`, data }, "*");
-                } else {
-                    console.log("Loading spectra from object");
-                    let nmrium_info = JSON.parse(
-                        this.selectedDataset.nmrium_info
-                    );
-                    let mols = JSON.parse(nmrium_info.molecules);
-                    if (mols) {
-                        this.currentMolecules = mols;
+                let spectra = [];
+                let nmrium_info = null;
+                if (
+                    this.selectedDataset &&
+                    this.selectedDataset.nmrium_info &&
+                    this.selectedDataset.nmrium_info != ""
+                ) {
+                    nmrium_info = JSON.parse(this.selectedDataset.nmrium_info);
+                }
+
+                if (nmrium_info && nmrium_info["spectra"]) {
+                    if (this.isString(nmrium_info["spectra"])) {
+                        spectra = JSON.parse(nmrium_info.spectra);
+                    } else {
+                        spectra = nmrium_info.spectra;
                     }
-                    mols.forEach((mol) => {
-                        mol.molfile = "\n" + mol.molfile + "\n";
-                    });
-                    let spectra = JSON.parse(nmrium_info.spectra);
-                    this.selectedSpectraData = spectra;
+                }
+
+                if (spectra && spectra.length <= 0) {
+                    this.loadFromURL();
+                } else {
+                    let mols = [];
+                    if (this.isString(nmrium_info.molecules)) {
+                        mols = JSON.parse(nmrium_info.molecules);
+                    } else {
+                        mols = nmrium_info.molecules;
+                    }
+
+                    if (mols && mols.length > 0) {
+                        this.currentMolecules = mols;
+                        mols.forEach((mol) => {
+                            mol.molfile = "\n" + mol.molfile + "\n";
+                        });
+                    }
+
                     let data = {
                         data: {
                             spectra: spectra,
@@ -464,8 +504,30 @@ export default {
                         type: "nmrium",
                     };
                     iframe.postMessage({ type: `nmr-wrapper:load`, data }, "*");
+                    this.selectedSpectraData = spectra;
                 }
             }
+        },
+        loadFromURL(url) {
+            this.selectedDataset.type = null;
+            const iframe = window.frames.datasetNMRiumIframe;
+            if (!url) {
+                url =
+                    this.url +
+                    "/" +
+                    this.team.owner.username +
+                    "/datasets/" +
+                    this.project.slug +
+                    "/" +
+                    this.study.slug +
+                    "/" +
+                    this.selectedDataset.slug;
+            }
+            let data = {
+                data: [url],
+                type: "url",
+            };
+            iframe.postMessage({ type: `nmr-wrapper:load`, data }, "*");
         },
     },
 };
