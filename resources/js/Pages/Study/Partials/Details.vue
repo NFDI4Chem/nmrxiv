@@ -871,18 +871,22 @@ export default {
         };
         this.emitter.all.set("openStudyDetails", [initialise]);
     },
-    beforeMount() {
-        if (this.study.license_id) {
-            axios.get(route("license", this.study.license_id)).then((res) => {
-                this.form.license = res.data[0];
-            });
-        }
-        axios.get(route("licenses")).then((res) => {
-            this.licenses = res.data;
-        });
-    },
     methods: {
         toggleDetails() {
+            if (this.$page.props.licenses) {
+                this.licenses = this.$page.props.licenses;
+                this.form.license = this.licenses.find(
+                    (l) => l.id == this.study.license_id
+                );
+            } else {
+                axios.get(route("licenses")).then((res) => {
+                    this.licenses = res.data;
+                    this.$page.props.licenses = res.data;
+                    this.form.license = this.licenses.find(
+                        (l) => l.id == this.study.license_id
+                    );
+                });
+            }
             this.open = !this.open;
             this.getTags();
         },
