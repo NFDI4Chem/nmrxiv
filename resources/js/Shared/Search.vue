@@ -189,6 +189,10 @@
                                                                             class="w-full"
                                                                             :href="
                                                                                 '/projects/' +
+                                                                                hit
+                                                                                    .owner
+                                                                                    .username +
+                                                                                '/' +
                                                                                 hit.slug
                                                                             "
                                                                         >

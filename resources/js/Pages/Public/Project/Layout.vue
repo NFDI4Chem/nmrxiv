@@ -34,11 +34,12 @@
                             <div class="flex-shrink-0">
                                 <span
                                     v-if="project.data.stats"
-                                    class="relative z-0 inline-flex shadow-sm rounded-lg"
+                                    class="relative z-0 inline-flex shadow-sm rounded-full"
                                 >
                                     <button
                                         type="button"
-                                        class="relative inline-flex items-center px-1 py-1 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-900 hover:bg-gray-50"
+                                        class="relative inline-flex items-center px-1 py-1 rounded-l-full border border-gray-300 bg-white text-sm font-medium text-gray-900 hover:bg-gray-50"
+                                        @click="toggleUpVote()"
                                     >
                                         <svg
                                             xmlns="http://www.w3.org/2000/svg"
@@ -54,7 +55,7 @@
                                         </svg>
                                     </button>
                                     <a
-                                        class="-ml-px relative inline-flex items-center px-4 py-1 rounded-r-md border border-gray-300 bg-white text-sm font-black text-dark hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                                        class="-ml-px relative inline-flex items-center px-4 py-1 rounded-r-full border border-gray-300 bg-white text-sm font-black text-dark hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
                                     >
                                         {{ project.data.stats.likes }}
                                     </a>
@@ -77,8 +78,12 @@
                                 <div
                                     class="-mt-12 sm:-mt-16 sm:flex sm:items-end sm:space-x-5"
                                 >
-                                    <div class="flex mb-5">
+                                    <div class="flex mb-12 h-24 w-72">
                                         <img
+                                            v-if="
+                                                project.data.photo_url &&
+                                                project.data.photo_url != ''
+                                            "
                                             class="h-24 w-72 object-cover border rounded ring-4 ring-white sm:h-32 sm:w-96"
                                             :src="project.data.photo_url"
                                             alt=""
@@ -161,7 +166,7 @@
 <script>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import { Link } from "@inertiajs/inertia-vue3";
-
+import { Inertia } from "@inertiajs/inertia";
 export default {
     components: {
         AppLayout,
@@ -196,6 +201,25 @@ export default {
     },
     computed: {},
     mounted() {},
-    methods: {},
+    methods: {
+        toggleUpVote() {
+            const url = "/projects/" + this.project.data.id + "/toggleUpVote";
+            axios
+                .get(url)
+                .catch((err) => {
+                    if (
+                        err.response.status !== 200 ||
+                        err.response.status !== 201
+                    ) {
+                        throw new Error(
+                            `API call failed with status code: ${err.response.status} after multiple attempts`
+                        );
+                    }
+                })
+                .then(function (response) {
+                    Inertia.reload({ only: ["project"] });
+                });
+        },
+    },
 };
 </script>

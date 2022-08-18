@@ -89,7 +89,7 @@ class StudyController extends Controller
         }
 
         $project = $study->project;
-        $team = $project->nonPersonalTeam;
+        $team = $project->team;
 
         return Inertia::render('Study/Datasets', [
             'study' => $study->load('users', 'owner', 'studyInvitations', 'datasets'),
