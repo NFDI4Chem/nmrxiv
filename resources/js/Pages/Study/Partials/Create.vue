@@ -374,14 +374,6 @@ export default {
         this.emitter.on("openStudyCreateDialog", () => {
             this.createStudyDialog = true;
         });
-        axios.get(route("licenses")).then((res) => {
-            this.licenses = res.data;
-        });
-        if (this.project.license_id) {
-            axios.get(route("license", this.project.license_id)).then((res) => {
-                this.createStudyForm.license = res.data[0];
-            });
-        }
     },
     methods: {
         createStudy() {
@@ -401,6 +393,20 @@ export default {
         toggleCreateStudyDialog() {
             this.createStudyDialog = !this.createStudyDialog;
             this.createStudyForm.clearErrors();
+            if (this.$page.props.licenses) {
+                this.licenses = this.$page.props.licenses;
+                this.createStudyForm.license = this.licenses.find(
+                    (l) => l.id == this.project.license_id
+                );
+            } else {
+                axios.get(route("licenses")).then((res) => {
+                    this.licenses = res.data;
+                    this.$page.props.licenses = res.data;
+                    this.createStudyForm.license = this.licenses.find(
+                        (l) => l.id == this.project.license_id
+                    );
+                });
+            }
         },
     },
 };
