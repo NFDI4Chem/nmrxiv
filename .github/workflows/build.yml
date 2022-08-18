@@ -1,4 +1,4 @@
-name : nmrXiv prod deployment to GKE vis Github Actions
+name : nmrXiv prod deployment to GKE via Github Actions
 
 on:
   push:
