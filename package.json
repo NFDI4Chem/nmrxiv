@@ -25,6 +25,7 @@
         "postcss-import": "^12.0.1",
         "prettier": "2.7.1",
         "tailwindcss": "^2.2.19",
+        "tailwindcss-bg-patterns": "^0.2.0",
         "vite": "^2.9.13",
         "vue": "^3.0.5",
         "vue-loader": "^16.1.2"

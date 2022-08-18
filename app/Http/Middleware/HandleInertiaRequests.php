@@ -40,12 +40,14 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request)
     {
+        $user = $request->user();
+
         return array_merge(parent::share($request), [
             'flash' => [
                 'message' => fn () => $request->session()->get('message'),
             ],
-            'user.permissions' => fn () => $request->user() ?
-                $request->user()->getPermissionsViaRoles()->pluck('name')
+            'user.permissions' => fn () => $user ?
+                $user->getPermissionsViaRoles()->pluck('name')
                 : null,
             'flash' => function () use ($request) {
                 return [
@@ -53,8 +55,8 @@ class HandleInertiaRequests extends Middleware
                     'error' => $request->session()->get('error'),
                 ];
             },
-            'user.roles' => fn () => $request->user() ?
-                $request->user()->getRoleNames()
+            'user.roles' => fn () => $user ?
+                $user->getRoleNames()
                 : null,
             'twitter' => (env('TWITTER_CLIENT_ID') !== null && env('TWITTER_CLIENT_ID') !== ''),
             'github' => (env('GITHUB_CLIENT_ID') !== null && env('GITHUB_CLIENT_ID') !== ''),
@@ -62,6 +64,7 @@ class HandleInertiaRequests extends Middleware
             'config.announcements' => Announcement::active(),
             'url' => env('APP_URL'),
             'nmriumURL' => env('NMRIUM_URL'),
+            'team' => $user ? $user->currentTeam : null,
             'environment' => env('APP_ENV'),
             'MEILISEARCH_HOST' => (env('MEILISEARCH_HOST')),
             'MEILISEARCH_PUBLICKEY' => (env('MEILISEARCH_PUBLICKEY')),
