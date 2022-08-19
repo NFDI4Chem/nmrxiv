@@ -444,7 +444,13 @@ export default {
                                     this.study.datasets[i] = response.data;
                                     this.selectedDataset =
                                         this.study.datasets[i];
-                                    this.selectedSpectraData = null;
+                                    let nmrium_info = JSON.parse(
+                                        this.selectedDataset.nmrium_info
+                                    );
+                                    if (nmrium_info) {
+                                        this.selectedSpectraData =
+                                            nmrium_info["spectra"];
+                                    }
                                 }
                                 i = i + 1;
                             });
