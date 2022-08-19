@@ -1610,12 +1610,17 @@
                                                 >
                                                     Quick links
                                                 </h3>
-                                                <jet-button
-                                                    type="submit"
-                                                    class="mr-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                                                <div
+                                                    v-if="downloadURL"
+                                                    class="ml-4 flex-shrink-0"
                                                 >
-                                                    Download Zip
-                                                </jet-button>
+                                                    <a
+                                                        :href="downloadURL"
+                                                        class="mr-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                                                    >
+                                                        Download
+                                                    </a>
+                                                </div>
                                                 <!-- <jet-button
                                                     type="submit"
                                                     class="mr-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
@@ -2456,6 +2461,16 @@ export default {
             return this.tabs.find((t) => t.current);
         },
 
+        downloadURL() {
+            return (
+                this.url +
+                "/" +
+                this.project.owner.username +
+                "/datasets/" +
+                this.project.slug
+            );
+        },
+
         nmriumURL() {
             return this.$page.props.nmriumURL
                 ? String(
@@ -3086,7 +3101,7 @@ export default {
                                     this.studies.length - 1
                                 ) {
                                     setTimeout(() => {
-                                        this.selectedDSIndex = 0;
+                                        this.selectedDSIndex = -1;
                                         this.selectStudy(
                                             this.studies[
                                                 this.selectedStudyIndex + 1
