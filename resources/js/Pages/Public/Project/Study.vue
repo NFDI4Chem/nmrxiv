@@ -304,7 +304,15 @@ export default {
     },
     computed: {
         shareURL() {
-            return window.location.href;
+            return this.url +
+                "/projects/" +
+                this.project.data.owner.username +
+                "/" +
+                this.project.slug +
+                "?tab=study&id=" +
+                this.study.slug +
+                "&dsid=" +
+                this.selectedDataset.slug
         },
         nmriumURL() {
             return this.$page.props.nmriumURL
