@@ -265,18 +265,18 @@ export default {
                     };
                     iframe.postMessage({ type: `nmr-wrapper:load`, data }, "*");
                 } else {
-                    console.log("Loading spectra from object");
-                    let nmrium_info = JSON.parse(
-                        this.selectedDataset.nmrium_info
-                    );
-                    let mols = JSON.parse(nmrium_info.molecules);
-                    if (mols) {
-                        this.currentMolecules = mols;
+                    let nmrium_info = this.parseJSON(this.selectedDataset.nmrium_info)
+                    let mols = []
+                    if(nmrium_info.molecules){
+                        let mols = this.parseJSON(nmrium_info.molecules);
+                        if (mols) {
+                            this.currentMolecules = mols;
+                            mols.forEach((mol) => {
+                                mol.molfile = "\n" + mol.molfile + "\n";
+                            });
+                        }
                     }
-                    mols.forEach((mol) => {
-                        mol.molfile = "\n" + mol.molfile + "\n";
-                    });
-                    let spectra = JSON.parse(nmrium_info.spectra);
+                    let spectra = nmrium_info.spectra;
                     this.selectedSpectraData = spectra;
                     let data = {
                         data: {
