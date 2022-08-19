@@ -49,6 +49,8 @@ class DownloadController extends Controller
             $environment = env('APP_ENV', 'local');
             $fsObj->path = $environment.'/'.$project->uuid;
             $fsObj->key = $project->uuid;
+            $fsObj->relative_url = '/'.$project->uuid;
+            $request->merge(['uuid' => $project->uuid]);
 
             return $this->downloadFromProject($request, $username, $project, $fsObj->key, $fsObj);
         }

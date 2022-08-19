@@ -92,6 +92,15 @@ export default {
         isString(val) {
             return typeof val === "string" || val instanceof String;
         },
+        parseJSON(val){
+            if(!val){
+                return null
+            }
+            if(this.isString(val)){
+                return JSON.parse(val)
+            }
+            return null
+        }
     },
     computed: {
         editable() {
