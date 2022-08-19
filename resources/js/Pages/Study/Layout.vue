@@ -248,6 +248,7 @@
                                         ref="studyDetailsElement"
                                         :study="study"
                                         :role="studyRole"
+                                        :studyPermissions="studyPermissions"
                                     />
                                 </div>
                             </div>
