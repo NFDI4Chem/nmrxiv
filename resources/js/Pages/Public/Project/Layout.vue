@@ -26,6 +26,7 @@
                         <div class="float-right">
                             <a
                                 class="ml-4 cursor-pointer relative inline-flex items-center px-4 py-1 rounded-full border border-gray-300 bg-white text-sm font-black text-dark hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                                :href="downloadURL"
                             >
                                 Download
                             </a>
@@ -199,7 +200,20 @@ export default {
             ],
         };
     },
-    computed: {},
+    computed: {
+        downloadURL() {
+            return (
+                this.url +
+                "/" +
+                this.project.data.owner.username +
+                "/datasets/" +
+                this.project.data.slug
+            );
+        },
+        url() {
+            return String(this.$page.props.url);
+        },
+    },
     mounted() {},
     methods: {
         toggleUpVote() {
