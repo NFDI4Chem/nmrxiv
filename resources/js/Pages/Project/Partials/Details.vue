@@ -75,7 +75,7 @@
                                                             v-model="form.name"
                                                             type="text"
                                                             :readonly="
-                                                                !editable
+                                                                !canUpdateProject
                                                             "
                                                             name="project-name"
                                                             class="block w-full shadow-sm sm:text-sm focus:ring-gray-500 focus:border-gray-500 border-gray-300 rounded-md"
@@ -153,7 +153,7 @@
                                                                                 form.description
                                                                             "
                                                                             :readonly="
-                                                                                !editable
+                                                                                !canUpdateProject
                                                                             "
                                                                             name="description"
                                                                             placeholder="Describe this project"
@@ -246,7 +246,7 @@
                                                                 ',',
                                                             ]"
                                                             :disabled="
-                                                                !editable
+                                                                !canUpdateProject
                                                             "
                                                             max-width="100%"
                                                             :tags="form.tags"
@@ -258,7 +258,7 @@
                                                         />
                                                     </div>
                                                 </div>
-                                                <div v-if="editable">
+                                                <div v-if="canUpdateProject">
                                                     <input
                                                         ref="photo"
                                                         type="file"
@@ -317,7 +317,7 @@
                             Remove Photo
                           </jet-secondary-button> -->
                                                 </div>
-                                                <div v-if="editable">
+                                                <div v-if="canUpdateProject">
                                                     <label
                                                         for="study-name"
                                                         class="block text-sm font-medium text-gray-900"
@@ -353,7 +353,7 @@
                                                                         true
                                                                     "
                                                                     :disabled="
-                                                                        !editable
+                                                                        !canUpdateProject
                                                                     "
                                                                     name="privacy"
                                                                     value="true"
@@ -401,7 +401,7 @@
                                                                             false
                                                                         "
                                                                         :disabled="
-                                                                            !editable
+                                                                            !canUpdateProject
                                                                         "
                                                                         name="privacy"
                                                                         value="false"
@@ -441,7 +441,7 @@
                                                 </fieldset>
                                             </div>
                                             <div
-                                                v-if="editable"
+                                                v-if="canUpdateProject"
                                                 class="pt-4 pb-6"
                                             >
                                                 <div
@@ -465,7 +465,7 @@
                                                 />
                                             </div>
                                             <div
-                                                v-if="editable"
+                                                v-if="canUpdateProject"
                                                 class="pt-4 pb-6"
                                             >
                                                 <div
@@ -492,7 +492,7 @@
                                                                     project.public_url
                                                                 "
                                                                 :readonly="
-                                                                    !editable
+                                                                    !canUpdateProject
                                                                 "
                                                                 type="text"
                                                                 class="rounded-l-md focus:ring-gray-500 focus:border-gray-500 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300"
@@ -774,7 +774,7 @@
                                         Cancel
                                     </jet-secondary-button>
                                     <jet-button
-                                        v-if="editable"
+                                        v-if="canUpdateProject"
                                         type="submit"
                                         class="ml-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
                                         @click="updateProject"
@@ -786,7 +786,7 @@
                                 <div
                                     v-if="
                                         this.form.is_public == 'true' &&
-                                        editable
+                                        canUpdateProject
                                     "
                                     class="flex-shrink-0 px-4 py-4 flex justify-end"
                                 >
@@ -937,7 +937,7 @@ export default defineComponent({
         SelectRich,
         VueTagsInput,
     },
-    props: ["project", "role"],
+    props: ["project", "role", "projectPermissions"],
     setup() {
         const activityDetailsElement = ref(null);
         return {
@@ -975,6 +975,13 @@ export default defineComponent({
             linkAccess: this.project.access == "link",
             confirmPublicAccess: false,
         };
+    },
+    computed:{
+        canUpdateProject() {
+            return this.projectPermissions
+                ? this.projectPermissions.canUpdateProject
+                : false;
+        },
     },
     methods: {
         clearPhotoFileInput() {

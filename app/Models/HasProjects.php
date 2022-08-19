@@ -91,7 +91,7 @@ trait HasProjects
             return false;
         }
 
-        return $this->hasProjectRole($project, 'owner') || $this->hasProjectRole($project, 'collaborator');
+        return $this->hasProjectRole($project, 'owner') || $this->hasProjectRole($project, 'collaborator') || $this->hasProjectRole($project, 'creator');
     }
 
     /**
@@ -103,6 +103,9 @@ trait HasProjects
      */
     public function hasProjectRole($project, $role)
     {
+        $team = $project->team ? $project->team : null;
+        $id = $this->id;
+        
         if (is_null($project) || is_null($role)) {
             return false;
         }
@@ -112,8 +115,6 @@ trait HasProjects
                 return true;
             }
         }
-
-        $id = $this->id;
 
         $projectUser = $project->users->first(function ($u) use ($id) {
             return $u->id === $id;
@@ -126,23 +127,24 @@ trait HasProjects
                 return false;
             }
         }
-
-        $team = $project->team;
-
+        
         if (! $team->personal_team) {
             $teamUser = $team->allUsers()->first(function ($u) use ($id) {
                 return $u->id === $id;
             });
-
             if (! is_null($teamUser)) {
-                if ($teamUser->projectMembership->role == $role) {
+                $membership = $teamUser->membership ? $teamUser->membership : null;
+                if($teamUser->ownsTeam($team)){
                     return true;
+                }else if ($membership) {
+                    if($membership->role == $role){
+                        return true;
+                    }
                 } else {
                     return false;
                 }
             }
         }
-
         return false;
     }
 }
