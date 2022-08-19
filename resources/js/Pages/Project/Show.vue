@@ -133,6 +133,7 @@
                                 <project-details
                                     ref="projectDetailsElement"
                                     :role="role"
+                                    :projectPermissions="projectPermissions"
                                     :project="project"
                                 />
                                 <add-author
@@ -506,6 +507,7 @@ export default {
         return {};
     },
     computed: {
+
         canDeleteProject() {
             if (this.role) {
                 if (this.role == "owner" || this.role == "creator") {

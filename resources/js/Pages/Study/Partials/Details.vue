@@ -75,7 +75,7 @@
                                                             v-model="form.name"
                                                             type="text"
                                                             :readonly="
-                                                                !editable
+                                                                !canUpdateStudy
                                                             "
                                                             name="study-name"
                                                             class="block w-full shadow-sm sm:text-sm focus:ring-gray-500 focus:border-gray-500 border-gray-300 rounded-md"
@@ -153,7 +153,7 @@
                                                                                 form.description
                                                                             "
                                                                             :readonly="
-                                                                                !editable
+                                                                                !canUpdateStudy
                                                                             "
                                                                             name="description"
                                                                             placeholder="Describe this study"
@@ -246,7 +246,7 @@
                                                                 ',',
                                                             ]"
                                                             :disabled="
-                                                                !editable
+                                                                !canUpdateStudy
                                                             "
                                                             max-width="100%"
                                                             :tags="form.tags"
@@ -258,7 +258,7 @@
                                                         />
                                                     </div>
                                                 </div>
-                                                <div v-if="editable">
+                                                <div v-if="canUpdateStudy">
                                                     <label
                                                         for="study-name"
                                                         class="block text-sm font-medium text-gray-900"
@@ -294,7 +294,7 @@
                                                                         true
                                                                     "
                                                                     :disabled="
-                                                                        !editable
+                                                                        !canUpdateStudy
                                                                     "
                                                                     name="privacy"
                                                                     value="true"
@@ -342,7 +342,7 @@
                                                                             false
                                                                         "
                                                                         :disabled="
-                                                                            !editable
+                                                                            !canUpdateStudy
                                                                         "
                                                                         name="privacy"
                                                                         value="false"
@@ -391,7 +391,7 @@
                                                             "
                                                             label="License"
                                                             :disabled="
-                                                                !editable
+                                                                !canUpdateStudy
                                                             "
                                                             :items="licenses"
                                                         />
@@ -706,7 +706,7 @@
                                         Cancel
                                     </jet-secondary-button>
                                     <jet-button
-                                        v-if="editable"
+                                        v-if="canUpdateStudy"
                                         type="submit"
                                         class="ml-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
                                         @click="updateStudy"
@@ -823,7 +823,7 @@ export default {
         SelectRich,
         VueTagsInput,
     },
-    props: ["study", "role"],
+    props: ["study", "role", "studyPermissions"],
     setup() {
         const activityDetailsElement = ref(null);
         return {
@@ -870,6 +870,13 @@ export default {
             this.open = true;
         };
         this.emitter.all.set("openStudyDetails", [initialise]);
+    },
+    computed: {
+        canUpdateStudy() {
+            return this.studyPermissions
+                ? this.studyPermissions.canUpdateStudy
+                : false;
+        },
     },
     methods: {
         toggleDetails() {
