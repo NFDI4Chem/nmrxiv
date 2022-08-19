@@ -976,7 +976,7 @@ export default defineComponent({
             confirmPublicAccess: false,
         };
     },
-    computed:{
+    computed: {
         canUpdateProject() {
             return this.projectPermissions
                 ? this.projectPermissions.canUpdateProject
