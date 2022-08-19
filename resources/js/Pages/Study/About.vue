@@ -57,11 +57,11 @@
                                 <dd
                                     class="mt-1 text-md text-gray-900 space-y-5"
                                 >
-                        <p
-                            style="max-width: 100ch !important"
-                            class="prose mt-1 text-sm text-blue-gray-500"
-                            v-html="md(study.description)"
-                        ></p>
+                                    <p
+                                        style="max-width: 100ch !important"
+                                        class="prose mt-1 text-sm text-blue-gray-500"
+                                        v-html="md(study.description)"
+                                    ></p>
                                 </dd>
                             </div>
                             <div class="mb-4">
@@ -176,10 +176,10 @@
                                         v-if="license"
                                         class="text-md text-gray-900 space-y-5"
                                     >
-                            <p
-                                style="max-width: 100ch !important"
-                                class="prose mt-1 text-sm text-blue-gray-500"
-                            >
+                                        <p
+                                            style="max-width: 100ch !important"
+                                            class="prose mt-1 text-sm text-blue-gray-500"
+                                        >
                                             {{ license.title }}
                                             <ToolTip
                                                 v-if="study.license_id"
