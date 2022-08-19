@@ -304,7 +304,8 @@ export default {
     },
     computed: {
         shareURL() {
-            return this.url +
+            return (
+                this.url +
                 "/projects/" +
                 this.project.data.owner.username +
                 "/" +
@@ -313,6 +314,7 @@ export default {
                 this.study.slug +
                 "&dsid=" +
                 this.selectedDataset.slug
+            );
         },
         nmriumURL() {
             return this.$page.props.nmriumURL
