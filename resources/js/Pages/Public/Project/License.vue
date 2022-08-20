@@ -13,9 +13,11 @@
                         class="grid grid-cols-1 gap-y-6 sm:grid-cols-6 sm:gap-x-6"
                     >
                         <div class="sm:col-span-6">
-                            <p class="mt-1 text-md text-blue-gray-500">
-                                {{ project.data.license.description }}
-                            </p>
+                            <p
+                                style="max-width: 100ch !important"
+                                class="prose mt-1 text-sm text-blue-gray-500"
+                                 v-html="project.data.license.description"
+                            ></p>
                         </div>
                     </div>
                 </div>
