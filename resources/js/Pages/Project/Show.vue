@@ -507,7 +507,6 @@ export default {
         return {};
     },
     computed: {
-
         canDeleteProject() {
             if (this.role) {
                 if (this.role == "owner" || this.role == "creator") {
