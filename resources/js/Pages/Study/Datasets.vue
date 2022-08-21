@@ -85,7 +85,7 @@
                                         ></div>
                                     </div>
                                     <!-- <p
-                    class="mt-2 block text-sm font-medium text-gray-900 truncate pointer-events-none"
+                    class="mt-2 block text-sm font-medium truncate text-gray-900 truncate pointer-events-none"
                   >
                     {{ file.title }}
                   </p>
