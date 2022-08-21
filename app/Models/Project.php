@@ -47,10 +47,7 @@ class Project extends Model implements Auditable
     ];
 
     protected static $marks = [
-        Like::class,
-        Bookmark::class,
-        Reaction::class,
-        Favorite::class,
+        Like::class
     ];
 
     /**
@@ -209,7 +206,7 @@ class Project extends Model implements Auditable
     }
 
     /**
-     * Remove the given user from the team.
+     * Remove the given user from the project.
      *
      * @param  \App\Models\User  $user
      * @return void
