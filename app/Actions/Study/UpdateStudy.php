@@ -44,7 +44,7 @@ class UpdateStudy
             ])->save();
 
             if (array_key_exists('tags_array', $input)) {
-                $study->syncTagsWithType($input['tags_array'], 'Study');
+                $study->syncTagsWithType(array_filter($input['tags_array']), 'Study');
             }
         });
     }
