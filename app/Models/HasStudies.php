@@ -103,6 +103,9 @@ trait HasStudies
      */
     public function hasStudyRole($study, $role)
     {
+        $team = $study->team ? $study->team : null;
+        $id = $this->id;
+
         if (is_null($study) || is_null($role)) {
             return false;
         }
@@ -112,8 +115,6 @@ trait HasStudies
                 return true;
             }
         }
-
-        $id = $this->id;
 
         $studyUser = $study->users->first(function ($u) use ($id) {
             return $u->id === $id;
@@ -138,17 +139,18 @@ trait HasStudies
                 return false;
             }
         }
-
-        $team = $study->team;
-
         if (! $team->personal_team) {
             $teamUser = $team->allUsers()->first(function ($u) use ($id) {
                 return $u->id === $id;
             });
-
             if (! is_null($teamUser)) {
-                if ($teamUser->studyMembership->role == $role) {
+                $membership = $teamUser->membership ? $teamUser->membership : null;
+                if($teamUser->ownsTeam($team)){
                     return true;
+                }else if ($membership) {
+                    if($membership->role == $role){
+                        return true;
+                    }
                 } else {
                     return false;
                 }

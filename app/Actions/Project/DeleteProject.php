@@ -14,6 +14,6 @@ class DeleteProject
      */
     public function delete($project)
     {
-        $project->delete();
+        // $project->delete();
     }
 }
