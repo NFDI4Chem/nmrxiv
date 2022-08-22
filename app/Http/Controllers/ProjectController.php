@@ -110,7 +110,7 @@ class ProjectController extends Controller
 
         return Inertia::render('Project/Show', [
             'project' => $project->load('projectInvitations', 'tags', 'authors'),
-            'team' => $team ? $team->load(['users','owner']) : null,
+            'team' => $team ? $team->load(['users', 'owner']) : null,
             'members' => $project->allUsers(),
             'availableRoles' => array_values(Jetstream::$roles),
             'role' => $project->userProjectRole(Auth::user()->email),
@@ -145,7 +145,7 @@ class ProjectController extends Controller
         }
 
         return Inertia::render('Project/Settings', [
-            'project' => $project
+            'project' => $project,
         ]);
     }
 
