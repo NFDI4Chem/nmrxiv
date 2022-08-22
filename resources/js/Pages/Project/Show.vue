@@ -133,6 +133,7 @@
                                 <project-details
                                     ref="projectDetailsElement"
                                     :role="role"
+                                    :projectPermissions="projectPermissions"
                                     :project="project"
                                 />
                                 <add-author

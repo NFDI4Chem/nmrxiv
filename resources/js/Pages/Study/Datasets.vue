@@ -13,6 +13,85 @@
         >
             <template #study-section>
                 <div class="px-4 sm:px-6 md:px-0">
+                    <div v-if="selectedDataset && study.is_public" class="p-4">
+                        <div class="float-right">
+                            <div class="flex-0.5 self-center">
+                                <Menu
+                                    as="div"
+                                    v-if="selectedDataset && study.is_public"
+                                    class="relative text-left"
+                                >
+                                    <div>
+                                        <MenuButton
+                                            class="bg-white text-sm rounded-full flex items-center text-gray-400 hover:text-gray-600"
+                                        >
+                                            <ShareIcon
+                                                class="h-4 w-4 text-gray-800 flex-shrink-0 mr-2"
+                                                aria-hidden="true"
+                                            ></ShareIcon
+                                            >Share
+                                        </MenuButton>
+                                    </div>
+                                    <transition
+                                        enter-active-class="transition ease-out duration-100"
+                                        enter-from-class="transform opacity-0 scale-95"
+                                        enter-to-class="transform opacity-100 scale-100"
+                                        leave-active-class="transition ease-in duration-75"
+                                        leave-from-class="transform opacity-100 scale-100"
+                                        leave-to-class="transform opacity-0 scale-95"
+                                    >
+                                        <MenuItems
+                                            class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
+                                        >
+                                            <div class="py-1">
+                                                <MenuItem v-slot="{ active }">
+                                                    <div
+                                                        :class="[
+                                                            active
+                                                                ? 'bg-gray-100 text-gray-900'
+                                                                : 'text-gray-700',
+                                                            'block px-4 py-2 text-sm flex',
+                                                        ]"
+                                                    >
+                                                        <div class="flex-grow">
+                                                            <input
+                                                                id="datasetPublicURLCopy"
+                                                                readonly
+                                                                type="text"
+                                                                :value="
+                                                                    shareURL
+                                                                "
+                                                                class="rounded-l-md focus:ring-gray-500 focus:border-gray-500 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300"
+                                                                @focus="
+                                                                    $event.target.select()
+                                                                "
+                                                            />
+                                                        </div>
+                                                        <button
+                                                            type="button"
+                                                            class="-ml-px relative inline-flex items-center space-x-2 px-2 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500"
+                                                            @click="
+                                                                copyToClipboard(
+                                                                    shareURL,
+                                                                    'datasetPublicURLCopy'
+                                                                )
+                                                            "
+                                                        >
+                                                            <span
+                                                                ><ClipboardCopyIcon
+                                                                    class="h-5 w-5"
+                                                                    aria-hidden="true"
+                                                            /></span>
+                                                        </button>
+                                                    </div>
+                                                </MenuItem>
+                                            </div>
+                                        </MenuItems>
+                                    </transition>
+                                </Menu>
+                            </div>
+                        </div>
+                    </div>
                     <div class="p-6">
                         <div>
                             <label
@@ -85,7 +164,7 @@
                                         ></div>
                                     </div>
                                     <!-- <p
-                    class="mt-2 block text-sm font-medium text-gray-900 truncate pointer-events-none"
+                    class="mt-2 block text-sm font-medium truncate text-gray-900 truncate pointer-events-none"
                   >
                     {{ file.title }}
                   </p>
@@ -281,11 +360,19 @@
 <script>
 import StudyContent from "@/Pages/Study/Content.vue";
 import LoadingButton from "@/Shared/LoadingButton.vue";
+import { ShareIcon, ClipboardCopyIcon } from "@heroicons/vue/solid";
+import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 
 export default {
     components: {
         StudyContent,
         LoadingButton,
+        ShareIcon,
+        ClipboardCopyIcon,
+        Menu,
+        MenuButton,
+        MenuItem,
+        MenuItems,
     },
     props: [
         "study",
@@ -314,6 +401,19 @@ export default {
         },
         url() {
             return String(this.$page.props.url);
+        },
+        shareURL() {
+            return (
+                this.url +
+                "/projects/" +
+                this.team.owner.username +
+                "/" +
+                this.project.slug +
+                "?tab=study&id=" +
+                this.study.slug +
+                "&dsid=" +
+                this.selectedDataset.slug
+            );
         },
         nmriumURL() {
             return this.$page.props.nmriumURL
