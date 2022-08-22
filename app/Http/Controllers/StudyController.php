@@ -123,9 +123,9 @@ class StudyController extends Controller
             $molecule = Molecule::firstOrCreate([
                 'STANDARD_INCHI' => $inchi,
             ], [
-                'FORMULA' => $request->get('formula'),
-                'INCHI_KEY' => $request->get('InChIKey'),
-                'MOL' => $request->get('mol'),
+                'FORMULA' => $request->get('formula') ? $request->get('formula') : '',
+                'INCHI_KEY' => $request->get('InChIKey') ? $request->get('InChIKey') : '',
+                'MOL' => $request->get('mol') ? $request->get('mol') : '',
             ]);
             $sample->molecules()->syncWithPivotValues([$molecule->id], ['percentage_composition' => $request->get('percentage')], false);
         }

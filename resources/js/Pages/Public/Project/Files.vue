@@ -118,7 +118,7 @@
                                             </span>
                                         </div>
                                         <p
-                                            class="mt-2 px-2 py-1 block text-sm font-medium text-gray-900 pointer-events-none"
+                                            class="mt-2 px-2 py-1 block truncate text-sm font-medium text-gray-900 pointer-events-none"
                                         >
                                             {{ file.name }}
                                         </p>
