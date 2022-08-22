@@ -9,7 +9,7 @@ class ProjectResource extends JsonResource
 {
     private bool $lite = true;
 
-    private array $properties = ['users', 'studies', 'files', 'license', 'authors'];
+    private array $properties = ['users', 'studies', 'files', 'authors'];
 
     public function lite(bool $lite, array $properties): self
     {
@@ -42,6 +42,9 @@ class ProjectResource extends JsonResource
             'stats' => [
                 'likes' => $this->likes(),
             ],
+            'license' => new LicenseResource(
+                $this->license
+            ),
             $this->mergeWhen(! $this->lite, function () {
                 return [
                     $this->mergeWhen(
@@ -78,16 +81,6 @@ class ProjectResource extends JsonResource
                                         ->orderBy('type')
                                         ->get(),
                                 ],
-                            ];
-                        }
-                    ),
-                    $this->mergeWhen(
-                        in_array('license', $this->properties),
-                        function () {
-                            return [
-                                'license' => new LicenseResource(
-                                    $this->license
-                                ),
                             ];
                         }
                     ),

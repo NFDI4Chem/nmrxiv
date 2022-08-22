@@ -73,7 +73,7 @@
                             >
                                 {{ project.name }}
                             </p>
-                            <p class="mt-2 text-sm text-gray-900 line-clamp-3">
+                            <p class="my-2 text-sm text-gray-900 line-clamp-3">
                                 {{ project.description }}
                             </p>
                         </Link>
@@ -126,37 +126,44 @@
                                 leave-to-class="transform opacity-0 scale-95"
                             >
                                 <MenuItems
-                                    class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
+                                    class="absolute -right-2 mt-2 z-50 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
                                 >
-                                    <div class="py-1">
+                                    <div>
                                         <MenuItem
                                             v-slot="{ active }"
                                             class="border-b"
                                         >
                                             <a
+                                                :href="downloadURL"
                                                 :class="[
                                                     active
-                                                        ? 'bg-gray-100 text-gray-900'
+                                                        ? 'bg-gray-100 text-gray-600'
                                                         : 'text-gray-700',
-                                                    'block px-4 py-2 text-sm',
+                                                    'block px-4 py-4 text-sm cursor-pointer hover:text-gray-900',
                                                 ]"
-                                                >Download</a
+                                            >
+                                                <DownloadIcon
+                                                    class="h-5 w-5 inline"
+                                                    aria-hidden="true"
+                                                />
+                                                Download</a
                                             >
                                         </MenuItem>
-                                        <MenuItem v-slot="{ active }">
-                                            <a
-                                                :class="[
-                                                    active
-                                                        ? 'bg-gray-100 text-gray-900'
-                                                        : 'text-gray-700',
-                                                    'block px-4 py-2 text-sm',
-                                                ]"
-                                                ><small class="text-gray-500"
-                                                    >License</small
-                                                >
-                                                <br />
-                                                {{ project.license.title }}</a
-                                            >
+                                        <MenuItem>
+                                            <div class="px-4 py-2">
+                                                <p class="pb-2">
+                                                    <small class="text-gray-500"
+                                                        >License</small
+                                                    ><br />
+                                                    <span
+                                                        class="mt-2 float rounded-full border text-xs whitespace-nowrap border-gray-200 items-center py-1.5 pl-3 pr-3 bg-white text-gray-900"
+                                                        >{{
+                                                            project.license
+                                                                .title
+                                                        }}</span
+                                                    >
+                                                </p>
+                                            </div>
                                         </MenuItem>
                                     </div>
                                 </MenuItems>
@@ -171,7 +178,7 @@
 
 <script>
 import { LockClosedIcon } from "@heroicons/vue/solid";
-import { LockOpenIcon } from "@heroicons/vue/solid";
+import { LockOpenIcon, DownloadIcon } from "@heroicons/vue/solid";
 import { PencilIcon } from "@heroicons/vue/solid";
 import { MailIcon } from "@heroicons/vue/solid";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
@@ -185,6 +192,7 @@ export default {
         Link,
         LockClosedIcon,
         LockOpenIcon,
+        DownloadIcon,
         MailIcon,
         PencilIcon,
         Menu,
@@ -198,25 +206,46 @@ export default {
     data() {
         return {};
     },
+    computed: {
+        downloadURL() {
+            return (
+                this.url +
+                "/" +
+                this.project.owner.username +
+                "/datasets/" +
+                this.project.slug
+            );
+        },
+        url() {
+            return String(this.$page.props.url);
+        },
+    },
     methods: {
         toggleUpVote() {
-            const url = "/projects/" + this.project.id + "/toggleUpVote";
-            axios
-                .get(url)
-                .catch((err) => {
-                    if (
-                        err.response.status !== 200 ||
-                        err.response.status !== 201
-                    ) {
-                        throw new Error(
-                            `API call failed with status code: ${err.response.status} after multiple attempts`
-                        );
-                    }
-                })
-                .then(function (response) {
-                    console.log(response);
-                    Inertia.reload({ only: ["projects"] });
-                });
+            if (
+                this.$page.props.user.username &&
+                this.$page.props.user.username != ""
+            ) {
+                const url = "/projects/" + this.project.id + "/toggleUpVote";
+                axios
+                    .get(url)
+                    .catch((err) => {
+                        if (
+                            err.response.status !== 200 ||
+                            err.response.status !== 201
+                        ) {
+                            throw new Error(
+                                `API call failed with status code: ${err.response.status} after multiple attempts`
+                            );
+                        }
+                    })
+                    .then(function (response) {
+                        console.log(response);
+                        Inertia.reload({ only: ["projects"] });
+                    });
+            } else {
+                this.$inertia.visit(route("login"));
+            }
         },
     },
 };
