@@ -210,6 +210,17 @@ class Study extends Model implements Auditable
     }
 
     /**
+     * Remove the given user from the study.
+     *
+     * @param  \App\Models\User  $user
+     * @return void
+     */
+    public function removeUser($user)
+    {
+        $this->users()->detach($user);
+    }
+
+    /**
      * Determine if the model should be searchable.
      *
      * @return bool
