@@ -6,13 +6,13 @@
             >
                 <div class="gap-y-6 sm:grid-cols-6 sm:gap-x-6">
                     <div class="sm:col-span-6">
-                        <h2 class="text-xl font-medium text-blue-gray-900">
+                        <h2 class="text-xl font-extrabold text-blue-gray-900">
                             Studies ({{ project.data.studies.length }})
                         </h2>
-                        <p class="mt-1 text-sm text-blue-gray-500 mb-4">
+                        <!-- <p class="mt-1 text-sm text-blue-gray-500 mb-4">
                             This information will be displayed publicly so be
                             careful what you share.
-                        </p>
+                        </p> -->
                     </div>
                     <div class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div

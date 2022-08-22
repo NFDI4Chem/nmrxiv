@@ -11,14 +11,14 @@
                     <div
                         class="grid grid-cols-1 gap-y-6 sm:grid-cols-6 sm:gap-x-6"
                     >
-                        <div class="sm:col-span-6">
+                        <div class="col-span-6">
                             <p
                                 style="max-width: 100ch !important"
                                 class="prose mt-1 text-sm text-blue-gray-500"
                                 v-html="md(project.data.description)"
                             ></p>
                         </div>
-                        <div>
+                        <div class="sm:col-span-12">
                             <a
                                 v-for="tag in project.data.tags"
                                 :key="tag.id"
@@ -32,7 +32,7 @@
 
                     <div class="pt-8 gap-y-6 sm:grid-cols-6 sm:gap-x-6">
                         <div class="sm:col-span-6">
-                            <h2 class="text-xl font-medium text-blue-gray-900">
+                            <h2 class="text-xl font-extrabold mb-3 text-blue-gray-900">
                                 Submitter(s)
                             </h2>
                         </div>
@@ -40,7 +40,7 @@
                             <div
                                 v-for="user in project.data.users"
                                 :key="user.email"
-                                class="relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm flex items-center space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-pink-500"
+                                class="relative rounded-lg border border-gray-300 bg-white p-5 shadow-sm flex items-center space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-pink-500"
                             >
                                 <div class="flex-shrink-0">
                                     <img
@@ -78,7 +78,7 @@
                         class="pt-8 gap-y-6 sm:grid-cols-6 sm:gap-x-6"
                     >
                         <div class="sm:col-span-6">
-                            <h2 class="text-xl font-medium text-blue-gray-900">
+                            <h2 class="text-xl font-extrabold mb-3 text-blue-gray-900">
                                 Author(s)
                             </h2>
                             <!-- <p class="mt-1 text-sm text-blue-gray-500">

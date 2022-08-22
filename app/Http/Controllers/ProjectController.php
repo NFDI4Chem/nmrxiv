@@ -145,8 +145,7 @@ class ProjectController extends Controller
         }
 
         return Inertia::render('Project/Settings', [
-            'project' => $project,
-            'studies' => $project->studies,
+            'project' => $project
         ]);
     }
 
