@@ -16,8 +16,8 @@
                                 Molecular Identifications
                             </h2>
                             <!-- <p class="mt-1 text-sm text-gray-500">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod.
-              </p> -->
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod.
+                            </p> -->
                         </div>
                     </div>
                 </div>
