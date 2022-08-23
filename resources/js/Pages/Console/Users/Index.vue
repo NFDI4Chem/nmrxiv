@@ -36,11 +36,12 @@
                         v-model="form.role"
                         class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                     >
-                        <option :value="null" />
+                        <option :value="null">-- no filter --</option>
                         <option
                             v-for="role in roles"
                             :key="role.id"
                             :value="role.name"
+                            :selected="form.role == role.name"
                         >
                             {{ role.name }}
                         </option>

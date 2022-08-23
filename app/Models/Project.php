@@ -7,10 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Scout\Searchable;
 use Maize\Markable\Markable;
-use Maize\Markable\Models\Bookmark;
-use Maize\Markable\Models\Favorite;
 use Maize\Markable\Models\Like;
-use Maize\Markable\Models\Reaction;
 use OwenIt\Auditing\Contracts\Auditable;
 use Spatie\Tags\HasTags;
 use Storage;
@@ -47,7 +44,7 @@ class Project extends Model implements Auditable
     ];
 
     protected static $marks = [
-        Like::class
+        Like::class,
     ];
 
     /**
@@ -254,5 +251,23 @@ class Project extends Model implements Auditable
     public function authors()
     {
         return $this->belongsToMany(Author::class);
+    }
+
+    public function scopeFilter($query, array $filters)
+    {
+        $query->when($filters['search'] ?? null, function ($query, $search) {
+            $query->where(function ($query) use ($search) {
+                $query->where('name', 'like', '%'.$search.'%')
+                    ->orWhere('description', 'like', '%'.$search.'%');
+            });
+        })->when($filters['sort'] ?? null, function ($query, $sort) {
+            if ($sort === 'newest') {
+                $query->orderByDesc('updated_at');
+            } elseif ($sort === 'rating') {
+                $query->orderByDesc('likes');
+            } elseif ($sort === 'creation') {
+                $query->orderByDesc('created_at');
+            }
+        });
     }
 }
