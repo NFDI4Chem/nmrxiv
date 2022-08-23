@@ -164,6 +164,8 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
 
         Route::post('studies/{study}/molecule', [StudyController::class, 'moleculeStore'])
             ->name('study-molecule.store');
+        Route::delete('studies/{study}/molecule/{molecule}', [StudyController::class, 'moleculeDetach'])
+            ->name('study-molecule.delete');
 
         Route::get('/study-invitations/{invitation}', [StudyInvitationController::class, 'acceptInvitation'])
             ->middleware(['signed'])
