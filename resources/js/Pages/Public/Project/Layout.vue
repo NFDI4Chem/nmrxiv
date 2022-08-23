@@ -217,22 +217,30 @@ export default {
     mounted() {},
     methods: {
         toggleUpVote() {
-            const url = "/projects/" + this.project.data.id + "/toggleUpVote";
-            axios
-                .get(url)
-                .catch((err) => {
-                    if (
-                        err.response.status !== 200 ||
-                        err.response.status !== 201
-                    ) {
-                        throw new Error(
-                            `API call failed with status code: ${err.response.status} after multiple attempts`
-                        );
-                    }
-                })
-                .then(function (response) {
-                    Inertia.reload({ only: ["project"] });
-                });
+            if (
+                this.$page.props.user.username &&
+                this.$page.props.user.username != ""
+            ) {
+                const url =
+                    "/projects/" + this.project.data.id + "/toggleUpVote";
+                axios
+                    .get(url)
+                    .catch((err) => {
+                        if (
+                            err.response.status !== 200 ||
+                            err.response.status !== 201
+                        ) {
+                            throw new Error(
+                                `API call failed with status code: ${err.response.status} after multiple attempts`
+                            );
+                        }
+                    })
+                    .then(function (response) {
+                        Inertia.reload({ only: ["project"] });
+                    });
+            } else {
+                this.$inertia.visit(route("login"));
+            }
         },
     },
 };

@@ -105,7 +105,7 @@ trait HasProjects
     {
         $team = $project->team ? $project->team : null;
         $id = $this->id;
-        
+
         if (is_null($project) || is_null($role)) {
             return false;
         }
@@ -127,17 +127,17 @@ trait HasProjects
                 return false;
             }
         }
-        
+
         if (! $team->personal_team) {
             $teamUser = $team->allUsers()->first(function ($u) use ($id) {
                 return $u->id === $id;
             });
             if (! is_null($teamUser)) {
                 $membership = $teamUser->membership ? $teamUser->membership : null;
-                if($teamUser->ownsTeam($team)){
+                if ($teamUser->ownsTeam($team)) {
                     return true;
-                }else if ($membership) {
-                    if($membership->role == $role){
+                } elseif ($membership) {
+                    if ($membership->role == $role) {
                         return true;
                     }
                 } else {
@@ -145,6 +145,7 @@ trait HasProjects
                 }
             }
         }
+
         return false;
     }
 }
