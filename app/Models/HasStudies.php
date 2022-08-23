@@ -145,10 +145,10 @@ trait HasStudies
             });
             if (! is_null($teamUser)) {
                 $membership = $teamUser->membership ? $teamUser->membership : null;
-                if($teamUser->ownsTeam($team)){
+                if ($teamUser->ownsTeam($team)) {
                     return true;
-                }else if ($membership) {
-                    if($membership->role == $role){
+                } elseif ($membership) {
+                    if ($membership->role == $role) {
                         return true;
                     }
                 } else {

@@ -32,7 +32,9 @@
 
                     <div class="pt-8 gap-y-6 sm:grid-cols-6 sm:gap-x-6">
                         <div class="sm:col-span-6">
-                            <h2 class="text-xl font-extrabold mb-3 text-blue-gray-900">
+                            <h2
+                                class="text-xl font-extrabold mb-3 text-blue-gray-900"
+                            >
                                 Submitter(s)
                             </h2>
                         </div>
@@ -64,7 +66,7 @@
                                                 user.last_name
                                             }}
                                         </p>
-                                        <!-- <p class="text-sm text-gray-500 truncate">Co-Founder / CEO</p> -->
+                                        <p class="text-sm text-gray-500 truncate">@ {{ user.username }}</p>
                                     </a>
                                 </div>
                             </div>
@@ -78,7 +80,9 @@
                         class="pt-8 gap-y-6 sm:grid-cols-6 sm:gap-x-6"
                     >
                         <div class="sm:col-span-6">
-                            <h2 class="text-xl font-extrabold mb-3 text-blue-gray-900">
+                            <h2
+                                class="text-xl font-extrabold mb-3 text-blue-gray-900"
+                            >
                                 Author(s)
                             </h2>
                             <!-- <p class="mt-1 text-sm text-blue-gray-500">
