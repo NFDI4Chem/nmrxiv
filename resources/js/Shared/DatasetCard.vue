@@ -1,55 +1,24 @@
 <template>
     <div>
-        <div v-if="project" class="hover:shadow-lg">
+        <div v-if="dataset" class="hover:shadow-lg">
             <div v-if="mode == 'mini' || mode == 'grid'">
                 <div class="flex flex-col rounded-lg shadow-lg">
-                    <div class="relative rounded-t-lg lg:h-36 xl:h-36">
-                        <img
-                            v-if="project.photo_url && project.photo_url != ''"
-                            :src="project.photo_url"
-                            alt=""
-                            class="w-full h-full object-center rounded-t-lg object-cover"
-                        />
+                    <div class="relative rounded-t lg:h-32 xl:h-32">
+                        <div
+                            v-if="dataset.dataset_photo_url"
+                            class="flex-shrink-0 h-32 p-3 border rounded-t border-gray-100"
+                        >
+                            <img
+                                :src="dataset.dataset_photo_url"
+                                alt=""
+                                class="w-full h-full object-center object-cover"
+                            />
+                        </div>
                         <div
                             v-else
-                            class="flex-shrink-0 lg:h-36 xl:h-36 pattern-diagonal-lines pattern-gray-400 pattern-bg-white pattern-size-2 pattern-opacity-20 border-b border-gray-400"
+                            class="flex-shrink-0 h-32 pattern-diagonal-lines pattern-gray-400 pattern-bg-white pattern-size-2 pattern-opacity-20 border-b border-gray-400"
                         ></div>
-                        <div class="absolute top-0 right-0">
-                            <div class="p-2 flex items-center">
-                                <div class="flex-shrink-0">
-                                    <span
-                                        v-if="project.stats"
-                                        class="relative z-0 inline-flex shadow-sm rounded-md"
-                                    >
-                                        <button
-                                            type="button"
-                                            class="relative inline-flex items-center px-1 py-1 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-900 hover:bg-gray-50"
-                                            @click="toggleUpVote()"
-                                        >
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                class="h-5 w-5"
-                                                viewBox="0 0 20 20"
-                                                fill="currentColor"
-                                            >
-                                                <path
-                                                    fill-rule="evenodd"
-                                                    d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z"
-                                                    clip-rule="evenodd"
-                                                />
-                                            </svg>
-                                        </button>
-                                        <a
-                                            class="-ml-px relative inline-flex items-center px-2 py-1 rounded-r-md border border-gray-300 bg-white text-sm font-black text-dark hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
-                                        >
-                                            {{ project.stats.likes }}
-                                        </a>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
                     </div>
-
                     <div
                         :class="[
                             mode != 'mini' ? '' : 'rounded-b-lg',
@@ -57,27 +26,53 @@
                         ]"
                     >
                         <div
-                            style="min-height: 150px; max-height: 168px"
+                            style="min-height: 100px; max-height: 168px"
                             class="flex-1 p-3"
                         >
                             <Link
                                 :href="
                                     '/projects/' +
-                                    project.owner.username +
+                                    dataset.owner.username +
                                     '/' +
-                                    project.slug
+                                    dataset.project +
+                                    '?tab=study&id=' +
+                                    dataset.study +
+                                    '&dsid=' +
+                                    dataset.slug
                                 "
-                                class="block cursor-pointer"
+                                class="block"
                             >
                                 <p
                                     class="text-lg font-black text-gray-900 line-clamp-2"
                                 >
-                                    {{ project.name }}
+                                    {{ dataset.name }}
                                 </p>
                                 <p
-                                    class="my-2 text-sm text-gray-500 line-clamp-3"
+                                    class="mt-0 text-sm capitalize text-gray-800 line-clamp-4"
                                 >
-                                    {{ project.description }}
+                                    <small class="text-gray-400">Project:</small
+                                    ><br />
+                                    <Link
+                                        :href="
+                                            '/projects/' +
+                                            dataset.owner.username +
+                                            '/' +
+                                            dataset.project
+                                        "
+                                        class="hover:underline hover:text-teal-900"
+                                        >{{ dataset.project }}</Link
+                                    >&nbsp;/&nbsp;<Link
+                                        class="hover:underline hover:text-teal-900"
+                                        :href="
+                                            '/projects/' +
+                                            dataset.owner.username +
+                                            '/' +
+                                            dataset.project +
+                                            '?tab=study&id=' +
+                                            dataset.study
+                                        "
+                                        >{{ dataset.study }}</Link
+                                    >
                                 </p>
                             </Link>
                         </div>
@@ -89,25 +84,25 @@
                         <div class="flex-0.5 self-center align-middle">
                             <img
                                 class="h-7 w-7 rounded-full"
-                                :src="project.owner.profile_photo_url"
+                                :src="dataset.owner.profile_photo_url"
                             />
                         </div>
                         <div class="flex-auto pl-4">
                             <p class="text-xs font-xs font-semibold text-black">
-                                <a>
-                                    {{ project.owner.first_name }}
-                                    {{ project.owner.last_name }}</a
+                                <Link>
+                                    {{ dataset.owner.first_name }}
+                                    {{ dataset.owner.last_name }}</Link
                                 >
                             </p>
                             <div
                                 class="flex-1 space-x-1 text-xs font-xs text-gray-500"
                             >
                                 <time datetime="2020-03-16"
-                                    >{{ formatDate(project.created_at) }}
+                                    >{{ formatDate(dataset.created_at) }}
                                 </time>
                             </div>
                         </div>
-                        <div class="flex-0.5 self-center">
+                        <!-- <div class="flex-0.5 self-center">
                             <Menu as="div" class="relative text-left">
                                 <div>
                                     <MenuButton
@@ -138,7 +133,7 @@
                                                 v-slot="{ active }"
                                                 class="border-b"
                                             >
-                                                <a
+                                                <Link
                                                     :href="downloadURL"
                                                     :class="[
                                                         active
@@ -151,10 +146,10 @@
                                                         class="h-5 w-5 inline"
                                                         aria-hidden="true"
                                                     />
-                                                    Download</a
+                                                    Download</Link
                                                 >
                                             </MenuItem>
-                                            <MenuItem>
+                                            <MenuItem v-if="dataset.license">
                                                 <div class="px-4 py-2">
                                                     <p class="pb-2">
                                                         <small
@@ -164,7 +159,7 @@
                                                         <span
                                                             class="mt-2 float rounded-full border text-xs whitespace-nowrap border-gray-200 items-center py-1.5 pl-3 pr-3 bg-white text-gray-900"
                                                             >{{
-                                                                project.license
+                                                                dataset.license
                                                                     .title
                                                             }}</span
                                                         >
@@ -175,7 +170,7 @@
                                     </MenuItems>
                                 </transition>
                             </Menu>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
             </div>
@@ -183,15 +178,19 @@
                 <!-- This example requires Tailwind CSS v2.0+ -->
                 <li class="flex border-b bprder-gray-100">
                     <div class="flex-shrink-0">
-                        <img
-                            v-if="project.photo_url && project.photo_url != ''"
-                            :src="project.photo_url"
-                            alt=""
-                            class="border w-36 lg:h-36 xl:h-36 m-2 mr-0 h-full object-center rounded-t-lg object-cover"
-                        />
+                        <div
+                            v-if="dataset.dataset_photo_url"
+                            class="flex-shrink-0 h-36 p-3"
+                        >
+                            <img
+                                :src="dataset.dataset_photo_url"
+                                alt=""
+                                class="w-full h-full object-center object-cover"
+                            />
+                        </div>
                         <div
                             v-else
-                            class="w-36 m-2 flex-shrink-0 border mr-0 lg:h-36 xl:h-36 pattern-diagonal-lines pattern-gray-400 pattern-bg-white pattern-size-2 pattern-opacity-20 border-b border-gray-400"
+                            class="flex-shrink-0 h-36 pattern-diagonal-lines pattern-gray-400 pattern-bg-white pattern-size-2 pattern-opacity-20 border-b border-gray-400"
                         ></div>
                     </div>
 
@@ -206,56 +205,46 @@
                                     <Link
                                         :href="
                                             '/projects/' +
-                                            project.owner.username +
+                                            dataset.owner.username +
                                             '/' +
-                                            project.slug
+                                            dataset.project +
+                                            '?tab=study&id=' +
+                                            dataset.study +
+                                            '&dsid=' +
+                                            dataset.slug
                                         "
-                                        class="block cursor-pointer"
+                                        class="block"
                                     >
-                                        {{ project.name }}
+                                        {{ dataset.name }}
                                     </Link>
                                 </p>
                                 <p
-                                    class="my-2 text-sm text-gray-500 line-clamp-2 pr-8"
+                                    class="mt-0 text-sm capitalize text-gray-800 line-clamp-4"
                                 >
-                                    {{ project.description }}
+                                    <small class="text-gray-400">Project:</small
+                                    ><br />
+                                    <Link
+                                        :href="
+                                            '/projects/' +
+                                            dataset.owner.username +
+                                            '/' +
+                                            dataset.project
+                                        "
+                                        class="hover:underline hover:text-teal-900"
+                                        >{{ dataset.project }}</Link
+                                    >&nbsp;/&nbsp;<Link
+                                        class="hover:underline hover:text-teal-900"
+                                        :href="
+                                            '/projects/' +
+                                            dataset.owner.username +
+                                            '/' +
+                                            dataset.project +
+                                            '?tab=study&id=' +
+                                            dataset.study
+                                        "
+                                        >{{ dataset.study }}</Link
+                                    >
                                 </p>
-                            </div>
-                            <div class="ml-2 flex-shrink-0 flex">
-                                <div>
-                                    <div class="p-2 flex items-center">
-                                        <div class="flex-shrink-0">
-                                            <span
-                                                v-if="project.stats"
-                                                class="relative z-0 inline-flex shadow-sm rounded-md"
-                                            >
-                                                <button
-                                                    type="button"
-                                                    class="relative inline-flex items-center px-1 py-1 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-900 hover:bg-gray-50"
-                                                    @click="toggleUpVote()"
-                                                >
-                                                    <svg
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                        class="h-5 w-5"
-                                                        viewBox="0 0 20 20"
-                                                        fill="currentColor"
-                                                    >
-                                                        <path
-                                                            fill-rule="evenodd"
-                                                            d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z"
-                                                            clip-rule="evenodd"
-                                                        />
-                                                    </svg>
-                                                </button>
-                                                <a
-                                                    class="-ml-px relative inline-flex items-center px-2 py-1 rounded-r-md border border-gray-300 bg-white text-sm font-black text-dark hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
-                                                >
-                                                    {{ project.stats.likes }}
-                                                </a>
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                         <div class="mt-2 sm:flex sm:justify-between">
@@ -265,31 +254,32 @@
                                 >
                                     <img
                                         class="h-7 w-5 mr-2 rounded-full"
-                                        :src="project.owner.profile_photo_url"
+                                        :src="dataset.owner.profile_photo_url"
                                     />
-                                    {{ project.owner.first_name }}
-                                    {{ project.owner.last_name }}
+                                    {{ dataset.owner.first_name }}
+                                    {{ dataset.owner.last_name }}
                                 </p>
                                 <p
+                                    v-if="dataset.license"
                                     class="flex items-center text-sm text-gray-500 sm:mt-0 sm:ml-3"
                                 >
                                     <ScaleIcon
                                         class="text-gray-400 h-5 w-5 mr-1.5"
                                     ></ScaleIcon>
-                                    {{ project.license.title }}
+                                    {{ dataset.license.title }}
                                 </p>
-                                <p
+                                <!-- <p
                                     class="flex items-center text-sm text-gray-500 sm:mt-0 sm:ml-2"
                                 >
-                                    <a
+                                    <Link
                                         :href="downloadURL"
                                         class="block px-4 text-sm cursor-pointer hover:text-gray-900', ]"
                                     >
                                         <DownloadIcon
                                             class="h-5 w-5 inline"
                                             aria-hidden="true"
-                                    /></a>
-                                </p>
+                                    /></Link>
+                                </p> -->
                             </div>
                             <div
                                 class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0"
@@ -310,7 +300,7 @@
                                 </svg>
                                 <p>
                                     <time datetime="2020-03-16"
-                                        >{{ formatDate(project.created_at) }}
+                                        >{{ formatDate(dataset.created_at) }}
                                     </time>
                                 </p>
                             </div>
@@ -348,21 +338,12 @@ export default {
         MenuItems,
         DotsVerticalIcon,
     },
-    props: ["project", "mode"],
+    props: ["dataset", "mode"],
     setup() {},
     data() {
         return {};
     },
     computed: {
-        downloadURL() {
-            return (
-                this.url +
-                "/" +
-                this.project.owner.username +
-                "/datasets/" +
-                this.project.slug
-            );
-        },
         url() {
             return String(this.$page.props.url);
         },
@@ -373,7 +354,7 @@ export default {
                 this.$page.props.user.username &&
                 this.$page.props.user.username != ""
             ) {
-                const url = "/projects/" + this.project.id + "/toggleUpVote";
+                const url = "/projects/" + this.dataset.id + "/toggleUpVote";
                 axios
                     .get(url)
                     .catch((err) => {
@@ -387,7 +368,7 @@ export default {
                         }
                     })
                     .then(function (response) {
-                        Inertia.reload({ only: ["projects"] });
+                        Inertia.reload({ only: ["datasets"] });
                     });
             } else {
                 this.$inertia.visit(route("login"));
