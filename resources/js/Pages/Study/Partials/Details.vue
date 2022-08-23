@@ -867,6 +867,7 @@ export default {
     },
     mounted() {
         const initialise = () => {
+            this.loadLicenses();
             this.open = true;
         };
         this.emitter.all.set("openStudyDetails", [initialise]);
@@ -880,6 +881,11 @@ export default {
     },
     methods: {
         toggleDetails() {
+            this.loadLicenses();
+            this.open = !this.open;
+            this.getTags();
+        },
+        loadLicenses() {
             if (this.$page.props.licenses) {
                 this.licenses = this.$page.props.licenses;
                 this.form.license = this.licenses.find(
@@ -894,8 +900,6 @@ export default {
                     );
                 });
             }
-            this.open = !this.open;
-            this.getTags();
         },
         getTags() {
             if (this.study && this.study.tags) {
