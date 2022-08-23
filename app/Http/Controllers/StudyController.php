@@ -134,6 +134,16 @@ class StudyController extends Controller
         return $sample->molecules;
     }
 
+    public function moleculeDetach(Request $request, Study $study, Molecule $molecule)
+    {
+        if ($molecule) {
+            $sample = $study->sample;
+            $sample->molecules()->detach([$molecule->id]);
+            $sample = $sample->fresh();
+            return $sample->molecules;
+        }
+    }
+
     public function files(Request $request, Study $study)
     {
         if (! Gate::forUser($request->user())->check('viewStudy', $study)) {
