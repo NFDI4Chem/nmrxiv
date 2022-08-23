@@ -66,7 +66,7 @@
                                                 user.last_name
                                             }}
                                         </p>
-                                        <!-- <p class="text-sm text-gray-500 truncate">Co-Founder / CEO</p> -->
+                                        <p class="text-sm text-gray-500 truncate">@ {{ user.username }}</p>
                                     </a>
                                 </div>
                             </div>
