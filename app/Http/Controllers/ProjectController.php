@@ -77,11 +77,12 @@ class ProjectController extends Controller
 
     public function publicProjectsView(Request $request)
     {
-        $projects = Cache::rememberForever('projects', function () {
-            return ProjectResource::collection(Project::where('is_public', true)->orderByDesc('updated_at')->paginate(15));
-        });
+        // $projects = Cache::rememberForever('projects', function () {
+        $projects = ProjectResource::collection(Project::where('is_public', true)->filter($request->only('search', 'sort', 'mode'))->paginate(12)->withQueryString());
+        // });
 
         return Inertia::render('Public/Projects', [
+            'filters' => $request->all('search', 'sort', 'mode'),
             'projects' => $projects,
         ]);
     }
