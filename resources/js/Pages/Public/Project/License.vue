@@ -16,7 +16,7 @@
                             <p
                                 style="max-width: 100ch !important"
                                 class="prose mt-1 text-sm text-blue-gray-500"
-                                 v-html="project.data.license.body"
+                                v-html="project.data.license.body"
                             ></p>
                         </div>
                     </div>
