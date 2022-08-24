@@ -252,6 +252,24 @@ class LicenseSeeder extends Seeder
             ),
 
             /*Other*/
+            array(
+                'title'              => 'Data files © Original Authors',
+                'slug'               => 'dfoa',
+                'spdx_id'            => 'DFOA',
+                'url'                => '',
+                'description'        => "",
+                'body'               => "",
+                'category'           => 'Other'
+            ),
+            array(
+                'title'              => 'Unknown',
+                'slug'               => 'unknown',
+                'spdx_id'            => 'Unknown',
+                'url'                => '',
+                'description'        => "",
+                'body'               => "",
+                'category'           => 'Other'
+            ),
 
             );
         foreach ($licenses as $license) {
