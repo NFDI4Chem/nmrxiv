@@ -270,16 +270,19 @@ class LicenseSeeder extends Seeder
             ],
 
         ];
-        foreach ($licenses as $license) {
-            $license = License::create([
-                'title' => $license['title'],
-                'slug' => $license['slug'],
-                'spdx_id' => $license['spdx_id'],
-                'url' => $license['url'],
-                'description' => $license['description'],
-                'body' => $license['body'],
-                'category' => $license['category'],
-            ]);
+        License::truncate();
+        if($licenses){
+            foreach ($licenses as $license) {
+                $license = License::create([
+                    'title' => $license['title'],
+                    'slug' => $license['slug'],
+                    'spdx_id' => $license['spdx_id'],
+                    'url' => $license['url'],
+                    'description' => $license['description'],
+                    'body' => $license['body'],
+                    'category' => $license['category'],
+                ]);
+            }
         }
     }
 }
