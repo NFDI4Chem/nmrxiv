@@ -17,8 +17,6 @@ class LicenseController extends Controller
         $licenses = Cache::rememberForever('licenses', function () {
             return License::select('id', 'title', 'description')->get();
         });
-
-        // $licenses = License::select('id','title')->get();
         return $licenses;
     }
 
