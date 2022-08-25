@@ -4,10 +4,10 @@
         :max-width="'6xl'"
         @close="addCitationDialog = false"
     >
-        <template #title> New Citation </template>
+        <template #title> Update Citation </template>
         <template #content>
             <div
-                class="relative grid grid-cols-1 gap-x-16 max-w-7xl mx-auto lg:grid-cols-2 divide-x"
+                class="relative grid grid-cols-1 gap-x-5 max-w-7xl mx-auto lg:grid-cols-2 divide-x"
             >
                 <div
                     class="pb-36 px-4 sm:px-6 lg:pb-16 lg:px-0 lg:row-start-1 lg:col-start-1"
@@ -18,7 +18,7 @@
                             Import From
                         </p>
                         <div
-                            class="mt-1 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2"
+                            class="mt-3 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2"
                         >
                             <div class="sm:col-span-2">
                                 <label
@@ -44,7 +44,7 @@
                             </div>
                         </div>
                         <div class="sm:col-span-2 mt-4">
-                            <jet-secondary-button @click="importAuthors">
+                            <jet-secondary-button @click="importCitation">
                                 Import
                             </jet-secondary-button>
                         </div>
@@ -54,22 +54,74 @@
                         >
                             <loading-button :loading="loading" />
                         </div>
+                        <!-- List Imported Citation -->
                         <div
-                            v-if="authorsListDOI.length > 0 && !loading"
-                            class="sm:col-span-9 mt-4"
+                            v-if="this.formattedCitationRes != null && !loading"
+                            class="mt-4"
                         >
-                            <author-checkbox
-                                v-model:checked="doiSelectedAuthorList"
-                                :items="authorsListDOI"
-                            />
-                        </div>
-                        <div
-                            v-if="authorsListDOI.length > 0"
-                            class="sm:col-span-6 pt-3"
-                        >
+                            <fieldset
+                                class="border rounded border-gray-200 overflow-auto"
+                            >
+                                <legend class="sr-only">Notifications</legend>
+                                <div
+                                    style="height: 40vh"
+                                    class="divide-y divide-gray-200"
+                                >
+                                    <div class="relative flex items-start p-4">
+                                        <div class="min-w-0 flex-1 text-sm">
+                                            <label
+                                                for="citation"
+                                                class="font-medium text-gray-700"
+                                            >
+                                                {{ formattedCitationRes.title }}
+                                            </label>
+                                            <p
+                                                id="citation-authors"
+                                                class="text-teal-500"
+                                            >
+                                                {{
+                                                    formattedCitationRes.authors
+                                                }}
+                                            </p>
+                                            <p
+                                                id="citation-text"
+                                                class="text-gray-500"
+                                            >
+                                                {{
+                                                    formattedCitationRes.citation_text
+                                                }}
+                                            </p>
+                                            <p
+                                                id="citation-doi"
+                                                class="text-gray-500 font-bold"
+                                            >
+                                                DOI -
+                                                {{ formattedCitationRes.doi }}
+                                            </p>
+                                            <p
+                                                v-if="
+                                                    formattedCitationRes.abstract
+                                                "
+                                                id="citation-doi"
+                                                class="font-bold text-gray-500 mt-2"
+                                            >
+                                                Abstract
+                                            </p>
+                                            <p
+                                                id="citation-abstract"
+                                                class="text-xs text-gray-500"
+                                            >
+                                                {{
+                                                    formattedCitationRes.abstract
+                                                }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </fieldset>
                             <jet-secondary-button
-                                class="float-right text-md font-bold text-teal-900"
-                                @click="addAuthor('DOI')"
+                                class="float-right text-md font-bold text-teal-900 mt-4"
+                                @click="addCitationTemp('DOI')"
                             >
                                 Add
                             </jet-secondary-button>
@@ -87,10 +139,28 @@
                         <div
                             class="mt-1 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2"
                         >
-                            <div class="sm:col-span-2">
+                            <div class="sm:col-span-1">
+                                <label
+                                    for="doi"
+                                    class="block text-sm font-medium text-gray-700"
+                                >
+                                    DOI
+                                </label>
+                                <div class="mt-1">
+                                    <input
+                                        id="doi"
+                                        v-model="manualAddCitationForm.doi"
+                                        type="text"
+                                        name="doi"
+                                        autocomplete="doi"
+                                        class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                                    />
+                                </div>
+                            </div>
+                            <div class="sm:col-span-4">
                                 <label
                                     for="title"
-                                    class="block text-sm font-medium text-gray-700"
+                                    class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
                                 >
                                     Title
                                 </label>
@@ -104,126 +174,86 @@
                                         class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md"
                                     />
                                 </div>
+                                <jet-input-error
+                                    :message="
+                                        manualAddCitationForm.errors.title
+                                    "
+                                    class="mt-2"
+                                />
                             </div>
-                            <div class="sm:col-span-2">
+                            <div class="sm:col-span-6">
                                 <label
-                                    for="family-name"
+                                    for="authors"
                                     class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
                                 >
-                                    Family Name
+                                    Authors
                                 </label>
                                 <div class="mt-1">
-                                    <input
-                                        id="family-name"
-                                        v-model="
-                                            manualAddCitationForm.family_name
-                                        "
-                                        type="text"
-                                        name="family-name"
-                                        autocomplete="family-name"
-                                        class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                                    <textarea
+                                        id="authors"
+                                        v-model="manualAddCitationForm.authors"
+                                        name="authors"
+                                        rows="3"
+                                        class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border border-gray-300 rounded-md"
+                                        placeholder=""
                                     />
                                 </div>
                                 <jet-input-error
                                     :message="
-                                        manualAddCitationForm.errors.family_name
+                                        manualAddCitationForm.errors.authors
                                     "
                                     class="mt-2"
                                 />
                             </div>
 
-                            <div class="sm:col-span-2">
+                            <div class="sm:col-span-6">
                                 <label
-                                    for="given-name"
+                                    for="abstract"
                                     class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
                                 >
-                                    Given Name
+                                    Abstract
                                 </label>
                                 <div class="mt-1">
-                                    <input
-                                        id="given-name"
-                                        v-model="
-                                            manualAddCitationForm.given_name
-                                        "
-                                        type="text"
-                                        name="given-name"
-                                        autocomplete="given-name"
-                                        class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                                    <textarea
+                                        id="abstract"
+                                        v-model="manualAddCitationForm.abstract"
+                                        name="abstract"
+                                        rows="3"
+                                        class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border border-gray-300 rounded-md"
+                                        placeholder=""
                                     />
                                 </div>
                                 <jet-input-error
                                     :message="
-                                        manualAddCitationForm.errors.given_name
+                                        manualAddCitationForm.errors.abstract
                                     "
                                     class="mt-2"
                                 />
                             </div>
-                            <div class="sm:col-span-3">
-                                <label
-                                    for="email"
-                                    class="block text-sm font-medium text-gray-700"
-                                >
-                                    Email address
-                                </label>
-                                <div class="mt-1">
-                                    <input
-                                        id="email"
-                                        v-model="manualAddCitationForm.email_id"
-                                        name="email"
-                                        type="email"
-                                        autocomplete="email"
-                                        class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                                        @blur="validateEmail"
-                                    />
-                                    <jet-input-error
-                                        :message="
-                                            manualAddCitationForm.errors
-                                                .email_id
-                                        "
-                                        class="mt-2"
-                                    />
-                                </div>
-                            </div>
-                            <div class="sm:col-span-3">
-                                <label
-                                    for="orcid"
-                                    class="block text-sm font-medium text-gray-700"
-                                >
-                                    ORCID ID
-                                </label>
-                                <div class="mt-1">
-                                    <input
-                                        id="orcid"
-                                        v-model="manualAddCitationForm.orcid_id"
-                                        name="orcid"
-                                        autocomplete="orcid"
-                                        type="text"
-                                        class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                                    />
-                                </div>
-                            </div>
+
                             <div class="sm:col-span-6">
                                 <label
-                                    for="about"
+                                    for="citation-text"
                                     class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
                                 >
-                                    Affiliation
+                                    Citation Text
                                 </label>
                                 <div class="mt-1">
                                     <textarea
-                                        id="affiliation"
+                                        id="citation-text"
                                         v-model="
-                                            manualAddCitationForm.affiliation
+                                            manualAddCitationForm.citation_text
                                         "
-                                        name="affiliation"
+                                        name="citation-text"
                                         rows="3"
                                         class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border border-gray-300 rounded-md"
-                                        placeholder="Name and address of affiliated University and Department. e.g. Institut für Anorganische und Analytische Chemie,Friedrich-Schiller-Universität,Schloßgasse 10, 07743 Jena"
+                                        placeholder=""
                                     />
                                 </div>
                                 <jet-input-error
                                     :message="
-                                        manualAddCitationForm.errors.affiliation
+                                        manualAddCitationForm.errors
+                                            .citation_text
                                     "
                                     class="mt-2"
                                 />
@@ -231,7 +261,7 @@
                             <div class="sm:col-span-6 float-left">
                                 <jet-secondary-button
                                     class="float-right text-md font-bold text-teal-900"
-                                    @click="addAuthor('Manual')"
+                                    @click="addCitationTemp('Manual')"
                                 >
                                     Add
                                 </jet-secondary-button>
@@ -240,8 +270,8 @@
                     </div>
                 </div>
             </div>
-            <!-- Added Author Summary -->
-            <div v-if="selectedAuthorsList.length > 0">
+            <!-- Added Citation Summary -->
+            <div v-if="selectedCitationList.length > 0">
                 <div class="ml-2 mt-2 overflow-y-scroll h-64">
                     <table
                         class="divide-y divide-gray-200 w-full table-fixed overflow-y-scroll"
@@ -253,7 +283,7 @@
                                     scope="col"
                                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                 >
-                                    Author
+                                    Citation
                                 </th>
                                 <th
                                     scope="col"
@@ -265,63 +295,57 @@
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
                             <tr
-                                v-for="author in selectedAuthorsList"
-                                :key="author.id"
+                                v-for="citation in selectedCitationList"
+                                :key="citation.id"
                             >
                                 <td colspan="3" class="py-4">
                                     <div class="ml-4">
                                         <h3
                                             class="text-sm leading-6 font-medium text-gray-900"
                                         >
-                                            {{ author.title }}
-                                            {{ author.given_name }}
-                                            {{ author.family_name }}
+                                            {{ citation.title }}
                                         </h3>
+                                        <p
+                                            class="mt-1 text-xs font-small text-teal-900 break-words"
+                                        >
+                                            {{ citation.authors }}
+                                        </p>
                                         <p
                                             class="mt-1 text-xs font-small text-blue-gray-900 break-words"
                                         >
-                                            {{ author.affiliation }}
+                                            {{ citation.citation_text }}
                                         </p>
                                         <div
-                                            v-if="author.orcid_id"
-                                            class="text-xs leading-6 font-medium text-gray-900"
+                                            v-if="citation.doi"
+                                            class="text-xs font-bold leading-6 font-medium text-gray-900"
                                         >
-                                            <p>
-                                                Orcid Id -
-                                                <a
-                                                    :href="author.orcid_id"
-                                                    class="text-teal-900"
-                                                    >{{ author.orcid_id }}</a
-                                                >
-                                            </p>
+                                            <p>DOI - {{ citation.doi }}</p>
                                         </div>
                                         <div
-                                            v-if="author.email_id"
-                                            class="text-xs leading-6 font-medium text-gray-900"
+                                            v-if="citation.abstract"
+                                            class="text-xs text-gray-500 truncate ..."
                                         >
-                                            <p>
-                                                Email Id - {{ author.email_id }}
-                                            </p>
+                                            <p>{{ citation.abstract }} ...</p>
                                         </div>
                                     </div>
                                 </td>
                                 <td
                                     class="px-6 py-4 text-sm leading-5 text-gray-500 whitespace-no-wrap border-gray-200"
                                 >
-                                    <button
+                                    <!-- <button
                                         type="button"
                                         class="inline-flex items-center p-1 border border-transparent"
-                                        @click="editAuthor(author)"
+                                        @click="editCitation(citation)"
                                     >
                                         <PencilIcon
                                             class="w-5 h-5 mr-1 text-gray-600"
                                         />
-                                    </button>
+                                    </button> -->
                                     <button
                                         type="button"
                                         class="inline-flex items-center p-1 border border-transparent"
                                         @click="
-                                            confirmAuthorDeletion(author.id)
+                                            confirmCitationDeletion(citation)
                                         "
                                     >
                                         <TrashIcon
@@ -335,13 +359,13 @@
                 </div>
             </div>
             <jet-dialog-modal
-                :show="confirmingAuthorDeletion"
+                :show="confirmingCitationDeletion"
                 @close="closeModal"
             >
-                <template #title> Delete Author </template>
+                <template #title> Delete Citation </template>
 
                 <template #content>
-                    Are you sure you want to delete this author?
+                    Are you sure you want to delete this citation?
                     <div class="mt-4"></div>
                 </template>
 
@@ -354,14 +378,13 @@
                         class="ml-2"
                         :class="{ 'opacity-25': form.processing }"
                         :disabled="form.processing"
-                        @click="deleteAuthor(authorId)"
+                        @click="deleteCitation()"
                     >
-                        Delete Author
+                        Delete Citation
                     </jet-danger-button>
                 </template>
             </jet-dialog-modal>
         </template>
-
         <template #footer>
             <jet-secondary-button class="float-left" @click="onClose">
                 Close
@@ -398,27 +421,242 @@ export default {
 
     data() {
         return {
+            form: this.$inertia.form({}),
             importCitationForm: this.$inertia.form({
-                doi: "",
-                errors: {},
-            }),
-            manualAddCitationForm: this.$inertia.form({
+                doi: "10.1021/acs.jmedchem.5b01009",
                 _method: "POST",
                 errors: {},
             }),
+            updateCitationForm: this.$inertia.form({
+                _method: "POST",
+                citationList: [],
+            }),
+            manualAddCitationForm: this.$inertia.form({
+                _method: "POST",
+                doi: "",
+                title: "",
+                authors: "",
+                abstract: "",
+                citation_text: "",
+                errors: {},
+            }),
+            formattedCitationRes: null,
+            importedCitationByDOI: [],
+            addCitationDialog: false,
+            selectedCitationList: [],
+            confirmingCitationDeletion: false,
+            selectedCitationforDelete: {},
+            loading: false,
         };
     },
-    mounted() {
+    /* mounted() {
+        console.log('citation called..')
         const initialise = () => {
             this.addCitationDialog = true;
         };
         this.emitter.all.set("openAddCitationDialog", [initialise]);
-    },
+    },*/
     methods: {
-        updateCitation() {},
+        toggleAddCitationDialog() {
+            this.selectedCitationList = [];
+            this.addCitationDialog = !this.addCitationDialog;
+            if (this.project.citations) {
+                for (var i = 0; i < this.project.citations.length; i++) {
+                    this.selectedCitationList.push(this.project.citations[i]);
+                }
+            }
+        },
+        /*Add citations to temp list either added Manually or imported from DOI.*/
+        addCitationTemp(source) {
+            if (source == "Manual") {
+                this.validateForm();
+                if (!this.manualAddCitationForm.hasErrors) {
+                    this.selectedCitationList.push(this.manualAddCitationForm);
+                    this.manualAddCitationForm = this.$inertia.form({});
+                }
+            } else if (source == "DOI") {
+                //Adding citation to tmp list imported from DOI.
+                this.selectedCitationList.push(this.formattedCitationRes);
+            }
+
+            //filtering duplicate values from the temp list.
+            if (this.selectedCitationList.length > 0) {
+                const keys = ["doi"];
+                this.selectedCitationList = this.selectedCitationList.filter(
+                    (value, index, self) =>
+                        self.findIndex((v) =>
+                            keys.every((k) => v[k] === value[k])
+                        ) === index
+                );
+            }
+        },
+        /*Import Citation from DOI*/
+        importCitation() {
+            this.loading = true;
+            this.importedCitationByDOI = [];
+            this.importCitationForm.errors = {};
+            this.formattedCitationRes = null;
+            if (!this.importCitationForm.doi) {
+                this.importCitationForm.errors.doi =
+                    "The DOI field is required.";
+            } else {
+                axios
+                    .get(this.$page.props.getCitationbyDOIApi, {
+                        params: {
+                            query: this.importCitationForm.doi,
+                            format: "json",
+                            pageSize: "1",
+                            resulttype: "core",
+                            synonym: "true",
+                        },
+                    })
+                    .then((res) => {
+                        this.formattedCitationRes = this.formatCitationResponse(
+                            res.data.resultList.result[0]
+                        );
+                    })
+                    .catch((error) => {
+                        this.importCitationForm.errors.doi =
+                            "Something went wrong. Please check the DOI and try again.";
+                    })
+                    .finally(() => {
+                        if (this.formattedCitationRes == null) {
+                            this.importCitationForm.errors.doi =
+                                "Something went wrong. Please check the DOI and try again.";
+                        }
+                        this.loading = false;
+                    });
+            }
+        },
+        formatCitationResponse(obj) {
+            var journalTitle = "";
+            var yearofPublication = "";
+            var volume = "";
+            var issue = "";
+            var pageInfo = "";
+            if (obj) {
+                this.formattedCitationRes = {};
+                if (obj.journalInfo) {
+                    journalTitle = obj.journalInfo.journal.title
+                        ? obj.journalInfo.journal.title
+                        : "";
+                    yearofPublication = obj.journalInfo.yearOfPublication
+                        ? obj.journalInfo.yearOfPublication
+                        : "";
+                    volume = obj.journalInfo.volume
+                        ? obj.journalInfo.volume
+                        : "";
+                    issue = obj.journalInfo.issue ? obj.journalInfo.issue : "";
+                }
+                pageInfo = obj.pageInfo ? obj.pageInfo : "";
+                this.formattedCitationRes.title = obj.title ? obj.title : "";
+                this.formattedCitationRes.authors = obj.authorString
+                    ? obj.authorString
+                    : "";
+                this.formattedCitationRes.citation_text =
+                    journalTitle +
+                    " " +
+                    yearofPublication +
+                    " " +
+                    volume +
+                    " ( " +
+                    issue +
+                    " ) " +
+                    pageInfo;
+                this.formattedCitationRes.doi = obj.doi ? obj.doi : "";
+                this.formattedCitationRes.abstract = obj.abstractText
+                    ? obj.abstractText
+                    : "";
+            }
+            return this.formattedCitationRes;
+        },
+        /*Update the Citation table and relationship*/
+        updateCitation() {
+            this.updateCitationForm.reset();
+            for (var i = 0; i < this.selectedCitationList.length; i++) {
+                this.updateCitationForm.citationList.push(
+                    this.selectedCitationList[i]
+                );
+            }
+            this.updateCitationForm.post(
+                route("update-citation", this.project.id),
+                {
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        this.addCitationDialog = false;
+                        this.resetData();
+                    },
+                    onError: (err) => console.error(err),
+                }
+            );
+        },
+        /*Validation form*/
+        validateForm() {
+            this.manualAddCitationForm.errors = {};
+            this.manualAddCitationForm.hasErrors = false;
+            var hasErrors = false;
+            if (!this.manualAddCitationForm.title) {
+                this.manualAddCitationForm.errors.title =
+                    "The title field is required.";
+                hasErrors = true;
+            }
+            if (!this.manualAddCitationForm.authors) {
+                this.manualAddCitationForm.errors.authors =
+                    "The authors field is required.";
+                hasErrors = true;
+            }
+            if (!this.manualAddCitationForm.abstract) {
+                this.manualAddCitationForm.errors.abstract =
+                    "The abstract field is required.";
+                hasErrors = true;
+            }
+            if (!this.manualAddCitationForm.citation_text) {
+                this.manualAddCitationForm.errors.citation_text =
+                    "The citation text field is required.";
+                hasErrors = true;
+            }
+            if (hasErrors) {
+                this.manualAddCitationForm.hasErrors = true;
+            }
+        },
+        editCitation() {
+            //
+        },
+        /*Confirming before deletion*/
+        confirmCitationDeletion(citation) {
+            this.selectedCitationforDelete = citation;
+            this.confirmingCitationDeletion = true;
+        },
+        /*Delete citation from the temp list*/
+        deleteCitation(citation) {
+            var index = this.selectedCitationforDelete
+                ? this.selectedCitationList.indexOf(
+                      this.selectedCitationforDelete
+                  )
+                : null;
+            if (index > -1) {
+                this.selectedCitationList.splice(index, 1);
+            }
+            this.closeModal();
+        },
+        closeModal() {
+            this.confirmingCitationDeletion = false;
+        },
+        /*Resetting local variables and forms*/
+        resetData() {
+            this.importCitationForm = this.$inertia.form({});
+            this.manualAddCitationForm = this.$inertia.form({});
+            this.formattedCitationRes = null;
+            this.importedCitationByDOI = [];
+            this.addCitationDialog = false;
+            this.selectedCitationList = [];
+            this.confirmingCitationDeletion = false;
+            this.selectedCitationforDelete = {};
+            this.loading = false;
+        },
         onClose() {
             this.addCitationDialog = false;
-            //this.resetData();
+            this.resetData();
         },
     },
 };
