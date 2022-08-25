@@ -5,22 +5,22 @@ namespace App\Http\Controllers\API\Bioschema;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Spatie\SchemaOrg\Schema;
+use App\Models\Bioschema\BioSchema;
 use App\Models\Project;
 use App\Models\Study;
-
+use App\Models\Bioschema\Study as StudySchema;
 use App\Models\User;
 use App\Models\Author;
 
 
 
-class ProjectController extends Controller
+class BiochemaController extends Controller
 {
     public function schema(Request $request, $username, $projectName, $studyName = null, $datasetName = null)
     {
         $user = User::where('username', $username)->firstOrFail();
         if($user){
-            $project = Project::where([['slug', $projectName], ['owner_id', $user->id]])->firstOrFail();
-            
+            $project = Project::where([['slug', $projectName], ['owner_id', $user->id]])->firstOrFail();  
         }
 
         if($project){
@@ -53,18 +53,48 @@ class ProjectController extends Controller
                 array_push($tags, $tag);
             }
             $projectSchema->keywords($tags);
-            $projectSchema->url($project->url);
+            $projectSchema->url($project->public_url);
             
+
+
             if($studyName && !$datasetName){
                 $study = Study::where([['slug', $studyName], ['owner_id', $user->id], ['project_id', $project->id]])->firstOrFail();
                 // send study back with project info added to it\
-                return [];
+                if($study){
+                    $studySchema = BioSchema::Study(); 
+                    $studySchema['@id']= $study->uuid;
+                    $studySchema['dct:conformsTo'] = $confromsTo;
+                    $studySchema->description($study->description);
+                    $studySchema->name($study->name);
+                    $tags = [];
+                    foreach ($study->tags as &$tag) {
+                        $tag = $tag->name; 
+                        array_push($tags, $tag);
+                    }
+                    $studySchema->keywords($tags);
+                    $studySchema->url($study->public_url);
+
+                    $projectSchema->relatedStudy($studySchema);
+
+                    return $projectSchema;
+                }
+                
             }else if($studyName && $datasetName){
                 $dataset = Dataset::where([['slug', $datasetName], ['owner_id', $user->id], ['project_id', $project->id], ['study_id', $study->id]])->firstOrFail();
                 // send dataset with project and study details
                 return [];
             }else{
                 // add studies and associated datasets
+                $studies = [];
+                foreach ($project->studies as &$study) {
+                    $studySchema = BioSchema::Study(); 
+                    $studySchema['@id']= $study->uuid;
+                    $studySchema['dct:conformsTo'] = $confromsTo;
+                    $studySchema->name($study->name);
+                    $studySchema->url($study->public_url);
+                    array_push($studies, $studySchema);   
+                }
+                $projectSchema->relatedStudy($studies);
                 return $projectSchema;
             }
         }

@@ -5,6 +5,7 @@ namespace App\Models\Bioschema;
 use \Spatie\SchemaOrg\Contracts\DatasetContract;
 use \Spatie\SchemaOrg\Contracts\CreativeWorkContract;
 use \Spatie\SchemaOrg\Contracts\ThingContract;
+use \Spatie\SchemaOrg\BaseType;
 
 /**
  * A body of structured information describing some topic(s) of interest.
@@ -13,7 +14,7 @@ use \Spatie\SchemaOrg\Contracts\ThingContract;
  * @link http://www.w3.org/wiki/WebSchemas/SchemaDotOrgSources
  *
  */
-class Project extends BaseType implements CreativeWorkContract, ThingContract
+class Study extends BaseType
 {
     /**
      * The author of this content or rating. Please note that author is special
