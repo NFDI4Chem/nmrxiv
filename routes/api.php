@@ -4,8 +4,7 @@ use App\Http\Controllers\API\Auth\LoginController;
 use App\Http\Controllers\API\Auth\RegisterController;
 use App\Http\Controllers\API\Auth\UserController;
 use App\Http\Controllers\API\Bioschema\DataCatalogController;
-use App\Http\Controllers\API\Bioschema\DatasetController;
-use App\Http\Controllers\API\Bioschema\ProjectController as ProjectSchemaController;
+use App\Http\Controllers\API\Bioschema\BiochemaController;
 use App\Http\Controllers\API\FileSystemController;
 use App\Http\Controllers\API\ProjectController;
 use Illuminate\Support\Facades\Route;
@@ -38,7 +37,7 @@ Route::prefix('v1')->group(function () {
     Route::prefix('schemas')->group(function () {
         Route::prefix('bioschema')->group(function () {
             Route::get('/', [DataCatalogController::class, 'schema']);
-            Route::get('/{username}/{project}/{study?}/{dataset?}', [ProjectSchemaController::class, 'schema']);
+            Route::get('/{username}/{project}/{study?}/{dataset?}', [BiochemaController::class, 'schema']);
         });
     });
 });
