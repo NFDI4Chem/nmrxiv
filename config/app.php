@@ -236,6 +236,4 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
 
     ],
-
-    'github_license_url' => env('GITHUB_LICENSE_URL', 'https://api.github.com/licenses'),
 ];
