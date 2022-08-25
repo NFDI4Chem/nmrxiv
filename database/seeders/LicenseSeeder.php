@@ -17,7 +17,7 @@ class LicenseSeeder extends Seeder
         $licenses = [
             /*Creative Commons*/
             [
-                'title' => 'CC0 1.0 Universal Public Domain Dedication',
+                'title' => 'Creative Commons Zero v1.0 Universal',
                 'slug' => 'cc0-1.0',
                 'spdx_id' => 'CC0-1.0',
                 'url' => 'https://creativecommons.org/publicdomain/zero/1.0/legalcode',
@@ -26,7 +26,7 @@ class LicenseSeeder extends Seeder
                 'category' => 'Creative Commons',
             ],
             [
-                'title' => 'Attribution-NonCommercial-ShareAlike 4.0 International',
+                'title' => 'Creative Commons Attribution Non Commercial Share Alike 4.0 International',
                 'slug' => 'cc-by-nc-sa-4.0',
                 'spdx_id' => 'CC-BY-NC-SA-4.0',
                 'url' => 'https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode',
@@ -35,7 +35,7 @@ class LicenseSeeder extends Seeder
                 'category' => 'Creative Commons',
             ],
             [
-                'title' => 'Attribution-ShareAlike 4.0 International',
+                'title' => 'Creative Commons Attribution Share Alike 4.0 International',
                 'slug' => 'cc-by-sa-4.0',
                 'spdx_id' => 'CC-BY-SA-4.0',
                 'url' => 'https://creativecommons.org/licenses/by-sa/4.0/legalcode',
@@ -44,7 +44,7 @@ class LicenseSeeder extends Seeder
                 'category' => 'Creative Commons',
             ],
             [
-                'title' => 'Attribution-ShareAlike 3.0 Unported',
+                'title' => 'Creative Commons Attribution Share Alike 3.0 Unported',
                 'slug' => 'cc-by-sa-3.0',
                 'spdx_id' => 'CC-BY-SA-3.0',
                 'url' => 'https://creativecommons.org/licenses/by-sa/3.0/legalcode',
@@ -53,7 +53,7 @@ class LicenseSeeder extends Seeder
                 'category' => 'Creative Commons',
             ],
             [
-                'title' => 'Attribution 4.0 International',
+                'title' => 'Creative Commons Attribution 4.0 International',
                 'slug' => 'cc-by-4.0',
                 'spdx_id' => 'CC-BY-4.0',
                 'url' => 'https://creativecommons.org/licenses/by/4.0/legalcode',
@@ -62,7 +62,7 @@ class LicenseSeeder extends Seeder
                 'category' => 'Creative Commons',
             ],
             [
-                'title' => 'Attribution-NonCommercial 4.0 International',
+                'title' => 'Creative Commons Attribution Non Commercial 4.0 International',
                 'slug' => 'cc-by-nc-4.0',
                 'spdx_id' => 'CC-BY-NC-4.0',
                 'url' => 'https://creativecommons.org/licenses/by-nc/4.0/legalcode',
@@ -71,7 +71,7 @@ class LicenseSeeder extends Seeder
                 'category' => 'Creative Commons',
             ],
             [
-                'title' => 'Attribution 3.0 Unported',
+                'title' => 'Creative Commons Attribution 3.0 Unported',
                 'slug' => 'cc-by-3.0',
                 'spdx_id' => 'CC-BY-3.0',
                 'url' => 'https://creativecommons.org/licenses/by/3.0/legalcode',
@@ -80,7 +80,7 @@ class LicenseSeeder extends Seeder
                 'category' => 'Creative Commons',
             ],
             [
-                'title' => 'Attribution 3.0 IGO',
+                'title' => 'Creative Commons Attribution 3.0 IGO',
                 'slug' => 'cc-by-3.0-igo',
                 'spdx_id' => 'CC-BY-3.0-IGO',
                 'url' => 'https://creativecommons.org/licenses/by/3.0/igo/legalcode',
@@ -89,7 +89,7 @@ class LicenseSeeder extends Seeder
                 'category' => 'Creative Commons',
             ],
             [
-                'title' => 'Attribution-NonCommercial-ShareAlike 3.0 IGO',
+                'title' => 'Creative Commons Attribution Non Commercial Share Alike 3.0 IGO',
                 'slug' => 'cc-by-3.0-igo',
                 'spdx_id' => 'CC-BY-NC-SA-3.0-IGO',
                 'url' => 'https://creativecommons.org/licenses/by-nc-sa/3.0/igo/legalcode',
@@ -98,7 +98,7 @@ class LicenseSeeder extends Seeder
                 'category' => 'Creative Commons',
             ],
             [
-                'title' => 'Attribution-NoDerivatives 4.0 International',
+                'title' => 'Creative Commons Attribution No Derivatives 4.0 International',
                 'slug' => 'cc-by-nd-4.0',
                 'spdx_id' => 'CC-BY-ND-4.0',
                 'url' => 'https://creativecommons.org/licenses/by-nd/4.0/legalcode',
@@ -107,7 +107,7 @@ class LicenseSeeder extends Seeder
                 'category' => 'Creative Commons',
             ],
             [
-                'title' => 'Attribution-NonCommercial-NoDerivatives 4.0 International',
+                'title' => 'Creative Commons Attribution Non Commercial No Derivatives 4.0 International',
                 'slug' => 'cc-by-nc-nd-4.0',
                 'spdx_id' => 'CC-BY-NC-ND-4.0',
                 'url' => 'https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode',
@@ -117,7 +117,7 @@ class LicenseSeeder extends Seeder
             ],
             /*GPL*/
             [
-                'title' => 'GNU General Public License, version 2',
+                'title' => 'GNU General Public License v2.0 only',
                 'slug' => 'gpl-2.0',
                 'spdx_id' => 'GPL-2.0-only',
                 'url' => 'https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html',
@@ -126,7 +126,7 @@ class LicenseSeeder extends Seeder
                 'category' => 'GPL',
             ],
             [
-                'title' => 'GNU Lesser General Public License, Version 3',
+                'title' => 'GNU Lesser General Public License v3.0 only',
                 'slug' => 'lgpl-3.0',
                 'spdx_id' => 'LGPL-3.0-only',
                 'url' => 'http://www.gnu.org/licenses/lgpl-3.0.html',
@@ -135,7 +135,7 @@ class LicenseSeeder extends Seeder
                 'category' => 'GPL',
             ],
             [
-                'title' => 'GNU Affero General Public License, Version 3',
+                'title' => 'GNU Affero General Public License v3.0',
                 'slug' => 'agpl-3.0',
                 'spdx_id' => 'AGPL-3.0',
                 'url' => 'https://www.gnu.org/licenses/agpl-3.0.html',
@@ -144,7 +144,7 @@ class LicenseSeeder extends Seeder
                 'category' => 'GPL',
             ],
             [
-                'title' => 'GNU Free Documentation License, Version 1.3',
+                'title' => 'GNU Free Documentation License v1.3',
                 'slug' => 'gfdl-1.3',
                 'spdx_id' => 'GFDL-1.3',
                 'url' => 'https://www.gnu.org/licenses/fdl-1.3.html',
@@ -155,16 +155,16 @@ class LicenseSeeder extends Seeder
 
             /*Open Data Commons*/
             [
-                'title' => 'Database Contents License (DbCL) v1.0',
-                'slug' => 'dbcl-v1.0',
-                'spdx_id' => 'DbCL-v1.0',
+                'title' => 'Open Data Commons Database Contents License (DbCL) v1.0',
+                'slug' => '',
+                'spdx_id' => '',
                 'url' => 'https://opendatacommons.org/licenses/dbcl/1-0/',
                 'description' => 'Open Data Commons is not a law firm and does not provide legal services of any kind.Open Data Commons has no formal relationship with you. Your receipt of this document does not create any kind of agent-client relationship. Please seek the advice of a suitably qualified legal professional licensed to practice in your jurisdiction before using this document.No warranties and disclaimer of any damages. This information is provided ‘as is‘, and this site makes no warranties on the information provided. Any damages resulting from its use are disclaimed.',
                 'body' => "The Licensor and You agree as follows:<br><br><b>1.0 Definitions of Capitalised Words</b><br>The definitions of the Open Database License (ODbL) 1.0 are incorporated by reference into the Database Contents License.<br><br><b>2.0 Rights granted and Conditions of Use</b><br>2.1 Rights granted. The Licensor grants to You a worldwide, royalty-free, non-exclusive, perpetual, irrevocable copyright license to do any act that is restricted by copyright over anything within the Contents, whether in the original medium or any other. These rights explicitly include commercial use, and do not exclude any field of endeavour. These rights include, without limitation, the right to sublicense the work.<br>2.2 Conditions of Use. You must comply with the ODbL.<br>2.3 Relationship to Databases and ODbL. This license does not cover any Database Rights, Database copyright, or contract over the Contents as part of the Database. Please see the ODbL covering the Database for more details about Your rights and obligations.<br>2.4 Non-assertion of copyright over facts. The Licensor takes the position that factual information is not covered by copyright. The DbCL grants you permission for any information having copyright contained in the Contents.<br><br><b>3.0 Warranties, disclaimer, and limitation of liability</b><br>3.1 The Contents are licensed by the Licensor “as is” and without any warranty of any kind, either express or implied, whether of title, of accuracy, of the presence of absence of errors, of fitness for purpose, or otherwise. Some jurisdictions do not allow the exclusion of implied warranties, so this exclusion may not apply to You.<br>3.2 Subject to any liability that may not be excluded or limited by law, the Licensor is not liable for, and expressly excludes, all liability for loss or damage however and whenever caused to anyone by any use under this License, whether by You or by anyone else, and whether caused by any fault on the part of the Licensor or not. This exclusion of liability includes, but is not limited to, any special, incidental, consequential, punitive, or exemplary damages. This exclusion applies even if the Licensor has been advised of the possibility of such damages.<br>3.3 If liability may not be excluded by law, it is limited to actual and direct financial loss to the extent it is caused by proved negligence on the part of the Licensor.<h3 style='color:#F5346C;'>Note: </h3><b>This is a human-readable summary of (and not a substitute for) the </b><a href='https://opendatacommons.org/licenses/dbcl/1-0/' style='color:#019DBB;' target='_blank'>license</a>.",
                 'category' => 'Open Data Commons',
             ],
             [
-                'title' => 'Open Data Commons Open Database License (ODbL) v1.0',
+                'title' => 'Open Data Commons Open Database License v1.0',
                 'slug' => 'odbl-1.0',
                 'spdx_id' => 'ODbL-1.0',
                 'url' => 'https://opendatacommons.org/licenses/odbl/1-0/',
@@ -173,7 +173,7 @@ class LicenseSeeder extends Seeder
                 'category' => 'Open Data Commons',
             ],
             [
-                'title' => 'Open Data Commons Public Domain Dedication and License (PDDL) v1.0',
+                'title' => 'Open Data Commons Public Domain Dedication & License 1.0',
                 'slug' => 'pddl-1.0',
                 'spdx_id' => 'PDDL-1.0',
                 'url' => 'https://opendatacommons.org/licenses/pddl/1.0/',
@@ -182,7 +182,7 @@ class LicenseSeeder extends Seeder
                 'category' => 'Open Data Commons',
             ],
             [
-                'title' => 'Open Data Commons Attribution License (ODC-By) v1.0',
+                'title' => 'Open Data Commons Attribution License v1.0',
                 'slug' => 'odc-by-1.0',
                 'spdx_id' => 'ODC-By-1.0',
                 'url' => 'https://opendatacommons.org/licenses/by/1-0/index.html',
@@ -193,7 +193,7 @@ class LicenseSeeder extends Seeder
 
             /*Community Data License*/
             [
-                'title' => 'Community Data License Agreement – Permissive, Version 1.0',
+                'title' => 'Community Data License Agreement Permissive 1.0',
                 'slug' => 'cdla-permissive-1.0',
                 'spdx_id' => 'CDLA-Permissive-1.0',
                 'url' => 'https://cdla.dev/permissive-1-0/',
@@ -202,7 +202,7 @@ class LicenseSeeder extends Seeder
                 'category' => 'Community Data License',
             ],
             [
-                'title' => 'Community Data License Agreement – Sharing, Version 1.0',
+                'title' => 'Community Data License Agreement Sharing 1.0',
                 'slug' => 'cdla-sharing-1.0',
                 'spdx_id' => 'CDLA-Sharing-1.0',
                 'url' => 'https://cdla.dev/sharing-1-0/',
@@ -214,8 +214,8 @@ class LicenseSeeder extends Seeder
             /*Special*/
             [
                 'title' => 'The World Bank Dataset Terms of Use',
-                'slug' => 'wbdtu',
-                'spdx_id' => 'WBDTU',
+                'slug' => '',
+                'spdx_id' => '',
                 'url' => 'https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets',
                 'description' => 'You are encouraged to use the Datasets to benefit yourself and others in creative ways. You may extract, download, and make copies of the data contained in the Datasets, and you may share that data with third parties according to these terms of use. Unless specifically labeled otherwise, these Datasets are provided to you under a Creative Commons Attribution 4.0 International License (CC BY 4.0), with additional terms.',
                 'body' => 'You are encouraged to use the Datasets to benefit yourself and others in creative ways. You may extract, download, and make copies of the data contained in the Datasets, and you may share that data with third parties according to these terms of use.<br>Unless specifically labeled otherwise, these Datasets are provided to you under a Creative Commons Attribution 4.0 International License (CC BY 4.0), with the additional terms below.  The basic terms may be accessed here.  When you download or use the Datasets, you are agreeing to comply with the terms of a CC BY 4.0 license, and also agreeing to the following mandatory and binding addition: Any and all disputes arising under this License that cannot be settled amicably shall be resolved in accordance with the following procedure:<ul><li>Pursuant to a notice of mediation communicated by reasonable means by either You or the Licensor to the other, the dispute shall be submitted to non-binding mediation conducted in accordance with rules designated by the Licensor in the copyright notice published with the Work, or if none then in accordance with those communicated in the notice of mediation. The language used in the mediation proceedings shall be English unless otherwise agreed.</li><br><li>If any such dispute has not been settled within 45 days following the date on which the notice of mediation is provided, either You or the Licensor may, pursuant to a notice of arbitration communicated by reasonable means to the other, elect to have the dispute referred to and finally determined by arbitration. The arbitration shall be conducted in accordance with the rules designated by the Licensor in the copyright notice published with the Work, or if none then in accordance with the UNCITRAL Arbitration Rules as then in force. The arbitral tribunal shall consist of a sole arbitrator and the language of the proceedings shall be English unless otherwise agreed. The place of arbitration shall be where the Licensor has its headquarters. The arbitral proceedings shall be conducted remotely (e.g., via telephone conference or written submissions) whenever practicable</li></ul><br><b>Exceptions for Some Third-Party Data</b><br>Some datasets and indicators are provided by third parties may be subject to terms and conditions that are different from those described above.<br><br><b>No Endorsement</b><br>You may not publicly represent or imply that The World Bank is participating in, or has sponsored, approved or endorsed the manner or purpose of your use or reproduction of the Datasets.<br><br><b>No Association</b><br>You may not use the name, any trade-mark, official mark, official emblem or logo of The World Bank, or any of its other means of promotion or publicity, without The World Bank prior written consent nor in any event to represent or imply an association or affiliation with The World Bank.<br><br><b>No Warranties</b><br>The World Bank reserves the right at any time and from time to time to modify or discontinue, temporarily or permanently, this website, the Datasets, any means of accessing or utilizing the Datasets, or the API, at our sole discretion with or without prior notice to you.<br><br><b>Exclusion of Liability</b>THE WORLD BANK SHALL NOT BE RESPONSIBLE OR LIABLE TO YOU FOR ANY LOSS OR DAMAGE OF ANY SORT INCURRED BY YOU IN CONNECTION WITH YOUR USE OF THE DATASETS.<br><br><b>Other</b>Please review The World Bank Terms and Conditions prior to using the Datasets.<h3 style="color:#F5346C;">Note: </h3><b>This is a human-readable summary of (and not a substitute for) the </b><a href="https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets" style="color:#019DBB;" target="_blank">license</a>.',
@@ -223,8 +223,8 @@ class LicenseSeeder extends Seeder
             ],
             [
                 'title' => 'Reddit API Access',
-                'slug' => 'raa',
-                'spdx_id' => 'RAA',
+                'slug' => '',
+                'spdx_id' => '',
                 'url' => 'https://www.reddit.com/wiki/api',
                 'description' => 'We want to allow developers to build great products powered by Reddit and we recognize our developer community is integral to the success of the Reddit platform. We also want protect our users’ privacy and security regardless of how they choose to consume Reddit content.',
                 'body' => 'In order to access the Reddit API directly, please make sure you comply with the following steps:<ul><li>You must <a href="https://docs.google.com/a/reddit.com/forms/d/1ao_gme8e_xfZ41q4QymFqg5HD29HggOD8I9-MFTG7So/viewform" style="color:#019DBB;" target="_blank">read the terms and register</a> in order to use the Reddit API.</li><li>All API clients must authenticate with <a href="https://github.com/reddit/reddit/wiki/OAuth2" style="color:#019DBB;" target="_blank">OAUTH 2</a></li><li>You may not use the Reddit logos and trademark without approval from us.</li><li>You may use "for reddit" or "a client for reddit" in the title of your app. You may not use "reddit" without "for" preceding it. You may not use the word "official" in the title, keywords or description in any way that implies the app was developed by Reddit, Inc.</li><li>If your intended usage is commercial, you’ll need approval from us (either by filling out the API terms form or emailing  api@reddit.com. Use of the API is considered "commercial" if you are earning money from it, including, but not limited to in-app advertising, in-app purchases or you intend to learn from the data and repackage for sale. Open source use is generally considered non-commercial.</li></ul><br><h3 style="color:#F5346C;">Note: </h3><b>This is a human-readable summary of (and not a substitute for) the </b><a href="https://www.reddit.com/wiki/api/" style="color:#019DBB;" target="_blank">license</a>.',
@@ -232,8 +232,8 @@ class LicenseSeeder extends Seeder
             ],
             [
                 'title' => 'U.S. Government Works',
-                'slug' => 'usgw',
-                'spdx_id' => 'USGW',
+                'slug' => '',
+                'spdx_id' => '',
                 'url' => 'https://www.usa.gov/government-works/',
                 'description' => 'Most U.S. government creative works such as writing or images are copyright-free. But not everything is. So before you use a U.S. government work, check to make sure it does not fall under one of these exceptions.',
                 'body' => "<b>Copyright Exceptions for U.S. Government Works</b><br><br>Most U.S. government creative works such as writing or images are copyright-free. But not everything is. So before you use a U.S. government work, check to make sure it does not fall under one of these exceptions:<ul><li>Other people may have rights in the work itself or in how the work is used, such as publicity or privacy rights. Privacy and publicity rights protect the interests of the person or people who may be the subject of the work. Learn more about copyright, privacy, and publicity rights from the <a href='http://lcweb2.loc.gov/ammem/copothr.html' style='color:#019DBB;' target='_blank'>Library of Congress.</a></li><li>You cannot use government trademarks or government agencies' logos without permission. For example, you cannot use an agency logo or trademark on your social media page.</li><li>You cannot use a government work in a way that implies endorsement by a government agency, official, or employee. For example, you can't use a photo of a government official wearing your product in an ad.</li><li>Works prepared for the government by independent contractors may be protected by copyright. The copyrights may be owned by the independent contractor or by the U.S. government.</li><li>Not everything that appears on a government website is a government work. Content may be protected intellectual property used with the rights holder's permission. To ensure that you don’t use protected intellectual property, check with the agency or program that manages the website.</li><li>The U.S. government work designation does not apply to works of state and local governments. Works of state and local governments may be protected by copyright.</li><li>Copyright laws differ internationally. U.S. copyright laws may not protect U.S. government works outside the country. But the work may be protected under the copyright laws of other jurisdictions when used in these jurisdictions. The U.S. government may assert copyright outside of the United States for U.S. government works.</li></ul><h3 style='color:#F5346C;'>Note: </h3><b>This is a human-readable summary of (and not a substitute for) the </b><a href='https://www.usa.gov/government-works/' style='color:#019DBB;' target='_blank'>license</a>",
@@ -241,8 +241,8 @@ class LicenseSeeder extends Seeder
             ],
             [
                 'title' => 'The European Commission Legal Notice',
-                'slug' => 'ecln',
-                'spdx_id' => 'ECLN',
+                'slug' => '',
+                'spdx_id' => '',
                 'url' => 'https://ec.europa.eu/info/legal-notice_en',
                 'description' => "The Commission's reuse policy is implemented by the Commission Decision of 12 December 2011 on the reuse of Commission documents. Unless otherwise indicated (e.g. in individual copyright notices), content owned by the EU on this website is licensed under the Creative Commons Attribution 4.0 International (CC BY 4.0) licence. This means that reuse is allowed, provided appropriate credit is given and changes are indicated.",
                 'body' => "The Commission's reuse policy is implemented by the <a href='https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32011D0833' style='color:#019DBB;' target='_blank'>Commission Decision of 12 December 2011 on the reuse of Commission documents.</a><br><br>Unless otherwise indicated (e.g. in individual copyright notices), content owned by the EU on this website is licensed under the <a href='http://creativecommons.org/licenses/by/4.0/' style='color:#019DBB;' target='_blank'>Creative Commons Attribution 4.0 International (CC BY 4.0) licence.</a>  This means that reuse is allowed, provided appropriate credit is given and changes are indicated.<br><br>You may be required to clear additional rights if a specific content depicts identifiable private individuals or includes third-party works. To use or reproduce content that is not owned by the EU, you may need to seek permission directly from the rightholders. Software or documents covered by industrial property rights, such as patents, trade marks, registered designs, logos and names, are excluded from the Commission's reuse policy and are not licensed to you.<h3 style='color:#F5346C;'>Note: </h3><b>This is a human-readable summary of (and not a substitute for) the </b><a href='https://ec.europa.eu/info/legal-notice_en' style='color:#019DBB;' target='_blank'>license.</a>",
@@ -252,8 +252,8 @@ class LicenseSeeder extends Seeder
             /*Other*/
             [
                 'title' => 'Data files © Original Authors',
-                'slug' => 'dfoa',
-                'spdx_id' => 'DFOA',
+                'slug' => '',
+                'spdx_id' => '',
                 'url' => '',
                 'description' => '',
                 'body' => '',
@@ -261,8 +261,8 @@ class LicenseSeeder extends Seeder
             ],
             [
                 'title' => 'Other (specified in the description) Unknown',
-                'slug' => 'unknown',
-                'spdx_id' => 'Unknown',
+                'slug' => '',
+                'spdx_id' => '',
                 'url' => '',
                 'description' => '',
                 'body' => '',
