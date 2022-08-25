@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\LicenseController;
 use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\Auth\SocialController;
 use App\Http\Controllers\AuthorController;
+use App\Http\Controllers\CitationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DatasetController;
 use App\Http\Controllers\DownloadController;
@@ -82,6 +83,10 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     // Authors
     Route::post('authors/{project}', [AuthorController::class, 'updateAuthor'])
                 ->name('update-author');
+    
+    //Citation
+    Route::post('citation/{project}', [CitationController::class, 'updateCitation'])
+    ->name('update-citation');
 
     Route::post('/onboarding/{status}', [DashboardController::class, 'onboardingStatus'])
             ->name('onboarding.complete');

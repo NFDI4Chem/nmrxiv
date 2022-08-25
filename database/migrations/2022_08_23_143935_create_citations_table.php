@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('citations', function (Blueprint $table) {
             $table->id();
-            $table->string('doi');
+            $table->string('doi')->nullable();
             $table->string('title');
             $table->longText('authors');
             $table->longText('abstract');

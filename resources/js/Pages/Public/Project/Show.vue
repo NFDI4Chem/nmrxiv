@@ -78,6 +78,63 @@
                     </div>
                     <div
                         v-if="
+                            project.data.citations &&
+                            project.data.citations.length > 0
+                        "
+                        class="pt-8 gap-y-6 sm:grid-cols-6 sm:gap-x-6"
+                    >
+                        <div class="sm:col-span-6">
+                            <h2
+                                class="text-xl font-extrabold mb-3 text-blue-gray-900"
+                            >
+                                Citation(s)
+                            </h2>
+                            <!-- <p class="mt-1 text-sm text-blue-gray-500">
+                      This information will be displayed publicly so be careful what you
+                      share.
+                    </p> -->
+                        </div>
+                        <div class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <div
+                                v-for="citation in project.data.citations"
+                                :key="citation.id"
+                                class="relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm flex items-center space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-pink-500"
+                            >
+                                <div class="flex-1 min-w-0">
+                                    <a class="focus:outline-none">
+                                        <span
+                                            class="absolute inset-0"
+                                            aria-hidden="true"
+                                        ></span>
+                                        <p
+                                            class="text-sm font-medium text-gray-900"
+                                        >
+                                            {{ citation.title }}
+                                        </p>
+                                        <p class="text-sm text-teal-500">
+                                            {{ citation.authors }}
+                                        </p>
+                                        <p class="text-sm text-gray-500">
+                                            {{ citation.citation_text }}
+                                        </p>
+                                        <p
+                                            v-if="citation.doi"
+                                            class="text-sm font-bold text-gray-500"
+                                        >
+                                            DOI - {{ citation.doi }}
+                                        </p>
+                                        <p
+                                            class="text-sm text-gray-500 truncate ..."
+                                        >
+                                            {{ citation.abstract }} ...
+                                        </p>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div
+                        v-if="
                             project.data.authors &&
                             project.data.authors.length > 0
                         "
