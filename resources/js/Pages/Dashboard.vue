@@ -82,7 +82,7 @@
                 role="list"
                 class="mt-6 border-b border-gray-200 divide-y divide-gray-200"
             >
-                <li>
+                <li id="v-step-6">
                     <div class="relative group py-4 flex items-start space-x-3">
                         <div class="flex-shrink-0">
                             <span
@@ -143,7 +143,7 @@
                     </div>
                 </li>
 
-                <li>
+                <li id="v-step-7">
                     <div class="relative group py-4 flex items-start space-x-3">
                         <div class="flex-shrink-0">
                             <span
@@ -205,7 +205,7 @@
                     </div>
                 </li>
 
-                <li>
+                <li id="v-step-8">
                     <div class="relative group py-4 flex items-start space-x-3">
                         <div class="flex-shrink-0">
                             <span
@@ -264,7 +264,7 @@
                     </div>
                 </li>
             </ul>
-            <div class="mt-6 flex">
+            <div class="mt-6 flex" id="v-step-9">
                 <a
                     href="mailto:info@nmrxiv.org"
                     class="text-sm font-medium text-indigo-600 hover:text-indigo-500"

@@ -140,6 +140,7 @@ class StudyController extends Controller
             $sample = $study->sample;
             $sample->molecules()->detach([$molecule->id]);
             $sample = $sample->fresh();
+
             return $sample->molecules;
         }
     }
