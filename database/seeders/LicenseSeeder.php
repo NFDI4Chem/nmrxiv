@@ -271,7 +271,7 @@ class LicenseSeeder extends Seeder
 
         ];
         License::truncate();
-        if($licenses){
+        if ($licenses) {
             foreach ($licenses as $license) {
                 $license = License::create([
                     'title' => $license['title'],
