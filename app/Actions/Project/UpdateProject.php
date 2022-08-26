@@ -116,4 +116,11 @@ class UpdateProject
             $authors
         );
     }
+
+    public function updateCitation(Project $project, $citations, $user)
+    {
+        $project->citations()->syncWithPivotValues(
+            $citations,['user' => $user->id]
+        );
+    }
 }

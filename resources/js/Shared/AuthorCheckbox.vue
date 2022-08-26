@@ -1,5 +1,5 @@
 <template>
-    <fieldset class="border border-gray-200 overflow-auto">
+    <fieldset class="border rounded border-gray-200 overflow-auto">
         <legend class="sr-only">Notifications</legend>
         <div style="height: 40vh" class="divide-y divide-gray-200">
             <div
