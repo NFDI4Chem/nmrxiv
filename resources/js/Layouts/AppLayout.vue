@@ -181,6 +181,7 @@
                             </div>
                             <Link
                                 :href="item.href"
+                                :id="item.id"
                                 :class="[
                                     $page.url === item.href
                                         ? ' border-r-4 bg-gray-200 border-r-black'
@@ -199,6 +200,7 @@
                             <Link
                                 v-for="child in item.children"
                                 :key="child.name"
+                                :id="child.id"
                                 :href="child.href"
                                 :class="[
                                     $page.url === child.href
@@ -271,7 +273,7 @@
                     <flash-messages />
                     <div class="ml-4 flex items-center md:ml-6">
                         <div>
-                            <a href="https://docs.nmrxiv.org" target="_blank"
+                            <a id="v-step-11" href="https://docs.nmrxiv.org" target="_blank"
                                 ><svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     viewBox="0 0 24 24"
@@ -291,7 +293,7 @@
                             v-if="$page.props.user.first_name != null"
                             class="ml-5"
                         >
-                            <a
+                            <a id="v-step-12"
                                 class="cursor-pointer text-gray-600"
                                 target="_blank"
                                 @click="startTour"
@@ -314,6 +316,7 @@
                             class="ml-3 relative"
                         >
                             <div
+                                id="v-step-13"
                                 v-if="
                                     $page.props.user.current_team &&
                                     $page.props.user.current_team.personal_team
@@ -713,6 +716,7 @@ const navigation = [
         name: "Dashboard",
         href: "/dashboard",
         prefix: "Your Space",
+        id: "v-step-1",
         icon: HomeIcon,
         bg: "bg-gray-50",
         children: [
@@ -720,6 +724,7 @@ const navigation = [
                 auth: true,
                 name: "Shared with me",
                 href: "/dashboard/shared-with-me",
+                id: "v-step-2",
                 icon: UsersIcon,
                 bg: "bg-white",
             },
@@ -727,6 +732,7 @@ const navigation = [
                 auth: false,
                 name: "Recent",
                 href: "/dashboard/recent",
+                id: "v-step-3",
                 icon: ClockIcon,
                 bg: "bg-white",
             },
@@ -734,6 +740,7 @@ const navigation = [
                 auth: false,
                 name: "Starred",
                 href: "/dashboard/starred",
+                id: "v-step-4",
                 icon: StarIcon,
                 bg: "bg-white",
             },
@@ -741,6 +748,7 @@ const navigation = [
                 auth: false,
                 name: "Trash",
                 href: "/dashboard/trashed",
+                id: "v-step-5",
                 icon: TrashIcon,
                 bg: "bg-white",
             },
