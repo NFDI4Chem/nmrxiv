@@ -270,4 +270,8 @@ class Project extends Model implements Auditable
             }
         });
     }
+    public function citations()
+    {
+        return $this->belongsToMany(Citation::class);
+    }
 }

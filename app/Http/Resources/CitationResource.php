@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class LicenseResource extends JsonResource
+class CitationResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -15,14 +15,11 @@ class LicenseResource extends JsonResource
     public function toArray($request)
     {
         return [
+            'doi' => $this->doi,
             'title' => $this->title,
-            'slug' => $this->slug,
-            'spdx_id' => $this->spdx_id,
-            'url' => $this->url,
-            'html_url' => $this->html_url,
-            'permissions' => $this->permissions,
-            'description' => $this->description,
-            'body'        => $this->body,
+            'authors' => $this->authors,
+            'abstract' => $this->abstract,
+            'citation_text' => $this->citation_text,
         ];
     }
 }
