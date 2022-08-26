@@ -140,6 +140,10 @@
                                     ref="addAuthorElement"
                                     :project="project"
                                 />
+                                <add-citation
+                                    ref="addCitationElement"
+                                    :project="project"
+                                />
                                 <span
                                     class="capitalize inline-flex pr-4 ml-7 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
                                 >
@@ -377,6 +381,76 @@
                         </dd>
                     </div>
                 </div>
+                <!-- Citation -->
+                <div class="mb-8">
+                    <div class="relative">
+                        <div
+                            class="absolute inset-0 flex items-center"
+                            aria-hidden="true"
+                        >
+                            <div class="w-full border-t border-gray-300"></div>
+                        </div>
+                        <div class="relative flex items-center justify-between">
+                            <span
+                                class="px-3 -ml-4 rounded text-sm bg-gray-100 font-medium text-gray-500"
+                            >
+                                Citation
+                            </span>
+                            <button
+                                v-if="canUpdateProject"
+                                type="button"
+                                class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                @click="toggleAddCitation"
+                            >
+                                <PencilIcon
+                                    class="w-4 h-4 mr-1 text-gray-600"
+                                />
+                                <span>Edit</span>
+                            </button>
+                        </div>
+                    </div>
+                    <dd class="mt-2 text-md text-gray-900 space-y-5">
+                        <div class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <div
+                                v-for="citation in project.citations"
+                                :key="citation.id"
+                                class="relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm flex items-center space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-pink-500"
+                            >
+                                <div class="flex-1 min-w-0">
+                                    <a class="focus:outline-none">
+                                        <span
+                                            class="absolute inset-0"
+                                            aria-hidden="true"
+                                        ></span>
+                                        <p
+                                            class="text-sm font-medium text-gray-900"
+                                        >
+                                            {{ citation.title }}
+                                        </p>
+                                        <p class="text-sm text-teal-500">
+                                            {{ citation.authors }}
+                                        </p>
+                                        <p class="text-sm text-gray-500">
+                                            {{ citation.citation_text }}
+                                        </p>
+                                        <p
+                                            v-if="citation.doi"
+                                            class="text-sm font-bold text-gray-500"
+                                        >
+                                            DOI - {{ citation.doi }}
+                                        </p>
+                                        <p
+                                            class="text-sm text-gray-500 truncate ..."
+                                        >
+                                            {{ citation.abstract }} ...
+                                        </p>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </dd>
+                </div>
+
                 <!-- Author -->
                 <div class="mb-8">
                     <div class="relative">
@@ -472,6 +546,7 @@ import { ref } from "vue";
 import { StarIcon, PencilIcon } from "@heroicons/vue/solid";
 import AddAuthor from "@/Shared/AddAuthor.vue";
 import ToolTip from "@/Shared/ToolTip.vue";
+import AddCitation from "@/Shared/AddCitation.vue";
 
 export default {
     components: {
@@ -484,6 +559,7 @@ export default {
         AccessDialogue,
         AddAuthor,
         ToolTip,
+        AddCitation,
     },
     props: [
         "project",
@@ -497,9 +573,11 @@ export default {
     setup() {
         const projectDetailsElement = ref(null);
         const addAuthorElement = ref(null);
+        const addCitationElement = ref(null);
         return {
             projectDetailsElement,
             addAuthorElement,
+            addCitationElement,
         };
     },
     mounted() {},
@@ -533,6 +611,10 @@ export default {
         },
         toggleAddAuthor() {
             this.addAuthorElement.toggleAddAuthorDialog();
+        },
+        toggleAddCitation() {
+            this.addCitationElement.toggleAddCitationDialog();
+            //this.emitter.emit("openAddCitationDialog", {});
         },
     },
 };

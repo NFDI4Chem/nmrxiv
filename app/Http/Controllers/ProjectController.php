@@ -40,7 +40,7 @@ class ProjectController extends Controller
 
         if ($tab == 'info') {
             return Inertia::render('Public/Project/Show', [
-                'project' => (new ProjectResource($project))->lite(false, ['users', 'authors']),
+                'project' => (new ProjectResource($project))->lite(false, ['users', 'authors', 'citations']),
                 'tab' => $tab,
             ]);
         } elseif ($tab == 'studies') {
@@ -69,7 +69,7 @@ class ProjectController extends Controller
             ]);
         } else {
             return Inertia::render('Public/Project/Show', [
-                'project' => (new ProjectResource($project))->lite(false, ['users', 'authors']),
+                'project' => (new ProjectResource($project))->lite(false, ['users', 'authors', 'citations']),
                 'tab' => 'info',
             ]);
         }
@@ -110,7 +110,7 @@ class ProjectController extends Controller
         }
 
         return Inertia::render('Project/Show', [
-            'project' => $project->load('projectInvitations', 'tags', 'authors'),
+            'project' => $project->load('projectInvitations', 'tags', 'authors', 'citations'),
             'team' => $team ? $team->load(['users', 'owner']) : null,
             'members' => $project->allUsers(),
             'availableRoles' => array_values(Jetstream::$roles),
