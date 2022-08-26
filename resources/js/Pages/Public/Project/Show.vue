@@ -66,7 +66,11 @@
                                                 user.last_name
                                             }}
                                         </p>
-                                        <p class="text-sm text-gray-500 truncate">@ {{ user.username }}</p>
+                                        <p
+                                            class="text-sm text-gray-500 truncate"
+                                        >
+                                            @ {{ user.username }}
+                                        </p>
                                     </a>
                                 </div>
                             </div>
