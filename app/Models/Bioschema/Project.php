@@ -2,16 +2,14 @@
 
 namespace App\Models\Bioschema;
 
-use \Spatie\SchemaOrg\Contracts\DatasetContract;
-use \Spatie\SchemaOrg\Contracts\CreativeWorkContract;
-use \Spatie\SchemaOrg\Contracts\ThingContract;
+use Spatie\SchemaOrg\Contracts\CreativeWorkContract;
+use Spatie\SchemaOrg\Contracts\ThingContract;
 
 /**
  * A body of structured information describing some topic(s) of interest.
  *
  * @see https://bioschemas.org/profiles/Study/0.2-DRAFT
  * @link http://www.w3.org/wiki/WebSchemas/SchemaDotOrgSources
- *
  */
 class Project extends BaseType implements CreativeWorkContract, ThingContract
 {
@@ -20,8 +18,7 @@ class Project extends BaseType implements CreativeWorkContract, ThingContract
      * in that HTML 5 provides a special mechanism for indicating authorship via
      * the rel tag. That is equivalent to this and may be used interchangeably.
      *
-     * @param \Spatie\SchemaOrg\Contracts\OrganizationContract|\Spatie\SchemaOrg\Contracts\OrganizationContract[]|\Spatie\SchemaOrg\Contracts\PersonContract|\Spatie\SchemaOrg\Contracts\PersonContract[] $author
-     *
+     * @param  \Spatie\SchemaOrg\Contracts\OrganizationContract|\Spatie\SchemaOrg\Contracts\OrganizationContract[]|\Spatie\SchemaOrg\Contracts\PersonContract|\Spatie\SchemaOrg\Contracts\PersonContract[]  $author
      * @return static
      *
      * @see https://schema.org/author
@@ -34,8 +31,7 @@ class Project extends BaseType implements CreativeWorkContract, ThingContract
     /**
      * Date of first broadcast/publication.
      *
-     * @param \DateTimeInterface|\DateTimeInterface[] $datePublished
-     *
+     * @param  \DateTimeInterface|\DateTimeInterface[]  $datePublished
      * @return static
      *
      * @see https://schema.org/datePublished
@@ -48,8 +44,7 @@ class Project extends BaseType implements CreativeWorkContract, ThingContract
     /**
      * A description of the item.
      *
-     * @param string|string[] $description
-     *
+     * @param  string|string[]  $description
      * @return static
      *
      * @see https://schema.org/description
@@ -66,8 +61,7 @@ class Project extends BaseType implements CreativeWorkContract, ThingContract
      * strings or as URL (URI) links. See [background
      * notes](/docs/datamodel.html#identifierBg) for more details.
      *
-     * @param \Spatie\SchemaOrg\Contracts\PropertyValueContract|\Spatie\SchemaOrg\Contracts\PropertyValueContract[]|string|string[] $identifier
-     *
+     * @param  \Spatie\SchemaOrg\Contracts\PropertyValueContract|\Spatie\SchemaOrg\Contracts\PropertyValueContract[]|string|string[]  $identifier
      * @return static
      *
      * @see https://schema.org/identifier
@@ -80,8 +74,7 @@ class Project extends BaseType implements CreativeWorkContract, ThingContract
     /**
      * The name of the item.
      *
-     * @param string|string[] $name
-     *
+     * @param  string|string[]  $name
      * @return static
      *
      * @see https://schema.org/name
@@ -96,35 +89,31 @@ class Project extends BaseType implements CreativeWorkContract, ThingContract
      * functional genomics or earth science. Those domains can also have an ontology
      * reference.
      *
-     * @param \Spatie\SchemaOrg\Contracts\PropertyValueContract|\Spatie\SchemaOrg\Contracts\PropertyValueContract[]|string|string[] $studyDomain
-     *
+     * @param  \Spatie\SchemaOrg\Contracts\PropertyValueContract|\Spatie\SchemaOrg\Contracts\PropertyValueContract[]|string|string[]  $studyDomain
      * @return static
-     *
      */
-    public function studyDomain($studyDomain)
+    public function projectDomain($projectDomain)
     {
-        return $this->setProperty('studyDomain', $studyDomain);
+        return $this->setProperty('projectDomain', $projectDomain);
     }
 
     /**
      * A subject of the study, i.e. one of the medical conditions, therapies, devices,
      * drugs, etc. investigated by the study.
      *
-     * @param \Spatie\SchemaOrg\Contracts\BioChemEntityContract|\Spatie\SchemaOrg\Contracts\MedicalEntityContract[] $studySubject
+     * @param  \Spatie\SchemaOrg\Contracts\BioChemEntityContract|\Spatie\SchemaOrg\Contracts\MedicalEntityContract[]  $studySubject
 
      * @return static
-     *
      */
-    public function studySubject($studySubject)
+    public function projectSubject($projectSubject)
     {
-        return $this->setProperty('studySubject', $studySubject);
+        return $this->setProperty('projectSubject', $projectSubject);
     }
 
     /**
      * The subject matter of the content.
      *
-     * @param \Spatie\SchemaOrg\Contracts\ThingContract|\Spatie\SchemaOrg\Contracts\ThingContract[] $about
-     *
+     * @param  \Spatie\SchemaOrg\Contracts\ThingContract|\Spatie\SchemaOrg\Contracts\ThingContract[]  $about
      * @return static
      *
      * @see https://schema.org/about
@@ -136,16 +125,15 @@ class Project extends BaseType implements CreativeWorkContract, ThingContract
     }
 
     /**
-     * A property-value pair representing an additional characteristics of the 
-     * entitity, e.g. a product feature or another characteristic for which there 
-     * is no matching property in schema.org. Note: Publishers should be aware that 
-     * applications designed to use specific schema.org properties (e.g. http://schema.org/width, 
-     * http://schema.org/color, http://schema.org/gtin13, …) will typically expect 
-     * such data to be provided using those properties, rather than using the generic 
+     * A property-value pair representing an additional characteristics of the
+     * entitity, e.g. a product feature or another characteristic for which there
+     * is no matching property in schema.org. Note: Publishers should be aware that
+     * applications designed to use specific schema.org properties (e.g. http://schema.org/width,
+     * http://schema.org/color, http://schema.org/gtin13, …) will typically expect
+     * such data to be provided using those properties, rather than using the generic
      * property/value mechanism.
      *
-     * @param \Spatie\SchemaOrg\Contracts\PropertyValueContract|\Spatie\SchemaOrg\Contracts\PropertyValueContract[] $additionalProperty
-     *
+     * @param  \Spatie\SchemaOrg\Contracts\PropertyValueContract|\Spatie\SchemaOrg\Contracts\PropertyValueContract[]  $additionalProperty
      * @return static
      *
      * @see https://schema.org/additionalProperty
@@ -159,8 +147,7 @@ class Project extends BaseType implements CreativeWorkContract, ThingContract
      * A citation or reference to another creative work, such as another
      * publication, web page, scholarly article, etc.
      *
-     * @param \Spatie\SchemaOrg\Contracts\CreativeWorkContract|\Spatie\SchemaOrg\Contracts\CreativeWorkContract[]|string|string[] $citation
-     *
+     * @param  \Spatie\SchemaOrg\Contracts\CreativeWorkContract|\Spatie\SchemaOrg\Contracts\CreativeWorkContract[]|string|string[]  $citation
      * @return static
      *
      * @see https://schema.org/citation
@@ -174,8 +161,7 @@ class Project extends BaseType implements CreativeWorkContract, ThingContract
      * The creator/author of this CreativeWork. This is the same as the Author
      * property for CreativeWork.
      *
-     * @param \Spatie\SchemaOrg\Contracts\OrganizationContract|\Spatie\SchemaOrg\Contracts\OrganizationContract[]|\Spatie\SchemaOrg\Contracts\PersonContract|\Spatie\SchemaOrg\Contracts\PersonContract[] $creator
-     *
+     * @param  \Spatie\SchemaOrg\Contracts\OrganizationContract|\Spatie\SchemaOrg\Contracts\OrganizationContract[]|\Spatie\SchemaOrg\Contracts\PersonContract|\Spatie\SchemaOrg\Contracts\PersonContract[]  $creator
      * @return static
      *
      * @see https://schema.org/creator
@@ -189,8 +175,7 @@ class Project extends BaseType implements CreativeWorkContract, ThingContract
      * The date on which the CreativeWork was created or the item was added to a
      * DataFeed.
      *
-     * @param \DateTimeInterface|\DateTimeInterface[] $dateCreated
-     *
+     * @param  \DateTimeInterface|\DateTimeInterface[]  $dateCreated
      * @return static
      *
      * @see https://schema.org/dateCreated
@@ -203,8 +188,7 @@ class Project extends BaseType implements CreativeWorkContract, ThingContract
     /**
      * The end date and time of the item (in ISO 8601 date format).
      *
-     * @param \DateTimeInterface|\DateTimeInterface[] $endDate
-     *
+     * @param  \DateTimeInterface|\DateTimeInterface[]  $endDate
      * @return static
      *
      * @see https://schema.org/endDate
@@ -217,8 +201,7 @@ class Project extends BaseType implements CreativeWorkContract, ThingContract
     /**
      * The start date and time of the item (in ISO 8601 date format).
      *
-     * @param \DateTimeInterface|\DateTimeInterface[] $startDate
-     *
+     * @param  \DateTimeInterface|\DateTimeInterface[]  $startDate
      * @return static
      *
      * @see https://schema.org/startDate
@@ -233,8 +216,7 @@ class Project extends BaseType implements CreativeWorkContract, ThingContract
      * a keywords list are typically delimited by commas, or by repeating the
      * property.
      *
-     * @param \Spatie\SchemaOrg\Contracts\DefinedTermContract|\Spatie\SchemaOrg\Contracts\DefinedTermContract[]|string|string[] $keywords
-     *
+     * @param  \Spatie\SchemaOrg\Contracts\DefinedTermContract|\Spatie\SchemaOrg\Contracts\DefinedTermContract[]|string|string[]  $keywords
      * @return static
      *
      * @see https://schema.org/keywords
@@ -248,10 +230,8 @@ class Project extends BaseType implements CreativeWorkContract, ThingContract
      * TA process performed as part of an experiment or wider study, i.e. intentionally
      * designed. These processes can have ontology URL attached to.
      *
-     * @param \Spatie\SchemaOrg\Contracts\PropertyValueContract|\Spatie\SchemaOrg\Contracts\PropertyValueContract[]|string|string[] $studyProcess
-     *
+     * @param  \Spatie\SchemaOrg\Contracts\PropertyValueContract|\Spatie\SchemaOrg\Contracts\PropertyValueContract[]|string|string[]  $studyProcess
      * @return static
-     *
      */
     public function studyProcess($studyProcess)
     {
@@ -261,8 +241,7 @@ class Project extends BaseType implements CreativeWorkContract, ThingContract
     /**
      * URL of the item.
      *
-     * @param string|string[] $url
-     *
+     * @param  string|string[]  $url
      * @return static
      *
      * @see https://schema.org/url

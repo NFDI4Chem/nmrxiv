@@ -114,10 +114,11 @@ export default {
                         title: "Let's upload a demo dataset",
                     },
                     content: `Click here to start uploading`,
-                    before: type => new Promise((resolve, reject) => {
-                        this.emitter.emit("openDatasetCreateDialog", {});
-                        resolve("upload dialog open");
-                    })
+                    before: (type) =>
+                        new Promise((resolve, reject) => {
+                            this.emitter.emit("openDatasetCreateDialog", {});
+                            resolve("upload dialog open");
+                        }),
                 },
                 {
                     target: "#v-step-14",
@@ -153,7 +154,7 @@ export default {
                         title: "Spectra files",
                     },
                     content: `Lets start uploading your spectra data. Here is an example dataset. Download and then drag and drop the files here. Once uploaded press next.`,
-                }
+                },
             ],
         };
     },
