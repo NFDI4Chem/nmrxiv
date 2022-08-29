@@ -19,7 +19,7 @@ class CitationController extends Controller
         $citations = [];
 
         foreach ($input as $item) {
-            $citation = Citation::create([
+            $citation = Citation::firstOrCreate([
                 'doi' => array_key_exists('doi', $item) ? $item['doi'] : null,
                 'title' => array_key_exists('title', $item) ? $item['title'] : null,
                 'authors' => array_key_exists('authors', $item) ? $item['authors'] : null,
