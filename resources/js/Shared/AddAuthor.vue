@@ -220,7 +220,7 @@
                             <div class="sm:col-span-6">
                                 <label
                                     for="about"
-                                    class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
+                                    class="block text-sm font-medium text-gray-700"
                                 >
                                     Affiliation
                                 </label>
@@ -431,7 +431,6 @@ export default {
             authorsListDOI: [],
             doiSelectedAuthorList: [],
             selectedAuthorsList: [],
-            getDetailsbyDOIApi: null,
             loading: false,
             confirmingAuthorDeletion: false,
             authorId: null,
@@ -459,25 +458,35 @@ export default {
         importAuthors() {
             this.loading = true;
             this.authorsListDOI = [];
-            this.getDetailsbyDOIApi = this.$page.props.getDetailsbyDOIApi;
             this.importAuthorsForm.errors = {};
             if (!this.importAuthorsForm.doi) {
                 this.importAuthorsForm.errors.doi =
                     "The DOI field is required.";
             } else {
-                this.getDetailsbyDOIApi =
-                    this.getDetailsbyDOIApi + "/" + this.importAuthorsForm.doi;
                 axios
-                    .get(this.getDetailsbyDOIApi)
+                    .get(this.$page.props.europemcWSApi, {
+                        params: {
+                            query: this.importAuthorsForm.doi,
+                            format: "json",
+                            pageSize: "1",
+                            resulttype: "core",
+                            synonym: "true",
+                        },
+                    })
                     .then((res) => {
                         this.authorsListDOI = this.formatAuthorResponse(
-                            res.data
+                            res.data.resultList.result[0]
                         );
                     })
                     .catch((error) => {
-                        this.importAuthorsForm.errors.doi = "Invalid DOI.";
+                        this.importAuthorsForm.errors.doi =
+                            "Something went wrong. Please check the DOI and try again.";
                     })
                     .finally(() => {
+                        if (this.authorsListDOI == null) {
+                            this.importAuthorsForm.errors.doi =
+                                "Something went wrong. Please check the DOI and try again.";
+                        }
                         this.loading = false;
                     });
             }
@@ -562,21 +571,29 @@ export default {
         formatAuthorResponse(response) {
             var authorsList = [];
             var author = {};
-            if (response && response["status"] == "ok") {
-                var authors = response["message"]["author"];
+            if (response) {
+                var authors = response.authorList.author;
                 authors.forEach((item) => {
-                    author["given_name"] = item.hasOwnProperty("given")
-                        ? item["given"]
+                    author["given_name"] = item.hasOwnProperty("firstName")
+                        ? item["firstName"]
                         : null;
-                    author["family_name"] = item.hasOwnProperty("family")
-                        ? item["family"]
+                    author["family_name"] = item.hasOwnProperty("lastName")
+                        ? item["lastName"]
                         : null;
-                    author["affiliation"] = item.hasOwnProperty("affiliation")
-                        ? item["affiliation"][0]["name"]
-                        : null;
-                    author["orcid_id"] = item.hasOwnProperty("ORCID")
-                        ? item["ORCID"]
-                        : null;
+                    if (item.hasOwnProperty("authorAffiliationDetailsList")) {
+                        var affiliationList =
+                            item["authorAffiliationDetailsList"]
+                                .authorAffiliation;
+                        affiliationList.forEach((item) => {
+                            author["affiliation"] = item["affiliation"];
+                        });
+                    }
+                    if (item.hasOwnProperty("authorId")) {
+                        var idType = item["authorId"].type;
+                        if (idType.toLowerCase() == "orcid") {
+                            author["orcid_id"] = item["authorId"].value;
+                        }
+                    }
                     authorsList.push(author);
                     author = {};
                 });
@@ -603,11 +620,6 @@ export default {
             if (!this.manualAddAuthorForm.family_name) {
                 this.manualAddAuthorForm.errors.family_name =
                     "The family name field is required.";
-                hasErrors = true;
-            }
-            if (!this.manualAddAuthorForm.affiliation) {
-                this.manualAddAuthorForm.errors.affiliation =
-                    "The affiliation field is required.";
                 hasErrors = true;
             }
             if (hasErrors) {
