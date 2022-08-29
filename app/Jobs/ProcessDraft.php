@@ -67,7 +67,7 @@ class ProcessDraft implements ShouldQueue, ShouldBeUnique
             $projectFSObjects = FileSystemObject::with('children')
                 ->where([
                     ['draft_id', $this->draft->id],
-                    ['project_id', $project->id],
+                    ['level', 0],
                 ])
                 ->get();
 

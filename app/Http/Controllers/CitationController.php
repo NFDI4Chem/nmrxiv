@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-
 use App\Actions\Project\UpdateProject;
 use App\Models\Citation;
 use App\Models\Project;
@@ -26,7 +25,7 @@ class CitationController extends Controller
                 'authors' => array_key_exists('authors', $item) ? $item['authors'] : null,
                 'abstract' => array_key_exists('abstract', $item) ? $item['abstract'] : null,
                 'citation_text' => array_key_exists('citation_text', $item) ? $item['citation_text'] : null,
-                ]);
+            ]);
             array_push($citations, $citation->id);
         }
         $updater->updateCitation($project, $citations, $user);
