@@ -69,8 +69,7 @@ class HandleInertiaRequests extends Middleware
             'MEILISEARCH_HOST' => (env('MEILISEARCH_HOST')),
             'MEILISEARCH_PUBLICKEY' => (env('MEILISEARCH_PUBLICKEY')),
             'SCOUT_PREFIX' => (env('SCOUT_PREFIX')),
-            'getDetailsbyDOIApi' => (env('GET_DETAILS_BY_DOI_API')),
-            'getCitationbyDOIApi' => (env('GET_CITATION_BY_DOI_API')),
+            'europemcWSApi' => (env('EUROPEMC_WS_API')),
         ]);
     }
 }
