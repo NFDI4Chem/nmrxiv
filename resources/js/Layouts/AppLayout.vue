@@ -273,7 +273,10 @@
                     <flash-messages />
                     <div class="ml-4 flex items-center md:ml-6">
                         <div>
-                            <a id="v-step-11" href="https://docs.nmrxiv.org" target="_blank"
+                            <a
+                                id="v-step-11"
+                                href="https://docs.nmrxiv.org"
+                                target="_blank"
                                 ><svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     viewBox="0 0 24 24"
@@ -293,7 +296,8 @@
                             v-if="$page.props.user.first_name != null"
                             class="ml-5"
                         >
-                            <a id="v-step-12"
+                            <a
+                                id="v-step-12"
                                 class="cursor-pointer text-gray-600"
                                 target="_blank"
                                 @click="startTour"
