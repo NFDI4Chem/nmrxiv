@@ -3,8 +3,8 @@
 use App\Http\Controllers\API\Auth\LoginController;
 use App\Http\Controllers\API\Auth\RegisterController;
 use App\Http\Controllers\API\Auth\UserController;
-use App\Http\Controllers\API\Bioschema\DataCatalogController;
 use App\Http\Controllers\API\Bioschema\BiochemaController;
+use App\Http\Controllers\API\Bioschema\DataCatalogController;
 use App\Http\Controllers\API\FileSystemController;
 use App\Http\Controllers\API\ProjectController;
 use Illuminate\Support\Facades\Route;
