@@ -501,7 +501,7 @@ export default {
                     "The DOI field is required.";
             } else {
                 axios
-                    .get(this.$page.props.getCitationbyDOIApi, {
+                    .get(this.$page.props.europemcWSApi, {
                         params: {
                             query: this.importCitationForm.doi,
                             format: "json",
