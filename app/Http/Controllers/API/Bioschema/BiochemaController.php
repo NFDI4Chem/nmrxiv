@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Bioschema\BioSchema;
 use App\Models\Dataset;
 use App\Models\Project;
-//use App\Models\Bioschema\Study as StudySchema;
 use App\Models\Study;
 use App\Models\User;
 use Illuminate\Http\Request;

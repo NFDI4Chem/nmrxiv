@@ -62,6 +62,9 @@ Route::get('{code}/studies/{study}/file/{filename}', [StudyController::class, 'f
 Route::get('projects/{project}/toggleUpVote', [ProjectController::class, 'toggleUpVote'])
     ->name('project.toggle-upvote');
 
+Route::get('projects/{project}/toggleStarred', [ProjectController::class, 'toggleStarred'])
+    ->name('project.toggle-starred');
+
 Route::get('projects/{owner}/{slug}', [ProjectController::class, 'publicProjectView'])
     ->name('public.project');
 
@@ -121,6 +124,8 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
             ->name('dashboard.project.settings');
         Route::get('projects/{project}/studies', [ProjectController::class, 'studies'])
             ->name('dashboard.project.studies');
+        Route::put('projects/{project}', [ProjectController::class, 'restore'])
+            ->name('dashboard.project.restore');
         Route::delete('projects/{project}', [ProjectController::class, 'destroy'])
             ->name('dashboard.project.destroy');
         Route::post('projects/create', [ProjectController::class, 'store'])
