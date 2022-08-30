@@ -21,8 +21,11 @@
             </div>
         </template>
         <div class="py-12 px-10">
-            <div>
+            <div v-if="!project.is_deleted">
                 <project-delete :project="project"></project-delete>
+            </div>
+            <div v-else>
+                <project-restore :project="project"></project-restore>
             </div>
         </div>
     </app-layout>
@@ -32,12 +35,14 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import { Link } from "@inertiajs/inertia-vue3";
 import ProjectDelete from "@/Pages/Project/Partials/Delete.vue";
+import ProjectRestore from "@/Pages/Project/Partials/Restore.vue";
 
 export default {
     components: {
         Link,
         AppLayout,
         ProjectDelete,
+        ProjectRestore,
     },
     props: ["project", "studies"],
 };

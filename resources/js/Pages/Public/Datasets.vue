@@ -45,7 +45,7 @@
         </div>
 
         <div class="min-h-[calc(100vh-500px)] px-12 mb-24 mx-auto">
-            <div class="relative z-10 border-gray-200 pt-4">
+            <div class="relative border-gray-200 pt-4">
                 <div class="mx-auto flex items-center justify-between">
                     <Menu as="div" class="relative inline-block text-left">
                         <div>
