@@ -204,6 +204,15 @@ class DraftController extends Controller
                 $project->save();
             }
 
+            foreach ($project->studies as $study) {
+                $fsObject = $study->fsObject;
+                if (! $fsObject) {
+                    $study->datasets()->delete();
+                    $study->delete();
+                }
+            }
+            $project = $project->fresh();
+
             $folders = FileSystemObject::with('children')
                 ->where([
                     ['draft_id', $draft->id],

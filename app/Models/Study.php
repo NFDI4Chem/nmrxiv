@@ -104,7 +104,7 @@ class Study extends Model implements Auditable
 
     public function fsObject()
     {
-        return $this->hasOne(FileSystemObject::class, 'fs_id');
+        return $this->hasOne(FileSystemObject::class);
     }
 
     /**
