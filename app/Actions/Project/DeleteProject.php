@@ -14,6 +14,20 @@ class DeleteProject
      */
     public function delete($project)
     {
-        // $project->delete();
+        if ($project->is_public) {
+            $project->studies()->update(['is_archived' => true]);
+            foreach ($project->studies as $study) {
+                $study->datasets()->update(['is_archived' => true]);
+            }
+            $project->is_archived = true;
+            $project->save();
+        } else {
+            $project->studies()->update(['is_deleted' => true]);
+            foreach ($project->studies as $study) {
+                $study->datasets()->update(['is_deleted' => true]);
+            }
+            $project->is_deleted = true;
+            $project->save();
+        }
     }
 }
