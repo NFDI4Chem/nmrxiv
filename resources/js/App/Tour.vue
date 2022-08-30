@@ -11,109 +11,103 @@ export default {
         return {
             steps: [
                 {
-                    target: "#v-step-0",
+                    target: "#tour-step-upload",
                     header: {
                         title: "Get Started",
                     },
-                    content: `Click to start uploading <br/> your datasets to nmrXiv. <br/> <small>Check out our guides  <br/>to prepare datasets <br/>for uploading <a class="text-green-400 hover:text-decoration-line" href="https://docs.nmrxiv.org">here</a>.</small>`,
+                    content: `Click to start uploading <br/> your datasets to nmrXiv. <br/> <small>Check out our guides  <br/>to prepare datasets <br/>for uploading <a class="text-green-400 hover:text-decoration-line" href="https://docs.nmrxiv.org" target="_blank">here</a>.</small>`,
                 },
                 {
-                    target: "#v-step-1",
+                    target: "#tour-step-dashboard",
                     header: {
                         title: "Your space: Dashboard",
                     },
-                    content: `You can find all your work<br/> organised under this section.<br/> <small>All your active projects <br/>and quicklinks are accessible <br/> from your dashboard. <br/>Please remember you will have <br/>dedicated dashboards for you <br/>and your teams.</small>`,
+                    content: `<small>You can find all your work<br/> organised under this section.<br/> All your active projects <br/>and quicklinks are accessible <br/> from your dashboard. <br/>Please remember you will have <br/>dedicated dashboards for you <br/>and your teams.</small>`,
                 },
                 {
-                    target: "#v-step-2",
+                    target: "#tour-step-shared-with-me",
                     header: {
                         title: "Your space: Shared with me",
                     },
-                    content: `Projects and studies shared<br/> with you can be accessed from here.`,
+                    content: `<small>Projects and studies shared<br/> with you can be accessed from here.</small>`,
                 },
                 {
-                    target: "#v-step-3",
+                    target: "#tour-step-recent",
                     header: {
                         title: "Your space: Recent",
                     },
-                    content: `Quick access to recently<br/> edited projects and studies.`,
+                    content: `<small>Quick access to recently<br/> edited projects and studies.</small>`,
                 },
                 {
-                    target: "#v-step-4",
+                    target: "#tour-step-starred",
                     header: {
                         title: "Your space: Starred",
                     },
-                    content: `Projects, studies that you starred<br/> can be accessed quickly from this view.`,
+                    content: `<small>Projects and studies that you star<br/> can be accessed quickly from this view.</small>`,
                 },
                 {
-                    target: "#v-step-5",
+                    target: "#tour-step-trash",
                     header: {
                         title: "Your space: Trash",
                     },
-                    content: `Projects, studies deleted will<br/> be available here for you to restore if need.`,
-                },
+                    content: `<small>Restore your deleted projects and studies <br/> (within 30 days) from here.</small>`,
+                }, 
                 {
-                    target: "#v-step-6",
+                    target: "#tour-step-submission-guide",
                     header: {
                         title: "Guides on Submission",
                     },
-                    content: `Check out our submission guides any time for more information. Here is a quick link for you right from your dashboard.`,
+                    content: `<small>Check out our submission guides any time for more information. Here is a quick link for you right from your dashboard.</small>`,
                 },
                 {
-                    target: "#v-step-7",
+                    target: "#tour-step-api",
                     header: {
                         title: "API",
                     },
-                    content: `Developing a tool? want to access data or submit programmatically? Check out our API`,
+                    content: `<small>Developing a tool? Check out our API to access our data.</small>`,
                 },
                 {
-                    target: "#v-step-8",
+                    target: "#tour-step-spectra-challenge",
                     header: {
                         title: "Spectra Challenges",
                     },
-                    content: `Are you proficient in structure ellucidation? Stay tuned for new challenges.`,
+                    content: `<small>Are you proficient in structure ellucidation? Stay tuned for new challenges.</small>`,
                 },
                 {
-                    target: "#v-step-9",
+                    target: "#tour-step-get-in-touch",
                     header: {
                         title: "Need help! Email us",
                     },
-                    content: `You can write to us via email for any further queries. We are happy to help!`,
+                    content: `<small>Any queries? Write to us via email.<br/>We are happy to help!</small>`,
                 },
                 {
-                    target: "#v-step-10",
+                    target: "#tour-step-support-bubble",
                     header: {
                         title: "Help! Chat window",
                     },
-                    content: `Reach out to us with any questions, suggestions or bugs. We will get back to you as soon as we can`,
+                    content: `<small>Reach out to us with any questions, suggestions or bugs. We will get back to you as soon as we can.</small>`,
                 },
                 {
-                    target: "#v-step-11",
+                    target: "#tour-step-documentation",
                     header: {
                         title: "Documentation site",
                     },
-                    content: `Check out our documentation site for our installation & submission guies, design principles and architectural overview.`,
+                    content: `<small>Check out our documentation site for the installation, submission guides, design principles and architectural overview.</small>`,
                 },
                 {
-                    target: "#v-step-12",
-                    header: {
-                        title: "Tour",
-                    },
-                    content: `You can always comeback and start this tour using this tour button`,
-                },
-                {
-                    target: "#v-step-13",
+                    target: "#tour-step-account-management",
                     header: {
                         title: "Account management",
                     },
-                    content: `You can manage your teams, profile and other settings from the drop down here.`,
+                    content: `<small>Manage your teams, profile and other settings from the drop down here.</small>`,
                 },
+
                 {
-                    target: "#v-step-0",
+                    target: "#tour-step-upload",
                     header: {
                         title: "Let's upload a demo dataset",
                     },
-                    content: `Click here to start uploading`,
+                    content: `<small>Click here to start uploading.</small>`,
                     before: (type) =>
                         new Promise((resolve, reject) => {
                             this.emitter.emit("openDatasetCreateDialog", {});
@@ -121,39 +115,179 @@ export default {
                         }),
                 },
                 {
-                    target: "#v-step-14",
+                    target: "#tour-step-submission-header",
                     header: {
                         title: "Files upload",
                     },
-                    content: `Lets provide some basic details about your submission and then upload files`,
+                    content: `<small>Lets provide some basic details about your submission and then upload files.</small>`,
                 },
                 {
-                    target: "#v-step-15",
+                    target: "#tour-step-project-name",
                     header: {
-                        title: "Name",
+                        title: "Project Name",
                     },
-                    content: `Project name`,
+                    content: `<small>Enter a suitable name for your project.</small>`,
                 },
                 {
-                    target: "#v-step-16",
+                    target: "#tour-step-project-desc",
                     header: {
-                        title: "Description",
+                        title: "Project Description",
                     },
-                    content: `Project Description`,
+                    content: `<small>Provide a short description about your project in not less than 20 words.</small>`,
                 },
                 {
-                    target: "#v-step-17",
+                    target: "#tour-step-project-keywords",
                     header: {
-                        title: "Keywords",
+                        title: "Project Keywords",
                     },
-                    content: `Project keywords`,
+                    content: `<small>Classify your project </br>by entering keywords or tags.</small>`,
                 },
                 {
-                    target: "#v-step-18",
+                    target: "#tour-step-upload-spectra",
                     header: {
-                        title: "Spectra files",
+                        title: "Upload Spectra files",
                     },
-                    content: `Lets start uploading your spectra data. Here is an example dataset. Download and then drag and drop the files here. Once uploaded press next.`,
+                    content: `<small>Lets start uploading your spectra data. <a class="text-green-400 hover:text-decoration-line" href="https://drive.google.com/drive/folders/1PS9jYkjCl_2iwwpod7rkxsmiH32QSgCM" target="_blank">Here</a> is an example dataset. Download and then drag and drop the files here.</small>`,
+                },
+                {
+                    target: "#tour-step-proceed-from-step-1",
+                    header: {
+                        title: "Proceed",
+                    },
+                    content: `<small>Once the upload is finish. Press on the Proceed button to continue.</small>`,
+                },
+                {
+                    target: "#tour-step-submission-header",
+                    header: {
+                        title: "Assignment and Meta data.",
+                    },
+                    content: `<small>In this step you can use NMRium to edit your spectra and assign the peaks to the corresponding chemical groups, additionally, you can provide the metadata of the studies and samples.</small>`,
+                },
+                {
+                    target: "#tour-step-side-panel-studies",
+                    header: {
+                        title: "Studies.",
+                    },
+                    content: `<small>In this panel, you have a view of all the studies in the project with the datasets they include.</small> `,
+                },
+                {
+                    target: "#tour-step-select-exp",
+                    header: {
+                        title: "Select Experiments.",
+                    },
+                    content: `<small>You can navigate through different datasets (experiments) within the study through this dropdown.</small>`,
+                },
+                {
+                    target: "#tour-step-nmrium",
+                    header: {
+                        title: "NMRium.",
+                    },
+                    content: `<small>Visualize and analyse your spectra data using NMRium.<br/> You can visualize both 1D and 2D spectra, do smart peak picking and much more. <br/>Click <a class="text-green-400 hover:text-decoration-line" href="https://docs.nmrxiv.org/docs/introduction/nmrium" target="_blank">here</a> to learn more about NMRium.</small> `,
+                },
+                {
+                    target: "#tour-step-spectra-info",
+                    header: {
+                        title: "Spectra Info.",
+                    },
+                    content: `<small>In the Info table, you get all the information extracted about the NMR experiment.</small>`,
+                },
+                // {
+                //     target: "#sample-info",
+                //     header: {
+                //         title: "Sample Info.",
+                //     },
+                //     content: `<small></small>`,
+                // },
+                // {
+                //     target: "#meta-data",
+                //     header: {
+                //         title: "Meta Data.",
+                //     },
+                //     content: `<small></small>`,
+                // },
+                {
+                    target: "#tour-step-proceed-from-step-2",
+                    header: {
+                        title: "Proceed.",
+                    },
+                    content: `<small>Click on proceed to submit your data and allow us for further processing.</small>`
+                },
+                {
+                    target: "#tour-step-queue",
+                    header: {
+                        title: "Queued.",
+                    },
+                    content: `<small>Give us some moment to process your submission. <br/>You will automatically be routed to next step and also recieve an email once the process is complete.</small>`,
+                },
+                {
+                    target: "#tour-step-submission-header",
+                    header: {
+                        title: "Complete.",
+                    },
+                    content: `<small>GREAT!! <br/>Your data is now submitted to us and you are almost done with the submission process. </br>Here you find the summary of the project and we ask you to update few of the essential info to make your project complete. </small>`,
+                },
+                {
+                    target: "#tour-step-summary",
+                    header: {
+                        title: "Summary.",
+                    },
+                    content: `<small>Checkout to find the quick summary of your Study(s) and the list of Dataset(s) within.</small>`,
+                },
+                {
+                    target: "#tour-step-privacy",
+                    header: {
+                        title: "Privacy.",
+                    },
+                    content: `<small>From here you can choose to keep your project as private or make it public for open access.</small>`,
+                },
+                {
+                    target: "#tour-step-release-date",
+                    header: {
+                        title: "Release Date.",
+                    },
+                    content: `<small>Choose a release date to auto publish your project on selected date and time.</small>`,
+                },
+                {
+                    target: "#tour-step-license",
+                    header: {
+                        title: "License.",
+                    },
+                    content: `<small>Add a license to your project from the drop down. </br> This step is required before making your project public.</small>`,
+                },
+                {
+                    target: "#tour-step-save",
+                    header: {
+                        title: "Save.",
+                    },
+                    content: `<small>Dont forget to click on Save after making any changes.</small>`,
+                },
+                {
+                    target: "#tour-step-download",
+                    header: {
+                        title: "Download.",
+                    },
+                    content: `<small>Here is the quick link to download your project.</small>`,
+                },
+                {
+                    target: "#tour-step-finish",
+                    header: {
+                        title: "Finish.",
+                    },
+                    content: `<small>Press on Finish once your changes are done and route to dahsboard. </small>`,
+                },
+                {
+                    target: "#tour-step-projects",
+                    header: {
+                        title: "Projects.",
+                    },
+                    content: `<small>Now that the project is created succesfully, you can find the list of your projects in this section.<br/> You can always visit your project by clicking on it and make changes if required.</small>`,
+                },
+                {
+                    target: "#tour-step-tour",
+                    header: {
+                        title: "Tour",
+                    },
+                    content: `<small>Thanks for completing the tour!! <br/> You can always comeback and start this tour by clicking on this tour button.</small>`,
                 },
             ],
         };

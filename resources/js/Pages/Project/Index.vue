@@ -2,7 +2,7 @@
     <div>
         <div class="flex items-baseline justify-between">
             <div>
-                <h2 class="text-lg">Projects</h2>
+                <h2 id ="tour-step-projects" class="text-lg">Projects</h2>
                 <!-- <div class="mt-2 text-sm text-gray-700"> -->
                 <!-- <div class="max-w-2xl">You may house a variety of projects.</div> -->
                 <!-- </div> -->

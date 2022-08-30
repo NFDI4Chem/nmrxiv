@@ -10,7 +10,7 @@
                 class="lg:border-b lg:border-gray-200 pb-3 pr-5 -mx-6"
             >
                 <div
-                    id="v-step-14"
+                    id="tour-step-submission-header"
                     class="flex items-left justify-start pl-5 float-left"
                 >
                     <b>{{
@@ -178,10 +178,10 @@
                             id="submission-dropzone"
                         >
                             <div v-if="currentDraft">
-                                <div id="v-step-15" class="mb-3">
+                                <div id="tour-step-project-name" class="mb-3">
                                     <label
                                         for="project-name"
-                                        class="block text-sm font-medium text-gray-700"
+                                        class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
                                     >
                                         Project Name
                                     </label>
@@ -198,10 +198,10 @@
                                         class="mt-2"
                                     />
                                 </div>
-                                <div id="v-step-16" class="mb-3">
+                                <div id="tour-step-project-desc" class="mb-3">
                                     <label
                                         for="description"
-                                        class="block text-sm font-medium text-gray-700"
+                                        class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
                                     >
                                         <span
                                             @click="
@@ -226,7 +226,7 @@
                                         class="mt-2"
                                     />
                                 </div>
-                                <div id="v-step-17" class="mb-3">
+                                <div id="tour-step-project-keywords" class="mb-3">
                                     <label
                                         for="description"
                                         class="block text-sm font-medium text-gray-700"
@@ -257,7 +257,7 @@
                                             >Draft ID:
                                             {{ currentDraft.key }}</small
                                         >
-                                        <div id="v-step-18">
+                                        <div id="tour-step-upload-spectra">
                                             <file-system-browser
                                                 ref="fsbRef"
                                                 :readonly="false"
@@ -302,6 +302,7 @@
                                             </span>
                                         </div>
                                         <div
+                                            id="tour-step-side-panel-studies"
                                             style="
                                                 height: 74vh;
                                                 overflow: scroll !important;
@@ -602,6 +603,7 @@
                                                             </div>
                                                         </div>
                                                         <div
+                                                            id="tour-step-nmrium"
                                                             v-if="
                                                                 currentTab.name ==
                                                                 'Experiments (Spectra)'
@@ -626,7 +628,7 @@
                                                                         >
                                                                     </label>
                                                                     <select
-                                                                        id="location"
+                                                                        id="tour-step-select-exp"
                                                                         v-model="
                                                                             selectedDataset
                                                                         "
@@ -742,6 +744,7 @@
                                                                             >Info</label
                                                                         >
                                                                         <div
+                                                                            id="tour-step-spectra-info"
                                                                             v-if="
                                                                                 selectedSpectraData
                                                                             "
@@ -1560,7 +1563,7 @@
                                                 class="max-w-lg mx-auto lg:max-w-none"
                                             >
                                                 <h2
-                                                    id="summary-heading"
+                                                    id="tour-step-summary"
                                                     class="text-lg font-medium text-gray-900"
                                                 >
                                                     Summary
@@ -1670,6 +1673,7 @@
                                                     class="ml-4 flex-shrink-0"
                                                 >
                                                     <a
+                                                        id="tour-step-download"
                                                         :href="downloadURL"
                                                         class="mr-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
                                                     >
@@ -1759,14 +1763,13 @@
                                                 </div>
                                             </section>
 
-                                            <section class="mt-5">
+                                            <section id="tour-step-privacy" class="mt-5">
                                                 <h2
-                                                    id="contact-info-heading"
                                                     class="text-lg font-medium text-gray-900"
                                                 >
                                                     Share and Release
                                                 </h2>
-                                                <div>
+                                                <div id="">
                                                     <fieldset>
                                                         <legend
                                                             class="text-sm font-medium text-gray-900"
@@ -1885,7 +1888,7 @@
                                                     "
                                                     class="mt-5"
                                                 >
-                                                    <div>
+                                                    <div id="tour-step-release-date">
                                                         <label
                                                             class="block text-sm font-medium text-gray-700, block text-sm font-medium text-gray-700"
                                                         >
@@ -2019,7 +2022,7 @@
                                                     </div>
                                                 </div>
                                                 <div class="mt-5">
-                                                    <div>
+                                                    <div id="tour-step-license">
                                                         <select-rich
                                                             v-model:selected="
                                                                 updateProjectForm.license
@@ -2078,6 +2081,7 @@
                                                             also be made public.
                                                         </label>
                                                         <jet-button
+                                                            id="tour-step-save"
                                                             class="mt-3"
                                                             :disabled="
                                                                 !confirmPublicAccess
@@ -2097,6 +2101,7 @@
                                                 class="mt-10 pt-6 border-t border-gray-200 sm:flex"
                                             >
                                                 <button
+                                                    id="tour-step-save"
                                                     class="w-full float-left bg-teal-600 border border-transparent rounded-md shadow-sm py-2 px-4 text-sm font-medium text-white hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-teal-500 sm:order-last sm:w-auto"
                                                     @click="updateProject"
                                                 >
@@ -2112,7 +2117,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div v-else>
+                            <div id ="tour-step-queue" v-else>
                                 <div class="py-16">
                                     <div class="text-center">
                                         <p
@@ -2238,7 +2243,7 @@
                 </Link>
             </span>
             <span v-else>
-                <span v-if="currentStep.id == '01'">
+                <span  v-if="currentStep.id == '01'">
                     <jet-secondary-button
                         v-if="drafts.length > 0"
                         class="ml-2 float-left"
@@ -2255,6 +2260,7 @@
                         Cancel
                     </Link>
                     <jet-button
+                        id="tour-step-proceed-from-step-1"
                         class="ml-2"
                         :class="{ 'opacity-25': createDatasetForm.processing }"
                         :disabled="
@@ -2264,7 +2270,7 @@
                         "
                         @click="process"
                     >
-                        <span v-if="loadingStep">
+                        <span  v-if="loadingStep">
                             <svg
                                 class="animate-spin -ml-1 mr-3 h-2 w-2 text-white"
                                 xmlns="http://www.w3.org/2000/svg"
@@ -2305,6 +2311,7 @@
                         Cancel
                     </Link>
                     <jet-button
+                        id="tour-step-proceed-from-step-2"
                         class="ml-2"
                         :class="{ 'opacity-25': createDatasetForm.processing }"
                         :disabled="
@@ -2341,6 +2348,7 @@
                 </span>
                 <span v-else-if="currentStep.id == '03'">
                     <Link
+                        id="tour-step-finish"
                         class="inline-flex items-center px-2.5 py-1 border border-gray-300 shadow-sm text-md font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                         :href="route('dashboard')"
                     >
@@ -2419,7 +2427,7 @@ export default {
             steps: [
                 {
                     id: "01",
-                    step: "v-step-14",
+                    step: "tour-step-submission-header",
                     name: "Files Upload",
                     description: "Vitae sed mi luctus laoreet.",
                     href: "#",
@@ -2427,6 +2435,7 @@ export default {
                 },
                 {
                     id: "02",
+                    step: "v-step-20",
                     name: "Assignments & Meta data",
                     description: "Cursus semper viverra.",
                     href: "#",

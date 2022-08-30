@@ -82,7 +82,7 @@
                 role="list"
                 class="mt-6 border-b border-gray-200 divide-y divide-gray-200"
             >
-                <li id="v-step-6">
+                <li>
                     <div class="relative group py-4 flex items-start space-x-3">
                         <div class="flex-shrink-0">
                             <span
@@ -109,6 +109,7 @@
                         <div class="min-w-0 flex-1">
                             <div class="text-sm font-medium text-gray-900">
                                 <a
+                                    id="tour-step-submission-guide"
                                     href="https://docs.nmrxiv.org/docs/introduction/intro"
                                     target="_blank"
                                 >
@@ -143,7 +144,7 @@
                     </div>
                 </li>
 
-                <li id="v-step-7">
+                <li>
                     <div class="relative group py-4 flex items-start space-x-3">
                         <div class="flex-shrink-0">
                             <span
@@ -170,6 +171,7 @@
                         <div class="min-w-0 flex-1">
                             <div class="text-sm font-medium text-gray-900">
                                 <a
+                                    id="tour-step-api"
                                     href="https://docs.nmrxiv.org/docs/developer-guides/API"
                                     target="_blank"
                                 >
@@ -205,7 +207,7 @@
                     </div>
                 </li>
 
-                <li id="v-step-8">
+                <li>
                     <div class="relative group py-4 flex items-start space-x-3">
                         <div class="flex-shrink-0">
                             <span
@@ -229,9 +231,9 @@
                                 </svg>
                             </span>
                         </div>
-                        <div class="min-w-0 flex-1">
+                        <div class="min-w-0 flex-1" >
                             <div class="text-sm font-medium text-gray-900">
-                                <a href="/">
+                                <a id="tour-step-spectra-challenge" href="/">
                                     <span
                                         class="absolute inset-0"
                                         aria-hidden="true"
@@ -264,8 +266,9 @@
                     </div>
                 </li>
             </ul>
-            <div class="mt-6 flex" id="v-step-9">
+            <div class="mt-6 flex" >
                 <a
+                    id="tour-step-get-in-touch"
                     href="mailto:info@nmrxiv.org"
                     class="text-sm font-medium text-indigo-600 hover:text-indigo-500"
                     >Or get in touch<span aria-hidden="true"> &rarr;</span></a
