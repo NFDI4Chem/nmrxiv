@@ -92,9 +92,9 @@ class Project extends BaseType implements CreativeWorkContract, ThingContract
      * @param  \Spatie\SchemaOrg\Contracts\PropertyValueContract|\Spatie\SchemaOrg\Contracts\PropertyValueContract[]|string|string[]  $studyDomain
      * @return static
      */
-    public function studyDomain($studyDomain)
+    public function projectDomain($projectDomain)
     {
-        return $this->setProperty('studyDomain', $studyDomain);
+        return $this->setProperty('projectDomain', $projectDomain);
     }
 
     /**
@@ -105,9 +105,9 @@ class Project extends BaseType implements CreativeWorkContract, ThingContract
 
      * @return static
      */
-    public function studySubject($studySubject)
+    public function projectSubject($projectSubject)
     {
-        return $this->setProperty('studySubject', $studySubject);
+        return $this->setProperty('projectSubject', $projectSubject);
     }
 
     /**

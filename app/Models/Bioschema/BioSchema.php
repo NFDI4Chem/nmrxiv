@@ -13,4 +13,9 @@ class BioSchema extends Schema
     {
         return new Study();
     }
+
+    public static function sample(): Sample
+    {
+        return new Sample();
+    }
 }

@@ -451,15 +451,21 @@
                             </button>
                         </div>
                     </div>
-                    <dd class="mt-2 text-md text-gray-900 space-y-5">
+                    <dd
+                        class="mt-2 text-md text-gray-900 space-y-5 focus:pointer-events-auto"
+                    >
                         <div class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div
                                 v-for="citation in project.citations"
                                 :key="citation.id"
-                                class="relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm flex items-center space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-pink-500"
+                                class="relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm flex items-top space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-teal-500"
                             >
                                 <div class="flex-1 min-w-0">
-                                    <a class="focus:outline-none">
+                                    <a
+                                        class="focus:outline-none cursor-pointer"
+                                        :href="getOrcidLink(citation.doi)"
+                                        :target="getTarget(citation.doi)"
+                                    >
                                         <span
                                             class="absolute inset-0"
                                             aria-hidden="true"
@@ -477,9 +483,14 @@
                                         </p>
                                         <p
                                             v-if="citation.doi"
-                                            class="text-sm font-bold text-gray-500"
+                                            class="text-sm font-sm text-gray-500"
                                         >
-                                            DOI - {{ citation.doi }}
+                                            DOI -
+                                            <a
+                                                :href="citation.doi"
+                                                class="text-teal-900"
+                                                >{{ citation.doi }}</a
+                                            >
                                         </p>
                                         <p
                                             class="text-sm text-gray-500 truncate ..."
@@ -526,34 +537,51 @@
                             <div
                                 v-for="author in project.authors"
                                 :key="author.id"
-                                class="relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm flex items-center space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-pink-500"
+                                class="relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm flex items-top space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-teal-500"
                             >
                                 <div class="flex-1 min-w-0">
-                                    <a class="focus:outline-none">
-                                        <span
-                                            class="absolute inset-0"
-                                            aria-hidden="true"
-                                        ></span>
-                                        <p
-                                            class="text-sm font-medium text-gray-900"
+                                    <div>
+                                        <a
+                                            class="focus:outline-none cursor-pointer"
+                                            :href="
+                                                getAuthorDOILink(
+                                                    author.orcid_id
+                                                )
+                                            "
+                                            :target="getTarget(author.orcid_id)"
                                         >
-                                            {{
-                                                author.given_name +
-                                                " " +
-                                                author.family_name
-                                            }}
-                                        </p>
-                                        <p class="text-sm text-gray-500">
-                                            {{ author.affiliation }}
-                                            <a
-                                                v-if="author.orcid_id"
-                                                :href="author.orcid_id"
-                                                class="text-teal-500"
-                                                >ORCID ID -
-                                                {{ author.orcid_id }}</a
+                                            <span
+                                                class="absolute inset-0"
+                                                aria-hidden="true"
+                                            ></span>
+                                            <p
+                                                class="text-sm font-medium text-gray-900"
                                             >
-                                        </p>
-                                    </a>
+                                                {{
+                                                    author.given_name +
+                                                    " " +
+                                                    author.family_name
+                                                }}
+                                            </p>
+                                            <p
+                                                v-if="author.affiliation"
+                                                class="text-sm text-gray-500"
+                                            >
+                                                {{ author.affiliation }}
+                                            </p>
+                                            <p
+                                                v-if="author.orcid_id"
+                                                class="text-sm text-gray-500"
+                                            >
+                                                <a
+                                                    :href="author.orcid_id"
+                                                    class="text-teal-500"
+                                                    >ORCID ID -
+                                                    {{ author.orcid_id }}</a
+                                                >
+                                            </p>
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -671,6 +699,27 @@ export default {
         toggleAddCitation() {
             this.addCitationElement.toggleAddCitationDialog();
             //this.emitter.emit("openAddCitationDialog", {});
+        },
+        getAuthorDOILink(orcidId) {
+            var link = "#";
+            if (orcidId) {
+                link = "https://orcid.org/" + orcidId;
+            }
+            return link;
+        },
+        getOrcidLink(doi) {
+            var link = "#";
+            if (doi) {
+                link = "https://doi.org/" + doi;
+            }
+            return link;
+        },
+        getTarget(id) {
+            var target = null;
+            if (id) {
+                target = "_blank";
+            }
+            return target;
         },
     },
 };

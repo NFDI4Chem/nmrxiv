@@ -195,7 +195,7 @@
                                         name="authors"
                                         rows="3"
                                         class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border border-gray-300 rounded-md"
-                                        placeholder=""
+                                        placeholder="Enter authors seperated by comma."
                                     />
                                 </div>
                                 <jet-input-error
@@ -423,7 +423,7 @@ export default {
         return {
             form: this.$inertia.form({}),
             importCitationForm: this.$inertia.form({
-                doi: "10.1021/acs.jmedchem.5b01009",
+                doi: "",
                 _method: "POST",
                 errors: {},
             }),
@@ -501,7 +501,7 @@ export default {
                     "The DOI field is required.";
             } else {
                 axios
-                    .get(this.$page.props.getCitationbyDOIApi, {
+                    .get(this.$page.props.europemcWSApi, {
                         params: {
                             query: this.importCitationForm.doi,
                             format: "json",
