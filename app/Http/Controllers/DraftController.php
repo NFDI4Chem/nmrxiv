@@ -95,9 +95,9 @@ class DraftController extends Controller
         $fsoIds = $this->getChildrenIds($filesystemobject, []);
         if (Storage::has($filesystemobject->path)) {
             if ($filesystemobject->type == 'directory') {
-                Storage::disk('minio')->deleteDirectory($filesystemobject->path);
+                Storage::disk(env('FILESYSTEM_DRIVER'))->deleteDirectory($filesystemobject->path);
             } else {
-                Storage::disk('minio')->delete($filesystemobject->path);
+                Storage::disk(env('FILESYSTEM_DRIVER'))->delete($filesystemobject->path);
             }
             FileSystemObject::whereIn('id', $fsoIds)->delete();
         }
