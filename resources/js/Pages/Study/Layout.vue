@@ -1,6 +1,32 @@
 <template>
     <app-layout :title="study.name">
         <template #header>
+            <div
+                v-if="study.is_deleted"
+                class="text-center px-3 py-1 bg-red-50 text-red-700 border-b"
+            >
+                <b>Warning: </b> This study is deleted. At the end of the 30-day
+                period, the study and all of its resources are deleted and
+                cannot be recovered. You can restore a deleted study/project
+                within the 30-day recovery period.
+            </div>
+            <div>
+                <div
+                    v-if="study.is_public && study.is_archived"
+                    class="text-center px-3 py-2 bg-yellow-50 text-yellow-700 border-b"
+                >
+                    <b>Warning: </b> This project is archived. It is now
+                    read-only.
+                </div>
+                <div
+                    class="text-center px-3 py-2 bg-green-50 text-green-700 border-b"
+                    v-if="study.is_public && !study.is_archived"
+                >
+                    <b>Info: </b> This project is published. You cannot edit a
+                    published project, please create a new version to updated
+                    the project.
+                </div>
+            </div>
             <div class="bg-white border-b">
                 <div class="px-12">
                     <div class="flex flex-nowrap justify-between py-6">

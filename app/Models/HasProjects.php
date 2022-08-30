@@ -15,6 +15,16 @@ trait HasProjects
     }
 
     /**
+     * User active projects
+     *
+     * @var array
+     */
+    public function activeProjects()
+    {
+        return $this->belongsToMany(Project::class)->where([['is_deleted', false]]);
+    }
+
+    /**
      * User model and Projects relationship - many to many
      *
      * @var array
