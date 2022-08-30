@@ -94,7 +94,16 @@
                                         <span
                                             class="flex max-w-2xl break-words block"
                                         >
-                                            {{ project.name }}
+                                            <span class="-ml-2 mr-1">
+                                                <StarIcon
+                                                    :class="[
+                                                        project.is_bookmarked
+                                                            ? 'text-yellow-400'
+                                                            : 'text-gray-200',
+                                                        'h-6 w-6 flex-shrink-0 -ml-1 mr-1',
+                                                    ]"
+                                                ></StarIcon> </span
+                                            >{{ project.name }}
                                             <span
                                                 v-if="
                                                     project.draft_id != null &&
@@ -112,6 +121,26 @@
                                                 class="ml-4 inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-blue-100 text-blue-800 capitalize"
                                             >
                                                 {{ project.status }}
+                                            </span>
+                                            <span
+                                                v-if="
+                                                    project.is_deleted !=
+                                                        null &&
+                                                    project.is_deleted
+                                                "
+                                                class="ml-4 inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-red-100 text-red-800 capitalize"
+                                            >
+                                                DELETED
+                                            </span>
+                                            <span
+                                                v-if="
+                                                    project.is_archived !=
+                                                        null &&
+                                                    project.is_archived
+                                                "
+                                                class="ml-4 inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-yellow-100 text-red-800 capitalize"
+                                            >
+                                                ARCHIVED
                                             </span>
                                         </span>
                                     </div>
@@ -249,9 +278,11 @@
 </template>
 <script>
 import { Link } from "@inertiajs/inertia-vue3";
+import { StarIcon } from "@heroicons/vue/solid";
 export default {
     components: {
         Link,
+        StarIcon,
     },
     props: ["projects", "mode", "teamRole", "team"],
     setup() {},

@@ -428,7 +428,10 @@ export default {
     },
     mounted() {
         const saveNMRiumUpdates = (e) => {
-            if (e.origin != "https://nmriumdev.nmrxiv.org") {
+            if (
+                e.origin != "https://nmriumdev.nmrxiv.org" ||
+                e.origin != "https://nmrium.nmrxiv.org"
+            ) {
                 return;
             }
             if (e.data.type == "nmr-wrapper:action-response") {
@@ -449,7 +452,6 @@ export default {
                     if (this.selectedSpectraData == null) {
                         this.selectedSpectraData = e.data.data.spectra;
                     }
-                    // console.log("stopping here");
                     return;
                 }
 

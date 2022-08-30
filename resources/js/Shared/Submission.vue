@@ -3126,7 +3126,10 @@ export default {
         toggleOpenCreateDatasetDialog() {
             this.openCreateDatasetDialog = !this.openCreateDatasetDialog;
             const saveNMRiumUpdates = (e) => {
-                if (e.origin != "https://nmriumdev.nmrxiv.org") {
+                if (
+                    e.origin != "https://nmriumdev.nmrxiv.org" ||
+                    e.origin != "https://nmrium.nmrxiv.org"
+                ) {
                     return;
                 }
                 if (e.data.type == "nmr-wrapper:action-response") {
