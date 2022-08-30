@@ -2,8 +2,7 @@
 
 namespace App\Models\Bioschema;
 
-use App\Models\Bioschema\Study;
-use \Spatie\SchemaOrg\Schema;
+use Spatie\SchemaOrg\Schema;
 
 /**
  * Factory class for all Schema.org types.
