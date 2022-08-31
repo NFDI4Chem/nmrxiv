@@ -48,7 +48,7 @@ class UpdateProject
             $license_id = $licenseExists ? $input['license_id'] : $project->license_id;
 
             if ($is_public == true) {
-                $release_date = Carbon::now()->timestamp;
+                $release_date = Carbon::now()->toDateTimeString();
             }
 
             $project
