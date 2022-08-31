@@ -2597,7 +2597,8 @@ export default {
             let sampleNames = [];
             let sampleTags = [];
             this.selectedStudy.datasets.forEach((ds) => {
-                let nmriuminfo = JSON.parse(ds.nmrium_info);
+                if(ds.nmrium_info){
+                    let nmriuminfo = JSON.parse(ds.nmrium_info);
                 if (nmriuminfo) {
                     let spectra = nmriuminfo.spectra;
                     spectra.forEach((sp) => {
@@ -2628,28 +2629,27 @@ export default {
                         );
                         if (sp.info.sampleName) {
                             sampleNames.push(sp.info.sampleName);
-                        }
-                        desc =
+                            desc =
                             desc +
                             "Sample Name: " +
                             sp.info.sampleName +
                             "</br>";
+                        }
                     });
                     desc = desc + "</br></br>";
+                }
                 }
             });
             this.studyForm.description = desc;
             if (sampleNames.length > 0) {
                 sampleNames = [...new Set(sampleNames)];
                 let sampleName = sampleNames.join(", ");
-                console.log(sampleName);
                 if (sampleName != "") {
                     this.studyForm.name = sampleNames.join(", ");
                 }
             }
             if (sampleTags.length > 0) {
                 sampleTags = [...new Set(sampleTags)];
-                this.studyForm.name = sampleNames.join(", ");
                 let tags = [];
                 sampleTags.forEach((t) => {
                     tags.push({
@@ -3118,7 +3118,7 @@ export default {
             this.openCreateDatasetDialog = !this.openCreateDatasetDialog;
             const saveNMRiumUpdates = (e) => {
                 if (
-                    e.origin != "https://nmriumdev.nmrxiv.org" ||
+                    e.origin != "https://nmriumdev.nmrxiv.org" &&
                     e.origin != "https://nmrium.nmrxiv.org"
                 ) {
                     return;
