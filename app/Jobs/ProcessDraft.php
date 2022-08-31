@@ -67,7 +67,7 @@ class ProcessDraft implements ShouldQueue, ShouldBeUnique
             $projectFSObjects = FileSystemObject::with('children')
                 ->where([
                     ['draft_id', $this->draft->id],
-                    ['project_id', $project->id],
+                    ['level', 0],
                 ])
                 ->get();
 
@@ -115,7 +115,7 @@ class ProcessDraft implements ShouldQueue, ShouldBeUnique
                     $path,
                     $fsObjectChild->path
                 );
-                Storage::disk('minio')->move($fsObjectChild->path, $newPath);
+                Storage::disk(env('FILESYSTEM_DRIVER'))->move($fsObjectChild->path, $newPath);
                 $fsObjectChild->path = $newPath;
                 $fsObjectChild->save();
             } else {

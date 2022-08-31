@@ -1,16 +1,42 @@
 <template>
     <app-layout :title="project.name">
         <template #header>
+            <div
+                v-if="project.is_deleted"
+                class="text-center px-3 py-2 bg-red-50 text-red-700 border-b"
+            >
+                <b>Warning: </b> This project is deleted. At the end of the
+                30-day period, the project and all of its resources are deleted
+                and cannot be recovered. You can restore a deleted project
+                within the 30-day recovery period.
+            </div>
+            <div v-if="project.is_public">
+                <div
+                    v-if="project.is_archived"
+                    class="text-center px-3 py-2 bg-yellow-50 text-yellow-700 border-b"
+                >
+                    <b>Warning: </b> This project is archived. It is now
+                    read-only.
+                </div>
+                <div
+                    class="text-center px-3 py-2 bg-green-50 text-green-700 border-b"
+                    v-else
+                >
+                    <b>Info: </b> This project is published. You cannot edit a
+                    published project, please create a new version to updated
+                    the project.
+                </div>
+            </div>
             <div class="bg-white border-b">
                 <div class="px-12">
                     <div class="flex flex-nowrap justify-between py-6">
                         <div class="">
                             <div
-                                class="flex pr-20 items-center text-xl text-gray-700 font-bold"
+                                class="flex pr-20 cursor-pointer items-center text-xl text-gray-700 font-bold"
                             >
                                 <StarIcon
                                     :class="[
-                                        project.starred
+                                        project.is_bookmarked
                                             ? 'text-yellow-400'
                                             : 'text-gray-200',
                                         'h-5 w-5 flex-shrink-0 -ml-1 mr-1',
@@ -208,7 +234,10 @@
                                 </span>
                             </div>
                         </div>
-                        <div v-if="canDeleteProject" class="flex-nowrap">
+                        <div
+                            v-if="canDeleteProject && canUpdateProject"
+                            class="flex-nowrap"
+                        >
                             <Link
                                 :href="
                                     route(
@@ -219,6 +248,19 @@
                                 class="text-sm flex-nowrap text-gray-800 font-bold"
                             >
                                 Project&nbsp;Settings
+                            </Link>
+                        </div>
+                        <div v-if="project.is_deleted" class="flex-nowrap">
+                            <Link
+                                :href="
+                                    route(
+                                        'dashboard.project.settings',
+                                        project.id
+                                    )
+                                "
+                                class="text-sm border px-4 py-2 rounded-md flex-nowrap text-gray-800 font-bold"
+                            >
+                                Restore
                             </Link>
                         </div>
                     </div>
@@ -409,15 +451,21 @@
                             </button>
                         </div>
                     </div>
-                    <dd class="mt-2 text-md text-gray-900 space-y-5">
+                    <dd
+                        class="mt-2 text-md text-gray-900 space-y-5 focus:pointer-events-auto"
+                    >
                         <div class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div
                                 v-for="citation in project.citations"
                                 :key="citation.id"
-                                class="relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm flex items-center space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-pink-500"
+                                class="relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm flex items-top space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-teal-500"
                             >
                                 <div class="flex-1 min-w-0">
-                                    <a class="focus:outline-none">
+                                    <a
+                                        class="focus:outline-none cursor-pointer"
+                                        :href="getOrcidLink(citation.doi)"
+                                        :target="getTarget(citation.doi)"
+                                    >
                                         <span
                                             class="absolute inset-0"
                                             aria-hidden="true"
@@ -435,9 +483,14 @@
                                         </p>
                                         <p
                                             v-if="citation.doi"
-                                            class="text-sm font-bold text-gray-500"
+                                            class="text-sm font-sm text-gray-500"
                                         >
-                                            DOI - {{ citation.doi }}
+                                            DOI -
+                                            <a
+                                                :href="citation.doi"
+                                                class="text-teal-900"
+                                                >{{ citation.doi }}</a
+                                            >
                                         </p>
                                         <p
                                             class="text-sm text-gray-500 truncate ..."
@@ -484,34 +537,51 @@
                             <div
                                 v-for="author in project.authors"
                                 :key="author.id"
-                                class="relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm flex items-center space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-pink-500"
+                                class="relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm flex items-top space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-teal-500"
                             >
                                 <div class="flex-1 min-w-0">
-                                    <a class="focus:outline-none">
-                                        <span
-                                            class="absolute inset-0"
-                                            aria-hidden="true"
-                                        ></span>
-                                        <p
-                                            class="text-sm font-medium text-gray-900"
+                                    <div>
+                                        <a
+                                            class="focus:outline-none cursor-pointer"
+                                            :href="
+                                                getAuthorDOILink(
+                                                    author.orcid_id
+                                                )
+                                            "
+                                            :target="getTarget(author.orcid_id)"
                                         >
-                                            {{
-                                                author.given_name +
-                                                " " +
-                                                author.family_name
-                                            }}
-                                        </p>
-                                        <p class="text-sm text-gray-500">
-                                            {{ author.affiliation }}
-                                            <a
-                                                v-if="author.orcid_id"
-                                                :href="author.orcid_id"
-                                                class="text-teal-500"
-                                                >ORCID ID -
-                                                {{ author.orcid_id }}</a
+                                            <span
+                                                class="absolute inset-0"
+                                                aria-hidden="true"
+                                            ></span>
+                                            <p
+                                                class="text-sm font-medium text-gray-900"
                                             >
-                                        </p>
-                                    </a>
+                                                {{
+                                                    author.given_name +
+                                                    " " +
+                                                    author.family_name
+                                                }}
+                                            </p>
+                                            <p
+                                                v-if="author.affiliation"
+                                                class="text-sm text-gray-500"
+                                            >
+                                                {{ author.affiliation }}
+                                            </p>
+                                            <p
+                                                v-if="author.orcid_id"
+                                                class="text-sm text-gray-500"
+                                            >
+                                                <a
+                                                    :href="author.orcid_id"
+                                                    class="text-teal-500"
+                                                    >ORCID ID -
+                                                    {{ author.orcid_id }}</a
+                                                >
+                                            </p>
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -540,6 +610,7 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import AccessDialogue from "@/Shared/AccessDialogue.vue";
 import { Link } from "@inertiajs/inertia-vue3";
+import { Inertia } from "@inertiajs/inertia";
 import StudyIndex from "@/Pages/Study/Index.vue";
 import ProjectDetails from "./Partials/Details.vue";
 import { ref } from "vue";
@@ -602,9 +673,22 @@ export default {
     },
     methods: {
         toogleStarred() {
+            const url = "/projects/" + this.project.id + "/toggleStarred";
             axios
-                .post(route("projects.toggle-starred", project))
-                .then((res) => {});
+                .get(url)
+                .catch((err) => {
+                    if (
+                        err.response.status !== 200 ||
+                        err.response.status !== 201
+                    ) {
+                        throw new Error(
+                            `API call failed with status code: ${err.response.status}`
+                        );
+                    }
+                })
+                .then(function (response) {
+                    Inertia.reload({ only: ["project"] });
+                });
         },
         toggleDetails() {
             this.projectDetailsElement.toggleDetails();
@@ -615,6 +699,27 @@ export default {
         toggleAddCitation() {
             this.addCitationElement.toggleAddCitationDialog();
             //this.emitter.emit("openAddCitationDialog", {});
+        },
+        getAuthorDOILink(orcidId) {
+            var link = "#";
+            if (orcidId) {
+                link = "https://orcid.org/" + orcidId;
+            }
+            return link;
+        },
+        getOrcidLink(doi) {
+            var link = "#";
+            if (doi) {
+                link = "https://doi.org/" + doi;
+            }
+            return link;
+        },
+        getTarget(id) {
+            var target = null;
+            if (id) {
+                target = "_blank";
+            }
+            return target;
         },
     },
 };

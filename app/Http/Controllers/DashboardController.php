@@ -17,10 +17,11 @@ class DashboardController extends Controller
         if ($team) {
             $team->users = $team->allUsers();
             if (! $team->personal_team) {
-                $projects = Project::with('users', 'owner')->where('team_id', $team->id)->get();
+                $projects = Project::with('users', 'owner')->where([['team_id', $team->id], ['is_deleted', false]])->orderBy('updated_at', 'DESC')->get();
             } else {
-                $projects = Project::with('users', 'owner')->where('owner_id', $user->id)
+                $projects = Project::with('users', 'owner')->where([['owner_id', $user->id], ['is_deleted', false]])
                     ->where('team_id', $team->id)
+                    ->orderBy('updated_at', 'DESC')
                     ->get();
             }
         }
@@ -51,7 +52,7 @@ class DashboardController extends Controller
     {
         $user = $request->user();
         $projects = Project::where('owner_id', $user->id)
-            ->where('is_archived', true)
+            ->Where('is_deleted', true)
             ->get();
 
         return Inertia::render('Trashed', [
@@ -63,7 +64,9 @@ class DashboardController extends Controller
     {
         $user = $request->user();
 
-        $projects = Project::whereHasLike(auth()->user())->get();
+        $projects = Project::where([['is_deleted', false]])->whereHasBookmark(
+            auth()->user()
+        )->get();
 
         return Inertia::render('Starred', [
             'projects' => $projects,
@@ -75,10 +78,10 @@ class DashboardController extends Controller
         $user = $request->user();
         $team = $user->currentTeam;
 
-        $projects = $user->projects->load('owner');
+        $projects = $user->activeProjects->load('owner');
 
         foreach ($user->allTeams() as $team) {
-            $projects = $projects->concat($team->projects->load('owner'));
+            $projects = $projects->concat($team->activeProjects->load('owner'));
         }
 
         $projects = $projects->unique()->sortByDesc(function ($project) {
