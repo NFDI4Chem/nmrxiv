@@ -2612,47 +2612,52 @@ export default {
             let sampleNames = [];
             let sampleTags = [];
             this.selectedStudy.datasets.forEach((ds) => {
-                if(ds.nmrium_info){
+                if (ds.nmrium_info) {
                     let nmriuminfo = JSON.parse(ds.nmrium_info);
-                if (nmriuminfo) {
-                    let spectra = nmriuminfo.spectra;
-                    spectra.forEach((sp) => {
-                        desc =
-                            desc +
-                            "Experiment: " +
-                            sp.info.experiment +
-                            "</br>";
-                        desc = desc + "Nucleus: " + sp.info.nucleus + "</br>";
-                        desc = desc + "Type: " + sp.info.type + "</br>";
-                        desc =
-                            desc +
-                            "Temperature: " +
-                            sp.info.temperature +
-                            "</br>";
-                        desc = desc + "Solvent: " + sp.info.solvent + "</br>";
-                        desc =
-                            desc +
-                            "Origin Frequency: " +
-                            sp.info.originFrequency +
-                            "</br>";
-                        desc =
-                            desc + "Probe Name: " + sp.info.probeName + "</br>";
-                        sampleTags.push(
-                            this.isString(sp.info.nucleus)
-                                ? sp.info.nucleus
-                                : sp.info.nucleus.join(" - ")
-                        );
-                        if (sp.info.sampleName) {
-                            sampleNames.push(sp.info.sampleName);
+                    if (nmriuminfo) {
+                        let spectra = nmriuminfo.spectra;
+                        spectra.forEach((sp) => {
                             desc =
-                            desc +
-                            "Sample Name: " +
-                            sp.info.sampleName +
-                            "</br>";
-                        }
-                    });
-                    desc = desc + "</br></br>";
-                }
+                                desc +
+                                "Experiment: " +
+                                sp.info.experiment +
+                                "</br>";
+                            desc =
+                                desc + "Nucleus: " + sp.info.nucleus + "</br>";
+                            desc = desc + "Type: " + sp.info.type + "</br>";
+                            desc =
+                                desc +
+                                "Temperature: " +
+                                sp.info.temperature +
+                                "</br>";
+                            desc =
+                                desc + "Solvent: " + sp.info.solvent + "</br>";
+                            desc =
+                                desc +
+                                "Origin Frequency: " +
+                                sp.info.originFrequency +
+                                "</br>";
+                            desc =
+                                desc +
+                                "Probe Name: " +
+                                sp.info.probeName +
+                                "</br>";
+                            sampleTags.push(
+                                this.isString(sp.info.nucleus)
+                                    ? sp.info.nucleus
+                                    : sp.info.nucleus.join(" - ")
+                            );
+                            if (sp.info.sampleName) {
+                                sampleNames.push(sp.info.sampleName);
+                                desc =
+                                    desc +
+                                    "Sample Name: " +
+                                    sp.info.sampleName +
+                                    "</br>";
+                            }
+                        });
+                        desc = desc + "</br></br>";
+                    }
                 }
             });
             this.studyForm.description = desc;

@@ -3,6 +3,7 @@
 namespace App\Actions\Project;
 
 use App\Models\Project;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -40,6 +41,16 @@ class UpdateProject
                 $s3filePath = '/projects/'.$file_name;
                 $s3->put($s3filePath, file_get_contents($image), 'public');
             }
+
+            $is_public = array_key_exists('is_public', $input) ? $input['is_public'] : $project->is_public;
+            $release_date = array_key_exists('release_date', $input) ? $input['release_date'] : $project->release_date;
+            $licenseExists = array_key_exists('license_id', $input);
+            $license_id = $licenseExists ? $input['license_id'] : $project->license_id;
+
+            if ($is_public == true) {
+                $release_date = Carbon::now()->toDateTimeString();
+            }
+
             $project
                 ->forceFill([
                     'name' => $input['name'],
@@ -65,46 +76,42 @@ class UpdateProject
                         : 'viewer',
                     'team_id' => $input['team_id'],
                     'owner_id' => $input['owner_id'],
-                    'is_public' => $input['is_public'],
-                    'release_date' => array_key_exists('release_date', $input)
-                        ? $input['release_date']
-                        : $project->release_date,
-                    'license_id' => array_key_exists('license_id', $input)
-                        ? $input['license_id']
-                        : $project->license_id,
+                    'is_public' => $is_public,
+                    'release_date' => $release_date,
+                    'license_id' => $license_id,
                     'project_photo_path' => $s3filePath ? $s3filePath : $project->project_photo_path,
                 ])
                 ->save();
 
-            if (array_key_exists('license_id', $input)) {
-                $studies = $project->studies;
-                foreach ($studies as $study) {
-                    if ($study->license_id == null) {
-                        $study->license_id = $input['license_id'];
-                        $study->save();
-                        $datasets = $study->datasets;
-                        foreach ($datasets as $dataset) {
-                            if ($dataset->license_id == null) {
-                                $dataset->license_id = $input['license_id'];
-                                $dataset->save();
-                            }
-                        }
-                    }
-                }
-            }
             if (array_key_exists('tags_array', $input)) {
                 $project->syncTagsWithType($input['tags_array'], 'Project');
             }
-            if ($input['is_public']) {
-                $studies = $project->studies;
-                foreach ($studies as $study) {
-                    $study->is_public = $input['is_public'];
-                    $study->save();
-                    $datasets = $study->datasets;
-                    foreach ($datasets as $dataset) {
-                        $dataset->is_public = $input['is_public'];
-                        $dataset->save();
+
+            $studies = $project->studies;
+            foreach ($studies as $study) {
+                if ($licenseExists) {
+                    if ($study->license_id == null) {
+                        $study->license_id = $license_id;
                     }
+                }
+                if ($is_public) {
+                    $study->is_public = $is_public;
+                    $study->release_date = $release_date;
+                }
+                $study->save();
+
+                $datasets = $study->datasets;
+                foreach ($datasets as $dataset) {
+                    if ($licenseExists) {
+                        if ($dataset->license_id == null) {
+                            $dataset->license_id = $license_id;
+                        }
+                    }
+                    if ($is_public) {
+                        $dataset->is_public = $is_public;
+                        $dataset->release_date = $release_date;
+                    }
+                    $dataset->save();
                 }
             }
         });
