@@ -664,6 +664,76 @@
                                                                             }}
                                                                         </option>
                                                                     </select>
+                                                                    <div
+                                                                        class="text-sm my-2"
+                                                                    >
+                                                                        <button
+                                                                            class="cursort-pointer"
+                                                                            @click.stop="
+                                                                                loadFromURL()
+                                                                            "
+                                                                        >
+                                                                            Reset
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                                <div
+                                                                    v-if="
+                                                                        spectraError
+                                                                    "
+                                                                >
+                                                                    <div
+                                                                        class="rounded-md bg-red-50 p-4"
+                                                                    >
+                                                                        <div
+                                                                            class="flex"
+                                                                        >
+                                                                            <div
+                                                                                class="flex-shrink-0"
+                                                                            >
+                                                                                <svg
+                                                                                    class="h-5 w-5 text-red-400"
+                                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                                    viewBox="0 0 20 20"
+                                                                                    fill="currentColor"
+                                                                                    aria-hidden="true"
+                                                                                >
+                                                                                    <path
+                                                                                        fill-rule="evenodd"
+                                                                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
+                                                                                        clip-rule="evenodd"
+                                                                                    />
+                                                                                </svg>
+                                                                            </div>
+                                                                            <div
+                                                                                class="ml-3"
+                                                                            >
+                                                                                <h3
+                                                                                    class="text-sm font-medium text-red-800"
+                                                                                >
+                                                                                    There
+                                                                                    were
+                                                                                    errors
+                                                                                    loading
+                                                                                    spectra
+                                                                                </h3>
+                                                                                <div
+                                                                                    class="mt-2 text-sm text-red-700"
+                                                                                >
+                                                                                    <ul
+                                                                                        role="list"
+                                                                                        class="list-disc space-y-1 pl-5"
+                                                                                    >
+                                                                                        <li>
+                                                                                            {{
+                                                                                                spectraError
+                                                                                            }}
+                                                                                        </li>
+                                                                                    </ul>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
                                                                 </div>
                                                                 <div
                                                                     class="my-7"
@@ -739,6 +809,9 @@
                                                                     class="grid grid-cols-2"
                                                                 >
                                                                     <div
+                                                                        v-if="
+                                                                            selectedSpectraData
+                                                                        "
                                                                         class="p-1 pr-2"
                                                                     >
                                                                         <label
@@ -2418,6 +2491,7 @@ export default {
             loadingStep: false,
             currentDraft: null,
             errorMessage: null,
+            spectraError: null,
 
             draftForm: this.$inertia.form({
                 _method: "POST",
@@ -2892,6 +2966,7 @@ export default {
 
         loadSpectra() {
             const iframe = window.frames.submissionNMRiumIframe;
+            this.spectraError = null;
             this.currentMolecules = [];
             let url =
                 this.url +
@@ -2923,11 +2998,7 @@ export default {
                 }
 
                 if (spectra && spectra.length <= 0) {
-                    let data = {
-                        data: [url],
-                        type: "url",
-                    };
-                    iframe.postMessage({ type: `nmr-wrapper:load`, data }, "*");
+                    this.loadFromURL(url);
                 } else {
                     let mols = [];
                     if (this.isString(nmrium_info.molecules)) {
@@ -2954,6 +3025,29 @@ export default {
                     this.selectedSpectraData = spectra;
                 }
             }
+        },
+
+        loadFromURL(url) {
+            this.selectedDataset.type = null;
+            this.selectedSpectraData = null;
+            const iframe = window.frames.submissionNMRiumIframe;
+            if (!url) {
+                url =
+                    this.url +
+                    "/" +
+                    this.$page.props.team.owner.username +
+                    "/datasets/" +
+                    this.project.slug +
+                    "/" +
+                    this.selectedStudy.slug +
+                    "/" +
+                    this.selectedDataset.slug;
+            }
+            let data = {
+                data: [url],
+                type: "url",
+            };
+            iframe.postMessage({ type: `nmr-wrapper:load`, data }, "*");
         },
 
         openSelectDraftsView() {
@@ -3141,6 +3235,10 @@ export default {
                     e.origin != "https://nmriumdev.nmrxiv.org" &&
                     e.origin != "https://nmrium.nmrxiv.org"
                 ) {
+                    return;
+                }
+                if (e.data.type == "nmr-wrapper:error") {
+                    this.spectraError = e.data.data;
                     return;
                 }
                 if (e.data.type == "nmr-wrapper:action-response") {
