@@ -455,7 +455,7 @@
                                                 </div>
                                                 <div v-else>
                                                     <div class="space-y-1">
-                                                        <div
+                                                        <!-- <div
                                                             class="relative flex items-start"
                                                         >
                                                             <div
@@ -479,7 +479,7 @@
                                                                     link</label
                                                                 >
                                                             </div>
-                                                        </div>
+                                                        </div> -->
                                                         <div v-if="linkAccess">
                                                             <div class="flex">
                                                                 <div
