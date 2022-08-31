@@ -253,14 +253,14 @@ class FileSystemController extends Controller
 
             $bucket =
                 $request->input('bucket') ?:
-                config('filesystems.disks.minio.bucket');
+                config('filesystems.disks.'.env('FILESYSTEM_DRIVER').'.bucket');
 
             $client = $this->storageClient();
 
             $uuid = (string) Str::uuid();
 
             $signedRequest = $client->createPresignedRequest(
-                $this->createCommand($request, $client, $bucket, $key = $filePath),
+                $this->createCommand($request, $client, $bucket, $key = ltrim($filePath, $filePath[0])),
                 '+90 minutes'
             );
 
@@ -486,7 +486,7 @@ class FileSystemController extends Controller
 
         $bucket =
             $request->input('bucket') ?:
-            config('filesystems.disks.minio.bucket');
+            config('filesystems.disks.'.env('FILESYSTEM_DRIVER').'.bucket');
 
         $client = $this->storageClient();
 
@@ -555,14 +555,14 @@ class FileSystemController extends Controller
     protected function storageClient()
     {
         $config = [
-            'region' => config('filesystems.disks.minio.region'),
+            'region' => config('filesystems.disks.'.env('FILESYSTEM_DRIVER').'.region'),
             'version' => 'latest',
             'use_path_style_endpoint' => true,
-            'url' => config('filesystems.disks.minio.endpoint'),
-            'endpoint' => config('filesystems.disks.minio.endpoint'),
+            'url' => config('filesystems.disks.'.env('FILESYSTEM_DRIVER').'.endpoint'),
+            'endpoint' => config('filesystems.disks.'.env('FILESYSTEM_DRIVER').'.endpoint'),
             'credentials' => [
-                'key' => config('filesystems.disks.minio.key'),
-                'secret' => config('filesystems.disks.minio.secret'),
+                'key' => config('filesystems.disks.'.env('FILESYSTEM_DRIVER').'.key'),
+                'secret' => config('filesystems.disks.'.env('FILESYSTEM_DRIVER').'.secret'),
             ],
         ];
 

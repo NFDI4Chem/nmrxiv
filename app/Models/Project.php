@@ -65,7 +65,7 @@ class Project extends Model implements Auditable
     public function getProjectPhotoUrlAttribute()
     {
         return $this->project_photo_path
-                    ? Storage::disk('minio_public')->url($this->project_photo_path)
+                    ? Storage::disk(env('FILESYSTEM_DRIVER_PUBLIC'))->url($this->project_photo_path)
                     : '';
     }
 
