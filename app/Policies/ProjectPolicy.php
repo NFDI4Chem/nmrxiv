@@ -67,6 +67,10 @@ class ProjectPolicy
      */
     public function updateProject(User $user, Project $project)
     {
+        if ($project->is_public || $project->is_archived || $project->is_deleted) {
+            return false;
+        }
+
         return $user->canUpdateProject($project);
     }
 
