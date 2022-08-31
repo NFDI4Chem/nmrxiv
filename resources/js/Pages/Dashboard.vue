@@ -231,7 +231,7 @@
                                 </svg>
                             </span>
                         </div>
-                        <div class="min-w-0 flex-1" >
+                        <div class="min-w-0 flex-1">
                             <div class="text-sm font-medium text-gray-900">
                                 <a id="tour-step-spectra-challenge" href="/">
                                     <span
@@ -266,7 +266,7 @@
                     </div>
                 </li>
             </ul>
-            <div class="mt-6 flex" >
+            <div class="mt-6 flex">
                 <a
                     id="tour-step-get-in-touch"
                     href="mailto:info@nmrxiv.org"

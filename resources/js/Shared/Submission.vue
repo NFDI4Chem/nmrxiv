@@ -226,7 +226,10 @@
                                         class="mt-2"
                                     />
                                 </div>
-                                <div id="tour-step-project-keywords" class="mb-3">
+                                <div
+                                    id="tour-step-project-keywords"
+                                    class="mb-3"
+                                >
                                     <label
                                         for="description"
                                         class="block text-sm font-medium text-gray-700"
@@ -739,12 +742,12 @@
                                                                         class="p-1 pr-2"
                                                                     >
                                                                         <label
+                                                                            id="tour-step-spectra-info"
                                                                             for="location"
                                                                             class="block text-sm font-medium text-gray-700"
                                                                             >Info</label
                                                                         >
                                                                         <div
-                                                                            id="tour-step-spectra-info"
                                                                             v-if="
                                                                                 selectedSpectraData
                                                                             "
@@ -1763,8 +1766,9 @@
                                                 </div>
                                             </section>
 
-                                            <section id="tour-step-privacy" class="mt-5">
+                                            <section class="mt-5">
                                                 <h2
+                                                    id="tour-step-privacy"
                                                     class="text-lg font-medium text-gray-900"
                                                 >
                                                     Share and Release
@@ -1888,7 +1892,9 @@
                                                     "
                                                     class="mt-5"
                                                 >
-                                                    <div id="tour-step-release-date">
+                                                    <div
+                                                        id="tour-step-release-date"
+                                                    >
                                                         <label
                                                             class="block text-sm font-medium text-gray-700, block text-sm font-medium text-gray-700"
                                                         >
@@ -2117,7 +2123,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div id ="tour-step-queue" v-else>
+                            <div id="tour-step-queue" v-else>
                                 <div class="py-16">
                                     <div class="text-center">
                                         <p
@@ -2243,7 +2249,7 @@
                 </Link>
             </span>
             <span v-else>
-                <span  v-if="currentStep.id == '01'">
+                <span v-if="currentStep.id == '01'">
                     <jet-secondary-button
                         v-if="drafts.length > 0"
                         class="ml-2 float-left"
@@ -2270,7 +2276,7 @@
                         "
                         @click="process"
                     >
-                        <span  v-if="loadingStep">
+                        <span v-if="loadingStep">
                             <svg
                                 class="animate-spin -ml-1 mr-3 h-2 w-2 text-white"
                                 xmlns="http://www.w3.org/2000/svg"
