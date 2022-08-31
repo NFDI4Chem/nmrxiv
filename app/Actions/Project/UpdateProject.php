@@ -35,7 +35,7 @@ class UpdateProject
 
             if (array_key_exists('photo', $input)) {
                 $image = $input['photo'];
-                $s3 = Storage::disk('minio_public');
+                $s3 = Storage::disk(env('FILESYSTEM_DRIVER_PUBLIC'));
                 $file_name =
                     uniqid().'.'.$image->getClientOriginalExtension();
                 $s3filePath = '/projects/'.$file_name;

@@ -60,7 +60,7 @@ class Study extends Model implements Auditable
     public function getStudyPhotoUrlAttribute()
     {
         return $this->study_photo_path
-                    ? Storage::disk('minio_public')->url($this->study_photo_path)
+                    ? Storage::disk(env('FILESYSTEM_DRIVER_PUBLIC'))->url($this->study_photo_path)
                     : '';
     }
 
@@ -104,7 +104,7 @@ class Study extends Model implements Auditable
 
     public function fsObject()
     {
-        return $this->hasOne(FileSystemObject::class, 'fs_id');
+        return $this->hasOne(FileSystemObject::class);
     }
 
     /**
