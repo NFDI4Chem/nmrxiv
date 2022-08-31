@@ -35,7 +35,6 @@ class BiochemaController extends Controller
                 $authorSchema->affiliation($author->affiliation);
                 array_push($authors, $authorSchema);
             }
-
             $tags = [];
             foreach ($project->tags as &$tag) {
                 $tag = $tag->name;
@@ -88,7 +87,6 @@ class BiochemaController extends Controller
             if ($studyName) {
                 // send study back with project info added to it\
                 $study = Study::where([['slug', $studyName], ['owner_id', $user->id], ['project_id', $project->id]])->firstOrFail();
-
                 if ($study) {
                     $tags = [];
                     foreach ($study->tags as &$tag) {
