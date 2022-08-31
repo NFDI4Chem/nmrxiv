@@ -9,7 +9,7 @@
         </div>
     </div>
 
-    <div id="v-step-10" class="spatie-support-bubble__button | pointer-events-auto">
+    <div id="tour-step-support-bubble" class="spatie-support-bubble__button | pointer-events-auto">
         @include('support-bubble::includes.bubble')
     </div>
 </div>
