@@ -21,11 +21,17 @@
             </div>
         </template>
         <div class="py-12 px-10">
-            <div v-if="!project.is_deleted">
+            <div v-if="!project.is_public && !project.is_deleted">
                 <project-delete :project="project"></project-delete>
             </div>
-            <div v-else>
+            <div v-if="project.is_deleted">
                 <project-restore :project="project"></project-restore>
+            </div>
+            <div v-if="project.is_public && !project.is_archived">
+                <project-archive :project="project"></project-archive>
+            </div>
+            <div v-if="project.is_public && project.is_archived">
+                <project-unarchive :project="project"></project-unarchive>
             </div>
         </div>
     </app-layout>
@@ -36,6 +42,8 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import { Link } from "@inertiajs/inertia-vue3";
 import ProjectDelete from "@/Pages/Project/Partials/Delete.vue";
 import ProjectRestore from "@/Pages/Project/Partials/Restore.vue";
+import ProjectArchive from "@/Pages/Project/Partials/Archive.vue";
+import ProjectUnarchive from "@/Pages/Project/Partials/Unarchive.vue";
 
 export default {
     components: {
@@ -43,6 +51,8 @@ export default {
         AppLayout,
         ProjectDelete,
         ProjectRestore,
+        ProjectArchive,
+        ProjectUnarchive,
     },
     props: ["project", "studies"],
 };
