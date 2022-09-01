@@ -55,7 +55,7 @@ class Dataset extends Model implements Auditable
     public function getDatasetPhotoUrlAttribute()
     {
         return $this->dataset_photo_path
-                    ? Storage::disk('minio_public')->url($this->dataset_photo_path)
+                    ? Storage::disk(env('FILESYSTEM_DRIVER_PUBLIC'))->url($this->dataset_photo_path)
                     : '';
     }
 
