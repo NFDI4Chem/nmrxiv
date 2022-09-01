@@ -274,7 +274,7 @@
                     <div class="ml-4 flex items-center md:ml-6">
                         <div>
                             <a
-                                id="v-step-11"
+                                id="tour-step-documentation"
                                 href="https://docs.nmrxiv.org"
                                 target="_blank"
                                 ><svg
@@ -297,7 +297,7 @@
                             class="ml-5"
                         >
                             <a
-                                id="v-step-12"
+                                id="tour-step-tour"
                                 class="cursor-pointer text-gray-600"
                                 target="_blank"
                                 @click="startTour"
@@ -320,7 +320,7 @@
                             class="ml-3 relative"
                         >
                             <div
-                                id="v-step-13"
+                                id="tour-step-account-management"
                                 v-if="
                                     $page.props.user.current_team &&
                                     $page.props.user.current_team.personal_team
@@ -720,7 +720,7 @@ const navigation = [
         name: "Dashboard",
         href: "/dashboard",
         prefix: "Your Space",
-        id: "v-step-1",
+        id: "tour-step-dashboard",
         icon: HomeIcon,
         bg: "bg-gray-50",
         children: [
@@ -728,7 +728,7 @@ const navigation = [
                 auth: true,
                 name: "Shared with me",
                 href: "/dashboard/shared-with-me",
-                id: "v-step-2",
+                id: "tour-step-shared-with-me",
                 icon: UsersIcon,
                 bg: "bg-white",
             },
@@ -736,7 +736,7 @@ const navigation = [
                 auth: false,
                 name: "Recent",
                 href: "/dashboard/recent",
-                id: "v-step-3",
+                id: "tour-step-recent",
                 icon: ClockIcon,
                 bg: "bg-white",
             },
@@ -744,7 +744,7 @@ const navigation = [
                 auth: false,
                 name: "Starred",
                 href: "/dashboard/starred",
-                id: "v-step-4",
+                id: "tour-step-starred",
                 icon: StarIcon,
                 bg: "bg-white",
             },
@@ -752,7 +752,7 @@ const navigation = [
                 auth: false,
                 name: "Trash",
                 href: "/dashboard/trashed",
-                id: "v-step-5",
+                id: "tour-step-trash",
                 icon: TrashIcon,
                 bg: "bg-white",
             },
