@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\License\GetLicense;
+use App\Actions\Project\ArchiveProject;
 use App\Actions\Project\CreateNewProject;
 use App\Actions\Project\DeleteProject;
 use App\Actions\Project\RestoreProject;
@@ -180,6 +181,31 @@ class ProjectController extends Controller
         $creator->restore($project);
 
         return redirect()->route('dashboard')->with('success', 'Project restored successfully');
+    }
+
+    public function toggleArchive(Request $request, StatefulGuard $guard, Project $project, ArchiveProject $creator)
+    {
+        if (! Gate::forUser($request->user())->check('deleteProject', $project)) {
+            throw new AuthorizationException;
+        }
+
+        if (! Gate::forUser($request->user())->check('deleteProject', $project)) {
+            throw new AuthorizationException;
+        }
+
+        $confirmed = app(ConfirmPassword::class)(
+            $guard, $request->user(), $request->password
+        );
+
+        if (! $confirmed) {
+            throw ValidationException::withMessages([
+                'password' => __('The password is incorrect.'),
+            ]);
+        }
+
+        $creator->toggle($project);
+
+        return redirect()->route('dashboard')->with('success', 'Project archive state updated successfully');
     }
 
     public function activity(Request $request, Project $project)

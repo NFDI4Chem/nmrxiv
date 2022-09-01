@@ -126,6 +126,8 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
             ->name('dashboard.project.studies');
         Route::put('projects/{project}', [ProjectController::class, 'restore'])
             ->name('dashboard.project.restore');
+        Route::put('projects/{project}/toggle-archive', [ProjectController::class, 'toggleArchive'])
+            ->name('dashboard.project.toggle-archive');
         Route::delete('projects/{project}', [ProjectController::class, 'destroy'])
             ->name('dashboard.project.destroy');
         Route::post('projects/create', [ProjectController::class, 'store'])
