@@ -72,7 +72,7 @@ class DownloadController extends Controller
 
             $s3Client = $this->storageClient();
 
-            $bucket = $request->input('bucket') ?: config('filesystems.disks.minio.bucket');
+            $bucket = $request->input('bucket') ?: config('filesystems.disks.'.env('FILESYSTEM_DRIVER').'.bucket');
 
             $s3keys = [];
 
@@ -84,7 +84,7 @@ class DownloadController extends Controller
             } else {
                 $command = $s3Client->getCommand('ListObjects');
                 $command['Bucket'] = $bucket;
-                $command['Prefix'] = $path.'/';
+                $command['Prefix'] = ltrim($path, $path[0]).'/';
 
                 $result = $s3Client->execute($command);
 
@@ -138,14 +138,14 @@ class DownloadController extends Controller
     protected function storageClient()
     {
         $config = [
-            'region' => config('filesystems.disks.minio.region'),
+            'region' => config('filesystems.disks.'.env('FILESYSTEM_DRIVER').'.region'),
             'version' => 'latest',
             'use_path_style_endpoint' => true,
-            'url' => config('filesystems.disks.minio.endpoint'),
-            'endpoint' => config('filesystems.disks.minio.endpoint'),
+            'url' => config('filesystems.disks.'.env('FILESYSTEM_DRIVER').'.endpoint'),
+            'endpoint' => config('filesystems.disks.'.env('FILESYSTEM_DRIVER').'.endpoint'),
             'credentials' => [
-                'key' => config('filesystems.disks.minio.key'),
-                'secret' => config('filesystems.disks.minio.secret'),
+                'key' => config('filesystems.disks.'.env('FILESYSTEM_DRIVER').'.key'),
+                'secret' => config('filesystems.disks.'.env('FILESYSTEM_DRIVER').'.secret'),
             ],
         ];
 

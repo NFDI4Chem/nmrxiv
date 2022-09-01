@@ -70,4 +70,9 @@ class Team extends JetstreamTeam
     {
         return $this->hasMany(Project::class);
     }
+
+    public function activeProjects()
+    {
+        return $this->hasMany(Project::class)->where([['is_deleted', false], ['is_archived', false]]);
+    }
 }

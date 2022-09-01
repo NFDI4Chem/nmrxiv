@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Bioschema\BioSchema;
 use App\Models\Dataset;
 use App\Models\Project;
-//use App\Models\Bioschema\Study as StudySchema;
 use App\Models\Study;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -36,7 +35,6 @@ class BiochemaController extends Controller
                 $authorSchema->affiliation($author->affiliation);
                 array_push($authors, $authorSchema);
             }
-
             $tags = [];
             foreach ($project->tags as &$tag) {
                 $tag = $tag->name;
@@ -89,7 +87,6 @@ class BiochemaController extends Controller
             if ($studyName) {
                 // send study back with project info added to it\
                 $study = Study::where([['slug', $studyName], ['owner_id', $user->id], ['project_id', $project->id]])->firstOrFail();
-
                 if ($study) {
                     $tags = [];
                     foreach ($study->tags as &$tag) {

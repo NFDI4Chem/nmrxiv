@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Actions\License\GetLicense;
+use App\Actions\Project\ArchiveProject;
 use App\Actions\Project\CreateNewProject;
 use App\Actions\Project\DeleteProject;
+use App\Actions\Project\RestoreProject;
 use App\Actions\Project\UpdateProject;
 use App\Http\Resources\ProjectResource;
 use App\Models\Project;
@@ -20,6 +22,7 @@ use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Laravel\Fortify\Actions\ConfirmPassword;
 use Laravel\Jetstream\Jetstream;
+use Maize\Markable\Models\Bookmark;
 use Maize\Markable\Models\Like;
 
 class ProjectController extends Controller
@@ -92,6 +95,11 @@ class ProjectController extends Controller
         return Like::toggle($project, $request->user());
     }
 
+    public function toggleStarred(Request $request, Project $project)
+    {
+        return Bookmark::toggle($project, $request->user());
+    }
+
     public function status(Request $request, Project $project)
     {
         return response()->json(['status' => $project->status, 'logs' => $project->process_logs]);
@@ -141,13 +149,63 @@ class ProjectController extends Controller
 
     public function settings(Request $request, Project $project)
     {
-        if (! Gate::forUser($request->user())->check('viewProject', $project)) {
+        if (! Gate::forUser($request->user())->check('deleteProject', $project)) {
             throw new AuthorizationException;
         }
 
         return Inertia::render('Project/Settings', [
             'project' => $project,
         ]);
+    }
+
+    public function restore(Request $request, StatefulGuard $guard, Project $project, RestoreProject $creator)
+    {
+        if (! Gate::forUser($request->user())->check('deleteProject', $project)) {
+            throw new AuthorizationException;
+        }
+
+        if (! Gate::forUser($request->user())->check('deleteProject', $project)) {
+            throw new AuthorizationException;
+        }
+
+        $confirmed = app(ConfirmPassword::class)(
+            $guard, $request->user(), $request->password
+        );
+
+        if (! $confirmed) {
+            throw ValidationException::withMessages([
+                'password' => __('The password is incorrect.'),
+            ]);
+        }
+
+        $creator->restore($project);
+
+        return redirect()->route('dashboard')->with('success', 'Project restored successfully');
+    }
+
+    public function toggleArchive(Request $request, StatefulGuard $guard, Project $project, ArchiveProject $creator)
+    {
+        if (! Gate::forUser($request->user())->check('deleteProject', $project)) {
+            throw new AuthorizationException;
+        }
+
+        if (! Gate::forUser($request->user())->check('deleteProject', $project)) {
+            throw new AuthorizationException;
+        }
+
+        $confirmed = app(ConfirmPassword::class)(
+            $guard, $request->user(), $request->password
+        );
+
+        if (! $confirmed) {
+            throw ValidationException::withMessages([
+                'password' => __('The password is incorrect.'),
+            ]);
+        }
+
+        $creator->toggle($project);
+
+        return redirect()->route('dashboard')->with('success', 'Project archive state updated successfully');
     }
 
     public function activity(Request $request, Project $project)
@@ -161,10 +219,9 @@ class ProjectController extends Controller
 
     public function store(Request $request, CreateNewProject $creator)
     {
-
-        // if (! Gate::forUser($request->user())->check('createProject', $project)) {
-        //     throw new AuthorizationException;
-        // }
+        if (! Gate::forUser($request->user())->check('createProject', $project)) {
+            throw new AuthorizationException;
+        }
 
         $project = $creator->create($request->all());
 

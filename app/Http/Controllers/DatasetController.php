@@ -76,7 +76,7 @@ class DatasetController extends Controller
         $study = $dataset->study;
         if ($content) {
             $path = '/projects/'.$study->project->uuid.'/'.$study->uuid.'/'.$dataset->slug.'.svg';
-            Storage::disk('minio_public')->put($path, $content);
+            Storage::disk(env('FILESYSTEM_DRIVER_PUBLIC'))->put($path, $content, 'public');
             $dataset->dataset_photo_path = $path;
             $dataset->save();
         }

@@ -94,7 +94,10 @@
                         <study-card :study="study" />
                     </div>
                 </div>
-                <div class="block w-100 mt-10">
+                <div
+                    v-if="studies.total > studies.per_page"
+                    class="block w-100 mt-10"
+                >
                     <nav
                         class="border-t border-gray-200 px-4 flex items-center justify-between sm:px-0"
                     >
