@@ -352,11 +352,7 @@
                                                                         form.is_public ===
                                                                         true
                                                                     "
-                                                                    :disabled="
-                                                                        !canUpdateProject
-                                                                    "
                                                                     name="privacy"
-                                                                    value="true"
                                                                     aria-describedby="privacy-public-description"
                                                                     type="radio"
                                                                     class="focus:ring-gray-500 h-4 w-4 text-gray-600 border-gray-300"
@@ -400,11 +396,7 @@
                                                                             form.is_public ===
                                                                             false
                                                                         "
-                                                                        :disabled="
-                                                                            !canUpdateProject
-                                                                        "
                                                                         name="privacy"
-                                                                        value="false"
                                                                         aria-describedby="privacy-private-to-project-description"
                                                                         type="radio"
                                                                         class="focus:ring-gray-500 h-4 w-4 text-gray-600 border-gray-300"
@@ -521,7 +513,7 @@
                                                 </div>
                                                 <div v-else>
                                                     <div class="space-y-1">
-                                                        <div
+                                                        <!-- <div
                                                             class="relative flex items-start"
                                                         >
                                                             <div
@@ -545,7 +537,7 @@
                                                                     link</label
                                                                 >
                                                             </div>
-                                                        </div>
+                                                        </div> -->
                                                         <div v-if="linkAccess">
                                                             <div class="flex">
                                                                 <div
@@ -807,8 +799,9 @@
                                             >I understand, if the project is
                                             made public then all the underlying
                                             studies and dataset will also be
-                                            made public.</label
-                                        >
+                                            made public and this version is no
+                                            longer editable.
+                                        </label>
                                     </div>
                                     <jet-secondary-button
                                         type="button"
