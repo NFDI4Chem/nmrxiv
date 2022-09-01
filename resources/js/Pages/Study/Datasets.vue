@@ -508,7 +508,7 @@ export default {
                 if (this.study && this.selectedDataset) {
                     if (this.selectedDataset.dataset_photo_url == "") {
                         console.info("Saving spectra preview");
-                        let iframe = window.frames.submissionNMRiumIframe;
+                        let iframe = window.frames.datasetNMRiumIframe;
                         if (iframe) {
                             let data = {
                                 type: "exportSpectraViewerAsBlob",
