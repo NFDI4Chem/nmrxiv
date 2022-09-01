@@ -130,6 +130,42 @@
                                 Reset
                             </button>
                         </div>
+                        <div v-if="spectraError">
+                            <div class="rounded-md bg-red-50 p-4">
+                                <div class="flex">
+                                    <div class="flex-shrink-0">
+                                        <svg
+                                            class="h-5 w-5 text-red-400"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            viewBox="0 0 20 20"
+                                            fill="currentColor"
+                                            aria-hidden="true"
+                                        >
+                                            <path
+                                                fill-rule="evenodd"
+                                                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
+                                                clip-rule="evenodd"
+                                            />
+                                        </svg>
+                                    </div>
+                                    <div class="ml-3">
+                                        <h3
+                                            class="text-sm font-medium text-red-800"
+                                        >
+                                            There were errors loading spectra
+                                        </h3>
+                                        <div class="mt-2 text-sm text-red-700">
+                                            <ul
+                                                role="list"
+                                                class="list-disc space-y-1 pl-5"
+                                            >
+                                                <li>{{ spectraError }}</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="my-7">
                             <iframe
                                 name="datasetNMRiumIframe"
@@ -201,6 +237,7 @@
                         <div class="grid grid-cols-2">
                             <div class="p-1 pr-2">
                                 <label
+                                    v-if="selectedSpectraData"
                                     for="location"
                                     class="block text-sm font-medium text-gray-700"
                                     >Info</label
@@ -264,7 +301,7 @@
                                     </table>
                                 </div>
                             </div>
-                            <div class="p-1 pr-2">
+                            <!-- <div class="p-1 pr-2">
                                 <div class="px-4 py-5 sm:p-6">
                                     <div>
                                         <div class="pt-3">
@@ -348,7 +385,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
                 </div>
@@ -393,6 +430,7 @@ export default {
             selectedSpectraData: null,
             license: "No license selected",
             loading: false,
+            spectraError: null,
         };
     },
     computed: {
@@ -428,7 +466,10 @@ export default {
     },
     mounted() {
         const saveNMRiumUpdates = (e) => {
-            if (e.origin != "https://nmriumdev.nmrxiv.org") {
+            if (
+                e.origin != "https://nmriumdev.nmrxiv.org" &&
+                e.origin != "https://nmrium.nmrxiv.org"
+            ) {
                 return;
             }
             if (e.data.type == "nmr-wrapper:action-response") {
@@ -437,9 +478,12 @@ export default {
                     this.saveStudyPreview(e.data.data.data);
                 }
             }
+            if (e.data.type == "nmr-wrapper:error") {
+                this.spectraError = e.data.data;
+                return;
+            }
             if (e.data.type == "nmr-wrapper:data-change") {
                 let actionType = e.data.data.actionType;
-
                 if (
                     actionType == "" ||
                     (actionType == "INITIATE" &&
@@ -449,7 +493,6 @@ export default {
                     if (this.selectedSpectraData == null) {
                         this.selectedSpectraData = e.data.data.spectra;
                     }
-                    // console.log("stopping here");
                     return;
                 }
 
@@ -485,7 +528,7 @@ export default {
         };
 
         if (!this.$page.props.dsEventRegistered) {
-            // console.log("registering");
+            console.log("registering");
             window.addEventListener("message", saveNMRiumUpdates);
             this.$page.props.dsEventRegistered = true;
         }
@@ -521,7 +564,6 @@ export default {
         },
         updateDataSet() {
             if (this.selectedDataset) {
-                // console.log("saving");
                 if (this.selectedSpectraData != null) {
                     this.autoSaving = true;
                     axios
@@ -563,12 +605,14 @@ export default {
             if (this.selectedDataset == null) {
                 this.selectedDataset = this.study.datasets[0];
             }
-
+            this.spectraError = null;
             this.currentMolecules = [];
             const iframe = window.frames.datasetNMRiumIframe;
             if (iframe) {
                 let spectra = [];
                 let nmrium_info = null;
+                this.selectedSpectraData = null;
+
                 if (
                     this.selectedDataset &&
                     this.selectedDataset.nmrium_info &&
@@ -616,6 +660,7 @@ export default {
         },
         loadFromURL(url) {
             this.selectedDataset.type = null;
+            this.selectedSpectraData = null;
             const iframe = window.frames.datasetNMRiumIframe;
             if (!url) {
                 url =

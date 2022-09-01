@@ -10,7 +10,7 @@
                 class="lg:border-b lg:border-gray-200 pb-3 pr-5 -mx-6"
             >
                 <div
-                    id="v-step-14"
+                    id="tour-step-submission-header"
                     class="flex items-left justify-start pl-5 float-left"
                 >
                     <b>{{
@@ -178,10 +178,10 @@
                             id="submission-dropzone"
                         >
                             <div v-if="currentDraft">
-                                <div id="v-step-15" class="mb-3">
+                                <div id="tour-step-project-name" class="mb-3">
                                     <label
                                         for="project-name"
-                                        class="block text-sm font-medium text-gray-700"
+                                        class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
                                     >
                                         Project Name
                                     </label>
@@ -198,10 +198,10 @@
                                         class="mt-2"
                                     />
                                 </div>
-                                <div id="v-step-16" class="mb-3">
+                                <div id="tour-step-project-desc" class="mb-3">
                                     <label
                                         for="description"
-                                        class="block text-sm font-medium text-gray-700"
+                                        class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
                                     >
                                         <span
                                             @click="
@@ -226,7 +226,10 @@
                                         class="mt-2"
                                     />
                                 </div>
-                                <div id="v-step-17" class="mb-3">
+                                <div
+                                    id="tour-step-project-keywords"
+                                    class="mb-3"
+                                >
                                     <label
                                         for="description"
                                         class="block text-sm font-medium text-gray-700"
@@ -257,7 +260,7 @@
                                             >Draft ID:
                                             {{ currentDraft.key }}</small
                                         >
-                                        <div id="v-step-18">
+                                        <div id="tour-step-upload-spectra">
                                             <file-system-browser
                                                 ref="fsbRef"
                                                 :readonly="false"
@@ -302,6 +305,7 @@
                                             </span>
                                         </div>
                                         <div
+                                            id="tour-step-side-panel-studies"
                                             style="
                                                 height: 74vh;
                                                 overflow: scroll !important;
@@ -602,6 +606,7 @@
                                                             </div>
                                                         </div>
                                                         <div
+                                                            id="tour-step-nmrium"
                                                             v-if="
                                                                 currentTab.name ==
                                                                 'Experiments (Spectra)'
@@ -626,7 +631,7 @@
                                                                         >
                                                                     </label>
                                                                     <select
-                                                                        id="location"
+                                                                        id="tour-step-select-exp"
                                                                         v-model="
                                                                             selectedDataset
                                                                         "
@@ -659,6 +664,76 @@
                                                                             }}
                                                                         </option>
                                                                     </select>
+                                                                    <div
+                                                                        class="text-sm my-2"
+                                                                    >
+                                                                        <button
+                                                                            class="cursort-pointer"
+                                                                            @click.stop="
+                                                                                loadFromURL()
+                                                                            "
+                                                                        >
+                                                                            Reset
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                                <div
+                                                                    v-if="
+                                                                        spectraError
+                                                                    "
+                                                                >
+                                                                    <div
+                                                                        class="rounded-md bg-red-50 p-4"
+                                                                    >
+                                                                        <div
+                                                                            class="flex"
+                                                                        >
+                                                                            <div
+                                                                                class="flex-shrink-0"
+                                                                            >
+                                                                                <svg
+                                                                                    class="h-5 w-5 text-red-400"
+                                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                                    viewBox="0 0 20 20"
+                                                                                    fill="currentColor"
+                                                                                    aria-hidden="true"
+                                                                                >
+                                                                                    <path
+                                                                                        fill-rule="evenodd"
+                                                                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
+                                                                                        clip-rule="evenodd"
+                                                                                    />
+                                                                                </svg>
+                                                                            </div>
+                                                                            <div
+                                                                                class="ml-3"
+                                                                            >
+                                                                                <h3
+                                                                                    class="text-sm font-medium text-red-800"
+                                                                                >
+                                                                                    There
+                                                                                    were
+                                                                                    errors
+                                                                                    loading
+                                                                                    spectra
+                                                                                </h3>
+                                                                                <div
+                                                                                    class="mt-2 text-sm text-red-700"
+                                                                                >
+                                                                                    <ul
+                                                                                        role="list"
+                                                                                        class="list-disc space-y-1 pl-5"
+                                                                                    >
+                                                                                        <li>
+                                                                                            {{
+                                                                                                spectraError
+                                                                                            }}
+                                                                                        </li>
+                                                                                    </ul>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
                                                                 </div>
                                                                 <div
                                                                     class="my-7"
@@ -734,9 +809,13 @@
                                                                     class="grid grid-cols-2"
                                                                 >
                                                                     <div
+                                                                        v-if="
+                                                                            selectedSpectraData
+                                                                        "
                                                                         class="p-1 pr-2"
                                                                     >
                                                                         <label
+                                                                            id="tour-step-spectra-info"
                                                                             for="location"
                                                                             class="block text-sm font-medium text-gray-700"
                                                                             >Info</label
@@ -1560,7 +1639,7 @@
                                                 class="max-w-lg mx-auto lg:max-w-none"
                                             >
                                                 <h2
-                                                    id="summary-heading"
+                                                    id="tour-step-summary"
                                                     class="text-lg font-medium text-gray-900"
                                                 >
                                                     Summary
@@ -1670,6 +1749,7 @@
                                                     class="ml-4 flex-shrink-0"
                                                 >
                                                     <a
+                                                        id="tour-step-download"
                                                         :href="downloadURL"
                                                         class="mr-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
                                                     >
@@ -1761,12 +1841,12 @@
 
                                             <section class="mt-5">
                                                 <h2
-                                                    id="contact-info-heading"
+                                                    id="tour-step-privacy"
                                                     class="text-lg font-medium text-gray-900"
                                                 >
                                                     Share and Release
                                                 </h2>
-                                                <div>
+                                                <div id="">
                                                     <fieldset>
                                                         <legend
                                                             class="text-sm font-medium text-gray-900"
@@ -1885,7 +1965,9 @@
                                                     "
                                                     class="mt-5"
                                                 >
-                                                    <div>
+                                                    <div
+                                                        id="tour-step-release-date"
+                                                    >
                                                         <label
                                                             class="block text-sm font-medium text-gray-700, block text-sm font-medium text-gray-700"
                                                         >
@@ -2019,7 +2101,7 @@
                                                     </div>
                                                 </div>
                                                 <div class="mt-5">
-                                                    <div>
+                                                    <div id="tour-step-license">
                                                         <select-rich
                                                             v-model:selected="
                                                                 updateProjectForm.license
@@ -2078,6 +2160,7 @@
                                                             also be made public.
                                                         </label>
                                                         <jet-button
+                                                            id="tour-step-save"
                                                             class="mt-3"
                                                             :disabled="
                                                                 !confirmPublicAccess
@@ -2097,6 +2180,7 @@
                                                 class="mt-10 pt-6 border-t border-gray-200 sm:flex"
                                             >
                                                 <button
+                                                    id="tour-step-save"
                                                     class="w-full float-left bg-teal-600 border border-transparent rounded-md shadow-sm py-2 px-4 text-sm font-medium text-white hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-teal-500 sm:order-last sm:w-auto"
                                                     @click="updateProject"
                                                 >
@@ -2112,7 +2196,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div v-else>
+                            <div id="tour-step-queue" v-else>
                                 <div class="py-16">
                                     <div class="text-center">
                                         <p
@@ -2255,6 +2339,7 @@
                         Cancel
                     </Link>
                     <jet-button
+                        id="tour-step-proceed-from-step-1"
                         class="ml-2"
                         :class="{ 'opacity-25': createDatasetForm.processing }"
                         :disabled="
@@ -2305,6 +2390,7 @@
                         Cancel
                     </Link>
                     <jet-button
+                        id="tour-step-proceed-from-step-2"
                         class="ml-2"
                         :class="{ 'opacity-25': createDatasetForm.processing }"
                         :disabled="
@@ -2341,6 +2427,7 @@
                 </span>
                 <span v-else-if="currentStep.id == '03'">
                     <Link
+                        id="tour-step-finish"
                         class="inline-flex items-center px-2.5 py-1 border border-gray-300 shadow-sm text-md font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                         :href="route('dashboard')"
                     >
@@ -2404,6 +2491,7 @@ export default {
             loadingStep: false,
             currentDraft: null,
             errorMessage: null,
+            spectraError: null,
 
             draftForm: this.$inertia.form({
                 _method: "POST",
@@ -2419,7 +2507,7 @@ export default {
             steps: [
                 {
                     id: "01",
-                    step: "v-step-14",
+                    step: "tour-step-submission-header",
                     name: "Files Upload",
                     description: "Vitae sed mi luctus laoreet.",
                     href: "#",
@@ -2427,6 +2515,7 @@ export default {
                 },
                 {
                     id: "02",
+                    step: "v-step-20",
                     name: "Assignments & Meta data",
                     description: "Cursus semper viverra.",
                     href: "#",
@@ -2597,59 +2686,64 @@ export default {
             let sampleNames = [];
             let sampleTags = [];
             this.selectedStudy.datasets.forEach((ds) => {
-                let nmriuminfo = JSON.parse(ds.nmrium_info);
-                if (nmriuminfo) {
-                    let spectra = nmriuminfo.spectra;
-                    spectra.forEach((sp) => {
-                        desc =
-                            desc +
-                            "Experiment: " +
-                            sp.info.experiment +
-                            "</br>";
-                        desc = desc + "Nucleus: " + sp.info.nucleus + "</br>";
-                        desc = desc + "Type: " + sp.info.type + "</br>";
-                        desc =
-                            desc +
-                            "Temperature: " +
-                            sp.info.temperature +
-                            "</br>";
-                        desc = desc + "Solvent: " + sp.info.solvent + "</br>";
-                        desc =
-                            desc +
-                            "Origin Frequency: " +
-                            sp.info.originFrequency +
-                            "</br>";
-                        desc =
-                            desc + "Probe Name: " + sp.info.probeName + "</br>";
-                        sampleTags.push(
-                            this.isString(sp.info.nucleus)
-                                ? sp.info.nucleus
-                                : sp.info.nucleus.join(" - ")
-                        );
-                        if (sp.info.sampleName) {
-                            sampleNames.push(sp.info.sampleName);
-                        }
-                        desc =
-                            desc +
-                            "Sample Name: " +
-                            sp.info.sampleName +
-                            "</br>";
-                    });
-                    desc = desc + "</br></br>";
+                if (ds.nmrium_info) {
+                    let nmriuminfo = JSON.parse(ds.nmrium_info);
+                    if (nmriuminfo) {
+                        let spectra = nmriuminfo.spectra;
+                        spectra.forEach((sp) => {
+                            desc =
+                                desc +
+                                "Experiment: " +
+                                sp.info.experiment +
+                                "</br>";
+                            desc =
+                                desc + "Nucleus: " + sp.info.nucleus + "</br>";
+                            desc = desc + "Type: " + sp.info.type + "</br>";
+                            desc =
+                                desc +
+                                "Temperature: " +
+                                sp.info.temperature +
+                                "</br>";
+                            desc =
+                                desc + "Solvent: " + sp.info.solvent + "</br>";
+                            desc =
+                                desc +
+                                "Origin Frequency: " +
+                                sp.info.originFrequency +
+                                "</br>";
+                            desc =
+                                desc +
+                                "Probe Name: " +
+                                sp.info.probeName +
+                                "</br>";
+                            sampleTags.push(
+                                this.isString(sp.info.nucleus)
+                                    ? sp.info.nucleus
+                                    : sp.info.nucleus.join(" - ")
+                            );
+                            if (sp.info.sampleName) {
+                                sampleNames.push(sp.info.sampleName);
+                                desc =
+                                    desc +
+                                    "Sample Name: " +
+                                    sp.info.sampleName +
+                                    "</br>";
+                            }
+                        });
+                        desc = desc + "</br></br>";
+                    }
                 }
             });
             this.studyForm.description = desc;
             if (sampleNames.length > 0) {
                 sampleNames = [...new Set(sampleNames)];
                 let sampleName = sampleNames.join(", ");
-                console.log(sampleName);
                 if (sampleName != "") {
                     this.studyForm.name = sampleNames.join(", ");
                 }
             }
             if (sampleTags.length > 0) {
                 sampleTags = [...new Set(sampleTags)];
-                this.studyForm.name = sampleNames.join(", ");
                 let tags = [];
                 sampleTags.forEach((t) => {
                     tags.push({
@@ -2872,6 +2966,7 @@ export default {
 
         loadSpectra() {
             const iframe = window.frames.submissionNMRiumIframe;
+            this.spectraError = null;
             this.currentMolecules = [];
             let url =
                 this.url +
@@ -2903,11 +2998,7 @@ export default {
                 }
 
                 if (spectra && spectra.length <= 0) {
-                    let data = {
-                        data: [url],
-                        type: "url",
-                    };
-                    iframe.postMessage({ type: `nmr-wrapper:load`, data }, "*");
+                    this.loadFromURL(url);
                 } else {
                     let mols = [];
                     if (this.isString(nmrium_info.molecules)) {
@@ -2934,6 +3025,29 @@ export default {
                     this.selectedSpectraData = spectra;
                 }
             }
+        },
+
+        loadFromURL(url) {
+            this.selectedDataset.type = null;
+            this.selectedSpectraData = null;
+            const iframe = window.frames.submissionNMRiumIframe;
+            if (!url) {
+                url =
+                    this.url +
+                    "/" +
+                    this.$page.props.team.owner.username +
+                    "/datasets/" +
+                    this.project.slug +
+                    "/" +
+                    this.selectedStudy.slug +
+                    "/" +
+                    this.selectedDataset.slug;
+            }
+            let data = {
+                data: [url],
+                type: "url",
+            };
+            iframe.postMessage({ type: `nmr-wrapper:load`, data }, "*");
         },
 
         openSelectDraftsView() {
@@ -3117,7 +3231,14 @@ export default {
         toggleOpenCreateDatasetDialog() {
             this.openCreateDatasetDialog = !this.openCreateDatasetDialog;
             const saveNMRiumUpdates = (e) => {
-                if (e.origin != "https://nmriumdev.nmrxiv.org") {
+                if (
+                    e.origin != "https://nmriumdev.nmrxiv.org" &&
+                    e.origin != "https://nmrium.nmrxiv.org"
+                ) {
+                    return;
+                }
+                if (e.data.type == "nmr-wrapper:error") {
+                    this.spectraError = e.data.data;
                     return;
                 }
                 if (e.data.type == "nmr-wrapper:action-response") {

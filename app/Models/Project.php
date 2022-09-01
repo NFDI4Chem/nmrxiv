@@ -3,10 +3,12 @@
 namespace App\Models;
 
 use App\Traits\CacheClear;
+use Auth;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Scout\Searchable;
 use Maize\Markable\Markable;
+use Maize\Markable\Models\Bookmark;
 use Maize\Markable\Models\Like;
 use OwenIt\Auditing\Contracts\Auditable;
 use Spatie\Tags\HasTags;
@@ -45,6 +47,7 @@ class Project extends Model implements Auditable
 
     protected static $marks = [
         Like::class,
+        Bookmark::class,
     ];
 
     /**
@@ -52,7 +55,7 @@ class Project extends Model implements Auditable
      *
      * @var array
      */
-    protected $appends = ['public_url', 'private_url', 'project_photo_url'];
+    protected $appends = ['public_url', 'private_url', 'project_photo_url', 'is_bookmarked'];
 
     /**
      * Get the URL to the project's profile photo.
@@ -62,8 +65,23 @@ class Project extends Model implements Auditable
     public function getProjectPhotoUrlAttribute()
     {
         return $this->project_photo_path
-                    ? Storage::disk('minio_public')->url($this->project_photo_path)
+                    ? Storage::disk(env('FILESYSTEM_DRIVER_PUBLIC'))->url($this->project_photo_path)
                     : '';
+    }
+
+    /**
+     * check if the project is bookmarked by current user
+     *
+     * @return string
+     */
+    public function getIsBookmarkedAttribute()
+    {
+        $user = Auth::user();
+        if (! $user) {
+            return false;
+        } else {
+            return Bookmark::has($this, $user);
+        }
     }
 
     public function studies()
@@ -86,7 +104,7 @@ class Project extends Model implements Auditable
         return $this->belongsTo(Draft::class, 'draft_id');
     }
 
-    public function likes()
+    public function likesCount()
     {
         return Like::count($this);
     }

@@ -60,6 +60,6 @@ return [
     |
     */
 
-    'profile_photo_disk' => 'minio_public',
+    'profile_photo_disk' => 'ceph_public',
 
 ];

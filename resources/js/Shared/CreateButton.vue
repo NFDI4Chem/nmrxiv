@@ -23,7 +23,7 @@
             </span>
             <span v-else>
                 <Link
-                    id="v-step-0"
+                    id="tour-step-upload"
                     :href="route('dashboard', { action: 'submission' })"
                     class="p-3 inline-flex items-center text-center border border-transparent text-base rounded-full shadow-sm text-white inline-flex items-center bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring focus:ring-gray-300 disabled:opacity-25 transition"
                 >
@@ -65,7 +65,7 @@
             </span>
             <span v-else
                 ><Link
-                    id="v-step-0"
+                    id="tour-step-upload"
                     :href="route('dashboard', { action: 'submission' })"
                     class="inline-flex items-center text-center p-3 border border-transparent text-base font-medium rounded-full shadow-sm inline-flex items-center bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring focus:ring-gray-300 disabled:opacity-25 transition"
                 >

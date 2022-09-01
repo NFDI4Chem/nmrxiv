@@ -46,6 +46,29 @@ class UpdateStudy
             if (array_key_exists('tags_array', $input)) {
                 $study->syncTagsWithType(array_filter($input['tags_array']), 'Study');
             }
+
+            $is_public = array_key_exists('is_public', $input) ? $input['is_public'] : $study->is_public;
+            $release_date = array_key_exists('release_date', $input) ? $input['release_date'] : $study->release_date;
+            $licenseExists = array_key_exists('license_id', $input);
+            $license_id = $licenseExists ? $input['license_id'] : $study->license_id;
+
+            if ($is_public == true) {
+                $release_date = Carbon::now()->timestamp;
+            }
+
+            $datasets = $study->datasets;
+            foreach ($datasets as $dataset) {
+                if ($licenseExists) {
+                    if ($dataset->license_id == null) {
+                        $dataset->license_id = $license_id;
+                    }
+                }
+                if ($is_public) {
+                    $dataset->is_public = $is_public;
+                    $dataset->release_date = $release_date;
+                }
+                $dataset->save();
+            }
         });
     }
 }
