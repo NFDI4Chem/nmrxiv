@@ -234,10 +234,7 @@
                                 </span>
                             </div>
                         </div>
-                        <div
-                            v-if="canDeleteProject && canUpdateProject"
-                            class="flex-nowrap"
-                        >
+                        <div v-if="canDeleteProject" class="flex-nowrap">
                             <Link
                                 :href="
                                     route(
@@ -248,19 +245,6 @@
                                 class="text-sm flex-nowrap text-gray-800 font-bold"
                             >
                                 Project&nbsp;Settings
-                            </Link>
-                        </div>
-                        <div v-if="project.is_deleted" class="flex-nowrap">
-                            <Link
-                                :href="
-                                    route(
-                                        'dashboard.project.settings',
-                                        project.id
-                                    )
-                                "
-                                class="text-sm border px-4 py-2 rounded-md flex-nowrap text-gray-800 font-bold"
-                            >
-                                Restore
                             </Link>
                         </div>
                     </div>
