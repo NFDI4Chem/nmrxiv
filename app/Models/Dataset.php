@@ -47,6 +47,10 @@ class Dataset extends Model implements Auditable
         'dataset_photo_url',
     ];
 
+    protected $hidden = [
+        'nmrium_info',
+    ];
+
     /**
      * Get the URL to the dataset's profile photo.
      *
