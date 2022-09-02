@@ -338,7 +338,9 @@
                                                     </legend>
                                                     <div class="mt-2 space-y-5">
                                                         <div
-                                                            @click="form.is_public = true"
+                                                            @click="
+                                                                form.is_public = true
+                                                            "
                                                             class="relative flex items-start"
                                                         >
                                                             <div
@@ -378,51 +380,51 @@
                                                                 </p>
                                                             </div>
                                                         </div>
+                                                        <div
+                                                            @click="
+                                                                form.is_public = false
+                                                            "
+                                                            class="relative flex items-start"
+                                                        >
                                                             <div
-                                                                @click="form.is_public = false"
-                                                                class="relative flex items-start"
+                                                                class="absolute flex items-center h-5"
                                                             >
-                                                                <div
-                                                                    class="absolute flex items-center h-5"
-                                                                >
-                                                                    <input
-                                                                        id="privacy-private-to-project"
-                                                                        :checked="
-                                                                            form.is_public ===
-                                                                            false
-                                                                        "
-                                                                        name="privacy"
-                                                                        aria-describedby="privacy-private-to-project-description"
-                                                                        type="radio"
-                                                                        class="focus:ring-gray-500 h-4 w-4 text-gray-600 border-gray-300"
-                                                                    />
-                                                                </div>
-                                                                <div
-                                                                    class="pl-7 text-sm"
-                                                                >
-                                                                    <label
-                                                                        for="privacy-private-to-project"
-                                                                        class="font-medium text-gray-900"
-                                                                    >
-                                                                        Private
-                                                                        to
-                                                                        project
-                                                                        members
-                                                                    </label>
-                                                                    <p
-                                                                        id="privacy-private-to-project-description"
-                                                                        class="text-gray-500"
-                                                                    >
-                                                                        Only
-                                                                        members
-                                                                        of this
-                                                                        project
-                                                                        would be
-                                                                        able to
-                                                                        access.
-                                                                    </p>
-                                                                </div>
+                                                                <input
+                                                                    id="privacy-private-to-project"
+                                                                    :checked="
+                                                                        form.is_public ===
+                                                                        false
+                                                                    "
+                                                                    name="privacy"
+                                                                    aria-describedby="privacy-private-to-project-description"
+                                                                    type="radio"
+                                                                    class="focus:ring-gray-500 h-4 w-4 text-gray-600 border-gray-300"
+                                                                />
                                                             </div>
+                                                            <div
+                                                                class="pl-7 text-sm"
+                                                            >
+                                                                <label
+                                                                    for="privacy-private-to-project"
+                                                                    class="font-medium text-gray-900"
+                                                                >
+                                                                    Private to
+                                                                    project
+                                                                    members
+                                                                </label>
+                                                                <p
+                                                                    id="privacy-private-to-project-description"
+                                                                    class="text-gray-500"
+                                                                >
+                                                                    Only members
+                                                                    of this
+                                                                    project
+                                                                    would be
+                                                                    able to
+                                                                    access.
+                                                                </p>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </fieldset>
                                             </div>
@@ -456,8 +458,7 @@
                                             >
                                                 <div
                                                     v-if="
-                                                        form.is_public ==
-                                                            true 
+                                                        form.is_public == true
                                                     "
                                                 >
                                                     <label
@@ -999,7 +1000,7 @@ export default defineComponent({
                 starred: this.project.starred,
                 access: this.project.access,
                 access_type: this.project.access_type,
-                is_public: this.project.is_public === 'true',
+                is_public: this.project.is_public === "true",
                 license: null,
                 license_id: null,
                 tag: "",
