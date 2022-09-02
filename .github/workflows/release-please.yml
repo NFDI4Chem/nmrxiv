@@ -14,3 +14,4 @@ jobs:
           release-type: php
           package-name: release-please-action
           token: ${{ secrets.GITHUB_TOKEN }}
+          prerelease: true
