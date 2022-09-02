@@ -338,6 +338,7 @@
                                                     </legend>
                                                     <div class="mt-2 space-y-5">
                                                         <div
+                                                            @click="form.is_public = true"
                                                             class="relative flex items-start"
                                                         >
                                                             <div
@@ -345,9 +346,6 @@
                                                             >
                                                                 <input
                                                                     id="privacy-public"
-                                                                    v-model="
-                                                                        form.is_public
-                                                                    "
                                                                     :checked="
                                                                         form.is_public ===
                                                                         true
@@ -380,8 +378,8 @@
                                                                 </p>
                                                             </div>
                                                         </div>
-                                                        <div>
                                                             <div
+                                                                @click="form.is_public = false"
                                                                 class="relative flex items-start"
                                                             >
                                                                 <div
@@ -389,9 +387,6 @@
                                                                 >
                                                                     <input
                                                                         id="privacy-private-to-project"
-                                                                        v-model="
-                                                                            form.is_public
-                                                                        "
                                                                         :checked="
                                                                             form.is_public ===
                                                                             false
@@ -428,7 +423,6 @@
                                                                     </p>
                                                                 </div>
                                                             </div>
-                                                        </div>
                                                     </div>
                                                 </fieldset>
                                             </div>
@@ -463,8 +457,7 @@
                                                 <div
                                                     v-if="
                                                         form.is_public ==
-                                                            true ||
-                                                        form.is_public == 'true'
+                                                            true 
                                                     "
                                                 >
                                                     <label
@@ -744,6 +737,60 @@
                                                     :project="project"
                                                 ></project-activity>
                                             </div>
+
+                                            <div class="pt-3" v-else>
+                                                <div
+                                                    v-if="
+                                                        form.is_public ==
+                                                            true ||
+                                                        form.is_public == 'true'
+                                                    "
+                                                >
+                                                    <label
+                                                        for="email"
+                                                        class="block text-sm font-medium text-gray-700"
+                                                        >Public URL</label
+                                                    >
+                                                    <div
+                                                        class="mt-1 flex rounded-md shadow-sm"
+                                                    >
+                                                        <div
+                                                            class="relative flex items-stretch flex-grow focus-within:z-10"
+                                                        >
+                                                            <input
+                                                                id="projectPublicURLCopy"
+                                                                v-model="
+                                                                    project.public_url
+                                                                "
+                                                                :readonly="
+                                                                    !canUpdateProject
+                                                                "
+                                                                type="text"
+                                                                class="rounded-l-md focus:ring-gray-500 focus:border-gray-500 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300"
+                                                                @focus="
+                                                                    $event.target.select()
+                                                                "
+                                                            />
+                                                        </div>
+                                                        <button
+                                                            type="button"
+                                                            class="-ml-px relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500"
+                                                            @click="
+                                                                copyToClipboard(
+                                                                    project.public_url,
+                                                                    'projectPublicURLCopy'
+                                                                )
+                                                            "
+                                                        >
+                                                            <span
+                                                                ><ClipboardCopyIcon
+                                                                    class="h-5 w-5"
+                                                                    aria-hidden="true"
+                                                            /></span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -952,7 +999,7 @@ export default defineComponent({
                 starred: this.project.starred,
                 access: this.project.access,
                 access_type: this.project.access_type,
-                is_public: this.project.is_public,
+                is_public: this.project.is_public === 'true',
                 license: null,
                 license_id: null,
                 tag: "",
