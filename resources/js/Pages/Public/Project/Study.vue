@@ -330,7 +330,39 @@ export default {
             return String(this.$page.props.url);
         },
     },
-    mounted() {},
+    mounted() {
+        const saveNMRiumUpdates = (e) => {
+            if (
+                e.origin != "https://nmriumdev.nmrxiv.org" &&
+                e.origin != "https://nmrium.nmrxiv.org"
+            ) {
+                return;
+            }
+            if (e.data.type == "nmr-wrapper:error") {
+                this.spectraError = e.data.data;
+                return;
+            }
+            if (e.data.type == "nmr-wrapper:data-change") {
+                let actionType = e.data.data.actionType;
+                if (
+                    actionType == "" ||
+                    (actionType == "INITIATE" &&
+                        this.selectedDataset &&
+                        this.selectedDataset.type != null)
+                ) {
+                    if (this.selectedSpectraData == null) {
+                        this.selectedSpectraData = e.data.data.spectra;
+                    }
+                    return;
+                }
+            }
+        };
+
+        if (!this.$page.props.dsEventRegistered) {
+            window.addEventListener("message", saveNMRiumUpdates);
+            this.$page.props.dsEventRegistered = true;
+        }
+    },
     methods: {
         loadSpectra() {
             this.selectedSpectraData = null;
