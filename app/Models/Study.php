@@ -89,12 +89,12 @@ class Study extends Model implements Auditable
 
     protected function getPublicUrlAttribute()
     {
-        return  env('APP_URL', null).'/projects/'.urlencode($this->slug);
+        return env('APP_URL', null).'/projects/'.$this->owner->username.'/'.urlencode($this->project->slug).'?tab=study&id='.$this->slug;
     }
 
     protected function getPrivateUrlAttribute()
     {
-        return  env('APP_URL', null).'/projects/'.urlencode($this->url);
+        return  env('APP_URL', null).'/studies/'.urlencode($this->url);
     }
 
     public function draft()

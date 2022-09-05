@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.8.2-beta](https://github.com/NFDI4Chem/nmrxiv/compare/v1.8.1-beta...v1.8.2-beta) (2022-09-05)
+
+
+### Bug Fixes
+
+* Public project share url display issue fixed ([6dbaa90](https://github.com/NFDI4Chem/nmrxiv/commit/6dbaa9095756c03cbff5f591717fb6a15dc863c8))
+* Public study - dataset info loading issue fixed and js code - formatting ([a9075cf](https://github.com/NFDI4Chem/nmrxiv/commit/a9075cf8f675850356ae5421cddf5e87ee038428))
+* Study share url bug fixed ([641b939](https://github.com/NFDI4Chem/nmrxiv/commit/641b9390ad6fb81d32fa7176387ca64d279217f6))
+
 ## [1.8.1-beta](https://github.com/NFDI4Chem/nmrxiv/compare/v1.8.0-beta...v1.8.1-beta) (2022-09-02)
 
 
