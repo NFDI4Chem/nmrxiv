@@ -275,8 +275,8 @@ class Project extends Model implements Auditable
     {
         $query->when($filters['search'] ?? null, function ($query, $search) {
             $query->where(function ($query) use ($search) {
-                $query->where('name', 'like', '%'.$search.'%')
-                    ->orWhere('description', 'like', '%'.$search.'%');
+                $query->where('name', 'ILIKE', '%'.$search.'%')
+                    ->orWhere('description', 'ILIKE', '%'.$search.'%');
             });
         })->when($filters['sort'] ?? null, function ($query, $sort) {
             if ($sort === 'newest') {
