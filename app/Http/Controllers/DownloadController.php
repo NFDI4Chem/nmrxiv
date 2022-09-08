@@ -84,10 +84,12 @@ class DownloadController extends Controller
             } else {
                 $command = $s3Client->getCommand('ListObjects');
                 $command['Bucket'] = $bucket;
-                $command['Prefix'] = ltrim($path, $path[0]).'/';
-
+                if ($path[0] == '/') {
+                    $command['Prefix'] = ltrim($path, $path[0]).'/';
+                } else {
+                    $command['Prefix'] = $path.'/';
+                }
                 $result = $s3Client->execute($command);
-
                 foreach ($result['Contents'] as $file) {
                     array_push($s3keys, $file['Key']);
                 }
