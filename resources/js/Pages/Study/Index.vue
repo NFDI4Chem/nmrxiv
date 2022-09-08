@@ -3,16 +3,31 @@
         <div class="flex items-baseline justify-between">
             <div>
                 <h2 class="text-lg">Studies</h2>
-                <div v-if="!loading" class="mt-2 text-sm text-gray-700">
-                    <div>
+                <div v-if="!loading" class="flex items-center mr-4 w-full">
+                    <div class="flex w-full bg-white shadow rounded-full">
                         <input
-                            placeholder="search"
-                            @blur="update()"
-                            type="text"
                             v-model="query"
-                            class="rounded-md w-full border-gray-200"
+                            class="relative w-full border-0 px-6 py-3 rounded-full focus:shadow-outline"
+                            autocomplete="off"
+                            type="text"
+                            name="search"
+                            placeholder="Search…"
                         />
                     </div>
+                    <button
+                        type="button"
+                        class="ml-2 inline-flex items-center rounded-full px-6 py-3 shadow rounded-full text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                        @click="update()"
+                    >
+                        GO
+                    </button>
+                    <button
+                        @click="reset()"
+                        class="ml-3 text-sm text-gray-500 hover:text-gray-700 focus:text-indigo-500"
+                        type="button"
+                    >
+                        Reset
+                    </button>
                 </div>
             </div>
             <!-- <div class="flex-shrink-0 ml-4">
@@ -29,7 +44,7 @@
         <div v-if="!loading && studies.data">
             <div v-if="studies.data.length <= 0 && editable">
                 <div class="mt-4 px-12 py-8 mx-auto max-w-4xl">
-                    <div class="px-6 py-4 bg-white shadow-md rounded-lg">
+                    <!-- <div class="px-6 py-4 bg-white shadow-md rounded-lg">
                         <div class="flex items-center">
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -83,6 +98,54 @@
                                 Create a new study
                             </span>
                         </button>
+                    </div> -->
+                    <div class="px-6 py-4 bg-white shadow-md rounded-lg">
+                        <div class="flex items-center">
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                class="h-6 w-6"
+                            >
+                                <path
+                                    d="M3 6l9 4v12l-9-4V6zm14-3v2c0 1.1-2.24 2-5 2s-5-.9-5-2V3c0 1.1 2.24 2 5 2s5-.9 5-2z"
+                                    class="fill-current text-gray-400"
+                                ></path>
+                                <polygon
+                                    points="21 6 12 10 12 22 21 18"
+                                    class="fill-current text-gray-600"
+                                ></polygon>
+                            </svg>
+                            <div
+                                class="ml-3 font-semibold text-sm text-gray-600 uppercase tracking-wider"
+                            >
+                                No studies that match the search query
+                            </div>
+                        </div>
+                        <button
+                            type="button"
+                            @click="reset()"
+                            class="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 mt-6 focus:ring-offset-2 focus:ring-teal-500"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke-width="1.5"
+                                stroke="currentColor"
+                                class="mx-auto h-12 w-12 text-gray-400"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                                />
+                            </svg>
+                            <span
+                                class="mt-2 block text-sm font-medium text-gray-900"
+                            >
+                                Empty results. <br />Click here to reset
+                            </span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -95,7 +158,7 @@
                     </div>
                 </div>
                 <div
-                    v-if="studies.total > studies.per_page"
+                    v-if="studies.meta.total > studies.meta.per_page"
                     class="block w-100 mt-10"
                 >
                     <nav
@@ -104,7 +167,7 @@
                         <div class="-mt-px w-0 flex-1 flex">&nbsp;</div>
                         <div class="hidden md:-mt-px md:flex">
                             <div
-                                v-for="link in studies.links"
+                                v-for="link in studies.meta.links"
                                 :key="link.url"
                                 @click="update(link)"
                                 v-html="link.label"
@@ -200,7 +263,7 @@ export default {
         fetchStudies(url) {
             axios.get(url).then((response) => {
                 this.loading = false;
-                this.studies = response.data.studies;
+                this.studies = response.data;
             });
         },
         update(link) {
@@ -212,8 +275,19 @@ export default {
             }
             if (link.url) {
                 this.loading = true;
-                this.fetchStudies(link.url + "&query=" + this.query);
+                this.executeQuery(link);
             }
+        },
+        reset() {
+            let link = {};
+            link["url"] =
+                route("dashboard.project.studies", this.project.id) + "?page=1";
+            this.query = "";
+            this.loading = true;
+            this.executeQuery(link);
+        },
+        executeQuery(link) {
+            this.fetchStudies(link.url + "&search=" + this.query);
         },
         openStudyCreateDialog() {
             this.emitter.emit("openStudyCreateDialog", {});
