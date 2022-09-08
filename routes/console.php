@@ -13,5 +13,5 @@ use Illuminate\Support\Facades\Artisan;
 |
 */
 Artisan::command('nmrxiv', function () {
-    $this->comment('Welcome to nmrXiv v0.1 Alpha');
+    $this->comment('Welcome to nmrXiv!');
 })->purpose('Display nmrxiv info');
