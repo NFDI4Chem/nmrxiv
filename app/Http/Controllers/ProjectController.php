@@ -9,6 +9,7 @@ use App\Actions\Project\DeleteProject;
 use App\Actions\Project\RestoreProject;
 use App\Actions\Project\UpdateProject;
 use App\Http\Resources\ProjectResource;
+use App\Http\Resources\StudyResource;
 use App\Models\Project;
 use App\Models\Study;
 use App\Models\User;
@@ -137,14 +138,7 @@ class ProjectController extends Controller
             throw new AuthorizationException;
         }
 
-        $q = $request->get('query');
-
-        $q = ($q) ? $q : '';
-
-        return response()->json(['studies' => Study::where('project_id', $project->id)->where(function ($query) use ($q) {
-            $query->where('name', 'LIKE', '%'.$q.'%')
-                ->orWhere('description', 'LIKE', '%'.$q.'%');
-        })->orderByDesc('updated_at')->paginate(9)->withQueryString()])->withCallback($request->input('callback'));
+        return StudyResource::collection(Study::where('project_id', $project->id)->filter($request->only('search', 'sort', 'mode'))->paginate(9)->withQueryString());
     }
 
     public function settings(Request $request, Project $project)
