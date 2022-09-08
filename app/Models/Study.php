@@ -252,4 +252,20 @@ class Study extends Model implements Auditable
     {
         return $this->belongsTo(License::class, 'license_id');
     }
+
+    public function scopeFilter($query, array $filters)
+    {
+        $query->when($filters['search'] ?? null, function ($query, $search) {
+            $query->where(function ($query) use ($search) {
+                $query->where('name', 'ILIKE', '%'.$search.'%')
+                    ->orWhere('description', 'ILIKE', '%'.$search.'%');
+            });
+        })->when($filters['sort'] ?? null, function ($query, $sort) {
+            if ($sort === 'newest') {
+                $query->orderByDesc('updated_at');
+            } elseif ($sort === 'creation') {
+                $query->orderByDesc('created_at');
+            }
+        });
+    }
 }
