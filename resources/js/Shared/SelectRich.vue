@@ -42,7 +42,7 @@
                                 active
                                     ? 'text-white bg-teal-600'
                                     : 'text-gray-900',
-                                'cursor-default select-none relative py-2 pl-8 pr-4',
+                                'cursor-default border-b select-none relative py-2 pl-8 pr-4',
                             ]"
                         >
                             <span
@@ -51,7 +51,8 @@
                                     'block truncate',
                                 ]"
                             >
-                                {{ item.title }}
+                                <b>{{ item.title }}</b> <br />
+                                <small v-html="item.description"> </small>
                                 <!-- ToolTip class="inline ml-3 float-right overflow-visible" :text="item.description"></ToolTip -->
                             </span>
                             <span
