@@ -49,7 +49,7 @@ class ProjectController extends Controller
             ]);
         } elseif ($tab == 'studies') {
             return Inertia::render('Public/Project/Studies', [
-                'project' => (new ProjectResource($project))->lite(false, ['studies']),
+                'project' => (new ProjectResource($project))->lite(false, []),
                 'tab' => $tab,
             ]);
         } elseif ($tab == 'files') {
@@ -69,7 +69,7 @@ class ProjectController extends Controller
             return Inertia::render('Public/Project/Study', [
                 'project' => (new ProjectResource($project))->lite(false, []),
                 'tab' => $tab,
-                'study' => $study->load('tags'),
+                'study' => $study->load(['tags', 'sample.molecules']),
             ]);
         } else {
             return Inertia::render('Public/Project/Show', [
@@ -89,6 +89,11 @@ class ProjectController extends Controller
             'filters' => $request->all('search', 'sort', 'mode'),
             'projects' => $projects,
         ]);
+    }
+
+    public function publicStudies(Request $request, Project $project)
+    {
+        return StudyResource::collection(Study::where([['project_id', $project->id], ['is_public', true]])->filter($request->only('search', 'sort', 'mode'))->paginate(9)->withQueryString());
     }
 
     public function toggleUpVote(Request $request, Project $project)
