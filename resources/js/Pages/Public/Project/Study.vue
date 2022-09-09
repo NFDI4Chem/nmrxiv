@@ -111,27 +111,160 @@
                     </div>
                     <div class="prose" v-html="md(study.description)"></div>
                 </div>
-                <div class="mt-4">
-                    <p>
-                        <span
-                            v-for="tag in study.tags"
-                            :key="tag.id"
-                            class="mr-2"
+                <div v-if="study.tags.length > 0" class="mt-4">
+                    <div class="relative">
+                        <div
+                            class="absolute inset-0 flex items-center"
+                            aria-hidden="true"
                         >
+                            <div class="w-full border-t border-gray-100"></div>
+                        </div>
+                        <div class="relative flex items-center justify-between">
                             <span
-                                class="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-indigo-100 text-indigo-800"
+                                class="pr-3 text-md bg-white font-medium text-gray-400"
                             >
-                                <svg
-                                    class="-ml-0.5 mr-1.5 h-2 w-2 text-indigo-400"
-                                    fill="currentColor"
-                                    viewBox="0 0 8 8"
-                                >
-                                    <circle cx="4" cy="4" r="3" />
-                                </svg>
-                                {{ tag.name["en"] }}
+                                Keywords
                             </span>
-                        </span>
-                    </p>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <dd class="mt-1 text-md text-gray-900 space-y-5">
+                            <p>
+                                <span
+                                    v-for="tag in study.tags"
+                                    :key="tag.id"
+                                    class="mr-2"
+                                >
+                                    <span
+                                        class="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-indigo-100 text-indigo-800"
+                                    >
+                                        <svg
+                                            class="-ml-0.5 mr-1.5 h-2 w-2 text-indigo-400"
+                                            fill="currentColor"
+                                            viewBox="0 0 8 8"
+                                        >
+                                            <circle cx="4" cy="4" r="3" />
+                                        </svg>
+                                        {{ tag.name["en"] }}
+                                    </span>
+                                </span>
+                            </p>
+                        </dd>
+                    </div>
+                </div>
+                <div v-if="study['sample'].molecules.length > 0 || study['sample'].description == ''" class="mt-4">
+                    <div class="relative">
+                        <div
+                            class="absolute inset-0 flex items-center"
+                            aria-hidden="true"
+                        >
+                            <div class="w-full border-t border-gray-100"></div>
+                        </div>
+                        <div class="relative flex items-center justify-between">
+                            <span
+                                class="pr-3 text-md bg-white font-medium text-gray-400"
+                            >
+                                Sample
+                            </span>
+                        </div>
+                    </div>
+                    <div
+                        v-if="study['sample'].molecules.length > 0"
+                        class="mt-3"
+                    >
+                        <label>Molecular Composition</label>
+                        <div class="grid grid-cols-2 gap-2 mt-2">
+                            <div class="pr-2">
+                                <div
+                                    v-if="study.sample.molecules.length > 0"
+                                    class="flow-root"
+                                >
+                                    <ul role="list" class="-mb-8">
+                                        <li
+                                            v-for="molecule in study.sample
+                                                .molecules"
+                                            :key="molecule.STANDARD_INCHI"
+                                        >
+                                            <div class="relative pb-8">
+                                                <span
+                                                    class="absolute top-5 left-5 -ml-px h-full w-0.5 bg-gray-200"
+                                                    aria-hidden="true"
+                                                ></span>
+                                                <div
+                                                    class="relative flex items-start space-x-3"
+                                                >
+                                                    <div
+                                                        v-if="
+                                                            molecule &&
+                                                            molecule.pivot
+                                                        "
+                                                        class="relative"
+                                                    >
+                                                        <div
+                                                            class="rounded-full border p-2 z-10 bg-gray-100 text-sm"
+                                                        >
+                                                            {{
+                                                                molecule.pivot
+                                                                    .percentage_composition
+                                                            }}%
+                                                        </div>
+                                                    </div>
+                                                    <div class="min-w-0 flex-1">
+                                                        <div>
+                                                            <div
+                                                                class="text-sm"
+                                                            >
+                                                                <a
+                                                                    class="font-medium text-gray-900"
+                                                                    >{{
+                                                                        molecule.STANDARD_INCHI
+                                                                    }}</a
+                                                                >
+                                                            </div>
+                                                        </div>
+                                                        <div
+                                                            class="mt-2 text-sm text-gray-700"
+                                                        >
+                                                            <div
+                                                                class="rounded-md border my-3 flex justify-center items-center"
+                                                            >
+                                                                <span
+                                                                    v-html="
+                                                                        getSVGString(
+                                                                            molecule
+                                                                        )
+                                                                    "
+                                                                ></span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                    <div
+                                        class="rounded-full border p-2 z-10 bg-gray-100 text-sm mt-14 text-center"
+                                    >
+                                        Sample chemical composition
+                                    </div>
+                                </div>
+                                <div v-else>
+                                    <div class="text-center my-10 py-10">
+                                        <h3
+                                            class="mt-2 text-sm font-medium text-gray-900"
+                                        >
+                                            No structures associated with the
+                                            sample yet!
+                                        </h3>
+                                        <p class="mt-1 text-sm text-gray-500">
+                                            Get started by adding a new
+                                            molecule.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="mt-4">
                     <div class="relative">
@@ -186,14 +319,13 @@
                     </div>
                 </div>
                 <div class="grid grid-cols-2">
-                    <div class="p-1 pr-2">
+                    <div class="p-1 pr-2" v-if="selectedSpectraData">
                         <label
                             for="location"
                             class="block text-sm font-medium text-gray-700"
                             >Info</label
                         >
                         <div
-                            v-if="selectedSpectraData"
                             class="overflow-hidden ring-1 mt-3 ring-black ring-opacity-5 md:rounded-lg"
                         >
                             <table
@@ -309,7 +441,7 @@ export default {
                 "/projects/" +
                 this.project.data.owner.username +
                 "/" +
-                this.project.slug +
+                this.project.data.slug +
                 "?tab=study&id=" +
                 this.study.slug +
                 "&dsid=" +
@@ -344,13 +476,12 @@ export default {
             }
             if (e.data.type == "nmr-wrapper:data-change") {
                 let actionType = e.data.data.actionType;
-                if (
-                    actionType == "" ||
-                    (actionType == "INITIATE" &&
-                        this.selectedDataset &&
-                        this.selectedDataset.type != null)
-                ) {
-                    if (this.selectedSpectraData == null) {
+                if (actionType == "" || actionType == "INITIATE") {
+                    if (
+                        this.selectedSpectraData == null ||
+                        (this.selectedSpectraData &&
+                            this.selectedSpectraData.length == 0)
+                    ) {
                         this.selectedSpectraData = e.data.data.spectra;
                     }
                     return;
@@ -364,6 +495,16 @@ export default {
         }
     },
     methods: {
+        getSVGString(molecule) {
+            if (molecule.MOL) {
+                let mol = OCL.Molecule.fromMolfile(
+                    "\n  " + molecule.MOL.replaceAll('"', "")
+                );
+                return mol.toSVG(200, 200);
+            } else {
+                console.log(molecule);
+            }
+        },
         loadSpectra() {
             this.selectedSpectraData = null;
             if (this.selectedDataset == null) {
