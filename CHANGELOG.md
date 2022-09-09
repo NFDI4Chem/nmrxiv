@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.8.4-beta](https://github.com/NFDI4Chem/nmrxiv/compare/v1.8.3-beta...v1.8.4-beta) (2022-09-09)
+
+
+### Bug Fixes
+
+* Download path ltrim broken links bug fix ([75380e7](https://github.com/NFDI4Chem/nmrxiv/commit/75380e7751b0a15cbef71a5c2f0b18b70814b951))
+* various bug fixes and updates ([d645248](https://github.com/NFDI4Chem/nmrxiv/commit/d645248a2b097ef8484ef8d45c4f937e36fa0d2b))
+* Welcome page horizontal overflow and cookie banner hidden element bug resolved ([eea3b9c](https://github.com/NFDI4Chem/nmrxiv/commit/eea3b9c97bc6daea20fa8f4b0b1e1ab6e6985229))
+
 ## [1.8.3-beta](https://github.com/NFDI4Chem/nmrxiv/compare/v1.8.2-beta...v1.8.3-beta) (2022-09-08)
 
 
