@@ -17,7 +17,8 @@ RUN set -ex \
     postgresql-dev
 RUN docker-php-ext-install pdo pdo_pgsql
 
-RUN echo 'max_execution_time = 600' >> /usr/local/etc/php/conf.d/docker-php-maxexectime.ini;
+RUN echo 'max_execution_time = 3600' >> /usr/local/etc/php/conf.d/docker-php-maxexectime.ini;
+RUN echo 'memory_limit = 512M' >> /usr/local/etc/php/conf.d/docker-php-memlimit.ini;
 
 FROM base AS dev
 
