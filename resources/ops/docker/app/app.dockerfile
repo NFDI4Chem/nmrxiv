@@ -17,6 +17,8 @@ RUN set -ex \
     postgresql-dev
 RUN docker-php-ext-install pdo pdo_pgsql
 
+RUN echo 'max_execution_time = 600' >> /usr/local/etc/php/conf.d/docker-php-maxexectime.ini;
+
 FROM base AS dev
 
 COPY /composer.json composer.json
