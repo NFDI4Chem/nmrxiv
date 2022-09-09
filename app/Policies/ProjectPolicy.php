@@ -40,11 +40,15 @@ class ProjectPolicy
      */
     public function viewProject(User $user, Project $project)
     {
-        if (is_null($user) && $project->is_public) {
+        if($project->is_public){
             return true;
+        }else{
+            if (is_null($user)) {
+                return false;
+            }else{
+                return $user->belongsToProject($project);
+            }
         }
-
-        return $user->belongsToProject($project);
     }
 
     /**
