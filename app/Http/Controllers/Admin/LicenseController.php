@@ -15,7 +15,7 @@ class LicenseController extends Controller
     public function index(Request $request)
     {
         $licenses = Cache::rememberForever('licenses', function () {
-            return License::select('id', 'title', 'description')->get();
+            return License::select('id', 'title', 'description')->orderBy('id', 'ASC')->get();
         });
 
         return $licenses;
