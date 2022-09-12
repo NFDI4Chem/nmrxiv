@@ -1,5 +1,3 @@
-# https://cert-manager.io/docs/tutorials/acme/nginx-ingress/#step-2-deploy-the-nginx-ingress-controller
-
    apiVersion: cert-manager.io/v1
    kind: Issuer
    metadata:
