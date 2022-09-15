@@ -42,6 +42,11 @@
                                 "
                                 class="block"
                             >
+                                <small
+                                    v-if="dataset.identifier"
+                                    class="text-gray-500"
+                                    >#{{ dataset.identifier }}</small
+                                >
                                 <p
                                     class="text-lg font-black text-gray-900 line-clamp-2"
                                 >
@@ -175,12 +180,11 @@
                 </div>
             </div>
             <div v-if="mode == 'list'">
-                <!-- This example requires Tailwind CSS v2.0+ -->
                 <li class="flex border-b bprder-gray-100">
                     <div class="flex-shrink-0">
                         <div
                             v-if="dataset.dataset_photo_url"
-                            class="flex-shrink-0 h-36 p-3"
+                            class="flex-shrink-0 w-64 border-r h-36 p-3"
                         >
                             <img
                                 :src="dataset.dataset_photo_url"
@@ -190,15 +194,20 @@
                         </div>
                         <div
                             v-else
-                            class="flex-shrink-0 h-36 pattern-diagonal-lines pattern-gray-400 pattern-bg-white pattern-size-2 pattern-opacity-20 border-b border-gray-400"
+                            class="flex-shrink-0 h-36 w-64 border-r pattern-diagonal-lines pattern-gray-400 pattern-bg-white pattern-size-2 pattern-opacity-20 border-b border-gray-400"
                         ></div>
                     </div>
 
                     <div
-                        class="flex-1 flex flex-col px-4 py-4 sm:px-6 justify-between"
+                        class="flex-1 flex flex-col px-4 py-2 sm:px-6 justify-between"
                     >
                         <div class="flex items-center justify-between">
                             <div>
+                                <small
+                                    v-if="dataset.identifier"
+                                    class="text-gray-500"
+                                    >#{{ dataset.identifier }}</small
+                                >
                                 <p
                                     class="text-lg font-black text-gray-900 line-clamp-2 font-black"
                                 >
