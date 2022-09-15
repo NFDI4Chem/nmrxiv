@@ -105,9 +105,9 @@
                                 type="button"
                                 :class="[
                                     filters.mode == 'list'
-                                        ? ''
-                                        : 'bg-gray-300 text-gray-900',
-                                    'relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500',
+                                        ? 'bg-gray-300 text-gray-900'
+                                        : '',
+                                    'relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-10',
                                 ]"
                             >
                                 <span class="sr-only">List</span>
@@ -121,9 +121,9 @@
                                 type="button"
                                 :class="[
                                     filters.mode == 'grid'
-                                        ? ''
-                                        : 'bg-gray-300 text-gray-900',
-                                    '-ml-px relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500',
+                                        ? 'bg-gray-300 text-gray-900'
+                                        : '',
+                                    '-ml-px relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50',
                                 ]"
                             >
                                 <span class="sr-only">Grid</span>

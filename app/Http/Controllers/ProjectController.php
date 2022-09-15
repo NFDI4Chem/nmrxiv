@@ -17,7 +17,6 @@ use Auth;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
@@ -81,9 +80,7 @@ class ProjectController extends Controller
 
     public function publicProjectsView(Request $request)
     {
-        // $projects = Cache::rememberForever('projects', function () {
         $projects = ProjectResource::collection(Project::where('is_public', true)->filter($request->only('search', 'sort', 'mode'))->paginate(12)->withQueryString());
-        // });
 
         return Inertia::render('Public/Projects', [
             'filters' => $request->all('search', 'sort', 'mode'),

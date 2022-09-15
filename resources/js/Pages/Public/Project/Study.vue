@@ -152,7 +152,13 @@
                         </dd>
                     </div>
                 </div>
-                <div v-if="study['sample'].molecules.length > 0 || study['sample'].description == ''" class="mt-4">
+                <div
+                    v-if="
+                        study['sample'].molecules.length > 0 ||
+                        study['sample'].description == ''
+                    "
+                    class="mt-4"
+                >
                     <div class="relative">
                         <div
                             class="absolute inset-0 flex items-center"

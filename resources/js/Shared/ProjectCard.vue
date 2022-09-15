@@ -196,10 +196,15 @@
                     </div>
 
                     <div
-                        class="flex-1 flex flex-col px-4 py-4 sm:px-6 justify-between"
+                        class="flex-1 flex flex-col px-4 py-2 sm:px-6 justify-between"
                     >
                         <div class="flex items-center justify-between">
                             <div>
+                                <small
+                                    v-if="project.identifier"
+                                    class="text-gray-500"
+                                    >#{{ project.identifier }}</small
+                                >
                                 <p
                                     class="text-lg font-black text-gray-900 line-clamp-2 font-black"
                                 >
