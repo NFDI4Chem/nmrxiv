@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\CacheClear;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Scout\Searchable;
@@ -15,6 +16,7 @@ class Study extends Model implements Auditable
     use Searchable;
     use CacheClear;
     use HasFactory;
+    use HasDOI;
     use HasTags;
     use \OwenIt\Auditing\Auditable;
 
@@ -51,6 +53,18 @@ class Study extends Model implements Auditable
         'study_photo_url',
         'study_preview_urls',
     ];
+
+    /**
+     * Get the study identifier
+     *
+     * @return \Illuminate\Database\Eloquent\Casts\Attribute
+     */
+    protected function identifier(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? 'NMRXIV:S'.$value : null,
+        );
+    }
 
     /**
      * Get the URL to the study's profile photo.

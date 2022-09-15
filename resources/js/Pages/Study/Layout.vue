@@ -27,6 +27,9 @@
                     the project.
                 </div>
             </div>
+            <div v-if="study.is_public && study.doi != null">
+                <Citation :doi="study.doi"></Citation>
+            </div>
             <div class="bg-white border-b">
                 <div class="px-12">
                     <div class="flex flex-nowrap justify-between py-6">
@@ -179,16 +182,6 @@
                                     <div
                                         class="mt-2 flex items-center text-sm text-gray-500"
                                     >
-                                        <CalendarIcon
-                                            class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
-                                            aria-hidden="true"
-                                        />
-                                        Updated on
-                                        {{ formatDateTime(study.updated_at) }}
-                                    </div>
-                                    <div
-                                        class="mt-2 flex items-center text-sm text-gray-500"
-                                    >
                                         <a
                                             class="cursor-pointer inline-flex items-center"
                                             @click="toggleDetails"
@@ -269,6 +262,26 @@
                                             </span>
                                             {{ studyRole }}
                                         </span>
+                                        <span
+                                            v-if="study.identifier"
+                                            class="inline-flex pr-4 ml-4 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
+                                        >
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                class="h-6 w-6 py-1"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                stroke="currentColor"
+                                                stroke-width="2"
+                                            >
+                                                <path
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    d="M5.25 8.25h15m-16.5 7.5h15m-1.8-13.5l-3.9 19.5m-2.1-19.5l-3.9 19.5"
+                                                />
+                                            </svg>
+                                            <b>{{ study.identifier }}</b>
+                                        </span>
                                     </div>
                                     <study-details
                                         ref="studyDetailsElement"
@@ -276,6 +289,16 @@
                                         :role="studyRole"
                                         :studyPermissions="studyPermissions"
                                     />
+                                </div>
+                                <div
+                                    class="mt-4 flex items-center text-xs text-gray-400"
+                                >
+                                    <CalendarIcon
+                                        class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-300"
+                                        aria-hidden="true"
+                                    />
+                                    Updated on
+                                    {{ formatDateTime(study.updated_at) }}
                                 </div>
                             </div>
                         </div>
@@ -309,6 +332,8 @@ import {
 } from "@heroicons/vue/solid";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import AccessDialogue from "@/Shared/AccessDialogue.vue";
+import Citation from "@/Shared/Citation.vue";
+
 export default {
     components: {
         Link,
@@ -330,6 +355,7 @@ export default {
         PencilIcon,
         StarIcon,
         AccessDialogue,
+        Citation,
     },
     props: [
         "study",

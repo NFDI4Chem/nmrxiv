@@ -24,7 +24,7 @@
             :alt="user.first_name"
         />
         <img
-            v-if="team"
+            v-if="team && !team.personal_team"
             class="w-8 h-8 -mr-2 rounded-full border-2 border-white"
             :src="team.owner.profile_photo_url"
             :alt="team.owner.first_name"
@@ -331,7 +331,7 @@
                                     </a>
                                 </li>
                             </ul>
-                            <span v-if="team">
+                            <span v-if="team && !team.personal_team">
                                 <div class="mb-2">
                                     <h2
                                         class="text-lg uppercase leading-6 font-medium text-gray-900"
@@ -843,7 +843,6 @@ export default {
     },
     methods: {
         personRole(person) {
-            console.log(person);
             if (person[this.model + "_membership"]) {
                 return person[this.model + "_membership"].role;
             } else {
