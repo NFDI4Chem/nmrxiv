@@ -3,6 +3,8 @@
 namespace App\Actions\Project;
 
 use App\Models\Project;
+use App\Models\Ticker;
+use App\Services\DOI\DOIService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -12,6 +14,18 @@ use Illuminate\Validation\Rule;
 
 class UpdateProject
 {
+    private $doiService;
+
+    /**
+     * Create a new class instance.
+     *
+     * @return void
+     */
+    public function __construct(DOIService $doiService)
+    {
+        $this->doiService = $doiService;
+    }
+
     /**
      * Create a project.
      *
@@ -46,9 +60,16 @@ class UpdateProject
             $release_date = array_key_exists('release_date', $input) ? $input['release_date'] : $project->release_date;
             $licenseExists = array_key_exists('license_id', $input);
             $license_id = $licenseExists ? $input['license_id'] : $project->license_id;
+            $projectIdentifier = $project->identifier ? $project->identifier : null;
 
             if ($is_public == true) {
                 $release_date = Carbon::now()->toDateTimeString();
+                if ($projectIdentifier == null) {
+                    $projectTicker = Ticker::whereType('project')->first();
+                    $projectIdentifier = $projectTicker->index + 1;
+                    $projectTicker->index = $projectIdentifier;
+                    $projectTicker->save();
+                }
             }
 
             $project
@@ -78,10 +99,13 @@ class UpdateProject
                     'owner_id' => $input['owner_id'],
                     'is_public' => $is_public,
                     'release_date' => $release_date,
+                    'identifier' => $projectIdentifier,
                     'license_id' => $license_id,
                     'project_photo_path' => $s3filePath ? $s3filePath : $project->project_photo_path,
                 ])
                 ->save();
+
+            $project->generateDOI($this->doiService);
 
             if (array_key_exists('tags_array', $input)) {
                 $project->syncTagsWithType($input['tags_array'], 'Project');
@@ -95,10 +119,49 @@ class UpdateProject
                     }
                 }
                 if ($is_public) {
+                    $studyIdentifier = $study->identifier ? $study->identifier : null;
+
+                    if ($studyIdentifier == null) {
+                        $studyTicker = Ticker::whereType('study')->first();
+                        $studyIdentifier = $studyTicker->index + 1;
+                        $study->identifier = $studyIdentifier;
+                        $studyTicker->index = $studyIdentifier;
+                        $studyTicker->save();
+                    }
+
+                    $sample = $study->sample;
+                    $sampleIdentifier = $sample->identifier ? $sample->identifier : null;
+
+                    if ($sampleIdentifier == null) {
+                        $sampleTicker = Ticker::whereType('sample')->first();
+                        $sampleIdentifier = $sampleTicker->index + 1;
+                        $sample->identifier = $sampleIdentifier;
+                        $sample->save();
+
+                        $sampleTicker->index = $sampleIdentifier;
+                        $sampleTicker->save();
+                    }
+
+                    $molecules = $sample->molecules;
+
+                    foreach ($molecules as $molecule) {
+                        $moleculeIdentifier = $molecule->identifier ? $molecule->identifier : null;
+                        if ($moleculeIdentifier == null) {
+                            $moleculeTicker = Ticker::whereType('molecule')->first();
+                            $moleculeIdentifier = $moleculeTicker->index + 1;
+                            $molecule->identifier = $moleculeIdentifier;
+                            $molecule->save();
+
+                            $moleculeTicker->index = $moleculeIdentifier;
+                            $moleculeTicker->save();
+                        }
+                    }
+
                     $study->is_public = $is_public;
                     $study->release_date = $release_date;
                 }
                 $study->save();
+                $study->generateDOI($this->doiService);
 
                 $datasets = $study->datasets;
                 foreach ($datasets as $dataset) {
@@ -108,10 +171,21 @@ class UpdateProject
                         }
                     }
                     if ($is_public) {
+                        $dsIdentifier = $dataset->identifier ? $dataset->identifier : null;
+
+                        if ($dsIdentifier == null) {
+                            $dsTicker = Ticker::whereType('dataset')->first();
+                            $dsIdentifier = $dsTicker->index + 1;
+                            $dataset->identifier = $dsIdentifier;
+
+                            $dsTicker->index = $dsIdentifier;
+                            $dsTicker->save();
+                        }
                         $dataset->is_public = $is_public;
                         $dataset->release_date = $release_date;
                     }
                     $dataset->save();
+                    $dataset->generateDOI($this->doiService);
                 }
             }
         });

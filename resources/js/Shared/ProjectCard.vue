@@ -57,9 +57,14 @@
                         ]"
                     >
                         <div
-                            style="min-height: 150px; max-height: 168px"
+                            style="min-height: 168px; max-height: 168px"
                             class="flex-1 p-3"
                         >
+                            <small
+                                v-if="project.identifier"
+                                class="text-gray-500"
+                                >#{{ project.identifier }}</small
+                            >
                             <Link
                                 :href="
                                     '/projects/' +

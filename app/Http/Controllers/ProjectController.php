@@ -69,7 +69,7 @@ class ProjectController extends Controller
             return Inertia::render('Public/Project/Study', [
                 'project' => (new ProjectResource($project))->lite(false, []),
                 'tab' => $tab,
-                'study' => $study->load(['tags', 'sample.molecules']),
+                'study' => (new StudyResource($study))->lite(false, ['tags', 'sample', 'datasets', 'molecules']),
             ]);
         } else {
             return Inertia::render('Public/Project/Show', [

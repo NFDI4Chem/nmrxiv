@@ -77,7 +77,6 @@
                                         :file="file"
                                         :study="study"
                                         :project="project"
-                                        @reload-nmrium="loadSpectra()"
                                     ></children>
                                 </div>
                             </aside>
@@ -375,82 +374,84 @@ export default {
         const vm = this;
         vm.$page.props.selectedFileSystemObject = vm.file;
         vm.$page.props.selectedFolder = "/";
-        let options = {
-            url: "/",
-            method: "put",
-            sending(file, xhr) {
-                let _send = xhr.send;
-                xhr.send = () => {
-                    _send.call(xhr, file);
-                };
-            },
-            autoProcessQueue: false,
-            uploadMultiple: false,
-            disablePreviews: true,
-            parallelUploads: 1,
-            maxFiles: 10000,
-            dictDefaultMessage:
-                document.querySelector("#dropzone-message").innerHTML,
-            done() {},
-            accept(file, done) {
-                const url = "/dashboard/storage/signed-storage-url";
+        if (!this.study.is_public) {
+            let options = {
+                url: "/",
+                method: "put",
+                sending(file, xhr) {
+                    let _send = xhr.send;
+                    xhr.send = () => {
+                        _send.call(xhr, file);
+                    };
+                },
+                autoProcessQueue: false,
+                uploadMultiple: false,
+                disablePreviews: true,
+                parallelUploads: 1,
+                maxFiles: 10000,
+                dictDefaultMessage:
+                    document.querySelector("#dropzone-message").innerHTML,
+                done() {},
+                accept(file, done) {
+                    const url = "/dashboard/storage/signed-storage-url";
 
-                const client = axios.create({
-                    baseURL: window.location.origin,
-                });
-                axiosRetry(client, {
-                    retries: 3,
-                    retryCondition: (error) => {
-                        return error.response.status === 500;
-                    },
-                });
-
-                client
-                    .post(url, {
-                        file: file,
-                        destination: vm.$page.props.selectedFolder,
-                        project_id: vm.project.id,
-                        study_id: vm.study.id,
-                    })
-                    .catch((err) => {
-                        // The first request fails
-                        if (
-                            err.response.status !== 200 ||
-                            err.response.status !== 201
-                        ) {
-                            throw new Error(
-                                `API call failed with status code: ${err.response.status} after multiple attempts`
-                            );
-                        }
-                    })
-                    .then(function (response) {
-                        let data = response.data;
-                        let headers = data.headers;
-                        if ("Host" in headers) {
-                            delete headers.Host;
-                        }
-                        file.uploadURL = data.url;
-                        setTimeout(() => vm.dropzone.processFile(file));
-                        done();
+                    const client = axios.create({
+                        baseURL: window.location.origin,
                     });
-            },
-            totaluploadprogress: function (progress) {
-                vm.progress = Math.ceil(progress);
-            },
-            queuecomplete: function () {
-                vm.status = "UPLOAD COMPLETE";
-                Inertia.reload();
-                this.$page.props.selectedFileSystemObject = this.files[0];
-            },
-        };
-        this.dropzone = new Dropzone(this.$el, options);
+                    axiosRetry(client, {
+                        retries: 3,
+                        retryCondition: (error) => {
+                            return error.response.status === 500;
+                        },
+                    });
 
-        vm.dropzone.on("processing", (file) => {
-            vm.status = "UPLOAD IN PROGRESS";
-            vm.dropzone.options.url = file.uploadURL;
-        });
+                    client
+                        .post(url, {
+                            file: file,
+                            destination: vm.$page.props.selectedFolder,
+                            project_id: vm.project.id,
+                            study_id: vm.study.id,
+                        })
+                        .catch((err) => {
+                            // The first request fails
+                            if (
+                                err.response.status !== 200 ||
+                                err.response.status !== 201
+                            ) {
+                                throw new Error(
+                                    `API call failed with status code: ${err.response.status} after multiple attempts`
+                                );
+                            }
+                        })
+                        .then(function (response) {
+                            let data = response.data;
+                            let headers = data.headers;
+                            if ("Host" in headers) {
+                                delete headers.Host;
+                            }
+                            file.uploadURL = data.url;
+                            setTimeout(() => vm.dropzone.processFile(file));
+                            done();
+                        });
+                },
+                totaluploadprogress: function (progress) {
+                    vm.progress = Math.ceil(progress);
+                },
+                queuecomplete: function () {
+                    vm.status = "UPLOAD COMPLETE";
+                    Inertia.reload();
+                    this.$page.props.selectedFileSystemObject = this.files[0];
+                },
+            };
+            this.dropzone = new Dropzone(this.$el, options);
 
-        this.$page.props.selectedFileSystemObject = "root";
+            vm.dropzone.on("processing", (file) => {
+                vm.status = "UPLOAD IN PROGRESS";
+                vm.dropzone.options.url = file.uploadURL;
+            });
+        }
+
+        this.$page.props.selectedFileSystemObject = this.file.children[0];
     },
     methods: {
         displaySelected(file) {
@@ -497,24 +498,6 @@ export default {
                     });
             }
             this.$emit("reloadnmrium");
-        },
-        loadSpectra() {
-            if (
-                this.$page.props.selectedFileSystemObject &&
-                this.$page.props.selectedFileSystemObject.key.indexOf(".mol") >
-                    -1
-            ) {
-                this.loadMol();
-            }
-            const iframe = window.frames.crossDomainIframe;
-            let url = this.downloadURL;
-            if (iframe) {
-                let data = {
-                    data: [url],
-                    type: "url",
-                };
-                iframe.postMessage({ type: `nmr-wrapper:load`, data }, "*");
-            }
         },
         loadMol() {
             this.svgString = null;

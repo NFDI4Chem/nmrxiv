@@ -413,7 +413,7 @@
                                                     "
                                                 >
                                                     <label
-                                                        for="email"
+                                                        for="public_url"
                                                         class="block text-sm font-medium text-gray-700"
                                                         >Public URL</label
                                                     >
@@ -451,6 +451,51 @@
                                                                     aria-hidden="true"
                                                             /></span>
                                                         </button>
+                                                    </div>
+                                                    <div
+                                                        class="mt-2"
+                                                        v-if="form.doi"
+                                                    >
+                                                        <label
+                                                            for="doi"
+                                                            class="block text-sm font-medium text-gray-700"
+                                                            >DOI</label
+                                                        >
+                                                        <div
+                                                            class="mt-1 flex rounded-md shadow-sm"
+                                                        >
+                                                            <div
+                                                                class="relative flex items-stretch flex-grow focus-within:z-10"
+                                                            >
+                                                                <input
+                                                                    id="studyPublicDOICopy"
+                                                                    v-model="
+                                                                        study.doi
+                                                                    "
+                                                                    type="text"
+                                                                    class="rounded-l-md focus:ring-gray-500 focus:border-gray-500 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300"
+                                                                    @focus="
+                                                                        $event.target.select()
+                                                                    "
+                                                                />
+                                                            </div>
+                                                            <button
+                                                                type="button"
+                                                                class="-ml-px relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500"
+                                                                @click="
+                                                                    copyToClipboard(
+                                                                        study.doi,
+                                                                        'studyPublicDOICopy'
+                                                                    )
+                                                                "
+                                                            >
+                                                                <span
+                                                                    ><ClipboardCopyIcon
+                                                                        class="h-5 w-5"
+                                                                        aria-hidden="true"
+                                                                /></span>
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div v-else>
@@ -844,6 +889,7 @@ export default {
                 is_public: this.study.is_public,
                 access: this.study.access,
                 access_type: this.study.access_type,
+                doi: this.study.doi,
                 license: null,
                 license_id: null,
                 tag: "",

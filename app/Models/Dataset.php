@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use OwenIt\Auditing\Contracts\Auditable;
@@ -11,6 +12,7 @@ class Dataset extends Model implements Auditable
 {
     use HasFactory;
     use \OwenIt\Auditing\Auditable;
+    use HasDOI;
 
     protected $fillable = [
         'name',
@@ -50,6 +52,18 @@ class Dataset extends Model implements Auditable
     protected $hidden = [
         'nmrium_info',
     ];
+
+    /**
+     * Get the dataset identifier
+     *
+     * @return \Illuminate\Database\Eloquent\Casts\Attribute
+     */
+    protected function identifier(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? 'NMRXIV:D'.$value : null,
+        );
+    }
 
     /**
      * Get the URL to the dataset's profile photo.

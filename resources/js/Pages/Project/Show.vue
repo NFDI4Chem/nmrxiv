@@ -27,6 +27,9 @@
                     the project.
                 </div>
             </div>
+            <div v-if="project.is_public && project.doi != null">
+                <Citation :doi="project.doi"></Citation>
+            </div>
             <div class="bg-white border-b">
                 <div class="px-12">
                     <div class="flex flex-nowrap justify-between py-6">
@@ -77,15 +80,15 @@
                                             class="fill-current text-gray-600"
                                         ></rect>
                                     </svg>
-                                    <span class="ml-2">View details</span></a
-                                >
+                                    <span class="ml-2">View details</span>
+                                </a>
                                 <a
                                     ><span
                                         v-if="project.is_public"
                                         class="inline-flex items-center"
                                     >
                                         <svg
-                                            class="h-3 w-3 ml-7 text-green-400 inline"
+                                            class="h-3 w-3 ml-4 text-green-400 inline"
                                             xmlns="http://www.w3.org/2000/svg"
                                             viewBox="0 0 64 64"
                                             width="512"
@@ -232,6 +235,36 @@
                                     </span>
                                     {{ role }}
                                 </span>
+                                <span
+                                    v-if="project.identifier"
+                                    class="inline-flex pr-4 ml-4 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        class="h-6 w-6 py-1"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            d="M5.25 8.25h15m-16.5 7.5h15m-1.8-13.5l-3.9 19.5m-2.1-19.5l-3.9 19.5"
+                                        />
+                                    </svg>
+                                    <b>{{ project.identifier }}</b>
+                                </span>
+                            </div>
+                            <div
+                                class="mt-4 flex items-center text-xs text-gray-400"
+                            >
+                                <CalendarIcon
+                                    class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-300"
+                                    aria-hidden="true"
+                                />
+                                Updated on
+                                {{ formatDateTime(project.updated_at) }}
                             </div>
                         </div>
                         <div v-if="canDeleteProject" class="flex-nowrap">
@@ -598,10 +631,11 @@ import { Inertia } from "@inertiajs/inertia";
 import StudyIndex from "@/Pages/Study/Index.vue";
 import ProjectDetails from "./Partials/Details.vue";
 import { ref } from "vue";
-import { StarIcon, PencilIcon } from "@heroicons/vue/solid";
+import { StarIcon, PencilIcon, CalendarIcon } from "@heroicons/vue/solid";
 import AddAuthor from "@/Shared/AddAuthor.vue";
 import ToolTip from "@/Shared/ToolTip.vue";
 import AddCitation from "@/Shared/AddCitation.vue";
+import Citation from "@/Shared/Citation.vue";
 
 export default {
     components: {
@@ -615,6 +649,8 @@ export default {
         AddAuthor,
         ToolTip,
         AddCitation,
+        CalendarIcon,
+        Citation,
     },
     props: [
         "project",

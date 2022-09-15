@@ -392,9 +392,12 @@
                                                         >
                                                             No structures
                                                             associated with the
-                                                            sample yet!
+                                                            sample!
                                                         </h3>
                                                         <p
+                                                            v-if="
+                                                                !study.is_public
+                                                            "
                                                             class="mt-1 text-sm text-gray-500"
                                                         >
                                                             Get started by

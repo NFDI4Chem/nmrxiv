@@ -130,7 +130,7 @@ class DraftController extends Controller
         ProcessDraft::dispatch($draft);
 
         return response()->json([
-            'project' => Project::with(['studies.datasets'])->where('draft_id', $draft->id)->first(),
+            'project' => Project::with(['studies.datasets', 'owner'])->where('draft_id', $draft->id)->first(),
         ]);
     }
 
