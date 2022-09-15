@@ -371,6 +371,19 @@
                                                                             ></TrashIcon
                                                                             >Delete
                                                                         </button>
+                                                                        <button
+                                                                            class="inline-flex ml-2 items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                                                            @click="
+                                                                                editMolecule(
+                                                                                    molecule
+                                                                                )
+                                                                            "
+                                                                        >
+                                                                            <PencilIcon
+                                                                                class="w-4 h-4 inline mr-1"
+                                                                            ></PencilIcon
+                                                                            >Edit
+                                                                        </button>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -414,6 +427,36 @@
                                                         class="block text-sm font-medium text-gray-700"
                                                     >
                                                         SMILES
+                                                        <div class="tooltip">
+                                                            <InformationCircleIcon
+                                                                class="w-5 h-5 inline"
+                                                            ></InformationCircleIcon
+                                                            ><span
+                                                                class="w-64 bg-gray-900 text-white p-4 shadow-lg rounded-md tooltiptext"
+                                                                >Simplified
+                                                                molecular-input
+                                                                line-entry
+                                                                system (SMILES)
+                                                                is a
+                                                                specification in
+                                                                the form of a
+                                                                line notation
+                                                                for describing
+                                                                the structure of
+                                                                chemical species
+                                                                using short
+                                                                ASCII strings.
+                                                                For more
+                                                                information
+                                                                please checkout
+                                                                <a
+                                                                    href="https://en.wikipedia.org/wiki/Simplified_molecular-input_line-entry_system"
+                                                                    class="text-gray-400"
+                                                                    target="_blank"
+                                                                    >here</a
+                                                                >.</span
+                                                            >
+                                                        </div>
                                                     </label>
                                                     <div class="mt-1 mb-2">
                                                         <input
@@ -543,7 +586,12 @@
 </template>
 
 <script>
-import { PlusSmIcon, TrashIcon } from "@heroicons/vue/solid";
+import {
+    PlusSmIcon,
+    TrashIcon,
+    PencilIcon,
+    InformationCircleIcon,
+} from "@heroicons/vue/solid";
 import StudyContent from "@/Pages/Study/Content.vue";
 import slider from "vue3-slider";
 import OCL from "openchemlib/full";
@@ -555,6 +603,8 @@ export default {
         PlusSmIcon,
         slider,
         TrashIcon,
+        PencilIcon,
+        InformationCircleIcon,
     },
     props: [
         "study",
@@ -632,6 +682,20 @@ export default {
                     this.smiles = "";
                     this.percentage = 0;
                     this.editor.setSmiles("");
+                });
+        },
+        editMolecule(mol) {
+            this.editor.setMolFile("\n  " + mol.MOL.replaceAll('"', ""));
+            this.percentage = parseInt(mol.pivot.percentage_composition);
+            axios
+                .delete(
+                    "/dashboard/studies/" +
+                        this.study.id +
+                        "/molecule/" +
+                        mol.id
+                )
+                .then((res) => {
+                    this.study.sample.molecules = res.data;
                 });
         },
         saveMolecule() {
