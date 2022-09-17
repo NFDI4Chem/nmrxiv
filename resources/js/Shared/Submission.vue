@@ -3298,12 +3298,10 @@ export default {
 
             if (this.openCreateDatasetDialog) {
                 if (!this.$props.eventRegistered) {
-                    console.log("registering");
                     window.addEventListener("message", saveNMRiumUpdates);
                     this.$props.eventRegistered = true;
                 }
             } else {
-                console.log("deregistering");
                 window.removeEventListener("message", saveNMRiumUpdates);
                 this.$props.eventRegistered = false;
             }

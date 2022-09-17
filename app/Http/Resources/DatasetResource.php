@@ -32,6 +32,8 @@ class DatasetResource extends JsonResource
             'slug' => $this->slug,
             'description' => $this->description,
             'type' => $this->type,
+            'identifier' => $this->identifier,
+            'doi' => $this->doi,
             'project' => $this->project ? $this->project->slug : '',
             'study' => $this->study ? $this->study->slug : '',
             'owner' => new UserResource($this->owner),

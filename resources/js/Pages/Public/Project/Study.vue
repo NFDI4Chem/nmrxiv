@@ -4,24 +4,16 @@
             <div
                 class="pb-10 mb-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6"
             >
-                <h2 class="mt-2 text-xl font-bold break-words text-gray-900">
-                    STUDY:
+                <h1 class="mt-2 text-2xl font-bold break-words text-gray-900">
                     <span class="text-blue-500">
-                        {{ study.name }}
+                        {{ study.data.name }}
                     </span>
+
                     <div class="float-right">
-                        <!-- <a
-                            
-                            class="ml-4 cursor-pointer relative inline-flex items-center px-4 py-1 rounded-full border border-gray-300 bg-white text-sm font-black text-dark hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
-                            target="_blank"
-                            :href="shareURL"
-                        >
-                            
-                        </a> -->
-                        <div class="flex-0.5 self-center">
+                        <span class="flex-0.5 self-center">
                             <Menu
                                 as="div"
-                                v-if="selectedDataset && study.is_public"
+                                v-if="selectedDataset && study.data.is_public"
                                 class="relative text-left"
                             >
                                 <div>
@@ -90,9 +82,17 @@
                                     </MenuItems>
                                 </transition>
                             </Menu>
+                        </span>
+                    </div>
+
+                    <div class="text-sm float-right mr-4">
+                        <div
+                            class="inline hover:text-blue-600 hover:cursor-pointer text-gray-200"
+                        >
+                            #{{ study.data.identifier }}
                         </div>
                     </div>
-                </h2>
+                </h1>
                 <div class="mt-4">
                     <div class="relative">
                         <div
@@ -109,9 +109,13 @@
                             </span>
                         </div>
                     </div>
-                    <div class="prose" v-html="md(study.description)"></div>
+                    <p
+                        style="max-width: 100ch !important"
+                        class="prose mt-1 text-sm text-blue-gray-500"
+                        v-html="md(study.data.description)"
+                    ></p>
                 </div>
-                <div v-if="study.tags.length > 0" class="mt-4">
+                <div v-if="study.data.tags.length > 0" class="mt-4">
                     <div class="relative">
                         <div
                             class="absolute inset-0 flex items-center"
@@ -131,7 +135,7 @@
                         <dd class="mt-1 text-md text-gray-900 space-y-5">
                             <p>
                                 <span
-                                    v-for="tag in study.tags"
+                                    v-for="tag in study.data.tags"
                                     :key="tag.id"
                                     class="mr-2"
                                 >
@@ -154,8 +158,8 @@
                 </div>
                 <div
                     v-if="
-                        study['sample'].molecules.length > 0 ||
-                        study['sample'].description == ''
+                        study.data.sample.molecules.length > 0 ||
+                        study.data.sample.description == ''
                     "
                     class="mt-4"
                 >
@@ -175,19 +179,21 @@
                         </div>
                     </div>
                     <div
-                        v-if="study['sample'].molecules.length > 0"
+                        v-if="study.data.sample.molecules.length > 0"
                         class="mt-3"
                     >
                         <label>Molecular Composition</label>
-                        <div class="grid grid-cols-2 gap-2 mt-2">
+                        <div class="grid md:grid-cols-2 gap-2 mt-2">
                             <div class="pr-2">
                                 <div
-                                    v-if="study.sample.molecules.length > 0"
+                                    v-if="
+                                        study.data.sample.molecules.length > 0
+                                    "
                                     class="flow-root"
                                 >
                                     <ul role="list" class="-mb-8">
                                         <li
-                                            v-for="molecule in study.sample
+                                            v-for="molecule in study.data.sample
                                                 .molecules"
                                             :key="molecule.STANDARD_INCHI"
                                         >
@@ -302,13 +308,16 @@
                             @change="loadSpectra"
                         >
                             <option
-                                v-for="dataset in study.datasets.sort((a, b) =>
-                                    a.name > b.name ? 1 : -1
+                                v-for="dataset in study.data.datasets.sort(
+                                    (a, b) => (a.name > b.name ? 1 : -1)
                                 )"
                                 :key="dataset.slug"
                                 :value="dataset"
                             >
                                 {{ dataset.name }}
+                                <span class="text-gray-200"
+                                    >- #{{ dataset.identifier }}</span
+                                >
                             </option>
                         </select>
                     </div>
@@ -324,11 +333,11 @@
                         ></iframe>
                     </div>
                 </div>
-                <div class="grid grid-cols-2">
+                <div class="grid md:grid-cols-2">
                     <div class="p-1 pr-2" v-if="selectedSpectraData">
                         <label
                             for="location"
-                            class="block text-sm font-medium text-gray-700"
+                            class="pr-3 text-md bg-white font-medium text-gray-400"
                             >Info</label
                         >
                         <div
@@ -449,7 +458,7 @@ export default {
                 "/" +
                 this.project.data.slug +
                 "?tab=study&id=" +
-                this.study.slug +
+                this.study.data.slug +
                 "&dsid=" +
                 this.selectedDataset.slug
             );
@@ -519,13 +528,13 @@ export default {
                 );
                 const params = Object.fromEntries(urlSearchParams.entries());
                 let dsId = params["dsid"];
-                this.study.datasets.forEach((ds) => {
+                this.study.data.datasets.forEach((ds) => {
                     if (ds.slug == dsId) {
                         this.selectedDataset = ds;
                     }
                 });
                 if (!this.selectedDataset) {
-                    this.selectedDataset = this.study.datasets[0];
+                    this.selectedDataset = this.study.data.datasets[0];
                 }
             }
             const iframe = window.frames.datasetNMRiumPublicIframe;
@@ -540,7 +549,7 @@ export default {
                                 "/datasets/" +
                                 this.project.data.slug +
                                 "/" +
-                                this.study.slug +
+                                this.study.data.slug +
                                 "/" +
                                 this.selectedDataset.slug,
                         ],

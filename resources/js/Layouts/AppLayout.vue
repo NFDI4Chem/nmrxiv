@@ -98,7 +98,7 @@
         </TransitionRoot>
         <div
             v-if="collapseSidebar"
-            class="hidden bg-white border-r md:flex md:flex-shrink-0 md:inset-y-0 z-10"
+            class="hidden fixed bg-white border-r md:flex md:flex-shrink-0 md:inset-y-0 z-10"
         >
             <div class="flex flex-col w-20">
                 <div class="flex-1 flex flex-col min-h-0 overflow-y-auto">
@@ -224,7 +224,7 @@
         </div>
         <div
             :class="[
-                collapseSidebar ? 'md:pl-20 md:-ml-20' : 'md:pl-64',
+                collapseSidebar ? 'md:pl-40 md:-ml-20' : 'md:pl-64',
                 'flex flex-col flex-1 z-0',
             ]"
         >

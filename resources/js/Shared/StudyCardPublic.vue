@@ -82,6 +82,9 @@
             </span>
         </div>
         <div class="flex-1 border-t bg-white p-3 flex flex-col justify-between">
+            <small v-if="study.identifier" class="text-gray-500"
+                >#{{ study.identifier }}</small
+            >
             <Link
                 :href="
                     route('public.project', {

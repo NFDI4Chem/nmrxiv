@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Traits\CacheClear;
 use Auth;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Scout\Searchable;
@@ -17,6 +18,7 @@ use Storage;
 class Project extends Model implements Auditable
 {
     use CacheClear;
+    use HasDOI;
     use Searchable;
     use Markable;
     use HasFactory;
@@ -82,6 +84,18 @@ class Project extends Model implements Auditable
         } else {
             return Bookmark::has($this, $user);
         }
+    }
+
+    /**
+     * Get the project identifier
+     *
+     * @return \Illuminate\Database\Eloquent\Casts\Attribute
+     */
+    protected function identifier(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? 'NMRXIV:P'.$value : null,
+        );
     }
 
     public function studies()
@@ -233,7 +247,8 @@ class Project extends Model implements Auditable
 
     protected function getPublicUrlAttribute()
     {
-        return env('APP_URL', null).'/projects/'.$this->owner->username.'/'.urlencode($this->slug);
+        // return env('APP_URL', null).'/projects/'.$this->owner->username.'/'.urlencode($this->slug);
+        return env('APP_URL', null).'/P'.$this->getAttributes()['identifier'];
     }
 
     protected function getPrivateUrlAttribute()
