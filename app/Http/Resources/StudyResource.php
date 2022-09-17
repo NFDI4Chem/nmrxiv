@@ -34,6 +34,8 @@ class StudyResource extends JsonResource
             'team' => $this->when(! $this->team->personal_team, $this->team),
             'photo_url' => $this->study_photo_path,
             'tags' => $this->tags,
+            'identifier' => $this->identifier,
+            'doi' => $this->doi,
             'created_at' => $this->created_at,
             'is_public' => $this->is_public,
             'updated_at' => $this->updated_at,

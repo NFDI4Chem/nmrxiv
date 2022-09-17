@@ -234,6 +234,32 @@
                                 </div>
                             </div>
                         </div>
+                        <div
+                            v-if="selectedDataset && selectedDataset.doi"
+                            class="pt-3"
+                        >
+                            <div>
+                                <label
+                                    for="about"
+                                    class="block text-sm font-medium text-gray-700"
+                                >
+                                    DOI
+                                </label>
+                                <div class="p-1 pr-2 grid grid-cols-2">
+                                    <div>
+                                        <loading-button :loading="loading" />
+                                        <input
+                                            v-if="!loading"
+                                            v-model="selectedDataset.doi"
+                                            readonly
+                                            type="text"
+                                            name="study-name"
+                                            class="block w-full shadow-sm sm:text-sm focus:ring-gray-500 focus:border-gray-500 border-gray-300 rounded-md"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="grid grid-cols-2">
                             <div class="p-1 pr-2">
                                 <label
@@ -528,7 +554,6 @@ export default {
         };
 
         if (!this.$page.props.dsEventRegistered) {
-            console.log("registering");
             window.addEventListener("message", saveNMRiumUpdates);
             this.$page.props.dsEventRegistered = true;
         }
@@ -586,12 +611,14 @@ export default {
                                     this.study.datasets[i] = response.data;
                                     this.selectedDataset =
                                         this.study.datasets[i];
-                                    let nmrium_info = JSON.parse(
-                                        this.selectedDataset.nmrium_info
-                                    );
-                                    if (nmrium_info) {
-                                        this.selectedSpectraData =
-                                            nmrium_info["spectra"];
+                                    if (this.selectedDataset.nmrium_info) {
+                                        let nmrium_info = JSON.parse(
+                                            this.selectedDataset.nmrium_info
+                                        );
+                                        if (nmrium_info) {
+                                            this.selectedSpectraData =
+                                                nmrium_info["spectra"];
+                                        }
                                     }
                                 }
                                 i = i + 1;

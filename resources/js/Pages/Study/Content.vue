@@ -27,7 +27,9 @@
                         </select>
                     </div>
                     <div class="hidden md:block">
-                        <div class="border-b border-gray-200 pl-4">
+                        <div
+                            class="border-b border-t rounded-t-md border-gray-200 pl-4"
+                        >
                             <nav
                                 class="-mb-px flex space-x-8"
                                 aria-label="Tabs"
