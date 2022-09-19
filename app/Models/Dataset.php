@@ -34,7 +34,6 @@ class Dataset extends Model implements Auditable
         'draft_id',
         'fs_id',
         'dataset_photo_path',
-        'nmrium_info',
         'license_id',
     ];
 
@@ -47,10 +46,6 @@ class Dataset extends Model implements Auditable
         'public_url',
         'private_url',
         'dataset_photo_url',
-    ];
-
-    protected $hidden = [
-        'nmrium_info',
     ];
 
     /**
@@ -110,6 +105,11 @@ class Dataset extends Model implements Auditable
     public function team()
     {
         return $this->belongsTo(Team::class, 'Team_id');
+    }
+
+    public function nmrium()
+    {
+        return $this->hasOne(NMRium::class);
     }
 
     /**

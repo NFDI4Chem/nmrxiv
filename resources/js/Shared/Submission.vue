@@ -365,7 +365,7 @@
                                                             v-for="ds in study.datasets"
                                                             :key="ds.id"
                                                             :class="[
-                                                                ds.nmrium_info
+                                                                ds.has_nmrium
                                                                     ? 'bg-green-100 text-gray-800'
                                                                     : 'bg-gray-100 text-gray-800',
                                                                 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium mr-1',
@@ -620,15 +620,6 @@
                                                                         class="block text-sm font-medium text-gray-700"
                                                                         >Select
                                                                         Experiment
-                                                                        <small
-                                                                            ><span
-                                                                                v-if="
-                                                                                    autoSaving
-                                                                                "
-                                                                                class="float-right"
-                                                                                >Saving...</span
-                                                                            ></small
-                                                                        >
                                                                     </label>
                                                                     <select
                                                                         id="tour-step-select-exp"
@@ -637,9 +628,6 @@
                                                                         "
                                                                         name="location"
                                                                         class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm rounded-md"
-                                                                        @change="
-                                                                            loadSpectra
-                                                                        "
                                                                     >
                                                                         <option
                                                                             v-for="dataset in selectedStudy.datasets.sort(
@@ -664,405 +652,25 @@
                                                                             }}
                                                                         </option>
                                                                     </select>
-                                                                    <div
-                                                                        class="text-sm my-2"
-                                                                    >
-                                                                        <button
-                                                                            class="cursort-pointer"
-                                                                            @click.stop="
-                                                                                loadFromURL()
-                                                                            "
-                                                                        >
-                                                                            Reset
-                                                                        </button>
-                                                                    </div>
-                                                                </div>
-                                                                <div
-                                                                    v-if="
-                                                                        spectraError
-                                                                    "
-                                                                >
-                                                                    <div
-                                                                        class="rounded-md bg-red-50 p-4"
-                                                                    >
-                                                                        <div
-                                                                            class="flex"
-                                                                        >
-                                                                            <div
-                                                                                class="flex-shrink-0"
-                                                                            >
-                                                                                <svg
-                                                                                    class="h-5 w-5 text-red-400"
-                                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                                    viewBox="0 0 20 20"
-                                                                                    fill="currentColor"
-                                                                                    aria-hidden="true"
-                                                                                >
-                                                                                    <path
-                                                                                        fill-rule="evenodd"
-                                                                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
-                                                                                        clip-rule="evenodd"
-                                                                                    />
-                                                                                </svg>
-                                                                            </div>
-                                                                            <div
-                                                                                class="ml-3"
-                                                                            >
-                                                                                <h3
-                                                                                    class="text-sm font-medium text-red-800"
-                                                                                >
-                                                                                    There
-                                                                                    were
-                                                                                    errors
-                                                                                    loading
-                                                                                    spectra
-                                                                                </h3>
-                                                                                <div
-                                                                                    class="mt-2 text-sm text-red-700"
-                                                                                >
-                                                                                    <ul
-                                                                                        role="list"
-                                                                                        class="list-disc space-y-1 pl-5"
-                                                                                    >
-                                                                                        <li>
-                                                                                            {{
-                                                                                                spectraError
-                                                                                            }}
-                                                                                        </li>
-                                                                                    </ul>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
                                                                 </div>
                                                                 <div
                                                                     class="my-7"
                                                                 >
-                                                                    <iframe
-                                                                        name="submissionNMRiumIframe"
-                                                                        frameborder="0"
-                                                                        allowfullscreen
-                                                                        class="rounded-md border"
-                                                                        style="
-                                                                            width: 100%;
-                                                                            height: 75vh;
-                                                                            max-height: 600px;
+                                                                    <SpectraEditor
+                                                                        :dataset="
+                                                                            selectedDataset
                                                                         "
-                                                                        :src="
-                                                                            nmriumURL
+                                                                        :project="
+                                                                            project
                                                                         "
-                                                                        @load="
-                                                                            loadSpectra()
+                                                                        :study="
+                                                                            selectedStudy
                                                                         "
-                                                                    ></iframe>
-                                                                </div>
-                                                                <div
-                                                                    v-if="
-                                                                        currentMolecules &&
-                                                                        currentMolecules.length >
-                                                                            0
-                                                                    "
-                                                                >
-                                                                    <ul
-                                                                        role="list"
-                                                                        class="flex gap-x-4 gap-y-8 sm:gap-x-6 xl:gap-x-8"
-                                                                    >
-                                                                        <li
-                                                                            v-for="molecule in currentMolecules"
-                                                                            :key="
-                                                                                molecule.key
-                                                                            "
-                                                                            class="relative"
-                                                                        >
-                                                                            <div
-                                                                                v-if="
-                                                                                    molecule.svg
-                                                                                "
-                                                                                class="group flex justify-center block w-full aspect-w-10 aspect-h-7 rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 focus-within:ring-teal-500 overflow-hidden"
-                                                                            >
-                                                                                <div
-                                                                                    class="p-4 object-cover pointer-events-none group-hover:opacity-75"
-                                                                                    v-html="
-                                                                                        molecule.svg
-                                                                                    "
-                                                                                ></div>
-                                                                            </div>
-                                                                            <div
-                                                                                v-else
-                                                                            >
-                                                                                <div
-                                                                                    class="rounded-md border my-3 flex justify-center items-center"
-                                                                                >
-                                                                                    <span
-                                                                                        v-html="
-                                                                                            loadMol(
-                                                                                                molecule.molfile
-                                                                                            )
-                                                                                        "
-                                                                                    ></span>
-                                                                                </div>
-                                                                            </div>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                                <div
-                                                                    class="grid grid-cols-2"
-                                                                >
-                                                                    <div
-                                                                        v-if="
-                                                                            selectedSpectraData
+                                                                        ref="spectraEditorREF"
+                                                                        @loading="
+                                                                            updateLoadingStatus
                                                                         "
-                                                                        class="p-1 pr-2"
-                                                                    >
-                                                                        <label
-                                                                            id="tour-step-spectra-info"
-                                                                            for="location"
-                                                                            class="block text-sm font-medium text-gray-700"
-                                                                            >Info</label
-                                                                        >
-                                                                        <div
-                                                                            v-if="
-                                                                                selectedSpectraData
-                                                                            "
-                                                                            class="overflow-hidden ring-1 mt-3 ring-black ring-opacity-5 md:rounded-lg"
-                                                                        >
-                                                                            <table
-                                                                                v-for="spectra in selectedSpectraData"
-                                                                                :key="
-                                                                                    spectra.id
-                                                                                "
-                                                                                class="min-w-full border divide-y divide-gray-300"
-                                                                            >
-                                                                                <thead
-                                                                                    class="bg-gray-50"
-                                                                                >
-                                                                                    <tr>
-                                                                                        <th
-                                                                                            scope="col"
-                                                                                            colspan="2"
-                                                                                            class="py-3.5 pl-4 pr-3 text-left text-sm font-bold text-blue-900 sm:pl-6 lg:pl-8"
-                                                                                        >
-                                                                                            Spectra
-                                                                                            ::
-                                                                                            {{
-                                                                                                spectra.id
-                                                                                            }}
-                                                                                        </th>
-                                                                                    </tr>
-                                                                                </thead>
-                                                                                <thead
-                                                                                    class="bg-gray-50"
-                                                                                >
-                                                                                    <tr>
-                                                                                        <th
-                                                                                            scope="col"
-                                                                                            class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 lg:pl-8"
-                                                                                        >
-                                                                                            Field
-                                                                                        </th>
-                                                                                        <th
-                                                                                            scope="col"
-                                                                                            class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                                                                        >
-                                                                                            Value
-                                                                                        </th>
-                                                                                    </tr>
-                                                                                </thead>
-                                                                                <tbody
-                                                                                    class="divide-y divide-gray-200 bg-white"
-                                                                                >
-                                                                                    <tr
-                                                                                        v-for="key in Object.keys(
-                                                                                            spectra.info
-                                                                                        )"
-                                                                                        :key="
-                                                                                            key
-                                                                                        "
-                                                                                    >
-                                                                                        <td
-                                                                                            class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8"
-                                                                                        >
-                                                                                            {{
-                                                                                                key
-                                                                                            }}
-                                                                                        </td>
-                                                                                        <td
-                                                                                            class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"
-                                                                                        >
-                                                                                            {{
-                                                                                                spectra
-                                                                                                    .info[
-                                                                                                    key
-                                                                                                ]
-                                                                                            }}
-                                                                                        </td>
-                                                                                    </tr>
-                                                                                    <tr>
-                                                                                        <td
-                                                                                            class="whitespace-nowrap py-2 pl-2 pr-3 text-sm font-medium text-gray-900 sm:pl-6 bg-gray-100 lg:pl-8"
-                                                                                            colspan="2"
-                                                                                        >
-                                                                                            Meta
-                                                                                        </td>
-                                                                                    </tr>
-                                                                                    <tr
-                                                                                        v-for="key in Object.keys(
-                                                                                            spectra.meta
-                                                                                        )"
-                                                                                        :key="
-                                                                                            key
-                                                                                        "
-                                                                                    >
-                                                                                        <td
-                                                                                            class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8"
-                                                                                        >
-                                                                                            {{
-                                                                                                key
-                                                                                            }}
-                                                                                        </td>
-                                                                                        <td
-                                                                                            class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"
-                                                                                        >
-                                                                                            {{
-                                                                                                spectra
-                                                                                                    .meta[
-                                                                                                    key
-                                                                                                ]
-                                                                                            }}
-                                                                                        </td>
-                                                                                    </tr>
-                                                                                </tbody>
-                                                                            </table>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div
-                                                                        class="p-1 pr-2"
-                                                                    >
-                                                                        <!-- <div
-                                                                            class="px-4 py-5 sm:p-6"
-                                                                        >
-                                                                            <div>
-                                                                                <div
-                                                                                    class="pt-3"
-                                                                                >
-                                                                                    <div>
-                                                                                        <label
-                                                                                            for="about"
-                                                                                            class="block text-sm font-medium text-gray-700"
-                                                                                        >
-                                                                                            Extraction
-                                                                                        </label>
-                                                                                        <div
-                                                                                            class="mt-1"
-                                                                                        >
-                                                                                            <textarea
-                                                                                                id="about"
-                                                                                                readonly
-                                                                                                name="about"
-                                                                                                rows="3"
-                                                                                                class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border border-gray-300 rounded-md"
-                                                                                            ></textarea>
-                                                                                        </div>
-                                                                                        <p
-                                                                                            class="mt-2 text-sm text-gray-500"
-                                                                                        >
-                                                                                            Describe
-                                                                                            your
-                                                                                            extraction
-                                                                                            protocol.
-                                                                                            Protocol
-                                                                                            parameters
-                                                                                            can
-                                                                                            be
-                                                                                            provided
-                                                                                            below.
-                                                                                        </p>
-                                                                                    </div>
-                                                            
-                                                                                </div>
-                                                                                <div
-                                                                                    class="mt-3"
-                                                                                >
-                                                                                    <label
-                                                                                        for="about"
-                                                                                        class="block text-sm font-medium text-gray-700"
-                                                                                    >
-                                                                                        NMR
-                                                                                        Sample
-                                                                                        preparation
-                                                                                    </label>
-                                                                                    <div
-                                                                                        class="mt-1"
-                                                                                    >
-                                                                                        <textarea
-                                                                                            id="about"
-                                                                                            readonly
-                                                                                            name="about"
-                                                                                            rows="3"
-                                                                                            class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border border-gray-300 rounded-md"
-                                                                                        ></textarea>
-                                                                                    </div>
-                                                                                    <p
-                                                                                        class="mt-2 text-sm text-gray-500"
-                                                                                    >
-                                                                                        Describe
-                                                                                        NMR
-                                                                                        sample
-                                                                                        preparation
-                                                                                        protocol
-                                                                                        details.
-                                                                                        Protocol
-                                                                                        parameters
-                                                                                        can
-                                                                                        be
-                                                                                        provided
-                                                                                        below.
-                                                                                    </p>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div
-                                                                                class="mt-3"
-                                                                            >
-                                                                                <div>
-                                                                                    <label
-                                                                                        for="about"
-                                                                                        class="block text-sm font-medium text-gray-700"
-                                                                                    >
-                                                                                        Data
-                                                                                        transformation
-                                                                                    </label>
-                                                                                    <div
-                                                                                        class="mt-1"
-                                                                                    >
-                                                                                        <textarea
-                                                                                            id="about"
-                                                                                            readonly
-                                                                                            name="about"
-                                                                                            rows="3"
-                                                                                            class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border border-gray-300 rounded-md"
-                                                                                        ></textarea>
-                                                                                    </div>
-                                                                                    <p
-                                                                                        class="mt-2 text-sm text-gray-500"
-                                                                                    >
-                                                                                        Describe
-                                                                                        any
-                                                                                        data
-                                                                                        transformation
-                                                                                        protocol
-                                                                                        performed.
-                                                                                        Protocol
-                                                                                        parameters
-                                                                                        can
-                                                                                        be
-                                                                                        provided
-                                                                                        below.
-                                                                                    </p>
-                                                                                </div>
-                                                                                
-                                                                            </div>
-                                                                        </div> -->
-                                                                    </div>
+                                                                    ></SpectraEditor>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -2449,6 +2057,7 @@ import OCL from "openchemlib/full";
 import Datepicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 import SelectRich from "@/Shared/SelectRich.vue";
+import SpectraEditor from "@/Shared/SpectraEditor.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import FileSystemBrowser from "./FileSystemBrowser.vue";
 import {
@@ -2461,7 +2070,6 @@ import {
     PauseIcon,
 } from "@heroicons/vue/solid";
 import { Link } from "@inertiajs/inertia-vue3";
-import { isString } from "@vueuse/core";
 
 export default {
     components: {
@@ -2482,6 +2090,7 @@ export default {
         TrashIcon,
         PlayIcon,
         PauseIcon,
+        SpectraEditor,
     },
     props: [],
     data() {
@@ -2491,7 +2100,6 @@ export default {
             loadingStep: false,
             currentDraft: null,
             errorMessage: null,
-            spectraError: null,
 
             draftForm: this.$inertia.form({
                 _method: "POST",
@@ -2554,16 +2162,12 @@ export default {
             status: null,
 
             selectedStudy: null,
-            selectedStudyIndex: 0,
             studyName: "",
             studyDescription: "",
             studyTags: [],
             studyTag: "",
 
             selectedDataset: null,
-            selectedDSIndex: 0,
-            selectedSpectraData: null,
-            autoSaving: false,
             currentMolecules: [],
 
             smiles: "",
@@ -2621,21 +2225,6 @@ export default {
                 "/datasets/" +
                 this.project.slug
             );
-        },
-
-        nmriumURL() {
-            return this.$page.props.nmriumURL
-                ? String(
-                      this.$page.props.nmriumURL +
-                          "?workspace=embedded&id=" +
-                          Math.random()
-                  )
-                : "http://nmriumdev.nmrxiv.org?workspace=embedded&id=" +
-                      Math.random();
-        },
-
-        url() {
-            return String(this.$page.props.url);
         },
 
         getMax() {
@@ -2754,27 +2343,8 @@ export default {
             }
         },
 
-        loadMol(molFile) {
-            let svgString = null;
-            let mol = OCL.Molecule.fromMolfile(molFile);
-            if (mol.toIsomericSmiles() != "") {
-                svgString = mol.toSVG(300, 300);
-            }
-            return svgString;
-        },
-
         updateLoadingStatus(status) {
             this.loadingStep = status;
-        },
-
-        hasNMRiumInfo(study) {
-            let info = true;
-            study.datasets.forEach((ds) => {
-                if (ds.nmrium_info == null || !ds.nmrium_info) {
-                    info = false;
-                }
-            });
-            return info;
         },
 
         deleteMolecule(mol) {
@@ -2866,15 +2436,6 @@ export default {
                 });
         },
 
-        getSVGString(molecule) {
-            if (molecule.MOL) {
-                let mol = OCL.Molecule.fromMolfile(
-                    "\n  " + molecule.MOL.replaceAll('"', "")
-                );
-                return mol.toSVG(200, 200);
-            }
-        },
-
         saveMolecule() {
             let mol = this.editor.getMolFile();
             axios
@@ -2964,92 +2525,6 @@ export default {
                 });
         },
 
-        loadSpectra() {
-            const iframe = window.frames.submissionNMRiumIframe;
-            this.spectraError = null;
-            this.currentMolecules = [];
-            let url =
-                this.url +
-                "/" +
-                this.$page.props.team.owner.username +
-                "/datasets/" +
-                this.project.slug +
-                "/" +
-                this.selectedStudy.slug +
-                "/" +
-                this.selectedDataset.slug;
-            if (iframe) {
-                let spectra = [];
-                let nmrium_info = null;
-                if (
-                    this.selectedDataset &&
-                    this.selectedDataset.nmrium_info &&
-                    this.selectedDataset.nmrium_info != ""
-                ) {
-                    nmrium_info = JSON.parse(this.selectedDataset.nmrium_info);
-                }
-
-                if (nmrium_info && nmrium_info["spectra"]) {
-                    if (this.isString(nmrium_info["spectra"])) {
-                        spectra = JSON.parse(nmrium_info.spectra);
-                    } else {
-                        spectra = nmrium_info.spectra;
-                    }
-                }
-
-                if (spectra && spectra.length <= 0) {
-                    this.loadFromURL(url);
-                } else {
-                    let mols = [];
-                    if (this.isString(nmrium_info.molecules)) {
-                        mols = JSON.parse(nmrium_info.molecules);
-                    } else {
-                        mols = nmrium_info.molecules;
-                    }
-
-                    if (mols && mols.length > 0) {
-                        this.currentMolecules = mols;
-                        mols.forEach((mol) => {
-                            mol.molfile = "\n" + mol.molfile + "\n";
-                        });
-                    }
-
-                    let data = {
-                        data: {
-                            spectra: spectra,
-                            molecules: mols,
-                        },
-                        type: "nmrium",
-                    };
-                    iframe.postMessage({ type: `nmr-wrapper:load`, data }, "*");
-                    this.selectedSpectraData = spectra;
-                }
-            }
-        },
-
-        loadFromURL(url) {
-            this.selectedDataset.type = null;
-            this.selectedSpectraData = null;
-            const iframe = window.frames.submissionNMRiumIframe;
-            if (!url) {
-                url =
-                    this.url +
-                    "/" +
-                    this.$page.props.team.owner.username +
-                    "/datasets/" +
-                    this.project.slug +
-                    "/" +
-                    this.selectedStudy.slug +
-                    "/" +
-                    this.selectedDataset.slug;
-            }
-            let data = {
-                data: [url],
-                type: "url",
-            };
-            iframe.postMessage({ type: `nmr-wrapper:load`, data }, "*");
-        },
-
         openSelectDraftsView() {
             this.steps.forEach((s) => {
                 s.status = "upcoming";
@@ -3059,12 +2534,10 @@ export default {
 
         selectDataset(dataset) {
             this.selectedDataset = dataset;
-            this.loadSpectra();
         },
 
-        selectStudy(study, index, dsindex) {
+        selectStudy(study, index) {
             this.selectedStudyIndex = index;
-            this.studies[index] = study;
             this.selectedStudy = study;
             this.studyForm.name = this.selectedStudy.name;
             this.studyForm.description = this.selectedStudy.description;
@@ -3075,15 +2548,8 @@ export default {
                 });
             });
             this.studyForm.tags = tags;
-            if (dsindex) {
-                this.selectedDSIndex = dsindex;
-                this.selectDataset(
-                    this.selectedStudy.datasets[this.selectedDSIndex]
-                );
-            } else {
-                this.selectedDSIndex = 0;
-                this.selectDataset(this.selectedStudy.datasets[0]);
-            }
+            this.selectedDSIndex = 0;
+            this.selectDataset(this.selectedStudy.datasets[0]);
         },
 
         createNewDraft() {
@@ -3225,167 +2691,17 @@ export default {
                         this.$refs.fsbRef.annotate();
                     }
                 });
+            } else if (id == 2) {
+                this.$nextTick(function () {
+                    if (this.$refs.spectraEditorREF) {
+                        this.$refs.spectraEditorREF.registerEvents();
+                    }
+                });
             }
         },
 
         toggleOpenCreateDatasetDialog() {
             this.openCreateDatasetDialog = !this.openCreateDatasetDialog;
-            const saveNMRiumUpdates = (e) => {
-                if (
-                    e.origin != "https://nmriumdev.nmrxiv.org" &&
-                    e.origin != "https://nmrium.nmrxiv.org"
-                ) {
-                    return;
-                }
-                if (e.data.type == "nmr-wrapper:error") {
-                    this.spectraError = e.data.data;
-                    return;
-                }
-                if (e.data.type == "nmr-wrapper:action-response") {
-                    let actionType = e.data.data.type;
-                    if (actionType == "exportSpectraViewerAsBlob") {
-                        this.saveStudyPreview(e.data.data.data);
-                    }
-                }
-                if (e.data.type == "nmr-wrapper:data-change") {
-                    let actionType = e.data.data.actionType;
-
-                    if (
-                        this.$page.props.autoimport &&
-                        !this.$page.props.autoimport
-                    ) {
-                        if (
-                            actionType == "" ||
-                            (actionType == "INITIATE" &&
-                                this.selectedDataset &&
-                                this.selectedDataset.type != null)
-                        ) {
-                            console.log("stopping here");
-                            return;
-                        }
-                    }
-
-                    this.selectedSpectraData = e.data.data.spectra;
-                    if (
-                        actionType == "ADD_MOLECULE" ||
-                        actionType == "DELETE_MOLECULE" ||
-                        e.data.data.molecules
-                    ) {
-                        this.currentMolecules = e.data.data.molecules;
-                    }
-
-                    if (this.selectedStudy && this.selectedDataset) {
-                        if (this.selectedDataset.dataset_photo_url == "") {
-                            console.info("Saving spectra preview");
-                            const iframe = window.frames.submissionNMRiumIframe;
-                            if (iframe) {
-                                let data = {
-                                    type: "exportSpectraViewerAsBlob",
-                                };
-                                iframe.postMessage(
-                                    {
-                                        type: `nmr-wrapper:action-request`,
-                                        data,
-                                    },
-                                    "*"
-                                );
-                            }
-                        }
-                        this.updateDataSet();
-                    }
-                }
-            };
-
-            if (this.openCreateDatasetDialog) {
-                if (!this.$props.eventRegistered) {
-                    window.addEventListener("message", saveNMRiumUpdates);
-                    this.$props.eventRegistered = true;
-                }
-            } else {
-                window.removeEventListener("message", saveNMRiumUpdates);
-                this.$props.eventRegistered = false;
-            }
-        },
-
-        saveStudyPreview(data) {
-            if (this.selectedDataset) {
-                const reader = new FileReader();
-                reader.addEventListener("loadend", () => {
-                    let svg = reader.result;
-                    axios.post(
-                        "/dashboard/datasets/" +
-                            this.selectedDataset.id +
-                            "/preview",
-                        {
-                            img: svg,
-                        }
-                    );
-                });
-                reader.readAsText(data.blob);
-            }
-        },
-
-        updateDataSet() {
-            if (this.selectedDataset != null) {
-                this.updateLoadingStatus(true);
-                axios
-                    .post(
-                        "/dashboard/datasets/" +
-                            this.selectedDataset.id +
-                            "/nmriumInfo",
-                        {
-                            spectra: this.selectedSpectraData,
-                            molecules: this.currentMolecules,
-                        }
-                    )
-                    .catch((err) => {
-                        this.updateLoadingStatus(false);
-                        this.autoSaving = false;
-                    })
-                    .then((response) => {
-                        this.updateLoadingStatus(false);
-                        this.autoSaving = false;
-                        this.selectedDataset.nmrium_info =
-                            response.data.nmrium_info;
-
-                        if (
-                            this.$page.props.autoimport &&
-                            this.$page.props.autoimport == true
-                        ) {
-                            if (
-                                this.selectedDSIndex + 1 <
-                                this.studies[this.selectedStudyIndex].datasets
-                                    .length
-                            ) {
-                                setTimeout(() => {
-                                    this.selectStudy(
-                                        this.studies[this.selectedStudyIndex],
-                                        this.selectedStudyIndex,
-                                        this.selectedDSIndex + 1
-                                    );
-                                }, 2000);
-                            } else {
-                                if (
-                                    this.selectedStudyIndex + 1 <=
-                                    this.studies.length - 1
-                                ) {
-                                    setTimeout(() => {
-                                        this.selectedDSIndex = -1;
-                                        this.selectStudy(
-                                            this.studies[
-                                                this.selectedStudyIndex + 1
-                                            ],
-                                            this.selectedStudyIndex + 1,
-                                            0
-                                        );
-                                    }, 2000);
-                                } else {
-                                    this.$page.props.autoimport = false;
-                                }
-                            }
-                        }
-                    });
-            }
         },
 
         toggleAutoImport() {

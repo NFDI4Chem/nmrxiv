@@ -4,7 +4,6 @@ use App\Http\Controllers\Admin\AnnouncementController;
 use App\Http\Controllers\Admin\ConsoleController;
 use App\Http\Controllers\Admin\LicenseController;
 use App\Http\Controllers\Admin\UsersController;
-use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\Auth\SocialController;
 use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\CitationController;
@@ -47,40 +46,6 @@ Route::get('/', function () {
 })->name('welcome');
 
 Route::supportBubble();
-
-Route::get('{id}', [ApplicationController::class, 'resolveIdentifier'])->where('id', '(P|S|D|M|p|s|d|m)[0-9]+');
-
-Route::get('{username}/download/{project}/{key?}', [DownloadController::class, 'downloadFromProject'])
-    ->name('download');
-
-Route::get('{username}/datasets/{project}/{study?}/{dataset?}', [DownloadController::class, 'downloadSet'])
-    ->name('download.set');
-
-// Route::get('{username}/download/{project}/{study}/{filename}', [DownloadController::class, 'download'])
-//     ->name('dataset.download');
-
-Route::get('{code}/studies/{study}/file/{filename}', [StudyController::class, 'file'])
-    ->name('study.file');
-
-Route::get('projects/{project}/toggleUpVote', [ProjectController::class, 'toggleUpVote'])
-    ->name('project.toggle-upvote');
-
-Route::get('projects/{project}/toggleStarred', [ProjectController::class, 'toggleStarred'])
-    ->name('project.toggle-starred');
-
-Route::get('projects/{project}/studies', [ProjectController::class, 'publicStudies'])
-    ->name('project.studies');
-
-Route::get('projects/{owner}/{slug}', [ProjectController::class, 'publicProjectView'])
-    ->name('public.project');
-
-Route::get('projects', [ProjectController::class, 'publicProjectsView'])
-    ->name('public.projects');
-
-Route::get('datasets/{owner}/{slug}', [DatasetController::class, 'publicDatasetView'])
-    ->name('public.dataset');
-Route::get('datasets', [DatasetController::class, 'publicDatasetsView'])
-    ->name('public.datasets');
 
 Route::group(['middleware' => ['auth', 'verified']], function () {
     // License
@@ -191,6 +156,10 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
         Route::delete('/study-invitations/{invitation}', [StudyInvitationController::class, 'destroyInvitation'])
             ->name('study-invitations.destroy');
 
+        Route::get('datasets/{dataset}/nmriumVersions', [DatasetController::class, 'nmriumVersions'])
+            ->name('dashboard.datasets.nmriumVersions');
+        Route::get('datasets/{dataset}/nmriumInfo', [DatasetController::class, 'fetchNMRium'])
+            ->name('dashboard.datasets.nmrium');
         Route::post('datasets/{dataset}/nmriumInfo', [DatasetController::class, 'nmriumInfo'])
             ->name('dashboard.datasets.nmriumInfo');
         Route::post('datasets/{dataset}/preview', [DatasetController::class, 'preview'])
@@ -260,3 +229,35 @@ Route::group([
         });
     });
 });
+
+Route::get('{username}/download/{project}/{key?}', [DownloadController::class, 'downloadFromProject'])
+    ->name('download');
+
+Route::get('{username}/datasets/{project}/{study?}/{dataset?}', [DownloadController::class, 'downloadSet'])
+    ->name('download.set');
+
+Route::get('{username}/download/{project}/{study}/{filename}', [DownloadController::class, 'download'])
+    ->name('dataset.download');
+
+Route::get('{code}/studies/{study}/file/{filename}', [StudyController::class, 'file'])
+    ->name('study.file');
+
+Route::get('projects/{project}/toggleUpVote', [ProjectController::class, 'toggleUpVote'])
+    ->name('project.toggle-upvote');
+
+Route::get('projects/{project}/toggleStarred', [ProjectController::class, 'toggleStarred'])
+    ->name('project.toggle-starred');
+
+Route::get('projects/{project}/studies', [ProjectController::class, 'publicStudies'])
+    ->name('project.studies');
+
+Route::get('projects/{owner}/{slug}', [ProjectController::class, 'publicProjectView'])
+    ->name('public.project');
+
+Route::get('projects', [ProjectController::class, 'publicProjectsView'])
+    ->name('public.projects');
+
+Route::get('datasets/{owner}/{slug}', [DatasetController::class, 'publicDatasetView'])
+    ->name('public.dataset');
+Route::get('datasets', [DatasetController::class, 'publicDatasetsView'])
+    ->name('public.datasets');
