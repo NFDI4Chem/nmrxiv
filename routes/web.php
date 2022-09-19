@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AnnouncementController;
+use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\Admin\ConsoleController;
 use App\Http\Controllers\Admin\LicenseController;
 use App\Http\Controllers\Admin\UsersController;
@@ -229,6 +230,9 @@ Route::group([
         });
     });
 });
+
+Route::get('{id}', [ApplicationController::class, 'resolveIdentifier'])->where('id', '(P|S|D|M|p|s|d|m)[0-9]+');
+
 
 Route::get('{username}/download/{project}/{key?}', [DownloadController::class, 'downloadFromProject'])
     ->name('download');

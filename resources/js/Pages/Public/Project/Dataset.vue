@@ -300,104 +300,11 @@
                         {{ dataset.data.name }}
                     </h1>
                     <div class="my-7">
-                        <iframe
-                            name="datasetNMRiumPublicIframe"
-                            frameborder="0"
-                            allowfullscreen
-                            class="rounded-md border"
-                            style="width: 100%; height: 75vh; max-height: 600px"
-                            :src="nmriumURL"
-                            @load="loadSpectra()"
-                        ></iframe>
-                    </div>
-                </div>
-                <div class="grid md:grid-cols-2">
-                    <div class="p-1 pr-2" v-if="selectedSpectraData">
-                        <label
-                            for="location"
-                            class="pr-3 text-md bg-white font-medium text-gray-400"
-                            >Info</label
-                        >
-                        <div
-                            class="overflow-hidden ring-1 mt-3 ring-black ring-opacity-5 md:rounded-lg"
-                        >
-                            <table
-                                v-for="spectra in selectedSpectraData"
-                                :key="spectra.id"
-                                class="min-w-full border divide-y divide-gray-300"
-                            >
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th
-                                            scope="col"
-                                            colspan="2"
-                                            class="py-3.5 pl-4 pr-3 text-left text-sm font-bold text-blue-900 sm:pl-6 lg:pl-8"
-                                        >
-                                            Spectra ::
-                                            {{ spectra.id }}
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th
-                                            scope="col"
-                                            class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 lg:pl-8"
-                                        >
-                                            Field
-                                        </th>
-                                        <th
-                                            scope="col"
-                                            class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                        >
-                                            Value
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody
-                                    class="divide-y divide-gray-200 bg-white"
-                                >
-                                    <tr
-                                        v-for="key in Object.keys(spectra.info)"
-                                        :key="key"
-                                    >
-                                        <td
-                                            class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8"
-                                        >
-                                            {{ key }}
-                                        </td>
-                                        <td
-                                            class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"
-                                        >
-                                            {{ spectra.info[key] }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td
-                                            class="whitespace-nowrap py-2 pl-2 pr-3 text-sm font-medium text-gray-900 sm:pl-6 bg-gray-100 lg:pl-8"
-                                            colspan="2"
-                                        >
-                                            Meta
-                                        </td>
-                                    </tr>
-                                    <tr
-                                        v-for="key in Object.keys(spectra.meta)"
-                                        :key="key"
-                                    >
-                                        <td
-                                            class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8"
-                                        >
-                                            {{ key }}
-                                        </td>
-                                        <td
-                                            class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"
-                                        >
-                                            {{ spectra.meta[key] }}
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                        <SpectraViewer
+                            :dataset="dataset.data"
+                            :project="project.data"
+                            :study="study.data"
+                        ></SpectraViewer>
                     </div>
                 </div>
             </div>
@@ -409,6 +316,7 @@
 import ProjectLayout from "@/Pages/Public/Project/Layout.vue";
 import { ShareIcon, ClipboardCopyIcon } from "@heroicons/vue/solid";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
+import SpectraViewer from "@/Shared/SpectraViewer.vue";
 
 export default {
     components: {
@@ -419,6 +327,7 @@ export default {
         MenuButton,
         MenuItem,
         MenuItems,
+        SpectraViewer,
     },
     props: ["project", "tab", "study", "dataset"],
     data() {
@@ -440,114 +349,11 @@ export default {
                 this.dataset.data.slug
             );
         },
-        nmriumURL() {
-            return this.$page.props.nmriumURL
-                ? String(
-                      this.$page.props.nmriumURL +
-                          "?workspace=embedded&id=" +
-                          Math.random()
-                  )
-                : "http://nmriumdev.nmrxiv.org?workspace=embedded&id=" +
-                      Math.random();
-        },
         url() {
             return String(this.$page.props.url);
         },
     },
-    mounted() {
-        const saveNMRiumUpdates = (e) => {
-            if (
-                e.origin != "https://nmriumdev.nmrxiv.org" &&
-                e.origin != "https://nmrium.nmrxiv.org"
-            ) {
-                return;
-            }
-            if (e.data.type == "nmr-wrapper:error") {
-                this.spectraError = e.data.data;
-                return;
-            }
-            if (e.data.type == "nmr-wrapper:data-change") {
-                let actionType = e.data.data.actionType;
-                if (actionType == "" || actionType == "INITIATE") {
-                    if (
-                        this.selectedSpectraData == null ||
-                        (this.selectedSpectraData &&
-                            this.selectedSpectraData.length == 0)
-                    ) {
-                        this.selectedSpectraData = e.data.data.spectra;
-                    }
-                    return;
-                }
-            }
-        };
-
-        if (!this.$page.props.dsEventRegistered) {
-            window.addEventListener("message", saveNMRiumUpdates);
-            this.$page.props.dsEventRegistered = true;
-        }
-    },
-    methods: {
-        getSVGString(molecule) {
-            if (molecule.MOL) {
-                let mol = OCL.Molecule.fromMolfile(
-                    "\n  " + molecule.MOL.replaceAll('"', "")
-                );
-                return mol.toSVG(200, 200);
-            } else {
-                console.log(molecule);
-            }
-        },
-        loadSpectra() {
-            this.selectedSpectraData = null;
-            if (this.dataset == null) {
-                this.dataset = this.dataset;
-            }
-            const iframe = window.frames.datasetNMRiumPublicIframe;
-            this.currentMolecules = [];
-            if (iframe) {
-                if (!this.dataset.data.nmrium_info) {
-                    let data = {
-                        data: [
-                            this.url +
-                                "/" +
-                                this.project.data.owner.username +
-                                "/datasets/" +
-                                this.project.data.slug +
-                                "/" +
-                                this.study.data.slug +
-                                "/" +
-                                this.dataset.data.slug,
-                        ],
-                        type: "url",
-                    };
-                    iframe.postMessage({ type: `nmr-wrapper:load`, data }, "*");
-                } else {
-                    let nmrium_info = this.parseJSON(
-                        this.dataset.data.nmrium_info
-                    );
-                    let mols = [];
-                    if (nmrium_info.molecules) {
-                        let mols = this.parseJSON(nmrium_info.molecules);
-                        if (mols) {
-                            this.currentMolecules = mols;
-                            mols.forEach((mol) => {
-                                mol.molfile = "\n" + mol.molfile + "\n";
-                            });
-                        }
-                    }
-                    let spectra = nmrium_info.spectra;
-                    this.selectedSpectraData = spectra;
-                    let data = {
-                        data: {
-                            spectra: spectra,
-                            molecules: mols,
-                        },
-                        type: "nmrium",
-                    };
-                    iframe.postMessage({ type: `nmr-wrapper:load`, data }, "*");
-                }
-            }
-        },
-    },
+    mounted() {},
+    methods: {},
 };
 </script>
