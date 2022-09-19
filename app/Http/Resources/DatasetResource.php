@@ -39,6 +39,7 @@ class DatasetResource extends JsonResource
             'owner' => new UserResource($this->owner),
             'dataset_photo_url' => $this->dataset_photo_url,
             'is_public' => $this->is_public,
+            'has_nmrium' => $this->has_nmrium,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
