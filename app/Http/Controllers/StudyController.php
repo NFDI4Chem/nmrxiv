@@ -153,6 +153,7 @@ class StudyController extends Controller
 
         $project = $study->project;
         $team = $project->nonPersonalTeam;
+        $studyFSObject =  $study->fsObject;
 
         return Inertia::render('Study/Files', [
             'study' => $study->load('users', 'owner', 'studyInvitations'),
@@ -171,6 +172,7 @@ class StudyController extends Controller
                     ->where([
                         ['project_id', $study->project->id],
                         ['study_id', $study->id],
+                        ['level', $studyFSObject->level]
                     ])
                     ->orderBy('type')
                     ->get(),
