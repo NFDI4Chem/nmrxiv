@@ -340,11 +340,7 @@ export default {
                     if (this.dataset && this.dataset.has_nmrium) {
                         this.infoLog("Loading Spectra from NMRium JSON..");
                         axios
-                            .get(
-                                "/dashboard/datasets/" +
-                                    this.dataset.id +
-                                    "/nmriumInfo"
-                            )
+                            .get("/datasets/" + this.dataset.id + "/nmriumInfo")
                             .then((response) => {
                                 this.updateLoadingStatus(false);
                                 nmrium_info = JSON.parse(
