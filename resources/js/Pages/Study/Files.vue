@@ -307,7 +307,7 @@ import {
     DocumentTextIcon,
     ChevronRightIcon,
     HomeIcon,
-} from "@heroicons/vue/solid";
+} from "@heroicons/vue/24/solid";
 import { Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/vue";
 export default {
     components: {

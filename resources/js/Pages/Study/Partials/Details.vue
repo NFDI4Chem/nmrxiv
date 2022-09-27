@@ -47,7 +47,7 @@
                                                     <span class="sr-only"
                                                         >Close panel</span
                                                     >
-                                                    <XIcon
+                                                    <XMarkIcon
                                                         class="h-6 w-6"
                                                         aria-hidden="true"
                                                     />
@@ -446,7 +446,7 @@
                                                             "
                                                         >
                                                             <span
-                                                                ><ClipboardCopyIcon
+                                                                ><ClipboardDocumentIcon
                                                                     class="h-5 w-5"
                                                                     aria-hidden="true"
                                                             /></span>
@@ -490,7 +490,7 @@
                                                                 "
                                                             >
                                                                 <span
-                                                                    ><ClipboardCopyIcon
+                                                                    ><ClipboardDocumentIcon
                                                                         class="h-5 w-5"
                                                                         aria-hidden="true"
                                                                 /></span>
@@ -554,7 +554,7 @@
                                                                     "
                                                                 >
                                                                     <span
-                                                                        ><ClipboardCopyIcon
+                                                                        ><ClipboardDocumentIcon
                                                                             class="h-5 w-5"
                                                                             aria-hidden="true"
                                                                     /></span>
@@ -778,13 +778,13 @@ import {
     TransitionChild,
     TransitionRoot,
 } from "@headlessui/vue";
-import { XIcon } from "@heroicons/vue/outline";
+import { XMarkIcon } from "@heroicons/vue/24/outline";
 import {
     LinkIcon,
-    PlusSmIcon,
+    PlusSmallIcon,
     QuestionMarkCircleIcon,
     ExclamationCircleIcon,
-} from "@heroicons/vue/solid";
+} from "@heroicons/vue/24/solid";
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import StudyActivity from "@/Pages/Study/Partials/Activity.vue";
@@ -792,10 +792,10 @@ import { ColorPicker } from "vue3-colorpicker";
 import "vue3-colorpicker/style.css";
 import { Switch, SwitchGroup, SwitchLabel } from "@headlessui/vue";
 import {
-    ClipboardCopyIcon,
+    ClipboardDocumentIcon,
     CheckIcon,
     ChevronDownIcon,
-} from "@heroicons/vue/solid";
+} from "@heroicons/vue/24/solid";
 import {
     Listbox,
     ListboxButton,
@@ -854,15 +854,15 @@ export default {
         TabPanel,
         TabPanels,
         LinkIcon,
-        PlusSmIcon,
+        PlusSmallIcon,
         QuestionMarkCircleIcon,
         ExclamationCircleIcon,
-        XIcon,
+        XMarkIcon,
         ColorPicker,
         Switch,
         SwitchGroup,
         SwitchLabel,
-        ClipboardCopyIcon,
+        ClipboardDocumentIcon,
         CheckIcon,
         ChevronDownIcon,
         SelectRich,

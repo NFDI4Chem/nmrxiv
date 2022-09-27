@@ -111,7 +111,7 @@
                                 ]"
                             >
                                 <span class="sr-only">List</span>
-                                <ViewListIcon
+                                <QueueListIcon
                                     class="h-5 w-5"
                                     aria-hidden="true"
                                 />
@@ -127,7 +127,7 @@
                                 ]"
                             >
                                 <span class="sr-only">Grid</span>
-                                <ViewGridIcon
+                                <Squares2X2Icon
                                     class="h-5 w-5"
                                     aria-hidden="true"
                                 />
@@ -203,12 +203,12 @@ import {
     TransitionRoot,
 } from "@headlessui/vue";
 import throttle from "lodash/throttle";
-import { XIcon } from "@heroicons/vue/outline";
+import { XMarkIcon } from "@heroicons/vue/24/outline";
 import {
     ChevronDownIcon,
-    ViewListIcon,
-    ViewGridIcon,
-} from "@heroicons/vue/solid";
+    QueueListIcon,
+    Squares2X2Icon,
+} from "@heroicons/vue/24/solid";
 import { Link } from "@inertiajs/inertia-vue3";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import ProjectCard from "@/Shared/ProjectCard.vue";
@@ -234,13 +234,13 @@ export default {
         PopoverPanel,
         TransitionChild,
         TransitionRoot,
-        XIcon,
+        XMarkIcon,
         ChevronDownIcon,
-        ViewListIcon,
+        QueueListIcon,
         Link,
         ProjectSearch,
         Pagination,
-        ViewGridIcon,
+        Squares2X2Icon,
     },
     props: {
         projects: {

@@ -112,7 +112,7 @@
                                 ]"
                             >
                                 <span class="sr-only">List</span>
-                                <ViewListIcon
+                                <QueueListIcon
                                     class="h-5 w-5"
                                     aria-hidden="true"
                                 />
@@ -128,7 +128,7 @@
                                 ]"
                             >
                                 <span class="sr-only">Grid</span>
-                                <ViewGridIcon
+                                <Squares2X2Icon
                                     class="h-5 w-5"
                                     aria-hidden="true"
                                 />
@@ -206,12 +206,12 @@ import {
     TransitionChild,
     TransitionRoot,
 } from "@headlessui/vue";
-import { XIcon } from "@heroicons/vue/outline";
+import { XMarkIcon } from "@heroicons/vue/24/outline";
 import {
     ChevronDownIcon,
-    ViewListIcon,
-    ViewGridIcon,
-} from "@heroicons/vue/solid";
+    QueueListIcon,
+    Squares2X2Icon,
+} from "@heroicons/vue/24/solid";
 
 export default {
     components: {
@@ -234,10 +234,10 @@ export default {
         PopoverPanel,
         TransitionChild,
         TransitionRoot,
-        XIcon,
+        XMarkIcon,
         ChevronDownIcon,
-        ViewListIcon,
-        ViewGridIcon,
+        QueueListIcon,
+        Squares2X2Icon,
         DatasetCard,
     },
     props: {

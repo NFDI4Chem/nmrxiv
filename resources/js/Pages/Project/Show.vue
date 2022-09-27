@@ -631,11 +631,12 @@ import { Inertia } from "@inertiajs/inertia";
 import StudyIndex from "@/Pages/Study/Index.vue";
 import ProjectDetails from "./Partials/Details.vue";
 import { ref } from "vue";
-import { StarIcon, PencilIcon, CalendarIcon } from "@heroicons/vue/solid";
+import { StarIcon, PencilIcon, CalendarIcon } from "@heroicons/vue/24/solid";
 import AddAuthor from "@/Shared/AddAuthor.vue";
 import ToolTip from "@/Shared/ToolTip.vue";
 import AddCitation from "@/Shared/AddCitation.vue";
 import Citation from "@/Shared/Citation.vue";
+import Publish from "@/Shared/Publish.vue";
 
 export default {
     components: {

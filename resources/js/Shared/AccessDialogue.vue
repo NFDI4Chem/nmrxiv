@@ -715,7 +715,7 @@
 
 <script>
 import { computed, ref } from "vue";
-import { UsersIcon } from "@heroicons/vue/outline";
+import { UsersIcon } from "@heroicons/vue/24/outline";
 import JetActionMessage from "@/Jetstream/ActionMessage.vue";
 import JetActionSection from "@/Jetstream/ActionSection.vue";
 import JetButton from "@/Jetstream/Button.vue";
@@ -740,7 +740,7 @@ import {
     TransitionRoot,
 } from "@headlessui/vue";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
-import { ChevronDownIcon } from "@heroicons/vue/solid";
+import { ChevronDownIcon } from "@heroicons/vue/24/solid";
 
 export default {
     components: {
