@@ -8,7 +8,7 @@ trait HasDOI
     {
         $identifier = $this->getIdentifier($this, 'identifier');
 
-        if ($this->doi == null && $identifier != null && $this->is_public == true) {
+        if ($this->doi == null) {
             $authors = [];
             $users = [];
             $suffix = null;

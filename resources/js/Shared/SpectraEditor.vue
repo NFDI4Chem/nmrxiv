@@ -11,12 +11,15 @@
                     <a
                         @click="showVersions"
                         class="cursor-pointer mr-3 border px-2 py-1 rounded-md"
-                        >Version History</a
+                        >Edit History</a
                     >
+
                     <a
                         @click="exportPreview()"
                         class="cursor-pointer border px-2 py-1 rounded-md"
-                        >Update Preview</a
+                    >
+                        <ArrowPathIcon class="w-4 h-4 inline" />
+                        Preview</a
                     >
                 </small>
             </div>
@@ -184,7 +187,12 @@
                 </div>
             </div>
             <div v-if="selectedSpectraData" class="p-1 pr-2">
-                <span v-if="selectedSpectraData[0]['peaks']">
+                <span
+                    v-if="
+                        selectedSpectraData[0]['peaks'] &&
+                        selectedSpectraData[0]['peaks']['values'].length > 0
+                    "
+                >
                     <label
                         id="tour-step-spectra-info"
                         for="location"
@@ -247,7 +255,12 @@
                     </div>
                 </span>
                 <div>&nbsp;</div>
-                <span v-if="selectedSpectraData[0]['ranges']">
+                <span
+                    v-if="
+                        selectedSpectraData[0]['ranges'] &&
+                        selectedSpectraData[0]['ranges']['values'].length > 0
+                    "
+                >
                     <label
                         id="tour-step-spectra-info"
                         for="location"
@@ -300,11 +313,20 @@
                 </span>
             </div>
         </div>
+        <Versions ref="versionsElement" :dataset="dataset" />
     </div>
 </template>
 
 <script>
+import Versions from "./Versions.vue";
+import { ArrowPathIcon } from "@heroicons/vue/24/outline";
+import { ref } from "vue";
+
 export default {
+    components: {
+        Versions,
+        ArrowPathIcon,
+    },
     props: {
         dataset: Object,
         project: Object,
@@ -317,6 +339,12 @@ export default {
                 this.loadSpectra();
             },
         },
+    },
+    setup() {
+        const versionsElement = ref(null);
+        return {
+            versionsElement,
+        };
     },
     data() {
         return {
@@ -364,7 +392,7 @@ export default {
                 }
                 if (e.data.type == "nmr-wrapper:data-change") {
                     let actionType = e.data.data.actionType;
-                    console.log(actionType);
+                    // console.log(actionType);
                     if (
                         actionType == "" ||
                         (actionType == "INITIATE" &&
@@ -394,11 +422,11 @@ export default {
                 }
             };
             if (!this.$props.eventRegistered) {
-                console.log("registering");
+                // console.log("registering");
                 window.addEventListener("message", saveNMRiumUpdates);
                 this.$props.eventRegistered = true;
             } else {
-                console.log("unregistering");
+                // console.log("unregistering");
                 window.removeEventListener("message", saveNMRiumUpdates);
                 this.$props.eventRegistered = false;
             }
@@ -409,10 +437,11 @@ export default {
             this.spectraError = null;
             this.currentMolecules = [];
             this.updateLoadingStatus(true);
+            let username = this.$page.props.team ? this.$page.props.team.owner.username : this.project.owner.username;
             let url =
                 this.url +
                 "/" +
-                this.$page.props.team.owner.username +
+                username +
                 "/datasets/" +
                 this.project.slug +
                 "/" +
@@ -500,7 +529,7 @@ export default {
             iframe.postMessage({ type: `nmr-wrapper:load`, data }, "*");
         },
         updateDataSet() {
-            console.log("updating dataset");
+            // console.log("updating dataset");
             if (this.dataset != null) {
                 this.updateLoadingStatus(true);
                 axios
@@ -580,15 +609,6 @@ export default {
                 return mol.toSVG(200, 200);
             }
         },
-        showVersions() {
-            axios
-                .get(
-                    "/dashboard/datasets/" + this.dataset.id + "/nmriumVersions"
-                )
-                .then((response) => {
-                    console.log(response.data);
-                });
-        },
         updateLoadingStatus(status) {
             this.$emit("loading", status);
         },
@@ -599,6 +619,9 @@ export default {
                     this.info = "";
                 }, 5000);
             }
+        },
+        showVersions() {
+            this.versionsElement.toggleVersions();
         },
     },
 };

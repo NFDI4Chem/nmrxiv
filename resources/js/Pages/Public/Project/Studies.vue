@@ -39,7 +39,7 @@
                     </div>
                 </div>
                 <div v-if="!loading && studies.data">
-                    <div v-if="studies.data.length <= 0 && editable">
+                    <div v-if="studies.data.length <= 0">
                         <div class="mt-4 px-12 py-8 mx-auto max-w-4xl">
                             <div
                                 class="px-6 py-4 bg-white shadow-md rounded-lg"
@@ -62,34 +62,9 @@
                                     <div
                                         class="ml-3 font-semibold text-sm text-gray-600 uppercase tracking-wider"
                                     >
-                                        No studies that match the search query
+                                        No studies
                                     </div>
                                 </div>
-                                <button
-                                    type="button"
-                                    @click="reset()"
-                                    class="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 mt-6 focus:ring-offset-2 focus:ring-teal-500"
-                                >
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke-width="1.5"
-                                        stroke="currentColor"
-                                        class="mx-auto h-12 w-12 text-gray-400"
-                                    >
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-                                        />
-                                    </svg>
-                                    <span
-                                        class="mt-2 block text-sm font-medium text-gray-900"
-                                    >
-                                        Empty results. <br />Click here to reset
-                                    </span>
-                                </button>
                             </div>
                         </div>
                     </div>

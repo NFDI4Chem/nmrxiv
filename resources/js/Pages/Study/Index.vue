@@ -2,7 +2,7 @@
     <div>
         <div class="flex items-baseline justify-between">
             <div>
-                <h2 class="text-lg">Studies</h2>
+                <h2 class="text-lg mb-3">Studies</h2>
                 <div v-if="!loading" class="flex items-center mr-4 w-full">
                     <div class="flex w-full bg-white shadow rounded-full">
                         <input
@@ -30,16 +30,16 @@
                     </button>
                 </div>
             </div>
-            <!-- <div class="flex-shrink-0 ml-4">
+            <div class="flex-shrink-0 ml-4">
                 <button
-                    v-if="editable"
+                    v-if="editable && project.draft_id !== null"
                     type="button"
                     class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                    @click="openStudyCreateDialog()"
+                    @click="openDatasetCreateDialog()"
                 >
-                    New Study
+                    + New Study
                 </button>
-            </div> -->
+            </div>
         </div>
         <div v-if="!loading && studies.data">
             <div v-if="studies.data.length <= 0 && editable">
@@ -257,6 +257,11 @@ export default {
         }
     },
     methods: {
+        openDatasetCreateDialog() {
+            this.emitter.emit("openDatasetCreateDialog", {
+                draft_id: this.project.draft_id,
+            });
+        },
         fetchStudies(url) {
             axios.get(url).then((response) => {
                 this.loading = false;

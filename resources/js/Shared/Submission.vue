@@ -1232,644 +1232,10 @@
                             </div>
                         </div>
                         <div v-if="currentStep.id == '03'">
-                            <div v-if="project.status == 'complete'">
-                                <div
-                                    class="relative grid grid-cols-1 gap-x-16 max-w-7xl mx-auto lg:grid-cols-2"
-                                >
-                                    <section
-                                        aria-labelledby="summary-heading"
-                                        class="bg-gray-50 pb-10 px-4 sm:px-6 lg:px-0 lg:pb-16 lg:bg-transparent lg:row-start-1 lg:col-start-2"
-                                    >
-                                        <div
-                                            class="p-4 px-6 bg-gray-100 rounded-lg"
-                                        >
-                                            <div
-                                                class="max-w-lg mx-auto lg:max-w-none"
-                                            >
-                                                <h2
-                                                    id="tour-step-summary"
-                                                    class="text-lg font-medium text-gray-900"
-                                                >
-                                                    Summary
-                                                </h2>
-                                            </div>
-                                            <div class="mt-2">
-                                                <h3
-                                                    class="text-sm leading-6 font-medium text-gray-700"
-                                                >
-                                                    Citation
-                                                </h3>
-                                                <p
-                                                    class="mt-1 text-sm text-gray-500"
-                                                >
-                                                    Author, 1., & Author, 2..
-                                                    (2022). FAIR,
-                                                    consensus-driven NMR data
-                                                    repository and computational
-                                                    platform. The ultimate goal
-                                                    is to accelerate broader
-                                                    coordination and data
-                                                    sharing among natural
-                                                    product (NP) researchers by
-                                                    enabling storage,
-                                                    management, sharing and
-                                                    analysis of NMR data.
-                                                </p>
-                                            </div>
-                                            <div class="mt-5 overflow-auto">
-                                                <table
-                                                    class="min-w-full rounded border divide-y divide-gray-300"
-                                                >
-                                                    <thead class="bg-gray-50">
-                                                        <tr>
-                                                            <th
-                                                                scope="col"
-                                                                class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 lg:pl-8"
-                                                            >
-                                                                Study
-                                                            </th>
-                                                            <th
-                                                                scope="col"
-                                                                class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                                            >
-                                                                Datasets
-                                                            </th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody
-                                                        class="divide-y divide-gray-200 bg-white"
-                                                    >
-                                                        <tr
-                                                            v-for="study in project.studies.sort(
-                                                                (a, b) =>
-                                                                    a.name >
-                                                                    b.name
-                                                                        ? 1
-                                                                        : -1
-                                                            )"
-                                                            :key="study.id"
-                                                            :value="study.name"
-                                                        >
-                                                            <td
-                                                                class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8"
-                                                            >
-                                                                {{ study.name }}
-                                                            </td>
-                                                            <td
-                                                                class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"
-                                                            >
-                                                                <div
-                                                                    v-for="dataset in study.datasets.sort(
-                                                                        (
-                                                                            a,
-                                                                            b
-                                                                        ) =>
-                                                                            a.name >
-                                                                            b.name
-                                                                                ? 1
-                                                                                : -1
-                                                                    )"
-                                                                    :key="
-                                                                        dataset.id
-                                                                    "
-                                                                >
-                                                                    <span
-                                                                        class="break-normal"
-                                                                    >
-                                                                        {{
-                                                                            dataset.name
-                                                                        }}
-                                                                    </span>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                            <div class="my-5">
-                                                <h3
-                                                    class="text-sm leading-6 mb-2 font-medium text-gray-700"
-                                                >
-                                                    Quick links
-                                                </h3>
-                                                <div
-                                                    v-if="downloadURL"
-                                                    class="ml-4 flex-shrink-0"
-                                                >
-                                                    <a
-                                                        id="tour-step-download"
-                                                        :href="downloadURL"
-                                                        class="mr-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-                                                    >
-                                                        Download
-                                                    </a>
-                                                </div>
-                                                <!-- <jet-button
-                                                    type="submit"
-                                                    class="mr-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-                                                >
-                                                    MD5 hashmap
-                                                </jet-button>
-                                                <jet-button
-                                                    type="submit"
-                                                    class="mr-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-                                                >
-                                                    Embed
-                                                </jet-button>
-                                                <jet-button
-                                                    type="submit"
-                                                    class="mr-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-                                                >
-                                                    Share
-                                                </jet-button> -->
-                                            </div>
-                                        </div>
-                                    </section>
-                                    <div
-                                        class="pb-36 px-4 sm:px-6 lg:pb-16 lg:px-0 lg:row-start-1 lg:col-start-1"
-                                    >
-                                        <div
-                                            class="max-w-lg mx-auto lg:max-w-none"
-                                        >
-                                            <section>
-                                                <div>
-                                                    <div>
-                                                        <label
-                                                            for="project-name"
-                                                            class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
-                                                        >
-                                                            Project name
-                                                        </label>
-                                                        <div class="mt-1">
-                                                            <input
-                                                                v-model="
-                                                                    project.name
-                                                                "
-                                                                type="text"
-                                                                autocomplete="given-name"
-                                                                class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                                                            />
-                                                        </div>
-                                                        <jet-input-error
-                                                            :message="
-                                                                updateProjectForm
-                                                                    .errors.name
-                                                            "
-                                                            class="mt-2"
-                                                        />
-                                                    </div>
-                                                    <div class="mt-4">
-                                                        <label
-                                                            for="description"
-                                                            class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
-                                                        >
-                                                            Description
-                                                        </label>
-                                                        <div class="mt-1">
-                                                            <textarea
-                                                                v-model="
-                                                                    project.description
-                                                                "
-                                                                placeholder="Describe this project"
-                                                                rows="4"
-                                                                class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border border-gray-300 rounded-md"
-                                                            />
-                                                        </div>
-                                                        <jet-input-error
-                                                            :message="
-                                                                updateProjectForm
-                                                                    .errors
-                                                                    .description
-                                                            "
-                                                            class="mt-2"
-                                                        />
-                                                    </div>
-                                                </div>
-                                            </section>
-
-                                            <section class="mt-5">
-                                                <h2
-                                                    id="tour-step-privacy"
-                                                    class="text-lg font-medium text-gray-900"
-                                                >
-                                                    Share and Release
-                                                </h2>
-                                                <div id="">
-                                                    <fieldset>
-                                                        <legend
-                                                            class="text-sm font-medium text-gray-900"
-                                                        >
-                                                            Privacy
-                                                        </legend>
-                                                        <div
-                                                            class="mt-2 space-y-5"
-                                                        >
-                                                            <div
-                                                                class="relative flex items-start"
-                                                            >
-                                                                <div
-                                                                    class="absolute flex items-center h-5"
-                                                                >
-                                                                    <input
-                                                                        id="privacy-public"
-                                                                        v-model="
-                                                                            updateProjectForm.is_public
-                                                                        "
-                                                                        :checked="
-                                                                            updateProjectForm.is_public ===
-                                                                            true
-                                                                        "
-                                                                        name="privacy"
-                                                                        value="true"
-                                                                        aria-describedby="privacy-public-description"
-                                                                        type="radio"
-                                                                        class="focus:ring-gray-500 h-4 w-4 text-gray-600 border-gray-300"
-                                                                    />
-                                                                </div>
-                                                                <div
-                                                                    class="pl-7 text-sm"
-                                                                >
-                                                                    <label
-                                                                        for="privacy-public"
-                                                                        class="font-medium text-gray-900"
-                                                                    >
-                                                                        Public
-                                                                        access
-                                                                    </label>
-                                                                    <p
-                                                                        id="privacy-public-description"
-                                                                        class="text-gray-500"
-                                                                    >
-                                                                        Everyone
-                                                                        with the
-                                                                        link
-                                                                        will see
-                                                                        this
-                                                                        project.
-                                                                    </p>
-                                                                </div>
-                                                            </div>
-                                                            <div>
-                                                                <div
-                                                                    class="relative flex items-start"
-                                                                >
-                                                                    <div
-                                                                        class="absolute flex items-center h-5"
-                                                                    >
-                                                                        <input
-                                                                            id="privacy-private-to-project"
-                                                                            v-model="
-                                                                                updateProjectForm.is_public
-                                                                            "
-                                                                            :checked="
-                                                                                updateProjectForm.is_public ===
-                                                                                false
-                                                                            "
-                                                                            name="privacy"
-                                                                            value="false"
-                                                                            aria-describedby="privacy-private-to-project-description"
-                                                                            type="radio"
-                                                                            class="focus:ring-gray-500 h-4 w-4 text-gray-600 border-gray-300"
-                                                                        />
-                                                                    </div>
-                                                                    <div
-                                                                        class="pl-7 text-sm"
-                                                                    >
-                                                                        <label
-                                                                            for="privacy-private-to-project"
-                                                                            class="font-medium text-gray-900"
-                                                                        >
-                                                                            Private
-                                                                            to
-                                                                            project
-                                                                            members
-                                                                        </label>
-                                                                        <p
-                                                                            id="privacy-private-to-project-description"
-                                                                            class="text-gray-500"
-                                                                        >
-                                                                            Only
-                                                                            members
-                                                                            of
-                                                                            this
-                                                                            project
-                                                                            would
-                                                                            be
-                                                                            able
-                                                                            to
-                                                                            access.
-                                                                        </p>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </fieldset>
-                                                </div>
-                                                <div
-                                                    v-if="
-                                                        updateProjectForm.is_public ==
-                                                            'false' ||
-                                                        !updateProjectForm.is_public
-                                                    "
-                                                    class="mt-5"
-                                                >
-                                                    <div
-                                                        id="tour-step-release-date"
-                                                    >
-                                                        <label
-                                                            class="block text-sm font-medium text-gray-700, block text-sm font-medium text-gray-700"
-                                                        >
-                                                            Choose Release Date
-                                                        </label>
-                                                        <Datepicker
-                                                            v-model="
-                                                                updateProjectForm.releaseDate
-                                                            "
-                                                        ></Datepicker>
-                                                        <p
-                                                            class="mt-1 text-sm text-gray-500"
-                                                        >
-                                                            Choose release date
-                                                            to auto publish your
-                                                            project to public.
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                                <!-- Share URL -->
-                                                <div class="mt-5">
-                                                    <!-- Public URL -->
-                                                    <div
-                                                        v-if="
-                                                            updateProjectForm.is_public ==
-                                                                'false' ||
-                                                            !updateProjectForm.is_public
-                                                        "
-                                                    >
-                                                        <label
-                                                            for="email"
-                                                            class="block text-sm font-medium text-gray-700"
-                                                            >Private URL</label
-                                                        >
-                                                        <div
-                                                            class="mt-1 flex rounded-md shadow-sm"
-                                                        >
-                                                            <div
-                                                                class="relative flex items-stretch flex-grow focus-within:z-10"
-                                                            >
-                                                                <input
-                                                                    id="projectPrivateURLCopy"
-                                                                    v-model="
-                                                                        project.private_url
-                                                                    "
-                                                                    type="text"
-                                                                    class="rounded-l-md focus:ring-gray-500 focus:border-gray-500 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300"
-                                                                    @focus="
-                                                                        $event.target.select()
-                                                                    "
-                                                                />
-                                                            </div>
-                                                            <button
-                                                                type="button"
-                                                                class="-ml-px relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500"
-                                                                @click="
-                                                                    copyToClipboard(
-                                                                        project.private_url,
-                                                                        'projectPrivateURLCopy'
-                                                                    )
-                                                                "
-                                                            >
-                                                                <span
-                                                                    ><ClipboardCopyIcon
-                                                                        class="h-5 w-5"
-                                                                        aria-hidden="true"
-                                                                /></span>
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                    <!-- Private URL-->
-                                                    <div v-else>
-                                                        <label
-                                                            for="email"
-                                                            class="block text-sm font-medium text-gray-700"
-                                                            >Public URL</label
-                                                        >
-                                                        <div
-                                                            class="mt-1 flex rounded-md shadow-sm"
-                                                        >
-                                                            <div
-                                                                class="relative flex items-stretch flex-grow focus-within:z-10"
-                                                            >
-                                                                <input
-                                                                    id="projectPublicURLCopy"
-                                                                    v-model="
-                                                                        project.public_url
-                                                                    "
-                                                                    type="text"
-                                                                    class="rounded-l-md focus:ring-gray-500 focus:border-gray-500 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300"
-                                                                    @focus="
-                                                                        $event.target.select()
-                                                                    "
-                                                                />
-                                                            </div>
-                                                            <button
-                                                                type="button"
-                                                                class="-ml-px relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500"
-                                                                @click="
-                                                                    copyToClipboard(
-                                                                        project.public_url,
-                                                                        'projectPublicURLCopy'
-                                                                    )
-                                                                "
-                                                            >
-                                                                <span
-                                                                    ><ClipboardCopyIcon
-                                                                        class="h-5 w-5"
-                                                                        aria-hidden="true"
-                                                                /></span>
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                    <div
-                                                        class="mt-6 flex text-sm"
-                                                    >
-                                                        <a
-                                                            target="_blank"
-                                                            href="https://docs.nmrxiv.org/docs/submission-guides/sharing"
-                                                            class="group inline-flex items-center text-gray-500 hover:text-gray-900"
-                                                        >
-                                                            <QuestionMarkCircleIcon
-                                                                class="h-5 w-5 text-gray-400 group-hover:text-gray-500"
-                                                                aria-hidden="true"
-                                                            />
-                                                            <span class="ml-2">
-                                                                Learn more about
-                                                                sharing
-                                                            </span>
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                                <div class="mt-5">
-                                                    <div id="tour-step-license">
-                                                        <select-rich
-                                                            v-model:selected="
-                                                                updateProjectForm.license
-                                                            "
-                                                            label="License"
-                                                            class="mt-0"
-                                                            :items="licenses"
-                                                        />
-                                                        <p
-                                                            class="mt-1 text-sm text-gray-500"
-                                                        >
-                                                            Choosing license is
-                                                            recommended before
-                                                            releasing the
-                                                            project to public.
-                                                        </p>
-                                                    </div>
-                                                    <jet-input-error
-                                                        :message="
-                                                            updateProjectForm
-                                                                .errors.license
-                                                        "
-                                                        class="mt-2"
-                                                    />
-                                                </div>
-                                            </section>
-                                            <div
-                                                class="mt-10 pt-2 border-t border-gray-200 sm:flex sm:items-center sm:justify-between"
-                                                v-if="
-                                                    this.updateProjectForm
-                                                        .is_public == 'true'
-                                                "
-                                            >
-                                                <div class="justify-left">
-                                                    <div class="text-sm">
-                                                        <label
-                                                            for="confirm"
-                                                            class="font-small float-left inline break-normal text-sm text-gray-700"
-                                                        >
-                                                            <input
-                                                                v-model="
-                                                                    this
-                                                                        .confirmPublicAccess
-                                                                "
-                                                                id="confirm"
-                                                                aria-describedby="confirm-description"
-                                                                name="confirm"
-                                                                type="checkbox"
-                                                                class="focus:ring-teal-500 mr-3 h-4 w-4 text-teal-600 border-gray-300 rounded"
-                                                            />
-                                                            I understand, if the
-                                                            project is made
-                                                            public then all the
-                                                            underlying studies
-                                                            and dataset will
-                                                            also be made public.
-                                                        </label>
-                                                        <jet-button
-                                                            id="tour-step-save"
-                                                            class="mt-3"
-                                                            :disabled="
-                                                                !confirmPublicAccess
-                                                            "
-                                                            @click="
-                                                                updateProject
-                                                            "
-                                                        >
-                                                            Save
-                                                        </jet-button>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div
-                                                v-else
-                                                class="mt-10 pt-6 border-t border-gray-200 sm:flex"
-                                            >
-                                                <button
-                                                    id="tour-step-save"
-                                                    class="w-full float-left bg-teal-600 border border-transparent rounded-md shadow-sm py-2 px-4 text-sm font-medium text-white hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-teal-500 sm:order-last sm:w-auto"
-                                                    @click="updateProject"
-                                                >
-                                                    Save
-                                                </button>
-                                                <p
-                                                    class="mt-4 text-center text-sm text-gray-500 sm:mt-0 sm:text-left"
-                                                >
-                                                    <!-- lorem ipsum -->
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div id="tour-step-queue" v-else>
-                                <div class="py-16">
-                                    <div class="text-center">
-                                        <p
-                                            class="text-sm font-semibold text-indigo-600 uppercase tracking-wide"
-                                        >
-                                            {{ project.name }}
-                                        </p>
-                                        <span v-if="project.status == 'queued'">
-                                            <span
-                                                class="m-3 relative inline-flex border-dotted border-2 border-gray-300 rounded-lg"
-                                                ><span
-                                                    class="inline-flex items-center px-4 py-2 font-semibold leading-6 text-sm rounded-md text-sky-500 bg-white dark:bg-slate-800 transition ease-in-out duration-150 cursor-not-allowed dark:ring-slate-200/20"
-                                                    disabled=""
-                                                    ><h1
-                                                        class="capitalize text-4xl font-extrabold text-gray-900 tracking-tight sm:text-5xl"
-                                                    >
-                                                        {{ project.status }}
-                                                    </h1></span
-                                                ></span
-                                            >
-                                        </span>
-                                        <span
-                                            v-if="
-                                                project.status == 'processing'
-                                            "
-                                        >
-                                            <span
-                                                class="m-3 relative inline-flex border-dotted border-2 border-gray-300 rounded-lg"
-                                                ><span
-                                                    class="inline-flex items-center px-4 py-2 font-semibold leading-6 text-sm rounded-md text-sky-500 bg-white dark:bg-slate-800 transition ease-in-out duration-150 cursor-not-allowed dark:ring-slate-200/20"
-                                                    disabled=""
-                                                    ><h1
-                                                        class="capitalize text-4xl font-extrabold text-gray-900 tracking-tight sm:text-5xl"
-                                                    >
-                                                        {{ project.status }}
-                                                    </h1></span
-                                                ><span
-                                                    class="flex absolute h-3 w-3 top-0 right-0 -mt-1 -mr-1"
-                                                    ><span
-                                                        class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"
-                                                    ></span
-                                                    ><span
-                                                        class="relative inline-flex rounded-full h-3 w-3 bg-sky-500"
-                                                    ></span></span
-                                            ></span>
-                                        </span>
-                                        <p class="mt-2 text-base text-gray-500">
-                                            Please allow some time to process
-                                            your submission. You will recieve an
-                                            email once your submission is
-                                            processed.
-                                        </p>
-                                        <!-- <div class="mt-6">
-                                            <a
-                                                class="text-base font-medium text-indigo-600 hover:text-indigo-500"
-                                                >Go back home<span
-                                                    aria-hidden="true"
-                                                >
-                                                    →</span
-                                                ></a
-                                            >
-                                        </div> -->
-                                    </div>
-                                </div>
-                            </div>
+                            <Validation
+                                :project="project"
+                                :validation="validation"
+                            ></Validation>
                         </div>
                     </div>
                 </div>
@@ -1903,7 +1269,7 @@
             >
                 <div class="flex">
                     <div class="flex-shrink-0">
-                        <ExclamationIcon
+                        <ExclamationTriangleIcon
                             class="h-5 w-5 text-red-400"
                             aria-hidden="true"
                         />
@@ -2054,21 +1420,20 @@ import VueTagsInput from "@sipec/vue3-tags-input";
 import { ref } from "vue";
 import slider from "vue3-slider";
 import OCL from "openchemlib/full";
-import Datepicker from "@vuepic/vue-datepicker";
-import "@vuepic/vue-datepicker/dist/main.css";
 import SelectRich from "@/Shared/SelectRich.vue";
 import SpectraEditor from "@/Shared/SpectraEditor.vue";
+import Validation from "@/Shared/Validation.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import FileSystemBrowser from "./FileSystemBrowser.vue";
 import {
     XCircleIcon,
-    ClipboardCopyIcon,
+    ClipboardDocumentIcon,
     QuestionMarkCircleIcon,
-    ExclamationIcon,
+    ExclamationTriangleIcon,
     TrashIcon,
     PlayIcon,
     PauseIcon,
-} from "@heroicons/vue/solid";
+} from "@heroicons/vue/24/solid";
 import { Link } from "@inertiajs/inertia-vue3";
 
 export default {
@@ -2080,17 +1445,17 @@ export default {
         VueTagsInput,
         slider,
         SelectRich,
-        Datepicker,
         XCircleIcon,
         JetInputError,
         FileSystemBrowser,
-        ClipboardCopyIcon,
+        ClipboardDocumentIcon,
         QuestionMarkCircleIcon,
-        ExclamationIcon,
+        ExclamationTriangleIcon,
         TrashIcon,
         PlayIcon,
         PauseIcon,
         SpectraEditor,
+        Validation,
     },
     props: [],
     data() {
@@ -2131,7 +1496,7 @@ export default {
                 },
                 {
                     id: "03",
-                    name: "Complete",
+                    name: "Complete ~ Community Standards",
                     description: "Penatibus eu quis ante.",
                     href: "#",
                     status: "upcoming",
@@ -2505,11 +1870,14 @@ export default {
                 })
                 .then((response) => {
                     this.project = response.data.project;
+                    this.validation = this.parseJSON(
+                        response.data.validation.report
+                    );
                     if (this.project) {
                         this.loadingStep = false;
                         this.loadLicenses();
                         this.selectStep(3);
-                        this.trackProject();
+                        // this.trackProject();
                     }
                 });
         },

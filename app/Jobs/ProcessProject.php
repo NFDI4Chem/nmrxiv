@@ -15,28 +15,31 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
+use App\Actions\Project\AssignIdentifier;
+use App\Actions\Project\PublishProject;
 
-class ProcessDraft implements ShouldQueue, ShouldBeUnique
+
+class ProcessProject implements ShouldQueue, ShouldBeUnique
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $timeout = 0;
 
     /**
-     * The draft instance.
+     * The project instance.
      *
-     * @var \App\Models\Draft
+     * @var \App\Models\Project
      */
-    public $draft;
+    public $project;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct(Draft $draft)
+    public function __construct(Project $project)
     {
-        $this->draft = $draft;
+        $this->project = $project;
     }
 
     /**
@@ -44,10 +47,9 @@ class ProcessDraft implements ShouldQueue, ShouldBeUnique
      *
      * @return void
      */
-    public function handle()
+    public function handle(AssignIdentifier $assigner, PublishProject $publisher)
     {
-        //
-        $project = Project::where('draft_id', $this->draft->id)->first();
+        $project = $this->project;
 
         $project->status = 'processing';
 
@@ -56,46 +58,59 @@ class ProcessDraft implements ShouldQueue, ShouldBeUnique
         $logs = 'Moving files in progress';
 
         if ($project) {
-            $environment = env('APP_ENV', 'local');
+            $draft = $project->draft;
 
-            $projectPath = preg_replace(
-                '~//+~',
-                '/',
-                $environment.'/'.$project->uuid
-            );
+            if($draft){
+                $environment = env('APP_ENV', 'local');
 
-            $projectFSObjects = FileSystemObject::with('children')
-                ->where([
-                    ['draft_id', $this->draft->id],
-                    ['level', 0],
-                ])
-                ->get();
+                $projectPath = preg_replace(
+                    '~//+~',
+                    '/',
+                    $environment.'/'.$project->uuid
+                );
 
-            foreach ($projectFSObjects as $FSObject) {
-                $this->moveFolder($FSObject, $this->draft, $projectPath);
+                $projectFSObjects = FileSystemObject::with('children')
+                    ->where([
+                        ['draft_id', $draft->id],
+                        ['level', 0],
+                    ])
+                    ->get();
+
+                foreach ($projectFSObjects as $FSObject) {
+                    $this->moveFolder($FSObject, $draft, $projectPath);
+                }
+
+                $logs = $logs.'<br/> Moving files complete <br/> Deleteing draft';
+
+                $draft->delete();
             }
 
-            $logs = $logs.'<br/> Moving files complete <br/> Deleteing draft';
-
-            $this->draft->delete();
+            $process_logs = json_decode($project->process_logs, true);
 
             $process_log = [Carbon::now()->timestamp => $logs];
 
-            $process_logs = json_decode($project->process_logs);
-
-            if (! is_null($process_logs)) {
+            if (!is_null($process_logs)) {
                 array_push($process_logs, $process_log);
             } else {
-                $process_logs = $process_log;
+                $process_logs = array();
+                array_push($process_logs, $process_log);
             }
 
-            $project->process_logs = $process_log;
+            $project->process_logs = $process_logs;
 
             $project->draft_id = null;
 
             $project->status = 'complete';
 
             $project->save();
+
+            $assigner->assign($project->fresh());
+
+            $release_date = Carbon::parse($project->release_date);
+
+            if($release_date->isToday()){
+                $publisher->publish($project);
+            }
 
             Notification::send($project->owner, new DraftProcessedNotification($project));
         }

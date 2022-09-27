@@ -93,36 +93,70 @@
                         </div>
                     </div>
                     <div class="p-6">
-                        <div>
-                            <label
-                                for="location"
-                                class="block text-sm font-medium text-gray-700"
-                                >Select Experiment
-                            </label>
-                            <select
-                                id="location"
-                                v-model="selectedDataset"
-                                name="location"
-                                class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm rounded-md"
-                            >
-                                <option
-                                    v-for="dataset in study.datasets.sort(
-                                        (a, b) => (a.name > b.name ? 1 : -1)
-                                    )"
-                                    :key="dataset.slug"
-                                    :value="dataset"
+                        <div
+                            class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6"
+                        >
+                            <div class="sm:col-span-5">
+                                <div>
+                                    <label
+                                        for="location"
+                                        class="block text-sm font-medium text-gray-700"
+                                        >Select Experiment
+                                    </label>
+                                    <select
+                                        id="location"
+                                        v-model="selectedDataset"
+                                        name="location"
+                                        class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm rounded-md"
+                                    >
+                                        <option
+                                            v-for="dataset in study.datasets.sort(
+                                                (a, b) =>
+                                                    a.name > b.name ? 1 : -1
+                                            )"
+                                            :key="dataset.slug"
+                                            :value="dataset"
+                                        >
+                                            {{ dataset.name }} - #{{
+                                                dataset.id
+                                            }}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="sm:col-span-1">
+                                <label
+                                    for="last-name"
+                                    class="block text-sm font-medium text-gray-700"
+                                    >&nbsp;</label
                                 >
-                                    {{ dataset.name }}
-                                </option>
-                            </select>
+                                <button
+                                    v-if="editable"
+                                    type="button"
+                                    class="inline-flex mt-1 items-center px-2.5 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                    @click="openDatasetCreateDialog()"
+                                >
+                                    + New Dataset
+                                </button>
+                            </div>
                         </div>
+
                         <div v-if="selectedDataset" class="my-7">
                             <SpectraEditor
+                                v-if="canUpdateStudy"
                                 :dataset="selectedDataset"
                                 :project="project"
                                 :study="study"
                                 ref="spectraEditorREF"
                             ></SpectraEditor>
+                            <SpectraViewer
+                                v-else
+                                :dataset="selectedDataset"
+                                :project="project"
+                                :study="study"
+                                ref="spectraViewerREF"
+                            ></SpectraViewer>
                         </div>
                         <div class="pt-3">
                             <div>
@@ -194,6 +228,7 @@ export default {
             license: "No license selected",
             loading: false,
             spectraError: null,
+            role: this.studyRole,
         };
     },
     computed: {
@@ -216,16 +251,29 @@ export default {
                 this.selectedDataset.slug
             );
         },
+        canUpdateStudy() {
+            return this.studyPermissions
+                ? this.studyPermissions.canUpdateStudy
+                : false;
+        },
     },
     mounted() {
-        if (this.selectedDataset == null) {
+        const urlSearchParams = new URLSearchParams(window.location.search);
+        const params = Object.fromEntries(urlSearchParams.entries());
+        let dsId = params["dsid"];
+        this.study.datasets.forEach((ds) => {
+            if (ds.id == dsId) {
+                this.selectedDataset = ds;
+            }
+        });
+        if (!this.selectedDataset) {
             this.selectedDataset = this.study.datasets[0];
-            this.$nextTick(function () {
-                if (this.$refs.spectraEditorREF) {
-                    this.$refs.spectraEditorREF.registerEvents();
-                }
-            });
         }
+        this.$nextTick(function () {
+            if (this.$refs.spectraEditorREF) {
+                this.$refs.spectraEditorREF.registerEvents();
+            }
+        });
     },
     beforeMount() {
         if (this.study.license_id) {
@@ -241,6 +289,11 @@ export default {
         }
     },
     methods: {
+        openDatasetCreateDialog() {
+            this.emitter.emit("openDatasetCreateDialog", {
+                draft_id: this.project.draft_id,
+            });
+        },
         updateDataSet() {
             if (this.selectedDataset) {
                 if (this.selectedSpectraData != null) {

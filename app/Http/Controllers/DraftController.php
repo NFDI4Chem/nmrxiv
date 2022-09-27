@@ -9,6 +9,7 @@ use App\Models\FileSystemObject;
 use App\Models\Project;
 use App\Models\Sample;
 use App\Models\Study;
+use App\Models\Validation;
 use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -119,18 +120,14 @@ class DraftController extends Controller
     {
         $project = Project::where('draft_id', $draft->id)->first();
 
-        $project->status = 'queued';
+        $validation = $project->validation;
+        $validation->process();
 
-        $project->save();
-
-        $draft->current_step = 3;
-
-        $draft->save();
-
-        ProcessDraft::dispatch($draft);
+        // ProcessDraft::dispatch($draft);
 
         return response()->json([
             'project' => Project::with(['studies.datasets', 'owner'])->where('draft_id', $draft->id)->first(),
+            'validation' => $validation,
         ]);
     }
 
@@ -180,6 +177,7 @@ class DraftController extends Controller
         }
 
         return DB::transaction(function () use ($draft, $user, $user_id, $team_id, $request, $project) {
+            $nmrXivValidation = null;
             if (! $project) {
                 $project = Project::create([
                     'name' => $draft->name,
@@ -197,10 +195,20 @@ class DraftController extends Controller
                 );
 
                 $project->syncTagsWithType($request->get('tags_array'), 'Project');
+                $project->save();
             } else {
                 $project->name = $draft->name;
                 $project->description = $draft->description;
                 $project->syncTagsWithType($request->get('tags_array'), 'Project');
+                $project->save();
+            }
+
+            if ($project->validation) {
+                $nmrXivValidation = $project->validation;
+            } else {
+                $nmrXivValidation = new Validation();
+                $nmrXivValidation->save();
+                $project->validation()->associate($nmrXivValidation);
                 $project->save();
             }
 
@@ -209,6 +217,13 @@ class DraftController extends Controller
                 if (! $fsObject) {
                     $study->datasets()->delete();
                     $study->delete();
+                }
+
+                foreach ($study->datasets as $dataset) {
+                    $fsObject = $dataset->fsObject;
+                    if (! $fsObject) {
+                        $dataset->delete();
+                    }
                 }
             }
             $project = $project->fresh();
@@ -242,6 +257,9 @@ class DraftController extends Controller
                         'project_id' => $project->id,
                         'fs_id' => $folder->id,
                     ]);
+
+                    $study->validation()->associate($nmrXivValidation);
+                    $study->save();
 
                     $sample = Sample::create([
                         'name' => $study->name.'_sample',
@@ -282,6 +300,9 @@ class DraftController extends Controller
                                 'study_id' => $study->id,
                                 'fs_id' => $sChild->id,
                             ]);
+
+                            $ds->validation()->associate($nmrXivValidation);
+                            $ds->save();
 
                             $sChild->dataset_id = $ds->id;
                             $sChild->save();
@@ -362,7 +383,7 @@ class DraftController extends Controller
             }
 
             return response()->json([
-                'project' => $project,
+                'project' => $project->load(['owner']),
                 'studies' => $studies,
             ]);
         });

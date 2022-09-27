@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\ProcessProject;
 use App\Actions\License\GetLicense;
 use App\Actions\Project\ArchiveProject;
 use App\Actions\Project\CreateNewProject;
@@ -121,7 +122,7 @@ class ProjectController extends Controller
         }
 
         return Inertia::render('Project/Show', [
-            'project' => $project->load('projectInvitations', 'tags', 'authors', 'citations'),
+            'project' => $project->load('projectInvitations', 'tags', 'authors', 'citations', 'owner'),
             'team' => $team ? $team->load(['users', 'owner']) : null,
             'members' => $project->allUsers(),
             'availableRoles' => array_values(Jetstream::$roles),
@@ -211,6 +212,51 @@ class ProjectController extends Controller
         }
 
         return response()->json(['audit' => $project->audits()->with('user')->orderBy('created_at', 'desc')->get()]);
+    }
+
+    public function validation(Request $request, Project $project)
+    {
+        if (! Gate::forUser($request->user())->check('viewProject', $project)) {
+            throw new AuthorizationException;
+        }
+
+        $validation = $project->validation;
+
+        $validation->process();
+
+        // $validation->fresh();
+
+        // dd($validation);
+
+        return Inertia::render('Project/Validation', [
+            'project' => $project->load('projectInvitations', 'tags', 'authors', 'citations'),
+            'validation' => $validation,
+        ]);
+    }
+
+    public function publish(Request $request, Project $project)
+    {
+        if($project){
+            $project->release_date = $request->get('releaseDate');
+            $project->status = 'queued';
+            $project->save();
+
+            $validation = $project->validation;
+            $validation->process();
+            $validation = $validation->fresh();
+
+            if($validation['report']['project']['status']){
+                ProcessProject::dispatch($project);
+                return response()->json([
+                    'project' => $project,
+                    'validation' => $validation,
+                ]);
+            }else{
+                return response()->json([
+                    'errors' => "Validation failing. Please provide all the required data and try again. If the problem persists, please contact us.",
+                ], 422);
+            }
+        }
     }
 
     public function store(Request $request, CreateNewProject $creator)
