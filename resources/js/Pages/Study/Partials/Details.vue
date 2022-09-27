@@ -278,7 +278,7 @@
                                                         Privacy
                                                     </legend>
                                                     <div class="mt-2 space-y-5">
-                                                        <div
+                                                        <!-- <div
                                                             class="relative flex items-start"
                                                         >
                                                             <div
@@ -324,7 +324,7 @@
                                                                     study.
                                                                 </p>
                                                             </div>
-                                                        </div>
+                                                        </div> -->
                                                         <div>
                                                             <div
                                                                 class="relative flex items-start"
@@ -380,11 +380,14 @@
                                                     </div>
                                                 </fieldset>
                                             </div>
-                                            <div class="pt-4 pb-6">
+                                            <div class="pb-6">
                                                 <div
                                                     class="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-1"
                                                 >
                                                     <div>
+                                                        <span class="float-right text-sm">
+                                                            <a target="_blank" href="https://docs.nmrxiv.org/docs/submission-guides/licenses">How to choose the right license?</a>
+                                                        </span>
                                                         <select-rich
                                                             v-model:selected="
                                                                 form.license
@@ -498,9 +501,9 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div v-else>
+                                                <!-- <div v-else>
                                                     <div class="space-y-1">
-                                                        <!-- <div
+                                                        <div
                                                             class="relative flex items-start"
                                                         >
                                                             <div
@@ -525,7 +528,7 @@
                                                                 >
                                                             </div>
                                                         </div> -->
-                                                        <div v-if="linkAccess">
+                                                <!-- <div v-if="linkAccess">
                                                             <div class="flex">
                                                                 <div
                                                                     class="flex-grow"
@@ -691,9 +694,9 @@
                                                                     </div>
                                                                 </Listbox>
                                                             </div>
-                                                        </div>
+                                                        </div> 
                                                     </div>
-                                                </div>
+                                                </div>-->
                                                 <div class="mt-6 flex text-sm">
                                                     <a
                                                         target="_blank"
@@ -710,7 +713,9 @@
                                                         </span>
                                                     </a>
                                                 </div>
-                                                <div class="mt-4 flex text-sm">
+                                                <div
+                                                    class="mt-4 flex text-sm mb-6"
+                                                >
                                                     <a
                                                         class="cursor-pointer group inline-flex items-center text-gray-500 hover:text-gray-900"
                                                         @click="

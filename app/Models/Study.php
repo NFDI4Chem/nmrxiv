@@ -52,7 +52,22 @@ class Study extends Model implements Auditable
         'private_url',
         'study_photo_url',
         'study_preview_urls',
+        'is_published'
     ];
+
+    public function getIsPublishedAttribute()
+    {
+        if($this->is_public){
+            return true;
+        }else{
+            if($this->release_date){
+                return !Carbon::now()->startOfDay()->gte($this->release_date);
+            }else{
+                return $this->project->is_published;
+            }
+        }
+        return false; 
+    }
 
     /**
      * Get the study identifier
@@ -119,6 +134,11 @@ class Study extends Model implements Auditable
     public function fsObject()
     {
         return $this->hasOne(FileSystemObject::class);
+    }
+
+    public function validation()
+    {
+        return $this->belongsTo(Validation::class, 'validation_id');
     }
 
     /**
@@ -215,9 +235,6 @@ class Study extends Model implements Auditable
         return $this->hasOne(Sample::class, 'study_id');
     }
 
-    /**
-     * Get all of the deployments for the project.
-     */
     public function molecules()
     {
         return $this->sample()->molecules();

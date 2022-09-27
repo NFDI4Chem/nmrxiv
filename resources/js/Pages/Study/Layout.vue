@@ -33,7 +33,7 @@
             <div class="bg-white border-b">
                 <div class="px-12">
                     <div class="flex flex-nowrap justify-between py-6">
-                        <div class="lg:flex lg:items-center lg:justify-between">
+                        <div class="lg:flex lg:items-center lg:justify-between w-full">
                             <div class="flex-1 min-w-0">
                                 <nav class="flex" aria-label="Breadcrumb">
                                     <ol
@@ -290,15 +290,27 @@
                                         :studyPermissions="studyPermissions"
                                     />
                                 </div>
-                                <div
-                                    class="mt-4 flex items-center text-xs text-gray-400"
-                                >
-                                    <CalendarIcon
-                                        class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-300"
-                                        aria-hidden="true"
-                                    />
-                                    Updated on
-                                    {{ formatDateTime(study.updated_at) }}
+                                <div class="flex flex-nowrap justify-between pb-3">
+                                    <div
+                                        class="mt-2 flex items-center text-xs text-gray-400"
+                                    >
+                                        <CalendarIcon
+                                            class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-300"
+                                            aria-hidden="true"
+                                        />
+                                        Updated on
+                                        {{ formatDateTime(study.updated_at) }}
+                                    </div>
+                                    <div>
+                                        <span
+                                            v-if="!study.is_public && study.is_published"
+                                            class="ml-4 inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-yellow-100 text-red-800 capitalize"
+                                        >
+                                            PUBLISHED -&emsp;
+                                            <b v-if="study.release_date">Release date: {{ formatDate(study.release_date) }}</b>
+                                            <b v-else>Release date: {{ formatDate(project.release_date) }}</b>
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         </div>

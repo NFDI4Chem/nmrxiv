@@ -137,45 +137,76 @@
                     </div>
                 </div>
             </div>
-            <div class="border-t mt-3 border-gray-100">
-                <h2 class="text-gray-600 text-md mt-4 font-bold">
-                    Results ({{ datasets.meta.total }})
-                </h2>
-            </div>
-            <div v-if="filters.mode == 'grid'">
-                <div
-                    class="mt-4 mx-auto max-w-md grid gap-8 sm:max-w-lg lg:grid-cols-4 lg:max-w-7xl"
-                >
-                    <span v-for="dataset in datasets.data" :key="dataset.id">
-                        <dataset-card
-                            :mode="filters.mode"
-                            :dataset="dataset"
-                        ></dataset-card>
-                    </span>
+
+            <div v-if="datasets.meta.total > 0">
+                <div class="border-t mt-3 border-gray-100">
+                    <h2 class="text-gray-600 text-md mt-4 font-bold">
+                        Results ({{ datasets.meta.total }})
+                    </h2>
                 </div>
-            </div>
-            <div v-if="filters.mode == 'list'">
-                <div class="mt-4 bg-white shadow overflow-hidden sm:rounded-md">
-                    <ul
-                        role="list"
-                        class="divide-y border rounded-md divide-gray-200"
+                <div v-if="filters.mode == 'grid'">
+                    <div
+                        class="mt-4 mx-auto max-w-md grid gap-8 sm:max-w-lg lg:grid-cols-4 lg:max-w-7xl"
                     >
                         <span
                             v-for="dataset in datasets.data"
                             :key="dataset.id"
                         >
                             <dataset-card
-                                :mode="filters.mode ? filters.mode : 'grid'"
+                                :mode="filters.mode"
                                 :dataset="dataset"
                             ></dataset-card>
                         </span>
-                    </ul>
+                    </div>
+                </div>
+                <div v-if="filters.mode == 'list'">
+                    <div
+                        class="mt-4 bg-white shadow overflow-hidden sm:rounded-md"
+                    >
+                        <ul
+                            role="list"
+                            class="divide-y border rounded-md divide-gray-200"
+                        >
+                            <span
+                                v-for="dataset in datasets.data"
+                                :key="dataset.id"
+                            >
+                                <dataset-card
+                                    :mode="filters.mode ? filters.mode : 'grid'"
+                                    :dataset="dataset"
+                                ></dataset-card>
+                            </span>
+                        </ul>
+                    </div>
+                </div>
+                <div class="py-10">
+                    <Pagination :links="datasets.meta.links"></Pagination>
                 </div>
             </div>
-        </div>
-
-        <div v-if="datasets.meta.links" class="py-10">
-            <Pagination :links="datasets.meta.links"></Pagination>
+            <div v-else>
+                <div
+                    class="text-center rounded-lg border-2 border-dashed border-gray-300 p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 mt-5"
+                >
+                    <svg
+                        class="mx-auto h-12 w-12 text-gray-400"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        aria-hidden="true"
+                    >
+                        <path
+                            vector-effect="non-scaling-stroke"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"
+                        />
+                    </svg>
+                    <h3 class="mt-2 text-sm font-medium text-gray-900">
+                        No datasets
+                    </h3>
+                </div>
+            </div>
         </div>
     </app-layout>
 </template>

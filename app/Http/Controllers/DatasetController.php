@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\DatasetResource;
 use App\Models\Dataset;
 use App\Models\NMRium;
+use App\Models\User;
 use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -91,7 +92,17 @@ class DatasetController extends Controller
         if ($dataset) {
             $nmrium = $dataset->nmrium;
 
-            return $nmrium->versions;
+            return $nmrium->versions()->orderBy('created_at', 'DESC')->get()->map(function ($version) {
+                $user = User::find($version->user_id);
+
+                return [
+                    'updated_at' => $version->updated_at,
+                    'user' => [
+                        'name' => $user->first_name.' '.$user->last_name,
+                        'profile_photo_url' => $user->profile_photo_url,
+                    ],
+                ];
+            });
         }
     }
 

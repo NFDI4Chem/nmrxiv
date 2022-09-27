@@ -340,54 +340,6 @@
                                                         <div
                                                             @click="
                                                                 updateAccess(
-                                                                    true
-                                                                )
-                                                            "
-                                                            class="relative flex items-start"
-                                                        >
-                                                            <div
-                                                                class="absolute flex items-center h-5"
-                                                            >
-                                                                <input
-                                                                    id="privacy-public"
-                                                                    :checked="
-                                                                        form.is_public ===
-                                                                        true
-                                                                    "
-                                                                    :disabled="
-                                                                        !canUpdateProject
-                                                                    "
-                                                                    name="privacy"
-                                                                    aria-describedby="privacy-public-description"
-                                                                    type="radio"
-                                                                    class="focus:ring-gray-500 h-4 w-4 text-gray-600 border-gray-300"
-                                                                />
-                                                            </div>
-                                                            <div
-                                                                class="pl-7 text-sm"
-                                                            >
-                                                                <label
-                                                                    for="privacy-public"
-                                                                    class="font-medium text-gray-900"
-                                                                >
-                                                                    Public
-                                                                    access
-                                                                </label>
-                                                                <p
-                                                                    id="privacy-public-description"
-                                                                    class="text-gray-500"
-                                                                >
-                                                                    Everyone
-                                                                    with the
-                                                                    link will
-                                                                    see this
-                                                                    project.
-                                                                </p>
-                                                            </div>
-                                                        </div>
-                                                        <div
-                                                            @click="
-                                                                updateAccess(
                                                                     false
                                                                 )
                                                             "
@@ -438,7 +390,7 @@
                                                     </div>
                                                 </fieldset>
                                             </div>
-                                            <div class="pt-4 pb-6">
+                                            <div>
                                                 <div v-if="form.is_public">
                                                     <label
                                                         for="email"
@@ -555,7 +507,7 @@
                                                                 >
                                                             </div>
                                                         </div> -->
-                                                        <div v-if="linkAccess">
+                                                <!-- <div v-if="linkAccess">
                                                             <div class="flex">
                                                                 <div
                                                                     class="flex-grow"
@@ -721,14 +673,17 @@
                                                                     </div>
                                                                 </Listbox>
                                                             </div>
-                                                        </div>
+                                                        </div> 
                                                     </div>
-                                                </div>
-                                                <div class="pt-4 pb-6">
+                                                </div>-->
+                                                <div>
                                                     <div
                                                         class="mt-6 grid grid-cols-1 gap-x-4 sm:grid-cols-1"
                                                     >
                                                         <div v-if="licenses">
+                                                            <span class="float-right text-sm">
+                                                                <a target="_blank" href="https://docs.nmrxiv.org/docs/submission-guides/licenses">How to choose the right license?</a>
+                                                            </span>
                                                             <select-rich
                                                                 v-model:selected="
                                                                     form.license
@@ -766,7 +721,9 @@
                                                         </span>
                                                     </a>
                                                 </div>
-                                                <div class="mt-4 flex text-sm">
+                                                <div
+                                                    class="mt-4 flex text-sm mb-6"
+                                                >
                                                     <a
                                                         class="cursor-pointer group inline-flex items-center text-gray-500 hover:text-gray-900"
                                                         @click="

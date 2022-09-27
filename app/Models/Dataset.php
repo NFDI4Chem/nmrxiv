@@ -97,6 +97,11 @@ class Dataset extends Model implements Auditable
         return $this->belongsTo(User::class, 'owner_id');
     }
 
+    public function validation()
+    {
+        return $this->belongsTo(Validation::class, 'validation_id');
+    }
+
     public function draft()
     {
         return $this->belongsTo(Draft::class, 'draft_id');
@@ -110,6 +115,11 @@ class Dataset extends Model implements Auditable
     public function nmrium()
     {
         return $this->hasOne(NMRium::class);
+    }
+
+    public function fsObject()
+    {
+        return $this->hasOne(FileSystemObject::class);
     }
 
     /**

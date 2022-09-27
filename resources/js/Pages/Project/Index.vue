@@ -257,6 +257,13 @@
                                         >
                                         {{ formatDate(project.created_at) }}
                                     </div>
+                                    <span
+                                        v-if="!project.is_public && project.is_published"
+                                        class="inline-flex items-center mt-2 px-3 py-0.5 rounded-full text-sm font-medium bg-yellow-100 text-red-800 capitalize"
+                                    >
+                                        PUBLISHED -&emsp;
+                                        <b>Release date: {{ formatDate(project.release_date) }}</b>
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -299,16 +306,9 @@ export default {
         },
         getLink(project) {
             if (project) {
-                if (project.draft_id == null) {
-                    return this.$inertia.visit(
-                        this.route("dashboard.projects", [project.id])
-                    );
-                }
-                if (project.draft_id && project.status == null) {
-                    this.openDatasetCreateDialog({
-                        draft_id: project.draft_id,
-                    });
-                }
+                return this.$inertia.visit(
+                    this.route("dashboard.projects", [project.id])
+                );
             }
         },
     },

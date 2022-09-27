@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Traits\CacheClear;
 use Auth;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -57,7 +58,7 @@ class Project extends Model implements Auditable
      *
      * @var array
      */
-    protected $appends = ['public_url', 'private_url', 'project_photo_url', 'is_bookmarked'];
+    protected $appends = ['public_url', 'private_url', 'project_photo_url', 'is_bookmarked', 'is_published'];
 
     /**
      * Get the URL to the project's profile photo.
@@ -69,6 +70,18 @@ class Project extends Model implements Auditable
         return $this->project_photo_path
                     ? Storage::disk(env('FILESYSTEM_DRIVER_PUBLIC'))->url($this->project_photo_path)
                     : '';
+    }
+
+    public function getIsPublishedAttribute()
+    {
+        if($this->is_public){
+            return true;
+        }else{
+            if($this->release_date){
+                return !Carbon::now()->startOfDay()->gte($this->release_date);
+            }
+        }
+        return false; 
     }
 
     /**
@@ -264,6 +277,11 @@ class Project extends Model implements Auditable
     public function license()
     {
         return $this->belongsTo(License::class, 'license_id');
+    }
+
+    public function validation()
+    {
+        return $this->belongsTo(Validation::class, 'validation_id');
     }
 
     /**

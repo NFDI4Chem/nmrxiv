@@ -1,10 +1,10 @@
 <?php
 
 use App\Http\Controllers\Admin\AnnouncementController;
-use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\Admin\ConsoleController;
 use App\Http\Controllers\Admin\LicenseController;
 use App\Http\Controllers\Admin\UsersController;
+use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\Auth\SocialController;
 use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\CitationController;
@@ -108,6 +108,11 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
             ->name('dashboard.project.update');
         Route::get('projects/{project}/activity', [ProjectController::class, 'activity'])
             ->name('dashboard.project.activity');
+        Route::get('projects/{project}/validation', [ProjectController::class, 'validation'])
+            ->name('dashboard.project.validation');
+
+        Route::post('projects/{project}/publish', [ProjectController::class, 'publish'])
+            ->name('dashboard.project.publish');
 
         Route::post('projects/{project}/members', [ProjectMemberController::class, 'memberStore'])
             ->name('project-members.store');
@@ -233,7 +238,6 @@ Route::group([
 
 Route::get('{id}', [ApplicationController::class, 'resolveIdentifier'])->where('id', '(P|S|D|M|p|s|d|m)[0-9]+');
 
-
 Route::get('{username}/download/{project}/{key?}', [DownloadController::class, 'downloadFromProject'])
     ->name('download');
 
@@ -261,6 +265,8 @@ Route::get('projects/{owner}/{slug}', [ProjectController::class, 'publicProjectV
 Route::get('projects', [ProjectController::class, 'publicProjectsView'])
     ->name('public.projects');
 
+Route::get('datasets/{dataset}/nmriumInfo', [DatasetController::class, 'fetchNMRium'])
+    ->name('dashboard.datasets.nmrium');
 Route::get('datasets/{owner}/{slug}', [DatasetController::class, 'publicDatasetView'])
     ->name('public.dataset');
 Route::get('datasets', [DatasetController::class, 'publicDatasetsView'])

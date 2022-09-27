@@ -32,7 +32,7 @@
             </div>
             <div class="bg-white border-b">
                 <div class="px-12">
-                    <div class="flex flex-nowrap justify-between py-6">
+                    <div class="flex flex-nowrap justify-between pt-6 w-full">
                         <div class="">
                             <div
                                 class="flex pr-20 cursor-pointer items-center text-xl text-gray-700 font-bold"
@@ -256,16 +256,6 @@
                                     <b>{{ project.identifier }}</b>
                                 </span>
                             </div>
-                            <div
-                                class="mt-4 flex items-center text-xs text-gray-400"
-                            >
-                                <CalendarIcon
-                                    class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-300"
-                                    aria-hidden="true"
-                                />
-                                Updated on
-                                {{ formatDateTime(project.updated_at) }}
-                            </div>
                         </div>
                         <div v-if="canDeleteProject" class="flex-nowrap">
                             <Link
@@ -279,6 +269,29 @@
                             >
                                 Project&nbsp;Settings
                             </Link>
+                        </div>
+                    </div>
+                    <div class="flex flex-nowrap justify-between pb-3">
+                        <div
+                            class="mt-2 flex items-center text-xs text-gray-400"
+                        >
+                            <CalendarIcon
+                                class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-300"
+                                aria-hidden="true"
+                            />
+                            Updated on
+                            {{ formatDateTime(project.updated_at) }}
+                        </div>
+                        <div v-if="!project.is_public && !project.is_published" class="flex-nowrap">
+                            <Publish :project="project" />
+                        </div>
+                        <div v-if="!project.is_public && project.is_published">
+                            <span
+                                class="ml-4 inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-yellow-100 text-red-800 capitalize"
+                            >
+                                PUBLISHED -&emsp;
+                                <b>Release date: {{ formatDate(project.release_date) }}</b>
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -652,6 +665,7 @@ export default {
         AddCitation,
         CalendarIcon,
         Citation,
+        Publish,
     },
     props: [
         "project",
@@ -672,7 +686,26 @@ export default {
             addCitationElement,
         };
     },
-    mounted() {},
+    mounted() {
+        const urlSearchParams = new URLSearchParams(window.location.search);
+        const params = Object.fromEntries(urlSearchParams.entries());
+        let editOperation = params["edit"];
+        if (editOperation) {
+            if (
+                editOperation == "license" ||
+                editOperation == "title" ||
+                editOperation == "description" ||
+                editOperation == "keywords" ||
+                editOperation == "profile_image"
+            ) {
+                this.toggleDetails();
+            } else if (editOperation == "citation") {
+                this.toggleAddCitation();
+            } else if (editOperation == "authors") {
+                this.toggleAddAuthor();
+            }
+        }
+    },
     data() {
         return {};
     },

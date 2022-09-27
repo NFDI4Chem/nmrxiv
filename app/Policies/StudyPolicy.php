@@ -67,7 +67,7 @@ class StudyPolicy
      */
     public function updateStudy(User $user, Study $study)
     {
-        if ($study->is_public || $study->is_archived || $study->is_deleted) {
+        if ($study->is_public || $study->is_archived || $study->is_deleted || $study->is_published) {
             return false;
         }
 

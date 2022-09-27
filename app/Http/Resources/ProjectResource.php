@@ -36,6 +36,7 @@ class ProjectResource extends JsonResource
             'owner' => new UserResource($this->owner),
             'photo_url' => $this->project_photo_url,
             'is_public' => $this->is_public,
+            'is_published' => $this->is_published,
             'identifier' => $this->identifier,
             'doi' => $this->doi,
             'tags' => $this->tags,
