@@ -218,10 +218,7 @@ import { Link } from "@inertiajs/inertia-vue3";
 import StudyCreate from "@/Pages/Study/Partials/Create.vue";
 import StudyCard from "@/Shared/StudyCard.vue";
 import JetButton from "@/Jetstream/Button.vue";
-import {
-    ArrowNarrowLeftIcon,
-    ArrowNarrowRightIcon,
-} from "@heroicons/vue/solid";
+import { ArrowLongLeftIcon, ArrowLongRightIcon } from "@heroicons/vue/24/solid";
 
 export default {
     components: {
@@ -229,8 +226,8 @@ export default {
         StudyCreate,
         StudyCard,
         JetButton,
-        ArrowNarrowLeftIcon,
-        ArrowNarrowRightIcon,
+        ArrowLongLeftIcon,
+        ArrowLongRightIcon,
     },
     props: {
         project: {

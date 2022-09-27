@@ -116,7 +116,7 @@
                                         <span class="sr-only"
                                             >Open options</span
                                         >
-                                        <DotsVerticalIcon
+                                        <EllipsisVerticalIcon
                                             class="h-5 w-5"
                                             aria-hidden="true"
                                         />
@@ -147,7 +147,7 @@
                                                         'block px-4 py-4 text-sm cursor-pointer hover:text-gray-900',
                                                     ]"
                                                 >
-                                                    <DownloadIcon
+                                                    <ArrowDownTrayIcon
                                                         class="h-5 w-5 inline"
                                                         aria-hidden="true"
                                                     />
@@ -284,7 +284,7 @@
                                         :href="downloadURL"
                                         class="block px-4 text-sm cursor-pointer hover:text-gray-900', ]"
                                     >
-                                        <DownloadIcon
+                                        <ArrowDownTrayIcon
                                             class="h-5 w-5 inline"
                                             aria-hidden="true"
                                     /></Link>
@@ -322,12 +322,12 @@
 </template>
 
 <script>
-import { LockClosedIcon } from "@heroicons/vue/solid";
-import { LockOpenIcon, DownloadIcon } from "@heroicons/vue/solid";
-import { PencilIcon } from "@heroicons/vue/solid";
-import { MailIcon } from "@heroicons/vue/solid";
+import { LockClosedIcon } from "@heroicons/vue/24/solid";
+import { LockOpenIcon, ArrowDownTrayIcon } from "@heroicons/vue/24/solid";
+import { PencilIcon } from "@heroicons/vue/24/solid";
+import { EnvelopeIcon } from "@heroicons/vue/24/solid";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
-import { DotsVerticalIcon, ScaleIcon } from "@heroicons/vue/solid";
+import { EllipsisVerticalIcon, ScaleIcon } from "@heroicons/vue/24/solid";
 import { Inertia } from "@inertiajs/inertia";
 import { Head, Link } from "@inertiajs/inertia-vue3";
 
@@ -337,15 +337,15 @@ export default {
         Link,
         LockClosedIcon,
         LockOpenIcon,
-        DownloadIcon,
-        MailIcon,
+        ArrowDownTrayIcon,
+        EnvelopeIcon,
         PencilIcon,
         ScaleIcon,
         Menu,
         MenuButton,
         MenuItem,
         MenuItems,
-        DotsVerticalIcon,
+        EllipsisVerticalIcon,
     },
     props: ["dataset", "mode"],
     setup() {},

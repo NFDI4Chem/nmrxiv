@@ -316,7 +316,7 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import { Link } from "@inertiajs/inertia-vue3";
 import StudyDetails from "./Partials/Details.vue";
-import { StarIcon } from "@heroicons/vue/solid";
+import { StarIcon } from "@heroicons/vue/24/solid";
 import { ref } from "vue";
 import {
     BriefcaseIcon,
@@ -326,10 +326,10 @@ import {
     ChevronRightIcon,
     CurrencyDollarIcon,
     LinkIcon,
-    LocationMarkerIcon,
+    MapPinIcon,
     PencilIcon,
     ExclamationCircleIcon,
-} from "@heroicons/vue/solid";
+} from "@heroicons/vue/24/solid";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import AccessDialogue from "@/Shared/AccessDialogue.vue";
 import Citation from "@/Shared/Citation.vue";
@@ -351,7 +351,7 @@ export default {
         ChevronRightIcon,
         CurrencyDollarIcon,
         LinkIcon,
-        LocationMarkerIcon,
+        MapPinIcon,
         PencilIcon,
         StarIcon,
         AccessDialogue,

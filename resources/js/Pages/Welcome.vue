@@ -19,7 +19,7 @@
                                     class="rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-teal-500"
                                 >
                                     <span class="sr-only">Open menu</span>
-                                    <MenuIcon
+                                    <Bars3Icon
                                         class="h-6 w-6"
                                         aria-hidden="true"
                                     />
@@ -164,7 +164,7 @@
                                                         <span class="sr-only"
                                                             >Close menu</span
                                                         >
-                                                        <XIcon
+                                                        <XMarkIcon
                                                             class="h-6 w-6"
                                                             aria-hidden="true"
                                                         />
@@ -927,24 +927,22 @@ import {
 import {
     ShareIcon,
     ScaleIcon,
-    AnnotationIcon,
-    ChatAlt2Icon,
-    ChatAltIcon,
-    DocumentReportIcon,
+    ChatBubbleLeftIcon,
+    ChatBubbleLeftRightIcon,
+    DocumentTextIcon,
     HeartIcon,
     InboxIcon,
-    MenuIcon,
-    PencilAltIcon,
-    SearchIcon,
-    ReplyIcon,
+    Bars3Icon,
+    PencilSquareIcon,
+    MagnifyingGlassIcon,
+    ArrowUturnLeftIcon,
     SparklesIcon,
     TrashIcon,
     UsersIcon,
-    XIcon,
-    DatabaseIcon,
-    DocumentTextIcon,
-} from "@heroicons/vue/outline";
-import { ChevronDownIcon } from "@heroicons/vue/solid";
+    XMarkIcon,
+    CircleStackIcon,
+} from "@heroicons/vue/24/outline";
+import { ChevronDownIcon } from "@heroicons/vue/24/solid";
 import ToolTip from "@/Shared/ToolTip.vue";
 
 const Search = [
@@ -960,14 +958,14 @@ const Search = [
         description:
             "Search similar spectra by simple drag and drop of your machine output files or search spectra by structures. Need further guidance or found any missing information. Reach out to us or check out our documentation site.",
         href: "#",
-        icon: SearchIcon,
+        icon: MagnifyingGlassIcon,
     },
 ];
 const features = [
     {
         name: "Advanced search",
         description: "",
-        icon: SearchIcon,
+        icon: MagnifyingGlassIcon,
     },
     {
         name: "Open Source",
@@ -982,17 +980,17 @@ const features = [
     {
         name: "Prediction",
         description: "",
-        icon: PencilAltIcon,
+        icon: PencilSquareIcon,
     },
     {
         name: "Schemas and MIChI",
         description: "",
-        icon: DocumentReportIcon,
+        icon: DocumentTextIcon,
     },
     {
         name: "Community challenges",
         description: "",
-        icon: ChatAltIcon,
+        icon: ChatBubbleLeftIcon,
     },
     {
         name: "Docs & API",
@@ -1002,7 +1000,7 @@ const features = [
     {
         name: "Backups",
         description: "",
-        icon: DatabaseIcon,
+        icon: CircleStackIcon,
     },
 ];
 const metrics = [
@@ -1141,28 +1139,27 @@ export default {
         Head,
         Link,
         JetApplicationLogo,
-        AnnotationIcon,
-        ChatAlt2Icon,
-        ChatAltIcon,
-        DocumentReportIcon,
+        ChatBubbleLeftIcon,
+        ChatBubbleLeftRightIcon,
+        DocumentTextIcon,
         HeartIcon,
         InboxIcon,
-        MenuIcon,
-        PencilAltIcon,
-        SearchIcon,
-        ReplyIcon,
+        Bars3Icon,
+        PencilSquareIcon,
+        MagnifyingGlassIcon,
+        ArrowUturnLeftIcon,
         SparklesIcon,
         TrashIcon,
         ShareIcon,
         UsersIcon,
-        XIcon,
+        XMarkIcon,
         ScaleIcon,
         Popover,
         PopoverButton,
         PopoverGroup,
         PopoverPanel,
         ChevronDownIcon,
-        DatabaseIcon,
+        CircleStackIcon,
         ToolTip,
         Projects,
     },

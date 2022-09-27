@@ -129,17 +129,17 @@
 </template>
 
 <script>
-import { LockClosedIcon } from "@heroicons/vue/solid";
-import { LockOpenIcon } from "@heroicons/vue/solid";
-import { PencilIcon } from "@heroicons/vue/solid";
-import { MailIcon } from "@heroicons/vue/solid";
+import { LockClosedIcon } from "@heroicons/vue/24/solid";
+import { LockOpenIcon } from "@heroicons/vue/24/solid";
+import { PencilIcon } from "@heroicons/vue/24/solid";
+import { EnvelopeIcon } from "@heroicons/vue/24/solid";
 import { Link } from "@inertiajs/inertia-vue3";
 
 export default {
     components: {
         LockClosedIcon,
         LockOpenIcon,
-        MailIcon,
+        EnvelopeIcon,
         PencilIcon,
         Link,
     },

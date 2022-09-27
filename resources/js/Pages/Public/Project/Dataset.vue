@@ -71,7 +71,7 @@
                                                         "
                                                     >
                                                         <span
-                                                            ><ClipboardCopyIcon
+                                                            ><ClipboardDocumentIcon
                                                                 class="h-5 w-5"
                                                                 aria-hidden="true"
                                                         /></span>
@@ -314,7 +314,7 @@
 
 <script>
 import ProjectLayout from "@/Pages/Public/Project/Layout.vue";
-import { ShareIcon, ClipboardCopyIcon } from "@heroicons/vue/solid";
+import { ShareIcon, ClipboardDocumentIcon } from "@heroicons/vue/24/solid";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import SpectraViewer from "@/Shared/SpectraViewer.vue";
 
@@ -322,7 +322,7 @@ export default {
     components: {
         ProjectLayout,
         ShareIcon,
-        ClipboardCopyIcon,
+        ClipboardDocumentIcon,
         Menu,
         MenuButton,
         MenuItem,

@@ -51,7 +51,7 @@
                                     @click="sidebarOpen = false"
                                 >
                                     <span class="sr-only">Close sidebar</span>
-                                    <XIcon
+                                    <XMarkIcon
                                         class="h-6 w-6 text-white"
                                         aria-hidden="true"
                                     />
@@ -157,7 +157,7 @@
           class="rounded px-1 mx-1 mr-3 border-gray-200 text-gray-500"
           @click="toggleCollapseSidebar()"
         >
-          <MenuIcon class="h-6 w-6" aria-hidden="true" />
+          <Bars3Icon class="h-6 w-6" aria-hidden="true" />
         </button> -->
                     <Link class="ml-2" :href="route('welcome')">
                         <jet-application-logo class="block h-10 w-auto" />
@@ -236,7 +236,7 @@
                     class="hidden md:inline-flex p-4 rounded mx-1 mr-3 border-red-200 text-gray-500"
                     @click="toggleCollapseSidebar()"
                 >
-                    <MenuIcon class="h-6 w-6" aria-hidden="true" />
+                    <Bars3Icon class="h-6 w-6" aria-hidden="true" />
                 </button>
                 <button
                     type="button"
@@ -244,7 +244,7 @@
                     @click="sidebarOpen = true"
                 >
                     <span class="sr-only">Open sidebar</span>
-                    <MenuIcon class="h-6 w-6" aria-hidden="true" />
+                    <Bars3Icon class="h-6 w-6" aria-hidden="true" />
                 </button>
                 <div class="flex-1 px-4 py-2 flex justify-between">
                     <div class="flex-1 flex">
@@ -258,7 +258,7 @@
                 <div
                   class="absolute inset-y-0 left-0 flex items-center pointer-events-none"
                 >
-                  <SearchIcon class="h-5 w-5" aria-hidden="true" />
+                  <MagnifyingGlassIcon class="h-5 w-5" aria-hidden="true" />
                 </div>
                 <input
                   id="search-field"
@@ -662,12 +662,12 @@ import ProjectCreate from "@/Pages/Project/Partials/Create.vue";
 import StudyCreate from "@/Pages/Study/Partials/Create.vue";
 import Submission from "@/Shared/Submission.vue";
 import {
-    BookmarkAltIcon,
+    BookmarkSquareIcon,
     FireIcon,
     HomeIcon,
     InboxIcon,
     UserIcon,
-} from "@heroicons/vue/outline";
+} from "@heroicons/vue/24/outline";
 import { ref } from "vue";
 import {
     DialogOverlay,
@@ -682,16 +682,16 @@ import {
 } from "@headlessui/vue";
 import {
     BellIcon,
-    MenuIcon,
-    XIcon,
+    Bars3Icon,
+    XMarkIcon,
     ClockIcon,
     UsersIcon,
     StarIcon,
     FolderIcon,
-    ViewGridIcon,
+    Squares2X2Icon,
     TrashIcon,
-} from "@heroicons/vue/outline";
-import { SearchIcon, PlusIcon } from "@heroicons/vue/solid";
+} from "@heroicons/vue/24/outline";
+import { MagnifyingGlassIcon, PlusIcon } from "@heroicons/vue/24/solid";
 
 const userNavigation = [];
 
@@ -712,7 +712,7 @@ const navigation = [
         auth: false,
         name: "Datasets",
         href: "/datasets",
-        icon: ViewGridIcon,
+        icon: Squares2X2Icon,
         bg: "bg-white",
     },
     {
@@ -780,9 +780,9 @@ export default {
         TransitionChild,
         TransitionRoot,
         BellIcon,
-        MenuIcon,
-        SearchIcon,
-        XIcon,
+        Bars3Icon,
+        MagnifyingGlassIcon,
+        XMarkIcon,
         PlusIcon,
         FlashMessages,
         DialogPanel,
@@ -794,7 +794,7 @@ export default {
         StarIcon,
         TrashIcon,
         FolderIcon,
-        ViewGridIcon,
+        Squares2X2Icon,
         StudyCreate,
         Submission,
     },

@@ -76,13 +76,17 @@
 import StudyLayout from "@/Pages/Study/Layout.vue";
 import { Link } from "@inertiajs/inertia-vue3";
 import {
-    DatabaseIcon,
+    CircleStackIcon,
     FolderOpenIcon,
-    ViewGridIcon,
-} from "@heroicons/vue/outline";
+    Squares2X2Icon,
+} from "@heroicons/vue/24/outline";
 const subNavigation = [
-    { name: "About", route: "dashboard.studies", icon: DatabaseIcon },
-    { name: "Datasets", route: "dashboard.study.datasets", icon: ViewGridIcon },
+    { name: "About", route: "dashboard.studies", icon: CircleStackIcon },
+    {
+        name: "Datasets",
+        route: "dashboard.study.datasets",
+        icon: Squares2X2Icon,
+    },
     { name: "Files", route: "dashboard.study.files", icon: FolderOpenIcon },
 ];
 

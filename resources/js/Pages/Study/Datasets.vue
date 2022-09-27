@@ -78,7 +78,7 @@
                                                             "
                                                         >
                                                             <span
-                                                                ><ClipboardCopyIcon
+                                                                ><ClipboardDocumentIcon
                                                                     class="h-5 w-5"
                                                                     aria-hidden="true"
                                                             /></span>
@@ -157,8 +157,9 @@
 <script>
 import StudyContent from "@/Pages/Study/Content.vue";
 import LoadingButton from "@/Shared/LoadingButton.vue";
-import { ShareIcon, ClipboardCopyIcon } from "@heroicons/vue/solid";
+import { ShareIcon, ClipboardDocumentIcon } from "@heroicons/vue/24/solid";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
+import SpectraViewer from "@/Shared/SpectraViewer.vue";
 import SpectraEditor from "@/Shared/SpectraEditor.vue";
 
 export default {
@@ -166,12 +167,13 @@ export default {
         StudyContent,
         LoadingButton,
         ShareIcon,
-        ClipboardCopyIcon,
+        ClipboardDocumentIcon,
         Menu,
         MenuButton,
         MenuItem,
         MenuItems,
         SpectraEditor,
+        SpectraViewer
     },
     props: [
         "study",

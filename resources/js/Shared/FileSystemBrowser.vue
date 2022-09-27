@@ -213,7 +213,7 @@
                                             class="h-5 w-5 inline text-green-400"
                                             aria-hidden="true"
                                         />
-                                        <UploadIcon
+                                        <ArrowUpTrayIcon
                                             v-if="
                                                 logs[file].status ==
                                                 'Inprogress'
@@ -221,7 +221,7 @@
                                             class="h-5 w-5 inline text-yellow-400"
                                             aria-hidden="true"
                                         />
-                                        <DotsVerticalIcon
+                                        <EllipsisVerticalIcon
                                             v-if="
                                                 logs[file].status ==
                                                 'Inprogress'
@@ -390,28 +390,28 @@ import {
     ChevronRightIcon,
     HomeIcon,
     InformationCircleIcon,
-    DotsVerticalIcon,
-    UploadIcon,
+    EllipsisVerticalIcon,
+    ArrowUpTrayIcon,
     CheckIcon,
     ExclamationCircleIcon,
     TrashIcon,
-    DownloadIcon,
-} from "@heroicons/vue/solid";
+    ArrowDownTrayIcon,
+} from "@heroicons/vue/24/solid";
 
 export default {
     components: {
         FolderIcon,
         DocumentTextIcon,
-        DownloadIcon,
+        ArrowDownTrayIcon,
         ChevronRightIcon,
         InformationCircleIcon,
         HomeIcon,
         FileDetails,
         JetDialogModal,
         JetSecondaryButton,
-        DotsVerticalIcon,
+        EllipsisVerticalIcon,
         ExclamationCircleIcon,
-        UploadIcon,
+        ArrowUpTrayIcon,
         CheckIcon,
         SelectInput,
         TrashIcon,

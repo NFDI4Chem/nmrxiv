@@ -501,6 +501,7 @@
                                                         </span>
                                                     </div>
                                                 </div>
+                                                <span class="float-right cursor-pointer hover:text-blue-700"><small href="https://docs.nmrxiv.org/docs/submission-guides/submission/molecular-assignments/structure-editor" target="_blank">Need help?</small></span>
                                                 <div
                                                     id="structureSearchEditor"
                                                     class="w-full border my-4 rounded-md"
@@ -590,11 +591,11 @@
 
 <script>
 import {
-    PlusSmIcon,
+    PlusSmallIcon,
     TrashIcon,
     PencilIcon,
     InformationCircleIcon,
-} from "@heroicons/vue/solid";
+} from "@heroicons/vue/24/solid";
 import StudyContent from "@/Pages/Study/Content.vue";
 import slider from "vue3-slider";
 import OCL from "openchemlib/full";
@@ -603,7 +604,7 @@ export default {
     components: {
         StudyContent,
         ToolTip,
-        PlusSmIcon,
+        PlusSmallIcon,
         slider,
         TrashIcon,
         PencilIcon,

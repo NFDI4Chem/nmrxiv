@@ -400,7 +400,7 @@ import JetDialogModal from "@/Jetstream/DialogModal.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import JetButton from "@/Jetstream/Button.vue";
 import AuthorCheckbox from "@/Shared/AuthorCheckbox.vue";
-import { TrashIcon, PencilIcon } from "@heroicons/vue/solid";
+import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
 import JetInputError from "@/Jetstream/InputError.vue";
 import LoadingButton from "@/Shared/LoadingButton.vue";
 import JetDangerButton from "@/Jetstream/DangerButton.vue";

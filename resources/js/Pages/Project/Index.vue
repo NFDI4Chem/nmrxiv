@@ -279,7 +279,7 @@
 </template>
 <script>
 import { Link } from "@inertiajs/inertia-vue3";
-import { StarIcon } from "@heroicons/vue/solid";
+import { StarIcon } from "@heroicons/vue/24/solid";
 export default {
     components: {
         Link,

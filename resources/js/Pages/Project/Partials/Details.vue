@@ -47,7 +47,7 @@
                                                     <span class="sr-only"
                                                         >Close panel</span
                                                     >
-                                                    <XIcon
+                                                    <XMarkIcon
                                                         class="h-6 w-6"
                                                         aria-hidden="true"
                                                     />
@@ -475,7 +475,7 @@
                                                             "
                                                         >
                                                             <span
-                                                                ><ClipboardCopyIcon
+                                                                ><ClipboardDocumentIcon
                                                                     class="h-5 w-5"
                                                                     aria-hidden="true"
                                                             /></span>
@@ -521,16 +521,16 @@
                                                             "
                                                         >
                                                             <span
-                                                                ><ClipboardCopyIcon
+                                                                ><ClipboardDocumentIcon
                                                                     class="h-5 w-5"
                                                                     aria-hidden="true"
                                                             /></span>
                                                         </button>
                                                     </div>
                                                 </div>
-                                                <div>
+                                                <!-- <div>
                                                     <div class="space-y-1">
-                                                        <!-- <div
+                                                        <div
                                                             class="relative flex items-start"
                                                         >
                                                             <div
@@ -584,7 +584,7 @@
                                                                     "
                                                                 >
                                                                     <span
-                                                                        ><ClipboardCopyIcon
+                                                                        ><ClipboardDocumentIcon
                                                                             class="h-5 w-5"
                                                                             aria-hidden="true"
                                                                     /></span>
@@ -880,13 +880,13 @@ import {
     TransitionChild,
     TransitionRoot,
 } from "@headlessui/vue";
-import { XIcon } from "@heroicons/vue/outline";
+import { XMarkIcon } from "@heroicons/vue/24/outline";
 import {
     LinkIcon,
-    PlusSmIcon,
+    PlusSmallIcon,
     QuestionMarkCircleIcon,
     ExclamationCircleIcon,
-} from "@heroicons/vue/solid";
+} from "@heroicons/vue/24/solid";
 import {
     Listbox,
     ListboxButton,
@@ -905,10 +905,10 @@ import { ColorPicker } from "vue3-colorpicker";
 import "vue3-colorpicker/style.css";
 import { Switch, SwitchGroup, SwitchLabel } from "@headlessui/vue";
 import {
-    ClipboardCopyIcon,
+    ClipboardDocumentIcon,
     CheckIcon,
     ChevronDownIcon,
-} from "@heroicons/vue/solid";
+} from "@heroicons/vue/24/solid";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import SelectRich from "@/Shared/SelectRich.vue";
 import JetButton from "@/Jetstream/Button.vue";
@@ -949,11 +949,11 @@ export default defineComponent({
         ColorPicker,
         JetActionMessage,
         JetInputError,
-        XIcon,
+        XMarkIcon,
         ProjectActivity,
         TransitionRoot,
         LinkIcon,
-        PlusSmIcon,
+        PlusSmallIcon,
         QuestionMarkCircleIcon,
         ExclamationCircleIcon,
         Listbox,
@@ -966,7 +966,7 @@ export default defineComponent({
         TabList,
         TabPanel,
         TabPanels,
-        ClipboardCopyIcon,
+        ClipboardDocumentIcon,
         CheckIcon,
         ChevronDownIcon,
         SelectRich,

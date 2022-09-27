@@ -90,20 +90,20 @@
 import { Link } from "@inertiajs/inertia-vue3";
 import { Menu, MenuItem, MenuItems } from "@headlessui/vue";
 import {
-    ArchiveIcon,
-    PencilAltIcon,
-    TableIcon,
+    ArchiveBoxIcon,
+    PencilSquareIcon,
+    TableCellsIcon,
     PlusIcon,
-} from "@heroicons/vue/solid";
+} from "@heroicons/vue/24/solid";
 export default {
     components: {
         Link,
         Menu,
         MenuItem,
         MenuItems,
-        ArchiveIcon,
-        PencilAltIcon,
-        TableIcon,
+        ArchiveBoxIcon,
+        PencilSquareIcon,
+        TableCellsIcon,
         PlusIcon,
     },
     props: {
