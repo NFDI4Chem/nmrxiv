@@ -74,14 +74,15 @@ class Project extends Model implements Auditable
 
     public function getIsPublishedAttribute()
     {
-        if($this->is_public){
+        if ($this->is_public) {
             return true;
-        }else{
-            if($this->release_date){
-                return !Carbon::now()->startOfDay()->gte($this->release_date);
+        } else {
+            if ($this->release_date) {
+                return ! Carbon::now()->startOfDay()->gte($this->release_date);
             }
         }
-        return false; 
+
+        return false;
     }
 
     /**

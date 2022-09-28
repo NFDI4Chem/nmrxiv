@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\ProcessProject;
 use App\Actions\License\GetLicense;
 use App\Actions\Project\ArchiveProject;
 use App\Actions\Project\CreateNewProject;
@@ -11,6 +10,7 @@ use App\Actions\Project\RestoreProject;
 use App\Actions\Project\UpdateProject;
 use App\Http\Resources\ProjectResource;
 use App\Http\Resources\StudyResource;
+use App\Jobs\ProcessProject;
 use App\Models\Project;
 use App\Models\Study;
 use App\Models\User;
@@ -236,7 +236,7 @@ class ProjectController extends Controller
 
     public function publish(Request $request, Project $project)
     {
-        if($project){
+        if ($project) {
             $project->release_date = $request->get('releaseDate');
             $project->status = 'queued';
             $project->save();
@@ -245,15 +245,16 @@ class ProjectController extends Controller
             $validation->process();
             $validation = $validation->fresh();
 
-            if($validation['report']['project']['status']){
+            if ($validation['report']['project']['status']) {
                 ProcessProject::dispatch($project);
+
                 return response()->json([
                     'project' => $project,
                     'validation' => $validation,
                 ]);
-            }else{
+            } else {
                 return response()->json([
-                    'errors' => "Validation failing. Please provide all the required data and try again. If the problem persists, please contact us.",
+                    'errors' => 'Validation failing. Please provide all the required data and try again. If the problem persists, please contact us.',
                 ], 422);
             }
         }

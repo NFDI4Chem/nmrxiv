@@ -3,8 +3,6 @@
 namespace App\Actions\Project;
 
 use App\Models\Project;
-use App\Models\Ticker;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -13,7 +11,6 @@ use Illuminate\Validation\Rule;
 
 class UpdateProject
 {
-
     /**
      * Create a project.
      *
@@ -100,7 +97,7 @@ class UpdateProject
                             $dataset->license_id = $license_id;
                         }
                     }
-                    
+
                     $dataset->save();
                 }
             }
