@@ -34,11 +34,11 @@ class SanitizeProjects extends Command
     public function handle()
     {
         return DB::transaction(function () {
-            $projects = Project::where([
+            $privateProjects = Project::where([
                 ['is_public', false]
             ])->get();
 
-            foreach ($projects as $project) {
+            foreach ($privateProjects as $project) {
                 if(!$project->draft){
                     $project->draft_id = null;
                     $project->save();
@@ -100,7 +100,36 @@ class SanitizeProjects extends Command
                     }
                 }
             }
+
+            foreach ($privateProjects as $project) {
+                $projectFSObjects = FileSystemObject::with('children')
+                    ->where([
+                        ['project_id', $project->id],
+                        ['level', 0],
+                    ])
+                    ->get();
+
+                foreach ($projectFSObjects as $FSObject) {
+                    $this->updateDraftId($FSObject, $project);
+                }
+            }
         });
+    }
+
+    public function updateDraftId($fsObject, $project)
+    {
+        $fsObject->draft_id = $project->draft_id;
+        $fsObject->save();
+
+        $fsObjectChildren = $fsObject->children;
+        foreach ($fsObjectChildren as $fsObjectChild) {
+            if ($fsObjectChild->type == 'file') {
+                $fsObjectChild->draft_id = $project->draft_id;
+                $fsObjectChild->save();
+            } else {
+                $this->updateDraftId($fsObjectChild, $project);
+            }
+        }
     }
 
     public function moveFolder($fsObject, $project, $draft)
