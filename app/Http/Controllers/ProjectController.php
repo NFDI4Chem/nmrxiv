@@ -14,6 +14,7 @@ use App\Jobs\ProcessProject;
 use App\Models\Project;
 use App\Models\Study;
 use App\Models\User;
+use App\Models\Validation;
 use Auth;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Auth\StatefulGuard;
