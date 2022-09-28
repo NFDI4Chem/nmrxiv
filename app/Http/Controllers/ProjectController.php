@@ -222,15 +222,27 @@ class ProjectController extends Controller
 
         $validation = $project->validation;
 
+        if(!$validation){
+            $validation = new Validation();
+            $validation->save();
+            $project->validation()->associate($validation);
+            $project->save();
+
+            foreach ($project->studies as $study) {
+                $study->validation()->associate($validation);
+                $study->save();
+                foreach ($study->datasets as $dataset) {
+                    $dataset->validation()->associate($validation);
+                    $dataset->save();
+                }
+            }
+        }
+
         $validation->process();
-
-        // $validation->fresh();
-
-        // dd($validation);
 
         return Inertia::render('Project/Validation', [
             'project' => $project->load('projectInvitations', 'tags', 'authors', 'citations'),
-            'validation' => $validation,
+            'validation' => $validation->fresh(),
         ]);
     }
 

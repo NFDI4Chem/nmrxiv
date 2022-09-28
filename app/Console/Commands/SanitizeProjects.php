@@ -35,6 +35,17 @@ class SanitizeProjects extends Command
     {
         return DB::transaction(function () {
             $projects = Project::where([
+                ['is_public', false]
+            ])->get();
+
+            foreach ($projects as $project) {
+                if(!$project->draft){
+                    $project->draft_id = null;
+                    $project->save();
+                }
+            }
+
+            $projects = Project::where([
                 ['is_public', false],
                 ['draft_id', null],
             ])->get();
