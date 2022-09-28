@@ -108,9 +108,24 @@ class SanitizeProjects extends Command
                         ['level', 0],
                     ])
                     ->get();
+                if($projectFSObjects->isEmpty()){
+                    $projectFSObjects = FileSystemObject::with('children')
+                    ->where([
+                        ['project_id', $project->id],
+                        ['level', 1],
+                    ])
+                    ->get();
 
-                foreach ($projectFSObjects as $FSObject) {
-                    $this->updateDraftId($FSObject, $project);
+                    foreach ($projectFSObjects as $FSObject) {
+                        $parent = $FSObject->parent;
+                        $parent->project_id = $project->id;
+                        $parent->save();
+                        $this->updateDraftId($parent->fresh(), $project);
+                    }
+                }else{
+                    foreach ($projectFSObjects as $FSObject) {
+                        $this->updateDraftId($FSObject, $project);
+                    }
                 }
             }
         });
@@ -118,13 +133,21 @@ class SanitizeProjects extends Command
 
     public function updateDraftId($fsObject, $project)
     {
+        echo("project: " . $project->id);
+        echo("\n");
         $fsObject->draft_id = $project->draft_id;
+        if ($fsObject->path == null){
+            $fsObject->path = '/' . $project->draft->path . $fsObject->relative_url;
+        }
         $fsObject->save();
 
         $fsObjectChildren = $fsObject->children;
         foreach ($fsObjectChildren as $fsObjectChild) {
             if ($fsObjectChild->type == 'file') {
                 $fsObjectChild->draft_id = $project->draft_id;
+                if ($fsObjectChild->path == null){
+                    $fsObjectChild->path = '/' . $project->draft->path . $fsObjectChild->relative_url;
+                }
                 $fsObjectChild->save();
             } else {
                 $this->updateDraftId($fsObjectChild, $project);
