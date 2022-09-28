@@ -186,7 +186,7 @@
                     </table>
                 </div>
             </div>
-            <div v-if="selectedSpectraData" class="p-1 pr-2">
+            <div v-if="selectedSpectraData && selectedSpectraData.length > 0" class="p-1 pr-2">
                 <span
                     v-if="
                         selectedSpectraData[0]['peaks'] &&
