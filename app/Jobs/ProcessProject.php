@@ -2,7 +2,8 @@
 
 namespace App\Jobs;
 
-use App\Models\Draft;
+use App\Actions\Project\AssignIdentifier;
+use App\Actions\Project\PublishProject;
 use App\Models\FileSystemObject;
 use App\Models\Project;
 use App\Notifications\DraftProcessedNotification;
@@ -15,9 +16,6 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
-use App\Actions\Project\AssignIdentifier;
-use App\Actions\Project\PublishProject;
-
 
 class ProcessProject implements ShouldQueue, ShouldBeUnique
 {
@@ -60,7 +58,7 @@ class ProcessProject implements ShouldQueue, ShouldBeUnique
         if ($project) {
             $draft = $project->draft;
 
-            if($draft){
+            if ($draft) {
                 $environment = env('APP_ENV', 'local');
 
                 $projectPath = preg_replace(
@@ -89,10 +87,10 @@ class ProcessProject implements ShouldQueue, ShouldBeUnique
 
             $process_log = [Carbon::now()->timestamp => $logs];
 
-            if (!is_null($process_logs)) {
+            if (! is_null($process_logs)) {
                 array_push($process_logs, $process_log);
             } else {
-                $process_logs = array();
+                $process_logs = [];
                 array_push($process_logs, $process_log);
             }
 
@@ -108,7 +106,7 @@ class ProcessProject implements ShouldQueue, ShouldBeUnique
 
             $release_date = Carbon::parse($project->release_date);
 
-            if($release_date->isToday()){
+            if ($release_date->isToday()) {
                 $publisher->publish($project);
             }
 

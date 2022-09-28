@@ -15,7 +15,7 @@ class AssignIdentifiers extends Command
      *
      * @var string
      */
-    protected $signature = 'identifiers:assign';
+    protected $signature = 'nmrxiv:assign-identifiers';
 
     /**
      * The console command description.

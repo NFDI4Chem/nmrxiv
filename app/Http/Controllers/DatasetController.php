@@ -92,17 +92,19 @@ class DatasetController extends Controller
         if ($dataset) {
             $nmrium = $dataset->nmrium;
 
-            return $nmrium->versions()->orderBy('created_at', 'DESC')->get()->map(function ($version) {
-                $user = User::find($version->user_id);
+            if ($nmrium) {
+                return $nmrium->versions()->orderBy('created_at', 'DESC')->get()->map(function ($version) {
+                    $user = User::find($version->user_id);
 
-                return [
-                    'updated_at' => $version->updated_at,
-                    'user' => [
-                        'name' => $user->first_name.' '.$user->last_name,
-                        'profile_photo_url' => $user->profile_photo_url,
-                    ],
-                ];
-            });
+                    return [
+                        'updated_at' => $version->updated_at,
+                        'user' => [
+                            'name' => $user->first_name.' '.$user->last_name,
+                            'profile_photo_url' => $user->profile_photo_url,
+                        ],
+                    ];
+                });
+            }
         }
     }
 

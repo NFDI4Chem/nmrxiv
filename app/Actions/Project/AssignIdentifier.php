@@ -8,7 +8,6 @@ use App\Services\DOI\DOIService;
 
 class AssignIdentifier
 {
-
     private $doiService;
 
     /**

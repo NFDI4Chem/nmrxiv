@@ -52,21 +52,22 @@ class Study extends Model implements Auditable
         'private_url',
         'study_photo_url',
         'study_preview_urls',
-        'is_published'
+        'is_published',
     ];
 
     public function getIsPublishedAttribute()
     {
-        if($this->is_public){
+        if ($this->is_public) {
             return true;
-        }else{
-            if($this->release_date){
-                return !Carbon::now()->startOfDay()->gte($this->release_date);
-            }else{
+        } else {
+            if ($this->release_date) {
+                return ! Carbon::now()->startOfDay()->gte($this->release_date);
+            } else {
                 return $this->project->is_published;
             }
         }
-        return false; 
+
+        return false;
     }
 
     /**

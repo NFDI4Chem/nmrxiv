@@ -2,11 +2,11 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
-use App\Models\Project;
-use Illuminate\Support\Facades\DB;
 use App\Actions\Project\PublishProject;
+use App\Models\Project;
 use Carbon\Carbon;
+use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 
 class PublishProjects extends Command
 {
@@ -15,7 +15,7 @@ class PublishProjects extends Command
      *
      * @var string
      */
-    protected $signature = 'publish:projects';
+    protected $signature = 'nmrxiv:publish';
 
     /**
      * The console command description.
@@ -36,9 +36,9 @@ class PublishProjects extends Command
                 ['is_public', false],
                 ['release_date', 'IS NOT', null],
             ])->get();
-            foreach($projects as $project){
+            foreach ($projects as $project) {
                 $release_date = Carbon::parse($project->release_date);
-                if($release_date->isToday()){
+                if ($release_date->isToday()) {
                     $publisher->publish($project);
                 }
             }

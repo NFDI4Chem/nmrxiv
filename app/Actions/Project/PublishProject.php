@@ -6,7 +6,6 @@ use App\Models\Project;
 
 class PublishProject
 {
-
     /**
      * Publish the given project.
      *
