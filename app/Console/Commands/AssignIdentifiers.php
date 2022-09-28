@@ -47,7 +47,7 @@ class AssignIdentifiers extends Command
                     $projectTicker->save();
                 }
                 $project->save();
-                $project->generateDOI($this->doiService);
+                $project->generateDOI($doiService);
 
                 $studies = $project->studies;
                 foreach ($studies as $study) {
@@ -92,7 +92,7 @@ class AssignIdentifiers extends Command
                         }
                     }
                     $study->save();
-                    $study->generateDOI($this->doiService);
+                    $study->generateDOI($doiService);
 
                     $datasets = $study->datasets;
                     foreach ($datasets as $dataset) {
@@ -107,7 +107,7 @@ class AssignIdentifiers extends Command
                                 $dsTicker->index = $dsIdentifier;
                                 $dsTicker->save();
                                 $dataset->save();
-                                $dataset->generateDOI($this->doiService);
+                                $dataset->generateDOI($doiService);
                             }
                         }
                     }
