@@ -31,7 +31,7 @@ class AssignIdentifiers extends Command
      */
     public function handle(DOIService $doiService)
     {
-        return DB::transaction(function () {
+        return DB::transaction(function () use ($doiService) {
             $projects = Project::where([
                 ['is_public', true],
                 ['identifier', null],
