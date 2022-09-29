@@ -25,7 +25,7 @@
                                     for="name"
                                     class="block text-sm font-medium text-gray-700"
                                 >
-                                    DOI
+                                    DOI or ORCID ID
                                 </label>
                                 <div class="mt-1 flex rounded-md shadow-sm">
                                     <input
@@ -44,7 +44,7 @@
                             </div>
                         </div>
                         <div class="sm:col-span-2 mt-4">
-                            <jet-secondary-button @click="importCitation">
+                            <jet-secondary-button :disabled="!this.importCitationForm.doi" @click="importCitation">
                                 Import
                             </jet-secondary-button>
                         </div>
@@ -261,6 +261,7 @@
                             <div class="sm:col-span-6 float-left">
                                 <jet-secondary-button
                                     class="float-right text-md font-bold text-teal-900"
+                                    :disabled = "!(this.manualAddCitationForm && this.manualAddCitationForm.title)"
                                     @click="addCitationTemp('Manual')"
                                 >
                                     Add
@@ -390,7 +391,7 @@
                 Close
             </jet-secondary-button>
 
-            <jet-button class="ml-2" @click="updateCitation"> Save </jet-button>
+            <jet-button class="ml-2" :disabled = "!(this.citationModified && this.selectedCitationList.length > 0)" @click="updateCitation"> Save </jet-button>
         </template>
     </jet-dialog-modal>
 </template>
@@ -447,6 +448,7 @@ export default {
             confirmingCitationDeletion: false,
             selectedCitationforDelete: {},
             loading: false,
+            citationModified: false,
         };
     },
     /* mounted() {
@@ -489,6 +491,7 @@ export default {
                         ) === index
                 );
             }
+            this.citationModified = true;
         },
         /*Import Citation from DOI*/
         importCitation() {
@@ -572,7 +575,11 @@ export default {
         },
         /*Update the Citation table and relationship*/
         updateCitation() {
-            this.updateCitationForm.reset();
+            //this.updateCitationForm.reset();
+            this.updateCitationForm = this.$inertia.form({
+                _method: "POST",
+                citationList: [],
+            });
             for (var i = 0; i < this.selectedCitationList.length; i++) {
                 this.updateCitationForm.citationList.push(
                     this.selectedCitationList[i]
@@ -637,6 +644,7 @@ export default {
             if (index > -1) {
                 this.selectedCitationList.splice(index, 1);
             }
+            this.citationModified = true;
             this.closeModal();
         },
         closeModal() {
@@ -646,6 +654,7 @@ export default {
         resetData() {
             this.importCitationForm = this.$inertia.form({});
             this.manualAddCitationForm = this.$inertia.form({});
+            this.updateCitationForm = this.$inertia.form({});
             this.formattedCitationRes = null;
             this.importedCitationByDOI = [];
             this.addCitationDialog = false;
@@ -653,6 +662,7 @@ export default {
             this.confirmingCitationDeletion = false;
             this.selectedCitationforDelete = {};
             this.loading = false;
+            this.citationModified = false;
         },
         onClose() {
             this.addCitationDialog = false;
