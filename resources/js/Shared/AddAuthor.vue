@@ -43,7 +43,7 @@
                                     for="name"
                                     class="block text-sm font-medium text-gray-700"
                                 >
-                                    DOI
+                                    DOI or ORCID ID
                                 </label>
                                 <div class="mt-1 flex rounded-md shadow-sm">
                                     <input
@@ -62,7 +62,7 @@
                             </div>
                         </div>
                         <div class="sm:col-span-2 mt-4">
-                            <jet-secondary-button @click="importAuthors">
+                            <jet-secondary-button :disabled = "!this.importAuthorsForm.doi" @click="importAuthors">
                                 Import
                             </jet-secondary-button>
                         </div>
@@ -87,6 +87,7 @@
                         >
                             <jet-secondary-button
                                 class="float-right text-md font-bold text-teal-900"
+                                :disabled= "!(this.doiSelectedAuthorList && this.doiSelectedAuthorList.length > 0)"
                                 @click="addAuthor('DOI')"
                             >
                                 Add
@@ -246,6 +247,7 @@
                             <div class="sm:col-span-6 float-left">
                                 <jet-secondary-button
                                     class="float-right text-md font-bold text-teal-900"
+                                    :disabled= "!(this.manualAddAuthorForm && this.manualAddAuthorForm.family_name && this.manualAddAuthorForm.given_name)"
                                     @click="addAuthor('Manual')"
                                 >
                                     Add
@@ -382,7 +384,7 @@
                 Close
             </jet-secondary-button>
 
-            <jet-button class="ml-2" @click="updateAuthor"> Save </jet-button>
+            <jet-button :disabled = "!(this.authorModified && this.selectedAuthorsList.length >0 )" class="ml-2" @click="updateAuthor"> Save </jet-button>
         </template>
     </jet-dialog-modal>
 </template>
@@ -434,6 +436,7 @@ export default {
             loading: false,
             confirmingAuthorDeletion: false,
             authorId: null,
+            authorModified: false,
         };
     },
     methods: {
@@ -506,6 +509,7 @@ export default {
                     }
                     this.selectedAuthorsList.push(this.manualAddAuthorForm);
                     this.manualAddAuthorForm = this.$inertia.form({});
+                    this.authorModified = true;
                 }
             } else if (source == "DOI") {
                 //Added from authors list retured from DOI.
@@ -521,6 +525,7 @@ export default {
                         this.doiSelectedAuthorList[i]
                     );
                 }
+                this.authorModified = true;
             }
             //filtering duplicate values from the temp list.
             const keys = ["id"];
@@ -548,6 +553,7 @@ export default {
                     this.selectedAuthorsList.splice(i, 1);
                 }
             }
+            this.authorModified = true;
             this.closeModal();
         },
         /*Update the database*/
@@ -651,6 +657,7 @@ export default {
             this.selectedAuthorsList = [];
             this.loading = false;
             this.authorId = null;
+            this.authorModified = false;
         },
     },
 };
