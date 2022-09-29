@@ -260,6 +260,7 @@
             <!-- Added Author Summary -->
             <div v-if="selectedAuthorsList.length > 0">
                 <div class="ml-2 mt-2 overflow-y-scroll h-64">
+                    <p class="float-left text-xs font-bold text-red-900 mt-4">*Please review your changes below and click on Save button to save your changes.</p>
                     <table
                         class="divide-y divide-gray-200 w-full table-fixed overflow-y-scroll"
                     >
