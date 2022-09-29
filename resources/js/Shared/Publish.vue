@@ -67,8 +67,8 @@
                                             {{ project.name }}
                                         </p>
                                         <span v-if="status == 'queued'">
-                                            <span
-                                                class="m-3 relative inline-flex border-dotted border-2 border-gray-300 rounded-lg"
+                                            <div
+                                                class="m-3 relative clear-both border-dotted border-2 border-gray-300 rounded-lg"
                                                 ><span
                                                     class="inline-flex items-center px-4 py-2 font-semibold leading-6 text-sm rounded-md text-sky-500 bg-white dark:bg-slate-800 transition ease-in-out duration-150 cursor-not-allowed dark:ring-slate-200/20"
                                                     disabled=""
@@ -77,12 +77,13 @@
                                                     >
                                                         {{ status }}
                                                     </h1></span
-                                                ></span
+                                                ></div
                                             >
                                             <Link
                                                 type="button"
-                                                class="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
                                                 :href="route('dashboard')"
+                                                class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                                
                                             >
                                                 Go to Dashboard
                                             </Link>
@@ -91,8 +92,8 @@
                                             v-if="status == 'processing'
                                             "
                                         >
-                                            <span
-                                                class="m-3 relative inline-flex border-dotted border-2 border-gray-300 rounded-lg"
+                                            <div
+                                                class="m-3 relative clear-both border-dotted border-2 border-gray-300 rounded-lg"
                                                 ><span
                                                     class="inline-flex items-center px-4 py-2 font-semibold leading-6 text-sm rounded-md text-sky-500 bg-white dark:bg-slate-800 transition ease-in-out duration-150 cursor-not-allowed dark:ring-slate-200/20"
                                                     disabled=""
@@ -109,11 +110,12 @@
                                                     ><span
                                                         class="relative inline-flex rounded-full h-3 w-3 bg-sky-500"
                                                     ></span></span
-                                            ></span>
+                                            ></div>
                                             <Link
                                                 type="button"
-                                                class="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
                                                 :href="route('dashboard')"
+                                                class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                                
                                             >
                                                 Go to Dashboard
                                             </Link>
@@ -122,8 +124,8 @@
                                             v-if="status == 'complete'
                                             "
                                         >
-                                            <span
-                                                class="m-3 relative inline-flex border-dotted border-2 border-gray-300 rounded-lg"
+                                            <div
+                                                class="m-3 clear-both relative border-dotted border-2 border-gray-300 rounded-lg"
                                                 ><span
                                                     class="inline-flex items-center px-4 py-2 font-semibold leading-6 text-sm rounded-md text-sky-500 bg-white dark:bg-slate-800 transition ease-in-out duration-150 cursor-not-allowed dark:ring-slate-200/20"
                                                     disabled=""
@@ -140,7 +142,15 @@
                                                     ><span
                                                         class="relative inline-flex rounded-full h-3 w-3 bg-sky-500"
                                                     ></span></span
-                                            ></span>
+                                            ></div>
+                                            <Link
+                                                type="button"
+                                                :href="route('dashboard')"
+                                                class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                                
+                                            >
+                                                Go to Dashboard
+                                            </Link>
                                         </span>
                                     </div>
                                 </div>
