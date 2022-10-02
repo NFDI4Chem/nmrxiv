@@ -174,7 +174,7 @@ class DraftController extends Controller
             $team_id = $user->current_team_id;
         }
 
-        return DB::transaction(function () use ($draft, $user, $user_id, $team_id, $request, $project) {
+        return DB::transaction(function () use ($draft, $user, $user_id, $team, $team_id, $request, $project) {
             $nmrXivValidation = null;
             if (! $project) {
                 $project = Project::create([
@@ -189,7 +189,11 @@ class DraftController extends Controller
                 ]);
 
                 $project->users()->attach(
-                    $user, ['role' => 'creator']
+                    $user, ['role' => 'owner']
+                );
+
+                $project->users()->attach(
+                    $team->owner, ['role' => 'creator']
                 );
 
                 $project->syncTagsWithType($request->get('tags_array'), 'Project');

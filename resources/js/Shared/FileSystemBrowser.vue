@@ -567,9 +567,9 @@ export default {
                         data.forEach((u) => {
                             let cFile = vm.dropzone.files.find((f) => {
                                 if (f.fullPath) {
-                                    return f.fullPath == u.fullPath;
+                                    return f.fullPath.trim() == u.fullPath;
                                 } else {
-                                    return "/" + f.name == u.fullPath;
+                                    return "/" + f.name.trim() == u.fullPath;
                                 }
                             });
 

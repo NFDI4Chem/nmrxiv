@@ -530,7 +530,7 @@ export default {
         },
         updateDataSet() {
             // console.log("updating dataset");
-            if (this.dataset != null) {
+            if (this.dataset != null && this.selectedSpectraData.length > 0) {
                 this.updateLoadingStatus(true);
                 axios
                     .post(
