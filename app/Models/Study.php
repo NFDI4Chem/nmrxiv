@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Laravel\Scout\Searchable;
 use OwenIt\Auditing\Contracts\Auditable;
 use Spatie\Tags\HasTags;
+use Carbon\Carbon;
 use Storage;
 
 class Study extends Model implements Auditable
