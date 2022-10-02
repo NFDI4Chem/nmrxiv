@@ -281,7 +281,7 @@
                                 <div class="flex-1 flex md:overflow-hidden">
                                     <nav
                                         aria-label="Sections"
-                                        class="hidden flex-shrink-0 w-64 bg-white border-r border-blue-gray-200 md:flex md:flex-col"
+                                        class="hidden flex-shrink-0 w-80 bg-white border-r border-blue-gray-200 md:flex md:flex-col"
                                     >
                                         <div
                                             class="border-gray-200 px-4 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider flex-shrink-0 border-b border-blue-gray-200"
@@ -320,7 +320,7 @@
                                                     selectedStudy.id == study.id
                                                         ? 'bg-gray-800 text-white'
                                                         : 'hover:bg-gray-200 hover:bg-opacity-50',
-                                                    'cursor-pointer flex p-4 border-b border-blue-gray-200',
+                                                    'cursor-pointer flex p-4 pr-5 border-b border-blue-gray-200',
                                                 ]"
                                                 @click="
                                                     selectStudy(study, $index)
@@ -340,7 +340,7 @@
                                                     class="ml-3 text-sm w-full"
                                                 >
                                                     <p
-                                                        class="font-medium text-blue-gray-900"
+                                                        class="font-medium text-blue-gray-900 pr-4"
                                                     >
                                                         {{ study.name }}
                                                         <span
@@ -358,22 +358,22 @@
                                                             />
                                                         </span>
                                                     </p>
-                                                    <p
+                                                    <div
                                                         class="mt-1 text-blue-gray-500"
                                                     >
-                                                        <span
+                                                        <div
                                                             v-for="ds in study.datasets"
                                                             :key="ds.id"
                                                             :class="[
                                                                 ds.has_nmrium
                                                                     ? 'bg-green-100 text-gray-800'
                                                                     : 'bg-gray-100 text-gray-800',
-                                                                'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium mr-1',
+                                                                'w-64 inline-flex truncate break-words items-center px-3 py-0.5 rounded-full text-xs font-medium mr-1',
                                                             ]"
                                                         >
                                                             {{ ds.name }}
-                                                        </span>
-                                                    </p>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </a>
                                         </div>
