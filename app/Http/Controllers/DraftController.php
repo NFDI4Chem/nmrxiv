@@ -188,13 +188,19 @@ class DraftController extends Controller
                     'draft_id' => $draft->id,
                 ]);
 
-                $project->users()->attach(
-                    $user, ['role' => 'owner']
-                );
+                if($team->owner->id != $user->id){
+                    $project->users()->attach(
+                        $user, ['role' => 'owner']
+                    );
 
-                $project->users()->attach(
-                    $team->owner, ['role' => 'creator']
-                );
+                    $project->users()->attach(
+                        $team->owner, ['role' => 'creator']
+                    );
+                }else{
+                    $project->users()->attach(
+                        $team->owner, ['role' => 'creator']
+                    );
+                }
 
                 $project->syncTagsWithType($request->get('tags_array'), 'Project');
                 $project->save();
