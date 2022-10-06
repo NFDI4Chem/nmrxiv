@@ -25,6 +25,11 @@
                                     :src="user.profile_photo_url"
                                     :alt="user.name"
                                 />
+                                <img
+                                    class="w-8 h-8 -mr-2 rounded-full border-2 border-white"
+                                    :src="team.owner.profile_photo_url"
+                                    :alt="team.owner.name"
+                                />
                             </div>
                         </div>
                         <div v-if="!team.personal_team">
