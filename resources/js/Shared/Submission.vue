@@ -1603,6 +1603,16 @@ export default {
                 return 100;
             }
         },
+        getSVGString(molecule) {
+            if (molecule.MOL) {
+                let mol = OCL.Molecule.fromMolfile(
+                    "\n  " + molecule.MOL.replaceAll('"', "")
+                );
+                return mol.toSVG(200, 200);
+            } else {
+                console.log(molecule);
+            }
+        },
     },
     mounted() {
         const initialise = (data) => {
