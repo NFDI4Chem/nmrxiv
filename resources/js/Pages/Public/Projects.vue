@@ -181,7 +181,10 @@
                         </ul>
                     </div>
                 </div>
-                <div v-if="projects.meta.total > projects.meta.per_page" class="py-10">
+                <div
+                    v-if="projects.meta.total > projects.meta.per_page"
+                    class="py-10"
+                >
                     <Pagination :links="projects.meta.links"></Pagination>
                 </div>
             </div>

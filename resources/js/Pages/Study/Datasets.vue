@@ -125,19 +125,18 @@
                                 </div>
                             </div>
 
-                            <div class="sm:col-span-1">
+                            <div v-if="canUpdateStudy" class="sm:col-span-1">
                                 <label
                                     for="last-name"
                                     class="block text-sm font-medium text-gray-700"
                                     >&nbsp;</label
                                 >
                                 <button
-                                    v-if="editable"
                                     type="button"
                                     class="inline-flex mt-1 items-center px-2.5 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                                     @click="openDatasetCreateDialog()"
                                 >
-                                    + New Dataset
+                                    + Manage Datasets
                                 </button>
                             </div>
                         </div>
@@ -207,7 +206,7 @@ export default {
         MenuItem,
         MenuItems,
         SpectraEditor,
-        SpectraViewer
+        SpectraViewer,
     },
     props: [
         "study",
@@ -328,3 +327,4 @@ export default {
     },
 };
 </script>
+New

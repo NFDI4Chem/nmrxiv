@@ -501,7 +501,14 @@
                                                         </span>
                                                     </div>
                                                 </div>
-                                                <span class="float-right cursor-pointer hover:text-blue-700"><small href="https://docs.nmrxiv.org/docs/submission-guides/submission/molecular-assignments/structure-editor" target="_blank">Need help?</small></span>
+                                                <span
+                                                    class="float-right cursor-pointer hover:text-blue-700"
+                                                    ><small
+                                                        href="https://docs.nmrxiv.org/docs/submission-guides/submission/molecular-assignments/structure-editor"
+                                                        target="_blank"
+                                                        >Need help?</small
+                                                    ></span
+                                                >
                                                 <div
                                                     id="structureSearchEditor"
                                                     class="w-full border my-4 rounded-md"

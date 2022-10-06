@@ -85,9 +85,7 @@
             <small v-if="study.identifier" class="text-gray-500"
                 >#{{ study.identifier }}</small
             >
-            <Link
-                :href="study.public_url"
-            >
+            <Link :href="study.public_url">
                 <div class="flex-1">
                     <p class="text-lg font-semibold text-gray-900 line-clamp-1">
                         {{ study.name }}

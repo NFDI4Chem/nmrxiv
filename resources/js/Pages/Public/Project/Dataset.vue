@@ -337,8 +337,7 @@ export default {
     },
     computed: {
         shareURL() {
-            return (
-                this.dataset.data.public_url);
+            return this.dataset.data.public_url;
         },
         url() {
             return String(this.$page.props.url);
