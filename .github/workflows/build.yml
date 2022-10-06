@@ -1,4 +1,4 @@
-name : Deploy to GKE
+name : Deploy to Dev
 
 on:
   push:
@@ -16,7 +16,7 @@ env:
 
 jobs:
   setup-build-publish-deploy:
-    name: Setup, Build, Publish, and Deploy
+    name: Deploy to Dev
     if: github.ref == 'refs/heads/development'
     runs-on: ubuntu-latest
     #needs: build
