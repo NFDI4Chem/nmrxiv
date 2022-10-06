@@ -65,13 +65,9 @@
                                 class="text-gray-500"
                                 >#{{ project.identifier }}</small
                             >
+                            {{  }}
                             <Link
-                                :href="
-                                    '/projects/' +
-                                    project.owner.username +
-                                    '/' +
-                                    project.slug
-                                "
+                                :href="project.public_url"
                                 class="block cursor-pointer"
                             >
                                 <p
@@ -214,12 +210,7 @@
                                     class="text-lg font-black text-gray-900 line-clamp-2 font-black"
                                 >
                                     <Link
-                                        :href="
-                                            '/projects/' +
-                                            project.owner.username +
-                                            '/' +
-                                            project.slug
-                                        "
+                                        :href="project.public_url "
                                         class="block cursor-pointer"
                                     >
                                         {{ project.name }}

@@ -188,7 +188,7 @@ class DraftController extends Controller
                     'draft_id' => $draft->id,
                 ]);
 
-                if($team->owner->id != $user->id){
+                if ($team->owner->id != $user->id) {
                     $project->users()->attach(
                         $user, ['role' => 'owner']
                     );
@@ -196,7 +196,7 @@ class DraftController extends Controller
                     $project->users()->attach(
                         $team->owner, ['role' => 'creator']
                     );
-                }else{
+                } else {
                     $project->users()->attach(
                         $team->owner, ['role' => 'creator']
                     );

@@ -138,15 +138,7 @@
                                 aria-label="Tabs"
                             >
                                 <Link
-                                    :href="
-                                        route('public.project', {
-                                            owner: project.data.owner.username,
-                                            slug: project.data.slug,
-                                            _query: {
-                                                tab: tab.name,
-                                            },
-                                        })
-                                    "
+                                    :href="project.data.public_url + '?tab=' + tab.name"
                                     v-for="tab in tabs"
                                     :key="tab.name"
                                     :class="[

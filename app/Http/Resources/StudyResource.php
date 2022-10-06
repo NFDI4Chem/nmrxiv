@@ -38,6 +38,7 @@ class StudyResource extends JsonResource
             'doi' => $this->doi,
             'created_at' => $this->created_at,
             'is_public' => $this->is_public,
+            'public_url' => $this->public_url ? $this->public_url : null,
             'updated_at' => $this->updated_at,
             'study_preview_urls' => $this->study_preview_urls,
             $this->mergeWhen(! $this->lite, function () {

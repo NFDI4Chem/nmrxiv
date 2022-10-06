@@ -86,16 +86,7 @@
                 >#{{ study.identifier }}</small
             >
             <Link
-                :href="
-                    route('public.project', {
-                        owner: project.owner.username,
-                        slug: project.slug,
-                        _query: {
-                            tab: 'study',
-                            id: study.slug,
-                        },
-                    })
-                "
+                :href="study.public_url"
             >
                 <div class="flex-1">
                     <p class="text-lg font-semibold text-gray-900 line-clamp-1">

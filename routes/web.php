@@ -236,7 +236,8 @@ Route::group([
     });
 });
 
-Route::get('{id}', [ApplicationController::class, 'resolveIdentifier'])->where('id', '(P|S|D|M|p|s|d|m)[0-9]+');
+Route::get('{id}', [ApplicationController::class, 'resolveIdentifier'])->where('id', '(P|S|D|M|p|s|d|m)[0-9]+')
+    ->name('public');
 
 Route::get('{username}/download/{project}/{key?}', [DownloadController::class, 'downloadFromProject'])
     ->name('download');
@@ -267,7 +268,9 @@ Route::get('projects', [ProjectController::class, 'publicProjectsView'])
 
 Route::get('datasets/{dataset}/nmriumInfo', [DatasetController::class, 'fetchNMRium'])
     ->name('dashboard.datasets.nmrium');
+
 Route::get('datasets/{owner}/{slug}', [DatasetController::class, 'publicDatasetView'])
     ->name('public.dataset');
+
 Route::get('datasets', [DatasetController::class, 'publicDatasetsView'])
-    ->name('public.datasets');
+->name('public.datasets');
