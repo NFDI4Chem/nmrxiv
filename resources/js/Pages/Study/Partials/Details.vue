@@ -708,7 +708,7 @@
                                                 <div class="mt-6 flex text-sm">
                                                     <a
                                                         target="_blank"
-                                                        href="https://docs.nmrxiv.org/docs/submission-guides/sharing"
+                                                        href="https://docs.nmrxiv.org/docs/category/miscellaneous/sharing"
                                                         class="group inline-flex items-center text-gray-500 hover:text-gray-900"
                                                     >
                                                         <QuestionMarkCircleIcon
