@@ -239,17 +239,7 @@ export default {
             return String(this.$page.props.url);
         },
         shareURL() {
-            return (
-                this.url +
-                "/projects/" +
-                this.team.owner.username +
-                "/" +
-                this.project.slug +
-                "?tab=study&id=" +
-                this.study.slug +
-                "&dsid=" +
-                this.selectedDataset.slug
-            );
+            return this.selectedDataset.public_url;
         },
         canUpdateStudy() {
             return this.studyPermissions
