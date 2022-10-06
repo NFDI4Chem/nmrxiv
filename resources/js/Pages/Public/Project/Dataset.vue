@@ -338,16 +338,7 @@ export default {
     computed: {
         shareURL() {
             return (
-                this.url +
-                "/projects/" +
-                this.project.data.owner.username +
-                "/" +
-                this.project.data.slug +
-                "?tab=study&id=" +
-                this.study.data.slug +
-                "&dsid=" +
-                this.dataset.data.slug
-            );
+                this.dataset.data.public_url);
         },
         url() {
             return String(this.$page.props.url);
