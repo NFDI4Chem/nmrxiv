@@ -101,7 +101,7 @@ class Validation extends Model
                 'title' => 'required',
                 'description' => 'required',
                 'keywords' => 'required',
-                'citations' => 'required|array|min:1',
+                'citations' => 'array|min:0',
                 'authors' => 'required|array|min:1',
                 'license' => 'required',
                 'image' => 'required',
