@@ -26,7 +26,7 @@
                             <span v-if="index == selectedPreviewIndex">
                                 <img
                                     class="h-36 w-full rounded-t-md shadow-lg"
-                                    :src="url"
+                                    :src="url + '?id=' + Math.random()"
                                     alt=""
                                 />
                             </span>
