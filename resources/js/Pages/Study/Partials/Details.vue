@@ -385,8 +385,16 @@
                                                     class="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-1"
                                                 >
                                                     <div>
-                                                        <span class="float-right text-sm">
-                                                            <a target="_blank" href="https://docs.nmrxiv.org/docs/submission-guides/licenses">How to choose the right license?</a>
+                                                        <span
+                                                            class="float-right text-sm"
+                                                        >
+                                                            <a
+                                                                target="_blank"
+                                                                href="https://docs.nmrxiv.org/docs/submission-guides/licenses"
+                                                                >How to choose
+                                                                the right
+                                                                license?</a
+                                                            >
                                                         </span>
                                                         <select-rich
                                                             v-model:selected="

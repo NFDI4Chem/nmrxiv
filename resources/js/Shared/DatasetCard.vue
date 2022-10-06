@@ -29,10 +29,7 @@
                             style="min-height: 100px; max-height: 168px"
                             class="flex-1 p-3"
                         >
-                            <Link
-                                :href="dataset.public_url"
-                                class="block"
-                            >
+                            <Link :href="dataset.public_url" class="block">
                                 <small
                                     v-if="dataset.identifier"
                                     class="text-gray-500"

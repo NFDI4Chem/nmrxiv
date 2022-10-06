@@ -179,7 +179,10 @@
                         </ul>
                     </div>
                 </div>
-                <div v-if="datasets.meta.total > datasets.meta.per_page" class="py-10">
+                <div
+                    v-if="datasets.meta.total > datasets.meta.per_page"
+                    class="py-10"
+                >
                     <Pagination :links="datasets.meta.links"></Pagination>
                 </div>
             </div>

@@ -258,11 +258,19 @@
                                         {{ formatDate(project.created_at) }}
                                     </div>
                                     <span
-                                        v-if="!project.is_public && project.is_published"
+                                        v-if="
+                                            !project.is_public &&
+                                            project.is_published
+                                        "
                                         class="inline-flex items-center mt-2 px-3 py-0.5 rounded-full text-sm font-medium bg-yellow-100 text-red-800 capitalize"
                                     >
                                         PUBLISHED -&emsp;
-                                        <b>Release date: {{ formatDate(project.release_date) }}</b>
+                                        <b
+                                            >Release date:
+                                            {{
+                                                formatDate(project.release_date)
+                                            }}</b
+                                        >
                                     </span>
                                 </div>
                             </div>

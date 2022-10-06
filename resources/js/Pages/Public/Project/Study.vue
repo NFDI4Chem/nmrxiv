@@ -360,7 +360,7 @@ export default {
     },
     computed: {
         shareURL() {
-            return (this.selectedDataset.public_url);
+            return this.selectedDataset.public_url;
         },
         url() {
             return String(this.$page.props.url);

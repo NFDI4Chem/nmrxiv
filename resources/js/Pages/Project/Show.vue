@@ -282,7 +282,10 @@
                             Updated on
                             {{ formatDateTime(project.updated_at) }}
                         </div>
-                        <div v-if="!project.is_public && !project.is_published" class="flex-nowrap">
+                        <div
+                            v-if="!project.is_public && !project.is_published"
+                            class="flex-nowrap"
+                        >
                             <Publish :project="project" />
                         </div>
                         <div v-if="!project.is_public && project.is_published">
@@ -290,7 +293,10 @@
                                 class="ml-4 inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-yellow-100 text-red-800 capitalize"
                             >
                                 PUBLISHED -&emsp;
-                                <b>Release date: {{ formatDate(project.release_date) }}</b>
+                                <b
+                                    >Release date:
+                                    {{ formatDate(project.release_date) }}</b
+                                >
                             </span>
                         </div>
                     </div>

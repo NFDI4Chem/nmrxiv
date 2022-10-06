@@ -138,7 +138,11 @@
                                 aria-label="Tabs"
                             >
                                 <Link
-                                    :href="project.data.public_url + '?tab=' + tab.name"
+                                    :href="
+                                        project.data.public_url +
+                                        '?tab=' +
+                                        tab.name
+                                    "
                                     v-for="tab in tabs"
                                     :key="tab.name"
                                     :class="[
