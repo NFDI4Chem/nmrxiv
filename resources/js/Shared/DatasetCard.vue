@@ -30,16 +30,7 @@
                             class="flex-1 p-3"
                         >
                             <Link
-                                :href="
-                                    '/projects/' +
-                                    dataset.owner.username +
-                                    '/' +
-                                    dataset.project +
-                                    '?tab=study&id=' +
-                                    dataset.study +
-                                    '&dsid=' +
-                                    dataset.slug
-                                "
+                                :href="dataset.public_url"
                                 class="block"
                             >
                                 <small
@@ -58,25 +49,13 @@
                                     <small class="text-gray-400">Project:</small
                                     ><br />
                                     <Link
-                                        :href="
-                                            '/projects/' +
-                                            dataset.owner.username +
-                                            '/' +
-                                            dataset.project
-                                        "
+                                        :href="dataset.project.public_url"
                                         class="hover:underline hover:text-teal-900"
-                                        >{{ dataset.project }}</Link
+                                        >{{ dataset.project.name }}</Link
                                     >&nbsp;/&nbsp;<Link
                                         class="hover:underline hover:text-teal-900"
-                                        :href="
-                                            '/projects/' +
-                                            dataset.owner.username +
-                                            '/' +
-                                            dataset.project +
-                                            '?tab=study&id=' +
-                                            dataset.study
-                                        "
-                                        >{{ dataset.study }}</Link
+                                        :href="dataset.study.public_url"
+                                        >{{ dataset.study.name }}</Link
                                     >
                                 </p>
                             </Link>
@@ -212,16 +191,7 @@
                                     class="text-lg font-black text-gray-900 line-clamp-2 font-black"
                                 >
                                     <Link
-                                        :href="
-                                            '/projects/' +
-                                            dataset.owner.username +
-                                            '/' +
-                                            dataset.project +
-                                            '?tab=study&id=' +
-                                            dataset.study +
-                                            '&dsid=' +
-                                            dataset.slug
-                                        "
+                                        :href="dataset.public_url"
                                         class="block"
                                     >
                                         {{ dataset.name }}
@@ -233,25 +203,13 @@
                                     <small class="text-gray-400">Project:</small
                                     ><br />
                                     <Link
-                                        :href="
-                                            '/projects/' +
-                                            dataset.owner.username +
-                                            '/' +
-                                            dataset.project
-                                        "
+                                        :href="dataset.project.public_url"
                                         class="hover:underline hover:text-teal-900"
-                                        >{{ dataset.project }}</Link
+                                        >{{ dataset.project.name }}</Link
                                     >&nbsp;/&nbsp;<Link
                                         class="hover:underline hover:text-teal-900"
-                                        :href="
-                                            '/projects/' +
-                                            dataset.owner.username +
-                                            '/' +
-                                            dataset.project +
-                                            '?tab=study&id=' +
-                                            dataset.study
-                                        "
-                                        >{{ dataset.study }}</Link
+                                        :href="dataset.study.public_url"
+                                        >{{ dataset.study.name }}</Link
                                     >
                                 </p>
                             </div>

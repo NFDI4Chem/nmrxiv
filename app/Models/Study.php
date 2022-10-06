@@ -3,13 +3,13 @@
 namespace App\Models;
 
 use App\Traits\CacheClear;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Scout\Searchable;
 use OwenIt\Auditing\Contracts\Auditable;
 use Spatie\Tags\HasTags;
-use Carbon\Carbon;
 use Storage;
 
 class Study extends Model implements Auditable
@@ -120,7 +120,8 @@ class Study extends Model implements Auditable
 
     protected function getPublicUrlAttribute()
     {
-        return env('APP_URL', null).'/projects/'.$this->owner->username.'/'.urlencode($this->project->slug).'?tab=study&id='.$this->slug;
+        // return env('APP_URL', null).'/projects/'.$this->owner->username.'/'.urlencode($this->project->slug).'?tab=study&id='.$this->slug;
+        return env('APP_URL', null).'/S'.$this->getAttributes()['identifier'];
     }
 
     protected function getPrivateUrlAttribute()

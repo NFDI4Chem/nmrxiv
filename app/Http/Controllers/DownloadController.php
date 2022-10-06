@@ -90,7 +90,7 @@ class DownloadController extends Controller
                     $command['Prefix'] = $path.'/';
                 }
                 $result = $s3Client->execute($command);
-                if($result['Contents']){
+                if ($result['Contents']) {
                     foreach ($result['Contents'] as $file) {
                         array_push($s3keys, $file['Key']);
                     }
