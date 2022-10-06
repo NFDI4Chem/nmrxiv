@@ -382,6 +382,7 @@ export default {
                 }
                 if (e.data.type == "nmr-wrapper:error") {
                     this.spectraError = e.data.data;
+                    this.updateLoadingStatus(false);
                     return;
                 }
                 if (e.data.type == "nmr-wrapper:action-response") {
