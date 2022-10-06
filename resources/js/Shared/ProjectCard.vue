@@ -192,7 +192,7 @@
                             v-if="project.photo_url && project.photo_url != ''"
                             :src="project.photo_url"
                             alt=""
-                            class="border w-36 lg:h-36 xl:h-36 m-2 mr-0 h-full object-center rounded-t-lg object-cover"
+                            class="border w-36 lg:h-36 xl:h-36 m-2 mr-0 h-full object-center object-cover"
                         />
                         <div
                             v-else

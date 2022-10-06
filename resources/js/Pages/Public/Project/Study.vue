@@ -389,6 +389,17 @@ export default {
             this.selectedDataset = this.study.data.datasets[0];
         }
     },
-    methods: {},
+    methods: {
+        getSVGString(molecule) {
+            if (molecule.MOL) {
+                let mol = OCL.Molecule.fromMolfile(
+                    "\n  " + molecule.MOL.replaceAll('"', "")
+                );
+                return mol.toSVG(200, 200);
+            } else {
+                console.log(molecule);
+            }
+        },
+    },
 };
 </script>
