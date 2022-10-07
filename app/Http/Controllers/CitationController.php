@@ -14,7 +14,6 @@ class CitationController extends Controller
     {
         $input = $request->citationList;
         $user = $request->user();
-        //dd($request->citationList);
         //DB transaction
         $citations = [];
 
