@@ -108,7 +108,7 @@
                                     <div class="flex-1 min-w-0">
                                         <a
                                             class="focus:outline-none cursor-pointer"
-                                            :href="getOrcidLink(citation.doi)"
+                                            :href="getCitationLink(citation.doi)"
                                             :target="getTarget(citation.doi)"
                                         >
                                             <span
@@ -176,7 +176,7 @@
                                     <a
                                         class="focus:outline-none cursor-pointer"
                                         :href="
-                                            getAuthorDOILink(author.orcid_id)
+                                            getOrcidLink(author.orcid_id)
                                         "
                                         :target="getTarget(author.orcid_id)"
                                     >
@@ -248,14 +248,14 @@ export default {
     computed: {},
     mounted() {},
     methods: {
-        getAuthorDOILink(orcidId) {
+        getOrcidLink(orcidId) {
             var link = "#";
             if (orcidId) {
                 link = "https://orcid.org/" + orcidId;
             }
             return link;
         },
-        getOrcidLink(doi) {
+        getCitationLink(doi) {
             var link = "#";
             if (doi) {
                 link = "https://doi.org/" + doi;
