@@ -310,10 +310,10 @@ export default {
             return this.$page.props.nmriumURL
                 ? String(
                       this.$page.props.nmriumURL +
-                          "?workspace=embedded&id=" +
+                          "?id=" +
                           Math.random()
                   )
-                : "http://nmriumdev.nmrxiv.org?workspace=embedded&id=" +
+                : "http://nmriumdev.nmrxiv.org?id=" +
                       Math.random();
         },
     },
