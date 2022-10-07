@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
+use App\Models\Study;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -68,8 +69,13 @@ class DashboardController extends Controller
             auth()->user()
         )->get();
 
+        $studies = Study::where([['is_deleted', false]])->whereHasBookmark(
+            auth()->user()
+        )->get();
+
         return Inertia::render('Starred', [
             'projects' => $projects,
+            'studies' => $studies,
         ]);
     }
 
