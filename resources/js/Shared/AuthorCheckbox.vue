@@ -16,7 +16,8 @@
                     </p>
                     <a
                         v-if="item.orcid_id"
-                        :href="item.orcid_id"
+                        :href="getOrcidLink(item.orcid_id)"
+                        :target="getTarget(item.orcid_id)"
                         class="text-teal-500"
                         >ORCID ID - {{ item.orcid_id }}</a
                     >
@@ -61,5 +62,21 @@ export default {
             },
         },
     },
+    methods: {
+        getOrcidLink(orcidId) {
+            var link = "#";
+            if (orcidId) {
+                link = "https://orcid.org/" + orcidId;
+            }
+            return link;
+        },
+        getTarget(id) {
+            var target = null;
+            if (id) {
+                target = "_blank";
+            }
+            return target;
+        },
+    }
 };
 </script>
