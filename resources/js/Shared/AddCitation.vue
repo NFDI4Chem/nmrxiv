@@ -4,7 +4,7 @@
         :max-width="'6xl'"
         @close="addCitationDialog = false"
     >
-        <template #title> Update Citation </template>
+        <template #title> Manage Citation </template>
         <template #content>
             <div
                 class="relative grid grid-cols-1 gap-x-5 max-w-7xl mx-auto lg:grid-cols-2 divide-x"

@@ -4,7 +4,7 @@
         :max-width="'6xl'"
         @close="addAuthorDialog = false"
     >
-        <template #title> New Author </template>
+        <template #title> Manage Author </template>
         <template #content>
             <div
                 class="relative grid grid-cols-1 gap-x-16 max-w-7xl mx-auto lg:grid-cols-2 divide-x"
