@@ -3,11 +3,15 @@
 namespace App\Models;
 
 use App\Traits\CacheClear;
+use Auth;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Scout\Searchable;
+use Maize\Markable\Markable;
+use Maize\Markable\Models\Bookmark;
+use Maize\Markable\Models\Like;
 use OwenIt\Auditing\Contracts\Auditable;
 use Spatie\Tags\HasTags;
 use Storage;
@@ -17,6 +21,7 @@ class Study extends Model implements Auditable
     use Searchable;
     use CacheClear;
     use HasFactory;
+    use Markable;
     use HasDOI;
     use HasTags;
     use \OwenIt\Auditing\Auditable;
@@ -43,6 +48,11 @@ class Study extends Model implements Auditable
         'license_id',
     ];
 
+    protected static $marks = [
+        Like::class,
+        Bookmark::class,
+    ];
+
     /**
      * The accessors to append to the model's array form.
      *
@@ -54,6 +64,7 @@ class Study extends Model implements Auditable
         'study_photo_url',
         'study_preview_urls',
         'is_published',
+        'is_bookmarked',
     ];
 
     public function getIsPublishedAttribute()
@@ -301,5 +312,20 @@ class Study extends Model implements Auditable
                 $query->orderByDesc('created_at');
             }
         });
+    }
+
+    /**
+     * check if the study is bookmarked by current user
+     *
+     * @return string
+     */
+    public function getIsBookmarkedAttribute()
+    {
+        $user = Auth::user();
+        if (! $user) {
+            return false;
+        } else {
+            return Bookmark::has($this, $user);
+        }
     }
 }

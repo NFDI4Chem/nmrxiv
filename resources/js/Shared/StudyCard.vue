@@ -86,10 +86,19 @@
                 >#{{ study.identifier }}</small
             >
             <Link :href="route('dashboard.studies', [study.id])">
-                <div class="flex-1">
-                    <p class="text-lg font-semibold text-gray-900 line-clamp-1">
-                        {{ study.name }}
-                    </p>
+                <div class="flex items-center font-bold text-lg text-gray-600">
+                    <span class="">
+                        <!-- Commented now to avoid to lighten the query, will be added later with cache. -->
+                        <!--  <StarIcon
+                        :class="[
+                            study.is_bookmarked
+                                ? 'text-yellow-400'
+                                : 'text-gray-200',
+                            'h-6 w-6 flex-shrink-0 -ml-1 mr-1',
+                        ]"
+                    ></StarIcon> -->
+                    </span>
+                    {{ study.name }}
                 </div>
                 <div class="pt-1">
                     <div class="float-left">
@@ -142,6 +151,7 @@ import { LockOpenIcon } from "@heroicons/vue/24/solid";
 import { PencilIcon } from "@heroicons/vue/24/solid";
 import { EnvelopeIcon } from "@heroicons/vue/24/solid";
 import { Link } from "@inertiajs/inertia-vue3";
+import { StarIcon } from "@heroicons/vue/24/solid";
 
 export default {
     components: {
@@ -149,6 +159,7 @@ export default {
         LockOpenIcon,
         EnvelopeIcon,
         PencilIcon,
+        StarIcon,
         Link,
     },
     props: ["study"],

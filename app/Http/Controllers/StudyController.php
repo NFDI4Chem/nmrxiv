@@ -21,6 +21,7 @@ use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Laravel\Fortify\Actions\ConfirmPassword;
 use Laravel\Jetstream\Jetstream;
+use Maize\Markable\Models\Bookmark;
 
 class StudyController extends Controller
 {
@@ -283,5 +284,10 @@ class StudyController extends Controller
                 ->orderBy('created_at', 'desc')
                 ->get(),
         ]);
+    }
+
+    public function toggleStarred(Request $request, Study $study)
+    {
+        return Bookmark::toggle($study, $request->user());
     }
 }
