@@ -71,20 +71,21 @@
                                         </li>
                                     </ol>
                                 </nav>
-                                <h2
-                                    class="mt-2 text-2xl font-bold break-words leading-7 text-gray-900 sm:text-3xl"
+                                <div
+                                    class="flex pr-20 cursor-pointer items-center text-xl text-gray-700 font-bold"
                                 >
                                     <StarIcon
                                         :class="[
-                                            study.starred
+                                            study.is_bookmarked
                                                 ? 'text-yellow-400'
                                                 : 'text-gray-200',
-                                            'h-5 w-5 inline flex-shrink-0 -ml-8 mr-0.5',
+                                            'h-5 w-5 flex-shrink-0 -ml-1 mr-1',
                                         ]"
                                         aria-hidden="true"
+                                        @click="toogleStarred"
                                     />
                                     {{ study.name }}
-                                </h2>
+                                </div>
                                 <div
                                     class="mt-1 flex flex-col sm:flex-row sm:flex-wrap sm:mt-0 sm:space-x-6"
                                 >
@@ -366,6 +367,7 @@ import {
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import AccessDialogue from "@/Shared/AccessDialogue.vue";
 import Citation from "@/Shared/Citation.vue";
+import { Inertia } from "@inertiajs/inertia";
 
 export default {
     components: {
@@ -412,6 +414,24 @@ export default {
     methods: {
         toggleDetails() {
             this.studyDetailsElement.toggleDetails();
+        },
+        toogleStarred() {
+            const url = "/studies/" + this.study.id + "/toggleStarred";
+            axios
+                .get(url)
+                .catch((err) => {
+                    if (
+                        err.response.status !== 200 ||
+                        err.response.status !== 201
+                    ) {
+                        throw new Error(
+                            `API call failed with status code: ${err.response.status}`
+                        );
+                    }
+                })
+                .then(function (response) {
+                    Inertia.reload({ only: ["study"] });
+                });
         },
     },
 };

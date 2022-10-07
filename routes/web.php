@@ -257,6 +257,9 @@ Route::get('projects/{project}/toggleUpVote', [ProjectController::class, 'toggle
 Route::get('projects/{project}/toggleStarred', [ProjectController::class, 'toggleStarred'])
     ->name('project.toggle-starred');
 
+Route::get('studies/{study}/toggleStarred', [StudyController::class, 'toggleStarred'])
+->name('study.toggle-starred');
+
 Route::get('projects/{project}/studies', [ProjectController::class, 'publicStudies'])
     ->name('project.studies');
 
