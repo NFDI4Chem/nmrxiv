@@ -113,7 +113,7 @@ class UpdateProject
 
     public function updateCitation(Project $project, $citations, $user)
     {
-        $project->citations()->syncWithPivotValues(
+        $project->citations()->sync(
             $citations, ['user' => $user->id]
         );
     }
