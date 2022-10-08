@@ -37,6 +37,7 @@ class DraftController extends Controller
             ->whereHas('files')
             ->Where('owner_id', $user_id)
             ->Where('team_id', $team_id)
+            ->where('is_deleted', false)
             ->orderBy('updated_at', 'DESC')
             ->get();
 
@@ -83,6 +84,7 @@ class DraftController extends Controller
                     'children' => FileSystemObject::with('children')
                         ->where([
                             ['level', 0],
+                            ['status', '<>', 'missing'],
                             ['draft_id', $draft->id],
                         ])
                         ->orderBy('type')
@@ -150,6 +152,7 @@ class DraftController extends Controller
         $draftFolders = FileSystemObject::with('children')
             ->where([
                 ['level', 0],
+                ['status', '<>', 'missing'],
                 ['draft_id', $draft->id],
             ])
             ->orderBy('type')
@@ -222,14 +225,14 @@ class DraftController extends Controller
 
             foreach ($project->studies as $study) {
                 $fsObject = $study->fsObject;
-                if (! $fsObject) {
+                if (! $fsObject || $fsObject->status == 'missing') {
                     $study->datasets()->delete();
                     $study->delete();
                 }
 
                 foreach ($study->datasets as $dataset) {
                     $fsObject = $dataset->fsObject;
-                    if (! $fsObject) {
+                    if (! $fsObject || $fsObject->status == 'missing') {
                         $dataset->delete();
                     }
                 }
@@ -239,6 +242,7 @@ class DraftController extends Controller
             $folders = FileSystemObject::with('children')
                 ->where([
                     ['draft_id', $draft->id],
+                    ['status', '<>', 'missing'],
                     ['model_type', 'study'],
                 ])
                 ->orderBy('type')
@@ -322,6 +326,7 @@ class DraftController extends Controller
             $folders = FileSystemObject::with('children')
                 ->where([
                     ['draft_id', $draft->id],
+                    ['status', '<>', 'missing'],
                     ['dataset_id', null],
                 ])
                 ->whereIn('instrument_type', ['bruker', 'joel', 'varian'])
@@ -402,6 +407,7 @@ class DraftController extends Controller
         $draftFolders = FileSystemObject::with('children')
             ->where([
                 ['level', 0],
+                ['status', '<>', 'missing'],
                 ['draft_id', $draft->id],
             ])
             ->orderBy('type')
