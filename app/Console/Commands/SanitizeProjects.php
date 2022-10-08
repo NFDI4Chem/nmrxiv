@@ -17,14 +17,14 @@ class SanitizeProjects extends Command
      *
      * @var string
      */
-    protected $signature = 'nmrxiv:clean';
+    protected $signature = 'nmrxiv:clean {name?}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Helper scripts to maintain the database.';
 
     /**
      * Execute the console command.
@@ -33,72 +33,92 @@ class SanitizeProjects extends Command
      */
     public function handle()
     {
-        return DB::transaction(function () {
+        $name = $this->argument('name');
+
+        if ($name == 'status') {
+            return $this->updateFilesStatus();
+        } elseif ($name == 'paths') {
+            return $this->updateFilePaths();
+        } elseif ($name == 'version') {
+            return $this->versionProjects();
+        } elseif ($name == 'drafts') {
+            return $this->cleanDrafts();
+        } elseif ($name == 'localise') {
+            return $this->localise();
+        }
+    }
+
+    public function cleanDrafts()
+    {
             $privateProjects = Project::where([
-                ['is_public', false]
+                ['is_public', false],
             ])->get();
 
             foreach ($privateProjects as $project) {
-                if(!$project->draft){
-                    $project->draft_id = null;
-                    $project->save();
-                }
+                DB::transaction(function () use($project) {
+                    if(!$project->draft){
+                        $project->draft_id = null;
+                        $project->save();
+                    }
+                });
             }
 
             $projects = Project::where([
                 ['is_public', false],
                 ['draft_id', null],
             ])->get();
-
+            
             foreach ($projects as $project) {
-                $user_id = $project->owner->id;
-                $team_id = $project->team_id;
-                $id = Str::uuid();
-                $environment = env('APP_ENV', 'local');
-                $path = preg_replace(
-                    '~//+~',
-                    '/',
-                    $environment.'/'.$user_id.'/drafts/'.$id
-                );
+                DB::transaction(function () use ($project) {
+                    $user_id = $project->owner->id;
+                    $team_id = $project->team_id;
+                    $id = Str::uuid();
+                    $environment = env('APP_ENV', 'local');
+                    $path = preg_replace(
+                        '~//+~',
+                        '/',
+                        $environment.'/'.$user_id.'/drafts/'.$id
+                    );
 
-                $draft = Draft::create([
-                    'name' => $project->name,
-                    'slug' => Str::slug('$project->name'),
-                    'description' => $project->description,
-                    'relative_url' => rtrim(
-                        preg_replace('~//+~', '/', '/'.$id),
-                        '/'
-                    ),
-                    'path' => $path,
-                    'owner_id' => $user_id,
-                    'team_id' => $team_id ? $team_id : null,
-                    'key' => $id,
-                ]);
+                    $draft = Draft::create([
+                        'name' => $project->name,
+                        'slug' => Str::slug('$project->name'),
+                        'description' => $project->description,
+                        'relative_url' => rtrim(
+                            preg_replace('~//+~', '/', '/'.$id),
+                            '/'
+                        ),
+                        'path' => $path,
+                        'owner_id' => $user_id,
+                        'team_id' => $team_id ? $team_id : null,
+                        'key' => $id
+                    ]);
 
-                $projectFSObjects = FileSystemObject::with('children')
-                    ->where([
-                        ['project_id', $project->id],
-                        ['level', 0],
-                    ])
-                    ->get();
+                    $projectFSObjects = FileSystemObject::with('children')
+                        ->where([
+                            ['project_id', $project->id],
+                            ['level', 0],
+                        ])
+                        ->get();
 
-                foreach ($projectFSObjects as $FSObject) {
-                    $this->moveFolder($FSObject, $project, $draft);
-                }
-
-                $project->status = null;
-                $project->process_logs = null;
-                $project->draft_id = $draft->id;
-                $project->save();
-
-                foreach ($project->studies as $study) {
-                    $study->draft_id = $draft->id;
-                    $study->save();
-                    foreach ($study->datasets as $dataset) {
-                        $dataset->draft_id = $draft->id;
-                        $dataset->save();
+                    foreach ($projectFSObjects as $FSObject) {
+                        $this->moveFolder($FSObject, $project, $draft);
                     }
-                }
+
+                    $project->status = null;
+                    $project->process_logs = null;
+                    $project->draft_id = $draft->id;
+                    $project->save();
+
+                    foreach ($project->studies as $study) {
+                        $study->draft_id = $draft->id;
+                        $study->save();
+                        foreach ($study->datasets as $dataset) {
+                            $dataset->draft_id = $draft->id;
+                            $dataset->save();
+                        }
+                    }
+                });
             }
 
             foreach ($privateProjects as $project) {
@@ -113,8 +133,7 @@ class SanitizeProjects extends Command
                     ->where([
                         ['project_id', $project->id],
                         ['level', 1],
-                    ])
-                    ->get();
+                    ])->get();
 
                     foreach ($projectFSObjects as $FSObject) {
                         $parent = $FSObject->parent;
@@ -128,16 +147,149 @@ class SanitizeProjects extends Command
                     }
                 }
             }
+
+            foreach ($privateProjects as $project) {
+                $projectFSObjects = FileSystemObject::with('children')
+                        ->where([
+                            ['project_id', $project->id],
+                            ['level', 0],
+                        ])
+                        ->get();
+
+                foreach ($projectFSObjects as $FSObject) {
+                    if(!str_contains($FSObject->path, $FSObject->draft->path)){
+                        $this->moveFolder($FSObject, $FSObject->project, $FSObject->draft);
+                    }
+                }
+            }
+
+            $projectFSObjects = FileSystemObject::with('children')
+                ->where([
+                    ['level', 0],
+                    ['project_id', 0],
+                    ['study_id', 0],
+                    ['dataset_id', 0],
+                ])
+                ->get();
+            $environment = env('APP_ENV', 'local');
+            foreach ($projectFSObjects as $FSObject) {
+                if (! $FSObject->draft) {
+                    $projectUUID = str_replace(['/'.$environment.'/', '/'.$FSObject->key], '', $FSObject->path);
+                    $project = Project::where('uuid', $projectUUID)->first();
+                    if ($project) {
+                        $FSObject->project_id = $project->id;
+                        $FSObject->save();
+                        $this->updateDraftId($FSObject->fresh(), $project);
+                    }
+                }
+            }
+
+            $projectFSObjects = FileSystemObject::with('children')
+                    ->where([
+                        ['project_id', $project->id],
+                        ['level', 0],
+                    ])
+                    ->get();
+
+            foreach ($projectFSObjects as $FSObject) {
+                if($FSObject->draft){
+                    if (! str_contains($FSObject->path, $FSObject->draft->path)) {
+                        $this->moveFolder($FSObject, $FSObject->project, $FSObject->draft);
+                    }
+                }
+            }
+
+
+            $projectFSObjects = FileSystemObject::all();
+
+            foreach ($projectFSObjects as $FSObject) {
+                    if (str_contains($FSObject->path, "Isopropanol-neat")) {
+                        echo($FSObject->path . ' -- ' . $FSObject->id);
+                        echo("\n");
+                    }
+            }
+
+    }
+
+    public function versionProjects(){
+        $projects = Project::all();
+
+        foreach ($projects as $project) {
+            if(!$project->schema_version){
+                $project->schema_version = "beta";
+                $project->save();
+            }
+        }
+    }
+
+    public function localise()
+    {
+        return DB::transaction(function () {
+            $fsObjects = FileSystemObject::all();
+            foreach ($fsObjects as $fsObject) {
+                if ($fsObject->path) {
+                    $fsObject->path = str_replace('production', 'local', $fsObject->path);
+                    $fsObject->save();
+                }
+            }
+
+            $drafts = Draft::all();
+            foreach ($drafts as $draft) {
+                if ($draft->path) {
+                    $draft->path = str_replace('production', 'local', $draft->path);
+                    $draft->save();
+                }
+            }
+        });
+    }
+
+    public function updateFilesStatus()
+    {
+        return DB::transaction(function () {
+            $fsObjects = FileSystemObject::all();
+
+            foreach ($fsObjects as $fsObject) {
+                if ($fsObject->path) {
+                    $exists = Storage::disk(env('FILESYSTEM_DRIVER'))->exists($fsObject->path);
+                    if (! $exists) {
+                        $fsObject->status = 'missing';
+                    } else {
+                        $fsObject->status = 'present';
+                    }
+                    $fsObject->save();
+                }
+            }
+        });
+    }
+
+    public function updateFilePaths()
+    {
+        return DB::transaction(function () {
+            $fsObjects = FileSystemObject::all();
+            foreach ($fsObjects as $fsObject) {
+                if (! $fsObject->path) {
+                    $project = $fsObject->project;
+                    if ($project) {
+                        $environment = env('APP_ENV', 'local');
+                        $path = preg_replace(
+                            '~//+~',
+                            '/',
+                            '/'.$environment.'/'.$project->uuid.$fsObject->relative_url
+                        );
+
+                        $fsObject->path = $path;
+                    }
+                    $fsObject->save();
+                }
+            }
         });
     }
 
     public function updateDraftId($fsObject, $project)
     {
-        echo("project: " . $project->id);
-        echo("\n");
         $fsObject->draft_id = $project->draft_id;
-        if ($fsObject->path == null){
-            $fsObject->path = '/' . $project->draft->path . $fsObject->relative_url;
+        if ($fsObject->path == null) {
+            $fsObject->path = '/'.$project->draft->path.$fsObject->relative_url;
         }
         $fsObject->save();
 
@@ -145,8 +297,8 @@ class SanitizeProjects extends Command
         foreach ($fsObjectChildren as $fsObjectChild) {
             if ($fsObjectChild->type == 'file') {
                 $fsObjectChild->draft_id = $project->draft_id;
-                if ($fsObjectChild->path == null){
-                    $fsObjectChild->path = '/' . $project->draft->path . $fsObjectChild->relative_url;
+                if ($fsObjectChild->path == null) {
+                    $fsObjectChild->path = '/'.$project->draft->path.$fsObjectChild->relative_url;
                 }
                 $fsObjectChild->save();
             } else {
@@ -166,10 +318,12 @@ class SanitizeProjects extends Command
         foreach ($fsObjectChildren as $fsObjectChild) {
             if ($fsObjectChild->type == 'file') {
                 $newFilePath = '/'.$draft->path.$fsObjectChild->relative_url;
-                Storage::disk(env('FILESYSTEM_DRIVER'))->move($fsObjectChild->path, $newFilePath);
-                $fsObjectChild->path = $newFilePath;
-                $fsObjectChild->draft_id = $draft->id;
-                $fsObjectChild->save();
+                if ($fsObjectChild->path && $newFilePath && $fsObjectChild->path != $newFilePath) {
+                    Storage::disk(env('FILESYSTEM_DRIVER'))->move($fsObjectChild->path, $newFilePath);
+                    $fsObjectChild->path = $newFilePath;
+                    $fsObjectChild->draft_id = $draft->id;
+                    $fsObjectChild->save();
+                }
             } else {
                 $this->moveFolder($fsObjectChild, $project, $draft);
             }
