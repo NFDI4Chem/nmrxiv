@@ -617,19 +617,19 @@
                             >
                             </MenuButton>
                             <div class="inline-flex">
-                                <a
+                                <Link
                                     href="/login"
                                     class="px-3 py-2 whitespace-nowrap text-base font-medium text-gray-500 hover:text-gray-900"
                                 >
                                     Login
-                                </a>
-                                <a
+                                </Link>
+                                <Link
                                     href="/register"
                                     type="button"
                                     class="inline-flex ml-3 items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                                 >
                                     Register
-                                </a>
+                                </Link>
                             </div>
                         </Menu>
                     </div>

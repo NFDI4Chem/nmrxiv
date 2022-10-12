@@ -33,12 +33,12 @@
                             </div>
                         </div>
                         <div v-if="!team.personal_team">
-                            <a
+                            <Link
                                 :href="'/teams/' + user.current_team.id"
                                 class="text-sm text-gray-800 font-bold"
                             >
                                 Team Settings
-                            </a>
+                            </Link>
                         </div>
                     </div>
                 </div>
@@ -292,6 +292,7 @@ import Onboarding from "@/App/Onboarding.vue";
 import { useMagicKeys } from "@vueuse/core";
 import { getCurrentInstance } from "vue";
 import { watchEffect } from "vue";
+import { Link } from "@inertiajs/inertia-vue3";
 const { meta, u } = useMagicKeys();
 
 export default {
@@ -300,6 +301,7 @@ export default {
         TeamProjects,
         Create,
         Onboarding,
+        Link,
     },
     props: ["user", "team", "projects", "teamRole", "filters"],
     setup() {
