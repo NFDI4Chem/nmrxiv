@@ -502,11 +502,11 @@
                                                     </div>
                                                 </div>
                                                 <span
-                                                    class="float-right cursor-pointer hover:text-blue-700"
-                                                    ><small
-                                                        href="https://docs.nmrxiv.org/docs/submission-guides/submission/molecular-assignments/structure-editor"
+                                                    class="float-right text-xs cursor-pointer hover:text-blue-700"
+                                                    ><a
+                                                        href="https://docs.nmrxiv.org/docs/submission-guides/submission/editor"
                                                         target="_blank"
-                                                        >Need help?</small
+                                                        >Need help?</a
                                                     ></span
                                                 >
                                                 <div

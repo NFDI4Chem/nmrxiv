@@ -10,6 +10,15 @@
     >
         <div>
             <div :class="[fullScreen ? 'px-6 py-4' : '', 'flex justify-end']">
+                <span
+                    class="float-right text-xs cursor-pointer hover:text-blue-700 mt-2 mr-2"
+                >
+                    <a
+                        href="https://docs.nmrxiv.org/docs/submission-guides/submission/folder-structure"
+                        target="_blank"
+                        >Learn more about folder structuring</a
+                    >
+                </span>
                 <button class="right" @click="toggleFullScreen">
                     <span v-if="fullScreen">
                         <svg
