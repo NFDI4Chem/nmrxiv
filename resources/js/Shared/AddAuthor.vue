@@ -62,7 +62,10 @@
                             </div>
                         </div>
                         <div class="sm:col-span-2 mt-4">
-                            <jet-secondary-button :disabled = "!this.importAuthorsForm.doi" @click="importAuthors">
+                            <jet-secondary-button
+                                :disabled="!this.importAuthorsForm.doi"
+                                @click="importAuthors"
+                            >
                                 Import
                             </jet-secondary-button>
                         </div>
@@ -87,7 +90,12 @@
                         >
                             <jet-secondary-button
                                 class="float-right text-md font-bold text-teal-900"
-                                :disabled= "!(this.doiSelectedAuthorList && this.doiSelectedAuthorList.length > 0)"
+                                :disabled="
+                                    !(
+                                        this.doiSelectedAuthorList &&
+                                        this.doiSelectedAuthorList.length > 0
+                                    )
+                                "
                                 @click="addAuthor('DOI')"
                             >
                                 Add
@@ -247,7 +255,14 @@
                             <div class="sm:col-span-6 float-left">
                                 <jet-secondary-button
                                     class="float-right text-md font-bold text-teal-900"
-                                    :disabled= "!(this.manualAddAuthorForm && this.manualAddAuthorForm.family_name && this.manualAddAuthorForm.given_name)"
+                                    :disabled="
+                                        !(
+                                            this.manualAddAuthorForm &&
+                                            this.manualAddAuthorForm
+                                                .family_name &&
+                                            this.manualAddAuthorForm.given_name
+                                        )
+                                    "
                                     @click="addAuthor('Manual')"
                                 >
                                     Add
@@ -260,7 +275,10 @@
             <!-- Added Author Summary -->
             <div v-if="selectedAuthorsList.length > 0">
                 <div class="ml-2 mt-2 overflow-y-scroll h-64">
-                    <p class="float-left text-xs font-bold text-red-900 mt-4">*Please review your changes below and click on Save button to save your changes.</p>
+                    <p class="float-left text-xs font-bold text-red-900 mt-4">
+                        *Please review your changes below and click on Save
+                        button to save your changes.
+                    </p>
                     <table
                         class="divide-y divide-gray-200 w-full table-fixed overflow-y-scroll"
                     >
@@ -385,7 +403,18 @@
                 Close
             </jet-secondary-button>
 
-            <jet-button :disabled = "!(this.authorModified && this.selectedAuthorsList.length >0 )" class="ml-2" @click="updateAuthor"> Save </jet-button>
+            <jet-button
+                :disabled="
+                    !(
+                        this.authorModified &&
+                        this.selectedAuthorsList.length > 0
+                    )
+                "
+                class="ml-2"
+                @click="updateAuthor"
+            >
+                Save
+            </jet-button>
         </template>
     </jet-dialog-modal>
 </template>

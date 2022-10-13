@@ -44,7 +44,10 @@
                             </div>
                         </div>
                         <div class="sm:col-span-2 mt-4">
-                            <jet-secondary-button :disabled="!this.importCitationForm.doi" @click="importCitation">
+                            <jet-secondary-button
+                                :disabled="!this.importCitationForm.doi"
+                                @click="importCitation"
+                            >
                                 Import
                             </jet-secondary-button>
                         </div>
@@ -264,7 +267,12 @@
                                 <div>
                                     <jet-secondary-button
                                         class="float-right text-md font-bold text-teal-900"
-                                        :disabled = "!(this.manualAddCitationForm && this.manualAddCitationForm.title)"
+                                        :disabled="
+                                            !(
+                                                this.manualAddCitationForm &&
+                                                this.manualAddCitationForm.title
+                                            )
+                                        "
                                         @click="addCitationTemp('Manual')"
                                     >
                                         Add
@@ -278,7 +286,10 @@
             <!-- Added Citation Summary -->
             <div v-if="selectedCitationList.length > 0">
                 <div class="ml-2 mt-2 overflow-y-scroll h-64">
-                    <p class="float-left text-xs font-bold text-red-900 mt-4">*Please review your changes below and click on Save button to save your changes.</p>
+                    <p class="float-left text-xs font-bold text-red-900 mt-4">
+                        *Please review your changes below and click on Save
+                        button to save your changes.
+                    </p>
                     <table
                         class="divide-y divide-gray-200 w-full table-fixed overflow-y-scroll"
                     >
@@ -396,7 +407,18 @@
                 Close
             </jet-secondary-button>
 
-            <jet-button class="ml-2" :disabled = "!(this.citationModified && this.selectedCitationList.length > 0)" @click="updateCitation"> Save </jet-button>
+            <jet-button
+                class="ml-2"
+                :disabled="
+                    !(
+                        this.citationModified &&
+                        this.selectedCitationList.length > 0
+                    )
+                "
+                @click="updateCitation"
+            >
+                Save
+            </jet-button>
         </template>
     </jet-dialog-modal>
 </template>

@@ -83,6 +83,15 @@
                                 >
                                     Share with users
                                 </h3>
+                                <span
+                                    class="float-center text-xs cursor-pointer hover:text-blue-700 mt-2"
+                                >
+                                    <a
+                                        href="https://docs.nmrxiv.org/docs/submission-guides/data-model/sharing"
+                                        target="_blank"
+                                        >Learn more about sharing
+                                    </a>
+                                </span>
                                 <div
                                     class="mt-2 max-w-xl text-sm text-gray-500"
                                 >

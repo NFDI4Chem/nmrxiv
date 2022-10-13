@@ -68,6 +68,15 @@
                         <div class="mt-1 flex-1 h-0 overflow-y-auto">
                             <div class="my-4 mx-4">
                                 <create mode="button"></create>
+                                <span
+                                    class="float-center text-xs cursor-pointer hover:text-blue-700 mt-2"
+                                >
+                                    <a
+                                        href="https://docs.nmrxiv.org/docs/submission-guides/submission/upload"
+                                        target="_blank"
+                                        >Need help?
+                                    </a>
+                                </span>
                             </div>
                             <nav
                                 v-for="item in filteredNavigation"
@@ -164,8 +173,17 @@
                     </Link>
                 </div>
                 <div class="flex-grow flex flex-col -mt-1.5">
-                    <div class="px-4 flex flex-col mt-3 mb-1">
+                    <div class="px-4 flex flex-col mt-3 mb-1 text-center">
                         <create mode="button"></create>
+                        <span
+                            class="text-xs cursor-pointer hover:text-blue-700 mt-2"
+                        >
+                            <a
+                                href="https://docs.nmrxiv.org/docs/submission-guides/submission/upload"
+                                target="_blank"
+                                >Need help?
+                            </a>
+                        </span>
                     </div>
                     <nav class="py-4 px-0 bg-white">
                         <div
