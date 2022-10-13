@@ -49,15 +49,6 @@
                                 />
                                 {{ project.name }}
                             </div>
-                            <div
-                                class="float-center text-xs cursor-pointer hover:text-blue-700 mt-2 ml-4"
-                            >
-                                <a
-                                    href="https://docs.nmrxiv.org/docs/submission-guides/data-model/project"
-                                    target="_blank"
-                                    >Learn more about projects
-                                </a>
-                            </div>
                             <div class="inline-flex items-center mt-3">
                                 <access-dialogue
                                     :available-roles="availableRoles"
@@ -266,8 +257,9 @@
                                 </span>
                             </div>
                         </div>
-                        <div v-if="canDeleteProject" class="flex-nowrap">
+                        <div class="flex-nowrap">
                             <Link
+                                v-if="canDeleteProject"
                                 :href="
                                     route(
                                         'dashboard.project.settings',

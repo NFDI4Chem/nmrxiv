@@ -3,15 +3,6 @@
         <div class="flex items-baseline justify-between">
             <div>
                 <h2 class="text-lg">Studies</h2>
-                <div
-                    class="float-center text-xs cursor-pointer hover:text-blue-700 mb-2"
-                >
-                    <a
-                        href="https://docs.nmrxiv.org/docs/submission-guides/data-model/study"
-                        target="_blank"
-                        >Learn more about studies
-                    </a>
-                </div>
                 <div v-if="!loading" class="flex items-center mr-4 w-full">
                     <div class="flex w-full bg-white shadow rounded-full">
                         <input
@@ -49,7 +40,7 @@
                     + Manage Studies
                 </button>
                 <div
-                    class="text-center text-xs cursor-pointer hover:text-blue-700 mt-2"
+                    class="text-center inline ml-2 text-xs cursor-pointer hover:text-blue-700 mt-2"
                 >
                     <a
                         href="https://docs.nmrxiv.org/docs/submission-guides/submission/upload/#manage-studies-and-datasets"
