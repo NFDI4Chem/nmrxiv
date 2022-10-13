@@ -77,6 +77,6 @@ export default {
             }
             return target;
         },
-    }
+    },
 };
 </script>

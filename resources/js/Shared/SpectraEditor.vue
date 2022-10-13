@@ -4,6 +4,12 @@
             <div class="mb-2 float-right">
                 <small>
                     <a
+                        class="text-xs cursor-pointer hover:text-blue-700 mr-2"
+                        href="https://docs.nmrxiv.org/docs/submission-guides/data-model/sharing"
+                        target="_blank"
+                        >Learn more
+                    </a>
+                    <a
                         @click="loadFromURL(null)"
                         class="cursor-pointer mr-3 border px-2 py-1 rounded-md"
                         >Reset</a
@@ -365,13 +371,8 @@ export default {
         },
         nmriumURL() {
             return this.$page.props.nmriumURL
-                ? String(
-                      this.$page.props.nmriumURL +
-                          "?id=" +
-                          Math.random()
-                  )
-                : "http://nmriumdev.nmrxiv.org?id=" +
-                      Math.random();
+                ? String(this.$page.props.nmriumURL + "?id=" + Math.random())
+                : "http://nmriumdev.nmrxiv.org?id=" + Math.random();
         },
     },
     methods: {

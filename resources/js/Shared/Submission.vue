@@ -1117,6 +1117,16 @@
                                                                             </span>
                                                                         </div>
                                                                     </div>
+                                                                    <span
+                                                                        class="float-right text-xs cursor-pointer hover:text-blue-700 m-2"
+                                                                    >
+                                                                        <a
+                                                                            href="https://docs.nmrxiv.org/docs/submission-guides/submission/editor"
+                                                                            target="_blank"
+                                                                            >Need
+                                                                            help?
+                                                                        </a>
+                                                                    </span>
                                                                     <div
                                                                         id="structureSearchEditor"
                                                                         class="w-full border my-4 rounded-md"
