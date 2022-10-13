@@ -308,13 +308,8 @@ export default {
         },
         nmriumURL() {
             return this.$page.props.nmriumURL
-                ? String(
-                      this.$page.props.nmriumURL +
-                          "?id=" +
-                          Math.random()
-                  )
-                : "http://nmriumdev.nmrxiv.org?id=" +
-                      Math.random();
+                ? String(this.$page.props.nmriumURL + "?id=" + Math.random())
+                : "http://nmriumdev.nmrxiv.org?id=" + Math.random();
         },
     },
     methods: {
