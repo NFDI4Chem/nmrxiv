@@ -10,7 +10,7 @@
     <div v-else>
         <Link
             :href="route('dashboard.project.validation', [project.id])"
-            class="text-gray-900 text-sm font-bold"
+            class="text-gray-900 text-sm font-bold hover:text-blue-700"
         >
             Why can't I publish?
         </Link>

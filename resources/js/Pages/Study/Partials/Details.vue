@@ -386,7 +386,7 @@
                                                 >
                                                     <div>
                                                         <span
-                                                            class="float-right text-sm"
+                                                            class="float-right text-xs cursor-pointer hover:text-blue-700 mt-2"
                                                         >
                                                             <a
                                                                 target="_blank"
@@ -708,7 +708,7 @@
                                                 <div class="mt-6 flex text-sm">
                                                     <a
                                                         target="_blank"
-                                                        href="https://docs.nmrxiv.org/docs/category/miscellaneous/sharing"
+                                                        href="https://docs.nmrxiv.org/docs/submission-guides/data-model/sharing"
                                                         class="group inline-flex items-center text-gray-500 hover:text-gray-900"
                                                     >
                                                         <QuestionMarkCircleIcon

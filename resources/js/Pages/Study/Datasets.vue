@@ -97,6 +97,15 @@
                             class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6"
                         >
                             <div class="sm:col-span-5">
+                                <div
+                                    class="float-right text-xs cursor-pointer hover:text-blue-700 mb-2"
+                                >
+                                    <a
+                                        href="https://docs.nmrxiv.org/docs/submission-guides/data-model/dataset"
+                                        target="_blank"
+                                        >Learn more about dataset
+                                    </a>
+                                </div>
                                 <div>
                                     <label
                                         for="location"
@@ -125,7 +134,10 @@
                                 </div>
                             </div>
 
-                            <div v-if="canUpdateStudy" class="sm:col-span-1">
+                            <div
+                                v-if="canUpdateStudy"
+                                class="flex-shrink-0 text-center"
+                            >
                                 <label
                                     for="last-name"
                                     class="block text-sm font-medium text-gray-700"
@@ -138,6 +150,15 @@
                                 >
                                     + Manage Datasets
                                 </button>
+                                <div
+                                    class="text-xs cursor-pointer hover:text-blue-700 mt-2"
+                                >
+                                    <a
+                                        href="https://docs.nmrxiv.org/docs/submission-guides/submission/upload/#manage-studies-and-datasets"
+                                        target="_blank"
+                                        >Need help?
+                                    </a>
+                                </div>
                             </div>
                         </div>
 

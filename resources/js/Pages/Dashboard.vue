@@ -78,6 +78,15 @@
                     </p>
                     <div class="mt-6">
                         <create mode="button"></create>
+                        <span
+                            class="float-center text-xs cursor-pointer hover:text-blue-700 mt-2"
+                        >
+                            <a
+                                href="https://docs.nmrxiv.org/docs/submission-guides/submission/upload"
+                                target="_blank"
+                                >Need Help?
+                            </a>
+                        </span>
                     </div>
                 </div>
             </div>
