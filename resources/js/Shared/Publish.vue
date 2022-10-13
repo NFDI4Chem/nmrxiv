@@ -250,18 +250,18 @@
                                                     />
                                                     <div class="ml-2 text-sm">
                                                         I agree to the
-                                                        <a
+                                                        <Link
                                                             target="_blank"
-                                                            href="http://localhost/terms-of-service"
+                                                            :href="route('terms.show')"
                                                             class="underline text-sm text-gray-600 hover:text-gray-900"
-                                                            >Terms of Service</a
+                                                            >Terms of Service</Link
                                                         >
                                                         and
-                                                        <a
+                                                        <Link
                                                             target="_blank"
-                                                            href="http://localhost/privacy-policy"
+                                                            :href="route('policy.show')"
                                                             class="underline text-sm text-gray-600 hover:text-gray-900"
-                                                            >Privacy Policy</a
+                                                            >Privacy Policy</Link
                                                         >
                                                         and hereby also grant
                                                         nmrXiv permissions to
