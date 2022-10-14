@@ -25,7 +25,7 @@
                                     for="name"
                                     class="block text-sm font-medium text-gray-700"
                                 >
-                                    DOI or ORCID ID
+                                    DOI
                                 </label>
                                 <div class="mt-1 flex rounded-md shadow-sm">
                                     <input
@@ -533,7 +533,7 @@ export default {
                 axios
                     .get(this.$page.props.europemcWSApi, {
                         params: {
-                            query: this.importCitationForm.doi,
+                            query: "DOI:" + this.importCitationForm.doi,
                             format: "json",
                             pageSize: "1",
                             resulttype: "core",
