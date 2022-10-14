@@ -49,6 +49,7 @@
                     + Manage Studies
                 </button>
                 <div
+                    v-if="editable && project.draft_id !== null"
                     class="text-center text-xs cursor-pointer hover:text-blue-700 mt-2"
                 >
                     <a
