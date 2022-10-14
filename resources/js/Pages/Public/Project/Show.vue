@@ -108,7 +108,9 @@
                                     <div class="flex-1 min-w-0">
                                         <a
                                             class="focus:outline-none cursor-pointer"
-                                            :href="getCitationLink(citation.doi)"
+                                            :href="
+                                                getCitationLink(citation.doi)
+                                            "
                                             :target="getTarget(citation.doi)"
                                         >
                                             <span
@@ -175,9 +177,7 @@
                                 <div class="flex-1 min-w-0">
                                     <a
                                         class="focus:outline-none cursor-pointer"
-                                        :href="
-                                            getOrcidLink(author.orcid_id)
-                                        "
+                                        :href="getOrcidLink(author.orcid_id)"
                                         :target="getTarget(author.orcid_id)"
                                     >
                                         <span

@@ -38,6 +38,7 @@ class ProjectResource extends JsonResource
             'is_public' => $this->is_public,
             'is_published' => $this->is_published,
             'identifier' => $this->identifier,
+            'schema_version' => $this->schema_version,
             'public_url' => $this->public_url ? $this->public_url : null,
             'doi' => $this->doi,
             'tags' => $this->tags,
