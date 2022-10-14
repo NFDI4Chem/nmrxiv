@@ -29,7 +29,7 @@ class DeleteProject
                 $study->datasets()->update(['is_deleted' => true]);
             }
             $draft = $project->draft;
-            if($draft){
+            if ($draft) {
                 $draft->update(['is_deleted' => true]);
             }
             $project->is_deleted = true;

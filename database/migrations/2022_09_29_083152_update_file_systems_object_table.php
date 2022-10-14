@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('file_system_objects', function (Blueprint $table) {
-            $table->string('status', 2048)->nullable();
+            $table->string('status', 2048)->default('present');
         });
     }
 

@@ -252,16 +252,26 @@
                                                         I agree to the
                                                         <Link
                                                             target="_blank"
-                                                            :href="route('terms.show')"
+                                                            :href="
+                                                                route(
+                                                                    'terms.show'
+                                                                )
+                                                            "
                                                             class="underline text-sm text-gray-600 hover:text-gray-900"
-                                                            >Terms of Service</Link
+                                                            >Terms of
+                                                            Service</Link
                                                         >
                                                         and
                                                         <Link
                                                             target="_blank"
-                                                            :href="route('policy.show')"
+                                                            :href="
+                                                                route(
+                                                                    'policy.show'
+                                                                )
+                                                            "
                                                             class="underline text-sm text-gray-600 hover:text-gray-900"
-                                                            >Privacy Policy</Link
+                                                            >Privacy
+                                                            Policy</Link
                                                         >
                                                         and hereby also grant
                                                         nmrXiv permissions to

@@ -153,6 +153,7 @@ class ProjectController extends Controller
 
         return Inertia::render('Project/Settings', [
             'project' => $project,
+            'schema' => $environment = env('SCHEMA_VERSION', 'local'),
         ]);
     }
 
