@@ -250,7 +250,7 @@
                                                     />
                                                     <div class="ml-2 text-sm">
                                                         I agree to the
-                                                        <Link
+                                                        <a
                                                             target="_blank"
                                                             :href="
                                                                 route(
@@ -259,10 +259,10 @@
                                                             "
                                                             class="underline text-sm text-gray-600 hover:text-gray-900"
                                                             >Terms of
-                                                            Service</Link
+                                                            Service</a
                                                         >
                                                         and
-                                                        <Link
+                                                        <a
                                                             target="_blank"
                                                             :href="
                                                                 route(
@@ -271,7 +271,7 @@
                                                             "
                                                             class="underline text-sm text-gray-600 hover:text-gray-900"
                                                             >Privacy
-                                                            Policy</Link
+                                                            Policy</a
                                                         >
                                                         and hereby also grant
                                                         nmrXiv permissions to

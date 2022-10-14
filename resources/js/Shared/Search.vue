@@ -185,7 +185,7 @@
                                                                                 'bg-gray-900 bg-opacity-5 text-gray-900',
                                                                         ]"
                                                                     >
-                                                                        <a
+                                                                        <Link
                                                                             class="w-full"
                                                                             :href="
                                                                                 '/projects/' +
@@ -218,7 +218,7 @@
                                                                                 >Jump
                                                                                 to...</span
                                                                             >
-                                                                        </a>
+                                                                        </Link>
                                                                     </li>
                                                                 </ComboboxOption>
                                                             </ul>

@@ -328,7 +328,7 @@
                             <a target="_blank" href="https://www.nfdi4chem.de/">
                                 <img
                                     class="h-12"
-                                    src="https://www.nfdi4chem.de/wp-content/uploads/2021/11/cropped-NFDI4Chem-Logo-Claim_mehrfarbig_schwarz-e1636478409489.png"
+                                    src="/img/nmrxiv-logo.png"
                                     alt="NFDI4Chem"
                                 />
                             </a>
@@ -339,7 +339,7 @@
                             <a target="_blank" href="https://www.nmrium.org/">
                                 <img
                                     class="h-12"
-                                    src="https://www.nmrium.org/brand/nmrium-logo.svg"
+                                    src="/img/nmrium-logo.png"
                                     alt="NMRium"
                                 />
                             </a>
