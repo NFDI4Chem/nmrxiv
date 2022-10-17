@@ -879,6 +879,7 @@ import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import SelectRich from "@/Shared/SelectRich.vue";
 import JetButton from "@/Jetstream/Button.vue";
 import VueTagsInput from "@sipec/vue3-tags-input";
+import { Inertia } from "@inertiajs/inertia";
 const publishingOptions = [
     {
         value: "viewer",
@@ -1072,6 +1073,18 @@ export default defineComponent({
                     this.form.tag = "";
                     this.open = false;
                     this.clearPhotoFileInput();
+                    let stale = false;
+                    window.addEventListener('popstate', () => {
+                    stale = true;
+                    });
+
+                    Inertia.on('navigate', (event) => {
+                    const page = event.detail.page;
+                    if (stale) {
+                        Inertia.get(page.url, {}, { replace: true, preserveState: false });
+                    }
+                    stale = false;
+                    });
                 },
                 onError: (err) => {},
             });
