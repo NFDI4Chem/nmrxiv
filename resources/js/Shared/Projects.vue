@@ -16,7 +16,7 @@ export default {
     components: {
         ProjectCard,
     },
-    props: [],
+    props: ['limit'],
     setup() {},
     data() {
         return {
@@ -24,8 +24,9 @@ export default {
         };
     },
     mounted() {
+        let max = this.limit ? this.limit : 8;
         axios.get("/api/v1/projects").then((response) => {
-            this.projects = response.data.data;
+            this.projects = response.data.data.slice(0, max);
         });
     },
     methods: {},

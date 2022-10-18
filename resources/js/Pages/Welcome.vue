@@ -457,7 +457,7 @@
                         <div
                             class="lg:mx-auto lg:max-w-7xl lg:px-8 md:grid grid-cols-1 grid-flow-col-dense lg:gap-24 px-4"
                         >
-                            <Projects></Projects>
+                            <Projects :limit="8"></Projects>
                         </div>
                     </div>
                 </div>
