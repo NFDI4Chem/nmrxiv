@@ -19,10 +19,12 @@ use App\Http\Controllers\ProjectMemberController;
 use App\Http\Controllers\StudyController;
 use App\Http\Controllers\StudyInvitationController;
 use App\Http\Controllers\StudyMemberController;
+use App\Http\Controllers\TeamController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use Laravel\Jetstream\Jetstream;
 
 Route::group([
     'prefix' => 'auth',
@@ -47,6 +49,13 @@ Route::get('/', function () {
 })->name('welcome');
 
 Route::supportBubble();
+
+Route::group(['middleware' => 'verified'], function () {
+    // Teams...
+    if (Jetstream::hasTeamFeatures()) {
+        Route::delete('/teams/{team}', [TeamController::class, 'destroy'])->name('app.teams.destroy');
+    }
+});
 
 Route::group(['middleware' => ['auth', 'verified']], function () {
     // License
