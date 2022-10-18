@@ -335,6 +335,21 @@
                                                         </Menu>
                                                     </div>
                                                 </div>
+                                                <div v-else>
+                                                    <div
+                                                        v-if="
+                                                            personRole(
+                                                                person
+                                                            )
+                                                        "
+                                                    >
+                                                        <span
+                                                            class="ml-6 text-sm text-dark-500"
+                                                        >
+                                                            Creator
+                                                        </span>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </a>
