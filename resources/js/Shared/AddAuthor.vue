@@ -616,7 +616,6 @@ export default {
             var author = {};
             var authors = [];
             var tempList = [];
-            console.log('Check for Input..' + input + "" + this.checkDOI(input));
             if(response){
                 if(!this.checkDOI(input)){
                     tempList = response.authorList.author;
