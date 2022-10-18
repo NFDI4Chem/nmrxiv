@@ -399,7 +399,7 @@
                             >
                                 <img
                                     class="w-full rounded-xl shadow-xl ring-1 ring-black ring-opacity-5 lg:absolute lg:left-0 lg:h-full lg:w-auto lg:max-w-none"
-                                    src="/img/s1.jpg"
+                                    src="/img/welcome1.jpg"
                                     alt=""
                                 />
                             </div>
@@ -583,7 +583,7 @@
                             >
                                 <img
                                     class="w-full rounded-xl shadow-xl ring-1 ring-black ring-opacity-5 lg:absolute lg:left-0 lg:h-full lg:w-auto lg:max-w-none"
-                                    src="/img/s1.jpg"
+                                    src="/img/welcome2.jpg"
                                     alt=""
                                 />
                             </div>
