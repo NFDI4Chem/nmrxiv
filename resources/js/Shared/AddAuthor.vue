@@ -48,7 +48,7 @@
                                 <div class="mt-1 flex rounded-md shadow-sm">
                                     <input
                                         id="name"
-                                        v-model="importAuthorsForm.doi"
+                                        v-model="importAuthorsForm.input"
                                         type="text"
                                         name="name"
                                         autocomplete="off"
@@ -56,21 +56,21 @@
                                     />
                                 </div>
                                 <jet-input-error
-                                    :message="importAuthorsForm.errors.doi"
+                                    :message="importAuthorsForm.errors.input"
                                     class="mt-2"
                                 />
                             </div>
                         </div>
                         <div class="sm:col-span-2 mt-4">
                             <jet-secondary-button
-                                :disabled="!this.importAuthorsForm.doi"
+                                :disabled="!this.importAuthorsForm.input"
                                 @click="importAuthors"
                             >
                                 Import
                             </jet-secondary-button>
                         </div>
                         <div
-                            v-if="loading && importAuthorsForm.doi"
+                            v-if="loading && importAuthorsForm.input"
                             class="sm:col-span-9 mt-4 align-centre"
                         >
                             <loading-button :loading="loading" />
@@ -456,8 +456,7 @@ export default {
                 errors: {},
             }),
             importAuthorsForm: this.$inertia.form({
-                doi: "",
-                orcid: "",
+                input: "",
                 errors: {},
             }),
             addAuthorDialog: false,
@@ -468,6 +467,8 @@ export default {
             confirmingAuthorDeletion: false,
             authorId: null,
             authorModified: false,
+            queryParam: "",
+            isDoi: false,
         };
     },
     methods: {
@@ -493,14 +494,19 @@ export default {
             this.loading = true;
             this.authorsListDOI = [];
             this.importAuthorsForm.errors = {};
-            if (!this.importAuthorsForm.doi) {
-                this.importAuthorsForm.errors.doi =
-                    "The DOI field is required.";
+            if (!this.importAuthorsForm.input) {
+                this.importAuthorsForm.errors.input =
+                    "Please enter a DOI or ORCID id to proceed.";
             } else {
+                this.queryParam = this.importAuthorsForm.input;
+                if(this.checkDOI(this.importAuthorsForm.input)){
+                    this.queryParam = "DOI:" + this.queryParam;
+                    this.isDoi = true;
+                }
                 axios
                     .get(this.$page.props.europemcWSApi, {
                         params: {
-                            query: this.importAuthorsForm.doi,
+                            query: this.queryParam,
                             format: "json",
                             pageSize: "1",
                             resulttype: "core",
@@ -509,17 +515,17 @@ export default {
                     })
                     .then((res) => {
                         this.authorsListDOI = this.formatAuthorResponse(
-                            res.data.resultList.result[0]
+                            res.data.resultList.result[0], this.importAuthorsForm.input
                         );
                     })
                     .catch((error) => {
-                        this.importAuthorsForm.errors.doi =
-                            "Something went wrong. Please check the DOI and try again.";
+                        this.importAuthorsForm.errors.input =
+                            "Something went wrong. Please check the input and try again.";
                     })
                     .finally(() => {
                         if (this.authorsListDOI == null) {
-                            this.importAuthorsForm.errors.doi =
-                                "Something went wrong. Please check the DOI and try again.";
+                            this.importAuthorsForm.errors.input =
+                                "Something went wrong. Please check the input and try again.";
                         }
                         this.loading = false;
                     });
@@ -605,37 +611,56 @@ export default {
             });
         },
         /*Format the response*/
-        formatAuthorResponse(response) {
+        formatAuthorResponse(response,input) {
             var authorsList = [];
             var author = {};
-            if (response) {
-                var authors = response.authorList.author;
-                authors.forEach((item) => {
-                    author["given_name"] = item.hasOwnProperty("firstName")
-                        ? item["firstName"]
-                        : null;
-                    author["family_name"] = item.hasOwnProperty("lastName")
-                        ? item["lastName"]
-                        : null;
-                    if (item.hasOwnProperty("authorAffiliationDetailsList")) {
-                        var affiliationList =
-                            item["authorAffiliationDetailsList"]
-                                .authorAffiliation;
-                        affiliationList.forEach((item) => {
-                            author["affiliation"] = item["affiliation"];
-                        });
-                    }
-                    if (item.hasOwnProperty("authorId")) {
-                        var idType = item["authorId"].type;
-                        if (idType.toLowerCase() == "orcid") {
-                            author["orcid_id"] = item["authorId"].value;
+            var authors = [];
+            var tempList = [];
+            console.log('Check for Input..' + input + "" + this.checkDOI(input));
+            if(response){
+                if(!this.checkDOI(input)){
+                    tempList = response.authorList.author;
+                    var orcidId = "";
+                    tempList.forEach((item) => {
+                        if(item.hasOwnProperty("authorId")) {
+                            var idType = item["authorId"].type;
+                            if(idType.toLowerCase() == "orcid"){
+                                orcidId = item["authorId"].value;
+                            }
+                            if(orcidId == input){
+                                authors.push(item);
+                            }
                         }
-                    }
-                    authorsList.push(author);
-                    author = {};
+                    });
+                } else {
+                    authors = response.authorList.author;
+                }
+            }
+            authors.forEach((item) => {
+            author["given_name"] = item.hasOwnProperty("firstName")
+                ? item["firstName"]
+                : null;
+            author["family_name"] = item.hasOwnProperty("lastName")
+                ? item["lastName"]
+                : null;
+            if (item.hasOwnProperty("authorAffiliationDetailsList")) {
+                var affiliationList =
+                    item["authorAffiliationDetailsList"]
+                        .authorAffiliation;
+                affiliationList.forEach((item) => {
+                    author["affiliation"] = item["affiliation"];
                 });
             }
-            return authorsList;
+            if (item.hasOwnProperty("authorId")) {
+                var idType = item["authorId"].type;
+                if (idType.toLowerCase() == "orcid") {
+                    author["orcid_id"] = item["authorId"].value;
+                }
+            }
+            authorsList.push(author);
+            author = {};
+        });
+        return authorsList;
         },
         /*Validating form*/
         validateForm() {
@@ -685,6 +710,13 @@ export default {
                 link = "https://orcid.org/" + orcidId;
             }
             return link;
+        },
+        /*Checking if the input is DOI*/
+        checkDOI(input){
+            var testKey = String(input);
+            var DOIpattern = new RegExp(/\b(10[.][0-9]{4,}(?:[.][0-9]+)*)\b/g);
+            var isDOI = DOIpattern.test(testKey);
+            return isDOI;
         },
         /*Reset forms and local variables*/
         resetData() {
