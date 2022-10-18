@@ -338,9 +338,7 @@
                                                 <div v-else>
                                                     <div
                                                         v-if="
-                                                            personRole(
-                                                                person
-                                                            )
+                                                            personRole(person)
                                                         "
                                                     >
                                                         <span

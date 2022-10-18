@@ -16,7 +16,7 @@ export default {
     components: {
         ProjectCard,
     },
-    props: ['limit'],
+    props: ["limit"],
     setup() {},
     data() {
         return {

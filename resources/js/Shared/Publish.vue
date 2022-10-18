@@ -258,8 +258,7 @@
                                                                 )
                                                             "
                                                             class="underline text-sm text-gray-600 hover:text-gray-900"
-                                                            >Terms of
-                                                            Service</a
+                                                            >Terms of Service</a
                                                         >
                                                         and
                                                         <a
@@ -270,8 +269,7 @@
                                                                 )
                                                             "
                                                             class="underline text-sm text-gray-600 hover:text-gray-900"
-                                                            >Privacy
-                                                            Policy</a
+                                                            >Privacy Policy</a
                                                         >
                                                         and hereby also grant
                                                         nmrXiv permissions to
