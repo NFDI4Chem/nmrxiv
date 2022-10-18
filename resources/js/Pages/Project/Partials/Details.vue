@@ -1074,16 +1074,19 @@ export default defineComponent({
                     this.open = false;
                     this.clearPhotoFileInput();
                     let stale = false;
+
+                    Inertia.reload({ only: ['project'] })
+                    
                     window.addEventListener('popstate', () => {
-                    stale = true;
+                        stale = true;
                     });
 
                     Inertia.on('navigate', (event) => {
                     const page = event.detail.page;
-                    if (stale) {
-                        Inertia.get(page.url, {}, { replace: true, preserveState: false });
-                    }
-                    stale = false;
+                        if (stale) {
+                            Inertia.get(page.url, {}, { replace: true, preserveState: false });
+                        }
+                        stale = false;
                     });
                 },
                 onError: (err) => {},

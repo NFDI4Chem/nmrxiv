@@ -83,7 +83,7 @@
                             <section
                                 class="min-w-0 p-6 flex-1 h-full flex flex-col overflow-y-auto lg:order-last"
                             >
-                                <div v-if="canUpdateFiles">
+                                <!-- <div v-if="canUpdateFiles">
                                     <form class="dropzone py-2 mb-3">
                                         <div
                                             id="dropzone-message"
@@ -155,7 +155,7 @@
                                             </div>
                                         </div>
                                     </form>
-                                </div>
+                                </div> -->
                                 <div
                                     v-if="
                                         $page.props.selectedFileSystemObject &&
