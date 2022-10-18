@@ -14,17 +14,17 @@
                 v-if="!project.is_public && project.is_published"
                 class="text-center px-3 py-2 bg-green-50 text-green-700 border-b"
             >
-                <b>Info: </b> This project is published and set to be released on
-                                    {{ formatDate(project.release_date) }}. You cannot edit a
-                    published project, please create a new version to updated
-                    the project.
+                <b>Info: </b> This project is published and set to be released
+                on {{ formatDate(project.release_date) }}. You cannot edit a
+                published project, please create a new version to updated the
+                project.
             </div>
             <div v-if="project.is_public">
                 <div
                     v-if="project.is_archived"
                     class="text-center px-3 py-2 bg-yellow-50 text-yellow-700 border-b"
                 >
-                    <b>Warning: </b> This project is archived. It is now 
+                    <b>Warning: </b> This project is archived. It is now
                     read-only.
                 </div>
                 <div

@@ -325,8 +325,12 @@
                                             <p>
                                                 Orcid Id -
                                                 <a
-                                                    :href="getOrcidLink(author.orcid_id)"
-                                                    target=_blank
+                                                    :href="
+                                                        getOrcidLink(
+                                                            author.orcid_id
+                                                        )
+                                                    "
+                                                    target="_blank"
                                                     class="text-teal-900"
                                                     >{{ author.orcid_id }}</a
                                                 >

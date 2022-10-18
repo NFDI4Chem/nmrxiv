@@ -1456,6 +1456,7 @@ import {
     TrashIcon,
     PlayIcon,
     PauseIcon,
+    PencilIcon,
 } from "@heroicons/vue/24/solid";
 import { Link } from "@inertiajs/inertia-vue3";
 
@@ -1469,6 +1470,7 @@ export default {
         slider,
         SelectRich,
         XCircleIcon,
+        PencilIcon,
         JetInputError,
         FileSystemBrowser,
         ClipboardDocumentIcon,
