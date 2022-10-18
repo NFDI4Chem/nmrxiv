@@ -342,9 +342,9 @@
                                                         "
                                                     >
                                                         <span
-                                                            class="ml-6 text-sm text-dark-500"
+                                                            class="ml-6 text-sm capitalize text-dark-500"
                                                         >
-                                                            Creator
+                                                            {{ personRole(person) }}
                                                         </span>
                                                     </div>
                                                 </div>
