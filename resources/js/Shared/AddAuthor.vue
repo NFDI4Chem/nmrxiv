@@ -325,7 +325,8 @@
                                             <p>
                                                 Orcid Id -
                                                 <a
-                                                    :href="author.orcid_id"
+                                                    :href="getOrcidLink(author.orcid_id)"
+                                                    target=_blank
                                                     class="text-teal-900"
                                                     >{{ author.orcid_id }}</a
                                                 >
@@ -676,6 +677,14 @@ export default {
         closeModal() {
             this.confirmingAuthorDeletion = false;
             this.authorId = null;
+        },
+        /*Get link for Orcid Ids*/
+        getOrcidLink(orcidId) {
+            var link = "#";
+            if (orcidId) {
+                link = "https://orcid.org/" + orcidId;
+            }
+            return link;
         },
         /*Reset forms and local variables*/
         resetData() {
