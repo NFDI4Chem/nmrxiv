@@ -3,6 +3,7 @@
 namespace App\Actions\Project;
 
 use App\Models\Project;
+use App\Models\Validation;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -104,12 +105,12 @@ class UpdateProject
 
             $validation = $project->validation;
 
-            if (!$validation) {
+            if (! $validation) {
                 $validation = new Validation();
                 $validation->save();
                 $project->validation()->associate($validation);
                 $project->save();
-    
+
                 foreach ($project->studies as $study) {
                     $study->validation()->associate($validation);
                     $study->save();
