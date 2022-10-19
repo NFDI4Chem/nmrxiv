@@ -344,7 +344,11 @@
                                                         <span
                                                             class="ml-6 text-sm capitalize text-dark-500"
                                                         >
-                                                            {{ personRole(person) }}
+                                                            {{
+                                                                personRole(
+                                                                    person
+                                                                )
+                                                            }}
                                                         </span>
                                                     </div>
                                                 </div>
