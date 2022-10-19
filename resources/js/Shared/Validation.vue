@@ -46,7 +46,7 @@
                                 </p>
                                 <a
                                     target="_blank"
-                                    v-if="!validation.project.title"
+                                    v-if="!getStatus(validation.project.title)"
                                     :href="
                                         route(
                                             'dashboard.projects',
@@ -77,7 +77,11 @@
                                             project.id
                                         ) + '?edit=description'
                                     "
-                                    v-if="!validation.project.description"
+                                    v-if="
+                                        !getStatus(
+                                            validation.project.description
+                                        )
+                                    "
                                     class="cursor-pointer bg-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
                                 >
                                     Edit
@@ -102,7 +106,9 @@
                                             project.id
                                         ) + '?edit=keywords'
                                     "
-                                    v-if="!validation.project.keywords"
+                                    v-if="
+                                        !getStatus(validation.project.keywords)
+                                    "
                                     class="cursor-pointer bg-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
                                 >
                                     Edit
@@ -127,7 +133,9 @@
                                             project.id
                                         ) + '?edit=citation'
                                     "
-                                    v-if="!validation.project.citations"
+                                    v-if="
+                                        !getStatus(validation.project.citations)
+                                    "
                                     class="cursor-pointer bg-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
                                 >
                                     Edit
@@ -152,7 +160,9 @@
                                             project.id
                                         ) + '?edit=authors'
                                     "
-                                    v-if="!validation.project.authors"
+                                    v-if="
+                                        !getStatus(validation.project.authors)
+                                    "
                                     class="cursor-pointer bg-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
                                 >
                                     Edit
@@ -177,7 +187,9 @@
                                             project.id
                                         ) + '?edit=license'
                                     "
-                                    v-if="!validation.project.license"
+                                    v-if="
+                                        !getStatus(validation.project.license)
+                                    "
                                     class="cursor-pointer bg-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
                                 >
                                     Edit
@@ -202,7 +214,7 @@
                                             project.id
                                         ) + '?edit=profile_image'
                                     "
-                                    v-if="!validation.project.image"
+                                    v-if="!getStatus(validation.project.image)"
                                     class="cursor-pointer bg-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
                                 >
                                     Edit
@@ -263,7 +275,11 @@
                                                         Study title
                                                     </p>
                                                     <span
-                                                        v-if="!study.title"
+                                                        v-if="
+                                                            !getStatus(
+                                                                study.title
+                                                            )
+                                                        "
                                                         class="cursor-pointer bg-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
                                                     >
                                                         Edit
@@ -284,7 +300,9 @@
                                                     </p>
                                                     <span
                                                         v-if="
-                                                            !study.description
+                                                            !getStatus(
+                                                                study.description
+                                                            )
                                                         "
                                                         class="cursor-pointer bg-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
                                                     >
@@ -302,12 +320,22 @@
                                                     >
                                                         Study keywords
                                                     </p>
-                                                    <span
-                                                        v-if="!study.keywords"
+                                                    <a
+                                                        v-if="
+                                                            !getStatus(
+                                                                study.keywords
+                                                            )
+                                                        "
                                                         class="cursor-pointer bg-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
+                                                        :href="
+                                                            route(
+                                                                'dashboard.studies',
+                                                                study.id
+                                                            )
+                                                        "
                                                     >
                                                         Edit
-                                                    </span>
+                                                    </a>
                                                 </div>
                                                 <div
                                                     class="flex items-center hover:bg-gray-100 rounded-md px-2"
@@ -321,7 +349,11 @@
                                                         Study sample details
                                                     </p>
                                                     <span
-                                                        v-if="!study.sample"
+                                                        v-if="
+                                                            !getStatus(
+                                                                study.sample
+                                                            )
+                                                        "
                                                         class="cursor-pointer bg-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
                                                     >
                                                         Edit
@@ -340,14 +372,22 @@
                                                     >
                                                         Sample Composition
                                                     </p>
-                                                    <span
+                                                    <a
                                                         v-if="
-                                                            !study.composition
+                                                            !getStatus(
+                                                                study.composition
+                                                            )
+                                                        "
+                                                        :href="
+                                                            route(
+                                                                'dashboard.studies',
+                                                                study.id
+                                                            )
                                                         "
                                                         class="cursor-pointer bg-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
                                                     >
                                                         Edit
-                                                    </span>
+                                                    </a>
                                                 </div>
                                                 <div
                                                     class="flex items-center mt-2"
@@ -404,7 +444,9 @@
                                                                 </p>
                                                                 <span
                                                                     v-if="
-                                                                        !dataset.files
+                                                                        !getStatus(
+                                                                            dataset.files
+                                                                        )
                                                                     "
                                                                     class="cursor-pointer bg-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
                                                                 >
@@ -427,7 +469,9 @@
                                                                 <a
                                                                     target="_blank"
                                                                     v-if="
-                                                                        !dataset.nmrium_info
+                                                                        !getStatus(
+                                                                            dataset.nmrium_info
+                                                                        )
                                                                     "
                                                                     :href="
                                                                         route(
@@ -458,7 +502,9 @@
                                                                 </p>
                                                                 <span
                                                                     v-if="
-                                                                        !dataset.assay
+                                                                        !getStatus(
+                                                                            dataset.assay
+                                                                        )
                                                                     "
                                                                     class="cursor-pointer bg-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
                                                                 >
@@ -478,14 +524,24 @@
                                                                 >
                                                                     Assignments
                                                                 </p>
-                                                                <span
+                                                                <a
                                                                     v-if="
-                                                                        !dataset.assignments
+                                                                        !getStatus(
+                                                                            dataset.assignments
+                                                                        )
                                                                     "
                                                                     class="cursor-pointer bg-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
+                                                                    :href="
+                                                                        route(
+                                                                            'dashboard.study.datasets',
+                                                                            study.id
+                                                                        ) +
+                                                                        '?dsid=' +
+                                                                        dataset.id
+                                                                    "
                                                                 >
                                                                     Edit
-                                                                </span>
+                                                                </a>
                                                             </div>
                                                         </DisclosurePanel>
                                                     </Disclosure>
@@ -556,6 +612,14 @@ export default {
     props: {
         project: Object,
         validation: Object,
+    },
+    methods: {
+        getStatus(value) {
+            if (typeof value == "boolean") {
+                return value;
+            }
+            return value.split("|")[0] == "true";
+        },
     },
 };
 </script>

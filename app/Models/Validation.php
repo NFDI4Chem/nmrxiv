@@ -86,42 +86,40 @@ class Validation extends Model
         $warnings = [];
         $errors = [];
 
+        $schema_version = $project->schema_version ? $project->schema_version : config('validations.default');
+
+        $rules = config('validations.'.$schema_version);
+
         if ($project) {
             $values = [
                 'title' => $project->name,
                 'description' => $project->description,
-                'keywords' => $project->tags,
+                'keywords' => $project->tags->pluck('id')->toArray(),
                 'citations' => $project->citations->pluck('id')->toArray(),
                 'authors' => $project->authors->pluck('id')->toArray(),
                 'license' => $project->license,
                 'image' => $project->project_photo_path,
             ];
 
-            $rules = [
-                'title' => 'required',
-                'description' => 'required',
-                'keywords' => 'required',
-                'citations' => 'array|min:0',
-                'authors' => 'required|array|min:1',
-                'license' => 'required',
-                'image' => 'required',
-            ];
+            $project_rules = $rules['project'];
 
-            $validator = Validator::make($values, $rules);
+            $validator = Validator::make($values, $project_rules);
 
             if ($validator->fails()) {
-                $status = false;
                 $errors = $validator->errors()->getMessages();
-                foreach ($rules as $key => $value) {
+                foreach ($project_rules as $key => $value) {
                     if (array_key_exists($key, $errors)) {
-                        $report['project'][$key] = false;
+                        $report['project'][$key] = 'false|'.$project_rules[$key];
+                        if (strpos($project_rules[$key], 'required') !== false) {
+                            $status = false;
+                        }
                     } else {
-                        $report['project'][$key] = true;
+                        $report['project'][$key] = 'true|'.$project_rules[$key];
                     }
                 }
             } else {
-                foreach ($rules as $key => $value) {
-                    $report['project'][$key] = true;
+                foreach ($project_rules as $key => $value) {
+                    $report['project'][$key] = 'true|'.$project_rules[$key];
                 }
             }
 
@@ -132,10 +130,6 @@ class Validation extends Model
             foreach ($studies as $study) {
                 $sstatus = true;
                 $study->load(['datasets', 'sample.molecules', 'tags']);
-                // check studies
-                // check title
-                // check description
-                // check keywords
                 $studyReport = [
                     'name' => $study->name,
                     'id' => $study->id,
@@ -144,47 +138,39 @@ class Validation extends Model
                 $values = [
                     'title' => $study->name,
                     'description' => $study->description,
-                    'keywords' => $study->tags,
-                    'composition' => $study->sample->molecules(),
+                    'keywords' => $study->tags->pluck('id')->toArray(),
+                    'composition' => $study->sample->molecules->pluck('id')->toArray(),
                     'sample' => $study->sample,
                 ];
 
-                $rules = [
-                    'title' => 'required',
-                    'description' => 'required',
-                    'keywords' => '',
-                    'composition' => 'required',
-                    'sample' => 'required',
-                ];
+                $study_rules = $rules['study'];
 
-                $validator = Validator::make($values, $rules);
+                $validator = Validator::make($values, $study_rules);
 
                 if ($validator->fails()) {
-                    $sstatus = false;
-                    $status = false;
                     $errors = $validator->errors()->getMessages();
-                    foreach ($rules as $key => $value) {
+                    foreach ($study_rules as $key => $value) {
                         if (array_key_exists($key, $errors)) {
-                            $studyReport[$key] = false;
+                            $studyReport[$key] = 'false|'.$study_rules[$key];
+                            if (strpos($study_rules[$key], 'required') !== false) {
+                                $sstatus = false;
+                                $status = false;
+                            }
                         } else {
-                            $studyReport[$key] = true;
+                            $studyReport[$key] = 'true|'.$study_rules[$key];
                         }
                     }
                 } else {
-                    foreach ($rules as $key => $value) {
-                        $studyReport[$key] = true;
+                    foreach ($study_rules as $key => $value) {
+                        $studyReport[$key] = 'true|'.$study_rules[$key];
                     }
                 }
 
                 $datasets = $study->datasets;
 
                 $datasetsValidation = [];
-                // check datasets
                 foreach ($datasets as $dataset) {
                     $dstatus = true;
-                    // check files
-                    // check nmriuminfo
-                    // check metadata
                     $datasetReport = [
                         'name' => $dataset->name,
                         'id' => $dataset->id,
@@ -197,30 +183,27 @@ class Validation extends Model
                         'assignments' => $dataset->has_nmrium ? $dataset->has_nmrium : null,
                     ];
 
-                    $rules = [
-                        'files' => 'required',
-                        'nmrium_info' => 'required',
-                        'assay' => '',
-                        'assignments' => 'required',
-                    ];
+                    $dataset_rules = $rules['dataset'];
 
-                    $validator = Validator::make($values, $rules);
+                    $validator = Validator::make($values, $dataset_rules);
 
                     if ($validator->fails()) {
-                        $dstatus = false;
-                        $sstatus = false;
-                        $status = false;
                         $errors = $validator->errors()->getMessages();
-                        foreach ($rules as $key => $value) {
+                        foreach ($dataset_rules as $key => $value) {
                             if (array_key_exists($key, $errors)) {
-                                $datasetReport[$key] = false;
+                                $datasetReport[$key] = 'false|'.$dataset_rules[$key];
+                                if (strpos($dataset_rules[$key], 'required') !== false) {
+                                    $dstatus = false;
+                                    $sstatus = false;
+                                    $status = false;
+                                }
                             } else {
-                                $datasetReport[$key] = true;
+                                $datasetReport[$key] = 'true|'.$dataset_rules[$key];
                             }
                         }
                     } else {
-                        foreach ($rules as $key => $value) {
-                            $datasetReport[$key] = true;
+                        foreach ($dataset_rules as $key => $value) {
+                            $datasetReport[$key] = 'true|'.$dataset_rules[$key];
                         }
                     }
 
