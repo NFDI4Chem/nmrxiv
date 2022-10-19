@@ -15,12 +15,9 @@ class DeleteTeam implements DeletesTeams
      */
     public function delete($team)
     {
-        $input = $team->toArray();
-        $input['hasProject'] = false;
-
         if ($team->projects()->count() > 0) {
             throw ValidationException::withMessages([
-                'hasProject' => __('This team cannot be deletd as it has project associated with it.'),
+                'hasProject' => __('This team cannot be deletd as it has project associated with it. Please do not forget to wait for the cool off period of 30 days for your project to be deleted permanently.'),
             ]);
         }
         $team->purge();
