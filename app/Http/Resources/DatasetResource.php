@@ -32,11 +32,21 @@ class DatasetResource extends JsonResource
             'slug' => $this->slug,
             'description' => $this->description,
             'type' => $this->type,
-            'project' => $this->project ? $this->project->slug : '',
-            'study' => $this->study ? $this->study->slug : '',
+            'identifier' => $this->identifier,
+            'doi' => $this->doi,
+            'project' => [
+                'name' => $this->project ? $this->project->slug : '',
+                'public_url' => $this->project ? $this->project->public_url : null,
+            ],
+            'study' => [
+                'name' => $this->study ? $this->study->slug : '',
+                'public_url' => $this->study ? $this->study->public_url : null,
+            ],
             'owner' => new UserResource($this->owner),
             'dataset_photo_url' => $this->dataset_photo_url,
             'is_public' => $this->is_public,
+            'public_url' => $this->public_url ? $this->public_url : null,
+            'has_nmrium' => $this->has_nmrium,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

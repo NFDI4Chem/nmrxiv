@@ -267,7 +267,7 @@
                                                         class="inline-flex mr-4 items-center justify-center px-5 py-3 border text-base font-medium rounded-md text-gray-900 bg-white hover:bg-gray-50"
                                                     >
                                                         Source code
-                                                        <ExternalLinkIcon
+                                                        <ArrowTopRightOnSquareIcon
                                                             class="-mr-1 ml-3 h-5 w-5 text-gray-400"
                                                             aria-hidden="true"
                                                         />
@@ -278,7 +278,7 @@
                                                         class="inline-flex items-center justify-center px-5 py-3 border text-base font-medium rounded-md text-gray-900 bg-white hover:bg-gray-50"
                                                     >
                                                         Visit the docs
-                                                        <ExternalLinkIcon
+                                                        <ArrowTopRightOnSquareIcon
                                                             class="-mr-1 ml-3 h-5 w-5 text-gray-400"
                                                             aria-hidden="true"
                                                         />
@@ -537,15 +537,15 @@ import {
     TransitionRoot,
 } from "@headlessui/vue";
 
-import { SearchIcon } from "@heroicons/vue/solid";
+import { MagnifyingGlassIcon } from "@heroicons/vue/24/solid";
 import {
-    DocumentAddIcon,
+    DocumentPlusIcon,
     FolderIcon,
-    FolderAddIcon,
+    FolderPlusIcon,
     HashtagIcon,
-    ExternalLinkIcon,
+    ArrowTopRightOnSquareIcon,
     TagIcon,
-} from "@heroicons/vue/outline";
+} from "@heroicons/vue/24/outline";
 import axios from "axios";
 import { Inertia } from "@inertiajs/inertia";
 
@@ -562,13 +562,13 @@ export default {
         DialogPanel,
         TransitionChild,
         TransitionRoot,
-        SearchIcon,
-        DocumentAddIcon,
+        MagnifyingGlassIcon,
+        DocumentPlusIcon,
         FolderIcon,
-        FolderAddIcon,
+        FolderPlusIcon,
         HashtagIcon,
         TagIcon,
-        ExternalLinkIcon,
+        ArrowTopRightOnSquareIcon,
     },
     props: [],
     data() {

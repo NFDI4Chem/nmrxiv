@@ -41,7 +41,7 @@
                                 class="rounded-lg inline-flex p-3 bg-sky-50 text-sky-700 ring-4 ring-white"
                             >
                                 <!-- Icon component getting conditionally rendered on the basis of icon name passed -->
-                                <DotsVerticalIcon
+                                <EllipsisVerticalIcon
                                     class="h-5 w-5"
                                     aria-hidden="true"
                                 />
@@ -92,14 +92,14 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import { Link } from "@inertiajs/inertia-vue3";
 import Blocks from "@/Shared/Blocks.vue";
-import { DotsVerticalIcon } from "@heroicons/vue/solid";
+import { EllipsisVerticalIcon } from "@heroicons/vue/24/solid";
 
 export default {
     components: {
         Link,
         AppLayout,
         Blocks,
-        DotsVerticalIcon,
+        EllipsisVerticalIcon,
     },
 };
 </script>

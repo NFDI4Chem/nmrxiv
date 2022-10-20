@@ -61,7 +61,7 @@ class FileSystemObject extends Model
 
     public function draft()
     {
-        return $this->belongsTo(Project::class, 'draft_id');
+        return $this->belongsTo(Draft::class, 'draft_id');
     }
 
     public function study()

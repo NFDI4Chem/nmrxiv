@@ -24,7 +24,7 @@
             :alt="user.first_name"
         />
         <img
-            v-if="team"
+            v-if="team && !team.personal_team"
             class="w-8 h-8 -mr-2 rounded-full border-2 border-white"
             :src="team.owner.profile_photo_url"
             :alt="team.owner.first_name"
@@ -83,6 +83,15 @@
                                 >
                                     Share with users
                                 </h3>
+                                <span
+                                    class="float-center text-xs cursor-pointer hover:text-blue-700 mt-2"
+                                >
+                                    <a
+                                        href="https://docs.nmrxiv.org/docs/submission-guides/data-model/sharing"
+                                        target="_blank"
+                                        >Learn more about sharing
+                                    </a>
+                                </span>
                                 <div
                                     class="mt-2 max-w-xl text-sm text-gray-500"
                                 >
@@ -326,12 +335,29 @@
                                                         </Menu>
                                                     </div>
                                                 </div>
+                                                <div v-else>
+                                                    <div
+                                                        v-if="
+                                                            personRole(person)
+                                                        "
+                                                    >
+                                                        <span
+                                                            class="ml-6 text-sm capitalize text-dark-500"
+                                                        >
+                                                            {{
+                                                                personRole(
+                                                                    person
+                                                                )
+                                                            }}
+                                                        </span>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </a>
                                 </li>
                             </ul>
-                            <span v-if="team">
+                            <span v-if="team && !team.personal_team">
                                 <div class="mb-2">
                                     <h2
                                         class="text-lg uppercase leading-6 font-medium text-gray-900"
@@ -715,7 +741,7 @@
 
 <script>
 import { computed, ref } from "vue";
-import { UsersIcon } from "@heroicons/vue/outline";
+import { UsersIcon } from "@heroicons/vue/24/outline";
 import JetActionMessage from "@/Jetstream/ActionMessage.vue";
 import JetActionSection from "@/Jetstream/ActionSection.vue";
 import JetButton from "@/Jetstream/Button.vue";
@@ -740,7 +766,7 @@ import {
     TransitionRoot,
 } from "@headlessui/vue";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
-import { ChevronDownIcon } from "@heroicons/vue/solid";
+import { ChevronDownIcon } from "@heroicons/vue/24/solid";
 
 export default {
     components: {
@@ -843,7 +869,6 @@ export default {
     },
     methods: {
         personRole(person) {
-            console.log(person);
             if (person[this.model + "_membership"]) {
                 return person[this.model + "_membership"].role;
             } else {

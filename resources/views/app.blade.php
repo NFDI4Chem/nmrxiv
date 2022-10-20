@@ -35,6 +35,16 @@
 
     </head>
     <body class="font-sans antialiased h-full">
+        @env (['development', 'local'])
+        <div
+            class="z-20 fixed bottom-0 bg-yellow-300 border-b w-screen border-black-800"
+        >
+            <div class="max-w-7xl mx-auto py-1 px-6 text-center">
+              <small><b>DEMO SITE WARNING</b>: Please be aware that this is a demo/test server for nmrXiv and don't upload or save any sensitive data.</small>
+            </div>
+        </div>
+        @endenv
+        
         @inertia
 
         @env ('local')
