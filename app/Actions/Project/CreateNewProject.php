@@ -4,6 +4,7 @@ namespace App\Actions\Project;
 
 use App\Models\Project;
 use App\Models\User;
+use App\Models\Validation;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -57,6 +58,10 @@ class CreateNewProject
                         $user, ['role' => 'creator']
                     );
                 }
+                $validaton = new Validation();
+                $validaton->save();
+                $project->associate($validation);
+                $project->save();
             });
         });
     }

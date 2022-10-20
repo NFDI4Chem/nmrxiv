@@ -82,11 +82,23 @@
             </span>
         </div>
         <div class="flex-1 border-t bg-white p-3 flex flex-col justify-between">
+            <small v-if="study.identifier" class="text-gray-500"
+                >#{{ study.identifier }}</small
+            >
             <Link :href="route('dashboard.studies', [study.id])">
-                <div class="flex-1">
-                    <p class="text-lg font-semibold text-gray-900 line-clamp-1">
-                        {{ study.name }}
-                    </p>
+                <div class="flex items-center font-bold text-lg text-gray-600">
+                    <span class="">
+                        <!-- Commented now to avoid to lighten the query, will be added later with cache. -->
+                        <!--  <StarIcon
+                        :class="[
+                            study.is_bookmarked
+                                ? 'text-yellow-400'
+                                : 'text-gray-200',
+                            'h-6 w-6 flex-shrink-0 -ml-1 mr-1',
+                        ]"
+                    ></StarIcon> -->
+                    </span>
+                    {{ study.name }}
                 </div>
                 <div class="pt-1">
                     <div class="float-left">
@@ -94,7 +106,26 @@
                             v-if="study.is_public"
                             class="flex items-center mt-1"
                         >
-                            <LockOpenIcon class="w-3 h-3 mr-1 text-green-600" />
+                            <svg
+                                class="h-3 w-3 mr-1 text-green-400 inline"
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 64 64"
+                                width="512"
+                                height="512"
+                            >
+                                <g id="globe">
+                                    <path
+                                        d="M53.85,47.85A27,27,0,0,1,24,57.8V56l3-3V49l4-4V42l4,4h5l2-2h8Z"
+                                    />
+                                    <path
+                                        d="M42,20.59v2.56L38.07,27H31l-5.36,5.26L31,37.51v5.06L27.44,39H22.86L16,32.11V24.2L11.8,20h-4A27,27,0,0,1,32,5a26.55,26.55,0,0,1,7.06.94L36,9H30v4l4,4h4.33Z"
+                                    />
+                                    <path
+                                        d="M32,60A28,28,0,1,1,60,32,28,28,0,0,1,32,60ZM32,6A26,26,0,1,0,58,32,26,26,0,0,0,32,6Z"
+                                    />
+                                </g>
+                            </svg>
+
                             <p class="text-xs text-gray-600">Public</p>
                         </div>
                         <div v-else class="flex items-center mt-1">
@@ -115,18 +146,20 @@
 </template>
 
 <script>
-import { LockClosedIcon } from "@heroicons/vue/solid";
-import { LockOpenIcon } from "@heroicons/vue/solid";
-import { PencilIcon } from "@heroicons/vue/solid";
-import { MailIcon } from "@heroicons/vue/solid";
+import { LockClosedIcon } from "@heroicons/vue/24/solid";
+import { LockOpenIcon } from "@heroicons/vue/24/solid";
+import { PencilIcon } from "@heroicons/vue/24/solid";
+import { EnvelopeIcon } from "@heroicons/vue/24/solid";
 import { Link } from "@inertiajs/inertia-vue3";
+import { StarIcon } from "@heroicons/vue/24/solid";
 
 export default {
     components: {
         LockClosedIcon,
         LockOpenIcon,
-        MailIcon,
+        EnvelopeIcon,
         PencilIcon,
+        StarIcon,
         Link,
     },
     props: ["study"],

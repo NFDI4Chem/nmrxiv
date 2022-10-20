@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\DatasetResource;
 use App\Models\Dataset;
+use App\Models\NMRium;
+use App\Models\User;
+use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
@@ -23,37 +26,85 @@ class DatasetController extends Controller
         }
     }
 
+    public function fetchNMRium(Request $request, Dataset $dataset)
+    {
+        if ($dataset) {
+            $nmrium = $dataset->nmrium;
+            if ($nmrium) {
+                return $nmrium;
+            } else {
+                return null;
+            }
+        }
+    }
+
     public function nmriumInfo(Request $request, Dataset $dataset)
     {
         if ($dataset) {
+            $user = Auth::user();
             $spectra = $request->get('spectra');
             $nmriumInfo = $spectra;
             $molecules = $request->get('molecules');
             $molecularInfo = $molecules;
 
-            if ($dataset->nmriumInfo) {
-                $nmriumData = $dataset->nmriumInfo;
+            $nmrium = $dataset->nmrium;
+            if ($nmrium) {
+                $nmriumData = json_decode($nmrium['nmrium_info'], true);
             } else {
                 $nmriumData = [];
             }
-            if ($nmriumInfo) {
+            if ($nmriumInfo && ! empty($nmriumInfo)) {
                 $nmriumData['spectra'] = $nmriumInfo;
             }
-            if ($molecularInfo) {
+            if ($molecularInfo && ! empty($molecularInfo)) {
                 $nmriumData['molecules'] = $molecularInfo;
             }
-            $dataset->nmrium_info = $nmriumData;
-            foreach ($spectra as $spectrum) {
-                $nucleus = $spectrum['info']['nucleus'];
-                if (is_array($nucleus)) {
-                    $nucleus = implode('-', $nucleus);
+
+            if (! empty($nmriumData)) {
+                if ($nmrium) {
+                    $nmrium->nmrium_info = $nmriumData;
+                    $nmrium->save();
+                } else {
+                    $nmrium = NMRium::create([
+                        'nmrium_info' => json_encode($nmriumData),
+                        'dataset_id' => $dataset->id,
+                    ]);
+                    $dataset->has_nmrium = true;
                 }
-                $dataset->type = $nucleus.', '.$dataset->type;
+
+                foreach ($spectra as $spectrum) {
+                    $nucleus = $spectrum['info']['nucleus'];
+                    if (is_array($nucleus)) {
+                        $nucleus = implode('-', $nucleus);
+                    }
+                    $dataset->type = $nucleus.', '.$dataset->type;
+                }
+
+                $dataset->save();
+
+                return $dataset->fresh();
             }
+        }
+    }
 
-            $dataset->save();
+    public function nmriumVersions(Request $request, Dataset $dataset)
+    {
+        if ($dataset) {
+            $nmrium = $dataset->nmrium;
 
-            return $dataset->fresh();
+            if ($nmrium) {
+                return $nmrium->versions()->orderBy('created_at', 'DESC')->get()->map(function ($version) {
+                    $user = User::find($version->user_id);
+
+                    return [
+                        'updated_at' => $version->updated_at,
+                        'user' => [
+                            'name' => $user->first_name.' '.$user->last_name,
+                            'profile_photo_url' => $user->profile_photo_url,
+                        ],
+                    ];
+                });
+            }
         }
     }
 

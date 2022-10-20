@@ -48,7 +48,7 @@
                                         @click="open = false"
                                     >
                                         <span class="sr-only">Close panel</span>
-                                        <XIcon
+                                        <XMarkIcon
                                             class="h-6 w-6"
                                             aria-hidden="true"
                                         />
@@ -252,8 +252,8 @@ import {
     TransitionChild,
     TransitionRoot,
 } from "@headlessui/vue";
-import { HeartIcon, XIcon } from "@heroicons/vue/outline";
-import { PencilIcon, PlusSmIcon } from "@heroicons/vue/solid";
+import { HeartIcon, XMarkIcon } from "@heroicons/vue/24/outline";
+import { PencilIcon, PlusSmallIcon } from "@heroicons/vue/24/solid";
 
 export default {
     components: {
@@ -263,8 +263,8 @@ export default {
         TransitionRoot,
         HeartIcon,
         PencilIcon,
-        PlusSmIcon,
-        XIcon,
+        PlusSmallIcon,
+        XMarkIcon,
     },
     props: ["study", "project"],
     data() {

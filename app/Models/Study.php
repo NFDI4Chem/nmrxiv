@@ -3,9 +3,15 @@
 namespace App\Models;
 
 use App\Traits\CacheClear;
+use Auth;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Scout\Searchable;
+use Maize\Markable\Markable;
+use Maize\Markable\Models\Bookmark;
+use Maize\Markable\Models\Like;
 use OwenIt\Auditing\Contracts\Auditable;
 use Spatie\Tags\HasTags;
 use Storage;
@@ -15,6 +21,8 @@ class Study extends Model implements Auditable
     use Searchable;
     use CacheClear;
     use HasFactory;
+    use Markable;
+    use HasDOI;
     use HasTags;
     use \OwenIt\Auditing\Auditable;
 
@@ -40,6 +48,11 @@ class Study extends Model implements Auditable
         'license_id',
     ];
 
+    protected static $marks = [
+        Like::class,
+        Bookmark::class,
+    ];
+
     /**
      * The accessors to append to the model's array form.
      *
@@ -50,7 +63,36 @@ class Study extends Model implements Auditable
         'private_url',
         'study_photo_url',
         'study_preview_urls',
+        'is_published',
+        'is_bookmarked',
     ];
+
+    public function getIsPublishedAttribute()
+    {
+        if ($this->is_public) {
+            return true;
+        } else {
+            if ($this->release_date) {
+                return ! Carbon::now()->startOfDay()->gte($this->release_date);
+            } else {
+                return $this->project->is_published;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Get the study identifier
+     *
+     * @return \Illuminate\Database\Eloquent\Casts\Attribute
+     */
+    protected function identifier(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? 'NMRXIV:S'.$value : null,
+        );
+    }
 
     /**
      * Get the URL to the study's profile photo.
@@ -89,7 +131,8 @@ class Study extends Model implements Auditable
 
     protected function getPublicUrlAttribute()
     {
-        return env('APP_URL', null).'/projects/'.$this->owner->username.'/'.urlencode($this->project->slug).'?tab=study&id='.$this->slug;
+        // return env('APP_URL', null).'/projects/'.$this->owner->username.'/'.urlencode($this->project->slug).'?tab=study&id='.$this->slug;
+        return env('APP_URL', null).'/S'.$this->getAttributes()['identifier'];
     }
 
     protected function getPrivateUrlAttribute()
@@ -105,6 +148,11 @@ class Study extends Model implements Auditable
     public function fsObject()
     {
         return $this->hasOne(FileSystemObject::class);
+    }
+
+    public function validation()
+    {
+        return $this->belongsTo(Validation::class, 'validation_id');
     }
 
     /**
@@ -201,9 +249,6 @@ class Study extends Model implements Auditable
         return $this->hasOne(Sample::class, 'study_id');
     }
 
-    /**
-     * Get all of the deployments for the project.
-     */
     public function molecules()
     {
         return $this->sample()->molecules();
@@ -267,5 +312,20 @@ class Study extends Model implements Auditable
                 $query->orderByDesc('created_at');
             }
         });
+    }
+
+    /**
+     * check if the study is bookmarked by current user
+     *
+     * @return string
+     */
+    public function getIsBookmarkedAttribute()
+    {
+        $user = Auth::user();
+        if (! $user) {
+            return false;
+        } else {
+            return Bookmark::has($this, $user);
+        }
     }
 }

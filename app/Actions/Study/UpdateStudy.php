@@ -3,6 +3,7 @@
 namespace App\Actions\Study;
 
 use App\Models\Study;
+use App\Models\Ticker;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -54,6 +55,34 @@ class UpdateStudy
 
             if ($is_public == true) {
                 $release_date = Carbon::now()->timestamp;
+
+                $sample = $study->sample;
+                $sampleIdentifier = $sample->identifier ? $sample->identifier : null;
+
+                if ($sampleIdentifier == null) {
+                    $sampleTicker = Ticker::whereType('sample')->first();
+                    $sampleIdentifier = $sampleTicker->index + 1;
+                    $sample->identifier = $sampleIdentifier;
+                    $sample->save();
+
+                    $sampleTicker->index = $sampleIdentifier;
+                    $sampleTicker->save();
+                }
+
+                $molecules = $sample->molecules;
+
+                foreach ($molecules as $molecule) {
+                    $moleculeIdentifier = $molecule->identifier ? $molecule->identifier : null;
+                    if ($moleculeIdentifier == null) {
+                        $moleculeTicker = Ticker::whereType('molecule')->first();
+                        $moleculeIdentifier = $moleculeTicker->index + 1;
+                        $molecule->identifier = $moleculeIdentifier;
+                        $molecule->save();
+
+                        $moleculeTicker->index = $moleculeIdentifier;
+                        $moleculeTicker->save();
+                    }
+                }
             }
 
             $datasets = $study->datasets;
@@ -64,6 +93,17 @@ class UpdateStudy
                     }
                 }
                 if ($is_public) {
+                    $dsIdentifier = $dataset->identifier ? $dataset->identifier : null;
+
+                    if ($dsIdentifier == null) {
+                        $dsTicker = Ticker::whereType('dataset')->first();
+                        $dsIdentifier = $dsTicker->index + 1;
+                        $dataset->identifier = $dsIdentifier;
+
+                        $dsTicker->index = $dsIdentifier;
+                        $dsTicker->save();
+                    }
+
                     $dataset->is_public = $is_public;
                     $dataset->release_date = $release_date;
                 }

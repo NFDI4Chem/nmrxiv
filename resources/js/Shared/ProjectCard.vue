@@ -57,16 +57,17 @@
                         ]"
                     >
                         <div
-                            style="min-height: 150px; max-height: 168px"
+                            style="min-height: 168px; max-height: 168px"
                             class="flex-1 p-3"
                         >
+                            <small
+                                v-if="project.identifier"
+                                class="text-gray-500"
+                                >#{{ project.identifier }}</small
+                            >
+                            {{}}
                             <Link
-                                :href="
-                                    '/projects/' +
-                                    project.owner.username +
-                                    '/' +
-                                    project.slug
-                                "
+                                :href="project.public_url"
                                 class="block cursor-pointer"
                             >
                                 <p
@@ -116,7 +117,7 @@
                                         <span class="sr-only"
                                             >Open options</span
                                         >
-                                        <DotsVerticalIcon
+                                        <EllipsisVerticalIcon
                                             class="h-5 w-5"
                                             aria-hidden="true"
                                         />
@@ -147,7 +148,7 @@
                                                         'block px-4 py-4 text-sm cursor-pointer hover:text-gray-900',
                                                     ]"
                                                 >
-                                                    <DownloadIcon
+                                                    <ArrowDownTrayIcon
                                                         class="h-5 w-5 inline"
                                                         aria-hidden="true"
                                                     />
@@ -187,7 +188,7 @@
                             v-if="project.photo_url && project.photo_url != ''"
                             :src="project.photo_url"
                             alt=""
-                            class="border w-36 lg:h-36 xl:h-36 m-2 mr-0 h-full object-center rounded-t-lg object-cover"
+                            class="border w-36 lg:h-36 xl:h-36 m-2 mr-0 h-full object-center object-cover"
                         />
                         <div
                             v-else
@@ -196,20 +197,20 @@
                     </div>
 
                     <div
-                        class="flex-1 flex flex-col px-4 py-4 sm:px-6 justify-between"
+                        class="flex-1 flex flex-col px-4 py-2 sm:px-6 justify-between"
                     >
                         <div class="flex items-center justify-between">
                             <div>
+                                <small
+                                    v-if="project.identifier"
+                                    class="text-gray-500"
+                                    >#{{ project.identifier }}</small
+                                >
                                 <p
                                     class="text-lg font-black text-gray-900 line-clamp-2 font-black"
                                 >
                                     <Link
-                                        :href="
-                                            '/projects/' +
-                                            project.owner.username +
-                                            '/' +
-                                            project.slug
-                                        "
+                                        :href="project.public_url"
                                         class="block cursor-pointer"
                                     >
                                         {{ project.name }}
@@ -285,7 +286,7 @@
                                         :href="downloadURL"
                                         class="block px-4 text-sm cursor-pointer hover:text-gray-900', ]"
                                     >
-                                        <DownloadIcon
+                                        <ArrowDownTrayIcon
                                             class="h-5 w-5 inline"
                                             aria-hidden="true"
                                     /></a>
@@ -323,12 +324,12 @@
 </template>
 
 <script>
-import { LockClosedIcon } from "@heroicons/vue/solid";
-import { LockOpenIcon, DownloadIcon } from "@heroicons/vue/solid";
-import { PencilIcon } from "@heroicons/vue/solid";
-import { MailIcon } from "@heroicons/vue/solid";
+import { LockClosedIcon } from "@heroicons/vue/24/solid";
+import { LockOpenIcon, ArrowDownTrayIcon } from "@heroicons/vue/24/solid";
+import { PencilIcon } from "@heroicons/vue/24/solid";
+import { EnvelopeIcon } from "@heroicons/vue/24/solid";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
-import { DotsVerticalIcon, ScaleIcon } from "@heroicons/vue/solid";
+import { EllipsisVerticalIcon, ScaleIcon } from "@heroicons/vue/24/solid";
 import { Inertia } from "@inertiajs/inertia";
 import { Head, Link } from "@inertiajs/inertia-vue3";
 
@@ -338,15 +339,15 @@ export default {
         Link,
         LockClosedIcon,
         LockOpenIcon,
-        DownloadIcon,
-        MailIcon,
+        ArrowDownTrayIcon,
+        EnvelopeIcon,
         PencilIcon,
         ScaleIcon,
         Menu,
         MenuButton,
         MenuItem,
         MenuItems,
-        DotsVerticalIcon,
+        EllipsisVerticalIcon,
     },
     props: ["project", "mode"],
     setup() {},

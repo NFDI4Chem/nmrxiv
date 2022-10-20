@@ -16,7 +16,7 @@
                 <span
                     class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none"
                 >
-                    <SelectorIcon
+                    <ChevronUpDownIcon
                         class="h-5 w-5 text-gray-400"
                         aria-hidden="true"
                     />
@@ -81,7 +81,7 @@ import {
     ListboxOption,
     ListboxOptions,
 } from "@headlessui/vue";
-import { CheckIcon, SelectorIcon } from "@heroicons/vue/solid";
+import { CheckIcon, ChevronUpDownIcon } from "@heroicons/vue/24/solid";
 import ToolTip from "@/Shared/ToolTip.vue";
 
 export default {
@@ -92,7 +92,7 @@ export default {
         ListboxOption,
         ListboxOptions,
         CheckIcon,
-        SelectorIcon,
+        ChevronUpDownIcon,
         ToolTip,
     },
     props: ["items", "selected", "label"],

@@ -10,6 +10,15 @@
                 and cannot be recovered. You can restore a deleted project
                 within the 30-day recovery period.
             </div>
+            <div
+                v-if="!project.is_public && project.is_published"
+                class="text-center px-3 py-2 bg-green-50 text-green-700 border-b"
+            >
+                <b>Info: </b> This project is published and set to be released
+                on {{ formatDate(project.release_date) }}. You cannot edit a
+                published project, please create a new version to updated the
+                project.
+            </div>
             <div v-if="project.is_public">
                 <div
                     v-if="project.is_archived"
@@ -27,9 +36,12 @@
                     the project.
                 </div>
             </div>
+            <div v-if="project.is_public && project.doi != null">
+                <Citation :doi="project.doi"></Citation>
+            </div>
             <div class="bg-white border-b">
                 <div class="px-12">
-                    <div class="flex flex-nowrap justify-between py-6">
+                    <div class="flex flex-nowrap justify-between pt-6 w-full">
                         <div class="">
                             <div
                                 class="flex pr-20 cursor-pointer items-center text-xl text-gray-700 font-bold"
@@ -45,6 +57,15 @@
                                     @click="toogleStarred"
                                 />
                                 {{ project.name }}
+                            </div>
+                            <div
+                                class="float-center text-xs cursor-pointer hover:text-blue-700 mt-2 ml-4"
+                            >
+                                <a
+                                    href="https://docs.nmrxiv.org/docs/submission-guides/data-model/project"
+                                    target="_blank"
+                                    >Learn more about projects
+                                </a>
                             </div>
                             <div class="inline-flex items-center mt-3">
                                 <access-dialogue
@@ -77,15 +98,15 @@
                                             class="fill-current text-gray-600"
                                         ></rect>
                                     </svg>
-                                    <span class="ml-2">View details</span></a
-                                >
+                                    <span class="ml-2">View details</span>
+                                </a>
                                 <a
                                     ><span
                                         v-if="project.is_public"
                                         class="inline-flex items-center"
                                     >
                                         <svg
-                                            class="h-3 w-3 ml-7 text-green-400 inline"
+                                            class="h-3 w-3 ml-4 text-green-400 inline"
                                             xmlns="http://www.w3.org/2000/svg"
                                             viewBox="0 0 64 64"
                                             width="512"
@@ -232,10 +253,31 @@
                                     </span>
                                     {{ role }}
                                 </span>
+                                <span
+                                    v-if="project.identifier"
+                                    class="inline-flex pr-4 ml-4 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        class="h-6 w-6 py-1"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            d="M5.25 8.25h15m-16.5 7.5h15m-1.8-13.5l-3.9 19.5m-2.1-19.5l-3.9 19.5"
+                                        />
+                                    </svg>
+                                    <b>{{ project.identifier }}</b>
+                                </span>
                             </div>
                         </div>
-                        <div v-if="canDeleteProject" class="flex-nowrap">
+                        <div class="flex-nowrap">
                             <Link
+                                v-if="canDeleteProject"
                                 :href="
                                     route(
                                         'dashboard.project.settings',
@@ -246,6 +288,35 @@
                             >
                                 Project&nbsp;Settings
                             </Link>
+                        </div>
+                    </div>
+                    <div class="flex flex-nowrap justify-between pb-3">
+                        <div
+                            class="mt-2 flex items-center text-xs text-gray-400"
+                        >
+                            <CalendarIcon
+                                class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-300"
+                                aria-hidden="true"
+                            />
+                            Updated on
+                            {{ formatDateTime(project.updated_at) }}
+                        </div>
+                        <div
+                            v-if="!project.is_public && !project.is_published"
+                            class="flex-nowrap"
+                        >
+                            <Publish :project="project" />
+                        </div>
+                        <div v-if="!project.is_public && project.is_published">
+                            <span
+                                class="ml-4 inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-yellow-100 text-red-800 capitalize"
+                            >
+                                PUBLISHED -&emsp;
+                                <b
+                                    >Release date:
+                                    {{ formatDate(project.release_date) }}</b
+                                >
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -447,7 +518,7 @@
                                 <div class="flex-1 min-w-0">
                                     <a
                                         class="focus:outline-none cursor-pointer"
-                                        :href="getOrcidLink(citation.doi)"
+                                        :href="getCitationLink(citation.doi)"
                                         :target="getTarget(citation.doi)"
                                     >
                                         <span
@@ -528,9 +599,7 @@
                                         <a
                                             class="focus:outline-none cursor-pointer"
                                             :href="
-                                                getAuthorDOILink(
-                                                    author.orcid_id
-                                                )
+                                                getOrcidLink(author.orcid_id)
                                             "
                                             :target="getTarget(author.orcid_id)"
                                         >
@@ -598,10 +667,12 @@ import { Inertia } from "@inertiajs/inertia";
 import StudyIndex from "@/Pages/Study/Index.vue";
 import ProjectDetails from "./Partials/Details.vue";
 import { ref } from "vue";
-import { StarIcon, PencilIcon } from "@heroicons/vue/solid";
+import { StarIcon, PencilIcon, CalendarIcon } from "@heroicons/vue/24/solid";
 import AddAuthor from "@/Shared/AddAuthor.vue";
 import ToolTip from "@/Shared/ToolTip.vue";
 import AddCitation from "@/Shared/AddCitation.vue";
+import Citation from "@/Shared/Citation.vue";
+import Publish from "@/Shared/Publish.vue";
 
 export default {
     components: {
@@ -615,6 +686,9 @@ export default {
         AddAuthor,
         ToolTip,
         AddCitation,
+        CalendarIcon,
+        Citation,
+        Publish,
     },
     props: [
         "project",
@@ -635,7 +709,26 @@ export default {
             addCitationElement,
         };
     },
-    mounted() {},
+    mounted() {
+        const urlSearchParams = new URLSearchParams(window.location.search);
+        const params = Object.fromEntries(urlSearchParams.entries());
+        let editOperation = params["edit"];
+        if (editOperation) {
+            if (
+                editOperation == "license" ||
+                editOperation == "title" ||
+                editOperation == "description" ||
+                editOperation == "keywords" ||
+                editOperation == "profile_image"
+            ) {
+                this.toggleDetails();
+            } else if (editOperation == "citation") {
+                this.toggleAddCitation();
+            } else if (editOperation == "authors") {
+                this.toggleAddAuthor();
+            }
+        }
+    },
     data() {
         return {};
     },
@@ -684,14 +777,14 @@ export default {
             this.addCitationElement.toggleAddCitationDialog();
             //this.emitter.emit("openAddCitationDialog", {});
         },
-        getAuthorDOILink(orcidId) {
+        getOrcidLink(orcidId) {
             var link = "#";
             if (orcidId) {
                 link = "https://orcid.org/" + orcidId;
             }
             return link;
         },
-        getOrcidLink(doi) {
+        getCitationLink(doi) {
             var link = "#";
             if (doi) {
                 link = "https://doi.org/" + doi;

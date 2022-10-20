@@ -331,7 +331,6 @@ class FileSystemController extends Controller
                     '/'.
                     $project->uuid.
                     '/'.
-                    $study->uuid.
                     $relativefilePath
             );
 
