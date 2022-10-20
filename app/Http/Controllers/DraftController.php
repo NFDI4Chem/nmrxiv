@@ -45,6 +45,8 @@ class DraftController extends Controller
             ->where('owner_id', $user_id)
             ->first();
 
+        $sharedDrafts = $user->sharedDrafts();
+
         if (! $defaultDraft) {
             $id = Str::uuid();
             $environment = env('APP_ENV', 'local');
@@ -71,6 +73,7 @@ class DraftController extends Controller
 
         return response()->json([
             'drafts' => $drafts,
+            'sharedDrafts' => $sharedDrafts,
             'default' => $defaultDraft,
         ]);
     }
