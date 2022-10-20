@@ -88,6 +88,8 @@ class Validation extends Model
 
         $schema_version = $project->schema_version ? $project->schema_version : config('validations.default');
 
+        $project->schema_version = $schema_version;
+
         $rules = config('validations.'.$schema_version);
 
         if ($project) {
