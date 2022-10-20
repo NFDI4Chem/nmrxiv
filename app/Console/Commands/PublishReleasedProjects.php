@@ -8,7 +8,7 @@ use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
-class PublishProjects extends Command
+class PublishReleasedProjects extends Command
 {
     /**
      * The name and signature of the console command.
