@@ -47,7 +47,7 @@
                                                     <span class="sr-only"
                                                         >Close panel</span
                                                     >
-                                                    <XIcon
+                                                    <XMarkIcon
                                                         class="h-6 w-6"
                                                         aria-hidden="true"
                                                     />
@@ -278,7 +278,7 @@
                                                         Privacy
                                                     </legend>
                                                     <div class="mt-2 space-y-5">
-                                                        <div
+                                                        <!-- <div
                                                             class="relative flex items-start"
                                                         >
                                                             <div
@@ -324,7 +324,7 @@
                                                                     study.
                                                                 </p>
                                                             </div>
-                                                        </div>
+                                                        </div> -->
                                                         <div>
                                                             <div
                                                                 class="relative flex items-start"
@@ -380,11 +380,22 @@
                                                     </div>
                                                 </fieldset>
                                             </div>
-                                            <div class="pt-4 pb-6">
+                                            <div class="pb-6">
                                                 <div
                                                     class="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-1"
                                                 >
                                                     <div>
+                                                        <span
+                                                            class="float-right text-xs cursor-pointer hover:text-blue-700 mt-2"
+                                                        >
+                                                            <a
+                                                                target="_blank"
+                                                                href="https://docs.nmrxiv.org/docs/submission-guides/licenses"
+                                                                >How to choose
+                                                                the right
+                                                                license?</a
+                                                            >
+                                                        </span>
                                                         <select-rich
                                                             v-model:selected="
                                                                 form.license
@@ -413,7 +424,7 @@
                                                     "
                                                 >
                                                     <label
-                                                        for="email"
+                                                        for="public_url"
                                                         class="block text-sm font-medium text-gray-700"
                                                         >Public URL</label
                                                     >
@@ -446,16 +457,61 @@
                                                             "
                                                         >
                                                             <span
-                                                                ><ClipboardCopyIcon
+                                                                ><ClipboardDocumentIcon
                                                                     class="h-5 w-5"
                                                                     aria-hidden="true"
                                                             /></span>
                                                         </button>
                                                     </div>
+                                                    <div
+                                                        class="mt-2"
+                                                        v-if="form.doi"
+                                                    >
+                                                        <label
+                                                            for="doi"
+                                                            class="block text-sm font-medium text-gray-700"
+                                                            >DOI</label
+                                                        >
+                                                        <div
+                                                            class="mt-1 flex rounded-md shadow-sm"
+                                                        >
+                                                            <div
+                                                                class="relative flex items-stretch flex-grow focus-within:z-10"
+                                                            >
+                                                                <input
+                                                                    id="studyPublicDOICopy"
+                                                                    v-model="
+                                                                        study.doi
+                                                                    "
+                                                                    type="text"
+                                                                    class="rounded-l-md focus:ring-gray-500 focus:border-gray-500 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300"
+                                                                    @focus="
+                                                                        $event.target.select()
+                                                                    "
+                                                                />
+                                                            </div>
+                                                            <button
+                                                                type="button"
+                                                                class="-ml-px relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500"
+                                                                @click="
+                                                                    copyToClipboard(
+                                                                        study.doi,
+                                                                        'studyPublicDOICopy'
+                                                                    )
+                                                                "
+                                                            >
+                                                                <span
+                                                                    ><ClipboardDocumentIcon
+                                                                        class="h-5 w-5"
+                                                                        aria-hidden="true"
+                                                                /></span>
+                                                            </button>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                                <div v-else>
+                                                <!-- <div v-else>
                                                     <div class="space-y-1">
-                                                        <!-- <div
+                                                        <div
                                                             class="relative flex items-start"
                                                         >
                                                             <div
@@ -480,7 +536,7 @@
                                                                 >
                                                             </div>
                                                         </div> -->
-                                                        <div v-if="linkAccess">
+                                                <!-- <div v-if="linkAccess">
                                                             <div class="flex">
                                                                 <div
                                                                     class="flex-grow"
@@ -509,7 +565,7 @@
                                                                     "
                                                                 >
                                                                     <span
-                                                                        ><ClipboardCopyIcon
+                                                                        ><ClipboardDocumentIcon
                                                                             class="h-5 w-5"
                                                                             aria-hidden="true"
                                                                     /></span>
@@ -646,13 +702,13 @@
                                                                     </div>
                                                                 </Listbox>
                                                             </div>
-                                                        </div>
+                                                        </div> 
                                                     </div>
-                                                </div>
+                                                </div>-->
                                                 <div class="mt-6 flex text-sm">
                                                     <a
                                                         target="_blank"
-                                                        href="https://docs.nmrxiv.org/docs/submission-guides/sharing"
+                                                        href="https://docs.nmrxiv.org/docs/submission-guides/data-model/sharing"
                                                         class="group inline-flex items-center text-gray-500 hover:text-gray-900"
                                                     >
                                                         <QuestionMarkCircleIcon
@@ -665,7 +721,9 @@
                                                         </span>
                                                     </a>
                                                 </div>
-                                                <div class="mt-4 flex text-sm">
+                                                <div
+                                                    class="mt-4 flex text-sm mb-6"
+                                                >
                                                     <a
                                                         class="cursor-pointer group inline-flex items-center text-gray-500 hover:text-gray-900"
                                                         @click="
@@ -733,13 +791,13 @@ import {
     TransitionChild,
     TransitionRoot,
 } from "@headlessui/vue";
-import { XIcon } from "@heroicons/vue/outline";
+import { XMarkIcon } from "@heroicons/vue/24/outline";
 import {
     LinkIcon,
-    PlusSmIcon,
+    PlusSmallIcon,
     QuestionMarkCircleIcon,
     ExclamationCircleIcon,
-} from "@heroicons/vue/solid";
+} from "@heroicons/vue/24/solid";
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import StudyActivity from "@/Pages/Study/Partials/Activity.vue";
@@ -747,10 +805,10 @@ import { ColorPicker } from "vue3-colorpicker";
 import "vue3-colorpicker/style.css";
 import { Switch, SwitchGroup, SwitchLabel } from "@headlessui/vue";
 import {
-    ClipboardCopyIcon,
+    ClipboardDocumentIcon,
     CheckIcon,
     ChevronDownIcon,
-} from "@heroicons/vue/solid";
+} from "@heroicons/vue/24/solid";
 import {
     Listbox,
     ListboxButton,
@@ -809,15 +867,15 @@ export default {
         TabPanel,
         TabPanels,
         LinkIcon,
-        PlusSmIcon,
+        PlusSmallIcon,
         QuestionMarkCircleIcon,
         ExclamationCircleIcon,
-        XIcon,
+        XMarkIcon,
         ColorPicker,
         Switch,
         SwitchGroup,
         SwitchLabel,
-        ClipboardCopyIcon,
+        ClipboardDocumentIcon,
         CheckIcon,
         ChevronDownIcon,
         SelectRich,
@@ -844,6 +902,7 @@ export default {
                 is_public: this.study.is_public,
                 access: this.study.access,
                 access_type: this.study.access_type,
+                doi: this.study.doi,
                 license: null,
                 license_id: null,
                 tag: "",

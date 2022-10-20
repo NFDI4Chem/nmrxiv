@@ -25,15 +25,20 @@
                                     :src="user.profile_photo_url"
                                     :alt="user.name"
                                 />
+                                <img
+                                    class="w-8 h-8 -mr-2 rounded-full border-2 border-white"
+                                    :src="team.owner.profile_photo_url"
+                                    :alt="team.owner.name"
+                                />
                             </div>
                         </div>
                         <div v-if="!team.personal_team">
-                            <a
+                            <Link
                                 :href="'/teams/' + user.current_team.id"
                                 class="text-sm text-gray-800 font-bold"
                             >
                                 Team Settings
-                            </a>
+                            </Link>
                         </div>
                     </div>
                 </div>
@@ -73,6 +78,15 @@
                     </p>
                     <div class="mt-6">
                         <create mode="button"></create>
+                        <span
+                            class="float-center text-xs cursor-pointer hover:text-blue-700 mt-2"
+                        >
+                            <a
+                                href="https://docs.nmrxiv.org/docs/submission-guides/submission/upload"
+                                target="_blank"
+                                >Need Help?
+                            </a>
+                        </span>
                     </div>
                 </div>
             </div>
@@ -287,6 +301,7 @@ import Onboarding from "@/App/Onboarding.vue";
 import { useMagicKeys } from "@vueuse/core";
 import { getCurrentInstance } from "vue";
 import { watchEffect } from "vue";
+import { Link } from "@inertiajs/inertia-vue3";
 const { meta, u } = useMagicKeys();
 
 export default {
@@ -295,6 +310,7 @@ export default {
         TeamProjects,
         Create,
         Onboarding,
+        Link,
     },
     props: ["user", "team", "projects", "teamRole", "filters"],
     setup() {

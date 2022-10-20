@@ -99,7 +99,7 @@ export default {
             if (this.isString(val)) {
                 return JSON.parse(val);
             }
-            return null;
+            return val;
         },
     },
     computed: {

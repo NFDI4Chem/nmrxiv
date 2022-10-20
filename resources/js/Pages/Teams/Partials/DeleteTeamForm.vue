@@ -29,6 +29,24 @@
                     Are you sure you want to delete this team? Once a team is
                     deleted, all of its resources and data will be permanently
                     deleted.
+                    <div class="mt-4">
+                        <jet-input
+                            ref="password"
+                            v-model="form.password"
+                            type="password"
+                            class="mt-1 block w-3/4"
+                            placeholder="Password"
+                            @keyup.enter="deleteTeam"
+                        />
+                        <jet-input-error
+                            :message="form.errors.password"
+                            class="mt-2"
+                        />
+                    </div>
+                    <jet-input-error
+                        :message="form.errors.hasProject"
+                        class="mt-2"
+                    />
                 </template>
 
                 <template #footer>
@@ -57,6 +75,8 @@ import JetActionSection from "@/Jetstream/ActionSection.vue";
 import JetConfirmationModal from "@/Jetstream/ConfirmationModal.vue";
 import JetDangerButton from "@/Jetstream/DangerButton.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
+import JetInputError from "@/Jetstream/InputError.vue";
+import JetInput from "@/Jetstream/Input.vue";
 
 export default {
     components: {
@@ -64,6 +84,8 @@ export default {
         JetConfirmationModal,
         JetDangerButton,
         JetSecondaryButton,
+        JetInputError,
+        JetInput,
     },
     props: ["team"],
 
@@ -72,7 +94,9 @@ export default {
             confirmingTeamDeletion: false,
             deleting: false,
 
-            form: this.$inertia.form(),
+            form: this.$inertia.form({
+                password: "",
+            }),
         };
     },
 
@@ -82,8 +106,10 @@ export default {
         },
 
         deleteTeam() {
-            this.form.delete(route("teams.destroy", this.team), {
+            this.form.delete(route("app.teams.destroy", this.team), {
+                onError: () => this.$refs.password.focus(),
                 errorBag: "deleteTeam",
+                onFinish: () => this.form.reset(),
             });
         },
     },

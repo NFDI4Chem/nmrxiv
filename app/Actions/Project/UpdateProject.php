@@ -3,7 +3,7 @@
 namespace App\Actions\Project;
 
 use App\Models\Project;
-use Carbon\Carbon;
+use App\Models\Validation;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -47,10 +47,6 @@ class UpdateProject
             $licenseExists = array_key_exists('license_id', $input);
             $license_id = $licenseExists ? $input['license_id'] : $project->license_id;
 
-            if ($is_public == true) {
-                $release_date = Carbon::now()->toDateTimeString();
-            }
-
             $project
                 ->forceFill([
                     'name' => $input['name'],
@@ -76,8 +72,6 @@ class UpdateProject
                         : 'viewer',
                     'team_id' => $input['team_id'],
                     'owner_id' => $input['owner_id'],
-                    'is_public' => $is_public,
-                    'release_date' => $release_date,
                     'license_id' => $license_id,
                     'project_photo_path' => $s3filePath ? $s3filePath : $project->project_photo_path,
                 ])
@@ -94,10 +88,7 @@ class UpdateProject
                         $study->license_id = $license_id;
                     }
                 }
-                if ($is_public) {
-                    $study->is_public = $is_public;
-                    $study->release_date = $release_date;
-                }
+
                 $study->save();
 
                 $datasets = $study->datasets;
@@ -107,13 +98,29 @@ class UpdateProject
                             $dataset->license_id = $license_id;
                         }
                     }
-                    if ($is_public) {
-                        $dataset->is_public = $is_public;
-                        $dataset->release_date = $release_date;
-                    }
+
                     $dataset->save();
                 }
             }
+
+            $validation = $project->validation;
+
+            if (! $validation) {
+                $validation = new Validation();
+                $validation->save();
+                $project->validation()->associate($validation);
+                $project->save();
+
+                foreach ($project->studies as $study) {
+                    $study->validation()->associate($validation);
+                    $study->save();
+                    foreach ($study->datasets as $dataset) {
+                        $dataset->validation()->associate($validation);
+                        $dataset->save();
+                    }
+                }
+            }
+            $validation->process();
         });
     }
 
@@ -126,7 +133,7 @@ class UpdateProject
 
     public function updateCitation(Project $project, $citations, $user)
     {
-        $project->citations()->syncWithPivotValues(
+        $project->citations()->sync(
             $citations, ['user' => $user->id]
         );
     }

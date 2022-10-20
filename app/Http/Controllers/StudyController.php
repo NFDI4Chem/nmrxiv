@@ -21,6 +21,7 @@ use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Laravel\Fortify\Actions\ConfirmPassword;
 use Laravel\Jetstream\Jetstream;
+use Maize\Markable\Models\Bookmark;
 
 class StudyController extends Controller
 {
@@ -153,6 +154,7 @@ class StudyController extends Controller
 
         $project = $study->project;
         $team = $project->nonPersonalTeam;
+        $studyFSObject = $study->fsObject;
 
         return Inertia::render('Study/Files', [
             'study' => $study->load('users', 'owner', 'studyInvitations'),
@@ -171,6 +173,7 @@ class StudyController extends Controller
                     ->where([
                         ['project_id', $study->project->id],
                         ['study_id', $study->id],
+                        ['level', $studyFSObject->level],
                     ])
                     ->orderBy('type')
                     ->get(),
@@ -281,5 +284,10 @@ class StudyController extends Controller
                 ->orderBy('created_at', 'desc')
                 ->get(),
         ]);
+    }
+
+    public function toggleStarred(Request $request, Study $study)
+    {
+        return Bookmark::toggle($study, $request->user());
     }
 }

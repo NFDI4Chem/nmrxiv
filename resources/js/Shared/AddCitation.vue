@@ -4,7 +4,7 @@
         :max-width="'6xl'"
         @close="addCitationDialog = false"
     >
-        <template #title> Update Citation </template>
+        <template #title> Manage Citation </template>
         <template #content>
             <div
                 class="relative grid grid-cols-1 gap-x-5 max-w-7xl mx-auto lg:grid-cols-2 divide-x"
@@ -44,7 +44,10 @@
                             </div>
                         </div>
                         <div class="sm:col-span-2 mt-4">
-                            <jet-secondary-button @click="importCitation">
+                            <jet-secondary-button
+                                :disabled="!this.importCitationForm.doi"
+                                @click="importCitation"
+                            >
                                 Import
                             </jet-secondary-button>
                         </div>
@@ -119,12 +122,14 @@
                                     </div>
                                 </div>
                             </fieldset>
-                            <jet-secondary-button
-                                class="float-right text-md font-bold text-teal-900 mt-4"
-                                @click="addCitationTemp('DOI')"
-                            >
-                                Add
-                            </jet-secondary-button>
+                            <div>
+                                <jet-secondary-button
+                                    class="float-right text-md font-bold text-teal-900 mt-4"
+                                    @click="addCitationTemp('DOI')"
+                                >
+                                    Add
+                                </jet-secondary-button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -259,12 +264,20 @@
                                 />
                             </div>
                             <div class="sm:col-span-6 float-left">
-                                <jet-secondary-button
-                                    class="float-right text-md font-bold text-teal-900"
-                                    @click="addCitationTemp('Manual')"
-                                >
-                                    Add
-                                </jet-secondary-button>
+                                <div>
+                                    <jet-secondary-button
+                                        class="float-right text-md font-bold text-teal-900"
+                                        :disabled="
+                                            !(
+                                                this.manualAddCitationForm &&
+                                                this.manualAddCitationForm.title
+                                            )
+                                        "
+                                        @click="addCitationTemp('Manual')"
+                                    >
+                                        Add
+                                    </jet-secondary-button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -273,6 +286,10 @@
             <!-- Added Citation Summary -->
             <div v-if="selectedCitationList.length > 0">
                 <div class="ml-2 mt-2 overflow-y-scroll h-64">
+                    <p class="float-left text-xs font-bold text-red-900 mt-4">
+                        *Please review your changes below and click on Save
+                        button to save your changes.
+                    </p>
                     <table
                         class="divide-y divide-gray-200 w-full table-fixed overflow-y-scroll"
                     >
@@ -390,7 +407,18 @@
                 Close
             </jet-secondary-button>
 
-            <jet-button class="ml-2" @click="updateCitation"> Save </jet-button>
+            <jet-button
+                class="ml-2"
+                :disabled="
+                    !(
+                        this.citationModified &&
+                        this.selectedCitationList.length > 0
+                    )
+                "
+                @click="updateCitation"
+            >
+                Save
+            </jet-button>
         </template>
     </jet-dialog-modal>
 </template>
@@ -400,7 +428,7 @@ import JetDialogModal from "@/Jetstream/DialogModal.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import JetButton from "@/Jetstream/Button.vue";
 import AuthorCheckbox from "@/Shared/AuthorCheckbox.vue";
-import { TrashIcon, PencilIcon } from "@heroicons/vue/solid";
+import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
 import JetInputError from "@/Jetstream/InputError.vue";
 import LoadingButton from "@/Shared/LoadingButton.vue";
 import JetDangerButton from "@/Jetstream/DangerButton.vue";
@@ -447,6 +475,7 @@ export default {
             confirmingCitationDeletion: false,
             selectedCitationforDelete: {},
             loading: false,
+            citationModified: false,
         };
     },
     /* mounted() {
@@ -489,6 +518,7 @@ export default {
                         ) === index
                 );
             }
+            this.citationModified = true;
         },
         /*Import Citation from DOI*/
         importCitation() {
@@ -503,7 +533,7 @@ export default {
                 axios
                     .get(this.$page.props.europemcWSApi, {
                         params: {
-                            query: this.importCitationForm.doi,
+                            query: "DOI:" + this.importCitationForm.doi,
                             format: "json",
                             pageSize: "1",
                             resulttype: "core",
@@ -572,7 +602,11 @@ export default {
         },
         /*Update the Citation table and relationship*/
         updateCitation() {
-            this.updateCitationForm.reset();
+            //this.updateCitationForm.reset();
+            this.updateCitationForm = this.$inertia.form({
+                _method: "POST",
+                citationList: [],
+            });
             for (var i = 0; i < this.selectedCitationList.length; i++) {
                 this.updateCitationForm.citationList.push(
                     this.selectedCitationList[i]
@@ -637,6 +671,7 @@ export default {
             if (index > -1) {
                 this.selectedCitationList.splice(index, 1);
             }
+            this.citationModified = true;
             this.closeModal();
         },
         closeModal() {
@@ -646,6 +681,7 @@ export default {
         resetData() {
             this.importCitationForm = this.$inertia.form({});
             this.manualAddCitationForm = this.$inertia.form({});
+            this.updateCitationForm = this.$inertia.form({});
             this.formattedCitationRes = null;
             this.importedCitationByDOI = [];
             this.addCitationDialog = false;
@@ -653,6 +689,7 @@ export default {
             this.confirmingCitationDeletion = false;
             this.selectedCitationforDelete = {};
             this.loading = false;
+            this.citationModified = false;
         },
         onClose() {
             this.addCitationDialog = false;
