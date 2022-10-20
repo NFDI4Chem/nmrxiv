@@ -35,6 +35,17 @@ trait HasProjects
     }
 
     /**
+     * User model and Drafts relationship - many to many
+     *
+     * @var array
+     */
+    public function sharedDrafts()
+    {
+        $sharedProjects = $this->projects()->wherePivot('role', '!=', 'creator');
+        return Draft::whereIn('id', $sharedProjects->pluck('draft_id'))->get();
+    }
+
+    /**
      * User model and Projects relationship - many to many
      *
      * @var array
