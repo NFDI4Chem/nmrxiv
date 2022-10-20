@@ -1633,10 +1633,16 @@ export default {
         const initialise = (data) => {
             this.fetchDrafts().then((response) => {
                 this.drafts = response.data.drafts;
+                this.sharedDrafts = response.data.sharedDrafts;
                 if (data.draft_id) {
                     let selectedDraft = this.drafts.find(
                         (d) => d.id == data.draft_id
                     );
+                    if(!selectedDraft){
+                        selectedDraft = this.sharedDrafts.find(
+                            (d) => d.id == data.draft_id
+                        );
+                    }
                     this.selectDraft(selectedDraft);
                     this.loading = false;
                     this.toggleOpenCreateDatasetDialog();
