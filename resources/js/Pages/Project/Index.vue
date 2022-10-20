@@ -82,10 +82,88 @@
             </div>
         </span>
         <span v-else>
-            <div v-for="project in projects" :key="project.uuid" class="mt-8">
+            <div
+                v-for="project in projects"
+                :key="project.uuid"
+                class="mt-8 relative"
+            >
+                <div class="absolute rotate-90 -left-16 top-1/3">
+                    <span
+                        v-if="project.is_public"
+                        class="inline-flex bg-gray-100 px-4 items-center border-b border-l border-r rounded-b-md"
+                    >
+                        <svg
+                            class="h-3 w-3 text-green-400 inline"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 64 64"
+                            width="512"
+                            height="512"
+                        >
+                            <g id="globe">
+                                <path
+                                    d="M53.85,47.85A27,27,0,0,1,24,57.8V56l3-3V49l4-4V42l4,4h5l2-2h8Z"
+                                />
+                                <path
+                                    d="M42,20.59v2.56L38.07,27H31l-5.36,5.26L31,37.51v5.06L27.44,39H22.86L16,32.11V24.2L11.8,20h-4A27,27,0,0,1,32,5a26.55,26.55,0,0,1,7.06.94L36,9H30v4l4,4h4.33Z"
+                                />
+                                <path
+                                    d="M32,60A28,28,0,1,1,60,32,28,28,0,0,1,32,60ZM32,6A26,26,0,1,0,58,32,26,26,0,0,0,32,6Z"
+                                />
+                            </g>
+                        </svg>
+                        <span class="ml-2">Public</span>
+                    </span>
+                    <span
+                        v-else
+                        class="inline-flex bg-red-100 px-4 items-center border-b border-l border-r rounded-b-md"
+                    >
+                        <svg
+                            id="Capa_1"
+                            class="h-3 w-3 text-gray-400 inline"
+                            version="1.1"
+                            xmlns="http://www.w3.org/2000/svg"
+                            xmlns:xlink="http://www.w3.org/1999/xlink"
+                            x="0px"
+                            y="0px"
+                            viewBox="0 0 512 512"
+                            style="enable-background: new 0 0 512 512"
+                            xml:space="preserve"
+                        >
+                            <g>
+                                <g>
+                                    <path
+                                        d="M437.333,192h-32v-42.667C405.333,66.99,338.344,0,256,0S106.667,66.99,106.667,149.333V192h-32
+    C68.771,192,64,196.771,64,202.667v266.667C64,492.865,83.135,512,106.667,512h298.667C428.865,512,448,492.865,448,469.333
+    V202.667C448,196.771,443.229,192,437.333,192z M287.938,414.823c0.333,3.01-0.635,6.031-2.656,8.292
+    c-2.021,2.26-4.917,3.552-7.948,3.552h-42.667c-3.031,0-5.927-1.292-7.948-3.552c-2.021-2.26-2.99-5.281-2.656-8.292l6.729-60.51
+    c-10.927-7.948-17.458-20.521-17.458-34.313c0-23.531,19.135-42.667,42.667-42.667s42.667,19.135,42.667,42.667
+    c0,13.792-6.531,26.365-17.458,34.313L287.938,414.823z M341.333,192H170.667v-42.667C170.667,102.281,208.948,64,256,64
+    s85.333,38.281,85.333,85.333V192z"
+                                    />
+                                </g>
+                            </g>
+                            <g></g>
+                            <g></g>
+                            <g></g>
+                            <g></g>
+                            <g></g>
+                            <g></g>
+                            <g></g>
+                            <g></g>
+                            <g></g>
+                            <g></g>
+                            <g></g>
+                            <g></g>
+                            <g></g>
+                            <g></g>
+                            <g></g>
+                        </svg>
+                        <span class="ml-2">Private</span>
+                    </span>
+                </div>
                 <a class="cursor-pointer" @click="getLink(project)">
                     <div
-                        class="flex justify-between items-center bg-white shadow-md border rounded-lg px-6 py-6 hover:drop-shadow-xl cursor-pointer"
+                        class="flex justify-between items-center bg-white shadow-md border rounded-lg px-6 py-6 cursor-pointer"
                     >
                         <div class="flex-grow">
                             <div class="flex justify-between items-baseline">
@@ -146,85 +224,8 @@
                                     </div>
                                 </div>
                             </div>
-                            <div
-                                class="flex justify-between items-baseline mt-3"
-                            >
+                            <div class="flex items-baseline mt-1 pl-5">
                                 <span class="text-sm text-gray-600">
-                                    <span
-                                        v-if="project.is_public"
-                                        class="inline-flex items-center"
-                                    >
-                                        <svg
-                                            class="h-3 w-3 text-green-400 inline"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            viewBox="0 0 64 64"
-                                            width="512"
-                                            height="512"
-                                        >
-                                            <g id="globe">
-                                                <path
-                                                    d="M53.85,47.85A27,27,0,0,1,24,57.8V56l3-3V49l4-4V42l4,4h5l2-2h8Z"
-                                                />
-                                                <path
-                                                    d="M42,20.59v2.56L38.07,27H31l-5.36,5.26L31,37.51v5.06L27.44,39H22.86L16,32.11V24.2L11.8,20h-4A27,27,0,0,1,32,5a26.55,26.55,0,0,1,7.06.94L36,9H30v4l4,4h4.33Z"
-                                                />
-                                                <path
-                                                    d="M32,60A28,28,0,1,1,60,32,28,28,0,0,1,32,60ZM32,6A26,26,0,1,0,58,32,26,26,0,0,0,32,6Z"
-                                                />
-                                            </g>
-                                        </svg>
-                                        <span class="ml-2">Public</span>
-                                    </span>
-                                    <span
-                                        v-else
-                                        class="inline-flex items-center"
-                                    >
-                                        <svg
-                                            id="Capa_1"
-                                            class="h-3 w-3 text-gray-400 inline"
-                                            version="1.1"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            xmlns:xlink="http://www.w3.org/1999/xlink"
-                                            x="0px"
-                                            y="0px"
-                                            viewBox="0 0 512 512"
-                                            style="
-                                                enable-background: new 0 0 512
-                                                    512;
-                                            "
-                                            xml:space="preserve"
-                                        >
-                                            <g>
-                                                <g>
-                                                    <path
-                                                        d="M437.333,192h-32v-42.667C405.333,66.99,338.344,0,256,0S106.667,66.99,106.667,149.333V192h-32
-                                        C68.771,192,64,196.771,64,202.667v266.667C64,492.865,83.135,512,106.667,512h298.667C428.865,512,448,492.865,448,469.333
-                                        V202.667C448,196.771,443.229,192,437.333,192z M287.938,414.823c0.333,3.01-0.635,6.031-2.656,8.292
-                                        c-2.021,2.26-4.917,3.552-7.948,3.552h-42.667c-3.031,0-5.927-1.292-7.948-3.552c-2.021-2.26-2.99-5.281-2.656-8.292l6.729-60.51
-                                        c-10.927-7.948-17.458-20.521-17.458-34.313c0-23.531,19.135-42.667,42.667-42.667s42.667,19.135,42.667,42.667
-                                        c0,13.792-6.531,26.365-17.458,34.313L287.938,414.823z M341.333,192H170.667v-42.667C170.667,102.281,208.948,64,256,64
-                                        s85.333,38.281,85.333,85.333V192z"
-                                                    />
-                                                </g>
-                                            </g>
-                                            <g></g>
-                                            <g></g>
-                                            <g></g>
-                                            <g></g>
-                                            <g></g>
-                                            <g></g>
-                                            <g></g>
-                                            <g></g>
-                                            <g></g>
-                                            <g></g>
-                                            <g></g>
-                                            <g></g>
-                                            <g></g>
-                                            <g></g>
-                                            <g></g>
-                                        </svg>
-                                        <span class="ml-2">Private</span>
-                                    </span>
                                     <div
                                         v-if="
                                             (team &&
@@ -256,6 +257,21 @@
                                         >
                                         {{ formatDate(project.created_at) }}
                                     </div>
+                                    <span
+                                        v-if="
+                                            !project.is_public &&
+                                            project.is_published
+                                        "
+                                        class="inline-flex items-center mt-2 px-3 py-0.5 rounded-full text-sm font-medium bg-yellow-100 text-red-800 capitalize"
+                                    >
+                                        PUBLISHED -&emsp;
+                                        <b
+                                            >Release date:
+                                            {{
+                                                formatDate(project.release_date)
+                                            }}</b
+                                        >
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -278,7 +294,7 @@
 </template>
 <script>
 import { Link } from "@inertiajs/inertia-vue3";
-import { StarIcon } from "@heroicons/vue/solid";
+import { StarIcon } from "@heroicons/vue/24/solid";
 export default {
     components: {
         Link,
@@ -298,16 +314,9 @@ export default {
         },
         getLink(project) {
             if (project) {
-                if (project.draft_id == null) {
-                    return this.$inertia.visit(
-                        this.route("dashboard.projects", [project.id])
-                    );
-                }
-                if (project.draft_id && project.status == null) {
-                    this.openDatasetCreateDialog({
-                        draft_id: project.draft_id,
-                    });
-                }
+                return this.$inertia.visit(
+                    this.route("dashboard.projects", [project.id])
+                );
             }
         },
     },

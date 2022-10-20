@@ -47,7 +47,7 @@
                                                     <span class="sr-only"
                                                         >Close panel</span
                                                     >
-                                                    <XIcon
+                                                    <XMarkIcon
                                                         class="h-6 w-6"
                                                         aria-hidden="true"
                                                     />
@@ -309,13 +309,13 @@
                                                     </jet-secondary-button>
 
                                                     <!-- <jet-secondary-button
-                            type="button"
-                            class="mt-2"
-                            @click.prevent="deletePhoto"
-                            v-if="project.project_photo_path"
-                          >
-                            Remove Photo
-                          </jet-secondary-button> -->
+                                                        type="button"
+                                                        class="mt-2"
+                                                        @click.prevent="deletePhoto"
+                                                        v-if="project.project_photo_path"
+                                                    >
+                                                        Remove Photo
+                                                    </jet-secondary-button> -->
                                                 </div>
                                                 <div v-if="canUpdateProject">
                                                     <label
@@ -339,50 +339,9 @@
                                                     <div class="mt-2 space-y-5">
                                                         <div
                                                             @click="
-                                                                form.is_public = true
-                                                            "
-                                                            class="relative flex items-start"
-                                                        >
-                                                            <div
-                                                                class="absolute flex items-center h-5"
-                                                            >
-                                                                <input
-                                                                    id="privacy-public"
-                                                                    :checked="
-                                                                        form.is_public ===
-                                                                        true
-                                                                    "
-                                                                    name="privacy"
-                                                                    aria-describedby="privacy-public-description"
-                                                                    type="radio"
-                                                                    class="focus:ring-gray-500 h-4 w-4 text-gray-600 border-gray-300"
-                                                                />
-                                                            </div>
-                                                            <div
-                                                                class="pl-7 text-sm"
-                                                            >
-                                                                <label
-                                                                    for="privacy-public"
-                                                                    class="font-medium text-gray-900"
-                                                                >
-                                                                    Public
-                                                                    access
-                                                                </label>
-                                                                <p
-                                                                    id="privacy-public-description"
-                                                                    class="text-gray-500"
-                                                                >
-                                                                    Everyone
-                                                                    with the
-                                                                    link will
-                                                                    see this
-                                                                    project.
-                                                                </p>
-                                                            </div>
-                                                        </div>
-                                                        <div
-                                                            @click="
-                                                                form.is_public = false
+                                                                updateAccess(
+                                                                    false
+                                                                )
                                                             "
                                                             class="relative flex items-start"
                                                         >
@@ -394,6 +353,9 @@
                                                                     :checked="
                                                                         form.is_public ===
                                                                         false
+                                                                    "
+                                                                    :disabled="
+                                                                        !canUpdateProject
                                                                     "
                                                                     name="privacy"
                                                                     aria-describedby="privacy-private-to-project-description"
@@ -428,39 +390,8 @@
                                                     </div>
                                                 </fieldset>
                                             </div>
-                                            <div
-                                                v-if="canUpdateProject"
-                                                class="pt-4 pb-6"
-                                            >
-                                                <div
-                                                    class="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-1"
-                                                >
-                                                    <div v-if="licenses">
-                                                        <select-rich
-                                                            v-model:selected="
-                                                                form.license
-                                                            "
-                                                            label="License"
-                                                            :items="licenses"
-                                                        />
-                                                    </div>
-                                                </div>
-                                                <jet-input-error
-                                                    :message="
-                                                        form.errors.license
-                                                    "
-                                                    class="mt-2"
-                                                />
-                                            </div>
-                                            <div
-                                                v-if="canUpdateProject"
-                                                class="pt-4 pb-6"
-                                            >
-                                                <div
-                                                    v-if="
-                                                        form.is_public == true
-                                                    "
-                                                >
+                                            <div>
+                                                <div v-if="form.is_public">
                                                     <label
                                                         for="email"
                                                         class="block text-sm font-medium text-gray-700"
@@ -477,9 +408,7 @@
                                                                 v-model="
                                                                     project.public_url
                                                                 "
-                                                                :readonly="
-                                                                    !canUpdateProject
-                                                                "
+                                                                :readonly="true"
                                                                 type="text"
                                                                 class="rounded-l-md focus:ring-gray-500 focus:border-gray-500 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300"
                                                                 @focus="
@@ -498,16 +427,62 @@
                                                             "
                                                         >
                                                             <span
-                                                                ><ClipboardCopyIcon
+                                                                ><ClipboardDocumentIcon
                                                                     class="h-5 w-5"
                                                                     aria-hidden="true"
                                                             /></span>
                                                         </button>
                                                     </div>
                                                 </div>
-                                                <div v-else>
+                                                <div
+                                                    class="mt-2"
+                                                    v-if="form.doi"
+                                                >
+                                                    <label
+                                                        for="email"
+                                                        class="block text-sm font-medium text-gray-700"
+                                                        >DOI</label
+                                                    >
+                                                    <div
+                                                        class="mt-1 flex rounded-md shadow-sm"
+                                                    >
+                                                        <div
+                                                            class="relative flex items-stretch flex-grow focus-within:z-10"
+                                                        >
+                                                            <input
+                                                                id="projectDOICopy"
+                                                                v-model="
+                                                                    project.doi
+                                                                "
+                                                                :readonly="true"
+                                                                type="text"
+                                                                class="rounded-l-md focus:ring-gray-500 focus:border-gray-500 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300"
+                                                                @focus="
+                                                                    $event.target.select()
+                                                                "
+                                                            />
+                                                        </div>
+                                                        <button
+                                                            type="button"
+                                                            class="-ml-px relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500"
+                                                            @click="
+                                                                copyToClipboard(
+                                                                    project.doi,
+                                                                    'projectDOICopy'
+                                                                )
+                                                            "
+                                                        >
+                                                            <span
+                                                                ><ClipboardDocumentIcon
+                                                                    class="h-5 w-5"
+                                                                    aria-hidden="true"
+                                                            /></span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <!-- <div>
                                                     <div class="space-y-1">
-                                                        <!-- <div
+                                                        <div
                                                             class="relative flex items-start"
                                                         >
                                                             <div
@@ -532,7 +507,7 @@
                                                                 >
                                                             </div>
                                                         </div> -->
-                                                        <div v-if="linkAccess">
+                                                <!-- <div v-if="linkAccess">
                                                             <div class="flex">
                                                                 <div
                                                                     class="flex-grow"
@@ -561,7 +536,7 @@
                                                                     "
                                                                 >
                                                                     <span
-                                                                        ><ClipboardCopyIcon
+                                                                        ><ClipboardDocumentIcon
                                                                             class="h-5 w-5"
                                                                             aria-hidden="true"
                                                                     /></span>
@@ -698,13 +673,51 @@
                                                                     </div>
                                                                 </Listbox>
                                                             </div>
+                                                        </div> 
+                                                    </div>
+                                                </div>-->
+                                                <div>
+                                                    <div
+                                                        class="mt-6 grid grid-cols-1 gap-x-4 sm:grid-cols-1"
+                                                    >
+                                                        <div v-if="licenses">
+                                                            <span
+                                                                class="float-right text-xs cursor-pointer hover:text-blue-700 mt-2"
+                                                            >
+                                                                <a
+                                                                    target="_blank"
+                                                                    href="https://docs.nmrxiv.org/docs/submission-guides/licenses"
+                                                                    >How to
+                                                                    choose the
+                                                                    right
+                                                                    license?</a
+                                                                >
+                                                            </span>
+                                                            <select-rich
+                                                                v-model:selected="
+                                                                    form.license
+                                                                "
+                                                                :disabled="
+                                                                    !canUpdateProject
+                                                                "
+                                                                label="License"
+                                                                :items="
+                                                                    licenses
+                                                                "
+                                                            />
                                                         </div>
                                                     </div>
+                                                    <jet-input-error
+                                                        :message="
+                                                            form.errors.license
+                                                        "
+                                                        class="mt-2"
+                                                    />
                                                 </div>
                                                 <div class="mt-6 flex text-sm">
                                                     <a
                                                         target="_blank"
-                                                        href="https://docs.nmrxiv.org/docs/submission-guides/sharing"
+                                                        href="https://docs.nmrxiv.org/docs/submission-guides/data-model/sharing"
                                                         class="group inline-flex items-center text-gray-500 hover:text-gray-900"
                                                     >
                                                         <QuestionMarkCircleIcon
@@ -717,7 +730,9 @@
                                                         </span>
                                                     </a>
                                                 </div>
-                                                <div class="mt-4 flex text-sm">
+                                                <div
+                                                    class="mt-4 flex text-sm mb-6"
+                                                >
                                                     <a
                                                         class="cursor-pointer group inline-flex items-center text-gray-500 hover:text-gray-900"
                                                         @click="
@@ -738,66 +753,12 @@
                                                     :project="project"
                                                 ></project-activity>
                                             </div>
-
-                                            <div class="pt-3" v-else>
-                                                <div
-                                                    v-if="
-                                                        form.is_public ==
-                                                            true ||
-                                                        form.is_public == 'true'
-                                                    "
-                                                >
-                                                    <label
-                                                        for="email"
-                                                        class="block text-sm font-medium text-gray-700"
-                                                        >Public URL</label
-                                                    >
-                                                    <div
-                                                        class="mt-1 flex rounded-md shadow-sm"
-                                                    >
-                                                        <div
-                                                            class="relative flex items-stretch flex-grow focus-within:z-10"
-                                                        >
-                                                            <input
-                                                                id="projectPublicURLCopy"
-                                                                v-model="
-                                                                    project.public_url
-                                                                "
-                                                                :readonly="
-                                                                    !canUpdateProject
-                                                                "
-                                                                type="text"
-                                                                class="rounded-l-md focus:ring-gray-500 focus:border-gray-500 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300"
-                                                                @focus="
-                                                                    $event.target.select()
-                                                                "
-                                                            />
-                                                        </div>
-                                                        <button
-                                                            type="button"
-                                                            class="-ml-px relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500"
-                                                            @click="
-                                                                copyToClipboard(
-                                                                    project.public_url,
-                                                                    'projectPublicURLCopy'
-                                                                )
-                                                            "
-                                                        >
-                                                            <span
-                                                                ><ClipboardCopyIcon
-                                                                    class="h-5 w-5"
-                                                                    aria-hidden="true"
-                                                            /></span>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
                                 <!--Footer-->
                                 <div
-                                    v-if="this.form.is_public != 'true'"
+                                    v-if="!this.form.is_public"
                                     class="flex-shrink-0 px-4 py-4 flex justify-end"
                                 >
                                     <jet-action-message
@@ -825,8 +786,7 @@
                                 <!--Footer with confirmation-->
                                 <div
                                     v-if="
-                                        this.form.is_public == 'true' &&
-                                        canUpdateProject
+                                        this.form.is_public && canUpdateProject
                                     "
                                     class="flex-shrink-0 px-4 py-4 flex justify-end"
                                 >
@@ -886,13 +846,13 @@ import {
     TransitionChild,
     TransitionRoot,
 } from "@headlessui/vue";
-import { XIcon } from "@heroicons/vue/outline";
+import { XMarkIcon } from "@heroicons/vue/24/outline";
 import {
     LinkIcon,
-    PlusSmIcon,
+    PlusSmallIcon,
     QuestionMarkCircleIcon,
     ExclamationCircleIcon,
-} from "@heroicons/vue/solid";
+} from "@heroicons/vue/24/solid";
 import {
     Listbox,
     ListboxButton,
@@ -911,14 +871,15 @@ import { ColorPicker } from "vue3-colorpicker";
 import "vue3-colorpicker/style.css";
 import { Switch, SwitchGroup, SwitchLabel } from "@headlessui/vue";
 import {
-    ClipboardCopyIcon,
+    ClipboardDocumentIcon,
     CheckIcon,
     ChevronDownIcon,
-} from "@heroicons/vue/solid";
+} from "@heroicons/vue/24/solid";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import SelectRich from "@/Shared/SelectRich.vue";
 import JetButton from "@/Jetstream/Button.vue";
 import VueTagsInput from "@sipec/vue3-tags-input";
+import { Inertia } from "@inertiajs/inertia";
 const publishingOptions = [
     {
         value: "viewer",
@@ -955,11 +916,11 @@ export default defineComponent({
         ColorPicker,
         JetActionMessage,
         JetInputError,
-        XIcon,
+        XMarkIcon,
         ProjectActivity,
         TransitionRoot,
         LinkIcon,
-        PlusSmIcon,
+        PlusSmallIcon,
         QuestionMarkCircleIcon,
         ExclamationCircleIcon,
         Listbox,
@@ -972,7 +933,7 @@ export default defineComponent({
         TabList,
         TabPanel,
         TabPanels,
-        ClipboardCopyIcon,
+        ClipboardDocumentIcon,
         CheckIcon,
         ChevronDownIcon,
         SelectRich,
@@ -1000,11 +961,12 @@ export default defineComponent({
                 starred: this.project.starred,
                 access: this.project.access,
                 access_type: this.project.access_type,
-                is_public: this.project.is_public === "true",
+                is_public: this.project.is_public,
                 license: null,
                 license_id: null,
                 tag: "",
                 tags: [],
+                doi: this.project.doi,
                 tags_array: [],
                 photo: null,
             }),
@@ -1025,6 +987,11 @@ export default defineComponent({
         },
     },
     methods: {
+        updateAccess(value) {
+            if (this.canUpdateProject) {
+                this.form.is_public = value;
+            }
+        },
         clearPhotoFileInput() {
             if (this.$refs.photo?.value) {
                 this.$refs.photo.value = null;
@@ -1106,6 +1073,25 @@ export default defineComponent({
                     this.form.tag = "";
                     this.open = false;
                     this.clearPhotoFileInput();
+                    let stale = false;
+
+                    Inertia.reload({ only: ["project"] });
+
+                    window.addEventListener("popstate", () => {
+                        stale = true;
+                    });
+
+                    Inertia.on("navigate", (event) => {
+                        const page = event.detail.page;
+                        if (stale) {
+                            Inertia.get(
+                                page.url,
+                                {},
+                                { replace: true, preserveState: false }
+                            );
+                        }
+                        stale = false;
+                    });
                 },
                 onError: (err) => {},
             });

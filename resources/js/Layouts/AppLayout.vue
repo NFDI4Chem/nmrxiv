@@ -51,7 +51,7 @@
                                     @click="sidebarOpen = false"
                                 >
                                     <span class="sr-only">Close sidebar</span>
-                                    <XIcon
+                                    <XMarkIcon
                                         class="h-6 w-6 text-white"
                                         aria-hidden="true"
                                     />
@@ -68,6 +68,15 @@
                         <div class="mt-1 flex-1 h-0 overflow-y-auto">
                             <div class="my-4 mx-4">
                                 <create mode="button"></create>
+                                <span
+                                    class="float-center text-xs cursor-pointer hover:text-blue-700 mt-2"
+                                >
+                                    <a
+                                        href="https://docs.nmrxiv.org/docs/submission-guides/submission/upload"
+                                        target="_blank"
+                                        >Need help?
+                                    </a>
+                                </span>
                             </div>
                             <nav
                                 v-for="item in filteredNavigation"
@@ -98,7 +107,7 @@
         </TransitionRoot>
         <div
             v-if="collapseSidebar"
-            class="hidden bg-white border-r md:flex md:flex-shrink-0 md:inset-y-0 z-10"
+            class="hidden fixed bg-white border-r md:flex md:flex-shrink-0 md:inset-y-0 z-10"
         >
             <div class="flex flex-col w-20">
                 <div class="flex-1 flex flex-col min-h-0 overflow-y-auto">
@@ -157,15 +166,24 @@
           class="rounded px-1 mx-1 mr-3 border-gray-200 text-gray-500"
           @click="toggleCollapseSidebar()"
         >
-          <MenuIcon class="h-6 w-6" aria-hidden="true" />
+          <Bars3Icon class="h-6 w-6" aria-hidden="true" />
         </button> -->
                     <Link class="ml-2" :href="route('welcome')">
                         <jet-application-logo class="block h-10 w-auto" />
                     </Link>
                 </div>
                 <div class="flex-grow flex flex-col -mt-1.5">
-                    <div class="px-4 flex flex-col mt-3 mb-1">
+                    <div class="px-4 flex flex-col mt-3 mb-1 text-center">
                         <create mode="button"></create>
+                        <span
+                            class="text-xs cursor-pointer hover:text-blue-700 mt-2"
+                        >
+                            <a
+                                href="https://docs.nmrxiv.org/docs/submission-guides/submission/upload"
+                                target="_blank"
+                                >Need help?
+                            </a>
+                        </span>
                     </div>
                     <nav class="py-4 px-0 bg-white">
                         <div
@@ -224,7 +242,7 @@
         </div>
         <div
             :class="[
-                collapseSidebar ? 'md:pl-20 md:-ml-20' : 'md:pl-64',
+                collapseSidebar ? 'md:pl-40 md:-ml-20' : 'md:pl-64',
                 'flex flex-col flex-1 z-0',
             ]"
         >
@@ -236,7 +254,7 @@
                     class="hidden md:inline-flex p-4 rounded mx-1 mr-3 border-red-200 text-gray-500"
                     @click="toggleCollapseSidebar()"
                 >
-                    <MenuIcon class="h-6 w-6" aria-hidden="true" />
+                    <Bars3Icon class="h-6 w-6" aria-hidden="true" />
                 </button>
                 <button
                     type="button"
@@ -244,7 +262,7 @@
                     @click="sidebarOpen = true"
                 >
                     <span class="sr-only">Open sidebar</span>
-                    <MenuIcon class="h-6 w-6" aria-hidden="true" />
+                    <Bars3Icon class="h-6 w-6" aria-hidden="true" />
                 </button>
                 <div class="flex-1 px-4 py-2 flex justify-between">
                     <div class="flex-1 flex">
@@ -258,7 +276,7 @@
                 <div
                   class="absolute inset-y-0 left-0 flex items-center pointer-events-none"
                 >
-                  <SearchIcon class="h-5 w-5" aria-hidden="true" />
+                  <MagnifyingGlassIcon class="h-5 w-5" aria-hidden="true" />
                 </div>
                 <input
                   id="search-field"
@@ -617,19 +635,19 @@
                             >
                             </MenuButton>
                             <div class="inline-flex">
-                                <a
+                                <Link
                                     href="/login"
                                     class="px-3 py-2 whitespace-nowrap text-base font-medium text-gray-500 hover:text-gray-900"
                                 >
                                     Login
-                                </a>
-                                <a
+                                </Link>
+                                <Link
                                     href="/register"
                                     type="button"
                                     class="inline-flex ml-3 items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                                 >
                                     Register
-                                </a>
+                                </Link>
                             </div>
                         </Menu>
                     </div>
@@ -662,12 +680,12 @@ import ProjectCreate from "@/Pages/Project/Partials/Create.vue";
 import StudyCreate from "@/Pages/Study/Partials/Create.vue";
 import Submission from "@/Shared/Submission.vue";
 import {
-    BookmarkAltIcon,
+    BookmarkSquareIcon,
     FireIcon,
     HomeIcon,
     InboxIcon,
     UserIcon,
-} from "@heroicons/vue/outline";
+} from "@heroicons/vue/24/outline";
 import { ref } from "vue";
 import {
     DialogOverlay,
@@ -682,16 +700,16 @@ import {
 } from "@headlessui/vue";
 import {
     BellIcon,
-    MenuIcon,
-    XIcon,
+    Bars3Icon,
+    XMarkIcon,
     ClockIcon,
     UsersIcon,
     StarIcon,
     FolderIcon,
-    ViewGridIcon,
+    Squares2X2Icon,
     TrashIcon,
-} from "@heroicons/vue/outline";
-import { SearchIcon, PlusIcon } from "@heroicons/vue/solid";
+} from "@heroicons/vue/24/outline";
+import { MagnifyingGlassIcon, PlusIcon } from "@heroicons/vue/24/solid";
 
 const userNavigation = [];
 
@@ -712,7 +730,7 @@ const navigation = [
         auth: false,
         name: "Datasets",
         href: "/datasets",
-        icon: ViewGridIcon,
+        icon: Squares2X2Icon,
         bg: "bg-white",
     },
     {
@@ -780,9 +798,9 @@ export default {
         TransitionChild,
         TransitionRoot,
         BellIcon,
-        MenuIcon,
-        SearchIcon,
-        XIcon,
+        Bars3Icon,
+        MagnifyingGlassIcon,
+        XMarkIcon,
         PlusIcon,
         FlashMessages,
         DialogPanel,
@@ -794,7 +812,7 @@ export default {
         StarIcon,
         TrashIcon,
         FolderIcon,
-        ViewGridIcon,
+        Squares2X2Icon,
         StudyCreate,
         Submission,
     },

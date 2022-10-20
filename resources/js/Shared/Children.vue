@@ -267,7 +267,7 @@
 
 <script>
 import StudyContent from "@/Pages/Study/Content.vue";
-import { FolderIcon, DocumentTextIcon } from "@heroicons/vue/solid";
+import { FolderIcon, DocumentTextIcon } from "@heroicons/vue/24/solid";
 import { Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/vue";
 
 export default {

@@ -76,7 +76,7 @@
                                         @update:modelValue="onSelect"
                                     >
                                         <div class="relative">
-                                            <SearchIcon
+                                            <MagnifyingGlassIcon
                                                 class="pointer-events-none absolute top-3.5 left-4 h-5 w-5 text-gray-900 text-opacity-40"
                                                 aria-hidden="true"
                                             />
@@ -185,7 +185,7 @@
                                                                                 'bg-gray-900 bg-opacity-5 text-gray-900',
                                                                         ]"
                                                                     >
-                                                                        <a
+                                                                        <Link
                                                                             class="w-full"
                                                                             :href="
                                                                                 '/projects/' +
@@ -218,7 +218,7 @@
                                                                                 >Jump
                                                                                 to...</span
                                                                             >
-                                                                        </a>
+                                                                        </Link>
                                                                     </li>
                                                                 </ComboboxOption>
                                                             </ul>
@@ -319,10 +319,14 @@
 <script>
 import { instantMeiliSearch } from "@meilisearch/instant-meilisearch";
 import { ref, watchEffect } from "vue";
-import { SearchIcon } from "@heroicons/vue/solid";
+import { MagnifyingGlassIcon } from "@heroicons/vue/24/solid";
 import { Link } from "@inertiajs/inertia-vue3";
 import { useMagicKeys } from "@vueuse/core";
-import { DocumentAddIcon, FolderIcon, TagIcon } from "@heroicons/vue/outline";
+import {
+    DocumentPlusIcon,
+    FolderIcon,
+    TagIcon,
+} from "@heroicons/vue/24/outline";
 import {
     Combobox,
     ComboboxInput,
@@ -344,7 +348,7 @@ const recent = [];
 const quickActions = [
     {
         name: "Ask a question...",
-        icon: DocumentAddIcon,
+        icon: DocumentPlusIcon,
         shortcut: "N",
         url: "mailto:info@nmrxiv.org",
     },
@@ -371,7 +375,7 @@ export default {
         Dialog,
         DialogOverlay,
         FolderIcon,
-        SearchIcon,
+        MagnifyingGlassIcon,
         TransitionChild,
         TransitionRoot,
         Link,

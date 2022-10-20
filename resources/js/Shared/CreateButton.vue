@@ -2,7 +2,7 @@
     <div>
         <span v-if="mode == 'button'">
             <span v-if="!$page.props.user.email">
-                <a
+                <Link
                     href="/login"
                     class="p-3 cursor-pointer inline-flex items-center text-center border border-transparent text-base rounded-full shadow-sm text-white inline-flex items-center bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring focus:ring-gray-300 disabled:opacity-25 transition"
                 >
@@ -19,7 +19,7 @@
                         />
                     </svg>
                     Upload &emsp;
-                </a>
+                </Link>
             </span>
             <span v-else>
                 <Link
@@ -45,7 +45,7 @@
         </span>
         <span v-if="mode == 'icon'">
             <span v-if="!$page.props.user.email">
-                <a
+                <Link
                     href="/login"
                     class="cursor-pointer inline-flex items-center text-center p-3 border border-transparent text-base font-medium rounded-full shadow-sm inline-flex items-center bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring focus:ring-gray-300 disabled:opacity-25 transition"
                 >
@@ -61,7 +61,7 @@
                             clip-rule="evenodd"
                         />
                     </svg>
-                </a>
+                </Link>
             </span>
             <span v-else
                 ><Link
@@ -90,20 +90,20 @@
 import { Link } from "@inertiajs/inertia-vue3";
 import { Menu, MenuItem, MenuItems } from "@headlessui/vue";
 import {
-    ArchiveIcon,
-    PencilAltIcon,
-    TableIcon,
+    ArchiveBoxIcon,
+    PencilSquareIcon,
+    TableCellsIcon,
     PlusIcon,
-} from "@heroicons/vue/solid";
+} from "@heroicons/vue/24/solid";
 export default {
     components: {
         Link,
         Menu,
         MenuItem,
         MenuItems,
-        ArchiveIcon,
-        PencilAltIcon,
-        TableIcon,
+        ArchiveBoxIcon,
+        PencilSquareIcon,
+        TableCellsIcon,
         PlusIcon,
     },
     props: {

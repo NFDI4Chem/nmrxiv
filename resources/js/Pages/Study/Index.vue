@@ -3,6 +3,15 @@
         <div class="flex items-baseline justify-between">
             <div>
                 <h2 class="text-lg">Studies</h2>
+                <div
+                    class="float-center text-xs cursor-pointer hover:text-blue-700 mb-2"
+                >
+                    <a
+                        href="https://docs.nmrxiv.org/docs/submission-guides/data-model/study"
+                        target="_blank"
+                        >Learn more about studies
+                    </a>
+                </div>
                 <div v-if="!loading" class="flex items-center mr-4 w-full">
                     <div class="flex w-full bg-white shadow rounded-full">
                         <input
@@ -15,31 +24,41 @@
                         />
                     </div>
                     <button
-                        type="button"
                         class="ml-2 inline-flex items-center rounded-full px-6 py-3 shadow rounded-full text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                        @click="update()"
+                        @click.prevent="update()"
+                        style="overflow-anchor: none"
                     >
                         GO
                     </button>
                     <button
-                        @click="reset()"
+                        @click.prevent="reset()"
                         class="ml-3 text-sm text-gray-500 hover:text-gray-700 focus:text-indigo-500"
-                        type="button"
+                        style="overflow-anchor: none"
                     >
                         Reset
                     </button>
                 </div>
             </div>
-            <!-- <div class="flex-shrink-0 ml-4">
+            <div class="flex-shrink-0 ml-4">
                 <button
-                    v-if="editable"
+                    v-if="editable && project.draft_id !== null"
                     type="button"
                     class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                    @click="openStudyCreateDialog()"
+                    @click.prevent="openDatasetCreateDialog()"
                 >
-                    New Study
+                    + Manage Studies
                 </button>
-            </div> -->
+                <div
+                    v-if="editable && project.draft_id !== null"
+                    class="text-center text-xs cursor-pointer hover:text-blue-700 mt-2"
+                >
+                    <a
+                        href="https://docs.nmrxiv.org/docs/submission-guides/submission/upload/#manage-studies-and-datasets"
+                        target="_blank"
+                        >Need help?
+                    </a>
+                </div>
+            </div>
         </div>
         <div v-if="!loading && studies.data">
             <div v-if="studies.data.length <= 0 && editable">
@@ -123,7 +142,7 @@
                         </div>
                         <button
                             type="button"
-                            @click="reset()"
+                            @click.prevent="reset()"
                             class="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 mt-6 focus:ring-offset-2 focus:ring-teal-500"
                         >
                             <svg
@@ -218,10 +237,7 @@ import { Link } from "@inertiajs/inertia-vue3";
 import StudyCreate from "@/Pages/Study/Partials/Create.vue";
 import StudyCard from "@/Shared/StudyCard.vue";
 import JetButton from "@/Jetstream/Button.vue";
-import {
-    ArrowNarrowLeftIcon,
-    ArrowNarrowRightIcon,
-} from "@heroicons/vue/solid";
+import { ArrowLongLeftIcon, ArrowLongRightIcon } from "@heroicons/vue/24/solid";
 
 export default {
     components: {
@@ -229,8 +245,8 @@ export default {
         StudyCreate,
         StudyCard,
         JetButton,
-        ArrowNarrowLeftIcon,
-        ArrowNarrowRightIcon,
+        ArrowLongLeftIcon,
+        ArrowLongRightIcon,
     },
     props: {
         project: {
@@ -260,6 +276,11 @@ export default {
         }
     },
     methods: {
+        openDatasetCreateDialog() {
+            this.emitter.emit("openDatasetCreateDialog", {
+                draft_id: this.project.draft_id,
+            });
+        },
         fetchStudies(url) {
             axios.get(url).then((response) => {
                 this.loading = false;
@@ -267,7 +288,7 @@ export default {
             });
         },
         update(link) {
-            if (!link && this.query != "") {
+            if (!link) {
                 link = {};
                 link["url"] =
                     route("dashboard.project.studies", this.project.id) +

@@ -17,50 +17,53 @@
                                 " " +
                                 project.data.owner.last_name
                             }}</a>
-                            updated on
-                            <time datetime="2020-08-25">{{
-                                formatDate(project.data.updated_at)
-                            }}</time>
+                            <span class="block md:inline ml-10 md:ml-0">
+                                updated on
+                                <time>{{
+                                    formatDate(project.data.updated_at)
+                                }}</time>
+                            </span>
                         </p>
-
-                        <div class="float-right">
-                            <a
-                                class="ml-4 cursor-pointer relative inline-flex items-center px-4 py-1 rounded-full border border-gray-300 bg-white text-sm font-black text-dark hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
-                                :href="downloadURL"
-                            >
-                                Download
-                            </a>
-                        </div>
-                        <div class="float-right">
-                            <div class="flex-shrink-0">
-                                <span
-                                    v-if="project.data.stats"
-                                    class="relative z-0 inline-flex shadow-sm rounded-full"
+                        <div class="flex mt-2 md:inline">
+                            <div class="float-left md:float-right">
+                                <a
+                                    class="md:ml-4 cursor-pointer relative inline-flex items-center px-4 py-1 rounded-full border border-gray-300 bg-white text-sm font-black text-dark hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                                    :href="downloadURL"
                                 >
-                                    <button
-                                        type="button"
-                                        class="relative inline-flex items-center px-1 py-1 rounded-l-full border border-gray-300 bg-white text-sm font-medium text-gray-900 hover:bg-gray-50"
-                                        @click="toggleUpVote()"
+                                    Download
+                                </a>
+                            </div>
+                            <div class="float-left md:float-right">
+                                <div class="flex-shrink-0">
+                                    <span
+                                        v-if="project.data.stats"
+                                        class="relative z-0 inline-flex shadow-sm rounded-full"
                                     >
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            class="h-5 w-5"
-                                            viewBox="0 0 20 20"
-                                            fill="currentColor"
+                                        <button
+                                            type="button"
+                                            class="relative inline-flex items-center px-1 py-1 rounded-l-full border border-gray-300 bg-white text-sm font-medium text-gray-900 hover:bg-gray-50"
+                                            @click="toggleUpVote()"
                                         >
-                                            <path
-                                                fill-rule="evenodd"
-                                                d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z"
-                                                clip-rule="evenodd"
-                                            />
-                                        </svg>
-                                    </button>
-                                    <a
-                                        class="-ml-px relative inline-flex items-center px-4 py-1 rounded-r-full border border-gray-300 bg-white text-sm font-black text-dark hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
-                                    >
-                                        {{ project.data.stats.likes }}
-                                    </a>
-                                </span>
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                class="h-5 w-5"
+                                                viewBox="0 0 20 20"
+                                                fill="currentColor"
+                                            >
+                                                <path
+                                                    fill-rule="evenodd"
+                                                    d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z"
+                                                    clip-rule="evenodd"
+                                                />
+                                            </svg>
+                                        </button>
+                                        <a
+                                            class="-ml-px relative inline-flex items-center px-4 py-1 rounded-r-full border border-gray-300 bg-white text-sm font-black text-dark hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                                        >
+                                            {{ project.data.stats.likes }}
+                                        </a>
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -111,6 +114,10 @@
                                         class="text-2xl font-bold text-gray-900 break-words"
                                     >
                                         {{ project.data.name }}
+                                        <a
+                                            class="float-right font-light hover:text-blue-600 hover:cursor-pointer text-gray-200"
+                                            >#{{ project.data.identifier }}</a
+                                        >
                                     </h1>
                                 </div>
                             </div>
@@ -132,13 +139,9 @@
                             >
                                 <Link
                                     :href="
-                                        route('public.project', {
-                                            owner: project.data.owner.username,
-                                            slug: project.data.slug,
-                                            _query: {
-                                                tab: tab.name,
-                                            },
-                                        })
+                                        project.data.public_url +
+                                        '?tab=' +
+                                        tab.name
                                     "
                                     v-for="tab in tabs"
                                     :key="tab.name"

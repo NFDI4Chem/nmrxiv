@@ -182,6 +182,7 @@ return [
         OwenIt\Auditing\AuditingServiceProvider::class,
         App\Providers\MinioStorageServiceProvider::class,
         App\Providers\CephStorageServiceProvider::class,
+        App\Providers\DOIServiceProvider::class,
     ],
 
     /*

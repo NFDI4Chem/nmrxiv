@@ -1,6 +1,6 @@
 # Privacy Policy
 
-Effective date: Nov 29, 2021
+Effective date: Oct 13, 2022
 
 nmrXiv ("us", "we", or "our") operates the https://nmrxiv.org website (hereinafter referred to as the "Service").
 
@@ -164,15 +164,52 @@ These third parties have access to your Personal Data only to perform these task
 
 ### Analytics
 
-We may use third-party Service Providers to monitor and analyse the use of our Service.
+We use the following Service Providers to monitor and analyse the use of our Service.
 
-*   **Google Analytics**
+*   **Matomo Analytics**
 
-    Google Analytics is a web analytics service offered by Google that tracks and reports website traffic. Google uses the data collected to track and monitor the use of our Service. This data is shared with other Google services. Google may use the collected data to contextualise and personalise the ads of its own advertising network.
+    Matomo is used to analyse the behaviour of the website visitors to identify potential pitfalls; not found pages, search engine indexing issues, which contents are the most appreciated… Once the data is processed (number of visitors reaching a not found pages, viewing only one page…), Matomo is generating reports for website owners to take action, for example changing the layout of the pages, publishing some fresh content… etc.
 
-    You can opt-out of having made your activity on the Service available to Google Analytics by installing the Google Analytics opt-out browser add-on. The add-on prevents the Google Analytics JavaScript (ga.js, analytics.js and dc.js) from sharing information with Google Analytics about visits activity.
+    Matomo is processing the following personal data:
 
-    For more information on the privacy practices of Google, please visit the Google Privacy & Terms web page: [https://policies.google.com/privacy?hl=en](https://policies.google.com/privacy?hl=en)
+    Pick up the one you are using:
+
+    - Cookies
+    - IP address
+    - User ID
+    - Custom Dimensions
+    - Custom Variables
+    - Order ID
+    - Location of the user
+
+    And also:
+
+    - Date and time
+    - Title of the page being viewed
+    - URL of the page being viewed
+    - URL of the page that was viewed prior to the current page
+    - Screen resolution
+    - Time in local timezone
+    - Files that were clicked and downloaded
+    - Link clicks to an outside domain
+    - Pages generation time
+    - Country, region, city
+    - Main Language of the browser
+    - User Agent of the browser
+
+    This list can be completed with additional features such as:
+
+    - Session recording, mouse events (movements, content forms and clicks)
+    - Form interactions
+    - Media interactions
+    - A/B Tests
+    - Pick up one of the two:
+
+    The processing of personal data with Matomo is based on legitimate interests:
+
+    Processing your personal data such as cookies is helping us identify what is working and what is not on our website. For example, it helps us identify if the way we are communicating is engaging or not and how we can organize the structure of the website better. Our team is benefiting from the processing of your personal data, and they are directly acting on the website. By processing your personal data, you can profit from a website which is getting better and better.
+
+    Without the data, we would not be able to provide you the service we are currently offering to you. Your data will be used only to improve the user experience on our website and help you find the information you are looking for.
 
 ## Links to Other Sites
 

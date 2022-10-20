@@ -10,6 +10,15 @@
     >
         <div>
             <div :class="[fullScreen ? 'px-6 py-4' : '', 'flex justify-end']">
+                <span
+                    class="float-right text-xs cursor-pointer hover:text-blue-700 mt-2 mr-2"
+                >
+                    <a
+                        href="https://docs.nmrxiv.org/docs/submission-guides/submission/folder-structure"
+                        target="_blank"
+                        >Learn more about folder structuring</a
+                    >
+                </span>
                 <button class="right" @click="toggleFullScreen">
                     <span v-if="fullScreen">
                         <svg
@@ -213,7 +222,7 @@
                                             class="h-5 w-5 inline text-green-400"
                                             aria-hidden="true"
                                         />
-                                        <UploadIcon
+                                        <ArrowUpTrayIcon
                                             v-if="
                                                 logs[file].status ==
                                                 'Inprogress'
@@ -221,7 +230,7 @@
                                             class="h-5 w-5 inline text-yellow-400"
                                             aria-hidden="true"
                                         />
-                                        <DotsVerticalIcon
+                                        <EllipsisVerticalIcon
                                             v-if="
                                                 logs[file].status ==
                                                 'Inprogress'
@@ -390,28 +399,28 @@ import {
     ChevronRightIcon,
     HomeIcon,
     InformationCircleIcon,
-    DotsVerticalIcon,
-    UploadIcon,
+    EllipsisVerticalIcon,
+    ArrowUpTrayIcon,
     CheckIcon,
     ExclamationCircleIcon,
     TrashIcon,
-    DownloadIcon,
-} from "@heroicons/vue/solid";
+    ArrowDownTrayIcon,
+} from "@heroicons/vue/24/solid";
 
 export default {
     components: {
         FolderIcon,
         DocumentTextIcon,
-        DownloadIcon,
+        ArrowDownTrayIcon,
         ChevronRightIcon,
         InformationCircleIcon,
         HomeIcon,
         FileDetails,
         JetDialogModal,
         JetSecondaryButton,
-        DotsVerticalIcon,
+        EllipsisVerticalIcon,
         ExclamationCircleIcon,
-        UploadIcon,
+        ArrowUpTrayIcon,
         CheckIcon,
         SelectInput,
         TrashIcon,
@@ -567,9 +576,9 @@ export default {
                         data.forEach((u) => {
                             let cFile = vm.dropzone.files.find((f) => {
                                 if (f.fullPath) {
-                                    return f.fullPath == u.fullPath;
+                                    return f.fullPath.trim() == u.fullPath;
                                 } else {
-                                    return "/" + f.name == u.fullPath;
+                                    return "/" + f.name.trim() == u.fullPath;
                                 }
                             });
 
