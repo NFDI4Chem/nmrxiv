@@ -42,6 +42,7 @@ trait HasProjects
     public function sharedDrafts()
     {
         $sharedProjects = $this->projects()->wherePivot('role', '!=', 'creator');
+
         return Draft::whereIn('id', $sharedProjects->pluck('draft_id'))->get();
     }
 
