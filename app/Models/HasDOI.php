@@ -16,17 +16,26 @@ trait HasDOI
                 $users = [];
                 $suffix = null;
                 $url = 'https://www.nmrxiv.org/';
+                $releaseDate = null;
+                $citation = null;
+
                 if ($this instanceof Project) {
                     $users = $this->allUsers();
                     $authors = $this->authors ? $this->authors : [];
                     $suffix = 'P'.$identifier;
                     $url = $url.'P'.$identifier;
+                    $releaseDate = $this->release_date;
+                    $resourceType = 'Project';
+                    $citationDoi = $this->citation->doi;
                 } elseif ($this instanceof Study) {
                     $users = $this->allUsers();
                     $authors = $this->project->authors ? $this->project->authors : [];
                     $projectIdentifier = $this->getIdentifier($this->project, 'identifier');
                     $suffix = 'P'.$projectIdentifier.'.'.'S'.$identifier;
                     $url = $url.'S'.$identifier;
+                    $releaseDate = $this->release_date;
+                    $resourceType = 'Study';
+                    $citationDoi = $this->project->citation->doi;
                 } elseif ($this instanceof Dataset) {
                     $users = $this->study->allUsers();
                     $authors = $this->project->authors ? $this->project->authors : [];
@@ -34,42 +43,71 @@ trait HasDOI
                     $studyIdentifier = $this->getIdentifier($this->study, 'identifier');
                     $suffix = 'P'.$projectIdentifier.'.'.'S'.$studyIdentifier.'.'.'D'.$identifier;
                     $url = $url.'D'.$identifier;
+                    $releaseDate = $this->study->release_date;
+                    $resourceType = 'Dataset';
+                    $citationDoi = $this->project->citation->doi;
                 }
 
                 $creators = [];
-                foreach ($users as $user) {
-                    array_push($creators, [
-                        'name' => $user->last_name.' '.$user->first_name,
+                foreach ($authors as $user) {
+                    array_push($contributors, [
+                        'name' => $user->family_name.', '.$user->given_name,
                         'nameType' => 'Personal',
-                        'givenName' => $user->first_name,
-                        'familyName' => $user->last_name,
-                        'affiliation' => [],
-                        'nameIdentifiers' => [],
+                        'givenName' => $user->given_name,
+                        'familyName' => $user->family_name,
+                        'nameIdentifiers' => $user->orcid_id,
+                        'nameIdentifierScheme' => 'ORCID',
+                        'schemeURI' => 'https://orcid.org',
+                        'affiliation' => $user->affiliation,
                     ]);
                 }
 
                 $contributors = [];
-                foreach ($authors as $user) {
-                    array_push($contributors, [
-                        'name' => $user->family_name.' '.$user->given_name,
+                foreach ($users as $user) {
+                    array_push($creators, [
+                        'contributorType' => 'Other',
+                        'name' => $user->last_name.', '.$user->first_name,
                         'nameType' => 'Personal',
-                        'contributorType' => 'RightsHolder',
-                        'givenName' => $user->given_name,
-                        'familyName' => $user->family_name,
-                        'affiliation' => [],
-                        'nameIdentifiers' => [],
+                        'givenName' => $user->first_name,
+                        'familyName' => $user->last_name,
                     ]);
                 }
 
+                $citations = [
+                    'relatedIdentifier' => $this->citationDoi,
+                    'relatedIdentifierType' => 'DOI',
+                    'relationType' => 'IsSupplementTo',
+                ];
+
+                $rights = [
+                    'rights' => $this->license,
+                    'rightsURI' => $license->url,
+                    'rightsIdentifier' => $license->spdx_id,
+                    'rightsIdentifierScheme' => 'SPDX',
+                    'schemeURI' => 'https://spdx.org/licenses/',
+                ];
+
+                $description = [
+                    'description' => $this->description,
+                    'descriptionType' => 'Other',
+                ];
+
                 $attributes = [
+                    'creators' => $creators,
                     'titles' => [
                         [
                             'title' => $this->name,
                         ],
                     ],
-                    'url' => $url,
-                    'creators' => $creators,
+                    'publisher' => 'nmrXiv',
                     'contributors' => $contributors,
+                    'publicationYear' => $releaseDate,
+                    'language' => 'en',
+                    'resourceType' => $this->resourceType,
+                    'resourceTypeGeneral' => 'Dataset',
+                    'rights' => $rights,
+                    'description' => $description,
+                    'url' => $url,
                     'isActive' => true,
                     'event' => 'publish',
                     'state' => 'findable',
