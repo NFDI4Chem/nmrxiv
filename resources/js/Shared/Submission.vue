@@ -1638,7 +1638,7 @@ export default {
                     let selectedDraft = this.drafts.find(
                         (d) => d.id == data.draft_id
                     );
-                    if(!selectedDraft){
+                    if (!selectedDraft) {
                         selectedDraft = this.sharedDrafts.find(
                             (d) => d.id == data.draft_id
                         );
