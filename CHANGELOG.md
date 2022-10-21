@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.9.1-beta](https://github.com/NFDI4Chem/nmrxiv/compare/v1.9.0-beta...v1.9.1-beta) (2022-10-21)
+
+
+### Bug Fixes
+
+* extend DataCite ([fe68b17](https://github.com/NFDI4Chem/nmrxiv/commit/fe68b1767081217877b0d53d8a779494f949a69d)), closes [#526](https://github.com/NFDI4Chem/nmrxiv/issues/526)
+* Extended clean command to maintain projects ([cc33a15](https://github.com/NFDI4Chem/nmrxiv/commit/cc33a1554e96b1aee61010fafab59c89ba5b0584))
+* Extended unpublish project command, version tag change and code formatting ([d1e9054](https://github.com/NFDI4Chem/nmrxiv/commit/d1e9054e903466920ba4571b7659d05c4862356e))
+* Extending drafts to include shared project drafts ([cade25c](https://github.com/NFDI4Chem/nmrxiv/commit/cade25c9bd296faf04db26af844b4b5177794610))
+
 ## [1.9.0-beta](https://github.com/NFDI4Chem/nmrxiv/compare/v1.8.4-beta...v1.9.0-beta) (2022-10-20)
 
 
