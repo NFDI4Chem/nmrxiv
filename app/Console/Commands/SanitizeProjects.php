@@ -45,7 +45,69 @@ class SanitizeProjects extends Command
             return $this->cleanDrafts();
         } elseif ($name == 'localise') {
             return $this->localise();
+        } elseif ($name == 'projects') {
+            return $this->cleanProjects();
         }
+    }
+
+    public function cleanProjects(){
+        $projects = Project::where([
+            ['is_public', false],
+            ['draft_id', null],
+        ])->get();
+
+        return DB::transaction(function () use ($projects) {
+            foreach ($projects as $project) {
+                $user_id = $project->owner->id;
+                $team_id = $project->team_id;
+                $id = Str::uuid();
+                $environment = env('APP_ENV', 'local');
+                $path = preg_replace(
+                    '~//+~',
+                    '/',
+                    $environment.'/'.$user_id.'/drafts/'.$id
+                );
+
+                $draft = Draft::create([
+                    'name' => $project->name,
+                    'slug' => Str::slug('$project->name'),
+                    'description' => $project->description,
+                    'relative_url' => rtrim(
+                        preg_replace('~//+~', '/', '/'.$id),
+                        '/'
+                    ),
+                    'path' => $path,
+                    'owner_id' => $user_id,
+                    'team_id' => $team_id ? $team_id : null,
+                    'key' => $id,
+                ]);
+
+                $projectFSObjects = FileSystemObject::with('children')
+                        ->where([
+                            ['project_id', $project->id],
+                            ['level', 0],
+                        ])
+                        ->get();
+
+                foreach ($projectFSObjects as $FSObject) {
+                    $this->moveFolder($FSObject, $project, $draft);
+                }
+
+                $project->status = null;
+                $project->process_logs = null;
+                $project->draft_id = $draft->id;
+                $project->save();
+
+                foreach ($project->studies as $study) {
+                    $study->draft_id = $draft->id;
+                    $study->save();
+                    foreach ($study->datasets as $dataset) {
+                        $dataset->draft_id = $draft->id;
+                        $dataset->save();
+                    }
+                }
+            }
+        });
     }
 
     public function cleanDrafts()
