@@ -503,7 +503,7 @@ export default {
                     "Please enter a DOI or ORCID id to proceed.";
             } else {
                 this.queryParam = this.importAuthorsForm.input;
-                if(this.checkDOI(this.importAuthorsForm.input)){
+                if (this.checkDOI(this.importAuthorsForm.input)) {
                     this.queryParam = "DOI:" + this.queryParam;
                     this.isDoi = true;
                 }
@@ -519,7 +519,8 @@ export default {
                     })
                     .then((res) => {
                         this.authorsListDOI = this.formatAuthorResponse(
-                            res.data.resultList.result[0], this.importAuthorsForm.input
+                            res.data.resultList.result[0],
+                            this.importAuthorsForm.input
                         );
                     })
                     .catch((error) => {
@@ -615,22 +616,22 @@ export default {
             });
         },
         /*Format the response*/
-        formatAuthorResponse(response,input) {
+        formatAuthorResponse(response, input) {
             var authorsList = [];
             var author = {};
             var authors = [];
             var tempList = [];
-            if(response){
-                if(!this.checkDOI(input)){
+            if (response) {
+                if (!this.checkDOI(input)) {
                     tempList = response.authorList.author;
                     var orcidId = "";
                     tempList.forEach((item) => {
-                        if(item.hasOwnProperty("authorId")) {
+                        if (item.hasOwnProperty("authorId")) {
                             var idType = item["authorId"].type;
-                            if(idType.toLowerCase() == "orcid"){
+                            if (idType.toLowerCase() == "orcid") {
                                 orcidId = item["authorId"].value;
                             }
-                            if(orcidId == input){
+                            if (orcidId == input) {
                                 authors.push(item);
                             }
                         }
@@ -640,30 +641,29 @@ export default {
                 }
             }
             authors.forEach((item) => {
-            author["given_name"] = item.hasOwnProperty("firstName")
-                ? item["firstName"]
-                : null;
-            author["family_name"] = item.hasOwnProperty("lastName")
-                ? item["lastName"]
-                : null;
-            if (item.hasOwnProperty("authorAffiliationDetailsList")) {
-                var affiliationList =
-                    item["authorAffiliationDetailsList"]
-                        .authorAffiliation;
-                affiliationList.forEach((item) => {
-                    author["affiliation"] = item["affiliation"];
-                });
-            }
-            if (item.hasOwnProperty("authorId")) {
-                var idType = item["authorId"].type;
-                if (idType.toLowerCase() == "orcid") {
-                    author["orcid_id"] = item["authorId"].value;
+                author["given_name"] = item.hasOwnProperty("firstName")
+                    ? item["firstName"]
+                    : null;
+                author["family_name"] = item.hasOwnProperty("lastName")
+                    ? item["lastName"]
+                    : null;
+                if (item.hasOwnProperty("authorAffiliationDetailsList")) {
+                    var affiliationList =
+                        item["authorAffiliationDetailsList"].authorAffiliation;
+                    affiliationList.forEach((item) => {
+                        author["affiliation"] = item["affiliation"];
+                    });
                 }
-            }
-            authorsList.push(author);
-            author = {};
-        });
-        return authorsList;
+                if (item.hasOwnProperty("authorId")) {
+                    var idType = item["authorId"].type;
+                    if (idType.toLowerCase() == "orcid") {
+                        author["orcid_id"] = item["authorId"].value;
+                    }
+                }
+                authorsList.push(author);
+                author = {};
+            });
+            return authorsList;
         },
         /*Validating form*/
         validateForm() {
@@ -715,7 +715,7 @@ export default {
             return link;
         },
         /*Checking if the input is DOI*/
-        checkDOI(input){
+        checkDOI(input) {
             var testKey = String(input);
             var DOIpattern = new RegExp(/\b(10[.][0-9]{4,}(?:[.][0-9]+)*)\b/g);
             var isDOI = DOIpattern.test(testKey);
