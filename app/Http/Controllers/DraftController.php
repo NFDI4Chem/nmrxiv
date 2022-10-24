@@ -481,28 +481,16 @@ class DraftController extends Controller
         return false;
     }
 
-    public function isJcampDX($folder)
+    public function isJcampDX($file)
     {
-        $fileTypes = ['jdx'];
-        // $children = $folder->children;
-        // $names = $children->pluck('name')->toArray();
-        $names = [$folder->name];
-        $extensions = array_map(fn ($s) => substr("$s", (strrpos($s, '.') + 1)), $names);
-        $isJDX = false;
-        if (array_intersect($fileTypes, $extensions) == $fileTypes) {
-            $isJDX = true;
-        }
-
-        $fileTypes = ['dx'];
-        $isDX = false;
-        if (array_intersect($fileTypes, $extensions) == $fileTypes) {
-            $isDX = true;
-        }
-
-        if ($isJDX || $isDX) {
+        $fileTypes = ['jdx','dx'];
+        $names = [$file->name];
+        $extensions = array_map(function ($s) {
+            return substr("$s", (strrpos($s, '.') + 1));
+        }, $names);
+        if (count(array_intersect($fileTypes, $extensions)) > 0 ) {
             return true;
         }
-
         return false;
     }
 
