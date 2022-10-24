@@ -171,7 +171,6 @@ class StudyController extends Controller
                 'name' => '/',
                 'children' => FileSystemObject::with('children')
                     ->where([
-                        ['project_id', $study->project->id],
                         ['study_id', $study->id],
                         ['level', $studyFSObject->level],
                     ])
