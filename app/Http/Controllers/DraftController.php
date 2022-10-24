@@ -484,11 +484,9 @@ class DraftController extends Controller
     public function isJcampDX($file)
     {
         $fileTypes = ['jdx','dx'];
-        $names = [$file->name];
-        $extensions = array_map(function ($s) {
-            return substr("$s", (strrpos($s, '.') + 1));
-        }, $names);
-        if (count(array_intersect($fileTypes, $extensions)) > 0 ) {
+        $name = $file->name;
+        $extension =  substr("$name", (strrpos($name, '.',-1) + 1));
+        if (in_array($extension,$fileTypes)) {
             return true;
         }
         return false;
