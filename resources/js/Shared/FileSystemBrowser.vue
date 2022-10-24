@@ -578,21 +578,21 @@ export default {
                                 if (f.fullPath) {
                                     return f.fullPath.trim() == u.fullPath;
                                 } else {
-                                    return "/" + f.name.trim() == u.fullPath;
+                                    return ("/" + f.name.trim() == u.fullPath || vm.$page.props.selectedFolder + "/" + f.name.trim() == u.fullPath);
                                 }
                             });
+                            console.log(cFile)
+                            if(cFile){
+                                let message =
+                                    "Presigned Upload URL receieved.  Starting Upload.";
+                                if (cFile.fullPath) {
+                                    vm.logs[cFile.fullPath].status = "Inprogress";
+                                    vm.logs[cFile.fullPath].messages.push(message);
+                                } else {
+                                    vm.logs[cFile.name].status = "Inprogress";
+                                    vm.logs[cFile.name].messages.push(message);
+                                }
 
-                            let message =
-                                "Presigned Upload URL receieved.  Starting Upload.";
-                            if (cFile.fullPath) {
-                                vm.logs[cFile.fullPath].status = "Inprogress";
-                                vm.logs[cFile.fullPath].messages.push(message);
-                            } else {
-                                vm.logs[cFile.name].status = "Inprogress";
-                                vm.logs[cFile.name].messages.push(message);
-                            }
-
-                            if (cFile) {
                                 let headers = u.headers;
                                 if ("Host" in headers) {
                                     delete headers.Host;
