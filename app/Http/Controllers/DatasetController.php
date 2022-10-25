@@ -77,7 +77,7 @@ class DatasetController extends Controller
                     if (is_array($nucleus)) {
                         $nucleus = implode('-', $nucleus);
                     }
-                    $dataset->type = $nucleus.', '.$dataset->type;
+                    $dataset->type = implode(array_unique(explode(",", $nucleus.', '.$dataset->type)), ',');
                 }
 
                 $dataset->save();
