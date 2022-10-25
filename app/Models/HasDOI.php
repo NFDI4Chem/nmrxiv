@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
+
 trait HasDOI
 {
     public function generateDOI($doiService)
@@ -16,26 +18,44 @@ trait HasDOI
                 $users = [];
                 $suffix = null;
                 $url = 'https://www.nmrxiv.org/';
-                $releaseDate = null;
-                $citation = null;
+                $publicationYear = Carbon::now()->year;
+                $citations = [];
+                $citationDois = [];
+                $license = $this->license;
 
                 if ($this instanceof Project) {
                     $users = $this->allUsers();
                     $authors = $this->authors ? $this->authors : [];
                     $suffix = 'P'.$identifier;
                     $url = $url.'P'.$identifier;
-                    $releaseDate = $this->release_date;
                     $resourceType = 'Project';
-                    $citationDoi = $this->citation->doi;
+                    $citations = $this->citation ? $this->citation : [];
+
+                    if (! $citations == []) {
+                        foreach ($citations as $citation) {
+                            $citationDoi = $citation->doi ? $citation->doi : null;
+                            array_push($citationDois, [
+                                'doi' => $citationDoi,
+                            ]);
+                        }
+                    }
                 } elseif ($this instanceof Study) {
                     $users = $this->allUsers();
                     $authors = $this->project->authors ? $this->project->authors : [];
                     $projectIdentifier = $this->getIdentifier($this->project, 'identifier');
                     $suffix = 'P'.$projectIdentifier.'.'.'S'.$identifier;
                     $url = $url.'S'.$identifier;
-                    $releaseDate = $this->release_date;
                     $resourceType = 'Study';
-                    $citationDoi = $this->project->citation->doi;
+                    $citations = $this->project->citation ? $this->project->citation : [];
+
+                    if (! $citations == []) {
+                        foreach ($citations as $citation) {
+                            $citationDoi = $citation->doi ? $citation->doi : null;
+                            array_push($citationDois, [
+                                'doi' => $citationDoi,
+                            ]);
+                        }
+                    }
                 } elseif ($this instanceof Dataset) {
                     $users = $this->study->allUsers();
                     $authors = $this->project->authors ? $this->project->authors : [];
@@ -43,28 +63,36 @@ trait HasDOI
                     $studyIdentifier = $this->getIdentifier($this->study, 'identifier');
                     $suffix = 'P'.$projectIdentifier.'.'.'S'.$studyIdentifier.'.'.'D'.$identifier;
                     $url = $url.'D'.$identifier;
-                    $releaseDate = $this->study->release_date;
                     $resourceType = 'Dataset';
-                    $citationDoi = $this->project->citation->doi;
+                    $citations = $this->project->citation ? $this->project->citation : [];
+
+                    if (! $citations == []) {
+                        foreach ($citations as $citation) {
+                            $citationDoi = $citation->doi ? $citation->doi : null;
+                            array_push($citationDois, [
+                                'doi' => $citationDoi,
+                            ]);
+                        }
+                    }
                 }
 
                 $creators = [];
                 foreach ($authors as $user) {
-                    array_push($contributors, [
+                    array_push($creators, [
                         'name' => $user->family_name.', '.$user->given_name,
                         'nameType' => 'Personal',
                         'givenName' => $user->given_name,
                         'familyName' => $user->family_name,
-                        'nameIdentifiers' => $user->orcid_id,
+                        'nameIdentifiers' => $user->orcid_id ? $user->orcid_id : null,
                         'nameIdentifierScheme' => 'ORCID',
                         'schemeURI' => 'https://orcid.org',
-                        'affiliation' => $user->affiliation,
+                        'affiliation' => $user->affiliation ? $user->affiliation : null,
                     ]);
                 }
 
                 $contributors = [];
                 foreach ($users as $user) {
-                    array_push($creators, [
+                    array_push($contributors, [
                         'contributorType' => 'Other',
                         'name' => $user->last_name.', '.$user->first_name,
                         'nameType' => 'Personal',
@@ -74,18 +102,28 @@ trait HasDOI
                 }
 
                 $citations = [
-                    'relatedIdentifier' => $this->citationDoi,
+                    'relatedIdentifier' => $this->citationDois,
                     'relatedIdentifierType' => 'DOI',
                     'relationType' => 'IsSupplementTo',
                 ];
 
-                $rights = [
-                    'rights' => $this->license,
-                    'rightsURI' => $license->url,
-                    'rightsIdentifier' => $license->spdx_id,
-                    'rightsIdentifierScheme' => 'SPDX',
-                    'schemeURI' => 'https://spdx.org/licenses/',
-                ];
+                if (! $license == null) {
+                    $rights = [
+                        'rights' => $license,
+                        'rightsURI' => $license->url,
+                        'rightsIdentifier' => $license->spdx_id,
+                        'rightsIdentifierScheme' => 'SPDX',
+                        'schemeURI' => 'https://spdx.org/licenses/',
+                    ];
+                } else {
+                    $rights = [
+                        'rights' => null,
+                        'rightsURI' => null,
+                        'rightsIdentifier' => null,
+                        'rightsIdentifierScheme' => 'SPDX',
+                        'schemeURI' => 'https://spdx.org/licenses/',
+                    ];
+                }
 
                 $description = [
                     'description' => $this->description,
@@ -101,7 +139,7 @@ trait HasDOI
                     ],
                     'publisher' => 'nmrXiv',
                     'contributors' => $contributors,
-                    'publicationYear' => $releaseDate,
+                    'publicationYear' => $publicationYear,
                     'language' => 'en',
                     'resourceType' => $this->resourceType,
                     'resourceTypeGeneral' => 'Dataset',
