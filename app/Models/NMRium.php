@@ -13,6 +13,8 @@ class NMRium extends Model
 
     protected $table = 'nmrium';
 
+    protected $keepOldVersions = 10;
+
     protected $fillable = [
         'nmrium_info',
         'dataset_id',
