@@ -50,7 +50,8 @@ class SanitizeProjects extends Command
         }
     }
 
-    public function cleanProjects(){
+    public function cleanProjects()
+    {
         $projects = Project::where([
             ['is_public', false],
             ['draft_id', null],
@@ -119,7 +120,7 @@ class SanitizeProjects extends Command
         foreach ($privateProjects as $project) {
             DB::transaction(function () use ($project) {
                 if (! $project->draft) {
-                    echo($project->id);
+                    echo $project->id;
                     $project->draft_id = null;
                     $project->save();
                 }
@@ -206,7 +207,7 @@ class SanitizeProjects extends Command
                     $FSObject->save();
                     $this->updateDraftId($parent->fresh(), $project);
                 }
-            }else {
+            } else {
                 foreach ($projectFSObjects as $FSObject) {
                     $this->updateDraftId($FSObject, $project);
                 }
@@ -224,7 +225,7 @@ class SanitizeProjects extends Command
             foreach ($projectFSObjects as $FSObject) {
                 if ($FSObject->draft) {
                     if (! str_contains($FSObject->path, $FSObject->draft->path)) {
-                        echo($FSObject->path . ' <-> ' . $FSObject->draft->path);
+                        echo $FSObject->path.' <-> '.$FSObject->draft->path;
                         echo "\n";
                         $this->moveFolder($FSObject, $FSObject->project, $FSObject->draft);
                     }
@@ -269,7 +270,6 @@ class SanitizeProjects extends Command
         //         }
         //     }
         // }
-
     }
 
     public function versionProjects()

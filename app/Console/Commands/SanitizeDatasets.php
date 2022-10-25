@@ -30,8 +30,8 @@ class SanitizeDatasets extends Command
     {
         $datasets = Dataset::orderBy('id', 'ASC')->get();
 
-        foreach($datasets as $dataset){
-            $dataset->type = implode( ',', array_unique(array_map('trim', explode(",", $dataset->type))));
+        foreach ($datasets as $dataset) {
+            $dataset->type = implode(',', array_unique(array_map('trim', explode(',', $dataset->type))));
             $dataset->save();
         }
     }
