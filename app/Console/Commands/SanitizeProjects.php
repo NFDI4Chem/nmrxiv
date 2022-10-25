@@ -24,7 +24,7 @@ class SanitizeProjects extends Command
      *
      * @var string
      */
-    protected $description = 'Helper scripts to maintain the database.';
+    protected $description = 'Helper scripts to maintain the database projects.';
 
     /**
      * Execute the console command.
