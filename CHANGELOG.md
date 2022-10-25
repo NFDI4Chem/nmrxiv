@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.0.1-rc.4](https://github.com/NFDI4Chem/nmrxiv/compare/v1.0.0-rc.4...v1.0.1-rc.4) (2022-10-25)
+
+
+### Bug Fixes
+
+* explode bug fix and updated nmrxiv:clean command ([a85044c](https://github.com/NFDI4Chem/nmrxiv/commit/a85044cdf6151c6256fe1282e79436cafdbeac9b))
+* removing duplicate dataset types ([da94547](https://github.com/NFDI4Chem/nmrxiv/commit/da9454708dcd1ff37a11074f6ba0f8fcbd5f4c8f))
+* Restricting NMRium versions to a maximum of 10 due to size constraints ([39acee6](https://github.com/NFDI4Chem/nmrxiv/commit/39acee62d644bb44c56f8f77c19096cd63be8ad7))
+
 ## [1.9.1-beta](https://github.com/NFDI4Chem/nmrxiv/compare/v1.9.0-beta...v1.9.1-beta) (2022-10-24)
 
 
