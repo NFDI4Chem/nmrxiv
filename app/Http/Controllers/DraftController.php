@@ -11,6 +11,7 @@ use App\Models\Sample;
 use App\Models\Study;
 use App\Models\Validation;
 use Auth;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -418,91 +419,186 @@ class DraftController extends Controller
         $this->processFolder($draftFolders);
     }
 
-    public function processFolder($folders)
+    /**
+     *
+     * Check the file types of a collection of FileSystemObjects and save the
+     * result in the model.
+     *
+     * @param Collection $fsItems A collection of FileSystemObjects
+     * @return void
+     */
+    public static function processFolder(Collection $fsItems)
     {
-        foreach ($folders as $folder) {
-            if ($folder->type == 'directory') {
-                if ($this->isBruker($folder)) {
-                    $this->saveInstrumentType($folder, 'bruker');
-                    $this->saveModelType($folder->parent);
-                } elseif ($this->isVarian($folder)) {
-                    $this->saveInstrumentType($folder, 'varian');
-                    $this->saveModelType($folder->parent);
+
+        foreach ($fsItems as $fsItem) {
+            $fileType = null;
+            if ($fsItem->type == 'directory') {
+                if (DraftController::isBruker($fsItem)) {
+                    $fileType = 'bruker';
+                } elseif (DraftController::isVarian($fsItem)) {
+                    $fileType = 'varian';
                 } else {
-                    $this->processFolder($folder->children);
+                    DraftController::processFolder($fsItem->children);
                 }
             } else {
-                if ($this->isJOEL($folder)) {
-                    $this->saveInstrumentType($folder, 'joel');
-                    $this->saveModelType($folder->parent);
-                } elseif ($this->isJcampDX($folder)) {
-                    $this->saveInstrumentType($folder, 'jcamp');
-                    $this->saveModelType($folder->parent);
+                if (DraftController::isJOEL($fsItem)) {
+                    $fileType = 'joel';
+                } elseif (DraftController::isJcampDX($fsItem)) {
+                    $fileType = 'jcamp';
                 }
+            }
+            if (!is_null($fileType)) {
+                DraftController::saveInstrumentType($fsItem, $fileType);
+                DraftController::saveModelType($fsItem->parent);
             }
         }
     }
 
-    public function saveModelType($folder)
+    /**
+     * Set the model type to 'study' and save
+     *
+     * @param FileSystemObject $folder A directory
+     * @return void
+     */
+    public static function saveModelType(?FileSystemObject $folder)
     {
-        if ($folder) {
+        if (!is_null($folder)) {
             $folder->model_type = 'study';
             $folder->save();
         }
     }
 
-    public function saveInstrumentType($folder, $type)
+    /**
+     * Set the instrument/format type and save folder/file
+     *
+     * @param FileSystemObject $fsItem A file or directory
+     * @param string $type The format type for the file or folder
+     * @return void
+     */
+    public static function saveInstrumentType(FileSystemObject $fsItem, string $type)
     {
-        $folder->instrument_type = $type;
-        $folder->save();
+        $fsItem->instrument_type = $type;
+        $fsItem->save();
     }
 
-    public function isBruker($folder)
+    /**
+     * Check if a file is of format Bruker
+     *
+     * TODO: Check file content, currently only checking for presences of certain files and directories
+     *
+     * @param FileSystemObject $folder A directory
+     * @return bool True if the $folder is of format Bruker
+     */
+    public static function isBruker(FileSystemObject $folder): bool
     {
-        $fileTypes = ['acqus', 'acqu', 'pdata'];
-        $children = $folder->children;
-        $names = $children->pluck('name')->toArray();
-        if (array_intersect($fileTypes, $names) == $fileTypes) {
-            return true;
-        }
-
-        return false;
+        $files = ['acqus', 'acqu'];
+        $directories = ['pdata'];
+        return DraftController::hasFiles($folder, $files) && DraftController::hasDirectories($folder, $directories);
     }
 
-    public function isVarian($folder)
+    /**
+     * Check if a file is of format Varian
+     *
+     *  TODO: Check file content, currently only checking for presences of certain files
+     *
+     * @param FileSystemObject $folder A  directory
+     * @return bool True if the $folder is of format Varian
+     */
+    public static function isVarian(FileSystemObject $folder): bool
     {
         $fileTypes = ['fid', 'log', 'text', 'procpar'];
+        return DraftController::hasFiles($folder, $fileTypes);
+    }
+
+    /**
+     * Check if a file is of format JOEL
+     *
+     * TODO: Check file content, currently only checking by file name extension
+     *
+     * @param FileSystemObject $file A file object
+     * @return bool True if file is in JCAMP format
+     */
+    public static function isJcampDX(FileSystemObject $file): bool
+    {
+        $extensions = ['jdx', 'dx'];
+        return DraftController::hasExtension($file, $extensions);
+    }
+
+    /**
+     * Check if a file is of format JOEL
+     *
+     * TODO: Check file content, currently only checking by file name extension
+     *
+     * @param FileSystemObject $file A file object
+     * @return bool True if the file is in JOEL format
+     */
+    public static function isJOEL(FileSystemObject $file): bool
+    {
+        $extensions = ['jdf'];
+        return DraftController::hasExtension($file, $extensions);
+    }
+
+    /**
+     * Check if a file name has one of various extensions
+     *
+     * @param FileSystemObject $file A file object
+     * @param array $extensions A list of possible extensions for the file type
+     * @return bool True if the $file name has one of the $extensions
+     */
+    public static function hasExtension(FileSystemObject $file, array $extensions): bool
+    {
+        $name = $file->name;
+        $extension = substr("$name", (strrpos($name, '.', -1) + 1));
+        if (in_array($extension, $extensions)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Check of directories are present in a folder
+     *
+     * @param FileSystemObject $folder
+     * @param array $dirNames A list of directory names
+     * @return bool True if all directories are present
+     */
+    public static function hasDirectories(FileSystemObject $folder, array $dirNames): bool
+    {
+        return DraftController::hasItems($folder, $dirNames, 'directory');
+    }
+
+    /**
+     * Check if files are present in a folder
+     *
+     * @param FileSystemObject $folder A directory
+     * @param array $fileNames List of file names to be present in the $folder
+     * @return bool True if all files are present
+     */
+    public static function hasFiles(FileSystemObject $folder, array $fileNames): bool
+    {
+        return DraftController::hasItems($folder, $fileNames);
+    }
+
+    /**
+     * Check if items are present in a folder
+     *
+     * @param FileSystemObject $folder A directory
+     * @param array $fileNames A list of item names which have to be present in the $folder
+     * @param string $fileType Type of the items ('file'|'directory')
+     * @return bool True if all items are present
+     */
+    public static function hasItems(FileSystemObject $folder, array $fileNames, string $fileType = 'file'): bool
+    {
         $children = $folder->children;
         $names = $children->pluck('name')->toArray();
-        if (array_intersect($fileTypes, $names) == $fileTypes) {
+        if (array_intersect($fileNames, $names) == $fileNames) {
+            foreach ($children as $fileObject) {
+                if ($fileObject->type != $fileType && in_array($fileObject->name, $fileNames)) {
+                    return false;
+                }
+            }
             return true;
         }
-
-        return false;
-    }
-
-    public function isJcampDX($file)
-    {
-        $fileTypes = ['jdx','dx'];
-        $name = $file->name;
-        $extension =  substr("$name", (strrpos($name, '.',-1) + 1));
-        if (in_array($extension,$fileTypes)) {
-            return true;
-        }
-        return false;
-    }
-
-    public function isJOEL($folder)
-    {
-        $fileTypes = ['jdf'];
-        // $children = $folder->children;
-        // $names = $children->pluck('name')->toArray();
-        $names = [$folder->name];
-        $extensions = array_map(fn ($s) => substr("$s", (strrpos($s, '.') + 1)), $names);
-        if (array_intersect($fileTypes, $extensions) == $fileTypes) {
-            return true;
-        }
-
         return false;
     }
 }
