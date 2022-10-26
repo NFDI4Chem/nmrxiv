@@ -121,6 +121,18 @@ class UpdateProject
                 }
             }
             $validation->process();
+
+            $project = $project->fresh();
+
+            $draft = $project->draft;
+
+            if($draft){
+                $draft->name = $project->name;
+                $draft->slug = $project->slug;
+                $draft->description = $project->description;
+                $draft->syncTagsWithType($project->tags->pluck('name')->toArray(), 'Draft');
+                $draft->save();
+            }
         });
     }
 
