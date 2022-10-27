@@ -73,7 +73,13 @@ export default {
             citationText: null,
         };
     },
-    computed: {},
+    computed: {
+        dataciteURL() {
+            return this.$page.props.dataciteURL
+                ? String(this.$page.props.dataciteURL) + "/dois/"
+                : "https://api.test.datacite.org/dois/";
+        },
+    },
     methods: {
         queryDataCite() {
             let config = {
@@ -84,7 +90,7 @@ export default {
 
             axios
                 .get(
-                    "https://api.test.datacite.org/dois/" +
+                    this.dataciteURL +
                         this.doi +
                         "?style=" +
                         this.formats[this.selectedFormat],
