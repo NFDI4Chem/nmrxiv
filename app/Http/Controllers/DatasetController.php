@@ -77,7 +77,7 @@ class DatasetController extends Controller
                     if (is_array($nucleus)) {
                         $nucleus = implode('-', $nucleus);
                     }
-                    $dataset->type = implode(',', array_unique(array_map('trim', explode(",", $nucleus.', '.$dataset->type))));
+                    $dataset->type = implode(',', array_unique(array_map('trim', explode(',', $nucleus.', '.$dataset->type))));
                 }
 
                 $dataset->save();
@@ -110,7 +110,6 @@ class DatasetController extends Controller
 
     public function publicDatasetsView(Request $request)
     {
-
         // $datasets = Cache::rememberForever('datasets', function () {
         $datasets = DatasetResource::collection(Dataset::with('project')->where('is_public', true)->filter($request->only('search', 'sort', 'mode'))->paginate(12)->withQueryString());
         // });
