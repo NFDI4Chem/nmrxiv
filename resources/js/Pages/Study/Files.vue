@@ -373,7 +373,9 @@ export default {
     mounted() {
         const vm = this;
         vm.$page.props.selectedFileSystemObject = vm.file;
-        vm.$page.props.selectedFolder = vm.file.children[0] ? vm.file.children[0].relative_url : '';
+        vm.$page.props.selectedFolder = vm.file.children[0]
+            ? vm.file.children[0].relative_url
+            : "";
         if (!this.study.is_public) {
             let options = {
                 url: "/",
