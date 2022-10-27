@@ -26,8 +26,10 @@ class DownloadController extends Controller
             if ($dataset) {
                 $study = Study::where([['project_id', $project->id], ['slug', $study],  ['owner_id', $user->id]])->firstOrFail();
                 $dataset = Dataset::where([['project_id', $project->id], ['study_id', $study->id], ['slug', $dataset], ['owner_id', $user->id]])->first();
-                $fsObject = FileSystemObject::where([['id', $dataset->fs_id], ['type', 'directory']])->first();
-                if (! $fsObject) {
+                if($dataset && $dataset->fs_id){
+                    $fsObject = FileSystemObject::where([['id', $dataset->fs_id], ['type', 'directory']])->first();
+                }
+                if (!$fsObject) {
                     $fsObject = FileSystemObject::where([['id', $dataset->fs_id], ['type', 'file']])->first();
                 }
                 $request->merge(['uuid' => $fsObject->uuid]);
