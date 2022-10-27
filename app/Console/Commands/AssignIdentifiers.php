@@ -105,9 +105,10 @@ class AssignIdentifiers extends Command
 
                                 $dsTicker->index = $dsIdentifier;
                                 $dsTicker->save();
-                                $dataset->save();
-                                $dataset->generateDOI($doiService);
                             }
+
+                            $dataset->save();
+                            $dataset->generateDOI($doiService);
                         }
                     }
                 }
