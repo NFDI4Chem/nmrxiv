@@ -70,6 +70,7 @@ class HandleInertiaRequests extends Middleware
             'MEILISEARCH_PUBLICKEY' => (env('MEILISEARCH_PUBLICKEY')),
             'SCOUT_PREFIX' => (env('SCOUT_PREFIX')),
             'europemcWSApi' => (env('EUROPEMC_WS_API')),
+            'dataciteURL' => env('DATACITE_ENDPOINT'),
         ]);
     }
 }
