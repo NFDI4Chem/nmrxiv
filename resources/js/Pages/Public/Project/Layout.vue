@@ -111,7 +111,7 @@
                                     class="hidden sm:block 2xl:hidden min-w-0 flex-1"
                                 >
                                     <h1
-                                        class="text-2xl font-bold text-gray-900 break-words"
+                                        class="text-2xl pl-1 font-bold text-gray-900 break-words"
                                     >
                                         {{ project.data.name }}
                                         <a
@@ -119,6 +119,21 @@
                                             >#{{ project.data.identifier }}</a
                                         >
                                     </h1>
+                                    <p class="text-gray-700 pl-1 pt-2">
+                                        DOI: {{ project.data.doi }}
+                                    </p>
+                                    <div class="sm:col-span-12 pt-4">
+                                        <a
+                                            v-for="tag in project.data.tags"
+                                            :key="tag.id"
+                                            target="_blank"
+                                            :href="
+                                                '/projects?tag=' + tag.name.en
+                                            "
+                                            class="mr-1 float rounded-full border border-gray-200 items-center py-1.5 pl-3 pr-3 text-sm font-medium bg-white text-gray-900 hover:text-white hover:bg-black"
+                                            ><span>{{ tag.name.en }}</span></a
+                                        >
+                                    </div>
                                 </div>
                             </div>
                         </div>
