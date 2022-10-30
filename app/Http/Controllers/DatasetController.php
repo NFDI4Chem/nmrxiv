@@ -63,6 +63,7 @@ class DatasetController extends Controller
             if (! empty($nmriumData)) {
                 if ($nmrium) {
                     $nmrium->nmrium_info = $nmriumData;
+                    $dataset->has_nmrium = true;
                     $nmrium->save();
                 } else {
                     $nmrium = NMRium::create([
