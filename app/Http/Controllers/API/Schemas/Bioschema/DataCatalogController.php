@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\API\Bioschema;
+namespace App\Http\Controllers\API\Schemas\Bioschema;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;

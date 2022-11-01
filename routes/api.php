@@ -3,10 +3,11 @@
 use App\Http\Controllers\API\Auth\LoginController;
 use App\Http\Controllers\API\Auth\RegisterController;
 use App\Http\Controllers\API\Auth\UserController;
-use App\Http\Controllers\API\Bioschema\BiochemaController;
-use App\Http\Controllers\API\Bioschema\DataCatalogController;
 use App\Http\Controllers\API\FileSystemController;
 use App\Http\Controllers\API\ProjectController;
+use App\Http\Controllers\API\Schemas\Bioschema\BiochemaController;
+use App\Http\Controllers\API\Schemas\Bioschema\DataCatalogController;
+use App\Http\Controllers\API\Schemas\Datacite\DataciteController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -38,6 +39,10 @@ Route::prefix('v1')->group(function () {
         Route::prefix('bioschema')->group(function () {
             Route::get('/', [DataCatalogController::class, 'schema']);
             Route::get('/{username}/{project}/{study?}/{dataset?}', [BiochemaController::class, 'schema']);
+        });
+
+        Route::prefix('datacite')->group(function () {
+            Route::get('/{username}/{project}/{study?}/{dataset?}', [DataCiteController::class, 'schema']);
         });
     });
 });
