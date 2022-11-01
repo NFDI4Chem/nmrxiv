@@ -160,7 +160,12 @@
                 </div>
             </div>
             <div v-if="selectedSpectraData" class="p-1 pr-2">
-                <span v-if="selectedSpectraData[0]['peaks']">
+                <span
+                    v-if="
+                        selectedSpectraData[0]['peaks'] &&
+                        selectedSpectraData[0]['peaks']['values'].length
+                    "
+                >
                     <label
                         id="tour-step-spectra-info"
                         for="location"
@@ -223,7 +228,12 @@
                     </div>
                 </span>
                 <div>&nbsp;</div>
-                <span v-if="selectedSpectraData[0]['ranges']">
+                <span
+                    v-if="
+                        selectedSpectraData[0]['ranges'] &&
+                        selectedSpectraData[0]['ranges']['values'].length
+                    "
+                >
                     <label
                         id="tour-step-spectra-info"
                         for="location"
