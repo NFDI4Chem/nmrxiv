@@ -351,6 +351,10 @@ export default {
                                 nmrium_info = JSON.parse(
                                     response.data.nmrium_info
                                 );
+                                let nmriumVersion = 3;
+                                if (nmrium_info && nmrium_info["version"]) {
+                                    nmriumVersion = nmrium_info["version"]
+                                }
                                 if (nmrium_info && nmrium_info["spectra"]) {
                                     if (this.isString(nmrium_info["spectra"])) {
                                         spectra = JSON.parse(
@@ -378,11 +382,11 @@ export default {
                                                 "\n" + mol.molfile + "\n";
                                         });
                                     }
-
                                     let data = {
                                         data: {
                                             spectra: spectra,
                                             molecules: mols,
+                                            version: nmriumVersion
                                         },
                                         type: "nmrium",
                                     };
