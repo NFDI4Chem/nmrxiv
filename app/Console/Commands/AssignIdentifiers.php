@@ -33,7 +33,7 @@ class AssignIdentifiers extends Command
     {
         return DB::transaction(function () use ($doiService) {
             $projects = Project::where([
-                ['is_public', true]
+                ['is_public', true],
             ])->get();
             foreach ($projects as $project) {
                 $projectIdentifier = $project->identifier ? $project->identifier : null;

@@ -126,7 +126,7 @@ class UpdateProject
 
             $draft = $project->draft;
 
-            if($draft){
+            if ($draft) {
                 $draft->name = $project->name;
                 $draft->slug = $project->slug;
                 $draft->description = $project->description;
@@ -136,9 +136,9 @@ class UpdateProject
         });
     }
 
-    public function updateAuthors(Project $project, $authors)
+    public function saveOrUpdateAuthor(Project $project, $authors)
     {
-        $project->authors()->sync(
+        $project->authors()->attach(
             $authors
         );
     }

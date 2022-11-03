@@ -771,7 +771,7 @@ export default {
             this.projectDetailsElement.toggleDetails();
         },
         toggleAddAuthor() {
-            this.addAuthorElement.toggleAddAuthorDialog();
+            this.addAuthorElement.toggleDialog();
         },
         toggleAddCitation() {
             this.addCitationElement.toggleAddCitationDialog();
