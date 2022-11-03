@@ -221,10 +221,8 @@ Route::group([
             ->name('console.users.update-password');
 
             Route::group(['middleware' => ['permission:manage roles']], function () {
-
                 Route::put('users/edit/{user}/role', [UsersController::class, 'updateRole'])
                 ->name('console.users.update-role');
-
             });
 
             Route::delete('users/edit/{user}/photo', [UsersController::class, 'destroyPhoto'])

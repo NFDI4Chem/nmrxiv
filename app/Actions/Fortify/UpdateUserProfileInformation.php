@@ -57,7 +57,7 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
         $user->forceFill([
             'first_name' => $input['first_name'],
             'last_name' => $input['last_name'],
-            'name' => $input['name'] ? $input['name']: $user->name,
+            'name' => $input['name'] ? $input['name'] : $user->name,
             'username' => $input['username'],
             'email' => $input['email'],
             'email_verified_at' => null,
