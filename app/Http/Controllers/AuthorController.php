@@ -6,30 +6,46 @@ use App\Actions\Project\UpdateProject;
 use App\Models\Author;
 use App\Models\Project;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class AuthorController extends Controller
 {
-    public function updateAuthor(Request $request, UpdateProject $updater, Project $project)
+    public function save(Request $request, UpdateProject $updater, Project $project)
     {
-        $input = $request->selectedAuthorsList;
-        //DB transaction
-        $authors = [];
+        $authors = $request->get('authors');
 
-        foreach ($input as $item) {
-            $author = Author::firstOrCreate([
-                'given_name' => array_key_exists('given_name', $item) ? $item['given_name'] : null,
-                'family_name' => array_key_exists('family_name', $item) ? $item['family_name'] : null,
-            ],
-                ['orcid_id' => array_key_exists('orcid_id', $item) ? $item['orcid_id'] : null,
-                    'email_id' => array_key_exists('email_id', $item) ? $item['email_id'] : null,
+        if(count($authors) > 0){
+            $processedAuthors = [];
+            foreach($authors as $author){
+                $family_name = $author['family_name'];
+                $given_name = $author['given_name'];
+                if (! is_null($family_name) && ! is_null($given_name)) {
+                    $_author = $project->authors->filter(function ($a) use ($family_name, $given_name) {
+                        return $family_name.$given_name === $a->family_name.$a->given_name;
+                    })->first();
 
-                    'affiliation' => array_key_exists('affiliation', $item) ? $item['affiliation'] : null,
-                ]);
-            array_push($authors, $author->id);
+                    if ($_author) {
+                        $_author->update([
+                            'given_name' => $given_name,
+                            'family_name' => $family_name,
+                            'orcid_id' => array_key_exists('orcid_id', $author) ? $author['orcid_id'] : null,
+                            'email_id' =>  array_key_exists('email_id', $author) ? $author['email_id'] : null,
+                            'affiliation' =>  array_key_exists('affiliation', $author) ? $author['affiliation'] : null
+                        ]);
+                    } else {
+                        $_author = Author::create([
+                            'given_name' => $given_name,
+                            'family_name' => $family_name,
+                            'orcid_id' => array_key_exists('orcid_id', $author) ? $author['orcid_id'] : null,
+                            'email_id' =>  array_key_exists('email_id', $author) ? $author['email_id'] : null,
+                            'affiliation' =>  array_key_exists('affiliation', $author) ? $author['affiliation'] : null
+                        ]);
+                        array_push($processedAuthors, $_author->id);
+                    }
+                }
+            }
+            $updater->saveOrUpdateAuthor($project, $processedAuthors);
+
         }
-        $updater->updateAuthors($project, $authors);
-
         return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('success', 'Authors updated successfully');
     }
 }
