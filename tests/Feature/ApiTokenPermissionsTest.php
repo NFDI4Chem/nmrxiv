@@ -33,7 +33,7 @@ class ApiTokenPermissionsTest extends TestCase
         $response = $this->put('/user/api-tokens/'.$token->id, [
             'name' => $token->name,
             'permissions' => [
-                'project:delete'
+                'project:delete',
             ],
         ]);
 

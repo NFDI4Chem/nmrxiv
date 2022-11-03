@@ -4,8 +4,8 @@ namespace App\Http\Middleware;
 
 use App\Models\Announcement;
 use Illuminate\Http\Request;
-use Inertia\Middleware;
 use Illuminate\Support\Facades\Schema;
+use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
 {

@@ -26,7 +26,7 @@ class DeleteTeamTest extends TestCase
         $response = $this->delete('/teams/'.$team->id, [
             'password' => 'password',
         ]);
-        
+
         $this->assertNull($team->fresh());
         $this->assertCount(0, $otherUser->fresh()->teams);
     }
