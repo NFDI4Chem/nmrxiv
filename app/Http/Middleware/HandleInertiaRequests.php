@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\Models\Announcement;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
+use Illuminate\Support\Facades\Schema;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -61,7 +62,7 @@ class HandleInertiaRequests extends Middleware
             'twitter' => (env('TWITTER_CLIENT_ID') !== null && env('TWITTER_CLIENT_ID') !== ''),
             'github' => (env('GITHUB_CLIENT_ID') !== null && env('GITHUB_CLIENT_ID') !== ''),
             'orcid' => (env('ORCID_CLIENT_ID') !== null && env('ORCID_CLIENT_ID') !== ''),
-            'config.announcements' => Announcement::active(),
+            'config.announcements' => Schema::hasTable('announcements') ? Announcement::active() : null,
             'url' => env('APP_URL'),
             'nmriumURL' => env('NMRIUM_URL'),
             'team' => $user ? $user->currentTeam : null,
