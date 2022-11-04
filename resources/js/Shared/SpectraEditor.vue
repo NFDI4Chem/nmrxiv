@@ -363,6 +363,7 @@ export default {
             currentMolecules: [],
             reset: false,
             info: null,
+            version: null,
         };
     },
     computed: {
@@ -395,6 +396,7 @@ export default {
                         this.saveStudyPreview(e.data.data.data);
                     }
                 }
+                this.version = e.data.data.version;
                 if (e.data.type == "nmr-wrapper:data-change") {
                     let actionType = e.data.data.actionType;
                     // console.log(actionType);
@@ -479,6 +481,10 @@ export default {
                             if (spectra && spectra.length <= 0) {
                                 this.loadFromURL(url);
                             } else {
+                                let nmriumVersion = 3;
+                                if (nmrium_info && nmrium_info["version"]) {
+                                    nmriumVersion = nmrium_info["version"]
+                                }
                                 let mols = [];
                                 if (this.isString(nmrium_info.molecules)) {
                                     mols = JSON.parse(nmrium_info.molecules);
@@ -496,6 +502,7 @@ export default {
                                     data: {
                                         spectra: spectra,
                                         molecules: mols,
+                                        version: nmriumVersion
                                     },
                                     type: "nmrium",
                                 };
@@ -547,6 +554,7 @@ export default {
                         {
                             spectra: this.selectedSpectraData,
                             molecules: this.currentMolecules,
+                            version: this.version ? this.version : 3
                         }
                     )
                     .catch((err) => {

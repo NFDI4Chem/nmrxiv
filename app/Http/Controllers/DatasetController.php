@@ -46,6 +46,7 @@ class DatasetController extends Controller
             $nmriumInfo = $spectra;
             $molecules = $request->get('molecules');
             $molecularInfo = $molecules;
+            $version = $request->get('version');
 
             $nmrium = $dataset->nmrium;
             if ($nmrium) {
@@ -58,6 +59,10 @@ class DatasetController extends Controller
             }
             if ($molecularInfo && ! empty($molecularInfo)) {
                 $nmriumData['molecules'] = $molecularInfo;
+            }
+
+            if ($version && ! empty($version)) {
+                $nmriumData['version'] = $version;
             }
 
             if (! empty($nmriumData)) {
