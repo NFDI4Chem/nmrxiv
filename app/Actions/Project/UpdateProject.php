@@ -126,7 +126,7 @@ class UpdateProject
 
             $draft = $project->draft;
 
-            if($draft){
+            if ($draft) {
                 $draft->name = $project->name;
                 $draft->slug = $project->slug;
                 $draft->description = $project->description;
