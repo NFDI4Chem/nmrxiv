@@ -1514,7 +1514,7 @@ export default {
                 {
                     id: "02",
                     step: "v-step-20",
-                    name: "Assignments & Meta data",
+                    name: "Assignments & Metadata",
                     description: "Cursus semper viverra.",
                     href: "#",
                     status: "upcoming",
