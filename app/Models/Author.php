@@ -15,6 +15,7 @@ class Author extends Model
      * @return \Illuminate\Database\Eloquent\Relations\belongsToMany
      */
     protected $fillable = [
+        'title',
         'orcid_id',
         'given_name',
         'family_name',

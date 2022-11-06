@@ -49,15 +49,15 @@
                             <jet-secondary-button
                                 class="ml-2"
                                 :disabled="!(fetchedAuthors.length > 0)"
-                                @click="this.fetchedAuthors = [], this.query = null "
+                                @click="
+                                    (this.fetchedAuthors = []),
+                                        (this.query = null)
+                                "
                             >
                                 Reset
                             </jet-secondary-button>
                         </div>
-                                <jet-input-error
-                                    :message="error"
-                                    class="mt-2"
-                                />
+                        <jet-input-error :message="error" class="mt-2" />
                         <div
                             v-if="loading"
                             class="sm:col-span-9 mt-4 align-centre"
@@ -121,12 +121,7 @@
                             >
                                 <jet-secondary-button
                                     class="float-right ml-2"
-                                    @click="
-                                        save(
-                                            (addSelected = false),
-                                            (addAll = true)
-                                        )
-                                    "
+                                    @click="save('addAll')"
                                 >
                                     Add All
                                 </jet-secondary-button>
@@ -140,12 +135,7 @@
                                         )
                                     "
                                     class="float-right"
-                                    @click="
-                                        save(
-                                            (addSelected = true),
-                                            (addAll = false)
-                                        )
-                                    "
+                                    @click="save('addSelected')"
                                 >
                                     Add Selected ({{
                                         selectedFetchedAuthorsList(false)
@@ -303,7 +293,7 @@
                                             this.form.given_name
                                         )
                                     "
-                                    @click="save()"
+                                    @click="save('addManually')"
                                 >
                                     Add
                                 </jet-secondary-button>
@@ -316,7 +306,10 @@
                                             this.form.given_name
                                         )
                                     "
-                                    @click="this.form.reset()"
+                                    @click="
+                                        this.form.reset(),
+                                            this.authorsForm.reset()
+                                    "
                                 >
                                     Clear
                                 </jet-secondary-button>
@@ -500,7 +493,7 @@ export default {
             authorsForm: this.$inertia.form({
                 authors: [],
             }),
-            query: "10.1002/mrc.4737",
+            query: "",
             showDialog: false,
             authors: [],
             fetchedAuthors: [],
@@ -540,7 +533,6 @@ export default {
             this.showDialog = false;
             this.form.reset();
             this.fetchedAuthors = [];
-
         },
         edit(author) {
             this.selectedAuthor = author;
@@ -588,14 +580,14 @@ export default {
                           );
                 })
                 .catch(() => {
-                      this.error =
+                    this.error =
                         "Something went wrong. Please check the input and try again.";
                 })
                 .finally(() => {
-                      if (this.fetchedAuthors.length == 0) {
+                    if (this.fetchedAuthors.length == 0) {
                         this.error =
-                          "Something went wrong. Please check the input and try again.";
-                      }
+                            "Something went wrong. Please check the input and try again.";
+                    }
                     this.loading = false;
                 });
         },
@@ -618,31 +610,36 @@ export default {
             });
             return authorsList;
         },
-        save(addSelected = false, addAll = false) {
-            if (addSelected) {
-                this.authorsForm.authors = this.formatAuthors(
-                    this.selectedFetchedAuthorsList(false)
-                );
-                this.executeQuery();
-            } else if (addAll) {
-                this.authorsForm.authors = this.formatAuthors(
-                    this.selectedFetchedAuthorsList(true)
-                );
-                this.executeQuery();
-            } else {
-                this.authorsForm.authors = [
-                    {
-                        family_name: this.form.family_name,
-                        given_name: this.form.given_name,
-                        email_id: this.form.email_id,
-                        orcid_id: this.form.orcid_id,
-                        affiliation: this.form.affiliation,
-                    },
-                ];
-                this.validateForm();
-                if(!this.authorsForm.hasErrors) {
+        save(input) {
+            switch (input) {
+                case "addSelected":
+                    this.authorsForm.authors = this.formatAuthors(
+                        this.selectedFetchedAuthorsList(false)
+                    );
                     this.executeQuery();
-                }
+                    break;
+                case "addAll":
+                    this.authorsForm.authors = this.formatAuthors(
+                        this.selectedFetchedAuthorsList(true)
+                    );
+                    this.executeQuery();
+                    break;
+                case "addManually":
+                    this.authorsForm.authors = [
+                        {
+                            title: this.form.title,
+                            family_name: this.form.family_name,
+                            given_name: this.form.given_name,
+                            email_id: this.form.email_id,
+                            orcid_id: this.form.orcid_id,
+                            affiliation: this.form.affiliation,
+                        },
+                    ];
+                    this.validateForm();
+                    if (!this.authorsForm.hasErrors) {
+                        this.executeQuery();
+                    }
+                    break;
             }
         },
         executeQuery() {
@@ -681,14 +678,13 @@ export default {
                 onError: (err) => console.error(err),
             });
         },
-        validateForm(){
+        validateForm() {
             this.authorsForm.errors = {};
             this.authorsForm.hasErrors = false;
             let _hasErrors = false;
             if (this.authorsForm.authors[0].email_id) {
                 if (!this.validEmail(this.authorsForm.authors[0].email_id)) {
-                    this.authorsForm.errors.email_id =
-                        "Valid email required.";
+                    this.authorsForm.errors.email_id = "Valid email required.";
                     _hasErrors = true;
                 }
             }
@@ -700,8 +696,7 @@ export default {
             var re =
                 /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
             return re.test(email);
-        }
-
+        },
     },
 };
 </script>

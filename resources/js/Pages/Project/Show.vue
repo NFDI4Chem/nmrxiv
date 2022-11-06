@@ -610,11 +610,9 @@
                                             <p
                                                 class="text-sm font-medium text-gray-900"
                                             >
-                                                {{
-                                                    author.given_name +
-                                                    " " +
-                                                    author.family_name
-                                                }}
+                                                {{ author.title }}
+                                                {{ author.given_name }}
+                                                {{ author.family_name }}
                                             </p>
                                             <p
                                                 v-if="author.affiliation"
