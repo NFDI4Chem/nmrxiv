@@ -139,9 +139,8 @@ class UpdateProject
     /**
      * Attach authors to a project.
      *
-     * @param  \App\Models\Project $project
-     * @param  array $authors
-     *
+     * @param  \App\Models\Project  $project
+     * @param  array  $authors
      * @return void
      */
     public function attachAuthor(Project $project, $authors)
@@ -154,9 +153,8 @@ class UpdateProject
     /**
      * Detach authors from a project.
      *
-     * @param  \App\Models\Project $project
-     * @param  array $authors
-     *
+     * @param  \App\Models\Project  $project
+     * @param  array  $authors
      * @return void
      */
     public function detachAuthor(Project $project, $author_id)
@@ -164,16 +162,14 @@ class UpdateProject
         $project->authors()->detach(
             $author_id
         );
-
     }
 
     /**
      * Attach citations to a project.
      *
-     * @param  \App\Models\Project $project
-     * @param  array $citations
-     * @param  App\Models\User $user
-     *
+     * @param  \App\Models\Project  $project
+     * @param  array  $citations
+     * @param  App\Models\User  $user
      * @return void
      */
     public function updateCitation(Project $project, $citations, $user)

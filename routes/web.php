@@ -66,7 +66,7 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     // Authors
     Route::post('authors/{project}', [AuthorController::class, 'save'])
                 ->name('author.save');
-    
+
     Route::delete('authors/{project}', [AuthorController::class, 'destroy'])
                 ->name('author.delete');
 
