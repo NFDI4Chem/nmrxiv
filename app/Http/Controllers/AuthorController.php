@@ -2,22 +2,40 @@
 
 namespace App\Http\Controllers;
 
-use App\Actions\Project\UpdateProject;
 use App\Models\Author;
 use App\Models\Project;
 use Illuminate\Http\Request;
+use App\Actions\Project\UpdateProject;
+use Illuminate\Support\Facades\Validator;
 
 class AuthorController extends Controller
 {
+
+    /**
+     * Save and sync updated author details for a project.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Actions\Project\UpdateProject $updater
+     * @param  \App\Models\Project $project
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function save(Request $request, UpdateProject $updater, Project $project)
     {
         $authors = $request->get('authors');
 
         if(count($authors) > 0){
             $processedAuthors = [];
+
             foreach($authors as $author){
                 $family_name = $author['family_name'];
                 $given_name = $author['given_name'];
+
+                Validator::make($author, [
+                    'given_name' => ['required', 'string', 'max:255'],
+                    'family_name' => ['required', 'string', 'max:255'],
+                ])->validate();
+
                 if (! is_null($family_name) && ! is_null($given_name)) {
                     $_author = $project->authors->filter(function ($a) use ($family_name, $given_name) {
                         return $family_name.$given_name === $a->family_name.$a->given_name;
@@ -43,9 +61,29 @@ class AuthorController extends Controller
                     }
                 }
             }
-            $updater->saveOrUpdateAuthor($project, $processedAuthors);
+            $updater->attachAuthor($project, $processedAuthors);
 
         }
         return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('success', 'Authors updated successfully');
     }
+
+    /**
+     * Delete author for a project.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Actions\Project\UpdateProject $updater
+     * @param  \App\Models\Project $project
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function destroy(Request $request, UpdateProject $updater, Project $project)
+    {
+       $authors = $request->get('authors');
+
+        if(count($authors) > 0){
+            $updater->detachAuthor($project, $authors[0]['id']);
+        }
+        return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('success', 'Author deleted successfully');
+    }
+
 }

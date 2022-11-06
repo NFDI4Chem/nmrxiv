@@ -136,13 +136,46 @@ class UpdateProject
         });
     }
 
-    public function saveOrUpdateAuthor(Project $project, $authors)
+    /**
+     * Attach authors to a project.
+     *
+     * @param  \App\Models\Project $project
+     * @param  array $authors
+     *
+     * @return void
+     */
+    public function attachAuthor(Project $project, $authors)
     {
         $project->authors()->attach(
             $authors
         );
     }
 
+    /**
+     * Detach authors from a project.
+     *
+     * @param  \App\Models\Project $project
+     * @param  array $authors
+     *
+     * @return void
+     */
+    public function detachAuthor(Project $project, $author_id)
+    {
+        $project->authors()->detach(
+            $author_id
+        );
+
+    }
+
+    /**
+     * Attach citations to a project.
+     *
+     * @param  \App\Models\Project $project
+     * @param  array $citations
+     * @param  App\Models\User $user
+     *
+     * @return void
+     */
     public function updateCitation(Project $project, $citations, $user)
     {
         $project->citations()->sync(
