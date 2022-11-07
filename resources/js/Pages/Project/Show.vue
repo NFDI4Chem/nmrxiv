@@ -183,8 +183,8 @@
                                     :projectPermissions="projectPermissions"
                                     :project="project"
                                 />
-                                <add-author
-                                    ref="addAuthorElement"
+                                <manage-author
+                                    ref="manageAuthorElement"
                                     :project="project"
                                 />
                                 <add-citation
@@ -578,7 +578,7 @@
                                 v-if="canUpdateProject"
                                 type="button"
                                 class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                                @click="toggleAddAuthor"
+                                @click="toggleManageAuthor"
                             >
                                 <PencilIcon
                                     class="w-4 h-4 mr-1 text-gray-600"
@@ -666,7 +666,7 @@ import StudyIndex from "@/Pages/Study/Index.vue";
 import ProjectDetails from "./Partials/Details.vue";
 import { ref } from "vue";
 import { StarIcon, PencilIcon, CalendarIcon } from "@heroicons/vue/24/solid";
-import AddAuthor from "@/Shared/AddAuthor.vue";
+import ManageAuthor from "@/Shared/ManageAuthor.vue";
 import ToolTip from "@/Shared/ToolTip.vue";
 import AddCitation from "@/Shared/AddCitation.vue";
 import Citation from "@/Shared/Citation.vue";
@@ -681,7 +681,7 @@ export default {
         StarIcon,
         PencilIcon,
         AccessDialogue,
-        AddAuthor,
+        ManageAuthor,
         ToolTip,
         AddCitation,
         CalendarIcon,
@@ -699,11 +699,11 @@ export default {
     ],
     setup() {
         const projectDetailsElement = ref(null);
-        const addAuthorElement = ref(null);
+        const manageAuthorElement = ref(null);
         const addCitationElement = ref(null);
         return {
             projectDetailsElement,
-            addAuthorElement,
+            manageAuthorElement,
             addCitationElement,
         };
     },
@@ -723,7 +723,7 @@ export default {
             } else if (editOperation == "citation") {
                 this.toggleAddCitation();
             } else if (editOperation == "authors") {
-                this.toggleAddAuthor();
+                this.toggleManageAuthor();
             }
         }
     },
@@ -768,8 +768,8 @@ export default {
         toggleDetails() {
             this.projectDetailsElement.toggleDetails();
         },
-        toggleAddAuthor() {
-            this.addAuthorElement.toggleDialog();
+        toggleManageAuthor() {
+            this.manageAuthorElement.toggleDialog();
         },
         toggleAddCitation() {
             this.addCitationElement.toggleAddCitationDialog();
