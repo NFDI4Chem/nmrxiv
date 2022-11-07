@@ -13,8 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('authors', function (Blueprint $table) {
-            $table->string('title')->nullable();
+        Schema::table('author_project', function (Blueprint $table){
+            $table->unique(['author_id', 'project_id']);
         });
     }
 
@@ -25,8 +25,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('authors', function (Blueprint $table) {
-            $table->dropColumn('title');
+        Schema::table('author_project', function (Blueprint $table){
+            $table->dropUnique('author_project_author_id_project_id_unique');
         });
     }
 };
