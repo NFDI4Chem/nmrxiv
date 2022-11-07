@@ -358,11 +358,15 @@
                                                             />
                                                         </span>
                                                     </p>
+                                                    <p
+                                                        class="font-medium text-blue-gray-900 pr-4"
+                                                    >NMR Data</p>
                                                     <div
                                                         class="mt-1 text-blue-gray-500"
                                                     >
+                                                        <template v-for="ds in study.datasets">
                                                         <div
-                                                            v-for="ds in study.datasets"
+                                                            v-if="ds.method == 'nmr'"
                                                             :key="ds.id"
                                                             :class="[
                                                                 ds.has_nmrium
@@ -373,6 +377,28 @@
                                                         >
                                                             {{ ds.name }}
                                                         </div>
+                                                        </template>
+                                                    </div>
+                                                    <p
+                                                        class="font-medium text-blue-gray-900 pr-4"
+                                                    >MS Data</p>
+                                                    <div
+                                                        class="mt-1 text-blue-gray-500"
+                                                    >
+                                                        <template v-for="ds in study.datasets">
+                                                        <div
+                                                            v-if="ds.method == 'ms'"
+                                                            :key="ds.id"
+                                                            :class="[
+                                                                ds.has_nmrium
+                                                                    ? 'bg-green-100 text-gray-800'
+                                                                    : 'bg-gray-100 text-gray-800',
+                                                                'w-64 inline-flex truncate break-words items-center px-3 py-0.5 rounded-full text-xs font-medium mr-1',
+                                                            ]"
+                                                        >
+                                                            {{ ds.name }}
+                                                        </div>
+                                                        </template>
                                                     </div>
                                                 </div>
                                             </a>
@@ -629,17 +655,18 @@
                                                                         name="location"
                                                                         class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm rounded-md"
                                                                     >
+                                                                        <template v-for="dataset in selectedStudy.datasets.sort(
+                                                                        (
+                                                                        a,
+                                                                        b
+                                                                        ) =>
+                                                                        a.name >
+                                                                        b.name
+                                                                        ? 1
+                                                                        : -1
+                                                                        )">
                                                                         <option
-                                                                            v-for="dataset in selectedStudy.datasets.sort(
-                                                                                (
-                                                                                    a,
-                                                                                    b
-                                                                                ) =>
-                                                                                    a.name >
-                                                                                    b.name
-                                                                                        ? 1
-                                                                                        : -1
-                                                                            )"
+                                                                            v-if="dataset.method == 'nmr'"
                                                                             :key="
                                                                                 dataset.slug
                                                                             "
@@ -651,6 +678,7 @@
                                                                                 dataset.name
                                                                             }}
                                                                         </option>
+                                                                        </template>
                                                                     </select>
                                                                 </div>
                                                                 <div
@@ -776,7 +804,7 @@
                                             </a>
                                           </li>
                                         </ul>
-                                      </div> 
+                                      </div>
                                                                     </div>
                                                                 </div>
                                                             </section> -->
@@ -1246,6 +1274,59 @@
                                                                 </div>
                                                             </div>
                                                         </div>
+                                                        <div
+                                                            id="tour-step-msdata"
+                                                            v-if="
+                                                                currentTab.name ==
+                                                                'MS Data'
+                                                            "
+                                                            class="px-4 sm:px-6 md:px-0"
+                                                        >
+                                                            <div class="p-6">
+                                                                <div>
+                                                                    <label
+                                                                        for="location"
+                                                                        class="block text-sm font-medium text-gray-700"
+                                                                    >Select
+                                                                        Experiment
+                                                                    </label>
+                                                                    <select
+                                                                        id="tour-step-select-exp"
+                                                                        v-model="
+                                                                            selectedDataset
+                                                                        "
+                                                                        name="location"
+                                                                        class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm rounded-md"
+                                                                    >
+                                                                        <template v-for="dataset in selectedStudy.datasets.sort(
+                                                                        (
+                                                                        a,
+                                                                        b
+                                                                        ) =>
+                                                                        a.name >
+                                                                        b.name
+                                                                        ? 1
+                                                                        : -1
+                                                                        )">
+                                                                            <option
+                                                                                v-if="dataset.method == 'ms'"
+                                                                                :key="
+                                                                                dataset.slug
+                                                                            "
+                                                                                :value="
+                                                                                dataset
+                                                                            "
+                                                                            >
+                                                                                {{
+                                                                                    dataset.name
+                                                                                }}
+                                                                            </option>
+                                                                        </template>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
                                                     </div>
                                                 </div>
                                             </main>
@@ -1532,6 +1613,7 @@ export default {
                 { name: "Experiments (Spectra)", current: true },
                 { name: "Sample Info", current: false },
                 { name: "Meta Data", current: false },
+                { name: "MS Data", current: false}
             ],
 
             createDatasetForm: this.$inertia.form({

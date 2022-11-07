@@ -301,6 +301,10 @@ class DraftController extends Controller
                             ['study_id', $study->id],
                             ['fs_id', $sChild->id],
                         ])->first();
+                        $ds_method = "nmr";
+                        if($sChild->instrument_type==="mzml") {
+                            $ds_method="ms";
+                        }
 
                         if (! $ds) {
                             $ds = Dataset::create([
@@ -315,6 +319,7 @@ class DraftController extends Controller
                                 'project_id' => $project->id,
                                 'study_id' => $study->id,
                                 'fs_id' => $sChild->id,
+                                'method' => $ds_method,
                             ]);
 
                             $ds->validation()->associate($nmrXivValidation);
@@ -445,6 +450,8 @@ class DraftController extends Controller
                     $fileType = 'joel';
                 } elseif (DraftController::isJcampDX($fsItem)) {
                     $fileType = 'jcamp';
+                } elseif (DraftController::isMzML($fsItem)) {
+                    $fileType = "mzml";
                 }
             }
             if (!is_null($fileType)) {
@@ -536,6 +543,12 @@ class DraftController extends Controller
     {
         $extensions = ['jdf'];
         return DraftController::hasExtension($file, $extensions);
+    }
+
+    public static function isMzML(FileSystemObject $file): bool
+    {
+        $extensions = ['mzML'];
+        return DraftController::hasExtension($file,$extensions);
     }
 
     /**

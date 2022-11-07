@@ -2,9 +2,17 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property Collection $children
+ * @property string $model_type
+ * @property string $name
+ * @property string $instrument_type
+ *
+ */
 class FileSystemObject extends Model
 {
     use HasFactory;
