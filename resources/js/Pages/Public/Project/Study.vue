@@ -314,6 +314,11 @@
                                 :value="dataset"
                             >
                                 {{ dataset.name }}
+                                <span v-if="dataset.type"
+                                    >({{
+                                        dataset.type.replace(/,\s*$/, "")
+                                    }})</span
+                                >
                                 <span class="text-gray-200"
                                     >- #{{ dataset.identifier }}</span
                                 >

@@ -126,9 +126,16 @@
                                             :key="dataset.slug"
                                             :value="dataset"
                                         >
-                                            {{ dataset.name }} - #{{
-                                                dataset.id
-                                            }}
+                                            {{ dataset.name }}
+                                            <span v-if="dataset.type"
+                                                >({{
+                                                    dataset.type.replace(
+                                                        /,\s*$/,
+                                                        ""
+                                                    )
+                                                }})</span
+                                            >
+                                            - #{{ dataset.id }}
                                         </option>
                                     </select>
                                 </div>

@@ -35,11 +35,11 @@ class DatasetResource extends JsonResource
             'identifier' => $this->identifier,
             'doi' => $this->doi,
             'project' => [
-                'name' => $this->project ? $this->project->slug : '',
+                'name' => $this->project ? $this->project->name : '',
                 'public_url' => $this->project ? $this->project->public_url : null,
             ],
             'study' => [
-                'name' => $this->study ? $this->study->slug : '',
+                'name' => $this->study ? $this->study->name : '',
                 'public_url' => $this->study ? $this->study->public_url : null,
             ],
             'owner' => new UserResource($this->owner),
