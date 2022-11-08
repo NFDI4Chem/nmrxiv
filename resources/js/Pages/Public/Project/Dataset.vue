@@ -298,6 +298,11 @@
                         class="mt-2 text-2xl font-bold break-words text-gray-900"
                     >
                         {{ dataset.data.name }}
+                        <span v-if="dataset.data.type"
+                            >- ({{
+                                dataset.data.type.replace(/,\s*$/, "")
+                            }})</span
+                        >
                     </h1>
                     <div class="my-7">
                         <SpectraViewer
