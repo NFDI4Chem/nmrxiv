@@ -277,8 +277,7 @@
                                                         upload NMR raw data from
                                                         any NMR instrument. We
                                                         can currently
-                                                        auto-detect Bruker,
-                                                        Varian, JCAMP files and
+                                                        auto-detect Bruker/Varian/JOEL formats, JCAMP files and
                                                         will support more raw &
                                                         processed file formats
                                                         soon. Once you upload
