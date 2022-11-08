@@ -113,4 +113,19 @@ class DashboardController extends Controller
             }
         }
     }
+
+    /**
+     * Update the database to skip displaying primer
+     *
+     * @return void
+     */
+    public function skipPrimer(Request $request)
+    {
+        $user = $request->user();
+
+        if ($user) {
+            $user->primed = true;
+            $user->save();
+        }
+    }
 }
