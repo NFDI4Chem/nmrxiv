@@ -483,7 +483,7 @@ export default {
                             } else {
                                 let nmriumVersion = 3;
                                 if (nmrium_info && nmrium_info["version"]) {
-                                    nmriumVersion = nmrium_info["version"]
+                                    nmriumVersion = nmrium_info["version"];
                                 }
                                 let mols = [];
                                 if (this.isString(nmrium_info.molecules)) {
@@ -502,7 +502,7 @@ export default {
                                     data: {
                                         spectra: spectra,
                                         molecules: mols,
-                                        version: nmriumVersion
+                                        version: nmriumVersion,
                                     },
                                     type: "nmrium",
                                 };
@@ -554,7 +554,7 @@ export default {
                         {
                             spectra: this.selectedSpectraData,
                             molecules: this.currentMolecules,
-                            version: this.version ? this.version : 3
+                            version: this.version ? this.version : 3,
                         }
                     )
                     .catch((err) => {
