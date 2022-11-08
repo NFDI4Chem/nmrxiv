@@ -1,5 +1,33 @@
 # Changelog
 
+## [1.1.0-rc.5](https://github.com/NFDI4Chem/nmrxiv/compare/v1.0.0-rc.5...v1.1.0-rc.5) (2022-11-08)
+
+
+### Features
+
+* enable views to introduce the user to nmrXiv concepts - ref [#553](https://github.com/NFDI4Chem/nmrxiv/issues/553) ([bec2580](https://github.com/NFDI4Chem/nmrxiv/commit/bec2580e17a0bc0de30eda610f2296180cbc6275))
+* fixed failing tests ([319964f](https://github.com/NFDI4Chem/nmrxiv/commit/319964f3357f4f79bb27ef94172b54ef7223fdd0))
+* labelling datasets/measurements with the nucleus details - ref [#570](https://github.com/NFDI4Chem/nmrxiv/issues/570) ([3d4abe2](https://github.com/NFDI4Chem/nmrxiv/commit/3d4abe245bd65eaf0b759177f541ffcc547c9782))
+
+
+### Bug Fixes
+
+* added datsets sanitize command ([d3154de](https://github.com/NFDI4Chem/nmrxiv/commit/d3154de883652f6a707359c865ef46315e58b483))
+* download controller null draft error handling ([6327143](https://github.com/NFDI4Chem/nmrxiv/commit/63271435b605fd43059655ccb47542092f48e12e))
+* draft processing owner id bug fix ([eb23e58](https://github.com/NFDI4Chem/nmrxiv/commit/eb23e58580626eb53ba6086d16b73ad42c122419))
+* enabled nmrium data versioning defaults to 3 ([ee2b6a2](https://github.com/NFDI4Chem/nmrxiv/commit/ee2b6a207695b486c2aed99e8910fdf867490234))
+* fetching datacite url from env and updates to the assign identifiers query ([ccdb509](https://github.com/NFDI4Chem/nmrxiv/commit/ccdb5094666c1e1f69fc94d139b130ac148f1345))
+* generateDOI check is performed for every ds instance ([c5a0e77](https://github.com/NFDI4Chem/nmrxiv/commit/c5a0e77c9adaf39cacc10d7ba6375ea02426cfdc))
+* increase post_max_body_size limit. ([e2b2a2b](https://github.com/NFDI4Chem/nmrxiv/commit/e2b2a2bf994ecd3ddd64d85f079154b43a5ac352))
+* manage roles added addition check ([fa76719](https://github.com/NFDI4Chem/nmrxiv/commit/fa76719428d597614d3dcd2c85f0fb130d17604c))
+* null fields sent to datacite ([8cf3702](https://github.com/NFDI4Chem/nmrxiv/commit/8cf370264f769058f121db440d25378e35dadf83)), closes [#538](https://github.com/NFDI4Chem/nmrxiv/issues/538)
+* project and study formatting in cards ref [#568](https://github.com/NFDI4Chem/nmrxiv/issues/568) ([68e10ee](https://github.com/NFDI4Chem/nmrxiv/commit/68e10ee08e0a7c7c325871d694e91e34a30cbbae))
+* published sail assets ([bb6a50d](https://github.com/NFDI4Chem/nmrxiv/commit/bb6a50d6a6085cbc3d64ec691bc9ab77f033c685))
+* Refactored draft controller owner, team and UI public views updates ([484cdf9](https://github.com/NFDI4Chem/nmrxiv/commit/484cdf9cd3493055b85b760ea079737fad3ab224))
+* syncing draft from the project updates ([7e6f6ef](https://github.com/NFDI4Chem/nmrxiv/commit/7e6f6ef1415afaf62d42905f8acea971a719b644))
+* updated headline from Meta data -&gt; Metadata ref [#562](https://github.com/NFDI4Chem/nmrxiv/issues/562) ([8fe93df](https://github.com/NFDI4Chem/nmrxiv/commit/8fe93df404fa666ab17e088fc6bf79ebdb90ed25))
+* validations view - missing file - 500 error handling - ref [#571](https://github.com/NFDI4Chem/nmrxiv/issues/571) ([804c3a9](https://github.com/NFDI4Chem/nmrxiv/commit/804c3a93086e1eff4666a3e447531555a15be939))
+
 ## [1.0.1-rc.4](https://github.com/NFDI4Chem/nmrxiv/compare/v1.0.0-rc.4...v1.0.1-rc.4) (2022-10-25)
 
 
