@@ -75,6 +75,9 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::post('/onboarding/{status}', [DashboardController::class, 'onboardingStatus'])
             ->name('onboarding.complete');
 
+    Route::post('/primer/skip', [DashboardController::class, 'skipPrimer'])
+            ->name('primer.skip');
+
     Route::get('projects/status/{project}/queue', [ProjectController::class, 'status'])
             ->name('project.status');
 
