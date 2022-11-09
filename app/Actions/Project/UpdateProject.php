@@ -145,8 +145,15 @@ class UpdateProject
      */
     public function attachAuthor(Project $project, $authors)
     {
-        $project->authors()->attach(
-            $authors
+        //dd($authors);
+
+        $authors_map = [];
+        foreach ($authors as $author) {
+            $authors_map[$author->id] = ['contributor_type' => $author->contributor_type];
+        }
+
+        $project->authors()->sync(
+            $authors_map
         );
     }
 
@@ -162,6 +169,21 @@ class UpdateProject
         $project->authors()->detach(
             $author_id
         );
+    }
+
+    /**
+     * Update existing Contributor type for a given author in a project.
+     *
+     * @param  \App\Models\Project  $project
+     * @param  string  $authorId
+     * @param  string  $role
+     * @return void
+     */
+    public function updateContributorType(Project $project, $author_id, $role)
+    {
+        $project->authors()->updateExistingPivot($author_id, [
+            'contributor_type' => $role,
+        ]);
     }
 
     /**

@@ -611,9 +611,28 @@
                                                 class="text-sm font-medium text-gray-900"
                                             >
                                                 {{ author.title }}
-                                                {{ author.given_name }}
                                                 {{ author.family_name }}
+                                                {{ author.given_name }}
                                             </p>
+                                            <button
+                                                v-if="
+                                                    author.pivot
+                                                        .contributor_type
+                                                "
+                                                class="mt-1 mb-1 text-sm text-gray-400"
+                                            >
+                                                <span
+                                                    class="px-2 inline-flex text-xs leading-5 font-semibold capitalize rounded-full bg-green-100 text-green-800"
+                                                >
+                                                    {{
+                                                        author.pivot
+                                                            .contributor_type
+                                                            ? author.pivot
+                                                                  .contributor_type
+                                                            : "Researcher"
+                                                    }}
+                                                </span>
+                                            </button>
                                             <p
                                                 v-if="author.affiliation"
                                                 class="text-sm text-gray-500"

@@ -65,10 +65,13 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
 
     // Authors
     Route::post('authors/{project}', [AuthorController::class, 'save'])
-                ->name('author.save');
+        ->name('author.save');
 
-    Route::delete('authors/{project}', [AuthorController::class, 'destroy'])
-                ->name('author.delete');
+    Route::delete('authors/{project}/delete', [AuthorController::class, 'destroy'])
+        ->name('author.delete');
+
+    Route::post('authors/{project}/updateRole', [AuthorController::class, 'updateRole'])
+        ->name('author.updateRole');
 
     //Citation
     Route::post('citation/{project}', [CitationController::class, 'updateCitation'])
