@@ -27,7 +27,8 @@ class ApplicationController extends Controller
             $tab = $request->get('tab');
 
             if ($namespace == 'Project') {
-                if (! $model->is_public) {
+                $project = $model;
+                if (! $project->is_public) {
                     if (! Gate::forUser($request->user())->check('viewProject', $project)) {
                         throw new AuthorizationException;
                     }
