@@ -250,7 +250,7 @@ Route::group([
     });
 });
 
-Route::get('{id}', [ApplicationController::class, 'resolveIdentifier'])->where('id', '(P|S|D|M|p|s|d|m)[0-9]+')
+Route::get('{id}', [ApplicationController::class, 'resolve'])->where('id', '(P|S|D|M|p|s|d|m)[0-9]+')
     ->name('public');
 
 Route::get('{username}/download/{project}/{key?}', [DownloadController::class, 'downloadFromProject'])
