@@ -7,10 +7,10 @@
         <template #title> {{ project.name }} - Manage Authors </template>
         <template #content>
             <div
-                class="relative grid grid-cols-1 gap-x-16 max-w-7xl mx-auto lg:grid-cols-2 divide-x"
+                class="relative grid grid-cols-1 gap-x-14 max-w-7xl mx-auto lg:grid-cols-2 divide-x"
             >
                 <div
-                    class="pb-36 px-4 sm:px-6 lg:pb-16 lg:px-0 lg:row-start-1 lg:col-start-1"
+                    class="pb-36 px-4 sm:px-6 lg:pb-5 lg:px-0 lg:row-start-1 lg:col-start-1"
                 >
                     <div>
                         <p class="text-sm leading-6 font-bold text-gray-900">
@@ -120,13 +120,6 @@
                                 class="sm:col-span-6 mt-4"
                             >
                                 <jet-secondary-button
-                                    class="float-right ml-2"
-                                    @click="save('addAll')"
-                                >
-                                    Add All
-                                </jet-secondary-button>
-
-                                <jet-secondary-button
                                     :disabled="
                                         !(
                                             this.selectedFetchedAuthorsList(
@@ -134,7 +127,7 @@
                                             ).length > 0
                                         )
                                     "
-                                    class="float-right"
+                                    class="float-right ml-2"
                                     @click="save('addSelected')"
                                 >
                                     Add Selected ({{
@@ -142,12 +135,18 @@
                                             .length
                                     }})
                                 </jet-secondary-button>
+                                <jet-secondary-button
+                                    class="float-right"
+                                    @click="save('addAll')"
+                                >
+                                    Add All
+                                </jet-secondary-button>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div
-                    class="pb-36 px-4 sm:px-6 lg:pb-16 lg:px-0 lg:row-start-1 lg:col-start-2"
+                    class="pb-36 px-4 sm:px-6 lg:pb-5 lg:px-0 lg:row-start-1 lg:col-start-2"
                 >
                     <div class="p-2">
                         <!--Add Manual Section-->
@@ -235,10 +234,9 @@
                                         type="email"
                                         autocomplete="email"
                                         class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                                        @blur="validateEmail"
                                     />
                                     <jet-input-error
-                                        :message="authorsForm.errors.email_id"
+                                        :message="form.errors.email_id"
                                         class="mt-2"
                                     />
                                 </div>
@@ -262,6 +260,13 @@
                                 </div>
                             </div>
                             <div class="sm:col-span-6">
+                                <select-rich
+                                    v-model:selected="form.contributor_type"
+                                    label="Role"
+                                    :items="this.contributorType"
+                                />
+                            </div>
+                            <div class="sm:col-span-6">
                                 <label
                                     for="about"
                                     class="block text-sm font-medium text-gray-700"
@@ -275,7 +280,7 @@
                                         name="affiliation"
                                         rows="3"
                                         class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border border-gray-300 rounded-md"
-                                        placeholder="Name and address of affiliated University and Department. e.g. Institut für Anorganische und Analytische Chemie,Friedrich-Schiller-Universität,Schloßgasse 10, 07743 Jena"
+                                        placeholder="Name and address of affiliated University and Department. e.g. Institut für Anorganische und Analytische Chemie, Friedrich-Schiller-Universität, Schloßgasse 10, 07743 Jena"
                                     />
                                 </div>
                                 <jet-input-error
@@ -340,6 +345,12 @@
                                     scope="col"
                                     class="px-6 text-center py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                 >
+                                    Role
+                                </th>
+                                <th
+                                    scope="col"
+                                    class="px-6 text-center py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                >
                                     Actions
                                 </th>
                             </tr>
@@ -352,8 +363,8 @@
                                             class="text-sm leading-6 font-medium text-teal-900"
                                         >
                                             {{ author.title }}
-                                            {{ author.given_name }}
                                             {{ author.family_name }}
+                                            {{ author.given_name }}
                                         </h3>
                                         <p
                                             class="mt-1 text-xs font-small text-blue-gray-900 break-words"
@@ -383,6 +394,30 @@
                                             </p>
                                         </div>
                                     </div>
+                                </td>
+                                <td
+                                    class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center"
+                                >
+                                    <button
+                                        v-if="author.pivot.contributor_type"
+                                        class="ml-2 text-sm text-gray-400 underline"
+                                        @click="
+                                            (showManageRoleDialog = true),
+                                                (this.updateRoleForm.author_id =
+                                                    author.id)
+                                        "
+                                    >
+                                        <span
+                                            class="px-2 inline-flex text-xs leading-5 font-semibold capitalize rounded-full bg-green-100 text-green-800"
+                                        >
+                                            {{
+                                                author.pivot.contributor_type
+                                                    ? author.pivot
+                                                          .contributor_type
+                                                    : "Researcher"
+                                            }}
+                                        </span>
+                                    </button>
                                 </td>
                                 <td
                                     class="text-center px-6 py-4 text-sm leading-5 text-gray-500 whitespace-no-wrap border-gray-200"
@@ -436,7 +471,7 @@
                         class="ml-2"
                         :class="{ 'opacity-25': form.processing }"
                         :disabled="form.processing"
-                        @click="deleteAuthor(author)"
+                        @click="deleteAuthor()"
                     >
                         Delete Author
                     </jet-danger-button>
@@ -451,6 +486,41 @@
             </div>
         </template>
     </jet-dialog-modal>
+    <!-- Manage Role Modal-->
+    <jet-dialog-modal
+        :show="showManageRoleDialog"
+        @close="showManageRoleDialog = false"
+    >
+        <template #title> Manage Role </template>
+
+        <template #content>
+            <div style="height: 30vh" class="overflow-auto p-1">
+                <div
+                    v-for="item in contributorType"
+                    :key="item.title"
+                    class="relative flex items-start mt-2"
+                >
+                    <div
+                        @click="updateRole(item)"
+                        class="cursor-pointer flex-1 border rounded-md p-2 bg-white-200 hover:bg-gray-200"
+                    >
+                        <div class="text-gray-900">
+                            <b>{{ item.title }}</b> <br />
+                            <p
+                                class="text-xs align-top"
+                                v-html="item.description"
+                            ></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+        <template #footer>
+            <jet-secondary-button @click="showManageRoleDialog = false">
+                Cancel
+            </jet-secondary-button>
+        </template>
+    </jet-dialog-modal>
 </template>
 
 <script>
@@ -462,6 +532,7 @@ import JetInputError from "@/Jetstream/InputError.vue";
 import LoadingButton from "@/Shared/LoadingButton.vue";
 import JetDangerButton from "@/Jetstream/DangerButton.vue";
 import { Inertia } from "@inertiajs/inertia";
+import SelectRich from "@/Shared/SelectRich.vue";
 
 export default {
     components: {
@@ -474,6 +545,7 @@ export default {
         JetInputError,
         LoadingButton,
         Inertia,
+        SelectRich,
     },
 
     props: ["project"],
@@ -487,9 +559,14 @@ export default {
                 affiliation: null,
                 orcid_id: null,
                 email_id: null,
+                contributor_type: null,
             }),
             authorsForm: this.$inertia.form({
                 authors: [],
+            }),
+            updateRoleForm: this.$inertia.form({
+                author_id: "",
+                role: "",
             }),
             query: "",
             showDialog: false,
@@ -499,12 +576,116 @@ export default {
             loading: false,
             confirmDelete: false,
             error: "",
+            showManageRoleDialog: false,
+            contributorType: [
+                {
+                    title: "Researcher",
+                    description:
+                        "A person involved in analysing data or the results of an experiment or formal study. May indicate an <br> intern or assistant to one of the authors who helped with research but who was not so “key” as to be listed as an author.",
+                },
+                {
+                    title: "ContactPerson",
+                    description:
+                        "Person with knowledge of how to access, troubleshoot, or otherwise field <br> issues related to the resource",
+                },
+                {
+                    title: "DataCollector",
+                    description:
+                        "Person/institution responsible for finding or gathering/collecting data under the <br> guidelines of the author(s) or Principal Investigator(PI)",
+                },
+                {
+                    title: "DataCurator",
+                    description:
+                        "Person tasked with reviewing, enhancing, cleaning, or standardizing metadata and the associated data <br> submitted for storage, use, and maintenance within a data centre or repository",
+                },
+                {
+                    title: "DataManager",
+                    description:
+                        "Person (or organisation with a staff of data managers, such as a data centre) <br> responsible for maintaining the finished resource",
+                },
+                {
+                    title: "Distributor",
+                    description:
+                        "Institution tasked with responsibility to generate/disseminate copies <br> of the resource in either electronic or print form",
+                },
+                {
+                    title: "Editor",
+                    description:
+                        "A person who oversees the details related to the publication format <br> of the resource ",
+                },
+                {
+                    title: "HostingInstitution",
+                    description:
+                        "Typically, the organisation allowing the resource to be available on the internet through <br> the provision of its hardware/software/operating support",
+                },
+                {
+                    title: "Producer",
+                    description:
+                        "Typically, a person or organisation responsible for the artistry and form <br> of a media product",
+                },
+                {
+                    title: "ProjectLeader",
+                    description:
+                        "Person officially designated as head of project team or subproject team instrumental <br> in the work necessary to development of the resource",
+                },
+                {
+                    title: "ProjectManager",
+                    description:
+                        "Person on the membership list of a designated project/project team",
+                },
+                {
+                    title: "RegistrationAgency",
+                    description:
+                        "Institution/organisation officially appointed by a Registration Authority to handle specific <br> tasks within a defined area of responsibility",
+                },
+                {
+                    title: "RelatedPerson",
+                    description:
+                        "A person without a specifically defined role in the development of the resource, but who is <br> someone the author wishes to recognize",
+                },
+                {
+                    title: "Researcher",
+                    description:
+                        "A person involved in analysing data or the results of an experiment or formal study. May indicate an intern or assistant to one of the authors who helped with research but who was not so “key” as to be listed as an author.",
+                },
+                {
+                    title: "ResearchGroup",
+                    description:
+                        "Typically refers to a group of individuals with a lab, department, or division that has a specifically <br> defined focus of activity.",
+                },
+                {
+                    title: "RightsHolder",
+                    description:
+                        "Person or institution owning or managing property rights, including intellectual property rights over the resource",
+                },
+                {
+                    title: "Sponsor",
+                    description:
+                        "Person or organisation that issued a contract or under the auspices of which a work has been written,<br> printed, published, developed, etc",
+                },
+                {
+                    title: "Supervisor",
+                    description:
+                        "Designated administrator over one or more groups/teams working to produce a resource, or over one or <br> more steps of a development process",
+                },
+                {
+                    title: "WorkPackageLeader",
+                    description:
+                        "A Work Package is a recognized data product, not all of which is included in publication. The package, instead, may include notes, discarded documents,<br> etc.The Work Package Leader is responsible for ensuring the comprehensive contents, versioning, and availability of the Work Package during the development of the resource. ",
+                },
+                {
+                    title: "Other",
+                    description:
+                        "Any person or institution making a significant contribution to the development and/or maintenance of the resource, but whose contribution is not adequately described by any of the other values for contributorType",
+                },
+            ],
         };
     },
     mounted() {
-        this.loadAuthors();
+        this.loadInitial();
     },
     methods: {
+        /*Return filtered fetched authors list on the basis of selection*/
         selectedFetchedAuthorsList(all = false) {
             if (all) {
                 return this.fetchedAuthors;
@@ -512,6 +693,7 @@ export default {
                 return this.fetchedAuthors.filter((a) => a.selected);
             }
         },
+        /*Add imported authors to selected list*/
         addAuthorToSelectedList(author) {
             if (author.selected) {
                 author.selected = false;
@@ -519,19 +701,28 @@ export default {
                 author.selected = true;
             }
         },
-        loadAuthors() {
+        /*Fetch and populate initial & default values*/
+        loadInitial() {
             if (this.project && this.project.authors) {
                 this.authors = this.project.authors;
             }
+            this.form.contributor_type = {};
+            this.form.contributor_type = this.contributorType[0];
         },
+        /*Control the display toggling*/
         toggleDialog() {
             this.showDialog = !this.showDialog;
         },
+        /*Reset variables on close of dialog*/
         onClose() {
             this.showDialog = false;
             this.form.reset();
             this.fetchedAuthors = [];
+            this.query = "";
+            this.form.contributor_type = {};
+            this.form.contributor_type = this.contributorType[0];
         },
+        /*Edit author*/
         edit(author) {
             this.selectedAuthor = author;
 
@@ -542,14 +733,18 @@ export default {
                         this.selectedAuthor.given_name
                 );
             });
-
             this.form.title = author.title;
             this.form.family_name = author.family_name;
             this.form.given_name = author.given_name;
             this.form.email_id = author.email_id;
             this.form.affiliation = author.affiliation;
             this.form.orcid_id = author.orcid_id;
+            this.form.contributor_type = {};
+            this.form.contributor_type.title = author.pivot
+                ? author.pivot.contributor_type
+                : null;
         },
+        /*Fetch author from DOI or ORCID id*/
         fetchAuthors() {
             this.loading = true;
             this.error = "";
@@ -589,6 +784,7 @@ export default {
                     this.loading = false;
                 });
         },
+        /*Format the response*/
         formatAuthors(authors) {
             let authorsList = [];
             authors.forEach((author) => {
@@ -608,49 +804,91 @@ export default {
             });
             return authorsList;
         },
+        /*Make the call to save API on the basis of selection*/
         save(input) {
             switch (input) {
                 case "addSelected":
-                    this.authorsForm.authors = this.formatAuthors(
-                        this.selectedFetchedAuthorsList(false)
-                    );
-                    this.executeQuery();
+                    this.addImportedAuthor(false);
                     break;
                 case "addAll":
-                    this.authorsForm.authors = this.formatAuthors(
-                        this.selectedFetchedAuthorsList(true)
-                    );
-                    this.executeQuery();
+                    this.addImportedAuthor(true);
                     break;
                 case "addManually":
-                    this.authorsForm.authors = [
-                        {
-                            title: this.form.title,
-                            family_name: this.form.family_name,
-                            given_name: this.form.given_name,
-                            email_id: this.form.email_id,
-                            orcid_id: this.form.orcid_id,
-                            affiliation: this.form.affiliation,
-                        },
-                    ];
-                    this.validateForm();
-                    if (!this.authorsForm.hasErrors) {
-                        this.executeQuery();
-                    }
+                    this.addManually();
                     break;
             }
         },
+        /*Prepare request form and execute save query for imported authors*/
+        addImportedAuthor(addAll) {
+            this.authorsForm.reset();
+            this.authorsForm.authors = this.formatAuthors(
+                this.selectedFetchedAuthorsList(addAll)
+            );
+            this.executeQuery();
+        },
+        /*Prepare request form and execute save query for authors added manually*/
+        addManually() {
+            this.validateForm();
+            if (!this.form.hasErrors) {
+                this.authorsForm.reset();
+                this.authorsForm.authors = [
+                    {
+                        title: this.form.title ? this.form.title.trim() : null,
+                        family_name: this.form.family_name
+                            ? this.form.family_name.trim()
+                            : null,
+                        given_name: this.form.given_name
+                            ? this.form.given_name.trim()
+                            : null,
+                        email_id: this.form.email_id
+                            ? this.form.email_id.trim()
+                            : null,
+                        orcid_id: this.form.orcid_id
+                            ? this.form.orcid_id.trim()
+                            : null,
+                        affiliation: this.form.affiliation
+                            ? this.form.affiliation.trim()
+                            : null,
+                        contributor_type: this.form.contributor_type
+                            ? this.form.contributor_type.title.trim()
+                            : "Researcher",
+                    },
+                ];
+                this.executeQuery();
+            }
+        },
+        /*Make request to save API*/
         executeQuery() {
+            if (this.authors.length > 0) {
+                let _authorObj = {};
+                this.authors.forEach((author) => {
+                    for (var key in author) {
+                        _authorObj[key] = author.hasOwnProperty(key)
+                            ? author[key]
+                            : null;
+                    }
+                    this.authorsForm.authors.push(_authorObj);
+                    _authorObj = {};
+                });
+            }
+            const keys = ["family_name", "given_name"];
+            this.authorsForm.authors = this.authorsForm.authors.filter(
+                (value, index, self) =>
+                    self.findIndex((v) =>
+                        keys.every((k) => v[k] === value[k])
+                    ) === index
+            );
             this.authorsForm.post(route("author.save", this.project.id), {
                 preserveScroll: true,
                 onSuccess: () => {
                     Inertia.reload({ only: ["project"] });
-                    this.loadAuthors();
+                    this.loadInitial();
                     this.form.reset();
                 },
                 onError: (err) => console.error(err),
             });
         },
+        /*Confirm delete and prepare request*/
         confirmDeletion(author) {
             this.confirmDelete = true;
             this.authorsForm.reset();
@@ -664,36 +902,51 @@ export default {
                 },
             ];
         },
+        /*Make request to delete API*/
         deleteAuthor() {
             this.authorsForm.delete(route("author.delete", this.project.id), {
                 preserveScroll: true,
                 onSuccess: () => {
                     Inertia.reload({ only: ["project"] });
-                    this.loadAuthors();
+                    this.loadInitial();
                     this.authorsForm.reset();
                     this.confirmDelete = false;
                 },
                 onError: (err) => console.error(err),
             });
         },
+        /*Check form for validation errors*/
         validateForm() {
-            this.authorsForm.errors = {};
-            this.authorsForm.hasErrors = false;
+            this.form.errors = {};
+            this.form.hasErrors = false;
             let _hasErrors = false;
-            if (this.authorsForm.authors[0].email_id) {
-                if (!this.validEmail(this.authorsForm.authors[0].email_id)) {
-                    this.authorsForm.errors.email_id = "Valid email required.";
+            if (this.form.email_id) {
+                if (!this.isValidEmail(this.form.email_id)) {
+                    this.form.errors.email_id = "Valid email required.";
                     _hasErrors = true;
                 }
             }
             if (_hasErrors) {
-                this.authorsForm.hasErrors = true;
+                this.form.hasErrors = true;
             }
         },
-        validEmail(email) {
-            var re =
-                /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-            return re.test(email);
+        /*Make request to update role API*/
+        updateRole(role) {
+            this.updateRoleForm.role = role.title;
+            this.updateRoleForm.post(
+                route("author.updateRole", this.project.id),
+                {
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        Inertia.reload({ only: ["project"] });
+                        this.loadInitial();
+                        this.updateRoleForm.reset();
+                        this.showManageRoleDialog = false;
+                        this.authorId = "";
+                    },
+                    onError: (err) => console.error(err),
+                }
+            );
         },
     },
 };

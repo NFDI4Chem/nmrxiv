@@ -6,6 +6,7 @@ use App\Actions\Project\UpdateProject;
 use App\Models\Author;
 use App\Models\Project;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Validator;
 
 class AuthorController extends Controller
@@ -21,7 +22,6 @@ class AuthorController extends Controller
     public function save(Request $request, UpdateProject $updater, Project $project)
     {
         $authors = $request->get('authors');
-
         if (count($authors) > 0) {
             $processedAuthors = [];
 
@@ -38,7 +38,7 @@ class AuthorController extends Controller
                     $_author = $project->authors->filter(function ($a) use ($family_name, $given_name) {
                         return $family_name.$given_name === $a->family_name.$a->given_name;
                     })->first();
-
+                    //dd($_author);
                     if ($_author) {
                         $_author->update([
                             'title' => array_key_exists('title', $author) ? $author['title'] : null,
@@ -57,8 +57,9 @@ class AuthorController extends Controller
                             'email_id' => array_key_exists('email_id', $author) ? $author['email_id'] : null,
                             'affiliation' => array_key_exists('affiliation', $author) ? $author['affiliation'] : null,
                         ]);
-                        array_push($processedAuthors, $_author->id);
                     }
+                    $_author->contributor_type = array_key_exists('contributor_type', $author) ? $author['contributor_type'] : 'Researcher';
+                    array_push($processedAuthors, $_author);
                 }
             }
             $updater->attachAuthor($project, $processedAuthors);
@@ -84,5 +85,27 @@ class AuthorController extends Controller
         }
 
         return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('success', 'Author deleted successfully');
+    }
+
+    /**
+     * Update existing Contributor type for a given author in a project.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Actions\Project\UpdateProject  $updater
+     * @param  \App\Models\Project  $project
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function updateRole(Request $request, UpdateProject $updater, Project $project)
+    {
+        $contributorTypes = Config::get('doi.'.Config::get('doi.default').'.contributor_types');
+        $roleExist = in_array($request->role, $contributorTypes);
+
+        if ($roleExist && $request->author_id && $request->role) {
+            $updater->updateContributorType($project, $request->author_id, $request->role);
+
+            return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('success', 'Author updated successfully');
+        } else {
+            return $request->wantsJson() ? new JsonResponse('', 500) : back()->with('error', 'Error occurred while updating Author role');
+        }
     }
 }
