@@ -385,9 +385,8 @@
                                                     <div
                                                         class="mt-1 text-blue-gray-500"
                                                     >
-                                                        <template v-for="ds in study.datasets">
                                                         <div
-                                                            v-if="ds.method == 'ms'"
+                                                            v-for="ds in study.datasets.filter(dataset => dataset.method === 'ms')"
                                                             :key="ds.id"
                                                             :class="[
                                                                 ds.has_nmrium
@@ -398,7 +397,6 @@
                                                         >
                                                             {{ ds.name }}
                                                         </div>
-                                                        </template>
                                                     </div>
                                                 </div>
                                             </a>
@@ -1282,49 +1280,10 @@
                                                             "
                                                             class="px-4 sm:px-6 md:px-0"
                                                         >
-                                                            <div class="p-6">
-                                                                <div>
-                                                                    <label
-                                                                        for="location"
-                                                                        class="block text-sm font-medium text-gray-700"
-                                                                    >Select
-                                                                        Experiment
-                                                                    </label>
-                                                                    <select
-                                                                        id="tour-step-select-exp"
-                                                                        v-model="
-                                                                            selectedDataset
-                                                                        "
-                                                                        name="location"
-                                                                        class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm rounded-md"
-                                                                    >
-                                                                        <template v-for="dataset in selectedStudy.datasets.sort(
-                                                                        (
-                                                                        a,
-                                                                        b
-                                                                        ) =>
-                                                                        a.name >
-                                                                        b.name
-                                                                        ? 1
-                                                                        : -1
-                                                                        )">
-                                                                            <option
-                                                                                v-if="dataset.method == 'ms'"
-                                                                                :key="
-                                                                                dataset.slug
-                                                                            "
-                                                                                :value="
-                                                                                dataset
-                                                                            "
-                                                                            >
-                                                                                {{
-                                                                                    dataset.name
-                                                                                }}
-                                                                            </option>
-                                                                        </template>
-                                                                    </select>
-                                                                </div>
-                                                            </div>
+                                                            <SubmissionMsDataTab :selected-dataset="selectedDataset"
+                                                                          :selected-study="selectedStudy.datasets.
+                                                                          filter(ds => ds.method === 'ms').
+                                                                          sort((a,b) => a.name > b.name ? 1 : -1)"/>
                                                         </div>
 
                                                     </div>
@@ -1521,41 +1480,29 @@ import JetDialogModal from "@/Jetstream/DialogModal.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import JetButton from "@/Jetstream/Button.vue";
 import VueTagsInput from "@sipec/vue3-tags-input";
-import { ref } from "vue";
+import {ref} from "vue";
 import slider from "vue3-slider";
 import OCL from "openchemlib/full";
-import SelectRich from "@/Shared/SelectRich.vue";
 import SpectraEditor from "@/Shared/SpectraEditor.vue";
 import Validation from "@/Shared/Validation.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import FileSystemBrowser from "./FileSystemBrowser.vue";
-import {
-    XCircleIcon,
-    ClipboardDocumentIcon,
-    QuestionMarkCircleIcon,
-    ExclamationTriangleIcon,
-    TrashIcon,
-    PlayIcon,
-    PauseIcon,
-    PencilIcon,
-} from "@heroicons/vue/24/solid";
-import { Link } from "@inertiajs/inertia-vue3";
+import {ExclamationTriangleIcon, PauseIcon, PencilIcon, PlayIcon, TrashIcon,} from "@heroicons/vue/24/solid";
+import {Link} from "@inertiajs/inertia-vue3";
+import SubmissionMsDataTab from "@/Shared/msdata/SubmissionMsDataTab.vue";
 
 export default {
     components: {
+        SubmissionMsDataTab,
         Link,
         JetDialogModal,
         JetSecondaryButton,
         JetButton,
         VueTagsInput,
         slider,
-        SelectRich,
-        XCircleIcon,
         PencilIcon,
         JetInputError,
         FileSystemBrowser,
-        ClipboardDocumentIcon,
-        QuestionMarkCircleIcon,
         ExclamationTriangleIcon,
         TrashIcon,
         PlayIcon,
