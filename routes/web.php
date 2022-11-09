@@ -77,6 +77,9 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::post('/onboarding/{status}', [DashboardController::class, 'onboardingStatus'])
             ->name('onboarding.complete');
 
+    Route::post('/primer/skip', [DashboardController::class, 'skipPrimer'])
+            ->name('primer.skip');
+
     Route::get('projects/status/{project}/queue', [ProjectController::class, 'status'])
             ->name('project.status');
 
@@ -222,8 +225,10 @@ Route::group([
             Route::put('users/edit/{user}/password', [UsersController::class, 'updatePassword'])
             ->name('console.users.update-password');
 
-            Route::put('users/edit/{user}/role', [UsersController::class, 'updateRole'])
-            ->name('console.users.update-role');
+            Route::group(['middleware' => ['permission:manage roles']], function () {
+                Route::put('users/edit/{user}/role', [UsersController::class, 'updateRole'])
+                ->name('console.users.update-role');
+            });
 
             Route::delete('users/edit/{user}/photo', [UsersController::class, 'destroyPhoto'])
             ->name('console.users.destroy-photo');

@@ -31,7 +31,25 @@ class SanitizeDatasets extends Command
         $datasets = Dataset::orderBy('id', 'ASC')->get();
 
         foreach ($datasets as $dataset) {
-            $dataset->type = implode(',', array_unique(array_map('trim', explode(',', $dataset->type))));
+            if($dataset->has_nmrium){
+                $nmrium = $dataset->nmrium;
+                $nmriumInfo = json_decode($nmrium['nmrium_info'], true);
+                if ($nmriumInfo && ! empty($nmriumInfo)) {
+                    $spectra = $nmriumInfo['spectra'];
+                    foreach ($spectra as $spectrum) {
+                        $experiment = $spectrum['info']['experiment'];
+                        if(is_null($experiment)){
+                            $nucleus = $spectrum['info']['nucleus'];
+                            if (is_array($nucleus)) {
+                                $nucleus = implode('-', $nucleus);
+                            }
+                            $dataset->type = implode(',', array_unique(array_map('trim', explode(',', $nucleus.', '.$dataset->type))));    
+                        }else{
+                            $dataset->type = $spectrum['info']['experiment'];
+                        }
+                    }
+                }
+            }
             $dataset->save();
         }
     }
