@@ -34,11 +34,13 @@ class ApplicationController extends Controller
                     }
                 }
             } elseif ($namespace == 'Study') {
-                $project = $model->project;
+                $study = $model;
+                $project = $study->project;
                 $tab = 'study';
             } elseif ($namespace == 'Dataset') {
-                $study = $model->study;
-                $project = $model->project;
+                $dataset = $model;
+                $study = $dataset->study;
+                $project = $dataset->project;
                 $tab = 'dataset';
             }
 
