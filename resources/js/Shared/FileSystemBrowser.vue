@@ -9,72 +9,84 @@
         ]"
     >
         <div>
-            <div :class="[fullScreen ? 'px-6 py-4' : '', 'flex justify-end']">
-                <span
-                    class="float-right text-xs cursor-pointer hover:text-blue-700 mt-2 mr-2"
-                >
-                    <a
-                        href="https://docs.nmrxiv.org/docs/submission-guides/submission/folder-structure"
-                        target="_blank"
-                        >Learn more about folder structuring</a
+            <div :class="[fullScreen ? 'px-6 py-4' : '', 'flex']">
+                <div class="w-full">
+                    <div
+                        class="float-left text-sm cursor-pointer hover:text-blue-700 mt-2 mr-10"
                     >
-                </span>
-                <button class="right" @click="toggleFullScreen">
-                    <span v-if="fullScreen">
-                        <svg
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
+                        <i
+                            ><a
+                                href="https://docs.nmrxiv.org/docs/submission-guides/submission/folder-structure"
+                                target="_blank"
+                                class="mb-4"
+                            >
+                                <ToolTip
+                                    class="w-3.5 h-3.5"
+                                    text="To submit data you will need an account with nmrXiv, so you will be redirected to our register page and once registered you can then go ahead and submit data. For more information please checkout our <a target='_blank' href='//docs.nmrxiv.org' class='text-gray-400' target='_blank'>documentation</a>."
+                                ></ToolTip>
+                                <span class="ml-4">
+                                    Learn more about folder structuring
+                                </span>
+                            </a></i
                         >
-                            <path
-                                d="M9 19V15M9 15H5M9 15L4 20"
-                                stroke="black"
+                    </div>
+                    <button class="float-right" @click="toggleFullScreen">
+                        <span v-if="fullScreen">
+                            <svg
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path
+                                    d="M9 19V15M9 15H5M9 15L4 20"
+                                    stroke="black"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                />
+                                <path
+                                    d="M15 5V9M15 9H19M15 9L20 4"
+                                    stroke="black"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                />
+                                <path
+                                    d="M9 5V9M9 9H5M9 9L4 4"
+                                    stroke="black"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                />
+                                <path
+                                    d="M15 19V15M15 15H19M15 15L20 20"
+                                    stroke="black"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                />
+                            </svg>
+                        </span>
+                        <span v-else>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="h-6 w-6"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
                                 stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                            />
-                            <path
-                                d="M15 5V9M15 9H19M15 9L20 4"
-                                stroke="black"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                            />
-                            <path
-                                d="M9 5V9M9 9H5M9 9L4 4"
-                                stroke="black"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                            />
-                            <path
-                                d="M15 19V15M15 15H19M15 15L20 20"
-                                stroke="black"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                            />
-                        </svg>
-                    </span>
-                    <span v-else>
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            class="h-6 w-6"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                            stroke-width="2"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
-                            />
-                        </svg>
-                    </span>
-                </button>
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
+                                />
+                            </svg>
+                        </span>
+                    </button>
+                </div>
             </div>
             <div v-if="!readonly" :class="[fullScreen ? 'px-6 py-4' : '', '']">
                 <form class="py-2 mb-3">
@@ -392,6 +404,7 @@ import { Dropzone } from "dropzone";
 import axiosRetry from "axios-retry";
 import FileDetails from "@/Shared/FileDetails.vue";
 import SelectInput from "@/Shared/SelectInput.vue";
+import ToolTip from "@/Shared/ToolTip.vue";
 
 import {
     FolderIcon,
@@ -424,6 +437,7 @@ export default {
         CheckIcon,
         SelectInput,
         TrashIcon,
+        ToolTip,
     },
     props: ["draft", "readonly"],
     data() {

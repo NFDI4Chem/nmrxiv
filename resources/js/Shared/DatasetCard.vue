@@ -41,7 +41,7 @@
                                     {{ dataset.name }}
                                 </p>
                                 <p
-                                    class="mt-0 text-sm capitalize text-gray-800 line-clamp-4"
+                                    class="mt-0 text-sm text-gray-800 line-clamp-4"
                                 >
                                     <small class="text-gray-400">Project:</small
                                     ><br />
@@ -195,7 +195,7 @@
                                     </Link>
                                 </p>
                                 <p
-                                    class="mt-0 text-sm capitalize text-gray-800 line-clamp-4"
+                                    class="mt-0 text-sm text-gray-800 line-clamp-4"
                                 >
                                     <small class="text-gray-400">Project:</small
                                     ><br />
