@@ -5,10 +5,14 @@
                 class="pb-10 mb-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6"
             >
                 <h1 class="mt-2 text-2xl font-bold break-words text-gray-900">
-                    <span class="text-blue-500">
+                    <div class="text-blue-500">
                         {{ study.data.name }}
-                    </span>
-
+                    </div>
+                    <div class="text-sm float-left">
+                        <span class="text-gray-400 pt-2">
+                            https://doi.org/{{ study.data.doi }}
+                        </span>
+                    </div>
                     <div class="float-right">
                         <span class="flex-0.5 self-center">
                             <Menu
@@ -93,6 +97,7 @@
                         </div>
                     </div>
                 </h1>
+                <br />
                 <div class="mt-4">
                     <div class="relative">
                         <div
