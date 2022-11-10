@@ -8,7 +8,11 @@
                     <span class="text-blue-500">
                         {{ study.data.name }}
                     </span>
-
+                    <div class="text-sm">
+                        <span class="text-gray-400 pt-2">
+                            https://doi.org/{{ study.data.doi }}
+                        </span>
+                    </div>
                     <div class="float-right">
                         <span class="flex-0.5 self-center">
                             <Menu
@@ -302,7 +306,12 @@
                             >- ({{
                                 dataset.data.type.replace(/,\s*$/, "")
                             }})</span
-                        >
+                        ><br />
+                        <div class="text-sm">
+                            <span class="text-gray-400 pt-2">
+                                https://doi.org/{{ dataset.data.doi }}
+                            </span>
+                        </div>
                     </h1>
                     <div class="my-7">
                         <SpectraViewer
