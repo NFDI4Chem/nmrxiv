@@ -324,11 +324,13 @@
                                         dataset.type.replace(/,\s*$/, "")
                                     }})</span
                                 >
-                                <span class="text-gray-200"
-                                    >- #{{ dataset.identifier }}</span
-                                >
                             </option>
                         </select>
+                        <div v-if="selectedDataset" class="text-sm my-2">
+                            <span class="text-gray-400 pt-2">
+                                DOI: https://doi.org/{{ selectedDataset.doi }}
+                            </span>
+                        </div>
                     </div>
                     <div class="mt-3">
                         <SpectraViewer
