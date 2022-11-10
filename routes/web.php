@@ -96,6 +96,7 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
 
         Route::post('/storage/signed-draft-storage-url', [FileSystemController::class, 'signedDraftStorageURL']);
         Route::post('/storage/signed-storage-url', [FileSystemController::class, 'signedStorageURL']);
+        Route::get('/storage/msdata-id/{file_id}', [FileSystemController::class, 'getMsDataId']);
 
         Route::get('/drafts', [DraftController::class, 'all']);
 

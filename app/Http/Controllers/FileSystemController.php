@@ -7,13 +7,49 @@ use App\Models\FileSystemObject;
 use App\Models\Project;
 use App\Models\Study;
 use Aws\S3\S3Client;
+use http\Env\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Http;
 
 class FileSystemController extends Controller
 {
+    public function getMsDataId(Request $request, int $fileid) {
+        $fsObj = FileSystemObject::where([
+            ['id', $fileid],
+        ])->first();
+        $key = substr($fsObj->path, 1);
+        $bucket =  config('filesystems.disks.'.env('FILESYSTEM_DRIVER').'.bucket');
+        $s3Client = $this->storageClient();
+        $s3Client->registerStreamWrapper();
+        $s3path = 's3://'.$bucket.'/'.$key;
+        $stream = fopen($s3path,'r');
+        $filename = $fsObj->name;
+        $content = stream_get_contents($stream);
+        $request = Http::attach(
+            'file', $content, $filename,                [
+                'Content-Disposition' => 'form-data;name="file";filename="'.$fsObj->name.'"',
+                'Content-Type' => 'text/plain'
+            ]
+        );
+        $request->attach('filename',$fsObj->name,null,
+            [
+                'Content-Disposition' => 'form-data;name="filename"',
+                'Content-Type' => 'text/plain'
+            ]);
+        $response = $request->post('http://192.168.2.143:8080/file');
+        if ($response->status() == 200) {
+            $json = json_decode($response->body(),TRUE);
+            $json['msdata_base_url'] = 'http://localhost:8080/msdata/';
+            return response()->json(
+                $json
+            );
+        }
+
+    }
+
     /**
      * Create a new draft signed URL.
      *
