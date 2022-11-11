@@ -10,9 +10,56 @@
             >.
         </h1>
         <div
-            class="flex items-center text-sm mt-6 mb-3 text-gray-700 uppercase font-bold tracking-widest"
+            class="items-center text-sm mt-6 mb-3 text-gray-700 uppercase font-bold tracking-widest"
         >
             Check list
+            <div class="float-right">
+                <small>
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                        class="w-5 h-5 inline text-red-700 mr-1"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        /></svg
+                    >Missing
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                        class="w-5 h-5 inline text-yellow-700 mr-1 ml-3"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
+                        /></svg
+                    >Optional
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                        class="w-5 h-5 inline text-green-700 mr-1 ml-3"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                    </svg>
+                    Complete</small
+                >
+            </div>
         </div>
         <div class="overflow-hidden bg-white shadow sm:rounded-md">
             <ul
@@ -250,6 +297,10 @@
                                                     'flex w-full rounded-md px-4 py-2 text-left text-sm font-medium text-gray-900 focus:outline-none focus-visible:ring focus-visible:ring-gray-500 focus-visible:ring-opacity-75',
                                                 ]"
                                             >
+                                                <ValidationStatus
+                                                    class="-my-2"
+                                                    :status="study.status"
+                                                ></ValidationStatus>
                                                 <span> {{ study.name }}</span>
                                                 <ChevronUpIcon
                                                     :class="
@@ -414,6 +465,12 @@
                                                                 'flex w-full rounded-md px-4 py-2 text-left text-sm font-medium text-gray-900 focus:outline-none focus-visible:ring focus-visible:ring-gray-500 focus-visible:ring-opacity-75',
                                                             ]"
                                                         >
+                                                            <ValidationStatus
+                                                                class="-my-2"
+                                                                :status="
+                                                                    dataset.status
+                                                                "
+                                                            ></ValidationStatus>
                                                             <span>{{
                                                                 dataset.name
                                                             }}</span>
@@ -464,7 +521,23 @@
                                                                 <p
                                                                     class="truncate text-md text-dark-600"
                                                                 >
-                                                                    NMRium info
+                                                                    Spectra
+                                                                    <small
+                                                                        v-if="
+                                                                            dataset.nmrium_info.split(
+                                                                                '|'
+                                                                            )[0] !==
+                                                                            'true'
+                                                                        "
+                                                                    >
+                                                                        <br />
+                                                                        Please
+                                                                        load and
+                                                                        confirm
+                                                                        the
+                                                                        spectra
+                                                                        uploaded.
+                                                                    </small>
                                                                 </p>
                                                                 <a
                                                                     target="_blank"

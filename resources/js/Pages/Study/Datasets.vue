@@ -96,7 +96,13 @@
                         <div
                             class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6"
                         >
-                            <div class="sm:col-span-5">
+                            <div
+                                :class="[
+                                    canUpdateStudy
+                                        ? 'sm:col-span-5'
+                                        : 'sm:col-span-6',
+                                ]"
+                            >
                                 <div
                                     class="float-right text-xs cursor-pointer hover:text-blue-700 mb-2"
                                 >
@@ -138,6 +144,12 @@
                                             - #{{ dataset.id }}
                                         </option>
                                     </select>
+                                    <div class="-mx-4" v-if="selectedDataset">
+                                        <Citation
+                                            :model="'dataset'"
+                                            :doi="selectedDataset.doi"
+                                        ></Citation>
+                                    </div>
                                 </div>
                             </div>
 
@@ -222,6 +234,7 @@ import { ShareIcon, ClipboardDocumentIcon } from "@heroicons/vue/24/solid";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import SpectraViewer from "@/Shared/SpectraViewer.vue";
 import SpectraEditor from "@/Shared/SpectraEditor.vue";
+import Citation from "@/Shared/Citation.vue";
 
 export default {
     components: {
@@ -235,6 +248,7 @@ export default {
         MenuItems,
         SpectraEditor,
         SpectraViewer,
+        Citation,
     },
     props: [
         "study",
