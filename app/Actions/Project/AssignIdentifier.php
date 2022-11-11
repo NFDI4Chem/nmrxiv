@@ -52,6 +52,8 @@ class AssignIdentifier
                 $studyTicker->index = $studyIdentifier;
                 $studyTicker->save();
             }
+            $study->save();
+            $study->generateDOI($this->doiService);
 
             $sample = $study->sample;
             $sampleIdentifier = $sample->identifier ? $sample->identifier : null;
@@ -97,9 +99,6 @@ class AssignIdentifier
                 $dataset->save();
                 $dataset->generateDOI($this->doiService);
             }
-
-            $study->save();
-            $study->generateDOI($this->doiService);
         }
     }
 }

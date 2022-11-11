@@ -37,7 +37,7 @@
                 </div>
             </div>
             <div v-if="project.is_public && project.doi != null">
-                <Citation :doi="project.doi"></Citation>
+                <Citation :model="'project'" :doi="project.doi"></Citation>
             </div>
             <div class="bg-white border-b">
                 <div class="px-12">
@@ -57,15 +57,6 @@
                                     @click="toogleStarred"
                                 />
                                 {{ project.name }}
-                            </div>
-                            <div
-                                class="float-center text-xs cursor-pointer hover:text-blue-700 mt-2 ml-4"
-                            >
-                                <a
-                                    href="https://docs.nmrxiv.org/docs/submission-guides/data-model/project"
-                                    target="_blank"
-                                    >Learn more about projects
-                                </a>
                             </div>
                             <div class="inline-flex items-center mt-3">
                                 <access-dialogue
