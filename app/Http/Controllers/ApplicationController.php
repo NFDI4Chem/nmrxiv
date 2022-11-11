@@ -87,4 +87,56 @@ class ApplicationController extends Controller
             abort(404, 'Page not found');
         }
     }
+
+    /**
+     * Resolve the incoming request and render a badge 
+     *
+     */
+    public function resolveBadge(Request $request, $identifier)
+    {
+        $resolvedModel = resolveIdentifier($identifier);
+        $model = $resolvedModel['model'];
+        $base = 39;
+        $_w = $base + (strlen($model->doi) * 6.7);
+        $_o = 30 + (strlen($model->doi) * 3.5);
+        $_bw = strlen($model->doi) * 7.1;
+        if($model && $model->doi){
+            return 
+            '<svg xmlns="http://www.w3.org/2000/svg"
+             width="'.$_w.'" height="20">
+                <linearGradient id="b" x2="0" y2="100%">
+                    <stop offset="0" stop-color="#bbb" stop-opacity=".1"/>
+                    <stop offset="1" stop-opacity=".1"/>
+                </linearGradient>
+                <mask id="a" width="'.$_w.'" height="20">
+                    <rect width="'.$_w.'" height="20" rx="3"
+                    fill="#fff"/>
+                </mask>
+                <g mask="url(#a)">
+                    <path fill="#555" d="M0 0h31v20H0z" />
+                    <path fill="#FFB30F"
+                    d="M31 0h'.$_bw.'v20H31z"
+                    />
+                    <path fill="url(#b)" d="M0 0h'.$_w.'v20H0z" />
+                </g>
+                <g fill="#fff" text-anchor="middle" font-family="DejaVu Sans,
+                Verdana,Geneva,sans-serif" font-size="11">
+                    <text x="16" y="15" fill="#010101"
+                    fill-opacity=".3">
+                        DOI
+                    </text>
+                    <text x="16" y="14">
+                        DOI
+                    </text>
+                    <text x="'.$_o.'"
+                    y="15" fill="#010101" fill-opacity=".3">
+                        '. $model->doi .'
+                    </text>
+                    <text x="'.$_o.'" y="14">
+                    '. $model->doi .'
+                    </text>
+                </g>
+            </svg>';
+        }
+    }
 }
