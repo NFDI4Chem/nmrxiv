@@ -6,6 +6,7 @@
 .tooltip {
   position: relative;
   display: inline-block;
+  font-size: 0.8em;
 }
 
 .tooltip .tooltiptext {
@@ -18,6 +19,35 @@
 }
 
 .tooltip:hover .tooltiptext {
+  visibility: visible;
+}
+
+
+.tooltip .tooltiptextbottom {
+  display: flex;
+  visibility: hidden;
+  position: absolute;
+  z-index: 1;
+  top: 100%;
+  margin: auto;
+}
+
+.tooltip:hover .tooltiptextbottom {
+  visibility: visible;
+  margin-left: -100%;
+}
+
+.tooltip .tooltiptextright {
+  display: flex;
+  visibility: hidden;
+  position: absolute;
+  z-index: 1;
+  left: 100%;
+  top: 0%;
+  margin: auto;
+}
+
+.tooltip:hover .tooltiptextright {
   visibility: visible;
 }
 
