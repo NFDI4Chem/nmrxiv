@@ -86,145 +86,101 @@
                             <div
                                 class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-2"
                             >
-                                <div
-                                    v-for="author in project.data.authors"
-                                    :key="author.id"
-                                    class="relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm flex items-top space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-teal-500"
-                                >
-                                    <div class="flex-1 min-w-0">
-                                        <a
-                                            class="focus:outline-none cursor-pointer"
-                                            :href="
-                                                getOrcidLink(author.orcid_id)
-                                            "
-                                            :target="getTarget(author.orcid_id)"
-                                        >
-                                            <span
-                                                class="absolute inset-0"
-                                                aria-hidden="true"
-                                            ></span>
-                                            <p
-                                                class="text-sm font-medium text-gray-900"
-                                            >
-                                                {{ author.title }}
-                                                {{ author.family_name }}
-                                                {{ author.given_name }}
-                                            </p>
-                                            <button
-                                                v-if="
-                                                    author.pivot
-                                                        .contributor_type
-                                                "
-                                                class="mt-1 mb-1 text-sm text-gray-400"
-                                            >
-                                                <span
-                                                    class="px-2 inline-flex text-xs leading-5 font-semibold capitalize rounded-full bg-green-100 text-green-800"
-                                                >
-                                                    {{
-                                                        author.pivot
-                                                            .contributor_type
-                                                            ? author.pivot
-                                                                  .contributor_type
-                                                            : "Researcher"
-                                                    }}
-                                                </span>
-                                            </button>
-                                            <p
-                                                v-if="author.affiliation"
-                                                class="text-sm text-gray-500"
-                                            >
-                                                {{ author.affiliation }}
-                                            </p>
-                                            <p
-                                                v-if="author.orcid_id"
-                                                class="text-sm text-gray-500"
-                                            >
-                                                <a
-                                                    :href="author.orcid_id"
-                                                    class="text-teal-500"
-                                                    >ORCID ID -
-                                                    {{ author.orcid_id }}</a
-                                                >
-                                            </p>
-                                        </a>
-                                    </div>
-                                </div>
+                                <author-card
+                                    :authors="this.project.data.authors"
+                                />
                             </div>
-                        </div>
-                    </div>
-                    <div
-                        v-if="
-                            project.data.citations &&
-                            project.data.citations.length > 0
-                        "
-                        class="pt-8 gap-y-6 sm:grid-cols-6 sm:gap-x-6"
-                    >
-                        <div class="sm:col-span-6">
-                            <h2
-                                class="text-xl font-extrabold mb-3 text-blue-gray-900"
+                            <div
+                                v-if="
+                                    project.data.citations &&
+                                    project.data.citations.length > 0
+                                "
+                                class="pt-8 gap-y-6 sm:grid-cols-6 sm:gap-x-6"
                             >
-                                Citation(s)
-                            </h2>
-                            <!-- <p class="mt-1 text-sm text-blue-gray-500">
+                                <div class="sm:col-span-6">
+                                    <h2
+                                        class="text-xl font-extrabold mb-3 text-blue-gray-900"
+                                    >
+                                        Citation(s)
+                                    </h2>
+                                    <!-- <p class="mt-1 text-sm text-blue-gray-500">
                       This information will be displayed publicly so be careful what you
                       share.
                     </p> -->
-                        </div>
-                        <dd
-                            class="mt-2 text-md text-gray-900 space-y-5 focus:pointer-events-auto"
-                        >
-                            <div
-                                class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-2"
-                            >
-                                <div
-                                    v-for="citation in project.data.citations"
-                                    :key="citation.id"
-                                    class="relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm flex items-top space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-teal-500"
-                                >
-                                    <div class="flex-1 min-w-0">
-                                        <a
-                                            class="focus:outline-none cursor-pointer"
-                                            :href="
-                                                getCitationLink(citation.doi)
-                                            "
-                                            :target="getTarget(citation.doi)"
-                                        >
-                                            <span
-                                                class="absolute inset-0"
-                                                aria-hidden="true"
-                                            ></span>
-                                            <p
-                                                class="text-sm font-medium text-gray-900"
-                                            >
-                                                {{ citation.title }}
-                                            </p>
-                                            <p class="text-sm text-teal-500">
-                                                {{ citation.authors }}
-                                            </p>
-                                            <p class="text-sm text-gray-500">
-                                                {{ citation.citation_text }}
-                                            </p>
-                                            <p
-                                                v-if="citation.doi"
-                                                class="text-sm font-sm text-gray-500"
-                                            >
-                                                DOI -
-                                                <a
-                                                    :href="citation.doi"
-                                                    class="text-teal-900"
-                                                    >{{ citation.doi }}</a
-                                                >
-                                            </p>
-                                            <p
-                                                class="text-sm text-gray-500 truncate ..."
-                                            >
-                                                {{ citation.abstract }} ...
-                                            </p>
-                                        </a>
-                                    </div>
                                 </div>
+                                <dd
+                                    class="mt-2 text-md text-gray-900 space-y-5 focus:pointer-events-auto"
+                                >
+                                    <div
+                                        class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-2"
+                                    >
+                                        <div
+                                            v-for="citation in project.data
+                                                .citations"
+                                            :key="citation.id"
+                                            class="relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm flex items-top space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-teal-500"
+                                        >
+                                            <div class="flex-1 min-w-0">
+                                                <a
+                                                    class="focus:outline-none cursor-pointer"
+                                                    :href="
+                                                        getCitationLink(
+                                                            citation.doi
+                                                        )
+                                                    "
+                                                    :target="
+                                                        getTarget(citation.doi)
+                                                    "
+                                                >
+                                                    <span
+                                                        class="absolute inset-0"
+                                                        aria-hidden="true"
+                                                    ></span>
+                                                    <p
+                                                        class="text-sm font-medium text-gray-900"
+                                                    >
+                                                        {{ citation.title }}
+                                                    </p>
+                                                    <p
+                                                        class="text-sm text-teal-500"
+                                                    >
+                                                        {{ citation.authors }}
+                                                    </p>
+                                                    <p
+                                                        class="text-sm text-gray-500"
+                                                    >
+                                                        {{
+                                                            citation.citation_text
+                                                        }}
+                                                    </p>
+                                                    <p
+                                                        v-if="citation.doi"
+                                                        class="text-sm font-sm text-gray-500"
+                                                    >
+                                                        DOI -
+                                                        <a
+                                                            :href="citation.doi"
+                                                            class="text-teal-900"
+                                                            >{{
+                                                                citation.doi
+                                                            }}</a
+                                                        >
+                                                    </p>
+                                                    <p
+                                                        class="text-sm text-gray-500 truncate ..."
+                                                    >
+                                                        {{
+                                                            citation.abstract
+                                                        }}
+                                                        ...
+                                                    </p>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </dd>
                             </div>
-                        </dd>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -234,10 +190,12 @@
 
 <script>
 import ProjectLayout from "@/Pages/Public/Project/Layout.vue";
+import AuthorCard from "@/Shared/AuthorCard.vue";
 
 export default {
     components: {
         ProjectLayout,
+        AuthorCard,
     },
     props: ["project", "tab"],
     data() {

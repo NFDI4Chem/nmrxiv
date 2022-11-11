@@ -21,6 +21,7 @@ class AuthorResource extends JsonResource
             'email_id' => $this->email_id,
             'orcid_id' => $this->orcid_id,
             'affiliation' => $this->affiliation,
+            'pivot' => $this->pivot,
         ];
     }
 }
