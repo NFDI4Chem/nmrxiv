@@ -277,12 +277,15 @@
                                                         upload NMR raw data from
                                                         any NMR instrument. We
                                                         can currently
-                                                        auto-detect Bruker/Varian/JOEL formats & JCAMP files and
-                                                        will support more raw &
-                                                        processed file formats
-                                                        soon. Once you upload
-                                                        your raw or processed
-                                                        NMR data, nmrXiv will
+                                                        auto-detect
+                                                        Bruker/Varian/JOEL
+                                                        formats & JCAMP files
+                                                        and will support more
+                                                        raw & processed file
+                                                        formats soon. Once you
+                                                        upload your raw or
+                                                        processed NMR data,
+                                                        nmrXiv will
                                                         auto-generate the
                                                         studies and datasets for
                                                         you based on the
