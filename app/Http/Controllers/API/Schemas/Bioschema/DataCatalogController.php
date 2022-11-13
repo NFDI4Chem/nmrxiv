@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\API\Bioschema;
+namespace App\Http\Controllers\API\Schemas\Bioschema;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -8,8 +8,17 @@ use Spatie\SchemaOrg\Schema;
 
 class DataCatalogController extends Controller
 {
+    /**
+     * Implement Bioschema Data Catalog profile on nmrXiv.
+     */
     public function schema(Request $request)
     {
+        /**
+         * Implement Bioschemas' data catalog.
+         *
+         * @param  Illuminate\Http\Request  $request
+         * @return object $dataCatalog
+         */
         $dataCatalog = Schema::dataCatalog();
 
         $nmrXivProvider = Schema::organization();
