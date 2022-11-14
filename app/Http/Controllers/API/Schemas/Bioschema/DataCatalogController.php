@@ -9,16 +9,20 @@ use Spatie\SchemaOrg\Schema;
 class DataCatalogController extends Controller
 {
     /**
-     * Implement Bioschema Data Catalog profile on nmrXiv.
+     * Implement Bioschema Data Catalog type on nmrXiv as a repository to enable exporting
+     * its metadata with a json endpoint.
      */
-    public function schema(Request $request)
+
+    /**
+     * Implement Bioschema Data Catalog type on nmrXiv as a repository.
+     *
+     * @link https://bioschemas.org/profiles/DataCatalog/0.3-RELEASE-2019_07_01
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @return object $dataCatalog
+     */
+    public function dataCatalogSchema(Request $request)
     {
-        /**
-         * Implement Bioschemas' data catalog.
-         *
-         * @param  Illuminate\Http\Request  $request
-         * @return object $dataCatalog
-         */
         $dataCatalog = Schema::dataCatalog();
 
         $nmrXivProvider = Schema::organization();

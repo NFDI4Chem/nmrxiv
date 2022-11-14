@@ -14,15 +14,20 @@ use Spatie\SchemaOrg\Schema;
 class BiochemaController extends Controller
 {
     /**
-     * Implement Bioschema profiles on nmrXiv project, study, and dataset.
+     * Implement Bioschemas types on nmrXiv project, study, and dataset to enable exporting
+     * their metadata with a json endpoint, including the samples and molecules.
+     */
+
+    /**
+     * Create a variable $confromsTo for Bioschemas' study creative work to be used
+     * for the project and study schemas.
+     *
+     * @link https://bioschemas.org/profiles/Study/0.2-DRAFT
+     *
+     * @return object $confromsTo
      */
     public function conforms()
     {
-        /**
-         * Create a variable $confromsTo for Bioschemas' study creative work.
-         *
-         * @return object $confromsTo
-         */
         $creativeWork = Schema::creativeWork();
         $creativeWork['@id'] = 'https://bioschemas.org/profiles/Study/0.2-DRAFT';
         $confromsTo = [];
@@ -31,14 +36,17 @@ class BiochemaController extends Controller
         return $confromsTo;
     }
 
-    public function datasetShort($dataset)
+    /**
+     * Implement Bioschemas' dataset with only few properties to be included in the project
+     * schema or the study schema.
+     *
+     * @link https://bioschemas.org/profiles/Dataset/1.0-RELEASE
+     *
+     * @param  App\Models\Dataset  $dataset
+     * @return object $datasetSchema
+     */
+    public function datasetLite($dataset)
     {
-        /**
-         * Implement Bioschemas' dataset with few properties.
-         *
-         * @param  App\Models\Dataset  $dataset
-         * @return object $datasetSchema
-         */
         $datasetSchema = Schema::Dataset();
         $datasetSchema->name($dataset->name);
         $datasetSchema->url($dataset->public_url);
@@ -46,14 +54,20 @@ class BiochemaController extends Controller
         return  $datasetSchema;
     }
 
-    public function studyShort($study)
+    /**
+     * Implement Bioschemas' study with only few properties, including the sample and molecules,
+     * to be included in the project
+     * schema.
+     *
+     * @link https://bioschemas.org/profiles/Study/0.2-DRAFT
+     * @link https://bioschemas.org/profiles/Sample/0.2-RELEASE-2018_11_10
+     * @link https://bioschemas.org/types/MolecularEntity/0.3-RELEASE-2019_09_02
+     *
+     * @param  App\Models\Study  $study
+     * @return object $studySchema
+     */
+    public function studyLite($study)
     {
-        /**
-         * Implement Bioschemas' study with few properties.
-         *
-         * @param  App\Models\Study  $study
-         * @return object $studySchema
-         */
         $sample = $study->sample;
         $sampleSchema = BioSchema::Sample();
         $sampleSchema->name($sample->name);
@@ -79,16 +93,19 @@ class BiochemaController extends Controller
         return $studySchema;
     }
 
+    /**
+     * Implement Bioschemas' dataset, along with the project and study it belongs to.
+     *
+     * @link https://bioschemas.org/profiles/Dataset/1.0-RELEASE
+     * @link https://bioschemas.org/profiles/Study/0.2-DRAFT
+     *
+     * @param  App\Models\Dataset  $dataset
+     * @param  App\Models\Study  $study
+     * @param  App\Models\Project  $project
+     * @return object $datasetSchema
+     */
     public function dataset($dataset, $study, $project)
     {
-        /**
-         * Implement Bioschemas' dataset.
-         *
-         * @param  App\Models\Dataset  $dataset
-         * @param  App\Models\Study  $study
-         * @param  App\Models\Project  $project
-         * @return object $datasetSchema
-         */
         $dataCatalog = Schema::dataCatalog();
         $dataCatalog->name(env('APP_NAME'));
         $dataCatalog->url('https://nmrxiv.org');
@@ -116,14 +133,20 @@ class BiochemaController extends Controller
         return $datasetSchema;
     }
 
+    /**
+     * Implement Bioschemas' study, including the sample and molecules, along
+     * with the project it belongs to and, briefly, the datasets it contains.
+     *
+     * @link https://bioschemas.org/profiles/Study/0.2-DRAFT
+     * @link https://bioschemas.org/profiles/Dataset/1.0-RELEASE
+     * @link https://bioschemas.org/profiles/Sample/0.2-RELEASE-2018_11_10
+     * @link https://bioschemas.org/types/MolecularEntity/0.3-RELEASE-2019_09_02
+     *
+     * @param  App\Models\Study  $study
+     * @return object $studySchema
+     */
     public function study($study)
     {
-        /**
-         * Implement Bioschemas' study.
-         *
-         * @param  App\Models\Study  $study
-         * @return object $studySchema
-         */
         $tags = [];
         foreach ($study->tags as &$tag) {
             $tag = $tag->name;
@@ -188,14 +211,20 @@ class BiochemaController extends Controller
         return $studySchema;
     }
 
+    /**
+     * Implement Bioschemas' project along with brief details about
+     * the studies and datasets it contains.
+     *
+     * @link https://bioschemas.org/profiles/Study/0.2-DRAFT
+     * @link https://bioschemas.org/profiles/Dataset/1.0-RELEASE
+     * @link https://bioschemas.org/profiles/Sample/0.2-RELEASE-2018_11_10
+     * @link https://bioschemas.org/types/MolecularEntity/0.3-RELEASE-2019_09_02
+     *
+     * @param  App\Models\Project  $project
+     * @return object $projectSchema
+     */
     public function project($project)
     {
-        /**
-         * Implement Bioschemas' project.
-         *
-         * @param  App\Models\Project  $project
-         * @return object $projectSchema
-         */
         $authors = [];
         foreach ($project->authors as &$author) {
             $authorSchema = Schema::Person();
@@ -240,57 +269,67 @@ class BiochemaController extends Controller
         return $projectSchema;
     }
 
-    public function name(Request $request, $username, $projectName, $studyName = null, $datasetName = null)
-    {
-        /**
-         * Implement Bioschemas upon request by name to generate a project, study, or dataset schema.
-         *
-         * @param  Illuminate\Http\Request  $request
-         * @param  App\Models\User  $username
-         * @param  App\Models\Project  $projectName
-         * @param  App\Models\Study  $studyName Optional
-         * @param  App\Models\Dataset  $datasetName Optional
-         * @return object
-         */
-        $user = User::where('username', $username)->firstOrFail();
-        if ($user) {
-            $project = Project::where([['slug', $projectName], ['owner_id', $user->id]])->firstOrFail();
-        }
-        if ($project) {
-            $projectSchema = $this->project($project);
+/**
+ * Implement Bioschemas upon request by model name to generate a project, study, or dataset schema.
+ *
+ * @link https://bioschemas.org/profiles/Study/0.2-DRAFT
+ * @link https://bioschemas.org/profiles/Dataset/1.0-RELEASE
+ * @link https://bioschemas.org/profiles/Sample/0.2-RELEASE-2018_11_10
+ * @link https://bioschemas.org/types/MolecularEntity/0.3-RELEASE-2019_09_02
+ *
+ * @param  Illuminate\Http\Request  $request
+ * @param  App\Models\User  $username
+ * @param  App\Models\Project  $projectName
+ * @param  App\Models\Study  $studyName Optional
+ * @param  App\Models\Dataset  $datasetName Optional
+ * @return object
+ */
+public function modelSchemaByName(Request $request, $username, $projectName, $studyName = null, $datasetName = null)
+{
+    $user = User::where('username', $username)->firstOrFail();
+    if ($user) {
+        $project = Project::where([['slug', $projectName], ['owner_id', $user->id]])->firstOrFail();
+    }
+    if ($project) {
+        $projectSchema = $this->project($project);
 
-            if ($studyName) {
-                // send study back with project info added to it\
-                $study = Study::where([['slug', $studyName], ['owner_id', $user->id], ['project_id', $project->id]])->firstOrFail();
-                if ($study) {
-                    $studySchema = $this->study($study);
+        if ($studyName) {
+            // send study back with project info added to it\
+            $study = Study::where([['slug', $studyName], ['owner_id', $user->id], ['project_id', $project->id]])->firstOrFail();
+            if ($study) {
+                $studySchema = $this->study($study);
 
-                    $projectSchema->relatedStudy($studySchema);
-                    if ($datasetName) {
-                        $dataset = Dataset::where([['slug', $datasetName], ['owner_id', $user->id], ['project_id', $project->id], ['study_id', $study->id]])->firstOrFail();
-                        // send dataset with project and study details
-                        if ($dataset) {
-                            $datasetSchema = $this->dataset($dataset, $study, $project);
+                $projectSchema->relatedStudy($studySchema);
+                if ($datasetName) {
+                    $dataset = Dataset::where([['slug', $datasetName], ['owner_id', $user->id], ['project_id', $project->id], ['study_id', $study->id]])->firstOrFail();
+                    // send dataset with project and study details
+                    if ($dataset) {
+                        $datasetSchema = $this->dataset($dataset, $study, $project);
 
-                            return $datasetSchema;
-                        }
+                        return $datasetSchema;
                     }
                 }
             }
-
-            return $projectSchema;
         }
-    }
 
-    public function id(Request $request, $identifier)
+        return $projectSchema;
+    }
+}
+
+    /**
+     * Implement Bioschemas upon request by model id to generate a project, study, or dataset schema.
+     *
+     * @link https://bioschemas.org/profiles/Study/0.2-DRAFT
+     * @link https://bioschemas.org/profiles/Dataset/1.0-RELEASE
+     * @link https://bioschemas.org/profiles/Sample/0.2-RELEASE-2018_11_10
+     * @link https://bioschemas.org/types/MolecularEntity/0.3-RELEASE-2019_09_02
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @param  string  $identifier
+     * @return object
+     */
+    public function modelSchemaByID(Request $request, $identifier)
     {
-        /**
-         * Implement Bioschemas upon request by id to generate a project, study, or dataset schema.
-         *
-         * @param  Illuminate\Http\Request  $request
-         * @param  string  $identifier
-         * @return object
-         */
         $resolvedModel = resolveIdentifier($identifier);
         $namespace = $resolvedModel['namespace'];
         $model = $resolvedModel['model'];

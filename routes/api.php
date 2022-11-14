@@ -37,14 +37,14 @@ Route::prefix('v1')->group(function () {
 
     Route::prefix('schemas')->group(function () {
         Route::prefix('bioschema')->group(function () {
-            Route::get('/', [DataCatalogController::class, 'name']);
-            Route::get('/{username}/{project}/{study?}/{dataset?}', [BiochemaController::class, 'name']);
-            Route::get('/{id}', [BiochemaController::class, 'id']);
+            Route::get('/', [DataCatalogController::class, 'dataCatalogSchema']);
+            Route::get('/{username}/{project}/{study?}/{dataset?}', [BiochemaController::class, 'modelSchemaByName']);
+            Route::get('/{id}', [BiochemaController::class, 'modelSchemaByID']);
         });
 
         Route::prefix('datacite')->group(function () {
-            Route::get('/{username}/{project}/{study?}/{dataset?}', [DataCiteController::class, 'name']);
-            Route::get('/{id}', [DataCiteController::class, 'id']);
+            Route::get('/{username}/{project}/{study?}/{dataset?}', [DataCiteController::class, 'modelSchemaByName']);
+            Route::get('/{id}', [DataCiteController::class, 'modelSchemaByID']);
         });
     });
 });
