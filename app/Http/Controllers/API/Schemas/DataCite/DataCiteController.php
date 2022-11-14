@@ -12,20 +12,24 @@ use Illuminate\Http\Request;
 class DataciteController extends Controller
 {
     /**
-     * Implement DataCite schema on nmrXiv .
+     * Implement DataCite metadata schema on nmrXiv project, study, and dataset to enable exporting
+     * their metadata with a json endpoint, including the samples and molecules.
      */
-    public function name(Request $request, $username, $projectName, $studyName = null, $datasetName = null)
+
+    /**
+     * Implement DataCite upon request by model name to generate a project, study, or dataset schema.
+     *
+     * @link https://schema.datacite.org/meta/kernel-4.4/
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @param  App\Models\User  $username
+     * @param  App\Models\Project  $projectName
+     * @param  App\Models\Study  $studyName Optional
+     * @param  App\Models\Dataset  $datasetName Optional
+     * @return object
+     */
+    public function modelSchemaByName(Request $request, $username, $projectName, $studyName = null, $datasetName = null)
     {
-        /**
-         * Implement DataCite upon request by name to generate a project, study, or dataset schema.
-         *
-         * @param  Illuminate\Http\Request  $request
-         * @param  App\Models\User  $username
-         * @param  App\Models\Project  $projectName
-         * @param  App\Models\Study  $studyName Optional
-         * @param  App\Models\Dataset  $datasetName Optional
-         * @return object
-         */
         $user = User::where('username', $username)->firstOrFail();
         if ($user) {
             $project = Project::where([['slug', $projectName], ['owner_id', $user->id]])->firstOrFail();
@@ -57,15 +61,17 @@ class DataciteController extends Controller
         }
     }
 
-    public function id(Request $request, $identifier)
+    /**
+     * Implement DataCite upon request by model id to generate a project, study, or dataset schema.
+     *
+     * @link https://schema.datacite.org/meta/kernel-4.4/
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @param  string  $identifier
+     * @return object
+     */
+    public function modelSchemaByID(Request $request, $identifier)
     {
-        /**
-         * Implement DataCite upon request by id to generate a project, study, or dataset schema.
-         *
-         * @param  Illuminate\Http\Request  $request
-         * @param  string  $identifier
-         * @return object
-         */
         $resolvedModel = resolveIdentifier($identifier);
         $model = $resolvedModel['model'];
 
