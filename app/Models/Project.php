@@ -302,7 +302,8 @@ class Project extends Model implements Auditable
      */
     public function authors()
     {
-        return $this->belongsToMany(Author::class);
+        return $this->belongsToMany(Author::class)
+            ->withPivot('contributor_type','sort_order');
     }
 
     public function scopeFilter($query, array $filters)

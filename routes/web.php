@@ -51,7 +51,6 @@ Route::get('/', function () {
 Route::supportBubble();
 
 Route::group(['middleware' => 'verified'], function () {
-    // Teams...
     if (Jetstream::hasTeamFeatures()) {
         Route::delete('/teams/{team}', [TeamController::class, 'destroy'])->name('app.teams.destroy');
     }
@@ -65,8 +64,14 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
                 ->name('license');
 
     // Authors
-    Route::post('authors/{project}', [AuthorController::class, 'updateAuthor'])
-                ->name('update-author');
+    Route::post('authors/{project}', [AuthorController::class, 'save'])
+        ->name('author.save');
+
+    Route::delete('authors/{project}/delete', [AuthorController::class, 'destroy'])
+        ->name('author.delete');
+
+    Route::post('authors/{project}/updateRole', [AuthorController::class, 'updateRole'])
+        ->name('author.updateRole');
 
     //Citation
     Route::post('citation/{project}', [CitationController::class, 'updateCitation'])

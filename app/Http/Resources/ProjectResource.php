@@ -95,7 +95,7 @@ class ProjectResource extends JsonResource
                             return [
                                 'authors' => AuthorResource::collection(
                                     $this->authors
-                                ),
+                                )
                             ];
                         }
                     ),
