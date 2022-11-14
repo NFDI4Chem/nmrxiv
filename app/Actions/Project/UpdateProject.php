@@ -172,33 +172,33 @@ class UpdateProject
         );
     }
 
-    /**
-     * Update existing Contributor type for a given author in a project.
-     *
-     * @param  \App\Models\Project  $project
-     * @param  string  $authorId
-     * @param  string  $role
-     * @return void
-     */
-    public function updateContributorType(Project $project, $author_id, $role)
+    public function syncCitations(Project $project, $citations, $user)
     {
-        $project->authors()->updateExistingPivot($author_id, [
-            'contributor_type' => $role,
-        ]);
+        $citations_map = [];
+        foreach ($citations as $citation) {
+            $citations_map[$citation->id] = ['user' => $user->id];
+        }
+
+        $project->citations()->sync(
+            $citations_map
+        );
+
+        // $project->citations()->sync(
+        //     $citations, ['user' => $user->get('id')]
+        // );
     }
 
     /**
-     * Attach citations to a project.
+     * Detach citation from a project.
      *
      * @param  \App\Models\Project  $project
-     * @param  array  $citations
-     * @param  App\Models\User  $user
+     * @param  array  $authors
      * @return void
      */
-    public function updateCitation(Project $project, $citations, $user)
+    public function detachCitation(Project $project, $citation_id)
     {
-        $project->citations()->sync(
-            $citations, ['user' => $user->id]
+        $project->citations()->detach(
+            $citation_id
         );
     }
 }
