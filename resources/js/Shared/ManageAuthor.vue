@@ -12,6 +12,7 @@
                 <div
                     class="pb-36 px-4 sm:px-6 lg:pb-5 lg:px-0 lg:row-start-1 lg:col-start-1"
                 >
+                    <!-- Import Section -->
                     <div>
                         <p class="text-sm leading-6 font-bold text-gray-900">
                             Import From
@@ -323,128 +324,122 @@
                     </div>
                 </div>
             </div>
-            <div v-if="authors.length > 0">
-                <div class="ml-2 mt-2 overflow-y-scroll h-64">
-                    <!-- <p class="float-left text-xs font-bold text-red-900 mt-4">
-              *Please review your changes below and click on Save button to save your
-              changes.
-            </p> -->
-                    <table
-                        class="divide-y border divide-gray-200 w-full table-fixed overflow-y-scroll"
-                    >
-                        <thead class="bg-gray-50 sticky top-0">
-                            <tr>
-                                <th
-                                    colspan="3"
-                                    scope="col"
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >
-                                    Author
-                                </th>
-                                <th
-                                    scope="col"
-                                    class="px-6 text-center py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >
-                                    Role
-                                </th>
-                                <th
-                                    scope="col"
-                                    class="px-6 text-center py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >
-                                    Actions
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            <tr v-for="author in authors" :key="author.id">
-                                <td colspan="3" class="py-4">
-                                    <div class="ml-4">
-                                        <h3
-                                            class="text-sm leading-6 font-medium text-teal-900"
-                                        >
-                                            {{ author.title }}
-                                            {{ author.family_name }}
-                                            {{ author.given_name }}
-                                        </h3>
-                                        <p
-                                            class="mt-1 text-xs font-small text-blue-gray-900 break-words"
-                                        >
-                                            {{ author.affiliation }}
-                                        </p>
+            <div
+                v-if="authors.length > 0"
+                class="shadow sm:rounded-md overflow-y-scroll h-64"
+            >
+                <draggable
+                    v-model="this.authors"
+                    @start="drag = true"
+                    @end="drag = false"
+                    @change="onSort()"
+                    item-key="author.id"
+                    group="author"
+                >
+                    <template #item="{ element }">
+                        <div class="overflow-auto bg-gray shadow sm:rounded-md">
+                            <ul role="list" class="divide-y divide-gray-900">
+                                <li>
+                                    <div class="px-4 py-4 sm:px-6">
                                         <div
-                                            v-if="author.orcid_id"
-                                            class="text-xs leading-6 font-medium text-gray-900"
+                                            class="flex items-center justify-between"
                                         >
-                                            <!-- <p>
-                          Orcid Id -
-                          <a
-                            :href="getOrcidLink(author.orcid_id)"
-                            target="_blank"
-                            class="text-teal-900"
-                            >{{ author.orcid_id }}</a
-                          >
-                        </p> -->
+                                            <p
+                                                class="text-sm font-medium text-teal-900"
+                                            >
+                                                {{ element.title }}
+                                                {{ element.family_name }}
+                                                {{ element.given_name }}
+                                                {{ element.id }}
+                                            </p>
+                                            <button
+                                                class="ml-2 flex flex-shrink-0"
+                                                @click="
+                                                    (showManageRoleDialog = true),
+                                                        (this.updateRoleForm.author_id =
+                                                            element.id)
+                                                "
+                                            >
+                                                <p
+                                                    v-if="
+                                                        element.pivot
+                                                            .contributor_type
+                                                    "
+                                                    class="inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold leading-5 text-green-800"
+                                                >
+                                                    {{
+                                                        element.pivot
+                                                            .contributor_type
+                                                            ? element.pivot
+                                                                  .contributor_type
+                                                            : "Researcher"
+                                                    }}
+                                                </p>
+                                            </button>
                                         </div>
                                         <div
-                                            v-if="author.email_id"
-                                            class="text-xs leading-6 font-medium text-gray-900"
+                                            class="mt-1 sm:flex sm:justify-between"
                                         >
-                                            <p>
-                                                Email Id - {{ author.email_id }}
+                                            <div class="sm:flex">
+                                                <p
+                                                    class="flex items-center text-xs font-small text-gray-500 break-words"
+                                                >
+                                                    {{ element.affiliation }}
+                                                </p>
+                                            </div>
+                                            <div
+                                                class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0"
+                                            >
+                                                <button
+                                                    type="button"
+                                                    class="inline-flex items-center p-1 border border-transparent"
+                                                    @click="edit(element)"
+                                                >
+                                                    <PencilIcon
+                                                        class="w-3.5 h-3.5 mr-1 text-gray-600"
+                                                    />
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    class="inline-flex items-center p-1 border border-transparent"
+                                                    @click="
+                                                        confirmDeletion(element)
+                                                    "
+                                                >
+                                                    <TrashIcon
+                                                        class="w-3.5 h-3.5 mr-1 text-gray-600"
+                                                    />
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="sm:flex sm:justify-between">
+                                            <p
+                                                v-if="element.orcid_id"
+                                                class="text-xs font-medium text-teal-900"
+                                            >
+                                                <b class="text-gray-500"
+                                                    >ORCID:</b
+                                                >
+                                                {{ element.orcid_id }}
+                                            </p>
+                                        </div>
+                                        <div class="sm:flex sm:justify-between">
+                                            <p
+                                                v-if="element.email_id"
+                                                class="text-xs font-medium text-gray-900"
+                                            >
+                                                <b class="text-gray-500"
+                                                    >Email-Id:</b
+                                                >
+                                                {{ element.email_id }}
                                             </p>
                                         </div>
                                     </div>
-                                </td>
-                                <td
-                                    class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center"
-                                >
-                                    <button
-                                        v-if="author.pivot.contributor_type"
-                                        class="ml-2 text-sm text-gray-400 underline"
-                                        @click="
-                                            (showManageRoleDialog = true),
-                                                (this.updateRoleForm.author_id =
-                                                    author.id)
-                                        "
-                                    >
-                                        <span
-                                            class="px-2 inline-flex text-xs leading-5 font-semibold capitalize rounded-full bg-green-100 text-green-800"
-                                        >
-                                            {{
-                                                author.pivot.contributor_type
-                                                    ? author.pivot
-                                                          .contributor_type
-                                                    : "Researcher"
-                                            }}
-                                        </span>
-                                    </button>
-                                </td>
-                                <td
-                                    class="text-center px-6 py-4 text-sm leading-5 text-gray-500 whitespace-no-wrap border-gray-200"
-                                >
-                                    <button
-                                        type="button"
-                                        class="inline-flex items-center p-1 border border-transparent"
-                                        @click="edit(author)"
-                                    >
-                                        <PencilIcon
-                                            class="w-5 h-5 mr-1 text-gray-600"
-                                        />
-                                    </button>
-                                    <button
-                                        type="button"
-                                        class="inline-flex items-center p-1 border border-transparent"
-                                        @click="confirmDeletion(author)"
-                                    >
-                                        <TrashIcon
-                                            class="w-5 h-5 mr-1 text-gray-600"
-                                        />
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </template>
+                </draggable>
             </div>
             <!-- Delete confirmation dialog -->
             <jet-dialog-modal
@@ -486,7 +481,7 @@
             </div>
         </template>
     </jet-dialog-modal>
-    <!-- Manage Role Modal-->
+    <!-- Manage Role Dialog Modal-->
     <jet-dialog-modal
         :show="showManageRoleDialog"
         @close="showManageRoleDialog = false"
@@ -533,6 +528,7 @@ import LoadingButton from "@/Shared/LoadingButton.vue";
 import JetDangerButton from "@/Jetstream/DangerButton.vue";
 import { Inertia } from "@inertiajs/inertia";
 import SelectRich from "@/Shared/SelectRich.vue";
+import Draggable from "vuedraggable";
 
 export default {
     components: {
@@ -546,6 +542,7 @@ export default {
         LoadingButton,
         Inertia,
         SelectRich,
+        Draggable,
     },
 
     props: ["project"],
@@ -577,6 +574,7 @@ export default {
             confirmDelete: false,
             error: "",
             showManageRoleDialog: false,
+            drag: false,
             contributorType: [
                 {
                     title: "Researcher",
@@ -703,8 +701,9 @@ export default {
         },
         /*Fetch and populate initial & default values*/
         loadInitial() {
+            console.log(this.project.authors);
             if (this.project && this.project.authors) {
-                this.authors = this.project.authors;
+                this.authors = this.project.authors.sort((a,b) =>a.pivot.sort_order - b.pivot.sort_order);
             }
             this.form.contributor_type = {};
             this.form.contributor_type = this.contributorType[0];
@@ -884,6 +883,8 @@ export default {
                     Inertia.reload({ only: ["project"] });
                     this.loadInitial();
                     this.form.reset();
+                    this.form.contributor_type = {};
+                    this.form.contributor_type = this.contributorType[0];
                 },
                 onError: (err) => console.error(err),
             });
@@ -947,6 +948,10 @@ export default {
                     onError: (err) => console.error(err),
                 }
             );
+        },
+        onSort() {
+            console.log("Draggable on change event fired..");
+            this.executeQuery();
         },
     },
 };

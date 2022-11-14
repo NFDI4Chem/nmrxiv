@@ -146,10 +146,11 @@ class UpdateProject
     public function attachAuthor(Project $project, $authors)
     {
         //dd($authors);
-
         $authors_map = [];
+        $index = 0;
         foreach ($authors as $author) {
-            $authors_map[$author->id] = ['contributor_type' => $author->contributor_type];
+            $authors_map[$author->id] = ['contributor_type' => $author->contributor_type, 'sort_order' => $index];
+            $index += 1;
         }
 
         $project->authors()->sync(
