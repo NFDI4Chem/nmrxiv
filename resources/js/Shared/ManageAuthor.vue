@@ -29,7 +29,7 @@
             <div>
                 <div v-if="displayAddAuthorForms">
                     <div
-                        class="relative grid grid-cols-1 gap-x-14 max-w-7xl mx-auto lg:grid-cols-2 divide-x"
+                        class="relative grid grid-cols-1 gap-x-5 max-w-7xl mx-auto lg:grid-cols-2"
                     >
                         <!--Add Manual Section-->
                         <div
@@ -284,7 +284,7 @@
                         </div>
                         <!-- Import Section -->
                         <div
-                            class="pb-36 px-4 sm:px-6 lg:pb-5 lg:px-0 lg:row-start-1 lg:col-start-2"
+                            class="pb-36 lg:px-1 lg:row-start-1 lg:col-start-2 border-l"
                         >
                             <div class="pl-2">
                                 <p
