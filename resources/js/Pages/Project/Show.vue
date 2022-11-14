@@ -178,8 +178,8 @@
                                     ref="manageAuthorElement"
                                     :project="project"
                                 />
-                                <add-citation
-                                    ref="addCitationElement"
+                                <manage-citation
+                                    ref="manageCitationElement"
                                     :project="project"
                                 />
                                 <span
@@ -614,7 +614,7 @@ import { ref } from "vue";
 import { StarIcon, PencilIcon, CalendarIcon } from "@heroicons/vue/24/solid";
 import ManageAuthor from "@/Shared/ManageAuthor.vue";
 import ToolTip from "@/Shared/ToolTip.vue";
-import AddCitation from "@/Shared/AddCitation.vue";
+import ManageCitation from "@/Shared/ManageCitation.vue";
 import Citation from "@/Shared/Citation.vue";
 import Publish from "@/Shared/Publish.vue";
 import AuthorCard from "@/Shared/AuthorCard.vue";
@@ -630,7 +630,7 @@ export default {
         AccessDialogue,
         ManageAuthor,
         ToolTip,
-        AddCitation,
+        ManageCitation,
         CalendarIcon,
         Citation,
         Publish,
@@ -647,12 +647,12 @@ export default {
     ],
     setup() {
         const projectDetailsElement = ref(null);
-        const manageAuthorElement = ref(null);
-        const addCitationElement = ref(null);
+        const addAuthorElement = ref(null);
+        const manageCitationElement = ref(null);
         return {
             projectDetailsElement,
-            manageAuthorElement,
-            addCitationElement,
+            addAuthorElement,
+            manageCitationElement,
         };
     },
     mounted() {
@@ -720,7 +720,7 @@ export default {
             this.manageAuthorElement.toggleDialog();
         },
         toggleAddCitation() {
-            this.addCitationElement.toggleAddCitationDialog();
+            this.manageCitationElement.toggleDialog();
             //this.emitter.emit("openAddCitationDialog", {});
         },
         getCitationLink(doi) {
