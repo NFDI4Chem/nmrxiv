@@ -82,6 +82,8 @@ class AuthorController extends Controller
 
         if (count($authors) > 0) {
             $updater->detachAuthor($project, $authors[0]['id']);
+
+            // #todo: check if the author is already associated with any other project and if not delete the author
         }
 
         return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('success', 'Author deleted successfully');
