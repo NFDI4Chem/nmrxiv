@@ -488,7 +488,7 @@
                                 v-if="canUpdateProject"
                                 type="button"
                                 class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                                @click="toggleAddCitation"
+                                @click="toggleManageCitation"
                             >
                                 <PencilIcon
                                     class="w-4 h-4 mr-1 text-gray-600"
@@ -647,11 +647,11 @@ export default {
     ],
     setup() {
         const projectDetailsElement = ref(null);
-        const addAuthorElement = ref(null);
+        const manageAuthorElement = ref(null);
         const manageCitationElement = ref(null);
         return {
             projectDetailsElement,
-            addAuthorElement,
+            manageAuthorElement,
             manageCitationElement,
         };
     },
@@ -669,7 +669,7 @@ export default {
             ) {
                 this.toggleDetails();
             } else if (editOperation == "citation") {
-                this.toggleAddCitation();
+                this.toggleManageCitation();
             } else if (editOperation == "authors") {
                 this.toggleManageAuthor();
             }
@@ -719,7 +719,7 @@ export default {
         toggleManageAuthor() {
             this.manageAuthorElement.toggleDialog();
         },
-        toggleAddCitation() {
+        toggleManageCitation() {
             this.manageCitationElement.toggleDialog();
             //this.emitter.emit("openAddCitationDialog", {});
         },
