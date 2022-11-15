@@ -28,7 +28,7 @@
                 </div>
             </div>
             <div v-if="study.is_public && study.doi != null">
-                <Citation :doi="study.doi"></Citation>
+                <Citation :model="'study'" :doi="study.doi"></Citation>
             </div>
             <div class="bg-white border-b">
                 <div class="px-12">
@@ -72,7 +72,7 @@
                                     </ol>
                                 </nav>
                                 <div
-                                    class="flex pr-20 cursor-pointer items-center text-xl text-gray-700 font-bold"
+                                    class="flex pr-20 mt-2 cursor-pointer items-center text-xl text-gray-700 font-bold"
                                 >
                                     <StarIcon
                                         :class="[

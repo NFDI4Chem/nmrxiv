@@ -290,7 +290,7 @@
                     </div>
                     <flash-messages />
                     <div class="ml-4 flex items-center md:ml-6">
-                        <div>
+                        <div class="tooltip">
                             <a
                                 id="tour-step-documentation"
                                 href="https://docs.nmrxiv.org"
@@ -309,10 +309,14 @@
                                         class="fill-current text-gray-600"
                                     ></path></svg
                             ></a>
+                            <span
+                                class="bg-gray-900 text-center text-white px-2 py-1 shadow-lg rounded-md tooltiptextbottom"
+                                >Submission guides</span
+                            >
                         </div>
                         <div
                             v-if="$page.props.user.first_name != null"
-                            class="ml-5"
+                            class="ml-5 tooltip"
                         >
                             <a
                                 id="tour-step-tour"
@@ -331,6 +335,10 @@
                                         clip-rule="evenodd"
                                     /></svg
                             ></a>
+                            <span
+                                class="bg-gray-900 text-center text-white px-2 py-1 shadow-lg rounded-md tooltiptextbottom"
+                                >Start&nbsp;tour</span
+                            >
                         </div>
                         <Menu
                             v-if="$page.props.user"
