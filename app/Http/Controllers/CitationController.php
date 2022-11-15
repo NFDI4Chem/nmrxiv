@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Project;
-use App\Models\Citation;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use App\Actions\Project\UpdateProject;
+use App\Models\Citation;
+use App\Models\Project;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class CitationController extends Controller
@@ -17,7 +16,6 @@ class CitationController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @param  \Actions\Project\UpdateProject  $updater
      * @param  \App\Models\Project  $project
-     * 
      * @return \Illuminate\Http\RedirectResponse
      */
     public function save(Request $request, UpdateProject $updater, Project $project)
@@ -27,7 +25,7 @@ class CitationController extends Controller
         //dd($citations);
         if (count($citations) > 0) {
             $processedCitations = [];
-    
+
             foreach ($citations as $citation) {
                 $title = $citation['title'];
 
@@ -36,7 +34,7 @@ class CitationController extends Controller
                     'authors' => ['required', 'string'],
                     'abstract' => ['required', 'string'],
                 ])->validate();
-    
+
                 if (! is_null($title)) {
                     $_citation = $project->citations->filter(function ($a) use ($title) {
                         return $title === $a->title;
@@ -63,7 +61,7 @@ class CitationController extends Controller
                 }
             }
             $updater->syncCitations($project, $processedCitations, $user);
-            
+
             return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('success', 'Citation updated successfully');
         }
     }
@@ -74,7 +72,6 @@ class CitationController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @param  \Actions\Project\UpdateProject  $updater
      * @param  \App\Models\Project  $project
-     * 
      * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy(Request $request, UpdateProject $updater, Project $project)
@@ -87,13 +84,9 @@ class CitationController extends Controller
 
         return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('success', 'Citation deleted successfully');
     }
-
-
-
 }
 
-
-    // foreach ($input as $item) {
+// foreach ($input as $item) {
     //     $citation = Citation::firstOrCreate([
     //         'doi' => array_key_exists('doi', $item) ? $item['doi'] : null,
     //         'title' => array_key_exists('title', $item) ? $item['title'] : null,
@@ -102,5 +95,5 @@ class CitationController extends Controller
     //         'citation_text' => array_key_exists('citation_text', $item) ? $item['citation_text'] : null,
     //     ]);
     //     array_push($citations, $citation->id);
-    // }
-    // $updater->updateCitation($project, $citations, $user);
+// }
+// $updater->updateCitation($project, $citations, $user);
