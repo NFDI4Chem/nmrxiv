@@ -124,7 +124,7 @@
                                     <div class="sm:col-span-6">
                                         <label
                                             for="abstract"
-                                            class="block text-sm font-medium text-gray-700"
+                                            class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
                                         >
                                             Abstract
                                         </label>
@@ -268,7 +268,7 @@
                                     <jet-secondary-button
                                         class="ml-2"
                                         :disabled="
-                                            (isEmpty(this.fetchedCitations))
+                                            isEmpty(this.fetchedCitations)
                                         "
                                         @click="
                                             (this.fetchedCitations = {}),
@@ -291,8 +291,10 @@
                                 <!-- List Fetched Citation -->
                                 <div
                                     v-if="
-                                        !(isEmpty(this.fetchedCitations) || this.fetchCitations == null) &&
-                                        !loading
+                                        !(
+                                            isEmpty(this.fetchedCitations) ||
+                                            this.fetchCitations == null
+                                        ) && !loading
                                     "
                                     class="mt-4"
                                 >
@@ -652,7 +654,10 @@ export default {
                         "Something went wrong. Please check the input and try again.";
                 })
                 .finally(() => {
-                    if(this.fetchedCitations == null || Object.keys(this.fetchedCitations).length == 0 ) {
+                    if (
+                        this.fetchedCitations == null ||
+                        Object.keys(this.fetchedCitations).length == 0
+                    ) {
                         this.error =
                             "Something went wrong. Please check the input and try again.";
                     }
@@ -701,12 +706,11 @@ export default {
                 this.executeQuery();
             }
         },
-        addFetchedCitation(){
+        addFetchedCitation() {
             this.citationsForm.reset();
-            if(this.citations.length > 0) {
+            if (this.citations.length > 0) {
                 this.citations = this.citations.concat(this.fetchedCitations);
-            }
-            else {
+            } else {
                 this.citations.push(this.fetchedCitations);
             }
             this.executeQuery();
@@ -760,11 +764,6 @@ export default {
             }
             if (!this.form.abstract) {
                 this.form.errors.abstract = "The abstract field is required.";
-                hasErrors = true;
-            }
-            if (!this.form.citation_text) {
-                this.form.errors.citation_text =
-                    "The citation text field is required.";
                 hasErrors = true;
             }
             if (hasErrors) {
@@ -855,12 +854,12 @@ export default {
             this.isEdit = false;
             this.form.reset();
         },
-        onBack(){
+        onBack() {
             this.displayAddCitationForms = false;
             this.isEdit = false;
             this.fetchedCitations = {};
             this.query = "";
-        }
+        },
     },
 };
 </script>
