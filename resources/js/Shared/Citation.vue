@@ -19,7 +19,7 @@
                 </div>
                 <div class="ml-3 w-full">
                     <p class="text-md text-blue-700">
-                        Cite this dataset
+                        Cite this {{ model }}
                         <select
                             @change="queryDataCite"
                             v-model="selectedFormat"
@@ -53,7 +53,7 @@
 import axios from "axios";
 export default {
     components: {},
-    props: ["doi"],
+    props: ["doi", "model"],
     mounted() {
         if (this.doi) {
             this.queryDataCite();
@@ -78,6 +78,13 @@ export default {
             return this.$page.props.dataciteURL
                 ? String(this.$page.props.dataciteURL) + "/dois/"
                 : "https://api.test.datacite.org/dois/";
+        },
+    },
+    watch: {
+        doi(newDOI, oldDOI) {
+            if (newDOI != oldDOI) {
+                this.queryDataCite();
+            }
         },
     },
     methods: {
