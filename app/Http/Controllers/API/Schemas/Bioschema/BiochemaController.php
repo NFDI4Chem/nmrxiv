@@ -84,7 +84,7 @@ class BiochemaController extends Controller
 
         $datasets = ['datasets' => []];
         foreach ($study->datasets as &$dataset) {
-            $datasetSchema = $this->datasetShort($dataset);
+            $datasetSchema = $this->datasetLite($dataset);
             array_push($datasets['datasets'], $datasetSchema);
         }
 
@@ -155,7 +155,7 @@ class BiochemaController extends Controller
 
         $datasets = ['datasets' => []];
         foreach ($study->datasets as &$dataset) {
-            $datasetSchema = $this->datasetShort($dataset);
+            $datasetSchema = $this->datasetLite($dataset);
             array_push($datasets['datasets'], $datasetSchema);
         }
 
@@ -244,10 +244,10 @@ class BiochemaController extends Controller
         foreach ($project->studies as &$study) {
             $datasets = ['datasets' => []];
             foreach ($study->datasets as &$dataset) {
-                $datasetSchema = $this->datasetShort($dataset);
+                $datasetSchema = $this->datasetLite($dataset);
                 array_push($datasets['datasets'], $datasetSchema);
             }
-            $studySchema = $this->studyShort($study);
+            $studySchema = $this->studyLite($study);
             array_push($studies['studies'], $studySchema);
         }
 
