@@ -439,7 +439,9 @@
                     style="height: 60vh"
                     class="sm:rounded-md overflow-y-scroll"
                 >
-                <p class="text-xs font-large text-red-800 mb-1">*Click and drag authors to sort order. </p>
+                    <p class="text-xs font-large text-red-800 mb-1">
+                        *Click and drag authors to sort order.
+                    </p>
                     <draggable
                         v-model="this.authors"
                         @start="drag = true"
