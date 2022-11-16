@@ -169,9 +169,7 @@
                                                     <p
                                                         class="text-sm text-gray-500 truncate ..."
                                                     >
-                                                        {{
-                                                            citation.abstract
-                                                        }}
+                                                        {{ citation.abstract }}
                                                         ...
                                                     </p>
                                                 </a>
