@@ -224,7 +224,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="flex items-baseline mt-1 pl-5">
+                            <div class="flex items-baseline mt-1">
                                 <span class="text-sm text-gray-600">
                                     <div
                                         v-if="
@@ -233,7 +233,7 @@
                                             project.owner_id !=
                                                 $page.props.user.id
                                         "
-                                        class="text-sm text-gray-600 pr-5"
+                                        class="text-sm text-gray-600"
                                     >
                                         <span
                                             class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
@@ -244,6 +244,7 @@
                                         >
                                     </div>
                                 </span>
+                                </div>
                                 <div class="grid grid-cols-1">
                                     <div>
                                         <dd class="text-xs text-gray-900 space-y-5 mt-1">
@@ -301,7 +302,6 @@
                                     </span>
                                 </div>
                             </div>
-                        </div>
                         <div class="border-l">
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
