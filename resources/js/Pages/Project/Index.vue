@@ -244,15 +244,42 @@
                                         >
                                     </div>
                                 </span>
-                                <div class="grid grid-cols-1 pt-1">
-                                    <div class="text-sm text-gray-600 pr-5">
-                                        <span class="text-gray-400"
+                                <div class="grid grid-cols-1">
+                                    <div>
+                                        <dd class="text-xs text-gray-900 space-y-5 mt-1">
+                                            <p>
+                                                <span
+                                                    v-for="tag in project.tags"
+                                                    :key="tag.id"
+                                                    class="mr-2"
+                                                >
+                                                    <span
+                                                        class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-indigo-100 text-indigo-800"
+                                                    >
+                                                        <svg
+                                                            class="-ml-0.5 mr-1.5 h-2 w-2 text-indigo-400"
+                                                            fill="currentColor"
+                                                            viewBox="0 0 8 8"
+                                                        >
+                                                            <circle cx="4" cy="4" r="3" />
+                                                        </svg>
+                                                        {{ tag.name["en"] }}
+                                                    </span>
+                                                </span>
+                                            </p>
+                                        </dd>
+                                    </div>
+                                    <div class="text-xs text-gray-400 pr-5 mb-1 mt-1 truncate ...">
+                                        {{ project.description }}
+                                    </div>
+                                    <div class="text-xs text-gray-400 pr-5">
+                                        <span class="font-bold text-gray-600 " 
                                             >Last updated on</span
                                         >
                                         {{ formatDate(project.updated_at) }}
                                     </div>
-                                    <div class="text-sm text-gray-600 pr-5">
-                                        <span class="text-gray-400"
+                                    <div class="text-xs text-gray-400 pr-5">
+                                        <span class="font-bold text-gray-600"
                                             >Created on</span
                                         >
                                         {{ formatDate(project.created_at) }}
