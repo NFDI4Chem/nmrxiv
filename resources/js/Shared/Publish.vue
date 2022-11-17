@@ -77,7 +77,7 @@
                                                 class="m-3 relative clear-both border-dotted border-2 border-gray-300 rounded-lg"
                                             >
                                                 <span
-                                                    class="inline-flex items-center px-4 py-2 font-semibold leading-6 text-sm rounded-md text-sky-500 bg-white dark:bg-slate-800 transition ease-in-out duration-150 cursor-not-allowed dark:ring-slate-200/20"
+                                                    class="inline-flex items-center px-4 py-2 font-semibold leading-6 text-sm rounded-md text-sky-500 bg-white transition ease-in-out duration-150 cursor-not-allowed"
                                                     disabled=""
                                                     ><h1
                                                         class="capitalize text-4xl font-extrabold text-gray-900 tracking-tight sm:text-5xl"
@@ -99,7 +99,7 @@
                                                 class="m-3 relative clear-both border-dotted border-2 border-gray-300 rounded-lg"
                                             >
                                                 <span
-                                                    class="inline-flex items-center px-4 py-2 font-semibold leading-6 text-sm rounded-md text-sky-500 bg-white dark:bg-slate-800 transition ease-in-out duration-150 cursor-not-allowed dark:ring-slate-200/20"
+                                                    class="inline-flex items-center px-4 py-2 font-semibold leading-6 text-sm rounded-md text-sky-500 bg-white transition ease-in-out duration-150 cursor-not-allowed"
                                                     disabled=""
                                                     ><h1
                                                         class="capitalize text-4xl font-extrabold text-gray-900 tracking-tight sm:text-5xl"
@@ -129,7 +129,7 @@
                                                 class="m-3 clear-both relative border-dotted border-2 border-gray-300 rounded-lg"
                                             >
                                                 <span
-                                                    class="inline-flex items-center px-4 py-2 font-semibold leading-6 text-sm rounded-md text-sky-500 bg-white dark:bg-slate-800 transition ease-in-out duration-150 cursor-not-allowed dark:ring-slate-200/20"
+                                                    class="inline-flex items-center px-4 py-2 font-semibold leading-6 text-sm rounded-md text-sky-500 bg-white transition ease-in-out duration-150 cursor-not-allowed"
                                                     disabled=""
                                                     ><h1
                                                         class="capitalize text-4xl font-extrabold text-gray-900 tracking-tight sm:text-5xl"
