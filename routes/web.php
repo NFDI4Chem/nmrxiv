@@ -258,7 +258,7 @@ Route::group([
 Route::get('{id}', [ApplicationController::class, 'resolve'])->where('id', '(P|S|D|M|p|s|d|m)[0-9]+')
     ->name('public');
 
-Route::get('/badge/doi/{id}', [ApplicationController::class, 'resolveBadge'])->where('id', '(P|S|D|M|p|s|d|m)[0-9]+')
+Route::get('/badge/doi/{id}', [ApplicationController::class, 'resolveBadge'])
     ->name('badge.doi');
 
 Route::get('{username}/download/{project}/{key?}', [DownloadController::class, 'downloadFromProject'])

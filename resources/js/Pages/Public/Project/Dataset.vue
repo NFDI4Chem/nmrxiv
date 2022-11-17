@@ -10,7 +10,7 @@
                     </span>
                     <div class="text-sm">
                         <span class="text-gray-400 pt-2">
-                            https://doi.org/{{ study.data.doi }}
+                            <img :src="'badge/doi/' + study.data.identifier" />
                         </span>
                     </div>
                     <div class="float-right">
@@ -309,7 +309,7 @@
                         ><br />
                         <div class="text-sm">
                             <span class="text-gray-400 pt-2">
-                                https://doi.org/{{ dataset.data.doi }}
+                                <img :src="'badge/doi/' + dataset.data.identifier" />
                             </span>
                         </div>
                     </h1>
