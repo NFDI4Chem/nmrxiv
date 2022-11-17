@@ -294,7 +294,7 @@
                             <span
                                 class="pr-3 text-md bg-white font-medium text-gray-400"
                             >
-                                Dataset
+                                Spectra
                             </span>
                         </div>
                     </div>

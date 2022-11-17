@@ -396,7 +396,10 @@
                                                     "
                                                     class="text-xs leading-6 font-medium text-teal-900"
                                                 >
-                                                    <b class="text-gray-500">ORCID iD:</b> {{ author.authorId.value }}
+                                                    <b class="text-gray-500"
+                                                        >ORCID iD:</b
+                                                    >
+                                                    {{ author.authorId.value }}
                                                 </div>
                                             </div>
                                         </div>
