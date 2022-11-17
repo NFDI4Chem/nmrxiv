@@ -328,7 +328,12 @@
                         </select>
                         <div v-if="selectedDataset" class="text-sm my-2">
                             <span class="text-gray-400 pt-2">
-                                <img :src="'badge/doi/' + selectedDataset.identifier" />
+                                <img
+                                    :src="
+                                        'badge/doi/' +
+                                        selectedDataset.identifier
+                                    "
+                                />
                             </span>
                         </div>
                     </div>

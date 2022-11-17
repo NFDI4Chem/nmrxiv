@@ -309,7 +309,11 @@
                         ><br />
                         <div class="text-sm">
                             <span class="text-gray-400 pt-2">
-                                <img :src="'badge/doi/' + dataset.data.identifier" />
+                                <img
+                                    :src="
+                                        'badge/doi/' + dataset.data.identifier
+                                    "
+                                />
                             </span>
                         </div>
                     </h1>

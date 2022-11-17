@@ -195,7 +195,6 @@ class UpdateProject
      * @param  array  $citations
      * @return void
      */
-
     public function syncCitations(Project $project, $citations, $user)
     {
         $citations_map = [];

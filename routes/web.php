@@ -20,7 +20,9 @@ use App\Http\Controllers\StudyController;
 use App\Http\Controllers\StudyInvitationController;
 use App\Http\Controllers\StudyMemberController;
 use App\Http\Controllers\TeamController;
-use Illuminate\Foundation\Application;
+use App\Models\Dataset;
+use App\Models\Molecule;
+use App\Models\Project;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -40,10 +42,18 @@ Route::get('/', function () {
         return redirect()->route('dashboard');
     } else {
         return Inertia::render('Welcome', [
-            'canLogin' => Route::has('login'),
-            'canRegister' => Route::has('register'),
-            'laravelVersion' => Application::VERSION,
-            'phpVersion' => PHP_VERSION,
+            'spectra' => Cache::rememberForever('stats.spectra', function () {
+                return Dataset::where('is_public', true)->get()->count();
+            }),
+            'projects' => Cache::rememberForever('stats.projects', function () {
+                return Project::where('is_public', true)->get()->count();
+            }),
+            'compounds' => Cache::rememberForever('stats.compounds', function () {
+                return Molecule::whereNotNull('identifier')->get()->count();
+            }),
+            'techniques' => Cache::rememberForever('stats.techniques', function () {
+                return Dataset::where('is_public', true)->get()->unique('type')->count();
+            }),
         ]);
     }
 })->name('welcome');
