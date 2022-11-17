@@ -158,7 +158,7 @@
                                             for="orcid"
                                             class="block text-sm font-medium text-gray-700"
                                         >
-                                            ORCID ID
+                                            ORCID iD
                                         </label>
                                         <div class="mt-1">
                                             <input
@@ -300,7 +300,7 @@
                                             for="name"
                                             class="block text-sm font-medium text-gray-700"
                                         >
-                                            DOI or ORCID ID
+                                            DOI or ORCID iD
                                         </label>
                                         <div
                                             class="mt-1 flex rounded-md shadow-sm"
@@ -396,7 +396,7 @@
                                                     "
                                                     class="text-xs leading-6 font-medium text-teal-900"
                                                 >
-                                                    {{ author.authorId.value }}
+                                                    <b class="text-gray-500">ORCID iD:</b> {{ author.authorId.value }}
                                                 </div>
                                             </div>
                                         </div>
@@ -543,7 +543,7 @@
                                                     class="text-xs font-medium text-teal-900"
                                                 >
                                                     <b class="text-gray-500"
-                                                        >ORCID:</b
+                                                        >ORCID iD:</b
                                                     >
                                                     {{ element.orcid_id }}
                                                 </p>
