@@ -280,7 +280,8 @@ export default {
         JetDangerButton,
         JetSecondaryButton,
         JetDialogModal,
-        ToggleButton,form
+        ToggleButton,
+        form,
     },
     props: {
         announcements: Array,

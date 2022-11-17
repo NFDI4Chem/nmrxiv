@@ -120,7 +120,12 @@
                                         >
                                     </h1>
                                     <p class="text-gray-700 pl-1 pt-2">
-                                        <img :src="'badge/doi/' + project.data.identifier" />
+                                        <img
+                                            :src="
+                                                'badge/doi/' +
+                                                project.data.identifier
+                                            "
+                                        />
                                     </p>
                                     <div class="sm:col-span-12 pt-4">
                                         <a
