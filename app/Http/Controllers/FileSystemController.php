@@ -39,10 +39,10 @@ class FileSystemController extends Controller
                 'Content-Disposition' => 'form-data;name="filename"',
                 'Content-Type' => 'text/plain'
             ]);
-        $response = $request->post('http://192.168.2.143:8080/file');
+        $response = $request->post('http://192.168.11.223:8080/file');
         if ($response->status() == 200) {
             $json = json_decode($response->body(),TRUE);
-            $json['msdata_base_url'] = 'http://localhost:8080/msdata/';
+            $json['msdata_base_url'] = 'http://192.168.11.223:8080/msdata/';
             return response()->json(
                 $json
             );

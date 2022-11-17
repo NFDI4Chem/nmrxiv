@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+    minio:
+        image: minio/minio:latest
+        ports:
+            - '9500:9000'
+            - '9590:9090'
+        volumes:
+            - './data:/data'
+        command: 'server /data --console-address ":9090"'

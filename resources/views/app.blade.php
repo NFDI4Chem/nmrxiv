@@ -6,7 +6,7 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <title inertia>{{ config('app.name', 'nmrXiv') }}</title>
-
+        <script src="https://go-echarts.github.io/go-echarts-assets/assets/echarts.min.js"></script>
         <!-- Fonts -->
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap">
 
@@ -14,7 +14,7 @@
         @vite(['resources/js/app.js'])
 
         @routes
-        
+
         @env ('production')
             <!-- Matomo -->
             <script>
@@ -44,7 +44,7 @@
             </div>
         </div>
         @endenv
-        
+
         @inertia
 
         @env ('local')
