@@ -101,10 +101,10 @@
                                     Projects
                                 </Link>
                                 <Link
-                                    href="/datasets"
+                                    href="/spectra"
                                     class="text-base font-medium text-gray-500 hover:text-gray-900"
                                 >
-                                    Datasets
+                                    Spectra
                                 </Link>
                                 <a
                                     target="_blank"

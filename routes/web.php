@@ -310,5 +310,5 @@ Route::get('datasets/{dataset}/nmriumInfo', [DatasetController::class, 'fetchNMR
 Route::get('datasets/{owner}/{slug}', [DatasetController::class, 'publicDatasetView'])
     ->name('public.dataset');
 
-Route::get('datasets', [DatasetController::class, 'publicDatasetsView'])
+Route::get('spectra', [DatasetController::class, 'publicDatasetsView'])
 ->name('public.datasets');
