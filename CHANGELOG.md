@@ -1,5 +1,41 @@
 # Changelog
 
+## [1.1.0-rc.6](https://github.com/NFDI4Chem/nmrxiv/compare/v1.0.0-rc.6...v1.1.0-rc.6) (2022-11-17)
+
+
+### Features
+
+* add contributor_type to author ([51fb1d8](https://github.com/NFDI4Chem/nmrxiv/commit/51fb1d87d3d04d0ff386cf16ef8b1c03c28806a3))
+* add sorting fetaure to authors. ([27c561d](https://github.com/NFDI4Chem/nmrxiv/commit/27c561d4a76553307c4519acb332fac6901f7a43))
+* added doi badge end point ([6507c44](https://github.com/NFDI4Chem/nmrxiv/commit/6507c44a897f526c215784eafe2b53bc6e312002))
+* added working metrics to the home page and code formatting (format/pint) ([010c0d6](https://github.com/NFDI4Chem/nmrxiv/commit/010c0d65ce3990d0ec3cff6986c4565ff3ac1f8e))
+* cite this dataset, semantification - ref [#573](https://github.com/NFDI4Chem/nmrxiv/issues/573) ([cf8d7f8](https://github.com/NFDI4Chem/nmrxiv/commit/cf8d7f8611f52f68ce17116b8bdeb87e40addbaf))
+* renamed dataset to spectra ([a6e67b8](https://github.com/NFDI4Chem/nmrxiv/commit/a6e67b8217e14d130ec3aca2aa44a07674c0f5f7))
+* ux/ui improvements ([5508e97](https://github.com/NFDI4Chem/nmrxiv/commit/5508e97891fd1e1b563424890973891ea95ecb00))
+
+
+### Bug Fixes
+
+* add alt texts - ref [#589](https://github.com/NFDI4Chem/nmrxiv/issues/589) ([a158c49](https://github.com/NFDI4Chem/nmrxiv/commit/a158c49c25117220a1db5b2394ef0a5737c8bad2))
+* add misisng comments. ([1c85a93](https://github.com/NFDI4Chem/nmrxiv/commit/1c85a934c1a10a605eec24baf5e08bd7207d7d25))
+* add more meta-data to project list. ([0ae5525](https://github.com/NFDI4Chem/nmrxiv/commit/0ae55252f700e28a959d390f57250fdfe47e2a7e))
+* commenting post_max_size limit. ([93b837e](https://github.com/NFDI4Chem/nmrxiv/commit/93b837ec1bd18173a7478a32afcce71b0a1116b6))
+* enabled global helper functions - ref [#592](https://github.com/NFDI4Chem/nmrxiv/issues/592) ([a183e6c](https://github.com/NFDI4Chem/nmrxiv/commit/a183e6c832c4bd28544b6090d60b2c4754d99984))
+* extracting the experiment type from nmrium ([dca26cf](https://github.com/NFDI4Chem/nmrxiv/commit/dca26cf2d89d56830acff4db2e44801cdce70ebf))
+* fastcgi_send_timeout 1800; ([833bd94](https://github.com/NFDI4Chem/nmrxiv/commit/833bd9474f8fbeb70e31553c627ee93ac9312752))
+* fats_cgi_timeout nginx ([b10ad23](https://github.com/NFDI4Chem/nmrxiv/commit/b10ad23e07eb893bc3dd0843aaccdbf5841d90e2))
+* missing study identifier in the dataset doi due to sequence fix ([d572feb](https://github.com/NFDI4Chem/nmrxiv/commit/d572feb83ffd1a7aa1a1ccbb441821e47b705b10))
+* missing variables reassignment ([be90575](https://github.com/NFDI4Chem/nmrxiv/commit/be905753bcbe8cdaf21b7a8ccd324b7ba0392b0c))
+* operating system mode based css classes issue fix ([130e67c](https://github.com/NFDI4Chem/nmrxiv/commit/130e67ca3f13966443c01311e39459d84a811610))
+* orcid name in author. ([83149e3](https://github.com/NFDI4Chem/nmrxiv/commit/83149e37881599d1f4fba63fdd6cbd250e6e91a7))
+* orcid name in author. ([6ac2b3e](https://github.com/NFDI4Chem/nmrxiv/commit/6ac2b3e22431751aa320752a6f256fb7ce007fca))
+* package-lock conflict fix and tailwind css updated to latest ([e1bf88e](https://github.com/NFDI4Chem/nmrxiv/commit/e1bf88eeb1fa3b1e59b1efb2de954e7a8969082d))
+* primer text file format details correction ([36f2741](https://github.com/NFDI4Chem/nmrxiv/commit/36f2741097d8754f355ae21dc6b8d4e534e71402))
+* shared by tag ([f576a0a](https://github.com/NFDI4Chem/nmrxiv/commit/f576a0a3db428b0b897ae82386beb48333d62fdb))
+* star of shared project. ([ca045d5](https://github.com/NFDI4Chem/nmrxiv/commit/ca045d5fd4be5e396346d002144b3ceb81145f4a))
+* tailwind v3 compatibility fixes ([179a849](https://github.com/NFDI4Chem/nmrxiv/commit/179a84971d8e0fc65a52aec44c2f28dd2506a8db))
+* undefined variable $project bug fix ([354ec91](https://github.com/NFDI4Chem/nmrxiv/commit/354ec914912ddcc0d7256c125477a134b8ec93b5))
+
 ## [1.1.0-rc.5](https://github.com/NFDI4Chem/nmrxiv/compare/v1.0.0-rc.5...v1.1.0-rc.5) (2022-11-08)
 
 
