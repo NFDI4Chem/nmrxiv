@@ -74,8 +74,11 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
         ->name('author.updateRole');
 
     //Citation
-    Route::post('citation/{project}', [CitationController::class, 'updateCitation'])
-    ->name('update-citation');
+    Route::post('citations/{project}', [CitationController::class, 'save'])
+    ->name('citation.save');
+
+    Route::delete('citations/{project}/delete', [CitationController::class, 'destroy'])
+    ->name('citation.delete');
 
     Route::post('/onboarding/{status}', [DashboardController::class, 'onboardingStatus'])
             ->name('onboarding.complete');
