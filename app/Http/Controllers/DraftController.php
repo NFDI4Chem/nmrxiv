@@ -9,6 +9,7 @@ use App\Models\FileSystemObject;
 use App\Models\Project;
 use App\Models\Sample;
 use App\Models\Study;
+use App\Models\Validation;
 use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -36,12 +37,15 @@ class DraftController extends Controller
             ->whereHas('files')
             ->Where('owner_id', $user_id)
             ->Where('team_id', $team_id)
+            ->where('is_deleted', false)
             ->orderBy('updated_at', 'DESC')
             ->get();
 
         $defaultDraft = Draft::doesntHave('files')
             ->where('owner_id', $user_id)
             ->first();
+
+        $sharedDrafts = $user->sharedDrafts();
 
         if (! $defaultDraft) {
             $id = Str::uuid();
@@ -69,6 +73,7 @@ class DraftController extends Controller
 
         return response()->json([
             'drafts' => $drafts,
+            'sharedDrafts' => $sharedDrafts,
             'default' => $defaultDraft,
         ]);
     }
@@ -82,6 +87,7 @@ class DraftController extends Controller
                     'children' => FileSystemObject::with('children')
                         ->where([
                             ['level', 0],
+                            ['status', '<>', 'missing'],
                             ['draft_id', $draft->id],
                         ])
                         ->orderBy('type')
@@ -119,18 +125,14 @@ class DraftController extends Controller
     {
         $project = Project::where('draft_id', $draft->id)->first();
 
-        $project->status = 'queued';
+        $validation = $project->validation;
+        $validation->process();
 
-        $project->save();
-
-        $draft->current_step = 3;
-
-        $draft->save();
-
-        ProcessDraft::dispatch($draft);
+        // ProcessDraft::dispatch($draft);
 
         return response()->json([
-            'project' => Project::with(['studies.datasets'])->where('draft_id', $draft->id)->first(),
+            'project' => Project::with(['studies.datasets', 'owner'])->where('draft_id', $draft->id)->first(),
+            'validation' => $validation,
         ]);
     }
 
@@ -139,11 +141,9 @@ class DraftController extends Controller
         $input = $request->all();
         $project = Project::where('draft_id', $draft->id)->first();
         if ($project) {
-            $rule = Rule::unique('projects')
-        ->where('owner_id', $input['owner_id'])->ignore($project->id);
+            $rule = Rule::unique('projects')->where('owner_id', $input['owner_id'])->ignore($project->id);
         } else {
-            $rule = Rule::unique('projects')
-        ->where('owner_id', $input['owner_id']);
+            $rule = Rule::unique('projects')->where('owner_id', $input['owner_id']);
         }
 
         $validation = $request->validate([
@@ -155,6 +155,7 @@ class DraftController extends Controller
         $draftFolders = FileSystemObject::with('children')
             ->where([
                 ['level', 0],
+                ['status', '<>', 'missing'],
                 ['draft_id', $draft->id],
             ])
             ->orderBy('type')
@@ -179,7 +180,8 @@ class DraftController extends Controller
             $team_id = $user->current_team_id;
         }
 
-        return DB::transaction(function () use ($draft, $user, $user_id, $team_id, $request, $project) {
+        return DB::transaction(function () use ($draft, $user, $user_id, $team, $team_id, $request, $project) {
+            $nmrXivValidation = null;
             if (! $project) {
                 $project = Project::create([
                     'name' => $draft->name,
@@ -192,11 +194,22 @@ class DraftController extends Controller
                     'draft_id' => $draft->id,
                 ]);
 
-                $project->users()->attach(
-                    $user, ['role' => 'creator']
-                );
+                if ($team->owner->id != $user->id) {
+                    $project->users()->attach(
+                        $user, ['role' => 'owner']
+                    );
+
+                    $project->users()->attach(
+                        $team->owner, ['role' => 'creator']
+                    );
+                } else {
+                    $project->users()->attach(
+                        $team->owner, ['role' => 'creator']
+                    );
+                }
 
                 $project->syncTagsWithType($request->get('tags_array'), 'Project');
+                $project->save();
             } else {
                 $project->name = $draft->name;
                 $project->description = $draft->description;
@@ -204,11 +217,27 @@ class DraftController extends Controller
                 $project->save();
             }
 
+            if ($project->validation) {
+                $nmrXivValidation = $project->validation;
+            } else {
+                $nmrXivValidation = new Validation();
+                $nmrXivValidation->save();
+                $project->validation()->associate($nmrXivValidation);
+                $project->save();
+            }
+
             foreach ($project->studies as $study) {
                 $fsObject = $study->fsObject;
-                if (! $fsObject) {
+                if (! $fsObject || $fsObject->status == 'missing') {
                     $study->datasets()->delete();
                     $study->delete();
+                }
+
+                foreach ($study->datasets as $dataset) {
+                    $fsObject = $dataset->fsObject;
+                    if (! $fsObject || $fsObject->status == 'missing') {
+                        $dataset->delete();
+                    }
                 }
             }
             $project = $project->fresh();
@@ -216,6 +245,7 @@ class DraftController extends Controller
             $folders = FileSystemObject::with('children')
                 ->where([
                     ['draft_id', $draft->id],
+                    ['status', '<>', 'missing'],
                     ['model_type', 'study'],
                 ])
                 ->orderBy('type')
@@ -236,12 +266,15 @@ class DraftController extends Controller
                         'description' => $folder->name,
                         'url' => Str::random(40),
                         'uuid' => Str::uuid(),
-                        'team_id' => $team_id ? $team_id : null,
-                        'owner_id' => $user_id,
+                        'team_id' => $project->team_id,
+                        'owner_id' => $project->owner_id,
                         'draft_id' => $draft->id,
                         'project_id' => $project->id,
                         'fs_id' => $folder->id,
                     ]);
+
+                    $study->validation()->associate($nmrXivValidation);
+                    $study->save();
 
                     $sample = Sample::create([
                         'name' => $study->name.'_sample',
@@ -275,13 +308,16 @@ class DraftController extends Controller
                                 'description' => $sChild->name,
                                 'url' => Str::random(40),
                                 'uuid' => Str::uuid(),
-                                'team_id' => $team_id ? $team_id : null,
-                                'owner_id' => $user_id,
+                                'team_id' => $project->team_id,
+                                'owner_id' => $project->owner_id,
                                 'draft_id' => $draft->id,
                                 'project_id' => $project->id,
                                 'study_id' => $study->id,
                                 'fs_id' => $sChild->id,
                             ]);
+
+                            $ds->validation()->associate($nmrXivValidation);
+                            $ds->save();
 
                             $sChild->dataset_id = $ds->id;
                             $sChild->save();
@@ -293,6 +329,7 @@ class DraftController extends Controller
             $folders = FileSystemObject::with('children')
                 ->where([
                     ['draft_id', $draft->id],
+                    ['status', '<>', 'missing'],
                     ['dataset_id', null],
                 ])
                 ->whereIn('instrument_type', ['bruker', 'joel', 'varian'])
@@ -307,8 +344,8 @@ class DraftController extends Controller
                         'description' => 'Untitled study for the dataset - '.$folder->name,
                         'url' => Str::random(40),
                         'uuid' => Str::uuid(),
-                        'team_id' => $team_id ? $team_id : null,
-                        'owner_id' => $user_id,
+                        'team_id' => $project->team_id,
+                        'owner_id' => $project->owner_id,
                         'draft_id' => $draft->id,
                         'project_id' => $project->id,
                         'fs_id' => $folder->id,
@@ -338,8 +375,8 @@ class DraftController extends Controller
                             'description' => $folder->name,
                             'url' => Str::random(40),
                             'uuid' => Str::uuid(),
-                            'team_id' => $team_id ? $team_id : null,
-                            'owner_id' => $user_id,
+                            'team_id' => $project->team_id,
+                            'owner_id' => $project->owner_id,
                             'draft_id' => $draft->id,
                             'project_id' => $project->id,
                             'study_id' => $study->id,
@@ -362,7 +399,7 @@ class DraftController extends Controller
             }
 
             return response()->json([
-                'project' => $project,
+                'project' => $project->load(['owner']),
                 'studies' => $studies,
             ]);
         });
@@ -373,6 +410,7 @@ class DraftController extends Controller
         $draftFolders = FileSystemObject::with('children')
             ->where([
                 ['level', 0],
+                ['status', '<>', 'missing'],
                 ['draft_id', $draft->id],
             ])
             ->orderBy('type')

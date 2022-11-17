@@ -8,16 +8,16 @@
                             <div
                                 class="text-4xl mb-3 font-bold tracking-tight text-gray-900"
                             >
-                                Datasets
+                                Spectra
                             </div>
                             <p>
-                                Explore, analyze, and share raw spectral data
+                                Explore, analyze, and share raw spectra
                                 and assignements. Learn more about
                                 <a
                                     class="text-teal-900"
                                     href="https://docs.nmrxiv.org/docs/introduction/intro"
                                     target="_blank"
-                                    >datasets</a
+                                    >spectra</a
                                 >.
                             </p>
                         </div>
@@ -106,13 +106,13 @@
                                 type="button"
                                 :class="[
                                     filters.mode == 'list'
-                                        ? ''
-                                        : 'bg-gray-300 text-gray-900',
-                                    'relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500',
+                                        ? 'bg-gray-300 text-gray-900'
+                                        : '',
+                                    'relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50',
                                 ]"
                             >
                                 <span class="sr-only">List</span>
-                                <ViewListIcon
+                                <QueueListIcon
                                     class="h-5 w-5"
                                     aria-hidden="true"
                                 />
@@ -122,13 +122,13 @@
                                 type="button"
                                 :class="[
                                     filters.mode == 'grid'
-                                        ? ''
-                                        : 'bg-gray-300 text-gray-900',
-                                    '-ml-px relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500',
+                                        ? 'bg-gray-300 text-gray-900'
+                                        : '',
+                                    '-ml-px relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50',
                                 ]"
                             >
                                 <span class="sr-only">Grid</span>
-                                <ViewGridIcon
+                                <Squares2X2Icon
                                     class="h-5 w-5"
                                     aria-hidden="true"
                                 />
@@ -137,45 +137,79 @@
                     </div>
                 </div>
             </div>
-            <div class="border-t mt-3 border-gray-100">
-                <h2 class="text-gray-600 text-md mt-4 font-bold">
-                    Results ({{ datasets.meta.total }})
-                </h2>
-            </div>
-            <div v-if="filters.mode == 'grid'">
-                <div
-                    class="mt-4 mx-auto max-w-md grid gap-8 sm:max-w-lg lg:grid-cols-4 lg:max-w-7xl"
-                >
-                    <span v-for="dataset in datasets.data" :key="dataset.id">
-                        <dataset-card
-                            :mode="filters.mode"
-                            :dataset="dataset"
-                        ></dataset-card>
-                    </span>
+
+            <div v-if="datasets.meta.total > 0">
+                <div class="border-t mt-3 border-gray-100">
+                    <h2 class="text-gray-600 text-md mt-4 font-bold">
+                        Results ({{ datasets.meta.total }})
+                    </h2>
                 </div>
-            </div>
-            <div v-if="filters.mode == 'list'">
-                <div class="mt-4 bg-white shadow overflow-hidden sm:rounded-md">
-                    <ul
-                        role="list"
-                        class="divide-y border rounded-md divide-gray-200"
+                <div v-if="filters.mode == 'grid'">
+                    <div
+                        class="mt-4 mx-auto max-w-md grid gap-8 sm:max-w-lg lg:grid-cols-4 lg:max-w-7xl"
                     >
                         <span
                             v-for="dataset in datasets.data"
                             :key="dataset.id"
                         >
                             <dataset-card
-                                :mode="filters.mode ? filters.mode : 'grid'"
+                                :mode="filters.mode"
                                 :dataset="dataset"
                             ></dataset-card>
                         </span>
-                    </ul>
+                    </div>
+                </div>
+                <div v-if="filters.mode == 'list'">
+                    <div
+                        class="mt-4 bg-white shadow overflow-hidden sm:rounded-md"
+                    >
+                        <ul
+                            role="list"
+                            class="divide-y border rounded-md divide-gray-200"
+                        >
+                            <span
+                                v-for="dataset in datasets.data"
+                                :key="dataset.id"
+                            >
+                                <dataset-card
+                                    :mode="filters.mode ? filters.mode : 'grid'"
+                                    :dataset="dataset"
+                                ></dataset-card>
+                            </span>
+                        </ul>
+                    </div>
+                </div>
+                <div
+                    v-if="datasets.meta.total > datasets.meta.per_page"
+                    class="py-10"
+                >
+                    <Pagination :links="datasets.meta.links"></Pagination>
                 </div>
             </div>
-        </div>
-
-        <div v-if="datasets.meta.links" class="py-10">
-            <Pagination :links="datasets.meta.links"></Pagination>
+            <div v-else>
+                <div
+                    class="text-center rounded-lg border-2 border-dashed border-gray-300 p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 mt-5"
+                >
+                    <svg
+                        class="mx-auto h-12 w-12 text-gray-400"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        aria-hidden="true"
+                    >
+                        <path
+                            vector-effect="non-scaling-stroke"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"
+                        />
+                    </svg>
+                    <h3 class="mt-2 text-sm font-medium text-gray-900">
+                        No datasets
+                    </h3>
+                </div>
+            </div>
         </div>
     </app-layout>
 </template>
@@ -206,12 +240,12 @@ import {
     TransitionChild,
     TransitionRoot,
 } from "@headlessui/vue";
-import { XIcon } from "@heroicons/vue/outline";
+import { XMarkIcon } from "@heroicons/vue/24/outline";
 import {
     ChevronDownIcon,
-    ViewListIcon,
-    ViewGridIcon,
-} from "@heroicons/vue/solid";
+    QueueListIcon,
+    Squares2X2Icon,
+} from "@heroicons/vue/24/solid";
 
 export default {
     components: {
@@ -234,10 +268,10 @@ export default {
         PopoverPanel,
         TransitionChild,
         TransitionRoot,
-        XIcon,
+        XMarkIcon,
         ChevronDownIcon,
-        ViewListIcon,
-        ViewGridIcon,
+        QueueListIcon,
+        Squares2X2Icon,
         DatasetCard,
     },
     props: {

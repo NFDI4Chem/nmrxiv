@@ -6,11 +6,12 @@ metadata:
     kubernetes.io/ingress.class: "nginx"
     #kubernetes.io/ingress.global-static-ip-name: nmrxiv-dev-ip-address
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    cert-manager.io/issuer: "letsencrypt-dev"
     nginx.ingress.kubernetes.io/proxy-body-size: 200M
     nginx.ingress.kubernetes.io/client-body-buffer-size: 200M
-    nginx.ingress.kubernetes.io/proxy-connect-timeout: 600s
-    nginx.ingress.kubernetes.io/proxy-read-timeout: 600s
-    cert-manager.io/issuer: "letsencrypt-dev"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "1800"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "1800"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "1800"
 
 spec:
   tls:
@@ -26,6 +27,9 @@ spec:
   - hosts:
       - msdev.nmrxiv.org
     secretName: nmrxiv-ms-tls
+  - hosts:
+      - dbdev.nmrxiv.org
+    secretName: nmrxiv-dbdev-tls
   rules:
   - host: dev.nmrxiv.org
     http:
@@ -67,3 +71,13 @@ spec:
             name: nmrxiv-meilisearch
             port:
               number: 7700
+  - host: dbdev.nmrxiv.org
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: nmrxiv-postgresql
+            port:
+              number: 5432

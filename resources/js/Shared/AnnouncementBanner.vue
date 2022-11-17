@@ -23,7 +23,7 @@
                     @click="acknowledgeAnnouncement()"
                 >
                     <span class="sr-only">Dismiss</span>
-                    <XIcon class="h-3 w-3 text-dark" aria-hidden="true" />
+                    <XMarkIcon class="h-3 w-3 text-dark" aria-hidden="true" />
                 </button>
             </div>
         </div>
@@ -31,12 +31,12 @@
 </template>
 
 <script>
-import { XIcon } from "@heroicons/vue/outline";
+import { XMarkIcon } from "@heroicons/vue/24/outline";
 import Button from "@/Shared/Dropdown.vue";
 
 export default {
     components: {
-        XIcon,
+        XMarkIcon,
         Button,
     },
     props: {},

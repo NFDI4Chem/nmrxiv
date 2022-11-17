@@ -105,7 +105,7 @@
 
 <script>
 import { Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/vue";
-import { FolderIcon, DocumentTextIcon } from "@heroicons/vue/solid";
+import { FolderIcon, DocumentTextIcon } from "@heroicons/vue/24/solid";
 
 export default {
     components: {

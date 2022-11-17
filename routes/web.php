@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AnnouncementController;
 use App\Http\Controllers\Admin\ConsoleController;
 use App\Http\Controllers\Admin\LicenseController;
 use App\Http\Controllers\Admin\UsersController;
+use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\Auth\SocialController;
 use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\CitationController;
@@ -18,10 +19,14 @@ use App\Http\Controllers\ProjectMemberController;
 use App\Http\Controllers\StudyController;
 use App\Http\Controllers\StudyInvitationController;
 use App\Http\Controllers\StudyMemberController;
-use Illuminate\Foundation\Application;
+use App\Http\Controllers\TeamController;
+use App\Models\Dataset;
+use App\Models\Molecule;
+use App\Models\Project;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use Laravel\Jetstream\Jetstream;
 
 Route::group([
     'prefix' => 'auth',
@@ -37,47 +42,29 @@ Route::get('/', function () {
         return redirect()->route('dashboard');
     } else {
         return Inertia::render('Welcome', [
-            'canLogin' => Route::has('login'),
-            'canRegister' => Route::has('register'),
-            'laravelVersion' => Application::VERSION,
-            'phpVersion' => PHP_VERSION,
+            'spectra' => Cache::rememberForever('stats.spectra', function () {
+                return Dataset::where('is_public', true)->get()->count();
+            }),
+            'projects' => Cache::rememberForever('stats.projects', function () {
+                return Project::where('is_public', true)->get()->count();
+            }),
+            'compounds' => Cache::rememberForever('stats.compounds', function () {
+                return Molecule::whereNotNull('identifier')->get()->count();
+            }),
+            'techniques' => Cache::rememberForever('stats.techniques', function () {
+                return Dataset::where('is_public', true)->get()->unique('type')->count();
+            }),
         ]);
     }
 })->name('welcome');
 
 Route::supportBubble();
 
-Route::get('{username}/download/{project}/{key?}', [DownloadController::class, 'downloadFromProject'])
-    ->name('download');
-
-Route::get('{username}/datasets/{project}/{study?}/{dataset?}', [DownloadController::class, 'downloadSet'])
-    ->name('download.set');
-
-// Route::get('{username}/download/{project}/{study}/{filename}', [DownloadController::class, 'download'])
-//     ->name('dataset.download');
-
-Route::get('{code}/studies/{study}/file/{filename}', [StudyController::class, 'file'])
-    ->name('study.file');
-
-Route::get('projects/{project}/toggleUpVote', [ProjectController::class, 'toggleUpVote'])
-    ->name('project.toggle-upvote');
-
-Route::get('projects/{project}/toggleStarred', [ProjectController::class, 'toggleStarred'])
-    ->name('project.toggle-starred');
-
-Route::get('projects/{project}/studies', [ProjectController::class, 'publicStudies'])
-    ->name('project.studies');
-
-Route::get('projects/{owner}/{slug}', [ProjectController::class, 'publicProjectView'])
-    ->name('public.project');
-
-Route::get('projects', [ProjectController::class, 'publicProjectsView'])
-    ->name('public.projects');
-
-Route::get('datasets/{owner}/{slug}', [DatasetController::class, 'publicDatasetView'])
-    ->name('public.dataset');
-Route::get('datasets', [DatasetController::class, 'publicDatasetsView'])
-    ->name('public.datasets');
+Route::group(['middleware' => 'verified'], function () {
+    if (Jetstream::hasTeamFeatures()) {
+        Route::delete('/teams/{team}', [TeamController::class, 'destroy'])->name('app.teams.destroy');
+    }
+});
 
 Route::group(['middleware' => ['auth', 'verified']], function () {
     // License
@@ -87,15 +74,27 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
                 ->name('license');
 
     // Authors
-    Route::post('authors/{project}', [AuthorController::class, 'updateAuthor'])
-                ->name('update-author');
+    Route::post('authors/{project}', [AuthorController::class, 'save'])
+        ->name('author.save');
+
+    Route::delete('authors/{project}/delete', [AuthorController::class, 'destroy'])
+        ->name('author.delete');
+
+    Route::post('authors/{project}/updateRole', [AuthorController::class, 'updateRole'])
+        ->name('author.updateRole');
 
     //Citation
-    Route::post('citation/{project}', [CitationController::class, 'updateCitation'])
-    ->name('update-citation');
+    Route::post('citations/{project}', [CitationController::class, 'save'])
+    ->name('citation.save');
+
+    Route::delete('citations/{project}/delete', [CitationController::class, 'destroy'])
+    ->name('citation.delete');
 
     Route::post('/onboarding/{status}', [DashboardController::class, 'onboardingStatus'])
             ->name('onboarding.complete');
+
+    Route::post('/primer/skip', [DashboardController::class, 'skipPrimer'])
+            ->name('primer.skip');
 
     Route::get('projects/status/{project}/queue', [ProjectController::class, 'status'])
             ->name('project.status');
@@ -139,6 +138,11 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
             ->name('dashboard.project.update');
         Route::get('projects/{project}/activity', [ProjectController::class, 'activity'])
             ->name('dashboard.project.activity');
+        Route::get('projects/{project}/validation', [ProjectController::class, 'validation'])
+            ->name('dashboard.project.validation');
+
+        Route::post('projects/{project}/publish', [ProjectController::class, 'publish'])
+            ->name('dashboard.project.publish');
 
         Route::post('projects/{project}/members', [ProjectMemberController::class, 'memberStore'])
             ->name('project-members.store');
@@ -188,6 +192,10 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
         Route::delete('/study-invitations/{invitation}', [StudyInvitationController::class, 'destroyInvitation'])
             ->name('study-invitations.destroy');
 
+        Route::get('datasets/{dataset}/nmriumVersions', [DatasetController::class, 'nmriumVersions'])
+            ->name('dashboard.datasets.nmriumVersions');
+        Route::get('datasets/{dataset}/nmriumInfo', [DatasetController::class, 'fetchNMRium'])
+            ->name('dashboard.datasets.nmrium');
         Route::post('datasets/{dataset}/nmriumInfo', [DatasetController::class, 'nmriumInfo'])
             ->name('dashboard.datasets.nmriumInfo');
         Route::post('datasets/{dataset}/preview', [DatasetController::class, 'preview'])
@@ -233,8 +241,10 @@ Route::group([
             Route::put('users/edit/{user}/password', [UsersController::class, 'updatePassword'])
             ->name('console.users.update-password');
 
-            Route::put('users/edit/{user}/role', [UsersController::class, 'updateRole'])
-            ->name('console.users.update-role');
+            Route::group(['middleware' => ['permission:manage roles']], function () {
+                Route::put('users/edit/{user}/role', [UsersController::class, 'updateRole'])
+                ->name('console.users.update-role');
+            });
 
             Route::delete('users/edit/{user}/photo', [UsersController::class, 'destroyPhoto'])
             ->name('console.users.destroy-photo');
@@ -257,3 +267,48 @@ Route::group([
         });
     });
 });
+
+Route::get('{id}', [ApplicationController::class, 'resolve'])->where('id', '(P|S|D|M|p|s|d|m)[0-9]+')
+    ->name('public');
+
+Route::get('/badge/doi/{id}', [ApplicationController::class, 'resolveBadge'])
+    ->name('badge.doi');
+
+Route::get('{username}/download/{project}/{key?}', [DownloadController::class, 'downloadFromProject'])
+    ->name('download');
+
+Route::get('{username}/datasets/{project}/{study?}/{dataset?}', [DownloadController::class, 'downloadSet'])
+    ->name('download.set');
+
+Route::get('{username}/download/{project}/{study}/{filename}', [DownloadController::class, 'download'])
+    ->name('dataset.download');
+
+Route::get('{code}/studies/{study}/file/{filename}', [StudyController::class, 'file'])
+    ->name('study.file');
+
+Route::get('projects/{project}/toggleUpVote', [ProjectController::class, 'toggleUpVote'])
+    ->name('project.toggle-upvote');
+
+Route::get('projects/{project}/toggleStarred', [ProjectController::class, 'toggleStarred'])
+    ->name('project.toggle-starred');
+
+Route::get('studies/{study}/toggleStarred', [StudyController::class, 'toggleStarred'])
+->name('study.toggle-starred');
+
+Route::get('projects/{project}/studies', [ProjectController::class, 'publicStudies'])
+    ->name('project.studies');
+
+Route::get('projects/{owner}/{slug}', [ProjectController::class, 'publicProjectView'])
+    ->name('public.project');
+
+Route::get('projects', [ProjectController::class, 'publicProjectsView'])
+    ->name('public.projects');
+
+Route::get('datasets/{dataset}/nmriumInfo', [DatasetController::class, 'fetchNMRium'])
+    ->name('dashboard.datasets.nmrium');
+
+Route::get('datasets/{owner}/{slug}', [DatasetController::class, 'publicDatasetView'])
+    ->name('public.dataset');
+
+Route::get('spectra', [DatasetController::class, 'publicDatasetsView'])
+->name('public.datasets');

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use OwenIt\Auditing\Contracts\Auditable;
@@ -11,6 +12,7 @@ class Dataset extends Model implements Auditable
 {
     use HasFactory;
     use \OwenIt\Auditing\Auditable;
+    use HasDOI;
 
     protected $fillable = [
         'name',
@@ -32,7 +34,6 @@ class Dataset extends Model implements Auditable
         'draft_id',
         'fs_id',
         'dataset_photo_path',
-        'nmrium_info',
         'license_id',
     ];
 
@@ -47,9 +48,17 @@ class Dataset extends Model implements Auditable
         'dataset_photo_url',
     ];
 
-    protected $hidden = [
-        'nmrium_info',
-    ];
+    /**
+     * Get the dataset identifier
+     *
+     * @return \Illuminate\Database\Eloquent\Casts\Attribute
+     */
+    protected function identifier(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? 'NMRXIV:D'.$value : null,
+        );
+    }
 
     /**
      * Get the URL to the dataset's profile photo.
@@ -65,7 +74,8 @@ class Dataset extends Model implements Auditable
 
     protected function getPublicUrlAttribute()
     {
-        return  env('APP_URL', null).'/datasets/'.urlencode($this->slug);
+        // return  env('APP_URL', null).'/datasets/'.urlencode($this->slug);
+        return env('APP_URL', null).'/D'.$this->getAttributes()['identifier'];
     }
 
     protected function getPrivateUrlAttribute()
@@ -88,6 +98,11 @@ class Dataset extends Model implements Auditable
         return $this->belongsTo(User::class, 'owner_id');
     }
 
+    public function validation()
+    {
+        return $this->belongsTo(Validation::class, 'validation_id');
+    }
+
     public function draft()
     {
         return $this->belongsTo(Draft::class, 'draft_id');
@@ -96,6 +111,16 @@ class Dataset extends Model implements Auditable
     public function team()
     {
         return $this->belongsTo(Team::class, 'Team_id');
+    }
+
+    public function nmrium()
+    {
+        return $this->hasOne(NMRium::class);
+    }
+
+    public function fsObject()
+    {
+        return $this->hasOne(FileSystemObject::class);
     }
 
     /**
@@ -115,7 +140,7 @@ class Dataset extends Model implements Auditable
                 $query->where('name', 'ILIKE', '%'.$search.'%')
                     ->orWhere('description', 'ILIKE', '%'.$search.'%');
             });
-        })->when($filters['sort'] ?? null, function ($query, $sort) {
+        })->when($filters['sort'] ?? 'newest', function ($query, $sort) {
             if ($sort === 'newest') {
                 $query->orderByDesc('updated_at');
             } elseif ($sort === 'rating') {

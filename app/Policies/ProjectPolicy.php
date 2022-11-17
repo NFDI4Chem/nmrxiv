@@ -40,12 +40,12 @@ class ProjectPolicy
      */
     public function viewProject(User $user, Project $project)
     {
-        if($project->is_public){
+        if ($project->is_public) {
             return true;
-        }else{
+        } else {
             if (is_null($user)) {
                 return false;
-            }else{
+            } else {
                 return $user->belongsToProject($project);
             }
         }
@@ -71,7 +71,7 @@ class ProjectPolicy
      */
     public function updateProject(User $user, Project $project)
     {
-        if ($project->is_public || $project->is_archived || $project->is_deleted) {
+        if ($project->is_public || $project->is_archived || $project->is_deleted || $project->is_published) {
             return false;
         }
 

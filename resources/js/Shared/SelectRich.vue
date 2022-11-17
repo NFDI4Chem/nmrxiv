@@ -12,11 +12,11 @@
                 <span v-if="selected" class="block truncate">{{
                     selected.title
                 }}</span>
-                <span v-else class="block truncate">Select a license</span>
+                <span v-else class="block truncate">--Select--</span>
                 <span
                     class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none"
                 >
-                    <SelectorIcon
+                    <ChevronUpDownIcon
                         class="h-5 w-5 text-gray-400"
                         aria-hidden="true"
                     />
@@ -52,7 +52,11 @@
                                 ]"
                             >
                                 <b>{{ item.title }}</b> <br />
-                                <small v-html="item.description"> </small>
+                                <small
+                                    v-if="item.description"
+                                    v-html="item.description"
+                                >
+                                </small>
                                 <!-- ToolTip class="inline ml-3 float-right overflow-visible" :text="item.description"></ToolTip -->
                             </span>
                             <span
@@ -81,7 +85,7 @@ import {
     ListboxOption,
     ListboxOptions,
 } from "@headlessui/vue";
-import { CheckIcon, SelectorIcon } from "@heroicons/vue/solid";
+import { CheckIcon, ChevronUpDownIcon } from "@heroicons/vue/24/solid";
 import ToolTip from "@/Shared/ToolTip.vue";
 
 export default {
@@ -92,7 +96,7 @@ export default {
         ListboxOption,
         ListboxOptions,
         CheckIcon,
-        SelectorIcon,
+        ChevronUpDownIcon,
         ToolTip,
     },
     props: ["items", "selected", "label"],

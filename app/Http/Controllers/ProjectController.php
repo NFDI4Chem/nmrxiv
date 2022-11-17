@@ -10,14 +10,15 @@ use App\Actions\Project\RestoreProject;
 use App\Actions\Project\UpdateProject;
 use App\Http\Resources\ProjectResource;
 use App\Http\Resources\StudyResource;
+use App\Jobs\ProcessProject;
 use App\Models\Project;
 use App\Models\Study;
 use App\Models\User;
+use App\Models\Validation;
 use Auth;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
@@ -69,7 +70,7 @@ class ProjectController extends Controller
             return Inertia::render('Public/Project/Study', [
                 'project' => (new ProjectResource($project))->lite(false, []),
                 'tab' => $tab,
-                'study' => $study->load(['tags', 'sample.molecules']),
+                'study' => (new StudyResource($study))->lite(false, ['tags', 'sample', 'datasets', 'molecules']),
             ]);
         } else {
             return Inertia::render('Public/Project/Show', [
@@ -81,9 +82,7 @@ class ProjectController extends Controller
 
     public function publicProjectsView(Request $request)
     {
-        // $projects = Cache::rememberForever('projects', function () {
         $projects = ProjectResource::collection(Project::where('is_public', true)->filter($request->only('search', 'sort', 'mode'))->paginate(12)->withQueryString());
-        // });
 
         return Inertia::render('Public/Projects', [
             'filters' => $request->all('search', 'sort', 'mode'),
@@ -124,7 +123,7 @@ class ProjectController extends Controller
         }
 
         return Inertia::render('Project/Show', [
-            'project' => $project->load('projectInvitations', 'tags', 'authors', 'citations'),
+            'project' => $project->load('projectInvitations', 'tags', 'authors', 'citations', 'owner'),
             'team' => $team ? $team->load(['users', 'owner']) : null,
             'members' => $project->allUsers(),
             'availableRoles' => array_values(Jetstream::$roles),
@@ -154,6 +153,7 @@ class ProjectController extends Controller
 
         return Inertia::render('Project/Settings', [
             'project' => $project,
+            'schema' => $environment = env('SCHEMA_VERSION', 'local'),
         ]);
     }
 
@@ -214,6 +214,64 @@ class ProjectController extends Controller
         }
 
         return response()->json(['audit' => $project->audits()->with('user')->orderBy('created_at', 'desc')->get()]);
+    }
+
+    public function validation(Request $request, Project $project)
+    {
+        if (! Gate::forUser($request->user())->check('viewProject', $project)) {
+            throw new AuthorizationException;
+        }
+
+        $validation = $project->validation;
+
+        if (! $validation) {
+            $validation = new Validation();
+            $validation->save();
+            $project->validation()->associate($validation);
+            $project->save();
+
+            foreach ($project->studies as $study) {
+                $study->validation()->associate($validation);
+                $study->save();
+                foreach ($study->datasets as $dataset) {
+                    $dataset->validation()->associate($validation);
+                    $dataset->save();
+                }
+            }
+        }
+
+        $validation->process();
+
+        return Inertia::render('Project/Validation', [
+            'project' => $project->load('projectInvitations', 'tags', 'authors', 'citations'),
+            'validation' => $validation->fresh(),
+        ]);
+    }
+
+    public function publish(Request $request, Project $project)
+    {
+        if ($project) {
+            $project->release_date = $request->get('releaseDate');
+            $project->status = 'queued';
+            $project->save();
+
+            $validation = $project->validation;
+            $validation->process();
+            $validation = $validation->fresh();
+
+            if ($validation['report']['project']['status']) {
+                ProcessProject::dispatch($project);
+
+                return response()->json([
+                    'project' => $project,
+                    'validation' => $validation,
+                ]);
+            } else {
+                return response()->json([
+                    'errors' => 'Validation failing. Please provide all the required data and try again. If the problem persists, please contact us.',
+                ], 422);
+            }
+        }
     }
 
     public function store(Request $request, CreateNewProject $creator)

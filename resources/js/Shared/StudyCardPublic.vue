@@ -26,7 +26,7 @@
                             <span v-if="index == selectedPreviewIndex">
                                 <img
                                     class="h-36 w-full rounded-t-md shadow-lg"
-                                    :src="url"
+                                    :src="url + '?id=' + Math.random()"
                                     alt=""
                                 />
                             </span>
@@ -82,18 +82,10 @@
             </span>
         </div>
         <div class="flex-1 border-t bg-white p-3 flex flex-col justify-between">
-            <Link
-                :href="
-                    route('public.project', {
-                        owner: project.owner.username,
-                        slug: project.slug,
-                        _query: {
-                            tab: 'study',
-                            id: study.slug,
-                        },
-                    })
-                "
+            <small v-if="study.identifier" class="text-gray-500"
+                >#{{ study.identifier }}</small
             >
+            <Link :href="study.public_url">
                 <div class="flex-1">
                     <p class="text-lg font-semibold text-gray-900 line-clamp-1">
                         {{ study.name }}
@@ -126,17 +118,17 @@
 </template>
 
 <script>
-import { LockClosedIcon } from "@heroicons/vue/solid";
-import { LockOpenIcon } from "@heroicons/vue/solid";
-import { PencilIcon } from "@heroicons/vue/solid";
-import { MailIcon } from "@heroicons/vue/solid";
+import { LockClosedIcon } from "@heroicons/vue/24/solid";
+import { LockOpenIcon } from "@heroicons/vue/24/solid";
+import { PencilIcon } from "@heroicons/vue/24/solid";
+import { EnvelopeIcon } from "@heroicons/vue/24/solid";
 import { Link } from "@inertiajs/inertia-vue3";
 
 export default {
     components: {
         LockClosedIcon,
         LockOpenIcon,
-        MailIcon,
+        EnvelopeIcon,
         PencilIcon,
         Link,
     },

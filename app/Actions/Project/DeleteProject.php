@@ -17,6 +17,7 @@ class DeleteProject
         if ($project->is_public) {
             $project->studies()->update(['is_archived' => true]);
             foreach ($project->studies as $study) {
+                $study->update(['is_archived' => true]);
                 $study->datasets()->update(['is_archived' => true]);
             }
             $project->is_archived = true;
@@ -24,7 +25,12 @@ class DeleteProject
         } else {
             $project->studies()->update(['is_deleted' => true]);
             foreach ($project->studies as $study) {
+                $study->update(['is_deleted' => true]);
                 $study->datasets()->update(['is_deleted' => true]);
+            }
+            $draft = $project->draft;
+            if ($draft) {
+                $draft->update(['is_deleted' => true]);
             }
             $project->is_deleted = true;
             $project->save();

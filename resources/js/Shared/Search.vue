@@ -1,7 +1,7 @@
 <template>
     <button
         type="button"
-        class="hidden -ml-4 sm:flex items-center w-96 text-left space-x-3 px-4 h-12 bg-white ring-1 ring-slate-900/10 hover:ring-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm rounded-lg text-slate-400 dark:bg-slate-800 dark:ring-0 dark:text-slate-300 dark:highlight-white/5 dark:hover:bg-slate-700"
+        class="hidden -ml-4 sm:flex items-center w-96 text-left space-x-3 px-4 h-12 bg-white ring-1 ring-slate-900/10 hover:ring-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm rounded-lg text-slate-400"
         @click="open = true"
     >
         <svg
@@ -76,7 +76,7 @@
                                         @update:modelValue="onSelect"
                                     >
                                         <div class="relative">
-                                            <SearchIcon
+                                            <MagnifyingGlassIcon
                                                 class="pointer-events-none absolute top-3.5 left-4 h-5 w-5 text-gray-900 text-opacity-40"
                                                 aria-hidden="true"
                                             />
@@ -185,7 +185,7 @@
                                                                                 'bg-gray-900 bg-opacity-5 text-gray-900',
                                                                         ]"
                                                                     >
-                                                                        <a
+                                                                        <Link
                                                                             class="w-full"
                                                                             :href="
                                                                                 '/projects/' +
@@ -218,7 +218,7 @@
                                                                                 >Jump
                                                                                 to...</span
                                                                             >
-                                                                        </a>
+                                                                        </Link>
                                                                     </li>
                                                                 </ComboboxOption>
                                                             </ul>
@@ -319,10 +319,14 @@
 <script>
 import { instantMeiliSearch } from "@meilisearch/instant-meilisearch";
 import { ref, watchEffect } from "vue";
-import { SearchIcon } from "@heroicons/vue/solid";
+import { MagnifyingGlassIcon } from "@heroicons/vue/24/solid";
 import { Link } from "@inertiajs/inertia-vue3";
 import { useMagicKeys } from "@vueuse/core";
-import { DocumentAddIcon, FolderIcon, TagIcon } from "@heroicons/vue/outline";
+import {
+    DocumentPlusIcon,
+    FolderIcon,
+    TagIcon,
+} from "@heroicons/vue/24/outline";
 import {
     Combobox,
     ComboboxInput,
@@ -344,7 +348,7 @@ const recent = [];
 const quickActions = [
     {
         name: "Ask a question...",
-        icon: DocumentAddIcon,
+        icon: DocumentPlusIcon,
         shortcut: "N",
         url: "mailto:info@nmrxiv.org",
     },
@@ -371,7 +375,7 @@ export default {
         Dialog,
         DialogOverlay,
         FolderIcon,
-        SearchIcon,
+        MagnifyingGlassIcon,
         TransitionChild,
         TransitionRoot,
         Link,

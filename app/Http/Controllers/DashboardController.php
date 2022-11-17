@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
+use App\Models\Study;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -29,7 +30,7 @@ class DashboardController extends Controller
         return Inertia::render('Dashboard', [
             'filters' => $request->all('action', 'draft_id'),
             'team' => $team,
-            'projects' => $projects,
+            'projects' => $projects->load('tags'),
             'teamRole' => $user->teamRole($team),
         ]);
     }
@@ -68,8 +69,13 @@ class DashboardController extends Controller
             auth()->user()
         )->get();
 
+        $studies = Study::where([['is_deleted', false]])->whereHasBookmark(
+            auth()->user()
+        )->get();
+
         return Inertia::render('Starred', [
-            'projects' => $projects,
+            'projects' => $projects->load('owner'),
+            'studies' => $studies,
         ]);
     }
 
@@ -105,6 +111,21 @@ class DashboardController extends Controller
 
                 return $user;
             }
+        }
+    }
+
+    /**
+     * Update the database to skip displaying primer
+     *
+     * @return void
+     */
+    public function skipPrimer(Request $request)
+    {
+        $user = $request->user();
+
+        if ($user) {
+            $user->primed = true;
+            $user->save();
         }
     }
 }

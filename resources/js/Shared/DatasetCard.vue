@@ -29,49 +29,34 @@
                             style="min-height: 100px; max-height: 168px"
                             class="flex-1 p-3"
                         >
-                            <Link
-                                :href="
-                                    '/projects/' +
-                                    dataset.owner.username +
-                                    '/' +
-                                    dataset.project +
-                                    '?tab=study&id=' +
-                                    dataset.study +
-                                    '&dsid=' +
-                                    dataset.slug
-                                "
-                                class="block"
-                            >
+                            <Link :href="dataset.public_url" class="block">
+                                <small
+                                    v-if="dataset.identifier"
+                                    class="text-gray-500"
+                                    >#{{ dataset.identifier }}</small
+                                >
                                 <p
                                     class="text-lg font-black text-gray-900 line-clamp-2"
                                 >
-                                    {{ dataset.name }}
+                                    {{ dataset.name }} <span v-if="dataset.type"
+                            >({{
+                                dataset.type.replace(/,\s*$/, "")
+                            }})</span
+                        >
                                 </p>
                                 <p
-                                    class="mt-0 text-sm capitalize text-gray-800 line-clamp-4"
+                                    class="mt-0 text-sm text-gray-800 line-clamp-4"
                                 >
                                     <small class="text-gray-400">Project:</small
                                     ><br />
                                     <Link
-                                        :href="
-                                            '/projects/' +
-                                            dataset.owner.username +
-                                            '/' +
-                                            dataset.project
-                                        "
+                                        :href="dataset.project.public_url"
                                         class="hover:underline hover:text-teal-900"
-                                        >{{ dataset.project }}</Link
+                                        >{{ dataset.project.name }}</Link
                                     >&nbsp;/&nbsp;<Link
                                         class="hover:underline hover:text-teal-900"
-                                        :href="
-                                            '/projects/' +
-                                            dataset.owner.username +
-                                            '/' +
-                                            dataset.project +
-                                            '?tab=study&id=' +
-                                            dataset.study
-                                        "
-                                        >{{ dataset.study }}</Link
+                                        :href="dataset.study.public_url"
+                                        >{{ dataset.study.name }}</Link
                                     >
                                 </p>
                             </Link>
@@ -111,7 +96,7 @@
                                         <span class="sr-only"
                                             >Open options</span
                                         >
-                                        <DotsVerticalIcon
+                                        <EllipsisVerticalIcon
                                             class="h-5 w-5"
                                             aria-hidden="true"
                                         />
@@ -142,7 +127,7 @@
                                                         'block px-4 py-4 text-sm cursor-pointer hover:text-gray-900',
                                                     ]"
                                                 >
-                                                    <DownloadIcon
+                                                    <ArrowDownTrayIcon
                                                         class="h-5 w-5 inline"
                                                         aria-hidden="true"
                                                     />
@@ -175,12 +160,11 @@
                 </div>
             </div>
             <div v-if="mode == 'list'">
-                <!-- This example requires Tailwind CSS v2.0+ -->
                 <li class="flex border-b bprder-gray-100">
                     <div class="flex-shrink-0">
                         <div
                             v-if="dataset.dataset_photo_url"
-                            class="flex-shrink-0 h-36 p-3"
+                            class="flex-shrink-0 w-64 border-r h-36 p-3"
                         >
                             <img
                                 :src="dataset.dataset_photo_url"
@@ -190,59 +174,43 @@
                         </div>
                         <div
                             v-else
-                            class="flex-shrink-0 h-36 pattern-diagonal-lines pattern-gray-400 pattern-bg-white pattern-size-2 pattern-opacity-20 border-b border-gray-400"
+                            class="flex-shrink-0 h-36 w-64 border-r pattern-diagonal-lines pattern-gray-400 pattern-bg-white pattern-size-2 pattern-opacity-20 border-b border-gray-400"
                         ></div>
                     </div>
 
                     <div
-                        class="flex-1 flex flex-col px-4 py-4 sm:px-6 justify-between"
+                        class="flex-1 flex flex-col px-4 py-2 sm:px-6 justify-between"
                     >
                         <div class="flex items-center justify-between">
                             <div>
+                                <small
+                                    v-if="dataset.identifier"
+                                    class="text-gray-500"
+                                    >#{{ dataset.identifier }}</small
+                                >
                                 <p
                                     class="text-lg font-black text-gray-900 line-clamp-2 font-black"
                                 >
                                     <Link
-                                        :href="
-                                            '/projects/' +
-                                            dataset.owner.username +
-                                            '/' +
-                                            dataset.project +
-                                            '?tab=study&id=' +
-                                            dataset.study +
-                                            '&dsid=' +
-                                            dataset.slug
-                                        "
+                                        :href="dataset.public_url"
                                         class="block"
                                     >
                                         {{ dataset.name }}
                                     </Link>
                                 </p>
                                 <p
-                                    class="mt-0 text-sm capitalize text-gray-800 line-clamp-4"
+                                    class="mt-0 text-sm text-gray-800 line-clamp-4"
                                 >
                                     <small class="text-gray-400">Project:</small
                                     ><br />
                                     <Link
-                                        :href="
-                                            '/projects/' +
-                                            dataset.owner.username +
-                                            '/' +
-                                            dataset.project
-                                        "
+                                        :href="dataset.project.public_url"
                                         class="hover:underline hover:text-teal-900"
-                                        >{{ dataset.project }}</Link
+                                        >{{ dataset.project.name }}</Link
                                     >&nbsp;/&nbsp;<Link
                                         class="hover:underline hover:text-teal-900"
-                                        :href="
-                                            '/projects/' +
-                                            dataset.owner.username +
-                                            '/' +
-                                            dataset.project +
-                                            '?tab=study&id=' +
-                                            dataset.study
-                                        "
-                                        >{{ dataset.study }}</Link
+                                        :href="dataset.study.public_url"
+                                        >{{ dataset.study.name }}</Link
                                     >
                                 </p>
                             </div>
@@ -275,7 +243,7 @@
                                         :href="downloadURL"
                                         class="block px-4 text-sm cursor-pointer hover:text-gray-900', ]"
                                     >
-                                        <DownloadIcon
+                                        <ArrowDownTrayIcon
                                             class="h-5 w-5 inline"
                                             aria-hidden="true"
                                     /></Link>
@@ -313,12 +281,12 @@
 </template>
 
 <script>
-import { LockClosedIcon } from "@heroicons/vue/solid";
-import { LockOpenIcon, DownloadIcon } from "@heroicons/vue/solid";
-import { PencilIcon } from "@heroicons/vue/solid";
-import { MailIcon } from "@heroicons/vue/solid";
+import { LockClosedIcon } from "@heroicons/vue/24/solid";
+import { LockOpenIcon, ArrowDownTrayIcon } from "@heroicons/vue/24/solid";
+import { PencilIcon } from "@heroicons/vue/24/solid";
+import { EnvelopeIcon } from "@heroicons/vue/24/solid";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
-import { DotsVerticalIcon, ScaleIcon } from "@heroicons/vue/solid";
+import { EllipsisVerticalIcon, ScaleIcon } from "@heroicons/vue/24/solid";
 import { Inertia } from "@inertiajs/inertia";
 import { Head, Link } from "@inertiajs/inertia-vue3";
 
@@ -328,15 +296,15 @@ export default {
         Link,
         LockClosedIcon,
         LockOpenIcon,
-        DownloadIcon,
-        MailIcon,
+        ArrowDownTrayIcon,
+        EnvelopeIcon,
         PencilIcon,
         ScaleIcon,
         Menu,
         MenuButton,
         MenuItem,
         MenuItems,
-        DotsVerticalIcon,
+        EllipsisVerticalIcon,
     },
     props: ["dataset", "mode"],
     setup() {},

@@ -27,10 +27,15 @@
                     the project.
                 </div>
             </div>
+            <div v-if="study.is_public && study.doi != null">
+                <Citation :model="'study'" :doi="study.doi"></Citation>
+            </div>
             <div class="bg-white border-b">
                 <div class="px-12">
                     <div class="flex flex-nowrap justify-between py-6">
-                        <div class="lg:flex lg:items-center lg:justify-between">
+                        <div
+                            class="lg:flex lg:items-center lg:justify-between w-full"
+                        >
                             <div class="flex-1 min-w-0">
                                 <nav class="flex" aria-label="Breadcrumb">
                                     <ol
@@ -66,20 +71,21 @@
                                         </li>
                                     </ol>
                                 </nav>
-                                <h2
-                                    class="mt-2 text-2xl font-bold break-words leading-7 text-gray-900 sm:text-3xl"
+                                <div
+                                    class="flex pr-20 mt-2 cursor-pointer items-center text-xl text-gray-700 font-bold"
                                 >
                                     <StarIcon
                                         :class="[
-                                            study.starred
+                                            study.is_bookmarked
                                                 ? 'text-yellow-400'
                                                 : 'text-gray-200',
-                                            'h-5 w-5 inline flex-shrink-0 -ml-8 mr-0.5',
+                                            'h-5 w-5 flex-shrink-0 -ml-1 mr-1',
                                         ]"
                                         aria-hidden="true"
+                                        @click="toogleStarred"
                                     />
                                     {{ study.name }}
-                                </h2>
+                                </div>
                                 <div
                                     class="mt-1 flex flex-col sm:flex-row sm:flex-wrap sm:mt-0 sm:space-x-6"
                                 >
@@ -179,16 +185,6 @@
                                     <div
                                         class="mt-2 flex items-center text-sm text-gray-500"
                                     >
-                                        <CalendarIcon
-                                            class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
-                                            aria-hidden="true"
-                                        />
-                                        Updated on
-                                        {{ formatDateTime(study.updated_at) }}
-                                    </div>
-                                    <div
-                                        class="mt-2 flex items-center text-sm text-gray-500"
-                                    >
                                         <a
                                             class="cursor-pointer inline-flex items-center"
                                             @click="toggleDetails"
@@ -269,6 +265,26 @@
                                             </span>
                                             {{ studyRole }}
                                         </span>
+                                        <span
+                                            v-if="study.identifier"
+                                            class="inline-flex pr-4 ml-4 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
+                                        >
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                class="h-6 w-6 py-1"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                stroke="currentColor"
+                                                stroke-width="2"
+                                            >
+                                                <path
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    d="M5.25 8.25h15m-16.5 7.5h15m-1.8-13.5l-3.9 19.5m-2.1-19.5l-3.9 19.5"
+                                                />
+                                            </svg>
+                                            <b>{{ study.identifier }}</b>
+                                        </span>
                                     </div>
                                     <study-details
                                         ref="studyDetailsElement"
@@ -276,6 +292,47 @@
                                         :role="studyRole"
                                         :studyPermissions="studyPermissions"
                                     />
+                                </div>
+                                <div
+                                    class="flex flex-nowrap justify-between pb-3"
+                                >
+                                    <div
+                                        class="mt-2 flex items-center text-xs text-gray-400"
+                                    >
+                                        <CalendarIcon
+                                            class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-300"
+                                            aria-hidden="true"
+                                        />
+                                        Updated on
+                                        {{ formatDateTime(study.updated_at) }}
+                                    </div>
+                                    <div>
+                                        <span
+                                            v-if="
+                                                !study.is_public &&
+                                                study.is_published
+                                            "
+                                            class="ml-4 inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-yellow-100 text-red-800 capitalize"
+                                        >
+                                            PUBLISHED -&emsp;
+                                            <b v-if="study.release_date"
+                                                >Release date:
+                                                {{
+                                                    formatDate(
+                                                        study.release_date
+                                                    )
+                                                }}</b
+                                            >
+                                            <b v-else
+                                                >Release date:
+                                                {{
+                                                    formatDate(
+                                                        project.release_date
+                                                    )
+                                                }}</b
+                                            >
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -293,7 +350,7 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import { Link } from "@inertiajs/inertia-vue3";
 import StudyDetails from "./Partials/Details.vue";
-import { StarIcon } from "@heroicons/vue/solid";
+import { StarIcon } from "@heroicons/vue/24/solid";
 import { ref } from "vue";
 import {
     BriefcaseIcon,
@@ -303,12 +360,15 @@ import {
     ChevronRightIcon,
     CurrencyDollarIcon,
     LinkIcon,
-    LocationMarkerIcon,
+    MapPinIcon,
     PencilIcon,
     ExclamationCircleIcon,
-} from "@heroicons/vue/solid";
+} from "@heroicons/vue/24/solid";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import AccessDialogue from "@/Shared/AccessDialogue.vue";
+import Citation from "@/Shared/Citation.vue";
+import { Inertia } from "@inertiajs/inertia";
+
 export default {
     components: {
         Link,
@@ -326,10 +386,11 @@ export default {
         ChevronRightIcon,
         CurrencyDollarIcon,
         LinkIcon,
-        LocationMarkerIcon,
+        MapPinIcon,
         PencilIcon,
         StarIcon,
         AccessDialogue,
+        Citation,
     },
     props: [
         "study",
@@ -353,6 +414,24 @@ export default {
     methods: {
         toggleDetails() {
             this.studyDetailsElement.toggleDetails();
+        },
+        toogleStarred() {
+            const url = "/studies/" + this.study.id + "/toggleStarred";
+            axios
+                .get(url)
+                .catch((err) => {
+                    if (
+                        err.response.status !== 200 ||
+                        err.response.status !== 201
+                    ) {
+                        throw new Error(
+                            `API call failed with status code: ${err.response.status}`
+                        );
+                    }
+                })
+                .then(function (response) {
+                    Inertia.reload({ only: ["study"] });
+                });
         },
     },
 };

@@ -3,7 +3,7 @@
 namespace App\Actions\Project;
 
 use App\Models\Project;
-use Carbon\Carbon;
+use App\Models\Validation;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -47,10 +47,6 @@ class UpdateProject
             $licenseExists = array_key_exists('license_id', $input);
             $license_id = $licenseExists ? $input['license_id'] : $project->license_id;
 
-            if ($is_public == true) {
-                $release_date = Carbon::now()->toDateTimeString();
-            }
-
             $project
                 ->forceFill([
                     'name' => $input['name'],
@@ -76,8 +72,6 @@ class UpdateProject
                         : 'viewer',
                     'team_id' => $input['team_id'],
                     'owner_id' => $input['owner_id'],
-                    'is_public' => $is_public,
-                    'release_date' => $release_date,
                     'license_id' => $license_id,
                     'project_photo_path' => $s3filePath ? $s3filePath : $project->project_photo_path,
                 ])
@@ -94,10 +88,7 @@ class UpdateProject
                         $study->license_id = $license_id;
                     }
                 }
-                if ($is_public) {
-                    $study->is_public = $is_public;
-                    $study->release_date = $release_date;
-                }
+
                 $study->save();
 
                 $datasets = $study->datasets;
@@ -107,27 +98,126 @@ class UpdateProject
                             $dataset->license_id = $license_id;
                         }
                     }
-                    if ($is_public) {
-                        $dataset->is_public = $is_public;
-                        $dataset->release_date = $release_date;
-                    }
+
                     $dataset->save();
                 }
+            }
+
+            $validation = $project->validation;
+
+            if (! $validation) {
+                $validation = new Validation();
+                $validation->save();
+                $project->validation()->associate($validation);
+                $project->save();
+
+                foreach ($project->studies as $study) {
+                    $study->validation()->associate($validation);
+                    $study->save();
+                    foreach ($study->datasets as $dataset) {
+                        $dataset->validation()->associate($validation);
+                        $dataset->save();
+                    }
+                }
+            }
+            $validation->process();
+
+            $project = $project->fresh();
+
+            $draft = $project->draft;
+
+            if ($draft) {
+                $draft->name = $project->name;
+                $draft->slug = $project->slug;
+                $draft->description = $project->description;
+                $draft->syncTagsWithType($project->tags->pluck('name')->toArray(), 'Draft');
+                $draft->save();
             }
         });
     }
 
-    public function updateAuthors(Project $project, $authors)
+    /**
+     * Attach authors to a project.
+     *
+     * @param  \App\Models\Project  $project
+     * @param  array  $authors
+     * @return void
+     */
+    public function attachAuthor(Project $project, $authors)
     {
+        //dd($authors);
+        $authors_map = [];
+        $index = 0;
+        foreach ($authors as $author) {
+            $authors_map[$author->id] = ['contributor_type' => $author->contributor_type, 'sort_order' => $index];
+            $index += 1;
+        }
+
         $project->authors()->sync(
-            $authors
+            $authors_map
         );
     }
 
-    public function updateCitation(Project $project, $citations, $user)
+    /**
+     * Detach authors from a project.
+     *
+     * @param  \App\Models\Project  $project
+     * @param  array  $authors
+     * @return void
+     */
+    public function detachAuthor(Project $project, $author_id)
     {
-        $project->citations()->syncWithPivotValues(
-            $citations, ['user' => $user->id]
+        $project->authors()->detach(
+            $author_id
+        );
+    }
+
+    /**
+     * Update existing Contributor type for a given author in a project.
+     *
+     * @param  \App\Models\Project  $project
+     * @param  string  $authorId
+     * @param  string  $role
+     * @return void
+     */
+    public function updateContributorType(Project $project, $author_id, $role)
+    {
+        $project->authors()->updateExistingPivot($author_id, [
+            'contributor_type' => $role,
+        ]);
+    }
+
+    /**
+     * Attach citations to a project.
+     *
+     * @param  \App\Models\Project  $project
+     * @param  \App\Models\User  $user
+     * @param  array  $citations
+     * @return void
+     */
+    public function syncCitations(Project $project, $citations, $user)
+    {
+        $citations_map = [];
+        foreach ($citations as $citation) {
+            $citations_map[$citation->id] = ['user' => $user->id];
+        }
+
+        $project->citations()->sync(
+            $citations_map
+        );
+    }
+
+    /**
+     * Detach citation from a project.
+     *
+     * @param  \App\Models\Project  $project
+     * @param  array  $authors
+     * @return void
+     */
+    public function detachCitation(Project $project, $citation_id)
+    {
+        $project->citations()->detach(
+            $citation_id
         );
     }
 }

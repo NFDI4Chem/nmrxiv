@@ -99,9 +99,18 @@ export default {
             if (this.isString(val)) {
                 return JSON.parse(val);
             }
-            return null;
+            return val;
+        },
+        isValidEmail(email) {
+            var re =
+                /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            return re.test(email);
+        },
+        isEmpty(obj) {
+            return Object.keys(obj).length === 0;
         },
     },
+
     computed: {
         editable() {
             if (this.role) {

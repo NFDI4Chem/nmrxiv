@@ -38,7 +38,10 @@
                                     @click="show = false"
                                 >
                                     <span class="sr-only">Close</span>
-                                    <XIcon class="h-5 w-5" aria-hidden="true" />
+                                    <XMarkIcon
+                                        class="h-5 w-5"
+                                        aria-hidden="true"
+                                    />
                                 </button>
                             </div>
                         </div>
@@ -66,7 +69,7 @@
                 <div class="p-4">
                     <div class="flex items-start">
                         <div class="flex-shrink-0">
-                            <ExclamationIcon
+                            <ExclamationTriangleIcon
                                 class="h-6 w-6 text-red-400"
                                 aria-hidden="true"
                             />
@@ -82,7 +85,7 @@
                                 @click="show = false"
                             >
                                 <span class="sr-only">Close</span>
-                                <XIcon class="h-5 w-5" aria-hidden="true" />
+                                <XMarkIcon class="h-5 w-5" aria-hidden="true" />
                             </button>
                         </div>
                     </div>
@@ -93,15 +96,15 @@
 </template>
 
 <script>
-import { CheckCircleIcon } from "@heroicons/vue/outline";
-import { XIcon } from "@heroicons/vue/solid";
-import { ExclamationIcon } from "@heroicons/vue/outline";
+import { CheckCircleIcon } from "@heroicons/vue/24/outline";
+import { XMarkIcon } from "@heroicons/vue/24/solid";
+import { ExclamationTriangleIcon } from "@heroicons/vue/24/outline";
 
 export default {
     components: {
         CheckCircleIcon,
-        XIcon,
-        ExclamationIcon,
+        XMarkIcon,
+        ExclamationTriangleIcon,
     },
     data() {
         return {

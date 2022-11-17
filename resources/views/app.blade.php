@@ -14,8 +14,37 @@
         @vite(['resources/js/app.js'])
 
         @routes
+        
+        @env ('production')
+            <!-- Matomo -->
+            <script>
+            var _paq = window._paq = window._paq || [];
+            /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+            _paq.push(['trackPageView']);
+            _paq.push(['enableLinkTracking']);
+            (function() {
+                var u="//matomo.nmrxiv.org/";
+                _paq.push(['setTrackerUrl', u+'matomo.php']);
+                _paq.push(['setSiteId', '2']);
+                var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+                g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+            })();
+            </script>
+            <!-- End Matomo Code -->
+        @endenv
+
     </head>
     <body class="font-sans antialiased h-full">
+        @env (['development', 'local'])
+        <div
+            class="z-20 fixed bottom-0 bg-yellow-300 border-b w-screen border-black-800"
+        >
+            <div class="max-w-7xl mx-auto py-1 px-6 text-center">
+              <small><b>DEMO SITE WARNING</b>: Please be aware that this is a demo/test server for nmrXiv and don't upload or save any sensitive data.</small>
+            </div>
+        </div>
+        @endenv
+        
         @inertia
 
         @env ('local')

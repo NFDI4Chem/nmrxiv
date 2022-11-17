@@ -49,7 +49,7 @@ class JetstreamServiceProvider extends ServiceProvider
      */
     protected function configurePermissions()
     {
-        Jetstream::defaultApiTokenPermissions(['read']);
+        Jetstream::defaultApiTokenPermissions(['project:read']);
 
         Jetstream::role('owner', 'Owner', [
             'project:create',

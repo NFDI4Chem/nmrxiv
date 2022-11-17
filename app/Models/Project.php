@@ -4,6 +4,8 @@ namespace App\Models;
 
 use App\Traits\CacheClear;
 use Auth;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Scout\Searchable;
@@ -17,6 +19,7 @@ use Storage;
 class Project extends Model implements Auditable
 {
     use CacheClear;
+    use HasDOI;
     use Searchable;
     use Markable;
     use HasFactory;
@@ -55,7 +58,7 @@ class Project extends Model implements Auditable
      *
      * @var array
      */
-    protected $appends = ['public_url', 'private_url', 'project_photo_url', 'is_bookmarked'];
+    protected $appends = ['public_url', 'private_url', 'project_photo_url', 'is_bookmarked', 'is_published'];
 
     /**
      * Get the URL to the project's profile photo.
@@ -67,6 +70,19 @@ class Project extends Model implements Auditable
         return $this->project_photo_path
                     ? Storage::disk(env('FILESYSTEM_DRIVER_PUBLIC'))->url($this->project_photo_path)
                     : '';
+    }
+
+    public function getIsPublishedAttribute()
+    {
+        if ($this->is_public) {
+            return true;
+        } else {
+            if ($this->release_date) {
+                return ! Carbon::now()->startOfDay()->gte($this->release_date);
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -82,6 +98,18 @@ class Project extends Model implements Auditable
         } else {
             return Bookmark::has($this, $user);
         }
+    }
+
+    /**
+     * Get the project identifier
+     *
+     * @return \Illuminate\Database\Eloquent\Casts\Attribute
+     */
+    protected function identifier(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? 'NMRXIV:P'.$value : null,
+        );
     }
 
     public function studies()
@@ -233,7 +261,8 @@ class Project extends Model implements Auditable
 
     protected function getPublicUrlAttribute()
     {
-        return env('APP_URL', null).'/projects/'.$this->owner->username.'/'.urlencode($this->slug);
+        // return env('APP_URL', null).'/projects/'.$this->owner->username.'/'.urlencode($this->slug);
+        return env('APP_URL', null).'/P'.$this->getAttributes()['identifier'];
     }
 
     protected function getPrivateUrlAttribute()
@@ -249,6 +278,11 @@ class Project extends Model implements Auditable
     public function license()
     {
         return $this->belongsTo(License::class, 'license_id');
+    }
+
+    public function validation()
+    {
+        return $this->belongsTo(Validation::class, 'validation_id');
     }
 
     /**
@@ -268,7 +302,8 @@ class Project extends Model implements Auditable
      */
     public function authors()
     {
-        return $this->belongsToMany(Author::class);
+        return $this->belongsToMany(Author::class)
+            ->withPivot('contributor_type', 'sort_order');
     }
 
     public function scopeFilter($query, array $filters)
@@ -278,7 +313,7 @@ class Project extends Model implements Auditable
                 $query->where('name', 'ILIKE', '%'.$search.'%')
                     ->orWhere('description', 'ILIKE', '%'.$search.'%');
             });
-        })->when($filters['sort'] ?? null, function ($query, $sort) {
+        })->when($filters['sort'] ?? 'newest', function ($query, $sort) {
             if ($sort === 'newest') {
                 $query->orderByDesc('updated_at');
             } elseif ($sort === 'rating') {
