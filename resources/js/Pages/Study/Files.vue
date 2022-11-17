@@ -391,8 +391,9 @@ export default {
                 disablePreviews: true,
                 parallelUploads: 1,
                 maxFiles: 10000,
-                dictDefaultMessage:
-                    document.querySelector("#dropzone-message").innerHTML,
+                dictDefaultMessage: document.querySelector("#dropzone-message")
+                    ? document.querySelector("#dropzone-message").innerHTML
+                    : null,
                 done() {},
                 accept(file, done) {
                     const url = "/dashboard/storage/signed-storage-url";
