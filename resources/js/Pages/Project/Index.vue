@@ -239,69 +239,85 @@
                                             class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
                                         >
                                             Shared by:
-                                            {{ project.owner.first_name }}
-                                            {{ project.owner.last_name }}</span
+                                            {{
+                                                project.owner
+                                                    ? project.owner.first_name
+                                                    : ""
+                                            }}
+                                            {{
+                                                project.owner
+                                                    ? project.owner.last_name
+                                                    : ""
+                                            }}</span
                                         >
                                     </div>
                                 </span>
-                                </div>
-                                <div class="grid grid-cols-1">
-                                    <div>
-                                        <dd class="text-xs text-gray-900 space-y-5 mt-1">
-                                            <p>
-                                                <span
-                                                    v-for="tag in project.tags"
-                                                    :key="tag.id"
-                                                    class="mr-2"
-                                                >
-                                                    <span
-                                                        class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-indigo-100 text-indigo-800"
-                                                    >
-                                                        <svg
-                                                            class="-ml-0.5 mr-1.5 h-2 w-2 text-indigo-400"
-                                                            fill="currentColor"
-                                                            viewBox="0 0 8 8"
-                                                        >
-                                                            <circle cx="4" cy="4" r="3" />
-                                                        </svg>
-                                                        {{ tag.name["en"] }}
-                                                    </span>
-                                                </span>
-                                            </p>
-                                        </dd>
-                                    </div>
-                                    <div class="text-xs text-gray-400 pr-5 mb-1 mt-1 truncate ...">
-                                        {{ project.description }}
-                                    </div>
-                                    <div class="text-xs text-gray-400 pr-5">
-                                        <span class="font-bold text-gray-600 " 
-                                            >Last updated on</span
-                                        >
-                                        {{ formatDate(project.updated_at) }}
-                                    </div>
-                                    <div class="text-xs text-gray-400 pr-5">
-                                        <span class="font-bold text-gray-600"
-                                            >Created on</span
-                                        >
-                                        {{ formatDate(project.created_at) }}
-                                    </div>
-                                    <span
-                                        v-if="
-                                            !project.is_public &&
-                                            project.is_published
-                                        "
-                                        class="inline-flex items-center mt-2 px-3 py-0.5 rounded-full text-sm font-medium bg-yellow-100 text-red-800 capitalize"
-                                    >
-                                        PUBLISHED -&emsp;
-                                        <b
-                                            >Release date:
-                                            {{
-                                                formatDate(project.release_date)
-                                            }}</b
-                                        >
-                                    </span>
-                                </div>
                             </div>
+                            <div class="grid grid-cols-1">
+                                <div>
+                                    <dd
+                                        class="text-xs text-gray-900 space-y-5 mt-1"
+                                    >
+                                        <p>
+                                            <span
+                                                v-for="tag in project.tags"
+                                                :key="tag.id"
+                                                class="mr-2"
+                                            >
+                                                <span
+                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-indigo-100 text-indigo-800"
+                                                >
+                                                    <svg
+                                                        class="-ml-0.5 mr-1.5 h-2 w-2 text-indigo-400"
+                                                        fill="currentColor"
+                                                        viewBox="0 0 8 8"
+                                                    >
+                                                        <circle
+                                                            cx="4"
+                                                            cy="4"
+                                                            r="3"
+                                                        />
+                                                    </svg>
+                                                    {{ tag.name["en"] }}
+                                                </span>
+                                            </span>
+                                        </p>
+                                    </dd>
+                                </div>
+                                <div
+                                    class="text-xs text-gray-400 pr-5 mb-1 mt-1 truncate ..."
+                                >
+                                    {{ project.description }}
+                                </div>
+                                <div class="text-xs text-gray-400 pr-5">
+                                    <span class="font-bold text-gray-600"
+                                        >Last updated on</span
+                                    >
+                                    {{ formatDate(project.updated_at) }}
+                                </div>
+                                <div class="text-xs text-gray-400 pr-5">
+                                    <span class="font-bold text-gray-600"
+                                        >Created on</span
+                                    >
+                                    {{ formatDate(project.created_at) }}
+                                </div>
+                                <span
+                                    v-if="
+                                        !project.is_public &&
+                                        project.is_published
+                                    "
+                                    class="inline-flex items-center mt-2 px-3 py-0.5 rounded-full text-sm font-medium bg-yellow-100 text-red-800 capitalize"
+                                >
+                                    PUBLISHED -&emsp;
+                                    <b
+                                        >Release date:
+                                        {{
+                                            formatDate(project.release_date)
+                                        }}</b
+                                    >
+                                </span>
+                            </div>
+                        </div>
                         <div class="border-l">
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
