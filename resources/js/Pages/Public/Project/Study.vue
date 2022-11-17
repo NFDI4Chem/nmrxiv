@@ -10,7 +10,7 @@
                     </div>
                     <div class="text-sm float-left">
                         <span class="text-gray-400 pt-2">
-                            https://doi.org/{{ study.data.doi }}
+                            <img :src="'badge/doi/' + study.data.identifier" />
                         </span>
                     </div>
                     <div class="float-right">
@@ -328,7 +328,12 @@
                         </select>
                         <div v-if="selectedDataset" class="text-sm my-2">
                             <span class="text-gray-400 pt-2">
-                                DOI: https://doi.org/{{ selectedDataset.doi }}
+                                <img
+                                    :src="
+                                        'badge/doi/' +
+                                        selectedDataset.identifier
+                                    "
+                                />
                             </span>
                         </div>
                     </div>

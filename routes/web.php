@@ -20,7 +20,9 @@ use App\Http\Controllers\StudyController;
 use App\Http\Controllers\StudyInvitationController;
 use App\Http\Controllers\StudyMemberController;
 use App\Http\Controllers\TeamController;
-use Illuminate\Foundation\Application;
+use App\Models\Dataset;
+use App\Models\Molecule;
+use App\Models\Project;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -40,10 +42,18 @@ Route::get('/', function () {
         return redirect()->route('dashboard');
     } else {
         return Inertia::render('Welcome', [
-            'canLogin' => Route::has('login'),
-            'canRegister' => Route::has('register'),
-            'laravelVersion' => Application::VERSION,
-            'phpVersion' => PHP_VERSION,
+            'spectra' => Cache::rememberForever('stats.spectra', function () {
+                return Dataset::where('is_public', true)->get()->count();
+            }),
+            'projects' => Cache::rememberForever('stats.projects', function () {
+                return Project::where('is_public', true)->get()->count();
+            }),
+            'compounds' => Cache::rememberForever('stats.compounds', function () {
+                return Molecule::whereNotNull('identifier')->get()->count();
+            }),
+            'techniques' => Cache::rememberForever('stats.techniques', function () {
+                return Dataset::where('is_public', true)->get()->unique('type')->count();
+            }),
         ]);
     }
 })->name('welcome');
@@ -51,7 +61,6 @@ Route::get('/', function () {
 Route::supportBubble();
 
 Route::group(['middleware' => 'verified'], function () {
-    // Teams...
     if (Jetstream::hasTeamFeatures()) {
         Route::delete('/teams/{team}', [TeamController::class, 'destroy'])->name('app.teams.destroy');
     }
@@ -65,12 +74,21 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
                 ->name('license');
 
     // Authors
-    Route::post('authors/{project}', [AuthorController::class, 'updateAuthor'])
-                ->name('update-author');
+    Route::post('authors/{project}', [AuthorController::class, 'save'])
+        ->name('author.save');
+
+    Route::delete('authors/{project}/delete', [AuthorController::class, 'destroy'])
+        ->name('author.delete');
+
+    Route::post('authors/{project}/updateRole', [AuthorController::class, 'updateRole'])
+        ->name('author.updateRole');
 
     //Citation
-    Route::post('citation/{project}', [CitationController::class, 'updateCitation'])
-    ->name('update-citation');
+    Route::post('citations/{project}', [CitationController::class, 'save'])
+    ->name('citation.save');
+
+    Route::delete('citations/{project}/delete', [CitationController::class, 'destroy'])
+    ->name('citation.delete');
 
     Route::post('/onboarding/{status}', [DashboardController::class, 'onboardingStatus'])
             ->name('onboarding.complete');
@@ -253,7 +271,7 @@ Route::group([
 Route::get('{id}', [ApplicationController::class, 'resolve'])->where('id', '(P|S|D|M|p|s|d|m)[0-9]+')
     ->name('public');
 
-Route::get('/badge/doi/{id}', [ApplicationController::class, 'resolveBadge'])->where('id', '(P|S|D|M|p|s|d|m)[0-9]+')
+Route::get('/badge/doi/{id}', [ApplicationController::class, 'resolveBadge'])
     ->name('badge.doi');
 
 Route::get('{username}/download/{project}/{key?}', [DownloadController::class, 'downloadFromProject'])
@@ -292,5 +310,5 @@ Route::get('datasets/{dataset}/nmriumInfo', [DatasetController::class, 'fetchNMR
 Route::get('datasets/{owner}/{slug}', [DatasetController::class, 'publicDatasetView'])
     ->name('public.dataset');
 
-Route::get('datasets', [DatasetController::class, 'publicDatasetsView'])
+Route::get('spectra', [DatasetController::class, 'publicDatasetsView'])
 ->name('public.datasets');

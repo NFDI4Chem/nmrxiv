@@ -136,17 +136,88 @@ class UpdateProject
         });
     }
 
-    public function updateAuthors(Project $project, $authors)
+    /**
+     * Attach authors to a project.
+     *
+     * @param  \App\Models\Project  $project
+     * @param  array  $authors
+     * @return void
+     */
+    public function attachAuthor(Project $project, $authors)
     {
+        //dd($authors);
+        $authors_map = [];
+        $index = 0;
+        foreach ($authors as $author) {
+            $authors_map[$author->id] = ['contributor_type' => $author->contributor_type, 'sort_order' => $index];
+            $index += 1;
+        }
+
         $project->authors()->sync(
-            $authors
+            $authors_map
         );
     }
 
-    public function updateCitation(Project $project, $citations, $user)
+    /**
+     * Detach authors from a project.
+     *
+     * @param  \App\Models\Project  $project
+     * @param  array  $authors
+     * @return void
+     */
+    public function detachAuthor(Project $project, $author_id)
     {
+        $project->authors()->detach(
+            $author_id
+        );
+    }
+
+    /**
+     * Update existing Contributor type for a given author in a project.
+     *
+     * @param  \App\Models\Project  $project
+     * @param  string  $authorId
+     * @param  string  $role
+     * @return void
+     */
+    public function updateContributorType(Project $project, $author_id, $role)
+    {
+        $project->authors()->updateExistingPivot($author_id, [
+            'contributor_type' => $role,
+        ]);
+    }
+
+    /**
+     * Attach citations to a project.
+     *
+     * @param  \App\Models\Project  $project
+     * @param  \App\Models\User  $user
+     * @param  array  $citations
+     * @return void
+     */
+    public function syncCitations(Project $project, $citations, $user)
+    {
+        $citations_map = [];
+        foreach ($citations as $citation) {
+            $citations_map[$citation->id] = ['user' => $user->id];
+        }
+
         $project->citations()->sync(
-            $citations, ['user' => $user->id]
+            $citations_map
+        );
+    }
+
+    /**
+     * Detach citation from a project.
+     *
+     * @param  \App\Models\Project  $project
+     * @param  array  $authors
+     * @return void
+     */
+    public function detachCitation(Project $project, $citation_id)
+    {
+        $project->citations()->detach(
+            $citation_id
         );
     }
 }

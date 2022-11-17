@@ -6,7 +6,7 @@
                 autocomplete="off"
                 type="text"
                 name="search"
-                placeholder="Search Dataset"
+                placeholder="Search"
                 :value="modelValue"
                 @input="$emit('update:modelValue', $event.target.value)"
             />
