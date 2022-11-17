@@ -74,7 +74,7 @@ class DashboardController extends Controller
         )->get();
 
         return Inertia::render('Starred', [
-            'projects' => $projects,
+            'projects' => $projects->load('owner'),
             'studies' => $studies,
         ]);
     }
