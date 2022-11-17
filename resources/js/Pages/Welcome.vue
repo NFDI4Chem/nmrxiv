@@ -101,10 +101,10 @@
                                     Projects
                                 </Link>
                                 <Link
-                                    href="/datasets"
+                                    href="/spectra"
                                     class="text-base font-medium text-gray-500 hover:text-gray-900"
                                 >
-                                    Datasets
+                                    Spectra
                                 </Link>
                                 <a
                                     target="_blank"
@@ -297,56 +297,76 @@
                 </div>
             </div>
 
-            <!-- Logo Cloud -->
-            <div class="bg-gray-50 border-t border-b border-gray-100">
+            <!-- Stats section -->
+            <div class="relative bg-gray-800">
                 <div
-                    class="max-w-7xl mx-auto content-center py-16 px-4 sm:px-6 lg:px-8"
+                    class="h-80 absolute inset-x-0 bottom-0 xl:top-0 xl:h-full"
                 >
-                    <p
-                        class="text-center text-sm font-semibold uppercase text-gray-600 tracking-wide"
+                    <div class="h-full w-full xl:grid xl:grid-cols-2">
+                        <div class="h-full xl:relative xl:col-start-2">
+                            <img
+                                class="h-full w-full object-cover opacity-25 xl:absolute xl:inset-0"
+                                src="https://images.unsplash.com/photo-1656331797721-b593b8f00297?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2830&q=80&sat=-100"
+                                alt="People working on laptops"
+                            />
+                            <div
+                                aria-hidden="true"
+                                class="absolute inset-x-0 top-0 h-32 bg-gradient-to-r from-gray-800 xl:inset-y-0 xl:left-0 xl:h-full xl:w-32 xl:bg-gradient-to-r"
+                            />
+                        </div>
+                    </div>
+                </div>
+                <div
+                    class="max-w-4xl mx-auto px-4 sm:px-6 lg:max-w-7xl lg:px-8 xl:grid xl:grid-cols-2 xl:grid-flow-col-dense xl:gap-x-8"
+                >
+                    <div
+                        class="relative pt-12 pb-64 sm:pt-24 sm:pb-64 xl:col-start-1 xl:pb-24"
                     >
-                        <!-- Trusted by over 5 very average small businesses -->
-                    </p>
-                    <div class="mt-6 grid grid-cols-3 gap-8">
-                        <div
-                            class="col-span-3 md:col-span-1 flex justify-center"
+                        <h2
+                            class="text-sm font-semibold tracking-wide uppercase"
                         >
-                            <a
-                                target="_blank"
-                                href="https://cheminf.uni-jena.de/"
+                            <span
+                                class="bg-gradient-to-r from-indigo-300 to-teal-300 bg-clip-text text-transparent"
+                                >Metrics</span
                             >
-                                <img
-                                    class="h-12"
-                                    src="https://www.uni-jena.de/unijenamedia/universitaet/abteilung-hochschulkommunikation/marketing/wort-bildmarke-universitaet-jena.jpg?height=335&width=1000"
-                                    alt="FSU Jena"
-                                />
-                            </a>
-                        </div>
+                        </h2>
+                        <p class="mt-3 text-xl font-bold text-gray-400">
+                            Validate your spectral findings and develop
+                            new/accurate tools using state of the art AI/ML
+                            models.
+                        </p>
                         <div
-                            class="col-span-3 md:col-span-1 flex justify-center"
+                            class="mt-4 grid grid-cols-1 gap-y-12 gap-x-6 sm:grid-cols-2"
                         >
-                            <a target="_blank" href="https://www.nfdi4chem.de/">
-                                <img
-                                    class="h-12"
-                                    src="/img/nmrxiv-logo.png"
-                                    alt="NFDI4Chem"
-                                />
-                            </a>
-                        </div>
-                        <div
-                            class="col-span-3 md:col-span-1 flex justify-center"
-                        >
-                            <a target="_blank" href="https://www.nmrium.org/">
-                                <img
-                                    class="h-12"
-                                    src="/img/nmrium-logo.png"
-                                    alt="NMRium"
-                                />
-                            </a>
+                            <p>
+                                <span
+                                    class="block text-2xl font-bold text-white"
+                                    >{{ projects }} Projects</span
+                                >
+                            </p>
+                            <p>
+                                <span
+                                    class="block text-2xl font-bold text-white"
+                                    >{{ compounds }} Compounds</span
+                                >
+                            </p>
+                            <p>
+                                <span
+                                    class="block text-2xl font-bold text-white"
+                                    >{{ spectra }} Spectra</span
+                                >
+                            </p>
+                            <p>
+                                <span
+                                    class="block text-2xl font-bold text-white"
+                                    >{{ techniques }} Techniques</span
+                                >
+                            </p>
                         </div>
                     </div>
                 </div>
             </div>
+
             <div class="relative pt-16 pb-32">
                 <div>
                     <div
@@ -634,64 +654,52 @@
                 </div>
             </div>
 
-            <!-- Stats section -->
-            <div class="relative bg-gray-900">
+            <!-- Logo Cloud -->
+            <div class="bg-gray-50 border-t border-b border-gray-100">
                 <div
-                    class="h-80 absolute inset-x-0 bottom-0 xl:top-0 xl:h-full"
+                    class="max-w-7xl mx-auto content-center py-16 px-4 sm:px-6 lg:px-8"
                 >
-                    <div class="h-full w-full xl:grid xl:grid-cols-2">
-                        <div class="h-full xl:relative xl:col-start-2">
-                            <img
-                                class="h-full w-full object-cover opacity-25 xl:absolute xl:inset-0"
-                                src="https://images.unsplash.com/photo-1521737852567-6949f3f9f2b5?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=2830&q=80&sat=-100"
-                                alt="People working on laptops"
-                            />
-                            <div
-                                aria-hidden="true"
-                                class="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-gray-900 xl:inset-y-0 xl:left-0 xl:h-full xl:w-32 xl:bg-gradient-to-r"
-                            />
-                        </div>
-                    </div>
-                </div>
-                <div
-                    class="max-w-4xl mx-auto px-4 sm:px-6 lg:max-w-7xl lg:px-8 xl:grid xl:grid-cols-2 xl:grid-flow-col-dense xl:gap-x-8"
-                >
-                    <div
-                        class="relative pt-12 pb-64 sm:pt-24 sm:pb-64 xl:col-start-1 xl:pb-24"
+                    <p
+                        class="text-center text-sm font-semibold uppercase text-gray-600 tracking-wide"
                     >
-                        <h2
-                            class="text-sm font-semibold tracking-wide uppercase"
-                        >
-                            <span
-                                class="bg-gradient-to-r from-indigo-300 to-teal-300 bg-clip-text text-transparent"
-                                >Valuable Metrics</span
-                            >
-                        </h2>
-                        <p class="mt-3 text-3xl font-extrabold text-white">
-                            Get actionable data that will help develop new and
-                            accurate tools using state of the art AI/ML models.
-                        </p>
-                        <!-- <p class="mt-5 text-lg text-gray-300">
-              Rhoncus sagittis risus arcu erat lectus bibendum. Ut in adipiscing quis in
-              viverra tristique sem. Ornare feugiat viverra eleifend fusce orci in quis
-              amet. Sit in et vitae tortor, massa. Dapibus laoreet amet lacus nibh integer
-              quis. Eu vulputate diam sit tellus quis at.
-            </p> -->
+                        <!-- Trusted by over 5 very average small businesses -->
+                    </p>
+                    <div class="mt-6 grid grid-cols-3 gap-8">
                         <div
-                            class="mt-12 grid grid-cols-1 gap-y-12 gap-x-6 sm:grid-cols-2"
+                            class="col-span-3 md:col-span-1 flex justify-center"
                         >
-                            <p v-for="item in metrics" :key="item.id">
-                                <span
-                                    class="block text-2xl font-bold text-white"
-                                    >{{ item.stat }}</span
-                                >
-                                <span class="mt-1 block text-base text-gray-300"
-                                    ><span class="font-medium text-white">{{
-                                        item.emphasis
-                                    }}</span>
-                                    {{ item.rest }}</span
-                                >
-                            </p>
+                            <a
+                                target="_blank"
+                                href="https://cheminf.uni-jena.de/"
+                            >
+                                <img
+                                    class="h-12"
+                                    src="https://www.uni-jena.de/unijenamedia/universitaet/abteilung-hochschulkommunikation/marketing/wort-bildmarke-universitaet-jena.jpg?height=335&width=1000"
+                                    alt="FSU Jena"
+                                />
+                            </a>
+                        </div>
+                        <div
+                            class="col-span-3 md:col-span-1 flex justify-center"
+                        >
+                            <a target="_blank" href="https://www.nfdi4chem.de/">
+                                <img
+                                    class="h-12"
+                                    src="/img/nmrxiv-logo.png"
+                                    alt="NFDI4Chem"
+                                />
+                            </a>
+                        </div>
+                        <div
+                            class="col-span-3 md:col-span-1 flex justify-center"
+                        >
+                            <a target="_blank" href="https://www.nmrium.org/">
+                                <img
+                                    class="h-12"
+                                    src="/img/nmrium-logo.png"
+                                    alt="NMRium"
+                                />
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -1003,32 +1011,6 @@ const features = [
         icon: CircleStackIcon,
     },
 ];
-const metrics = [
-    {
-        id: 1,
-        stat: "XXXXX Spectra Datasets",
-        emphasis: "",
-        rest: "",
-    },
-    {
-        id: 2,
-        stat: "XX Techniques Covered",
-        emphasis: "",
-        rest: "",
-    },
-    {
-        id: 3,
-        stat: "XX Active Challenges",
-        emphasis: "",
-        rest: "",
-    },
-    {
-        id: 4,
-        stat: "XXXX Users",
-        emphasis: "",
-        rest: "",
-    },
-];
 const footerNavigation = {
     // Search: [
     //   { name: "Browse", href: "/projects" },
@@ -1165,17 +1147,16 @@ export default {
     },
 
     props: {
-        canLogin: Boolean,
-        canRegister: Boolean,
-        laravelVersion: String,
-        phpVersion: String,
+        spectra: String,
+        projects: String,
+        compounds: String,
+        techniques: String,
     },
 
     setup() {
         return {
             Search,
             features,
-            metrics,
             footerNavigation,
         };
     },

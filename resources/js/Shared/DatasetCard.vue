@@ -38,7 +38,11 @@
                                 <p
                                     class="text-lg font-black text-gray-900 line-clamp-2"
                                 >
-                                    {{ dataset.name }}
+                                    {{ dataset.name }} <span v-if="dataset.type"
+                            >({{
+                                dataset.type.replace(/,\s*$/, "")
+                            }})</span
+                        >
                                 </p>
                                 <p
                                     class="mt-0 text-sm text-gray-800 line-clamp-4"

@@ -174,12 +174,12 @@
                                     :projectPermissions="projectPermissions"
                                     :project="project"
                                 />
-                                <add-author
-                                    ref="addAuthorElement"
+                                <manage-author
+                                    ref="manageAuthorElement"
                                     :project="project"
                                 />
-                                <add-citation
-                                    ref="addCitationElement"
+                                <manage-citation
+                                    ref="manageCitationElement"
                                     :project="project"
                                 />
                                 <span
@@ -488,7 +488,7 @@
                                 v-if="canUpdateProject"
                                 type="button"
                                 class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                                @click="toggleAddCitation"
+                                @click="toggleManageCitation"
                             >
                                 <PencilIcon
                                     class="w-4 h-4 mr-1 text-gray-600"
@@ -569,7 +569,7 @@
                                 v-if="canUpdateProject"
                                 type="button"
                                 class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                                @click="toggleAddAuthor"
+                                @click="toggleManageAuthor"
                             >
                                 <PencilIcon
                                     class="w-4 h-4 mr-1 text-gray-600"
@@ -580,54 +580,7 @@
                     </div>
                     <dd class="mt-2 text-md text-gray-900 space-y-5">
                         <div class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-3">
-                            <div
-                                v-for="author in project.authors"
-                                :key="author.id"
-                                class="relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm flex items-top space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-teal-500"
-                            >
-                                <div class="flex-1 min-w-0">
-                                    <div>
-                                        <a
-                                            class="focus:outline-none cursor-pointer"
-                                            :href="
-                                                getOrcidLink(author.orcid_id)
-                                            "
-                                            :target="getTarget(author.orcid_id)"
-                                        >
-                                            <span
-                                                class="absolute inset-0"
-                                                aria-hidden="true"
-                                            ></span>
-                                            <p
-                                                class="text-sm font-medium text-gray-900"
-                                            >
-                                                {{
-                                                    author.given_name +
-                                                    " " +
-                                                    author.family_name
-                                                }}
-                                            </p>
-                                            <p
-                                                v-if="author.affiliation"
-                                                class="text-sm text-gray-500"
-                                            >
-                                                {{ author.affiliation }}
-                                            </p>
-                                            <p
-                                                v-if="author.orcid_id"
-                                                class="text-sm text-gray-500"
-                                            >
-                                                <a
-                                                    :href="author.orcid_id"
-                                                    class="text-teal-500"
-                                                    >ORCID ID -
-                                                    {{ author.orcid_id }}</a
-                                                >
-                                            </p>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
+                            <author-card :authors="this.project.authors" />
                         </div>
                     </dd>
                 </div>
@@ -659,11 +612,12 @@ import StudyIndex from "@/Pages/Study/Index.vue";
 import ProjectDetails from "./Partials/Details.vue";
 import { ref } from "vue";
 import { StarIcon, PencilIcon, CalendarIcon } from "@heroicons/vue/24/solid";
-import AddAuthor from "@/Shared/AddAuthor.vue";
+import ManageAuthor from "@/Shared/ManageAuthor.vue";
 import ToolTip from "@/Shared/ToolTip.vue";
-import AddCitation from "@/Shared/AddCitation.vue";
+import ManageCitation from "@/Shared/ManageCitation.vue";
 import Citation from "@/Shared/Citation.vue";
 import Publish from "@/Shared/Publish.vue";
+import AuthorCard from "@/Shared/AuthorCard.vue";
 
 export default {
     components: {
@@ -674,12 +628,13 @@ export default {
         StarIcon,
         PencilIcon,
         AccessDialogue,
-        AddAuthor,
+        ManageAuthor,
         ToolTip,
-        AddCitation,
+        ManageCitation,
         CalendarIcon,
         Citation,
         Publish,
+        AuthorCard,
     },
     props: [
         "project",
@@ -692,12 +647,12 @@ export default {
     ],
     setup() {
         const projectDetailsElement = ref(null);
-        const addAuthorElement = ref(null);
-        const addCitationElement = ref(null);
+        const manageAuthorElement = ref(null);
+        const manageCitationElement = ref(null);
         return {
             projectDetailsElement,
-            addAuthorElement,
-            addCitationElement,
+            manageAuthorElement,
+            manageCitationElement,
         };
     },
     mounted() {
@@ -714,9 +669,9 @@ export default {
             ) {
                 this.toggleDetails();
             } else if (editOperation == "citation") {
-                this.toggleAddCitation();
+                this.toggleManageCitation();
             } else if (editOperation == "authors") {
-                this.toggleAddAuthor();
+                this.toggleManageAuthor();
             }
         }
     },
@@ -761,19 +716,12 @@ export default {
         toggleDetails() {
             this.projectDetailsElement.toggleDetails();
         },
-        toggleAddAuthor() {
-            this.addAuthorElement.toggleAddAuthorDialog();
+        toggleManageAuthor() {
+            this.manageAuthorElement.toggleDialog();
         },
-        toggleAddCitation() {
-            this.addCitationElement.toggleAddCitationDialog();
+        toggleManageCitation() {
+            this.manageCitationElement.toggleDialog();
             //this.emitter.emit("openAddCitationDialog", {});
-        },
-        getOrcidLink(orcidId) {
-            var link = "#";
-            if (orcidId) {
-                link = "https://orcid.org/" + orcidId;
-            }
-            return link;
         },
         getCitationLink(doi) {
             var link = "#";
