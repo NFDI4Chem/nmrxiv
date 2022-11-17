@@ -736,8 +736,8 @@ const navigation = [
     },
     {
         auth: false,
-        name: "Datasets",
-        href: "/datasets",
+        name: "Spectra",
+        href: "/spectra",
         icon: Squares2X2Icon,
         bg: "bg-white",
     },

@@ -281,6 +281,7 @@ export default {
         JetSecondaryButton,
         JetDialogModal,
         ToggleButton,
+        form,
     },
     props: {
         announcements: Array,

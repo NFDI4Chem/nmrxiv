@@ -19,6 +19,12 @@ class UsersController extends Controller
 {
     use PasswordValidationRules;
 
+    /**
+     * Render the index page with list of users.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Pages\Console\Users\Index
+     */
     public function index(Request $request)
     {
         return Inertia::render('Console/Users/Index', [
@@ -44,6 +50,11 @@ class UsersController extends Controller
         ]);
     }
 
+    /**
+     * Render the create user page.
+     *
+     * @return \Pages\Console\Users\Create
+     */
     public function create()
     {
         return Inertia::render('Console/Users/Create', [
@@ -55,6 +66,13 @@ class UsersController extends Controller
         );
     }
 
+    /**
+     * Store the newly created user.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Actions\Fortify\CreateNewUser  $creator
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function store(Request $request, CreateNewUser $creator)
     {
         $user = $creator->create($request->all());
@@ -63,6 +81,12 @@ class UsersController extends Controller
         return redirect()->route('console.users')->with('success', 'User created successfully');
     }
 
+    /**
+     * Render the edit user page.
+     *
+     * @param  \App\Models\User  $user
+     * @return \Pages\Console\Users\Edit
+     */
     public function edit(User $user)
     {
         return Inertia::render('Console/Users/Edit', [
@@ -76,6 +100,14 @@ class UsersController extends Controller
         ]);
     }
 
+    /**
+     * Save the updated user info.
+     *
+     * @param  \App\Models\User  $user
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Actions\Fortify\UpdateUserProfileInformation  $updater
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function update(User $user, Request $request, UpdatesUserProfileInformation $updater)
     {
         $updater->update($user, $request->all());
@@ -83,6 +115,13 @@ class UsersController extends Controller
         return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('success', 'Profile updated succesfully');
     }
 
+    /**
+     * Save the updated password for the user.
+     *
+     * @param  \App\Models\User  $user
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function updatePassword(User $user, Request $request)
     {
         Validator::make($request->all(), [
@@ -96,6 +135,13 @@ class UsersController extends Controller
         return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('success', 'Profile updated succesfully');
     }
 
+    /**
+     * Save the updated role for the user.
+     *
+     * @param  \App\Models\User  $user
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function updateRole(User $user, Request $request)
     {
         Validator::make($request->all(), [
@@ -117,6 +163,12 @@ class UsersController extends Controller
         return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('success', 'Profile updated succesfully');
     }
 
+    /**
+     * Check if user has password.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
     public function checkPassword(Request $request)
     {
         $user = $request->user();
@@ -130,6 +182,13 @@ class UsersController extends Controller
         ]);
     }
 
+    /**
+     * Delete the profile photo.
+     *
+     * @param  \App\Models\User  $user
+     * @param  \Illuminate\Http\Request  $request
+     *  @return \Illuminate\Http\RedirectResponse
+     */
     public function destroyPhoto(User $user, Request $request)
     {
         $user->deleteProfilePhoto();
