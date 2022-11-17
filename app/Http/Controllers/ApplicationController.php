@@ -11,7 +11,7 @@ use Inertia\Inertia;
 class ApplicationController extends Controller
 {
     /**
-     * Resolve the incoming request into right models and render the 
+     * Resolve the incoming request into right models and render the
      * inertia view
      *
      * @return Inertia\Inertia
@@ -89,8 +89,7 @@ class ApplicationController extends Controller
     }
 
     /**
-     * Resolve the incoming request and render a badge 
-     *
+     * Resolve the incoming request and render a badge
      */
     public function resolveBadge(Request $request, $identifier)
     {
@@ -100,9 +99,14 @@ class ApplicationController extends Controller
         $_w = $base + (strlen($model->doi) * 6.7);
         $_o = 30 + (strlen($model->doi) * 3.5);
         $_bw = strlen($model->doi) * 7.1;
-        if($model && $model->doi){
-            return 
-            '<svg xmlns="http://www.w3.org/2000/svg"
+        $colorMap = [
+            'Project' => '#019DBB',
+            'Study' => '#E7AD4C',
+            'Dataset' => '#8BC34B',
+        ];
+        $coloreCode = $colorMap[$resolvedModel['namespace']];
+        if ($model && $model->doi) {
+            return  response('<svg xmlns="http://www.w3.org/2000/svg"
              width="'.$_w.'" height="20">
                 <linearGradient id="b" x2="0" y2="100%">
                     <stop offset="0" stop-color="#bbb" stop-opacity=".1"/>
@@ -114,7 +118,7 @@ class ApplicationController extends Controller
                 </mask>
                 <g mask="url(#a)">
                     <path fill="#555" d="M0 0h31v20H0z" />
-                    <path fill="#FFB30F"
+                    <path fill="'.$coloreCode.'"
                     d="M31 0h'.$_bw.'v20H31z"
                     />
                     <path fill="url(#b)" d="M0 0h'.$_w.'v20H0z" />
@@ -130,13 +134,13 @@ class ApplicationController extends Controller
                     </text>
                     <text x="'.$_o.'"
                     y="15" fill="#010101" fill-opacity=".3">
-                        '. $model->doi .'
+                        '.$model->doi.'
                     </text>
                     <text x="'.$_o.'" y="14">
-                    '. $model->doi .'
+                    '.$model->doi.'
                     </text>
                 </g>
-            </svg>';
+            </svg>')->header('Content-Type', 'image/svg+xml');
         }
     }
 }
