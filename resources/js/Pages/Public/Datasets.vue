@@ -1,5 +1,5 @@
 <template>
-    <app-layout title="Datasets">
+    <app-layout title="Spectra">
         <template #header>
             <div class="bg-white mb-0">
                 <div class="px-8">
@@ -8,16 +8,16 @@
                             <div
                                 class="text-4xl mb-3 font-bold tracking-tight text-gray-900"
                             >
-                                Datasets
+                                Spectra
                             </div>
                             <p>
-                                Explore, analyze, and share raw spectral data
-                                and assignements. Learn more about
+                                Explore, analyze, and share raw spectra and
+                                assignements. Learn more about
                                 <a
                                     class="text-teal-900"
                                     href="https://docs.nmrxiv.org/docs/introduction/intro"
                                     target="_blank"
-                                    >datasets</a
+                                    >spectra</a
                                 >.
                             </p>
                         </div>

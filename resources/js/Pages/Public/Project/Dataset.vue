@@ -10,7 +10,7 @@
                     </span>
                     <div class="text-sm">
                         <span class="text-gray-400 pt-2">
-                            https://doi.org/{{ study.data.doi }}
+                            <img :src="'badge/doi/' + study.data.identifier" />
                         </span>
                     </div>
                     <div class="float-right">
@@ -294,7 +294,7 @@
                             <span
                                 class="pr-3 text-md bg-white font-medium text-gray-400"
                             >
-                                Dataset
+                                Spectra
                             </span>
                         </div>
                     </div>
@@ -309,7 +309,11 @@
                         ><br />
                         <div class="text-sm">
                             <span class="text-gray-400 pt-2">
-                                https://doi.org/{{ dataset.data.doi }}
+                                <img
+                                    :src="
+                                        'badge/doi/' + dataset.data.identifier
+                                    "
+                                />
                             </span>
                         </div>
                     </h1>
