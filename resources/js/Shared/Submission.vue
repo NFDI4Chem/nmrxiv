@@ -442,7 +442,7 @@
                                             >
                                                 STUDY ({{ studies.length }})
 
-                                                <span
+                                                <!-- <span
                                                     class="float-right"
                                                     @click="toggleAutoImport()"
                                                 >
@@ -457,7 +457,7 @@
                                                         v-else
                                                         class="w-5 h-5"
                                                     ></PauseIcon>
-                                                </span>
+                                                </span> -->
                                             </div>
                                             <div
                                                 id="tour-step-side-panel-studies"
@@ -478,12 +478,6 @@
                                                             : 'hover:bg-gray-200 hover:bg-opacity-50',
                                                         'cursor-pointer flex p-4 pr-5 border-b border-blue-gray-200',
                                                     ]"
-                                                    @click="
-                                                        selectStudy(
-                                                            study,
-                                                            $index
-                                                        )
-                                                    "
                                                 >
                                                     <svg
                                                         xmlns="http://www.w3.org/2000/svg"
@@ -501,7 +495,18 @@
                                                         <p
                                                             class="font-medium text-blue-gray-900 pr-4"
                                                         >
-                                                            {{ study.name }}
+                                                            <a
+                                                                @click="
+                                                                    selectStudy(
+                                                                        study,
+                                                                        $index
+                                                                    )
+                                                                "
+                                                                class="hover:font-bold"
+                                                                >{{
+                                                                    study.name
+                                                                }}</a
+                                                            >
                                                             <span
                                                                 v-if="
                                                                     study.sample
@@ -521,18 +526,32 @@
                                                         <div
                                                             class="mt-1 text-blue-gray-500"
                                                         >
-                                                            <div
-                                                                v-for="ds in study.datasets"
+                                                            <span
+                                                                v-for="(
+                                                                    ds, $dsIndex
+                                                                ) in study.datasets"
                                                                 :key="ds.id"
-                                                                :class="[
-                                                                    ds.has_nmrium
-                                                                        ? 'bg-green-100 text-gray-800'
-                                                                        : 'bg-gray-100 text-gray-800',
-                                                                    'w-64 inline-flex truncate break-words items-center px-3 py-0.5 rounded-full text-xs font-medium mr-1',
-                                                                ]"
                                                             >
-                                                                {{ ds.name }}
-                                                            </div>
+                                                                <div
+                                                                    @click="
+                                                                        selectStudy(
+                                                                            study,
+                                                                            $index,
+                                                                            $dsIndex
+                                                                        )
+                                                                    "
+                                                                    :class="[
+                                                                        ds.has_nmrium
+                                                                            ? 'bg-green-100 text-gray-800'
+                                                                            : 'bg-gray-100 text-gray-800',
+                                                                        'w-64 inline-flex truncate break-words items-center px-3 py-0.5 rounded-full text-xs font-medium mr-1 hover:bg-teal-700',
+                                                                    ]"
+                                                                >
+                                                                    <a>{{
+                                                                        ds.name
+                                                                    }}</a>
+                                                                </div>
+                                                            </span>
                                                         </div>
                                                     </div>
                                                 </a>
@@ -781,7 +800,7 @@
                                                                             for="location"
                                                                             class="block text-sm font-medium text-gray-700"
                                                                             >Select
-                                                                            Experiment
+                                                                            Spectra
                                                                         </label>
                                                                         <select
                                                                             id="tour-step-select-exp"
@@ -812,6 +831,15 @@
                                                                                 {{
                                                                                     dataset.name
                                                                                 }}
+                                                                                <span
+                                                                                    v-if="
+                                                                                        dataset.type
+                                                                                    "
+                                                                                >
+                                                                                    ({{
+                                                                                        dataset.type
+                                                                                    }})
+                                                                                </span>
                                                                             </option>
                                                                         </select>
                                                                     </div>
@@ -1379,7 +1407,7 @@
                                                                     <div
                                                                         v-if="
                                                                             selectedStudy.molecules &&
-                                                                            selectStudy
+                                                                            selectedStudy
                                                                                 .molecules
                                                                                 .length ==
                                                                                 0
@@ -1419,7 +1447,7 @@
                                                                     <div
                                                                         v-if="
                                                                             selectedStudy.molecules &&
-                                                                            selectStudy
+                                                                            selectedStudy
                                                                                 .molecules
                                                                                 .length >
                                                                                 0
@@ -2208,7 +2236,7 @@ export default {
             this.selectedDataset = dataset;
         },
 
-        selectStudy(study, index) {
+        selectStudy(study, index, datasetIndex = null) {
             this.selectedStudyIndex = index;
             this.selectedStudy = study;
             this.studyForm.name = this.selectedStudy.name;
@@ -2220,8 +2248,13 @@ export default {
                 });
             });
             this.studyForm.tags = tags;
-            this.selectedDSIndex = 0;
-            this.selectDataset(this.selectedStudy.datasets[0]);
+            if (!datasetIndex) {
+                this.selectedDSIndex = 0;
+                this.selectDataset(this.selectedStudy.datasets[0]);
+            } else {
+                this.selectedDSIndex = datasetIndex;
+                this.selectDataset(this.selectedStudy.datasets[datasetIndex]);
+            }
         },
 
         createNewDraft() {

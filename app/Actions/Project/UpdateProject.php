@@ -191,14 +191,33 @@ class UpdateProject
      * Attach citations to a project.
      *
      * @param  \App\Models\Project  $project
+     * @param  \App\Models\User  $user
      * @param  array  $citations
-     * @param  App\Models\User  $user
      * @return void
      */
-    public function updateCitation(Project $project, $citations, $user)
+    public function syncCitations(Project $project, $citations, $user)
     {
+        $citations_map = [];
+        foreach ($citations as $citation) {
+            $citations_map[$citation->id] = ['user' => $user->id];
+        }
+
         $project->citations()->sync(
-            $citations, ['user' => $user->id]
+            $citations_map
+        );
+    }
+
+    /**
+     * Detach citation from a project.
+     *
+     * @param  \App\Models\Project  $project
+     * @param  array  $authors
+     * @return void
+     */
+    public function detachCitation(Project $project, $citation_id)
+    {
+        $project->citations()->detach(
+            $citation_id
         );
     }
 }

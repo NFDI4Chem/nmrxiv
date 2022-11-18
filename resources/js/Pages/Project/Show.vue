@@ -178,8 +178,8 @@
                                     ref="manageAuthorElement"
                                     :project="project"
                                 />
-                                <add-citation
-                                    ref="addCitationElement"
+                                <manage-citation
+                                    ref="manageCitationElement"
                                     :project="project"
                                 />
                                 <span
@@ -488,7 +488,7 @@
                                 v-if="canUpdateProject"
                                 type="button"
                                 class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                                @click="toggleAddCitation"
+                                @click="toggleManageCitation"
                             >
                                 <PencilIcon
                                     class="w-4 h-4 mr-1 text-gray-600"
@@ -580,8 +580,8 @@
                     </div>
                     <dd class="mt-2 text-md text-gray-900 space-y-5">
                         <div class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-3">
-                                <author-card :authors="this.project.authors" />
-                            </div>
+                            <author-card :authors="this.project.authors" />
+                        </div>
                     </dd>
                 </div>
 
@@ -614,7 +614,7 @@ import { ref } from "vue";
 import { StarIcon, PencilIcon, CalendarIcon } from "@heroicons/vue/24/solid";
 import ManageAuthor from "@/Shared/ManageAuthor.vue";
 import ToolTip from "@/Shared/ToolTip.vue";
-import AddCitation from "@/Shared/AddCitation.vue";
+import ManageCitation from "@/Shared/ManageCitation.vue";
 import Citation from "@/Shared/Citation.vue";
 import Publish from "@/Shared/Publish.vue";
 import AuthorCard from "@/Shared/AuthorCard.vue";
@@ -630,7 +630,7 @@ export default {
         AccessDialogue,
         ManageAuthor,
         ToolTip,
-        AddCitation,
+        ManageCitation,
         CalendarIcon,
         Citation,
         Publish,
@@ -648,11 +648,11 @@ export default {
     setup() {
         const projectDetailsElement = ref(null);
         const manageAuthorElement = ref(null);
-        const addCitationElement = ref(null);
+        const manageCitationElement = ref(null);
         return {
             projectDetailsElement,
             manageAuthorElement,
-            addCitationElement,
+            manageCitationElement,
         };
     },
     mounted() {
@@ -669,7 +669,7 @@ export default {
             ) {
                 this.toggleDetails();
             } else if (editOperation == "citation") {
-                this.toggleAddCitation();
+                this.toggleManageCitation();
             } else if (editOperation == "authors") {
                 this.toggleManageAuthor();
             }
@@ -719,8 +719,8 @@ export default {
         toggleManageAuthor() {
             this.manageAuthorElement.toggleDialog();
         },
-        toggleAddCitation() {
-            this.addCitationElement.toggleAddCitationDialog();
+        toggleManageCitation() {
+            this.manageCitationElement.toggleDialog();
             //this.emitter.emit("openAddCitationDialog", {});
         },
         getCitationLink(doi) {
