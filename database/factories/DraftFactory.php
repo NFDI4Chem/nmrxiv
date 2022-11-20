@@ -23,15 +23,16 @@ class DraftFactory extends Factory
         $key = Str::uuid();
         $environment = env('APP_ENV', 'local');
         $path = $environment.'/'.$user->id.'/drafts/'.$key;
+        $name = $this->faker->word();
 
         return [
-            'name'            => Str::random(),
-            'slug'            => Str::random(),
+            'name'            => $name,
+            'slug'            => Str::slug($name, '-'),
             'description'     => $this->faker->text(),
             'relative_url'    => "/".$this->faker->uuid(),
             'path'            => $path,
             'key'             => Str::uuid(),
-            'is_deleted'      => "False",
+            'is_deleted'      => $this->faker->boolean(),
             'owner_id'        => $user->id,
             'team_id'         => Team::factory(),
             'info'            => "{}",
