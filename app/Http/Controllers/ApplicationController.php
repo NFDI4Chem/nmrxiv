@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\DatasetResource;
 use App\Http\Resources\ProjectResource;
 use App\Http\Resources\StudyResource;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
