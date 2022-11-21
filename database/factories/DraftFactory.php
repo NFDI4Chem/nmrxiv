@@ -2,8 +2,9 @@
 
 namespace Database\Factories;
 
-use App\Models\User;
 use App\Models\Team;
+use App\Models\User;
+use App\Models\Draft;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -13,9 +14,16 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class DraftFactory extends Factory
 {
     /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = Draft::class;
+
+    /**
      * Define the model's default state.
      *
-     * @return array<string, mixed>
+     * @return array
      */
     public function definition()
     {
