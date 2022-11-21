@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\Draft;
 use App\Models\License;
 use App\Models\Project;
+use App\Models\Study;
 use App\Models\Team;
 use App\Models\User;
 use App\Models\Validation;
@@ -12,14 +13,14 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
-class ProjectFactory extends Factory
+class StudyFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
      * @var string
      */
-    protected $model = Project::class;
+    protected $model = Study::class;
 
     /**
      * Define the model's default state.
@@ -33,9 +34,6 @@ class ProjectFactory extends Factory
 
         $licenseArray = [License::factory(), null];
         $licenseId = $licenseArray[rand(0, 1)];
-
-        $pathArray = ['/projects/6376658a5251f.svg', null]; //todo: provide varying url
-        $projectPhotoPath = $pathArray[rand(0, 1)];
 
         $dt = Carbon::now();
 
@@ -59,11 +57,12 @@ class ProjectFactory extends Factory
             'access_type' => 'viewer',
             'team_id' => Team::factory(),
             'owner_id' => User::factory(),
+            'project_id' => Project::factory(),
             'license_id' => $licenseId,
             'draft_id' => Draft::factory(),
-            'fs_id' => null,
+            'fs_id' => rand(1, 10),
             'release_date' => null,
-            'project_photo_path' => $projectPhotoPath,
+            'study_photo_path' => null, //todo: Adjust when studies images field is provided in nmrXiv
             'created_at' => $dt->subDays(rand(1, 10)),
             'updated_at' => $dt->subHours(rand(1, 10)),
             'doi' => null,
@@ -71,7 +70,6 @@ class ProjectFactory extends Factory
             'identifier' => null,
             'validation_id' => Validation::factory(),
             'validation_status' => false,
-            'schema_version' => 'beta', //todo: provide varying values
             'internal_status' => null, //todo: provide varying values
         ];
     }
