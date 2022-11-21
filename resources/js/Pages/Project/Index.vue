@@ -161,16 +161,19 @@
                         <span class="ml-2">Private</span>
                     </span>
                 </div>
-                <a class="cursor-pointer" @click="getLink(project)">
+                <a>
                     <div
-                        class="flex justify-between items-center bg-white shadow-md border rounded-lg px-6 py-6 cursor-pointer"
+                        class="flex justify-between items-center bg-white shadow-md border rounded-lg px-6 py-6"
                     >
-                        <div class="flex-grow">
+                        <div
+                            @click="getLink(project)"
+                            class="flex-grow cursor-pointer"
+                        >
                             <div class="flex justify-between items-baseline">
                                 <div class="font-bold text-lg text-gray-600">
                                     <div class="flex items-center">
                                         <span
-                                            class="flex max-w-2xl break-words block"
+                                            class="cursor-pointer flex max-w-2xl break-words block"
                                         >
                                             <span class="-ml-2 mr-1">
                                                 <StarIcon
@@ -318,16 +321,38 @@
                                 </span>
                             </div>
                         </div>
-                        <div class="border-l">
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 24 24"
-                                class="h-8 w-8 text-gray-600 fill-current ml-4"
+                        <div class="border-l cursor-pointer">
+                            <a
+                                target="_blank"
+                                :href="
+                                    route('dashboard.projects', [project.id])
+                                "
+                                class="text-gray-500 hover:text-gray-900"
                             >
-                                <path
-                                    d="M9.3 8.7a1 1 0 0 1 1.4-1.4l4 4a1 1 0 0 1 0 1.4l-4 4a1 1 0 0 1-1.4-1.4l3.29-3.3-3.3-3.3z"
-                                ></path>
-                            </svg>
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke-width="1.5"
+                                    stroke="currentColor"
+                                    class="h-5 w-5 text-gray-600 ml-4"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
+                                    />
+                                </svg>
+                            </a>
+                            <!-- <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                class="h-8 w-8 text-gray-600 fill-current ml-4"
+              >
+                <path
+                  d="M9.3 8.7a1 1 0 0 1 1.4-1.4l4 4a1 1 0 0 1 0 1.4l-4 4a1 1 0 0 1-1.4-1.4l3.29-3.3-3.3-3.3z"
+                ></path>
+              </svg> -->
                         </div>
                     </div>
                 </a>
