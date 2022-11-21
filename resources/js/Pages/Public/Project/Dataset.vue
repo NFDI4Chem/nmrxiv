@@ -369,8 +369,6 @@ export default {
                     "\n  " + molecule.MOL.replaceAll('"', "")
                 );
                 return mol.toSVG(200, 200);
-            } else {
-                console.log(molecule);
             }
         },
     },
