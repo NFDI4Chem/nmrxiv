@@ -228,7 +228,7 @@
                                                         I understand once the
                                                         project is published,
                                                         all the underlying
-                                                        studies and datasets
+                                                        studies and spectra
                                                         will also be made public
                                                         and agree to make this
                                                         data persistently
