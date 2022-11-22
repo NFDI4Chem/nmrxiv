@@ -92,7 +92,7 @@
                 >
             </team-projects>
         </div>
-        <div class="px-12 border-t py-8 mx-auto max-w-4xl">
+        <div v-if="studies.length > 0" class="px-12 border-t py-8 mx-auto max-w-4xl">
             <div>
                 <h2 class="text-lg">Studies</h2>
             </div>
