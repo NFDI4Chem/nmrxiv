@@ -2,19 +2,16 @@
 
 namespace Database\Seeders;
 
-use App\Models\Team;
-use App\Models\Draft;
-use App\Models\Author;
-use App\Models\NMRium;
-use App\Models\License;
-use App\Models\Project;
-use App\Models\Citation;
 use App\Models\Announcement;
-use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-use Database\Factories\ProtonNMRiumFactory;
+use App\Models\Author;
+use App\Models\Citation;
+use App\Models\Draft;
+use App\Models\License;
+use App\Models\NMRium;
+use App\Models\Project;
+use App\Models\Team;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Seeder;
 
 class TestFactory extends Seeder
 {
@@ -47,5 +44,4 @@ class TestFactory extends Seeder
 
         // $this->command->line('Citation created succesfully..'.$citation);
     }
-
 }

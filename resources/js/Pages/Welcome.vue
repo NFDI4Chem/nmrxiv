@@ -400,7 +400,7 @@
                                         services to analyse data. Additionally,
                                         get community support for any of your
                                         NMR spectra-related queries or provide
-                                        one yourself. 
+                                        one yourself.
                                     </p>
                                     <div class="mt-6">
                                         <Link
