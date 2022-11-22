@@ -446,8 +446,19 @@
                                                     class="float-right"
                                                     @click="autoImport()"
                                                 >
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 7.5h-.75A2.25 2.25 0 004.5 9.75v7.5a2.25 2.25 0 002.25 2.25h7.5a2.25 2.25 0 002.25-2.25v-7.5a2.25 2.25 0 00-2.25-2.25h-.75m-6 3.75l3 3m0 0l3-3m-3 3V1.5m6 9h.75a2.25 2.25 0 012.25 2.25v7.5a2.25 2.25 0 01-2.25 2.25h-7.5a2.25 2.25 0 01-2.25-2.25v-.75" />
+                                                    <svg
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        fill="none"
+                                                        viewBox="0 0 24 24"
+                                                        stroke-width="1.5"
+                                                        stroke="currentColor"
+                                                        class="w-5 h-5"
+                                                    >
+                                                        <path
+                                                            stroke-linecap="round"
+                                                            stroke-linejoin="round"
+                                                            d="M7.5 7.5h-.75A2.25 2.25 0 004.5 9.75v7.5a2.25 2.25 0 002.25 2.25h7.5a2.25 2.25 0 002.25-2.25v-7.5a2.25 2.25 0 00-2.25-2.25h-.75m-6 3.75l3 3m0 0l3-3m-3 3V1.5m6 9h.75a2.25 2.25 0 012.25 2.25v7.5a2.25 2.25 0 01-2.25 2.25h-7.5a2.25 2.25 0 01-2.25-2.25v-.75"
+                                                        />
                                                     </svg>
                                                 </span>
                                             </div>
@@ -2426,32 +2437,41 @@ export default {
 
         autoImport() {
             this.$page.props.autoimport = !this.$page.props.autoimport;
-            let ownerUserName = this.$page.props.team ? this.$page.props.team.owner.username : this.project.owner.username
-            this.studies.forEach( study => {
-                study.datasets.forEach(dataset => {
-                    if(!dataset.has_nmrium){
-                        axios.post("https://nodejsdev.nmrxiv.org/spectra-parser", {
-                            "urls" : [
-                                this.url +
-                                "/" +
-                                ownerUserName +
-                                "/datasets/" +
-                                this.project.slug +
-                                "/" +
-                                study.slug +
-                                "/" +
-                                dataset.slug
-                            ],
-                            "snapshot": false
-                        }).then(response => {
-                            axios.post(
-                                "/dashboard/datasets/" + dataset.id + "/nmriumInfo",
-                                response.data.data
+            let ownerUserName = this.$page.props.team
+                ? this.$page.props.team.owner.username
+                : this.project.owner.username;
+            this.studies.forEach((study) => {
+                study.datasets.forEach((dataset) => {
+                    if (!dataset.has_nmrium) {
+                        axios
+                            .post(
+                                "https://nodejsdev.nmrxiv.org/spectra-parser",
+                                {
+                                    urls: [
+                                        this.url +
+                                            "/" +
+                                            ownerUserName +
+                                            "/datasets/" +
+                                            this.project.slug +
+                                            "/" +
+                                            study.slug +
+                                            "/" +
+                                            dataset.slug,
+                                    ],
+                                    snapshot: false,
+                                }
                             )
-                        })
+                            .then((response) => {
+                                axios.post(
+                                    "/dashboard/datasets/" +
+                                        dataset.id +
+                                        "/nmriumInfo",
+                                    response.data.data
+                                );
+                            });
                     }
-                })
-            })
+                });
+            });
         },
 
         fetchDrafts() {
