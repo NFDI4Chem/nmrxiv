@@ -37,8 +37,12 @@ class TestFactory extends Seeder
         ->sequence(fn ($sequence) => ['dataset_id' => $sequence->index])
         ->create()*/
 
-        //$nmrium = NMRium::factory()->create();
-        $project =  Project::factory()->create();
+        // $nmrium = NMRium::factory()->create([
+        //     'nmrium_info' => NMRiumMockData('13c'),
+        //     'dataset_id' => 1
+        // ]);
+
+        // $project =  Project::factory()->create();
         // $this->command->line('Author created succesfully..'.$author);
 
         // $this->command->line('Citation created succesfully..'.$citation);

@@ -4,6 +4,7 @@ use App\Models\Dataset;
 use App\Models\Project;
 use App\Models\Study;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Http;
 
 function resolveIdentifier($identifier)
 {
@@ -52,4 +53,26 @@ function resolveIdentifier($identifier)
         'namespace' => null,
         'model' => null,
     ];
+}
+
+function NMRiumMockData($type = null)
+{
+    if($type){
+        $nmriumDataTypeMapping = [
+            'proton' => 'https://nmrxiv.org/datasets/1444/nmriumInfo', 
+            '13c' => 'https://nmrxiv.org/datasets/1447/nmriumInfo', 
+            'dept' => 'https://nmrxiv.org/datasets/1448/nmriumInfo', 
+            'hsqc' => 'https://nmrxiv.org/datasets/1446/nmriumInfo', 
+            'hmbc' => 'https://nmrxiv.org/datasets/1451/nmriumInfo'
+        ];
+    
+        $response = Http::get($nmriumDataTypeMapping[$type]);
+    
+        if ($response) {
+            return $response['nmrium_info'];
+        }
+        
+        return json_encode('{}');
+    }
+    return json_encode('{}');
 }
