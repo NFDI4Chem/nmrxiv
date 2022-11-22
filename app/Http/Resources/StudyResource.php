@@ -31,7 +31,7 @@ class StudyResource extends JsonResource
             'name' => $this->name,
             'slug' => $this->slug,
             'description' => $this->description,
-            'team' => $this->when(! $this->team->personal_team, $this->team),
+            'team' => $this->when(! ($this->team && $this->team->personal_team), $this->team),
             'photo_url' => $this->study_photo_path,
             'tags' => $this->tags,
             'identifier' => $this->identifier,
