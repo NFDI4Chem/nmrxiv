@@ -42,15 +42,16 @@ class DeleteTrashedProject extends Command
             if ($deletedOn) {
                 $dueDate = Carbon::parse($deletedOn)->diffInDays(Carbon::now());
                 //echo('Due Date  '.$dueDate);
+                if ($dueDate == 23) {
+                    //Send First Notification one week before
+                    $this->sendNotification($project->owner, $project);
+                }
+                if ($dueDate == 29) {
+                    //Send Second Notification one day before
+                    $this->sendNotification($project->owner, $project);
+                }
             }
-            if ($dueDate == 23) {
-                //Send First Notification one week before
-                $this->sendNotification($project->owner, $project);
-            }
-            if ($dueDate == 29) {
-                //Send Second Notification one day before
-                $this->sendNotification($project->owner, $project);
-            }
+
         }
     }
 
