@@ -780,10 +780,10 @@
                                     </li>
                                     <li>
                                         <Link
-                                            href="/datasets"
+                                            href="/spectra"
                                             class="text-base text-gray-500 hover:text-gray-900"
                                         >
-                                            Datasets
+                                            Spectra
                                         </Link>
                                     </li>
                                 </ul>

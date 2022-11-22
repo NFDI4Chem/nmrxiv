@@ -601,7 +601,6 @@ export default {
                                     );
                                 }
                             });
-                            console.log(cFile);
                             if (cFile) {
                                 let message =
                                     "Presigned Upload URL receieved.  Starting Upload.";

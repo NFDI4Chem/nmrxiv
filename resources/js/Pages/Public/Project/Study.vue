@@ -295,7 +295,7 @@
                             <span
                                 class="pr-3 text-md bg-white font-medium text-gray-400"
                             >
-                                Datasets
+                                Spectra
                             </span>
                         </div>
                     </div>
@@ -403,8 +403,6 @@ export default {
                     "\n  " + molecule.MOL.replaceAll('"', "")
                 );
                 return mol.toSVG(200, 200);
-            } else {
-                console.log(molecule);
             }
         },
     },
