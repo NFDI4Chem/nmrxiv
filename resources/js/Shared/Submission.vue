@@ -2426,6 +2426,7 @@ export default {
 
         autoImport() {
             this.$page.props.autoimport = !this.$page.props.autoimport;
+            let ownerUserName = this.$page.props.team ? this.$page.props.team.owner.username : this.project.owner.username
             this.studies.forEach( study => {
                 study.datasets.forEach(dataset => {
                     if(!dataset.has_nmrium){
@@ -2433,7 +2434,7 @@ export default {
                             "urls" : [
                                 this.url +
                                 "/" +
-                                this.$page.props.team.owner.username +
+                                ownerUserName +
                                 "/datasets/" +
                                 this.project.slug +
                                 "/" +
