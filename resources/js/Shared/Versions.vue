@@ -221,7 +221,6 @@ export default {
                 )
                 .then((response) => {
                     this.versions = response.data;
-                    console.log(this.versions);
                 });
         },
     },

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\DatasetResource;
 use App\Http\Resources\ProjectResource;
 use App\Http\Resources\StudyResource;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -95,7 +96,8 @@ class ApplicationController extends Controller
     {
         $resolvedModel = resolveIdentifier($identifier);
         $model = $resolvedModel['model'];
-        $base = 39;
+        if($model){
+            $base = 39;
         $_w = $base + (strlen($model->doi) * 6.7);
         $_o = 30 + (strlen($model->doi) * 3.5);
         $_bw = strlen($model->doi) * 7.1;
@@ -141,6 +143,7 @@ class ApplicationController extends Controller
                     </text>
                 </g>
             </svg>')->header('Content-Type', 'image/svg+xml');
+        }
         }
     }
 }
