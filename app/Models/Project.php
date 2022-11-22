@@ -46,6 +46,7 @@ class Project extends Model implements Auditable
         'project_photo_path',
         'license_id',
         'release_date',
+        'deleted_on',
     ];
 
     protected static $marks = [
