@@ -3,7 +3,6 @@
 namespace Database\Factories;
 
 use App\Models\Author;
-use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -31,10 +30,7 @@ class AuthorFactory extends Factory
             'given_name' => $this->faker->firstName(),
             'family_name' => $this->faker->lastName(),
             'email_id' => $this->faker->unique()->safeEmail(),
-            'affiliation'=> $this->faker->text(),
+            'affiliation' => $this->faker->text(),
         ];
     }
-
-    
-
 }

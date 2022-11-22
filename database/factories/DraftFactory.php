@@ -2,11 +2,11 @@
 
 namespace Database\Factories;
 
+use App\Models\Draft;
 use App\Models\Team;
 use App\Models\User;
-use App\Models\Draft;
-use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Draft>
@@ -34,17 +34,17 @@ class DraftFactory extends Factory
         $name = $this->faker->word();
 
         return [
-            'name'            => $name,
-            'slug'            => Str::slug($name, '-'),
-            'description'     => $this->faker->text(),
-            'relative_url'    => "/".$this->faker->uuid(),
-            'path'            => $path,
-            'key'             => Str::uuid(),
-            'is_deleted'      => $this->faker->boolean(),
-            'owner_id'        => $user->id,
-            'team_id'         => Team::factory(),
-            'info'            => "{}",
-            'settings'        => "{}",
+            'name' => $name,
+            'slug' => Str::slug($name, '-'),
+            'description' => $this->faker->text(),
+            'relative_url' => '/'.$this->faker->uuid(),
+            'path' => $path,
+            'key' => Str::uuid(),
+            'is_deleted' => $this->faker->boolean(),
+            'owner_id' => $user->id,
+            'team_id' => Team::factory(),
+            'info' => '{}',
+            'settings' => '{}',
         ];
     }
 }
