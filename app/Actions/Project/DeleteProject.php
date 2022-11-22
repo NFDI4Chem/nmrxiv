@@ -3,6 +3,7 @@
 namespace App\Actions\Project;
 
 use App\Models\Project;
+use Illuminate\Support\Carbon;
 
 class DeleteProject
 {
@@ -32,6 +33,7 @@ class DeleteProject
             if ($draft) {
                 $draft->update(['is_deleted' => true]);
             }
+            $project->deleted_on = Carbon::now();
             $project->is_deleted = true;
             $project->save();
         }
