@@ -80,7 +80,7 @@ class MoleculeFactory extends Factory
             'SSSR' => null,
             'SAR' => null,
             'COMMENT' => null,
-            'MOL' => null,
+            'MOL' => null, //todo: add mol file
             'MULTIPLICITY_0' => null,
             'MULTIPLICITY_1' => null,
             'MULTIPLICITY_2' => null,
