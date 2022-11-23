@@ -3,12 +3,6 @@
 namespace Database\Factories;
 
 use App\Models\Dataset;
-use App\Models\Draft;
-use App\Models\License;
-use App\Models\Project;
-use App\Models\Study;
-use App\Models\Team;
-use App\Models\User;
 use App\Models\Validation;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -33,9 +27,6 @@ class DatasetFactory extends Factory
         $name = $this->faker->word().'dx';
         $slug = Str::slug($name, '-');
 
-        $licenseArray = [License::factory(), null];
-        $licenseId = $licenseArray[rand(0, 1)];
-
         $dt = Carbon::now();
 
         return[
@@ -55,13 +46,13 @@ class DatasetFactory extends Factory
             'uuid' => Str::uuid(),
             'access' => 'restricted',
             'access_type' => 'viewer',
-            'team_id' => Team::factory(),
-            'owner_id' => User::factory(),
-            'project_id' => Project::factory(),
-            'study_id' => Study::factory(),
-            'license_id' => $licenseId,
-            'draft_id' => Draft::factory(),
-            'fs_id' => rand(1, 10),
+            'team_id' => rand(1, 100),
+            'owner_id' => rand(1, 100),
+            'project_id' => rand(1, 100),
+            'study_id' => rand(1, 100),
+            'license_id' => rand(1, 10),
+            'draft_id' => rand(1, 100),
+            'fs_id' => rand(1, 100),
             'dataset_photo_path' => null, //todo: Adjust when datasets images field is provided in nmrXiv
             'release_date' => null,
             'created_at' => $dt->subDays(rand(1, 10)),
