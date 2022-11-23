@@ -5,11 +5,14 @@ namespace Tests\Feature;
 use App\Models\Author;
 use App\Models\Project;
 use App\Models\User;
-use Illuminate\Support\Facades\Http;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class ManageAuthorsTest extends TestCase
 {
+
+    // use RefreshDatabase;
+
     /**
      * Test if a author can be updated
      *
@@ -17,24 +20,30 @@ class ManageAuthorsTest extends TestCase
      */
     public function test_author_can_be_updated()
     {
-        $project = Project::factory();
+        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 
-        $this->actingAs($user = User::factory()->has($project)->create());
+        $project = Project::factory()->create([
+            'owner_id' => $user->id
+        ]);
 
         $author = Author::factory()->create();
 
-        // $response = $this->post('author.save', [
-        //     'title'         => $author->title,
-        //     'given_name'    => $author->given_name,
-        //     'family_name'   => $author->family_name,
-        //     'orcid_id'      => $author->orcid_id,
-        //     'email_id'      => $author->email_id,
-        //     'affiliation'   => $author->affiliation,
-        // ]);
-        $response = $this->post('author.save', [
-            'request' => $author,
-            'project' => $project,
-        ]);
+        $project->authors()->sync([$author->id => ['contributor_type' => 'Researcher', 'sort_order' => 0] ]);
+
+        $body = [
+            'authors' => [[
+                'title'         => $author->title,
+                'given_name'    => $author->given_name,
+                'family_name'   => $author->family_name,
+                'orcid_id'      => $author->orcid_id,
+                'email_id'      => $author->email_id,
+                'affiliation'   => $author->affiliation . '_ updated',
+            ]]
+        ];
+        
+        $response = $this->withHeaders([
+            'Accept' => 'application/json'
+        ])->post('authors/'.$project->id, $body);
 
         $response->assertStatus(200);
     }
