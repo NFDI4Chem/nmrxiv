@@ -47,7 +47,7 @@
         <div class="min-h-[calc(100vh-500px)] px-12 mb-24 mx-auto">
             <div class="relative border-gray-200 pt-4">
                 <div class="mx-auto flex items-center justify-between">
-                    <Menu as="div" class="relative inline-block text-left">
+                    <Menu as="div" class="relative inline-block text-left z-10">
                         <div>
                             <MenuButton
                                 class="group inline-flex justify-center text-sm font-medium text-gray-700 hover:text-gray-900"
@@ -319,7 +319,7 @@ export default {
         form: {
             deep: true,
             handler: throttle(function () {
-                this.$inertia.get("/datasets", pickBy(this.form), {
+                this.$inertia.get("/spectra", pickBy(this.form), {
                     preserveState: true,
                 });
             }, 150),
