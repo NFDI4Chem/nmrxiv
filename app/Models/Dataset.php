@@ -138,7 +138,8 @@ class Dataset extends Model implements Auditable
         $query->when($filters['search'] ?? null, function ($query, $search) {
             $query->where(function ($query) use ($search) {
                 $query->where('name', 'ILIKE', '%'.$search.'%')
-                    ->orWhere('description', 'ILIKE', '%'.$search.'%');
+                    ->orWhere('description', 'ILIKE', '%'.$search.'%')
+                    ->orWhere('type', 'ILIKE', '%'.$search.'%');
             });
         })->when($filters['sort'] ?? 'newest', function ($query, $sort) {
             if ($sort === 'newest') {
