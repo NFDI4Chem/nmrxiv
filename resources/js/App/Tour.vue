@@ -201,7 +201,7 @@ export default {
                 // {
                 //     target: "#meta-data",
                 //     header: {
-                //         title: "Meta Data.",
+                //         title: "Metadata.",
                 //     },
                 //     content: `<small></small>`,
                 // },

@@ -405,6 +405,17 @@ class DraftController extends Controller
         });
     }
 
+    public function info(Request $request, Draft $draft){
+        $project = Project::where('draft_id', $draft->id)->first();
+
+        $studies = json_decode($project->studies->load(['datasets', 'sample.molecules', 'tags']));
+
+        return response()->json([
+            'project' => $project->load(['owner']),
+            'studies' => $studies,
+        ]);
+    }
+
     public function annotate(Request $request, Draft $draft)
     {
         $draftFolders = FileSystemObject::with('children')
