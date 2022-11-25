@@ -13,11 +13,11 @@ class ManageAuthorsTest extends TestCase
     // use RefreshDatabase;
 
     /**
-     * Test if a author can be updated
+     * Test if a author can be created and updated
      *
      * @return void
      */
-    public function test_author_can_be_updated()
+    public function test_author_can_be_created_and_updated()
     {
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 
