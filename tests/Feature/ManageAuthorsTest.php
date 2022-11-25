@@ -10,7 +10,6 @@ use Tests\TestCase;
 
 class ManageAuthorsTest extends TestCase
 {
-
     // use RefreshDatabase;
 
     /**
@@ -23,26 +22,26 @@ class ManageAuthorsTest extends TestCase
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 
         $project = Project::factory()->create([
-            'owner_id' => $user->id
+            'owner_id' => $user->id,
         ]);
 
         $author = Author::factory()->create();
 
-        $project->authors()->sync([$author->id => ['contributor_type' => 'Researcher', 'sort_order' => 0] ]);
+        $project->authors()->sync([$author->id => ['contributor_type' => 'Researcher', 'sort_order' => 0]]);
 
         $body = [
             'authors' => [[
-                'title'         => $author->title,
-                'given_name'    => $author->given_name,
-                'family_name'   => $author->family_name,
-                'orcid_id'      => $author->orcid_id,
-                'email_id'      => $author->email_id,
-                'affiliation'   => $author->affiliation . '_ updated',
-            ]]
+                'title' => $author->title,
+                'given_name' => $author->given_name,
+                'family_name' => $author->family_name,
+                'orcid_id' => $author->orcid_id,
+                'email_id' => $author->email_id,
+                'affiliation' => $author->affiliation.'_ updated',
+            ]],
         ];
-        
+
         $response = $this->withHeaders([
-            'Accept' => 'application/json'
+            'Accept' => 'application/json',
         ])->post('authors/'.$project->id, $body);
 
         $response->assertStatus(200);
@@ -55,28 +54,33 @@ class ManageAuthorsTest extends TestCase
      */
     public function test_author_can_be_deleted()
     {
-    }
+        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 
-    /**
-     * API test to europemc to fetch author
-     *
-     * @return void
-     */
-    public function test_author_can_be_fetched_from_europemc_api()
-    {
-        /*$response = Http::get('https://www.ebi.ac.uk/europepmc/webservices/rest/search', [
-            'query' => 'DOI:10.1002/mrc.4737',
-            'format' => "json",
-            'pageSize' => 1,
-            'resulttype'=> "core",
-            'synonym' => "true",
+        $project = Project::factory()->create([
+            'owner_id' => $user->id,
         ]);
 
-        if($response && $response['resultList']){
-            $response->assertStatus(200);
-        } else {
-            $response->assertStatus(500);
-        }*/
+        $author = Author::factory()->create();
+
+        $project->authors()->sync([$author->id => ['contributor_type' => 'Researcher', 'sort_order' => 0]]);
+
+        $body = [
+            'authors' => [[
+                'id' => $author->id,
+                'title' => $author->title,
+                'given_name' => $author->given_name,
+                'family_name' => $author->family_name,
+                'orcid_id' => $author->orcid_id,
+                'email_id' => $author->email_id,
+                'affiliation' => $author->affiliation.'_ updated',
+            ]],
+        ];
+
+        $response = $this->withHeaders([
+            'Accept' => 'application/json',
+        ])->delete('authors/'.$project->id.'/delete', $body);
+
+        $response->assertStatus(200);
     }
 
     /**
@@ -86,5 +90,25 @@ class ManageAuthorsTest extends TestCase
      */
     public function test_role_of_an_author_can_be_updated()
     {
+        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+
+        $project = Project::factory()->create([
+            'owner_id' => $user->id,
+        ]);
+
+        $author = Author::factory()->create();
+
+        $project->authors()->sync([$author->id => ['contributor_type' => 'Researcher', 'sort_order' => 0]]);
+
+        $body = [
+            'author_id' => $author->id,
+            'role' => 'Researcher',
+        ];
+
+        $response = $this->withHeaders([
+            'Accept' => 'application/json',
+        ])->post('authors/'.$project->id.'/updateRole', $body);
+
+        $response->assertStatus(200);
     }
 }

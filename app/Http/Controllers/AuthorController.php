@@ -5,11 +5,10 @@ namespace App\Http\Controllers;
 use App\Actions\Project\UpdateProject;
 use App\Models\Author;
 use App\Models\Project;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Validator;
-
 
 class AuthorController extends Controller
 {
