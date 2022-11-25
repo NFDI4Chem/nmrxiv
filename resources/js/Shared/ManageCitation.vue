@@ -167,7 +167,7 @@
                                                 v-model="form.citation_text"
                                                 name="citation-text"
                                                 autocomplete="citation-text"
-                                                placeholder="journal title + year of publication + volume + (issue) + page info e.g. - Magnetic resonance in chemistry : MRC 2018 56 ( 8 ) 703-715"
+                                                placeholder="<journal title> <year of publication> <volume> <(issue)> <page info> e.g. - Magnetic resonance in chemistry : MRC 2018 56 ( 8 ) 703-715 or please provide any relevant information."
                                                 type="text"
                                                 :class="[
                                                     isEdit
@@ -667,7 +667,7 @@ export default {
                         Object.keys(this.fetchedCitations).length == 0
                     ) {
                         this.error =
-                            "Something went wrong. Please check the input and try again.";
+                            "No data found. Please enter the details manually.";
                     }
                     this.loading = false;
                 });
