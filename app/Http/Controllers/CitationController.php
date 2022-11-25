@@ -32,7 +32,6 @@ class CitationController extends Controller
                 Validator::make($citation, [
                     'title' => ['required', 'string'],
                     'authors' => ['required', 'string'],
-                    'abstract' => ['required', 'string'],
                 ])->validate();
 
                 if (! is_null($title)) {

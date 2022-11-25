@@ -201,6 +201,8 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
         Route::post('datasets/{dataset}/preview', [DatasetController::class, 'preview'])
             ->name('dashboard.dataset.preview');
 
+        Route::get('drafts/{draft}/info', [DraftController::class, 'info'])
+            ->name('dashboard.draft.info');
         Route::get('drafts/{draft}/files', [DraftController::class, 'files'])
             ->name('dashboard.draft.files');
         Route::delete('drafts/{draft}/files/{filesystemobject}', [DraftController::class, 'deleteFSO'])
