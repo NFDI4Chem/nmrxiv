@@ -2,11 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Models\Draft;
-use App\Models\License;
 use App\Models\Project;
-use App\Models\Team;
-use App\Models\User;
 use App\Models\Validation;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -31,12 +27,6 @@ class ProjectFactory extends Factory
         $name = $this->faker->sentence($nbWords = 4);
         $slug = Str::slug($name, '-');
 
-        $licenseArray = [License::factory(), null];
-        $licenseId = $licenseArray[rand(0, 1)];
-
-        $pathArray = ['/projects/6376658a5251f.svg', null]; //todo: provide varying url
-        $projectPhotoPath = $pathArray[rand(0, 1)];
-
         $dt = Carbon::now();
 
         return[
@@ -52,18 +42,18 @@ class ProjectFactory extends Factory
             'location' => null, //todo: Adjust when location field is provided in nmrXiv
             'url' => Str::random(40),
             'description' => $this->faker->text(),
-            'sort_order' => rand(1, 10),
+            'sort_order' => rand(1, 100),
             'type' => null,  //todo: Adjust when type field is provided in nmrXiv
             'uuid' => Str::uuid(),
             'access' => 'restricted',
             'access_type' => 'viewer',
-            'team_id' => Team::factory(),
-            'owner_id' => User::factory(),
-            'license_id' => $licenseId,
-            'draft_id' => Draft::factory(),
+            'team_id' => rand(1, 100),
+            'owner_id' => rand(1, 100),
+            'license_id' => rand(1, 10),
+            'draft_id' => rand(1, 100),
             'fs_id' => null,
             'release_date' => null,
-            'project_photo_path' => $projectPhotoPath,
+            'project_photo_path' => null,
             'created_at' => $dt->subDays(rand(1, 10)),
             'updated_at' => $dt->subHours(rand(1, 10)),
             'doi' => null,

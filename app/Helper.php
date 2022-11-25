@@ -57,22 +57,23 @@ function resolveIdentifier($identifier)
 
 function NMRiumMockData($type = null)
 {
-    if($type){
+    if ($type) {
         $nmriumDataTypeMapping = [
-            'proton' => 'https://nmrxiv.org/datasets/1444/nmriumInfo', 
-            '13c' => 'https://nmrxiv.org/datasets/1447/nmriumInfo', 
-            'dept' => 'https://nmrxiv.org/datasets/1448/nmriumInfo', 
-            'hsqc' => 'https://nmrxiv.org/datasets/1446/nmriumInfo', 
-            'hmbc' => 'https://nmrxiv.org/datasets/1451/nmriumInfo'
+            'proton' => 'https://nmrxiv.org/datasets/1444/nmriumInfo',
+            '13c' => 'https://nmrxiv.org/datasets/1447/nmriumInfo',
+            'dept' => 'https://nmrxiv.org/datasets/1448/nmriumInfo',
+            'hsqc' => 'https://nmrxiv.org/datasets/1446/nmriumInfo',
+            'hmbc' => 'https://nmrxiv.org/datasets/1451/nmriumInfo',
         ];
-    
+
         $response = Http::get($nmriumDataTypeMapping[$type]);
-    
+
         if ($response) {
             return $response['nmrium_info'];
         }
-        
+
         return json_encode('{}');
     }
+
     return json_encode('{}');
 }
