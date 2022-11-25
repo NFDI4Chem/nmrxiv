@@ -1879,7 +1879,7 @@ export default {
         },
 
         url() {
-            return "https://dev.nmrxiv.org"
+            return String(this.$page.props.url) ? String(this.$page.props.url) : "https://dev.nmrxiv.org"
         },
 
         getMax() {
@@ -2493,6 +2493,10 @@ export default {
                         "/dashboard/datasets/" + datasetDetails.datasetId + "/nmriumInfo",
                         response.data.data
                     ).then( res => {
+                        this.loadingStep = false;
+                        this.datasetsToImport.filter(f => f.datasetId == datasetDetails.datasetId)[0].status = true;
+                        this.fetchNMRium()
+                    }).catch(err => {
                         this.loadingStep = false;
                         this.datasetsToImport.filter(f => f.datasetId == datasetDetails.datasetId)[0].status = true;
                         this.fetchNMRium()
