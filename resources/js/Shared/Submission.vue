@@ -2496,6 +2496,10 @@ export default {
                         this.loadingStep = false;
                         this.datasetsToImport.filter(f => f.datasetId == datasetDetails.datasetId)[0].status = true;
                         this.fetchNMRium()
+                    }).catch(err => {
+                        this.loadingStep = false;
+                        this.datasetsToImport.filter(f => f.datasetId == datasetDetails.datasetId)[0].status = true;
+                        this.fetchNMRium()
                     })
                 }).catch(error => {
                     this.loadingStep = false;
