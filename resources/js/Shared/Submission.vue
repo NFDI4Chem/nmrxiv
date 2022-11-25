@@ -1879,7 +1879,7 @@ export default {
         },
 
         url() {
-            return "https://dev.nmrxiv.org"
+            return String(this.$page.props.url) ? String(this.$page.props.url) : "https://dev.nmrxiv.org"
         },
 
         getMax() {
