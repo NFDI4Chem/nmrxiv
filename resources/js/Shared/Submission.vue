@@ -107,6 +107,10 @@
                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     ></path>
                 </svg>
+                <div v-if="datasetsToImport && datasetsToImport.length > 0">
+                    <br/>
+                    Processing {{ datasetsToImport.filter(f => f.status == true).length + 1 }} of {{ datasetsToImport.length }} spectra
+                </div>
             </div>
             <div v-if="!loading">
                 <div v-if="drafts.length > 0 && !currentDraft">
@@ -541,7 +545,7 @@
                                                                 >
                                                                     <a>{{
                                                                         ds.name
-                                                                    }}</a>
+                                                                    }} <span v-if="ds.type">({{ ds.type }})</span></a>
                                                                 </div>
                                                             </span>
                                                         </div>
@@ -640,7 +644,7 @@
                                                             <div
                                                                 v-if="
                                                                     currentTab.name ==
-                                                                    'Meta Data'
+                                                                    'Metadata'
                                                                 "
                                                                 class="px-4 sm:px-6"
                                                             >
@@ -1740,6 +1744,7 @@ export default {
             loadingStep: false,
             currentDraft: null,
             errorMessage: null,
+            datasetsToImport: null,
 
             draftForm: this.$inertia.form({
                 _method: "POST",
@@ -1781,7 +1786,7 @@ export default {
             tabs: [
                 { name: "Experiments (Spectra)", current: true },
                 { name: "Sample Info", current: false },
-                { name: "Meta Data", current: false },
+                { name: "Metadata", current: false },
             ],
 
             createDatasetForm: this.$inertia.form({
@@ -1874,7 +1879,7 @@ export default {
         },
 
         url() {
-            return String(this.$page.props.url);
+            return "https://dev.nmrxiv.org"
         },
 
         getMax() {
@@ -2394,6 +2399,28 @@ export default {
             }
         },
 
+        fetchProjectData(){
+            axios.get('/dashboard/drafts/'+this.currentDraft.id+'/info').then(response => {
+                this.project = response.data.project;
+                this.studies = response.data.studies;
+                if (
+                    this.project &&
+                    this.studies &&
+                    this.studies.length > 0
+                ) {
+                    this.selectStudy(this.studies[0], 0);
+                    this.selectedDataset =
+                        this.selectedStudy.datasets[0];
+                    this.loadingStep = false;
+                    this.selectStep(2);
+                } else {
+                    if (this.studies.length == 0) {
+                        this.loadingStep = false;
+                    }
+                }
+            })
+        },
+
         selectStep(id) {
             this.steps.forEach((step) => {
                 if (parseInt(step.id) < id) {
@@ -2425,32 +2452,62 @@ export default {
         },
 
         autoImport() {
-            this.$page.props.autoimport = !this.$page.props.autoimport;
+            this.loadingStep = true;
+            this.datasetsToImport = []
             this.studies.forEach( study => {
                 study.datasets.forEach(dataset => {
                     if(!dataset.has_nmrium){
-                        axios.post("https://nodejsdev.nmrxiv.org/spectra-parser", {
-                            "urls" : [
-                                this.url +
-                                "/" +
-                                this.$page.props.team.owner.username +
-                                "/datasets/" +
-                                this.project.slug +
-                                "/" +
-                                study.slug +
-                                "/" +
-                                dataset.slug
-                            ],
-                            "snapshot": false
-                        }).then(response => {
-                            axios.post(
-                                "/dashboard/datasets/" + dataset.id + "/nmriumInfo",
-                                response.data.data
-                            )
+                        this.datasetsToImport.push({
+                            projectSlug: this.project.slug ,
+                            studySlug: study.slug,
+                            datasetSlug: dataset.slug,
+                            datasetId: dataset.id,
+                            status: false
                         })
                     }
                 })
             })
+            this.fetchNMRium()
+        },
+
+        fetchNMRium(){
+            let datasetDetails = this.datasetsToImport.filter(f => f.status == false)[0];
+            if(datasetDetails){
+                this.loadingStep = true;
+                let ownerUserName = this.$page.props.team ? this.$page.props.team.owner.username : this.project.owner.username
+                axios.post("https://nodejsdev.nmrxiv.org/spectra-parser", {
+                    "urls" : [
+                        this.url +
+                        "/" +
+                        ownerUserName +
+                        "/datasets/" +
+                        datasetDetails.projectSlug +
+                        "/" +
+                        datasetDetails.studySlug +
+                        "/" +
+                        datasetDetails.datasetSlug
+                    ],
+                    "snapshot": false
+                }).then(response => {
+                    axios.post(
+                        "/dashboard/datasets/" + datasetDetails.datasetId + "/nmriumInfo",
+                        response.data.data
+                    ).then( res => {
+                        this.loadingStep = false;
+                        this.datasetsToImport.filter(f => f.datasetId == datasetDetails.datasetId)[0].status = true;
+                        this.fetchNMRium()
+                    })
+                }).catch(error => {
+                    this.loadingStep = false;
+                    this.datasetsToImport.filter(f => f.datasetId == datasetDetails.datasetId)[0].status = true;
+                    this.fetchNMRium()
+                })
+            }else{
+                if(this.datasetsToImport.length > 0){
+                    this.datasetsToImport = null
+                    this.fetchProjectData()
+                }
+            }
         },
 
         fetchDrafts() {
