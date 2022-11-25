@@ -18,7 +18,7 @@
             <button
                 type="button"
                 v-else
-                @click="(displayAddAuthorForms = false), (isEdit = false)"
+                @click="onBack"
                 class="inline-flex float-right items-center rounded-md border border-transparent bg-gray-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
             >
                 <ArrowSmallRightIcon class="w-5 h-5 mr-1 text-white" />
@@ -311,6 +311,7 @@
                                                 type="text"
                                                 name="name"
                                                 autocomplete="off"
+                                                placeholder="DOI or ORCID iD e.g. 10.1186/s13321-022-00614-7 or 0000-0001-6033-2910"
                                                 class="flex-1 focus:ring-teal-500 focus:border-teal-500 block w-full min-w-0 rounded sm:text-sm border-gray-300"
                                             />
                                         </div>
@@ -371,12 +372,15 @@
                                                 <label
                                                     for="items"
                                                     class="font-medium text-teal-900"
-                                                    >{{ author.firstName }}
-                                                    {{ author.lastName }}
+                                                    >{{ author.lastName }}
+                                                    {{ author.firstName }}
                                                 </label>
                                                 <p
                                                     v-if="
-                                                        author.authorAffiliationDetailsList
+                                                        author.authorAffiliationDetailsList &&
+                                                        author
+                                                            .authorAffiliationDetailsList
+                                                            .authorAffiliation[0]
                                                     "
                                                     id="items-description"
                                                     class="text-xs font-medium text-gray-900"
@@ -470,8 +474,8 @@
                                                     class="text-sm font-medium text-teal-900"
                                                 >
                                                     {{ element.title }}
-                                                    {{ element.family_name }}
                                                     {{ element.given_name }}
+                                                    {{ element.family_name }}
                                                 </p>
                                                 <button
                                                     class="ml-2 flex flex-shrink-0"
@@ -966,11 +970,12 @@ export default {
                         author.authorId && author.authorId.type == "ORCID"
                             ? author.authorId.value
                             : "",
-                    affiliation: author.authorAffiliationDetailsList
-                        .authorAffiliation[0].affiliation
-                        ? author.authorAffiliationDetailsList
-                              .authorAffiliation[0].affiliation
-                        : "",
+                    affiliation:
+                        author.authorAffiliationDetailsList &&
+                        author.authorAffiliationDetailsList.authorAffiliation[0]
+                            ? author.authorAffiliationDetailsList
+                                  .authorAffiliation[0].affiliation
+                            : "",
                 });
             });
             return authorsList;
@@ -1147,6 +1152,17 @@ export default {
                 this.form.reset(),
                 (this.form.contributor_type = {});
             this.form.contributor_type = this.contributorType[0];
+        },
+        onBack() {
+            if (this.selectedAuthor) {
+                this.authors.splice(
+                    this.selectedAuthor.pivot.sort_order,
+                    0,
+                    this.selectedAuthor
+                );
+            }
+            this.displayAddAuthorForms = false;
+            this.isEdit = false;
         },
     },
 };
