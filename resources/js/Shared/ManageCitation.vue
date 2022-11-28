@@ -58,6 +58,7 @@
                                                 v-model="form.doi"
                                                 type="text"
                                                 name="doi"
+                                                placeholder="DOI ID e.g. 10.1186/s13321-022-00614-7"
                                                 :class="[
                                                     isEdit
                                                         ? 'shadow-sm focus:ring-red-500 focus:border-red-500 block w-full sm:text-sm border-red-500 rounded-md bg-gray-100'
@@ -66,6 +67,10 @@
                                                 ]"
                                             />
                                         </div>
+                                        <jet-input-error
+                                            :message="form.errors.doi"
+                                            class="mt-2"
+                                        />
                                     </div>
                                     <div class="sm:col-span-4">
                                         <label
@@ -108,6 +113,7 @@
                                                 v-model="form.authors"
                                                 type="text"
                                                 name="authors"
+                                                placeholder="e.g. Pupier N, Nuzillard JM, Wist J, Schlörer NE."
                                                 :class="[
                                                     isEdit
                                                         ? 'shadow-sm focus:ring-red-500 focus:border-red-500 block w-full sm:text-sm border-red-500 rounded-md bg-gray-100'
@@ -124,7 +130,7 @@
                                     <div class="sm:col-span-6">
                                         <label
                                             for="abstract"
-                                            class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
+                                            class="block text-sm font-medium text-gray-700"
                                         >
                                             Abstract
                                         </label>
@@ -161,6 +167,7 @@
                                                 v-model="form.citation_text"
                                                 name="citation-text"
                                                 autocomplete="citation-text"
+                                                placeholder="<journal title> <year of publication> <volume> <(issue)> <page info> e.g. - Magnetic resonance in chemistry : MRC 2018 56 ( 8 ) 703-715 or please provide any relevant information."
                                                 type="text"
                                                 :class="[
                                                     isEdit
@@ -251,6 +258,7 @@
                                                 v-model="query"
                                                 type="text"
                                                 name="query"
+                                                placeholder="DOI ID e.g. 10.1186/s13321-022-00614-7"
                                                 autocomplete="off"
                                                 class="flex-1 focus:ring-teal-500 focus:border-teal-500 block w-full min-w-0 rounded sm:text-sm border-gray-300"
                                             />
@@ -659,7 +667,7 @@ export default {
                         Object.keys(this.fetchedCitations).length == 0
                     ) {
                         this.error =
-                            "Something went wrong. Please check the input and try again.";
+                            "No data found. Please enter the details manually.";
                     }
                     this.loading = false;
                 });
@@ -762,10 +770,6 @@ export default {
                 this.form.errors.authors = "The authors field is required.";
                 hasErrors = true;
             }
-            if (!this.form.abstract) {
-                this.form.errors.abstract = "The abstract field is required.";
-                hasErrors = true;
-            }
             if (hasErrors) {
                 this.form.hasErrors = true;
             }
@@ -855,6 +859,9 @@ export default {
             this.form.reset();
         },
         onBack() {
+            if (this.selectedCitation) {
+                this.citations.push(this.selectedCitation);
+            }
             this.displayAddCitationForms = false;
             this.isEdit = false;
             this.fetchedCitations = {};
