@@ -22,7 +22,7 @@ class DeleteTrashedProject extends Command
      *
      * @var string
      */
-    protected $description = 'Look trashed projects which has passed the cool-off period of 30 days and delete it permanently also send a reminder email to the owner before doing so.';
+    protected $description = 'Look trashed projects which has passed the cool-off period of 30 days and delete it permanently also send a reminder email to the owner before performing the delete action.';
 
     /**
      * Execute the console command.
@@ -34,34 +34,47 @@ class DeleteTrashedProject extends Command
         $projects = Project::where('is_deleted', true)->get();
         foreach ($projects as $project) {
             $deletedOn = $project->deleted_on;
-            //$deletedDate = explode("-",explode(" ", $deletedOn)[0]);
             $dueDate = null;
-            //$deletionDt = Carbon::createMidnightDate($deletedDate[0], $deletedDate[1], $deletedDate[2]);
-            //echo('Midnight time  '.$deletionDt);
-
             if ($deletedOn) {
                 $dueDate = Carbon::parse($deletedOn)->diffInDays(Carbon::now());
-                //echo('Due Date  '.$dueDate);
-                if ($dueDate == 23) {
-                    //Send First Notification one week before
+                echo('Due Date  '.$dueDate);
+                if ($dueDate == 23 || $dueDate == 29) {
                     $this->sendNotification($project->owner, $project);
                 }
-                if ($dueDate == 29) {
-                    //Send Second Notification one day before
-                    $this->sendNotification($project->owner, $project);
+                if ($dueDate >= 30) {
+                    $this->deletePermanently($dueDate, $project);
                 }
+
             }
 
         }
     }
+
+    /**
+     * Send Notification via email.
+     *
+     * @param  String  $owner
+     * @param  App\Models\Project $project
+     * 
+     * @return void
+     */
 
     public function sendNotification($owner, $project)
     {
         Notification::send($project->owner, new ProjectDeletionReminderNotification($project));
     }
 
-    public function deletePermanently()
+    /**
+     * Delete project and related studies and datasets permanently.
+     *
+     * @param  String  $owner
+     * @param  App\Models\Project $project
+     * 
+     * @return void
+     */
+
+    public function deletePermanently($dueDate, $project)
     {
-        // To do
+        
     }
 }
