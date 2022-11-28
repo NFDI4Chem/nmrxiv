@@ -37,44 +37,45 @@ class DeleteTrashedProject extends Command
             $dueDate = null;
             if ($deletedOn) {
                 $dueDate = Carbon::parse($deletedOn)->diffInDays(Carbon::now());
-                echo('Due Date  '.$dueDate);
+                echo 'Due Date  '.$dueDate;
                 if ($dueDate == 23 || $dueDate == 29) {
-                    $this->sendNotification($project->owner, $project);
+                    $this->sendNotification($project);
                 }
                 if ($dueDate >= 30) {
                     $this->deletePermanently($dueDate, $project);
                 }
-
             }
-
         }
     }
 
     /**
      * Send Notification via email.
      *
-     * @param  String  $owner
-     * @param  App\Models\Project $project
-     * 
+     * @param  string  $owner
+     * @param  App\Models\Project  $project
      * @return void
      */
-
-    public function sendNotification($owner, $project)
+    public function sendNotification($project)
     {
-        Notification::send($project->owner, new ProjectDeletionReminderNotification($project));
+        $sendTo = [];
+        foreach ($project->allUsers() as $member) {
+            if ($member->projectMembership->role == 'creator' || $member->projectMembership->role == 'owner') {
+                array_push($sendTo, $member);
+            } else {
+                array_push($sendTo, $project->owner);
+            }
+        }
+        Notification::send($sendTo, new ProjectDeletionReminderNotification($project));
     }
 
     /**
      * Delete project and related studies and datasets permanently.
      *
-     * @param  String  $owner
-     * @param  App\Models\Project $project
-     * 
+     * @param  string  $owner
+     * @param  App\Models\Project  $project
      * @return void
      */
-
     public function deletePermanently($dueDate, $project)
     {
-        
     }
 }
