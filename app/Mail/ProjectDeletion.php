@@ -6,7 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class ProjectDeletionReminder extends Mailable
+class ProjectDeletion extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -29,9 +29,10 @@ class ProjectDeletionReminder extends Mailable
      */
     public function build()
     {
-        return $this->markdown('vendor.mail.project-deletion-reminder', [
-            'url' => url(config('app.url').'/dashboard/projects/'.$this->project->id),
+        return $this->markdown('vendor.mail.project-deletion', [
+            'url' => url(config('app.url').'/dashboard/projects/'.$this->project->id.'/settings'),
             'projectName' => $this->project->name,
-        ])->subject(__('Your project would be deleted soon'.' - '.$this->project->name));
+            'deletedOn' => explode(' ', $this->project->deleted_on)[0],
+        ])->subject(__('Your project has been moved to trash'.' - '.$this->project->name));
     }
 }
