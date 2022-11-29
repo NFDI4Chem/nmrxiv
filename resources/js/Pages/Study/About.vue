@@ -644,7 +644,7 @@ export default {
     data() {
         return {
             smiles: "",
-            percentage: 1,
+            percentage: 0,
             editor: "",
         };
     },
