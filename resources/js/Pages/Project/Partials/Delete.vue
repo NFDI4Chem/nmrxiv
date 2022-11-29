@@ -32,7 +32,10 @@
                             your project is deleted, all of its resources and
                             data will be permanently deleted. Please enter your
                             password to confirm you would like to permanently
-                            delete your project.
+                            delete your project. After this confirmation, your
+                            project will be moved to the Trash folder, where you
+                            can restore it within 30 days before the permanent
+                            deletion.
 
                             <div class="mt-4">
                                 <jet-input
