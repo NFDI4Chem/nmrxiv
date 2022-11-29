@@ -47,12 +47,12 @@ class StudyFactory extends Factory
             'uuid' => Str::uuid(),
             'access' => 'restricted',
             'access_type' => 'viewer',
-            'team_id' => rand(1, 100),
-            'owner_id' => rand(1, 100),
-            'project_id' => rand(1, 100),
+            'team_id' => 1,
+            'owner_id' => 1,
+            'project_id' => 1,
             'license_id' => rand(1, 10),
-            'draft_id' => rand(1, 100),
-            'fs_id' => rand(1, 100),
+            'draft_id' => 1,
+            'fs_id' => 1,
             'release_date' => null,
             'study_photo_path' => null, //todo: Adjust when studies images field is provided in nmrXiv
             'created_at' => $dt->subDays(rand(1, 10)),
@@ -60,7 +60,7 @@ class StudyFactory extends Factory
             'doi' => null,
             'datacite_schema' => null,
             'identifier' => null,
-            'validation_id' => Validation::factory(),
+            'validation_id' => 1,
             'validation_status' => false,
             'internal_status' => null, //todo: provide varying values
         ];

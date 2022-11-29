@@ -56,7 +56,8 @@ class ProjectSeeder extends Seeder
                 'updated_at' => $study->updated_at,
             ]);
 
-            $dsTypes = [
+            $dsTypes = 
+            [
                 'proton',
                 '13c',
                 'dept',
@@ -78,7 +79,7 @@ class ProjectSeeder extends Seeder
         }
 
         $this->command->alert('nmrXiv: Projects table seed successfully');
-        $this->command->line('You may log in to admin console using <info>'.$user->email.'</info> and password: <info>'.$password.'</info>');
+        $this->command->line('You may log into the project user account using <info>'.$user->email.'</info> and password: <info>'.$password.'</info>');
         $this->command->line('');
     }
 }

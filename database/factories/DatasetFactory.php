@@ -46,13 +46,13 @@ class DatasetFactory extends Factory
             'uuid' => Str::uuid(),
             'access' => 'restricted',
             'access_type' => 'viewer',
-            'team_id' => rand(1, 100),
-            'owner_id' => rand(1, 100),
-            'project_id' => rand(1, 100),
-            'study_id' => rand(1, 100),
+            'team_id' => 1,
+            'owner_id' => 1,
+            'project_id' => 1,
+            'study_id' => 1,
             'license_id' => rand(1, 10),
-            'draft_id' => rand(1, 100),
-            'fs_id' => rand(1, 100),
+            'draft_id' => 1,
+            'fs_id' => 1,
             'dataset_photo_path' => null, //todo: Adjust when datasets images field is provided in nmrXiv
             'release_date' => null,
             'created_at' => $dt->subDays(rand(1, 10)),
@@ -61,7 +61,7 @@ class DatasetFactory extends Factory
             'datacite_schema' => null,
             'identifier' => null,
             'has_nmrium' => null,
-            'validation_id' => Validation::factory(),
+            'validation_id' => 1,
             'validation_status' => false,
             'internal_status' => null, //todo: provide varying values
         ];
