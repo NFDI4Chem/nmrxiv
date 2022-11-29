@@ -463,6 +463,13 @@
                                                                     class="text-gray-400"
                                                                     target="_blank"
                                                                     >here</a
+                                                                >
+                                                                and
+                                                                <a
+                                                                    href="https://www.daylight.com/dayhtml/doc/theory/theory.smiles.html"
+                                                                    class="text-gray-400"
+                                                                    target="_blank"
+                                                                    >here</a
                                                                 >.</span
                                                             >
                                                         </div>
