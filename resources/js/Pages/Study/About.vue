@@ -336,7 +336,7 @@
                                                                                 class="text-sm"
                                                                             >
                                                                                 <a
-                                                                                    class="font-medium text-gray-900"
+                                                                                    class="break-all font-medium text-gray-900"
                                                                                     >{{
                                                                                         molecule.STANDARD_INCHI
                                                                                     }}</a
