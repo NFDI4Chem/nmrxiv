@@ -3,7 +3,6 @@
 namespace Database\Factories;
 
 use App\Models\Dataset;
-use App\Models\Validation;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
@@ -26,8 +25,6 @@ class DatasetFactory extends Factory
     {
         $name = $this->faker->word().'dx';
         $slug = Str::slug($name, '-');
-
-        $dt = Carbon::now();
 
         return[
             'name' => $name,
@@ -55,8 +52,8 @@ class DatasetFactory extends Factory
             'fs_id' => 1,
             'dataset_photo_path' => null, //todo: Adjust when datasets images field is provided in nmrXiv
             'release_date' => null,
-            'created_at' => $dt->subDays(rand(1, 10)),
-            'updated_at' => $dt->subHours(rand(1, 10)),
+            'created_at' => Carbon::now()->timestamp,
+            'updated_at' => Carbon::now()->timestamp,
             'doi' => null,
             'datacite_schema' => null,
             'identifier' => null,

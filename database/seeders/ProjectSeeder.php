@@ -56,7 +56,7 @@ class ProjectSeeder extends Seeder
                 'updated_at' => $study->updated_at,
             ]);
 
-            $dsTypes = 
+            $dsTypes =
             [
                 'proton',
                 '13c',

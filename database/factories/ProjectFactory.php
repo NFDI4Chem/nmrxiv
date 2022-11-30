@@ -3,7 +3,6 @@
 namespace Database\Factories;
 
 use App\Models\Project;
-use App\Models\Validation;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
@@ -26,8 +25,6 @@ class ProjectFactory extends Factory
     {
         $name = $this->faker->sentence($nbWords = 4);
         $slug = Str::slug($name, '-');
-
-        $dt = Carbon::now();
 
         return[
             'name' => $name,
@@ -54,8 +51,8 @@ class ProjectFactory extends Factory
             'fs_id' => null,
             'release_date' => null,
             'project_photo_path' => null,
-            'created_at' => $dt->subDays(rand(1, 10)),
-            'updated_at' => $dt->subHours(rand(1, 10)),
+            'created_at' => Carbon::now()->timestamp,
+            'updated_at' => Carbon::now()->timestamp,
             'doi' => null,
             'datacite_schema' => null,
             'identifier' => null,

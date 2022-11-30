@@ -22,8 +22,6 @@ class MoleculeFactory extends Factory
      */
     public function definition()
     {
-        $dt = Carbon::now();
-
         $cid = rand(1000, 9999);
         echo $cid;
         $pubchemRecordLink = 'https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/'.$cid.'/record/JSON';
@@ -87,8 +85,8 @@ class MoleculeFactory extends Factory
             'MULTIPLICITY_3' => null,
             'VIEWS' => null,
             'DOI' => null,
-            'created_at' => $dt->subDays(rand(1, 10)),
-            'updated_at' => $dt->subHours(rand(1, 10)),
+            'created_at' => Carbon::now()->timestamp,
+            'updated_at' => Carbon::now()->timestamp,
             'doi' => null,
             'datacite_schema' => null,
             'identifier' => null,
