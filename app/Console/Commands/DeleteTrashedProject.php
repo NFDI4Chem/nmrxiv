@@ -15,14 +15,14 @@ class DeleteTrashedProject extends Command
      *
      * @var string
      */
-    protected $signature = 'nmrxiv:delete-trashed-project';
+    protected $signature = 'nmrxiv:delete-projects {ids?}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Look trashed projects which has passed the cool-off period of 30 days and delete it permanently also send a reminder email to the owner before performing the delete action.';
+    protected $description = 'Look for trashed projects which has passed the cool-off period of 30 days and delete it permanently(along with associated objects) also send a reminder email to the owner before performing the delete action.';
 
     /**
      * Execute the console command.
@@ -31,13 +31,18 @@ class DeleteTrashedProject extends Command
      */
     public function handle()
     {
-        $projects = Project::where('is_deleted', true)->get();
+        $ids = $this->argument('ids') ? explode(',', $this->argument('ids')) : null;
+        if($ids){
+            $projects = Project::whereIn('id', $ids)
+            ->where('is_deleted', true)->get();
+        } else {
+            $projects = Project::where('is_deleted', true)->get();
+        }
         foreach ($projects as $project) {
             $deletedOn = $project->deleted_on;
             $dueDate = null;
             if ($deletedOn) {
                 $dueDate = Carbon::parse($deletedOn)->diffInDays(Carbon::now());
-                //echo 'Due Date  '.$dueDate;
                 if ($dueDate == 23 || $dueDate == 29) {
                     $this->sendNotification($project);
                 }
