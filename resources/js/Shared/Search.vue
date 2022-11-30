@@ -187,13 +187,7 @@
                                                                     >
                                                                         <Link
                                                                             class="w-full"
-                                                                            :href="
-                                                                                '/projects/' +
-                                                                                hit
-                                                                                    .owner
-                                                                                    .username +
-                                                                                '/' +
-                                                                                hit.slug
+                                                                            :href="hit.public_url
                                                                             "
                                                                         >
                                                                             <FolderIcon
