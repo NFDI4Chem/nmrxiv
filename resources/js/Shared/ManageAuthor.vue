@@ -814,11 +814,6 @@ export default {
                         "A person without a specifically defined role in the development of the resource, but who is <br> someone the author wishes to recognize",
                 },
                 {
-                    title: "Researcher",
-                    description:
-                        "A person involved in analysing data or the results of an experiment or formal study. May indicate an intern or assistant to one of the authors who helped with research but who was not so “key” as to be listed as an author.",
-                },
-                {
                     title: "ResearchGroup",
                     description:
                         "Typically refers to a group of individuals with a lab, department, or division that has a specifically <br> defined focus of activity.",
