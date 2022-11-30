@@ -25,7 +25,7 @@ class CitationFactory extends Factory
     public function definition()
     {
         return [
-            'doi' => '10.1002/mrc.4737',
+            'doi' => null,
             'title' => $this->faker->title(),
             'authors' => $this->faker->firstName().$this->faker->lastName(),
             'abstract' => $this->faker->text(),
