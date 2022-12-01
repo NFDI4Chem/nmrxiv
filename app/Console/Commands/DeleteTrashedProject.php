@@ -3,10 +3,14 @@
 namespace App\Console\Commands;
 
 use App\Models\Project;
-use App\Notifications\ProjectDeletionReminderNotification;
-use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
+use Illuminate\Console\Command;
+use App\Models\FileSystemObject;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Notification;
+use App\Notifications\ProjectDeletionReminderNotification;
 
 class DeleteTrashedProject extends Command
 {
@@ -27,7 +31,7 @@ class DeleteTrashedProject extends Command
     /**
      * Execute the console command.
      *
-     * @return int
+     * @return void
      */
     public function handle()
     {
@@ -47,7 +51,7 @@ class DeleteTrashedProject extends Command
                     $this->sendNotification($project);
                 }
                 if ($dueDate >= 30) {
-                    $this->deleteObjects($project);
+                    $this->delete($project);
                 }
             }
         }
@@ -56,8 +60,8 @@ class DeleteTrashedProject extends Command
     /**
      * Send Notification via email.
      *
-     * @param  string  $owner
      * @param  App\Models\Project  $project
+     * 
      * @return void
      */
     public function sendNotification($project)
@@ -74,21 +78,130 @@ class DeleteTrashedProject extends Command
     }
 
     /**
-     * Delete project and related objects permanently.
+     * Delete project and related objects
      *
-     * @param  string  $owner
+     * @param  App\Models\Project  $project
+     * 
+     * @return void
+     */
+    public function delete($project)
+    {
+        if (! $project->is_public) {
+            return DB::transaction(function () use ($project) {
+                $this->deleteObjects($project);
+            });
+        } else {
+            // Log info to be added.
+        }
+    }
+
+    /**
+     * Delete project and related objects.
+     *
      * @param  App\Models\Project  $project
      * @return void
      */
     public function deleteObjects($project)
     {
-        echo 'Deletion starts..';
-        if (! $project->is_public) {
-            $this->deleteDraftAndFiles($project);
-            $this->deleteStudiesAndRelations($project);
-        } else {
-            echo 'Project-'.$project->name.' cannot be deleted as it is public.';
+        $studies = $project->studies;
+        foreach ($studies as $study) {
+            $this->deleteStudyAndRelations($study);
         }
+        $this->deleteProjectAndRelations($project);
+    }
+
+    /**
+     * Delete study and related objects.
+     *
+     * @param  App\Models\Study  $study
+     * 
+     * @return void
+     */
+
+    public function deleteStudyAndRelations($study){
+        $datasets = $study->datasets;
+        $sample = $study->sample;
+        //Detach Molecules and Delete Sample
+        if ($sample) {
+            $this->deleteSampleAndRelations($sample);
+        }
+        foreach($datasets as $dataset){
+            $this->deleteDatasetsAndRelations($dataset);
+        }
+        //Delete Study
+        $study->delete();
+
+    }
+
+    /**
+     * Delete dataset and related objects.
+     *
+     * @param  \Illuminate\Support\Collection  $datasets
+     * 
+     * @return void
+     */
+    public function deleteDatasetsAndRelations($dataset)
+    {
+        $nmriumInfo = $dataset->nmrium;
+        if($nmriumInfo){
+            $this->deleteNMRiumAndVersions($nmriumInfo);
+        }
+        //Delete Dataset
+        $dataset->delete();
+    }
+
+    /**
+     * Delete project and related objects.
+     *
+     * @param  App\Models\Project  $project
+     * @return void
+     */
+    public function deleteProjectAndRelations($project)
+    {
+        $project = $project->fresh();
+        $authors = $project->authors->pluck('id')->toArray();
+        $citations = $project->citations->pluck('id')->toArray();
+        $draft = $project->draft;
+        $validation = $project->validation;
+        //Detach Authors
+        if ($authors && count($authors) > 0) {
+            $this->detachAuthors($project, $authors);
+        }
+        //Detach Citations
+        if ($citations && count($citations) > 0) {
+            $this->detachCitations($project, $citations);
+        }
+        //Delete Validations
+        if($validation){
+            $validation->delete();
+
+        }
+        //Delete Project
+        $project->delete();
+        
+        //Delete Draft and Files
+        if($draft){
+            $this->deleteDraftAndFiles($draft);
+        }
+    }
+
+    /**
+     * Delete NMRium and associated versions.
+     *
+     * @param  App\Models\NMRium  $nmriumInfo
+     * 
+     * @return void
+     */
+
+    public function deleteNMRiumAndVersions($nmriumInfo)
+    {
+        $nmriumVersions = $nmriumInfo->versions();
+        if($nmriumVersions){
+            $nmriumVersions->each(function ($version) {
+                $version->delete();
+            });
+        }
+        $nmriumInfo->delete();
     }
 
     /**
@@ -97,116 +210,100 @@ class DeleteTrashedProject extends Command
      * @param  App\Models\Draft  $drafts
      * @return void
      */
-    public function deleteDraftAndFiles($project)
+    public function deleteDraftAndFiles($draft)
     {
-        $draft = $project->draft;
-        if ($draft) {
-            //Delete Files
-            $files = $draft->files;
-            echo 'Delete Files..';
-            foreach ($files as $file) {
-                $file->delete();
+        //Delete Files
+        $files = $draft->files;
+        foreach ($files as $file) {
+            $this->deleteFSO($file);
+        }
+        //Delete Draft
+        $draft = $draft->refresh();
+        $draft->delete();
+    }
+
+    /**
+     * Delete FileSystemObject from DB and Storage.
+     *
+     * @param  App\Models\FileSystemObject  $filesystemobject
+     * 
+     * @return void
+     */
+    public function deleteFSO(FileSystemObject $filesystemobject)
+    {
+        $fsoIds = $this->getChildrenIds($filesystemobject, []);
+        if (Storage::has($filesystemobject->path)) {
+            if ($filesystemobject->type == 'directory') {
+                Storage::disk(env('FILESYSTEM_DRIVER'))->deleteDirectory($filesystemobject->path);
+            } else {
+                Storage::disk(env('FILESYSTEM_DRIVER'))->delete($filesystemobject->path);
             }
-            //Delete Draft
-            $draft = $draft->refresh();
-            if ($draft->files->isEmpty()) {
-                echo 'Delete Drafts..';
-                $draft->delete();
-            }
+            FileSystemObject::whereIn('id', $fsoIds)->delete();
         }
     }
 
     /**
-     * Delete study and related objects permanently.
+     * Get the children Ids of FSO.
      *
-     * @param  App\Models\Project  $project
-     * @return void
+     * @param  App\Models\FileSystemObject  $filesystemobject 
+     * @param  Array $fsoIds
+     * 
+     * @return array
      */
-    public function deleteStudiesAndRelations($project)
+
+    public function getChildrenIds($filesystemobject, $fsoIds)
     {
-        $studies = $project->studies;
-        foreach ($studies as $study) {
-            $datasets = $study->datasets;
-            $sample = $study->sample;
-            //Delete Sample and Detach Molecules
-            if ($sample) {
-                $molecules = $sample->molecules;
-                if ($molecules) {
-                    foreach ($molecules as $molecule) {
-                        $sample->molecules()->detach([$molecule->id]);
-                    }
-                }
-                $sample->delete();
-            }
-            if ($datasets && count($datasets) > 0) {
-                $this->deleteDatasetsAndRelations($study);
+        array_push($fsoIds, $filesystemobject->id);
+        if ($filesystemobject->has_children) {
+            foreach ($filesystemobject->children as $child) {
+                $fsoIds = array_merge($fsoIds, $this->getChildrenIds($child, []));
             }
         }
-        $this->deleteProjectAndRelations($project);
+
+        return $fsoIds;
     }
 
     /**
-     * Delete dataset and related objects permanently.
+     * Delete sample and detach associated molecules.
      *
-     * @param  \Illuminate\Support\Collection  $datasets
+     * @param  App\Models\Sample  $sample
+     * 
      * @return void
      */
-    public function deleteDatasetsAndRelations($study)
+    public function deleteSampleAndRelations($sample)
     {
-        $datasets = $study->datasets;
-        foreach ($datasets as $dataset) {
-            $nmriumInfo = $dataset->nmrium();
-            //Delete NMRium
-            if ($nmriumInfo) {
-                echo 'Delete NMRium';
-                $nmriumInfo->delete();
-            }
-            //Delete Dataset
-            $dataset->delete();
-            echo 'Delete Dataset..';
+        $molecules = $sample->molecules->pluck('id')->toArray();
+        if ($molecules && count($molecules) > 0) {
+            $sample->molecules()->detach($molecules);
         }
-
-        //Delete Study
-        $study = $study->fresh();
-        if ($study->datasets->isEmpty()) {
-            echo 'Delete Study..';
-            $study->delete();
-        }
+        $sample->delete();
     }
 
     /**
-     * Delete project and related objects permanently.
+     * Detach authors
      *
-     * @param  App\Models\Project  $project
+     * @param  App\Models\Author  $author
+     * 
      * @return void
      */
-    public function deleteProjectAndRelations($project)
+    public function detachAuthors($project, $authors)
     {
-        $project = $project->fresh();
-        $authors = $project->authors;
-        $citations = $project->citations;
-        //Detach Authors
-        if ($authors) {
-            foreach ($authors as $author) {
-                $project->authors()->detach(
-                    [$author->id]
-                );
-            }
-        }
-        //Detach Citations
-        if ($citations) {
-            foreach ($citations as $citation) {
-                $project->citations()->detach(
-                    [$citation->id]
-                );
-            }
-        }
+        $project->authors()->detach(
+            $authors
+        );
+    }
 
-        //Delete Project
-        $project = $project->fresh();
-        if ($project->studies->isEmpty()) {
-            echo 'Delete Project..';
-            $project->delete();
-        }
+    /**
+     * Detach citations
+     *
+     * @param  App\Models\Citation  $citation
+     * 
+     * @return void
+     */
+    public function detachCitations($project, $citations)
+    {
+        $project->citations()->detach(
+            $citations
+        ); 
     }
 }
