@@ -3,6 +3,7 @@
 namespace App\Actions\Project;
 
 use App\Models\Project;
+use App\Models\User;
 
 class ArchiveProject
 {
@@ -21,5 +22,29 @@ class ArchiveProject
         }
         $project->is_archived = $archiveState;
         $project->save();
+        if ($project->is_archived) {
+            $project->sendNotification('archival', $this->prepareSendList($project));
+            $project->sendNotification('archivalAdmin', User::role(['super-admin'])->get());
+        }
+    }
+
+    /**
+     * Prepare Sent to list.
+     *
+     * @param  App\Models\Project  $project
+     * @return void
+     */
+    public function prepareSendList($project)
+    {
+        $sendTo = [];
+        foreach ($project->allUsers() as $member) {
+            if ($member->projectMembership->role == 'creator' || $member->projectMembership->role == 'owner') {
+                array_push($sendTo, $member);
+            } else {
+                array_push($sendTo, $project->owner);
+            }
+        }
+
+        return $sendTo;
     }
 }

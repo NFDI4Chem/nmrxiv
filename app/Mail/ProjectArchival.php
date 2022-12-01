@@ -6,7 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class ProjectDeletion extends Mailable
+class ProjectArchival extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -29,10 +29,9 @@ class ProjectDeletion extends Mailable
      */
     public function build()
     {
-        return $this->markdown('vendor.mail.project-deletion', [
+        return $this->markdown('vendor.mail.project-archival', [
             'url' => url(config('app.url').'/dashboard/projects/'.$this->project->id.'/settings'),
             'projectName' => $this->project->name,
-            'deletedOn' => explode(' ', $this->project->deleted_on)[0],
-        ])->subject(__('Your project has been moved to trash'.' - '.$this->project->name));
+        ])->subject(__('Your project is archived'.' - '.$this->project->name));
     }
 }
