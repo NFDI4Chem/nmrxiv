@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use Throwable;
 use App\Models\Project;
 use Illuminate\Support\Carbon;
 use Illuminate\Console\Command;
@@ -88,10 +89,15 @@ class DeleteTrashedProject extends Command
     {
         if (! $project->is_public) {
             return DB::transaction(function () use ($project) {
-                $this->deleteObjects($project);
+                try {
+                    $this->deleteObjects($project);
+                }
+                catch (Throwable $e) {
+                    throw $e;
+                }
             });
         } else {
-            // Log info to be added.
+            // Do nothing
         }
     }
 
@@ -99,6 +105,7 @@ class DeleteTrashedProject extends Command
      * Delete project and related objects.
      *
      * @param  App\Models\Project  $project
+     * 
      * @return void
      */
     public function deleteObjects($project)
@@ -154,6 +161,7 @@ class DeleteTrashedProject extends Command
      * Delete project and related objects.
      *
      * @param  App\Models\Project  $project
+     * 
      * @return void
      */
     public function deleteProjectAndRelations($project)
@@ -208,6 +216,7 @@ class DeleteTrashedProject extends Command
      * Delete drafts and associated files permanently.
      *
      * @param  App\Models\Draft  $drafts
+     * 
      * @return void
      */
     public function deleteDraftAndFiles($draft)
