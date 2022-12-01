@@ -26,7 +26,7 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('telescope:prune')->daily();
         $schedule->command('nmrxiv:publish')->daily();
-        $schedule->command('nmrxiv:delete-trashed-project')->daily();
+        $schedule->command('nmrxiv:delete-projects')->daily();
     }
 
     /**
