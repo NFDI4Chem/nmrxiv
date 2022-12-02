@@ -34,6 +34,6 @@ class ProjectDeletionReminder extends Mailable
             'projectName' => $this->project->name,
             'deletedOn' => explode(' ', $this->project->deleted_on)[0],
             'dueDate'   => explode(' ',Carbon::parse($this->project->deleted_on)->addDays(30))[0],
-        ])->subject(__('Your project would be deleted soon'.' - '.$this->project->name));
+        ])->subject(__('Your project will be deleted soon'.' - '.$this->project->name));
     }
 }
