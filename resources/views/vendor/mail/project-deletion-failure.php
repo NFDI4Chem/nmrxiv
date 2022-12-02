@@ -2,7 +2,10 @@
 
 Dear admin,
 
-{{ __('Project deletion failed for project name - :project project id - :projectId.', ['project' => $projectName, 'projectId' => $projectId]) }}
+Deletion failed for below project.
+
+{{ __('Project Name - :project', ['project' => $projectName]) }}
+{{ __('Project ID - :projectId', ['projectId' => $projectId]) }}
 
 Regards,
 The nmrXiv Team
