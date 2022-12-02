@@ -2,17 +2,22 @@
 
 Dear nmrXiv user,
 
-Your project archived..
+{{ __('Your project - :project has been archived successfully.', ['project' => $projectName]) }}
 
-You can always restore your project anytime before the cool-off period. 
-To restore:
-Go to your Trash section click on Project >> Project Settings >> Restore Project,  or click on the button below.
+A warning will now be displayed on your project, indicating that the project is no longer maintained.
 
+You may unarchive your project if you would like to. To unarchive your project:
+Visit the project page (link).
+Select the project you want to unarchive, and click Project settings > Unarchive.
+In the confirmation dialogue, click confirm.
 
-If you do not recognize this action please report to us at info@nmrxiv.org.
+For further questions, please visit our documentation site or contact us at info@nmrxiv.org.
+
+Regards,
+The nmrXiv Team
 
 @component('mail::button', ['url' =>  $url, 'color' => 'green'])
-Restore Project
+Unarchive Project
 @endcomponent
 
 @endcomponent
