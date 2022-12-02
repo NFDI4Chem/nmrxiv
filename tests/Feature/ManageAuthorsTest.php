@@ -10,7 +10,7 @@ use Tests\TestCase;
 
 class ManageAuthorsTest extends TestCase
 {
-    // use RefreshDatabase;
+    use RefreshDatabase;
 
     /**
      * Test if a author can be created and updated
@@ -27,24 +27,21 @@ class ManageAuthorsTest extends TestCase
 
         $author = Author::factory()->create();
 
-        $project->authors()->sync([$author->id => ['contributor_type' => 'Researcher', 'sort_order' => 0]]);
-
-        $body = [
-            'authors' => [[
-                'title' => $author->title,
-                'given_name' => $author->given_name,
-                'family_name' => $author->family_name,
-                'orcid_id' => $author->orcid_id,
-                'email_id' => $author->email_id,
-                'affiliation' => $author->affiliation.'_ updated',
-            ]],
-        ];
+        $body = $this->prepareBody($author);
 
         $response = $this->withHeaders([
             'Accept' => 'application/json',
         ])->post('authors/'.$project->id, $body);
 
         $response->assertStatus(200);
+        
+        $project = $project->fresh();
+        $authors = $project->authors->toArray();
+
+        $this->assertDatabaseHas('author_project', $authors[0]['pivot']);
+        unset($authors[0]['pivot']);
+        $this->assertDatabaseHas('authors', $authors[0]);
+
     }
 
     /**
@@ -52,7 +49,7 @@ class ManageAuthorsTest extends TestCase
      *
      * @return void
      */
-    public function test_author_can_be_deleted()
+    public function test_author_can_be_detached()
     {
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 
@@ -63,24 +60,74 @@ class ManageAuthorsTest extends TestCase
         $author = Author::factory()->create();
 
         $project->authors()->sync([$author->id => ['contributor_type' => 'Researcher', 'sort_order' => 0]]);
+        $project = $project->fresh();
+        $authors = $project->authors->toArray();
 
-        $body = [
-            'authors' => [[
-                'id' => $author->id,
-                'title' => $author->title,
-                'given_name' => $author->given_name,
-                'family_name' => $author->family_name,
-                'orcid_id' => $author->orcid_id,
-                'email_id' => $author->email_id,
-                'affiliation' => $author->affiliation.'_ updated',
-            ]],
-        ];
+        $body = $this->prepareBody($author);
 
         $response = $this->withHeaders([
             'Accept' => 'application/json',
         ])->delete('authors/'.$project->id.'/delete', $body);
 
         $response->assertStatus(200);
+        
+        $this->assertDatabaseMissing('author_project', $authors[0]['pivot']);
+    }
+
+    /**
+     * Test if the author cannot be updated by the reviewer
+     *
+     * @return void
+     */
+    public function test_author_cannot_be_updated_by_reviewer()
+    {
+        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+
+        $project = Project::factory()->create();
+
+        $reviewer = User::find($user->id);
+        if (! is_null($reviewer)) {
+            $project->users()->attach(
+                $reviewer, ['role' => 'reviewer']
+            );
+        }
+
+        $author = Author::factory()->create();
+
+        $body = $this->prepareBody($author);
+
+        $response = $this->withHeaders([
+            'Accept' => 'application/json',
+        ])->post('authors/'.$project->id, $body);
+
+        $response->assertStatus(403);
+
+    }
+
+    /**
+     * Test if the author cannot be updated if project is made public
+     *
+     * @return void
+     */
+    public function test_author_cannot_be_updated_if_project_is_public()
+    {
+        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+
+        $project = Project::factory()->create([
+            'owner_id'  => $user->id,
+            'is_public' => true
+        ]);
+
+        $author = Author::factory()->create();
+
+        $body = $this->prepareBody($author);
+
+        $response = $this->withHeaders([
+            'Accept' => 'application/json',
+        ])->post('authors/'.$project->id, $body);
+
+        $response->assertStatus(403);
+
     }
 
     /**
@@ -102,7 +149,7 @@ class ManageAuthorsTest extends TestCase
 
         $body = [
             'author_id' => $author->id,
-            'role' => 'Researcher',
+            'role' => 'DataCurator',
         ];
 
         $response = $this->withHeaders([
@@ -110,5 +157,37 @@ class ManageAuthorsTest extends TestCase
         ])->post('authors/'.$project->id.'/updateRole', $body);
 
         $response->assertStatus(200);
+
+        $project = $project->refresh();
+        $authors = $project->authors->toArray();
+
+        $this->assertDatabaseHas('author_project', $authors[0]['pivot']);
+
+    }
+
+    /**
+     * Prepare request body for author
+     *
+     * @param \App\Models\Author  $author
+     * 
+     * @return Array $body
+     */
+    public function prepareBody($author){
+        $body = [];
+        if($author){
+            $body = [
+                'authors' => [[
+                    'id' => $author->id,
+                    'title' => $author->title,
+                    'given_name' => $author->given_name,
+                    'family_name' => $author->family_name,
+                    'orcid_id' => $author->orcid_id,
+                    'email_id' => $author->email_id,
+                    'affiliation' => $author->affiliation.'_ updated',
+                ]],
+            ];
+    }
+
+        return $body;
     }
 }
