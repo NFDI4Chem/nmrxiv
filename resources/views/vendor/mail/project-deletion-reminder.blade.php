@@ -2,11 +2,20 @@
 
 Dear nmrXiv user,
 
-{{ __('Your project - :project which is in trash for a while is about to cross the cool off period of 30 days and will be deleted permanently soon.', ['project' => $projectName]) }}
+{{ __('Your nmrXiv project - :project is scheduled to be permanently deleted on.', ['project' => $projectName, 'deletedOn' => $deletedOn]) }}
 
-If you do not want to get this deleted permanently then please restore your project by clicking on restore option under project settings tab.
+You may recover deleted projects and the data stored in them for a limited time before they are permanently deleted.
 
-Click on the button below to get more details.
+{{ __("If you'd like to recover your project, you must cancel the project's permanent deletion before :dueDate ", ['dueDate' => $deletedOn]) }}
+
+To recover your deleted project:
+Visit the thrash page (link).
+Select the project you want to recover, and click Project settings > Restore.
+In the confirmation dialogue, click Restore.
+
+{{ __('If you take no action by :dueDate, you will be unable to recover your project.', ['dueDate' => $dueDate]) }}
+
+For further questions, please visit our documentation site or contact us at info@nmrxiv.org.
 
 @component('mail::button', ['url' =>  $url, 'color' => 'green'])
 View Project

@@ -5,7 +5,7 @@ Dear nmrXiv user,
 {{ __('Your project - :project was deleted on :deletedOn.', ['project' => $projectName, 'deletedOn' => $deletedOn]) }}
 
 You may recover deleted projects and the data stored in them for a limited time before they are permanently deleted.
-{{ __('If you had like to recover your project, you must cancel the project permanent deletion before :dueDate ', ['dueDate' => $dueDate]) }}
+{{ __("If you'd like to recover your project, you must cancel the project's permanent deletion before :dueDate", ['dueDate' => $dueDate]) }}
 
 
 To recover your deleted project:
