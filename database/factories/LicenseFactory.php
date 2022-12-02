@@ -25,14 +25,17 @@ class LicenseFactory extends Factory
      */
     public function definition()
     {
+        $title = $this->faker->sentence($nbWords = 4);
+        $slug = Str::slug($title, '-');
+
         return [
-            'title' => 'Creative Commons Zero v1.0 Universal',
-            'slug' => $this->faker->slug(),
+            'title' => $title,
+            'slug' => $slug,
             'spdx_id' => Str::random(),
             'url' => $this->faker->url(),
             'description' => $this->faker->text(),
             'body' => $this->faker->text(),
-            'category' => 'Creative Commons',
+            'category' => Str::random(40),
         ];
     }
 }

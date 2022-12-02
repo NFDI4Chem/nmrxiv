@@ -33,16 +33,12 @@ class ProjectSeeder extends Seeder
             'team_id' => $team->id,
             'owner_id' => $user->id,
             'project_id' => $project->id,
-            'created_at' => $project->created_at,
-            'updated_at' => $project->updated_at->subMinutes(rand(1, 30)),
         ]);
 
         foreach ($studies as $study) {
             $sample = Sample::factory()->create([
                 'study_id' => $study->id,
                 'project_id' => $project->id,
-                'created_at' => $study->created_at->addMinutes(rand(1, 10)),
-                'updated_at' => $study->created_at->addMinutes(rand(11, 20)),
             ]);
 
             //todo: add molecules to the sample
@@ -52,11 +48,10 @@ class ProjectSeeder extends Seeder
                 'owner_id' => $user->id,
                 'project_id' => $project->id,
                 'study_id' => $study->id,
-                'created_at' => $project->created_at,
-                'updated_at' => $study->updated_at,
             ]);
 
-            $dsTypes = [
+            $dsTypes =
+            [
                 'proton',
                 '13c',
                 'dept',
@@ -78,7 +73,7 @@ class ProjectSeeder extends Seeder
         }
 
         $this->command->alert('nmrXiv: Projects table seed successfully');
-        $this->command->line('You may log in to admin console using <info>'.$user->email.'</info> and password: <info>'.$password.'</info>');
+        $this->command->line('You may log into the project user account using <info>'.$user->email.'</info> and password: <info>'.$password.'</info>');
         $this->command->line('');
     }
 }
