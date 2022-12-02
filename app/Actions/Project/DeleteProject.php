@@ -19,7 +19,7 @@ class DeleteProject
      */
     public function delete($project)
     {
-        if (! $project->is_public) {
+        if ($project->is_public) {
             $project->studies()->update(['is_archived' => true]);
             foreach ($project->studies as $study) {
                 $study->update(['is_archived' => true]);
