@@ -30,9 +30,7 @@ class ManageAuthorsTest extends TestCase
         $body = $this->prepareBody($author);
 
         //Update author
-        $response = $this->withHeaders([
-            'Accept' => 'application/json',
-        ])->post('authors/'.$project->id, $body);
+        $response = $this->updateAuthor($body, $project->id);
 
         $response->assertStatus(200);
 
@@ -66,10 +64,7 @@ class ManageAuthorsTest extends TestCase
         $body = $this->prepareBody($author);
 
         //Detach author
-        $response = $this->withHeaders([
-            'Accept' => 'application/json',
-        ])->delete('authors/'.$project->id.'/delete', $body);
-
+        $response = $this->detachAuthor($body, $project->id);
         $response->assertStatus(200);
 
         //Check if entry got deleted from DB
@@ -99,17 +94,11 @@ class ManageAuthorsTest extends TestCase
         $body = $this->prepareBody($author);
 
         //Update author
-        $response = $this->withHeaders([
-            'Accept' => 'application/json',
-        ])->post('authors/'.$project->id, $body);
-
+        $response = $this->updateAuthor($body, $project->id);
         $response->assertStatus(403);
 
         //Detach author
-        $response = $this->withHeaders([
-            'Accept' => 'application/json',
-        ])->delete('authors/'.$project->id.'/delete', $body);
-
+        $response = $response = $this->detachAuthor($body, $project->id);
         $response->assertStatus(403);
     }
 
@@ -132,17 +121,11 @@ class ManageAuthorsTest extends TestCase
         $body = $this->prepareBody($author);
 
         //Update author
-        $response = $this->withHeaders([
-            'Accept' => 'application/json',
-        ])->post('authors/'.$project->id, $body);
-
+        $response = $this->updateAuthor($body, $project->id);
         $response->assertStatus(403);
 
         //Detach author
-        $response = $this->withHeaders([
-            'Accept' => 'application/json',
-        ])->delete('authors/'.$project->id.'/delete', $body);
-
+        $response = $response = $this->detachAuthor($body, $project->id);
         $response->assertStatus(403);
     }
 
@@ -186,6 +169,7 @@ class ManageAuthorsTest extends TestCase
      * Prepare request body for author
      *
      * @param  \App\Models\Author  $author
+     * 
      * @return array $body
      */
     public function prepareBody($author)
@@ -206,5 +190,31 @@ class ManageAuthorsTest extends TestCase
         }
 
         return $body;
+    }
+
+    /**
+     * Make Request to update author
+     *
+     * @param  \App\Models\Author  $author
+     * 
+     * @return array $body
+     */
+    public function updateAuthor($body, $projectId){
+        return $this->withHeaders([
+            'Accept' => 'application/json',
+        ])->post('authors/'.$projectId, $body);
+    }
+
+    /**
+     * Make Request to detach author
+     *
+     * @param  \App\Models\Author  $author
+     * 
+     * @return array $body
+     */
+    public function detachAuthor($body, $projectId){
+        return $this->withHeaders([
+            'Accept' => 'application/json',
+        ])->delete('authors/'.$projectId.'/delete', $body);
     }
 }
