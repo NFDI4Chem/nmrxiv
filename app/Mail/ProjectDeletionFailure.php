@@ -30,9 +30,9 @@ class ProjectDeletionFailure extends Mailable
     public function build()
     {
         return $this->markdown('vendor.mail.project-deletion-failure', [
-            'url' => url(config('app.url').'/dashboard/projects/'.$this->project->id.'/settings'),
+            'url' => url(config('app.url').'/horizon/failed'),
             'projectName' => $this->project->name,
-            'deletedOn' => explode(' ', $this->project->deleted_on)[0],
-        ])->subject(__('Project Deletion failed'.' - '.$this->project->name));
+            'projectId' => $this->project->id,
+        ])->subject(__('Project Deletion failed - '.' - '.$this->project->name));
     }
 }
