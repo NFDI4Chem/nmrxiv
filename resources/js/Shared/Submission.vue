@@ -108,8 +108,13 @@
                     ></path>
                 </svg>
                 <div v-if="datasetsToImport && datasetsToImport.length > 0">
-                    <br/>
-                    Processing {{ datasetsToImport.filter(f => f.status == true).length + 1 }} of {{ datasetsToImport.length }} spectra
+                    <br />
+                    Processing
+                    {{
+                        datasetsToImport.filter((f) => f.status == true)
+                            .length + 1
+                    }}
+                    of {{ datasetsToImport.length }} spectra
                 </div>
             </div>
             <div v-if="!loading">
@@ -450,8 +455,19 @@
                                                     class="float-right"
                                                     @click="autoImport()"
                                                 >
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 7.5h-.75A2.25 2.25 0 004.5 9.75v7.5a2.25 2.25 0 002.25 2.25h7.5a2.25 2.25 0 002.25-2.25v-7.5a2.25 2.25 0 00-2.25-2.25h-.75m-6 3.75l3 3m0 0l3-3m-3 3V1.5m6 9h.75a2.25 2.25 0 012.25 2.25v7.5a2.25 2.25 0 01-2.25 2.25h-7.5a2.25 2.25 0 01-2.25-2.25v-.75" />
+                                                    <svg
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        fill="none"
+                                                        viewBox="0 0 24 24"
+                                                        stroke-width="1.5"
+                                                        stroke="currentColor"
+                                                        class="w-5 h-5"
+                                                    >
+                                                        <path
+                                                            stroke-linecap="round"
+                                                            stroke-linejoin="round"
+                                                            d="M7.5 7.5h-.75A2.25 2.25 0 004.5 9.75v7.5a2.25 2.25 0 002.25 2.25h7.5a2.25 2.25 0 002.25-2.25v-7.5a2.25 2.25 0 00-2.25-2.25h-.75m-6 3.75l3 3m0 0l3-3m-3 3V1.5m6 9h.75a2.25 2.25 0 012.25 2.25v7.5a2.25 2.25 0 01-2.25 2.25h-7.5a2.25 2.25 0 01-2.25-2.25v-.75"
+                                                        />
                                                     </svg>
                                                 </span>
                                             </div>
@@ -543,9 +559,19 @@
                                                                         'w-64 inline-flex truncate break-words items-center px-3 py-0.5 rounded-full text-xs font-medium mr-1 hover:bg-teal-700',
                                                                     ]"
                                                                 >
-                                                                    <a>{{
-                                                                        ds.name
-                                                                    }} <span v-if="ds.type">({{ ds.type }})</span></a>
+                                                                    <a
+                                                                        >{{
+                                                                            ds.name
+                                                                        }}
+                                                                        <span
+                                                                            v-if="
+                                                                                ds.type
+                                                                            "
+                                                                            >({{
+                                                                                ds.type
+                                                                            }})</span
+                                                                        ></a
+                                                                    >
                                                                 </div>
                                                             </span>
                                                         </div>
@@ -1879,7 +1905,9 @@ export default {
         },
 
         url() {
-            return String(this.$page.props.url) ? String(this.$page.props.url) : "https://dev.nmrxiv.org"
+            return String(this.$page.props.url)
+                ? String(this.$page.props.url)
+                : "https://dev.nmrxiv.org";
         },
 
         getMax() {
@@ -2399,26 +2427,27 @@ export default {
             }
         },
 
-        fetchProjectData(){
-            axios.get('/dashboard/drafts/'+this.currentDraft.id+'/info').then(response => {
-                this.project = response.data.project;
-                this.studies = response.data.studies;
-                if (
-                    this.project &&
-                    this.studies &&
-                    this.studies.length > 0
-                ) {
-                    this.selectStudy(this.studies[0], 0);
-                    this.selectedDataset =
-                        this.selectedStudy.datasets[0];
-                    this.loadingStep = false;
-                    this.selectStep(2);
-                } else {
-                    if (this.studies.length == 0) {
+        fetchProjectData() {
+            axios
+                .get("/dashboard/drafts/" + this.currentDraft.id + "/info")
+                .then((response) => {
+                    this.project = response.data.project;
+                    this.studies = response.data.studies;
+                    if (
+                        this.project &&
+                        this.studies &&
+                        this.studies.length > 0
+                    ) {
+                        this.selectStudy(this.studies[0], 0);
+                        this.selectedDataset = this.selectedStudy.datasets[0];
                         this.loadingStep = false;
+                        this.selectStep(2);
+                    } else {
+                        if (this.studies.length == 0) {
+                            this.loadingStep = false;
+                        }
                     }
-                }
-            })
+                });
         },
 
         selectStep(id) {
@@ -2453,63 +2482,83 @@ export default {
 
         autoImport() {
             this.loadingStep = true;
-            this.datasetsToImport = []
-            this.studies.forEach( study => {
-                study.datasets.forEach(dataset => {
-                    if(!dataset.has_nmrium){
+            this.datasetsToImport = [];
+            this.studies.forEach((study) => {
+                study.datasets.forEach((dataset) => {
+                    if (!dataset.has_nmrium) {
                         this.datasetsToImport.push({
-                            projectSlug: this.project.slug ,
+                            projectSlug: this.project.slug,
                             studySlug: study.slug,
                             datasetSlug: dataset.slug,
                             datasetId: dataset.id,
-                            status: false
-                        })
+                            status: false,
+                        });
                     }
-                })
-            })
-            this.fetchNMRium()
+                });
+            });
+            this.fetchNMRium();
         },
 
-        fetchNMRium(){
-            let datasetDetails = this.datasetsToImport.filter(f => f.status == false)[0];
-            if(datasetDetails){
+        fetchNMRium() {
+            let datasetDetails = this.datasetsToImport.filter(
+                (f) => f.status == false
+            )[0];
+            if (datasetDetails) {
                 this.loadingStep = true;
-                let ownerUserName = this.$page.props.team ? this.$page.props.team.owner.username : this.project.owner.username
-                axios.post("https://nodejsdev.nmrxiv.org/spectra-parser", {
-                    "urls" : [
-                        this.url +
-                        "/" +
-                        ownerUserName +
-                        "/datasets/" +
-                        datasetDetails.projectSlug +
-                        "/" +
-                        datasetDetails.studySlug +
-                        "/" +
-                        datasetDetails.datasetSlug
-                    ],
-                    "snapshot": false
-                }).then(response => {
-                    axios.post(
-                        "/dashboard/datasets/" + datasetDetails.datasetId + "/nmriumInfo",
-                        response.data.data
-                    ).then( res => {
-                        this.loadingStep = false;
-                        this.datasetsToImport.filter(f => f.datasetId == datasetDetails.datasetId)[0].status = true;
-                        this.fetchNMRium()
-                    }).catch(err => {
-                        this.loadingStep = false;
-                        this.datasetsToImport.filter(f => f.datasetId == datasetDetails.datasetId)[0].status = true;
-                        this.fetchNMRium()
+                let ownerUserName = this.$page.props.team
+                    ? this.$page.props.team.owner.username
+                    : this.project.owner.username;
+                axios
+                    .post("https://nodejsdev.nmrxiv.org/spectra-parser", {
+                        urls: [
+                            this.url +
+                                "/" +
+                                ownerUserName +
+                                "/datasets/" +
+                                datasetDetails.projectSlug +
+                                "/" +
+                                datasetDetails.studySlug +
+                                "/" +
+                                datasetDetails.datasetSlug,
+                        ],
+                        snapshot: false,
                     })
-                }).catch(error => {
-                    this.loadingStep = false;
-                    this.datasetsToImport.filter(f => f.datasetId == datasetDetails.datasetId)[0].status = true;
-                    this.fetchNMRium()
-                })
-            }else{
-                if(this.datasetsToImport.length > 0){
-                    this.datasetsToImport = null
-                    this.fetchProjectData()
+                    .then((response) => {
+                        axios
+                            .post(
+                                "/dashboard/datasets/" +
+                                    datasetDetails.datasetId +
+                                    "/nmriumInfo",
+                                response.data.data
+                            )
+                            .then((res) => {
+                                this.loadingStep = false;
+                                this.datasetsToImport.filter(
+                                    (f) =>
+                                        f.datasetId == datasetDetails.datasetId
+                                )[0].status = true;
+                                this.fetchNMRium();
+                            })
+                            .catch((err) => {
+                                this.loadingStep = false;
+                                this.datasetsToImport.filter(
+                                    (f) =>
+                                        f.datasetId == datasetDetails.datasetId
+                                )[0].status = true;
+                                this.fetchNMRium();
+                            });
+                    })
+                    .catch((error) => {
+                        this.loadingStep = false;
+                        this.datasetsToImport.filter(
+                            (f) => f.datasetId == datasetDetails.datasetId
+                        )[0].status = true;
+                        this.fetchNMRium();
+                    });
+            } else {
+                if (this.datasetsToImport.length > 0) {
+                    this.datasetsToImport = null;
+                    this.fetchProjectData();
                 }
             }
         },
