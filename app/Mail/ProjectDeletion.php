@@ -4,6 +4,7 @@ namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use Illuminate\Support\Carbon;
 use Illuminate\Queue\SerializesModels;
 
 class ProjectDeletion extends Mailable
@@ -33,6 +34,7 @@ class ProjectDeletion extends Mailable
             'url' => url(config('app.url').'/dashboard/projects/'.$this->project->id.'/settings'),
             'projectName' => $this->project->name,
             'deletedOn' => explode(' ', $this->project->deleted_on)[0],
+            'dueDate'   => explode(' ',Carbon::parse($this->project->deleted_on)->addDays(30))[0],
         ])->subject(__('Your project has been moved to trash'.' - '.$this->project->name));
     }
 }
