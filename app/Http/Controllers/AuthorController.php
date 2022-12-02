@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Actions\Project\UpdateProject;
 use App\Models\Author;
 use App\Models\Project;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Gate;
+use App\Actions\Project\UpdateProject;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Auth\Access\AuthorizationException;
 
 class AuthorController extends Controller
 {
@@ -18,10 +20,15 @@ class AuthorController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @param  \Actions\Project\UpdateProject  $updater
      * @param  \App\Models\Project  $project
+     * 
      * @return \Illuminate\Http\RedirectResponse
      */
     public function save(Request $request, UpdateProject $updater, Project $project)
     {
+        if (! Gate::forUser($request->user())->check('updateProject', $project)) {
+            throw new AuthorizationException;
+        }
+        
         $authors = $request->get('authors');
         if (count($authors) > 0) {
             $processedAuthors = [];
@@ -75,6 +82,7 @@ class AuthorController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @param  \Actions\Project\UpdateProject  $updater
      * @param  \App\Models\Project  $project
+     * 
      * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy(Request $request, UpdateProject $updater, Project $project)
@@ -96,6 +104,7 @@ class AuthorController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @param  \Actions\Project\UpdateProject  $updater
      * @param  \App\Models\Project  $project
+     * 
      * @return \Illuminate\Http\RedirectResponse
      */
     public function updateRole(Request $request, UpdateProject $updater, Project $project)
