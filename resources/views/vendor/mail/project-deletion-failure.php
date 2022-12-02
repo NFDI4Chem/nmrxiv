@@ -8,6 +8,7 @@ Deletion failed for below project.
 {{ __('Project ID - :projectId', ['projectId' => $projectId]) }}
 
 Regards,
+
 The nmrXiv Team
 
 @component('mail::button', ['url' =>  $url, 'color' => 'red'])

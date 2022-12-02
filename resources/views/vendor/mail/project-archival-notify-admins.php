@@ -8,6 +8,7 @@ Below project has been archived.
 {{ __('Project ID - :projectId', ['projectId' => $projectId]) }}
 
 Regards,
+
 The nmrXiv Team
 
 @component('mail::button', ['url' =>  $url, 'color' => 'green'])
