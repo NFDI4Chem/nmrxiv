@@ -39,7 +39,7 @@ class ProjectFactory extends Factory
             'location' => null, //todo: Adjust when location field is provided in nmrXiv
             'url' => Str::random(40),
             'description' => $this->faker->text(),
-            'sort_order' => rand(1, 100),
+            'sort_order' => 0,
             'type' => null,  //todo: Adjust when type field is provided in nmrXiv
             'uuid' => Str::uuid(),
             'access' => 'restricted',
