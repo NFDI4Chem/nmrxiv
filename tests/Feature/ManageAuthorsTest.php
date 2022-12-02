@@ -29,19 +29,19 @@ class ManageAuthorsTest extends TestCase
 
         $body = $this->prepareBody($author);
 
+        //Update author
         $response = $this->withHeaders([
             'Accept' => 'application/json',
         ])->post('authors/'.$project->id, $body);
 
         $response->assertStatus(200);
-        
+
+        //Check if entry got created in DB
         $project = $project->fresh();
         $authors = $project->authors->toArray();
-
         $this->assertDatabaseHas('author_project', $authors[0]['pivot']);
         unset($authors[0]['pivot']);
         $this->assertDatabaseHas('authors', $authors[0]);
-
     }
 
     /**
@@ -65,12 +65,14 @@ class ManageAuthorsTest extends TestCase
 
         $body = $this->prepareBody($author);
 
+        //Detach author
         $response = $this->withHeaders([
             'Accept' => 'application/json',
         ])->delete('authors/'.$project->id.'/delete', $body);
 
         $response->assertStatus(200);
-        
+
+        //Check if entry got deleted from DB
         $this->assertDatabaseMissing('author_project', $authors[0]['pivot']);
     }
 
@@ -79,7 +81,7 @@ class ManageAuthorsTest extends TestCase
      *
      * @return void
      */
-    public function test_author_cannot_be_updated_by_reviewer()
+    public function test_author_cannot_be_updated_or_deleted_by_reviewer()
     {
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 
@@ -96,12 +98,19 @@ class ManageAuthorsTest extends TestCase
 
         $body = $this->prepareBody($author);
 
+        //Update author
         $response = $this->withHeaders([
             'Accept' => 'application/json',
         ])->post('authors/'.$project->id, $body);
 
         $response->assertStatus(403);
 
+        //Detach author
+        $response = $this->withHeaders([
+            'Accept' => 'application/json',
+        ])->delete('authors/'.$project->id.'/delete', $body);
+
+        $response->assertStatus(403);
     }
 
     /**
@@ -109,25 +118,32 @@ class ManageAuthorsTest extends TestCase
      *
      * @return void
      */
-    public function test_author_cannot_be_updated_if_project_is_public()
+    public function test_author_cannot_be_updated_or_deleted_if_project_is_public()
     {
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 
         $project = Project::factory()->create([
-            'owner_id'  => $user->id,
-            'is_public' => true
+            'owner_id' => $user->id,
+            'is_public' => true,
         ]);
 
         $author = Author::factory()->create();
 
         $body = $this->prepareBody($author);
 
+        //Update author
         $response = $this->withHeaders([
             'Accept' => 'application/json',
         ])->post('authors/'.$project->id, $body);
 
         $response->assertStatus(403);
 
+        //Detach author
+        $response = $this->withHeaders([
+            'Accept' => 'application/json',
+        ])->delete('authors/'.$project->id.'/delete', $body);
+
+        $response->assertStatus(403);
     }
 
     /**
@@ -152,6 +168,7 @@ class ManageAuthorsTest extends TestCase
             'role' => 'DataCurator',
         ];
 
+        //Update author's role
         $response = $this->withHeaders([
             'Accept' => 'application/json',
         ])->post('authors/'.$project->id.'/updateRole', $body);
@@ -161,20 +178,20 @@ class ManageAuthorsTest extends TestCase
         $project = $project->refresh();
         $authors = $project->authors->toArray();
 
+        //Check if entry got updated in DB
         $this->assertDatabaseHas('author_project', $authors[0]['pivot']);
-
     }
 
     /**
      * Prepare request body for author
      *
-     * @param \App\Models\Author  $author
-     * 
-     * @return Array $body
+     * @param  \App\Models\Author  $author
+     * @return array $body
      */
-    public function prepareBody($author){
+    public function prepareBody($author)
+    {
         $body = [];
-        if($author){
+        if ($author) {
             $body = [
                 'authors' => [[
                     'id' => $author->id,
@@ -186,7 +203,7 @@ class ManageAuthorsTest extends TestCase
                     'affiliation' => $author->affiliation.'_ updated',
                 ]],
             ];
-    }
+        }
 
         return $body;
     }
