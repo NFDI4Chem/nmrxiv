@@ -336,7 +336,7 @@
                                                                                 class="text-sm"
                                                                             >
                                                                                 <a
-                                                                                    class="font-medium text-gray-900"
+                                                                                    class="break-all font-medium text-gray-900"
                                                                                     >{{
                                                                                         molecule.STANDARD_INCHI
                                                                                     }}</a
@@ -460,6 +460,13 @@
                                                                 please checkout
                                                                 <a
                                                                     href="https://en.wikipedia.org/wiki/Simplified_molecular-input_line-entry_system"
+                                                                    class="text-gray-400"
+                                                                    target="_blank"
+                                                                    >here</a
+                                                                >
+                                                                and
+                                                                <a
+                                                                    href="https://www.daylight.com/dayhtml/doc/theory/theory.smiles.html"
                                                                     class="text-gray-400"
                                                                     target="_blank"
                                                                     >here</a
@@ -637,7 +644,7 @@ export default {
     data() {
         return {
             smiles: "",
-            percentage: 1,
+            percentage: 0,
             editor: "",
         };
     },
