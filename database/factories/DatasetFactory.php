@@ -23,7 +23,7 @@ class DatasetFactory extends Factory
      */
     public function definition()
     {
-        $name = $this->faker->word().'dx';
+        $name = $this->faker->word();
         $slug = Str::slug($name, '-');
 
         return[
@@ -38,7 +38,7 @@ class DatasetFactory extends Factory
             'process_logs' => null,
             'location' => null, //todo: Adjust when location field is provided in nmrXiv
             'url' => Str::random(40),
-            'description' => $name,
+            'description' => $this->faker->text(),
             'type' => null,  //todo: Adjust when type field is provided in nmrXiv
             'uuid' => Str::uuid(),
             'access' => 'restricted',
