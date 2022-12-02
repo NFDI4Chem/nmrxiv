@@ -29,10 +29,14 @@
                     <template v-if="!loading">
                         <span v-if="hasPassword">
                             Are you sure you want to delete your project? Once
-                            your project is deleted, all of its resources and
-                            data will be permanently deleted. Please enter your
-                            password to confirm you would like to permanently
-                            delete your project.
+                            your project is deleted, all its resources and data
+                            will be moved to the trash. You may recover deleted
+                            projects and the data stored in them for a limited
+                            time before they are permanently deleted. Please
+                            enter your password to confirm you would like to
+                            delete your project, and if there is no action in
+                            the next 30 days, the project will be deleted
+                            permanently.
 
                             <div class="mt-4">
                                 <jet-input
