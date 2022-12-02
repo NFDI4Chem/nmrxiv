@@ -16,7 +16,6 @@ return new class extends Migration
         Schema::table('citations', function (Blueprint $table) {
             $table->longText('abstract')->nullable()->change();
             $table->longText('citation_text')->nullable()->change();
-
         });
     }
 
@@ -30,8 +29,6 @@ return new class extends Migration
         Schema::table('citations', function (Blueprint $table) {
             $table->longText('abstract')->nullable(false)->change();
             $table->longText('citation_text')->nullable(false)->change();
-
         });
-
     }
 };
