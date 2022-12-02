@@ -77,7 +77,7 @@ class ManageAuthorsTest extends TestCase
     }
 
     /**
-     * Test if the author cannot be updated by the reviewer
+     * Test if the author cannot be updated or detached by the reviewer
      *
      * @return void
      */
@@ -114,11 +114,11 @@ class ManageAuthorsTest extends TestCase
     }
 
     /**
-     * Test if the author cannot be updated if project is made public
+     * Test if the author cannot be updated or detached if project is made public
      *
      * @return void
      */
-    public function test_author_cannot_be_updated_or_deleted_if_project_is_public()
+    public function test_author_cannot_be_updated_or_detached_if_project_is_public()
     {
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 
