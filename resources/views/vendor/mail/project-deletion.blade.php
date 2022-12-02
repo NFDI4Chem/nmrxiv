@@ -17,6 +17,9 @@ In the confirmation dialogue, click Restore.
 
 For further questions, please visit our documentation site or contact us at info@nmrxiv.org.
 
+Regards,
+The nmrXiv Team
+
 @component('mail::button', ['url' =>  $url, 'color' => 'green'])
 Restore Project
 @endcomponent
