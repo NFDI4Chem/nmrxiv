@@ -228,12 +228,11 @@
                                                         I understand once the
                                                         project is published,
                                                         all the underlying
-                                                        studies and spectra
-                                                        will also be made public
-                                                        and agree to make this
-                                                        data persistently
-                                                        available in this
-                                                        location.
+                                                        studies and spectra will
+                                                        also be made public and
+                                                        agree to make this data
+                                                        persistently available
+                                                        in this location.
                                                     </div>
                                                 </div>
                                             </div>

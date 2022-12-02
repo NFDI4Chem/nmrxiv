@@ -421,9 +421,12 @@ export default {
                     if (this.study && this.dataset) {
                         if (this.dataset.dataset_photo_url == "") {
                             this.infoLog("Saving Preview");
-                            setTimeout(function(){
-                                this.exportPreview();
-                            }.bind(this), 500); 
+                            setTimeout(
+                                function () {
+                                    this.exportPreview();
+                                }.bind(this),
+                                500
+                            );
                         }
                         this.updateDataSet();
                     }
@@ -524,7 +527,9 @@ export default {
             this.dataset.type = null;
             this.selectedSpectraData = null;
             this.reset = true;
-            let ownerUserName = this.$page.props.team ? this.$page.props.team.owner.username : this.project.owner.username
+            let ownerUserName = this.$page.props.team
+                ? this.$page.props.team.owner.username
+                : this.project.owner.username;
             const iframe = window.frames.submissionNMRiumIframe;
             if (!url) {
                 url =
@@ -568,7 +573,9 @@ export default {
                     .catch((err) => {
                         this.updateLoadingStatus(false);
                         this.infoLog("Error saving spectra info");
-                        console.error("Error saving the nmrium info. Please contact us at info@nmrxiv.org if the error persist.")
+                        console.error(
+                            "Error saving the nmrium info. Please contact us at info@nmrxiv.org if the error persist."
+                        );
                         this.autoSaving = false;
                     });
             }
