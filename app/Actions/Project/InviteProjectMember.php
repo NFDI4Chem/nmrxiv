@@ -34,6 +34,7 @@ class InviteProjectMember
             'email' => $email,
             'role' => $role,
             'message' => $message,
+            'invited_by' => $user->id,
         ]);
 
         Mail::to($email)->send(new ProjectInvitation($invitation));
