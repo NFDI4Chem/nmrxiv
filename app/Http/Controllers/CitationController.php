@@ -6,8 +6,10 @@ use App\Models\Project;
 use App\Models\Citation;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Gate;
 use App\Actions\Project\UpdateProject;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Auth\Access\AuthorizationException;
 
 class CitationController extends Controller
 {
@@ -21,6 +23,10 @@ class CitationController extends Controller
      */
     public function save(Request $request, UpdateProject $updater, Project $project)
     {
+        if (! Gate::forUser($request->user())->check('updateProject', $project)) {
+            throw new AuthorizationException;
+        }
+
         $user = $request->user();
         $citations = $request->get('citations');
         //dd($citations);
@@ -76,6 +82,10 @@ class CitationController extends Controller
      */
     public function destroy(Request $request, UpdateProject $updater, Project $project)
     {
+        if (! Gate::forUser($request->user())->check('updateProject', $project)) {
+            throw new AuthorizationException;
+        }
+        
         $citation = $request->get('citations');
 
         if (count($citation) > 0) {
