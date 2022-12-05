@@ -3,7 +3,6 @@
 namespace Database\Factories;
 
 use App\Models\Dataset;
-use App\Models\Validation;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
@@ -24,10 +23,8 @@ class DatasetFactory extends Factory
      */
     public function definition()
     {
-        $name = $this->faker->word().'dx';
+        $name = $this->faker->word();
         $slug = Str::slug($name, '-');
-
-        $dt = Carbon::now();
 
         return[
             'name' => $name,
@@ -41,27 +38,27 @@ class DatasetFactory extends Factory
             'process_logs' => null,
             'location' => null, //todo: Adjust when location field is provided in nmrXiv
             'url' => Str::random(40),
-            'description' => $name,
+            'description' => $this->faker->text(),
             'type' => null,  //todo: Adjust when type field is provided in nmrXiv
             'uuid' => Str::uuid(),
             'access' => 'restricted',
             'access_type' => 'viewer',
-            'team_id' => rand(1, 100),
-            'owner_id' => rand(1, 100),
-            'project_id' => rand(1, 100),
-            'study_id' => rand(1, 100),
+            'team_id' => 1,
+            'owner_id' => 1,
+            'project_id' => 1,
+            'study_id' => 1,
             'license_id' => rand(1, 10),
-            'draft_id' => rand(1, 100),
-            'fs_id' => rand(1, 100),
+            'draft_id' => 1,
+            'fs_id' => 1,
             'dataset_photo_path' => null, //todo: Adjust when datasets images field is provided in nmrXiv
             'release_date' => null,
-            'created_at' => $dt->subDays(rand(1, 10)),
-            'updated_at' => $dt->subHours(rand(1, 10)),
+            'created_at' => Carbon::now()->timestamp,
+            'updated_at' => Carbon::now()->timestamp,
             'doi' => null,
             'datacite_schema' => null,
             'identifier' => null,
             'has_nmrium' => null,
-            'validation_id' => Validation::factory(),
+            'validation_id' => 1,
             'validation_status' => false,
             'internal_status' => null, //todo: provide varying values
         ];

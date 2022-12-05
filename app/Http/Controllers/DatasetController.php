@@ -80,7 +80,7 @@ class DatasetController extends Controller
 
                 foreach ($spectra as $spectrum) {
                     $experimentDetailsExists = array_key_exists('experiment', $spectrum['info']);
-                    if($experimentDetailsExists ){
+                    if ($experimentDetailsExists) {
                         $experiment = ['experiment'];
                         if (is_null($experiment)) {
                             $nucleus = $spectrum['info']['nucleus'];
