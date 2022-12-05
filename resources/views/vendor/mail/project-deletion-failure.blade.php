@@ -4,8 +4,8 @@ Dear admin,
 
 Deletion failed for below project.
 
-{{ __('Project Name - :project', ['project' => $projectName]) }}
-{{ __('Project ID - :projectId', ['projectId' => $projectId]) }}
+{{ __('Project Name - **:project**', ['project' => $projectName]) }}
+{{ __('Project ID - **:projectId**', ['projectId' => $projectId]) }}
 
 Regards,
 

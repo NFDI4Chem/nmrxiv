@@ -2,12 +2,13 @@
 
 namespace App\Actions\Project;
 
-use App\Models\FileSystemObject;
+use Throwable;
+use App\Models\User;
 use App\Models\Project;
 use Illuminate\Support\Carbon;
+use App\Models\FileSystemObject;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Throwable;
 
 class DeleteProject
 {
@@ -57,8 +58,8 @@ class DeleteProject
                     $this->deleteObjects($project);
                 });
             } catch (Throwable $e) {
-                throw $e;
                 $project->sendNotification('deletionFailure', User::role(['super-admin'])->get());
+                throw $e;
             }
         } else {
             // Do nothing

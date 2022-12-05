@@ -4,8 +4,8 @@ Dear admin,
 
 Below project has been archived.
 
-{{ __('Project Name - :project', ['project' => $projectName]) }}
-{{ __('Project ID - :projectId', ['projectId' => $projectId]) }}
+{{ __('Project Name - **:project**', ['project' => $projectName]) }}
+{{ __('Project ID - **:projectId**', ['projectId' => $projectId]) }}
 
 Regards,
 
