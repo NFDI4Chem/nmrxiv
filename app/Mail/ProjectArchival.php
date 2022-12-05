@@ -32,6 +32,6 @@ class ProjectArchival extends Mailable
         return $this->markdown('vendor.mail.project-archival', [
             'url' => url(config('app.url').'/dashboard/projects/'.$this->project->id.'/settings'),
             'projectName' => $this->project->name,
-        ])->subject(__('Your project is archived'.' - '.$this->project->name));
+        ])->subject(__('Project archived successfully'.' - '.$this->project->name));
     }
 }

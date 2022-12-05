@@ -2,27 +2,29 @@
 
 Dear nmrXiv user,
 
-{{ __('Your nmrXiv project - :project is scheduled to be permanently deleted on.', ['project' => $projectName, 'deletedOn' => $deletedOn]) }}
+{{ __('Your nmrXiv project - **:project** is scheduled to be permanently deleted on - **:dueDate**.', ['project' => $projectName, 'dueDate' => $dueDate]) }}
 
 You may recover deleted projects and the data stored in them for a limited time before they are permanently deleted.
 
-{{ __("If you'd like to recover your project, you must cancel the project's permanent deletion before :dueDate ", ['dueDate' => $deletedOn]) }}
+{{ __("If you'd like to recover your project, you must cancel the project's permanent deletion before **:dueDate** ", ['dueDate' => $dueDate]) }}
+
+{{ __('Please note, you will be unable to recover your project, if you donot take any action before the due data.', ['dueDate' => $dueDate]) }}
 
 To recover your deleted project:
-Visit the thrash page (link).
+
+Go to thrash section,
 Select the project you want to recover, and click Project settings > Restore.
-In the confirmation dialogue, click Restore.
 
-{{ __('If you take no action by :dueDate, you will be unable to recover your project.', ['dueDate' => $dueDate]) }}
+Follow our [documentation](https://docs.nmrxiv.org/) to learn more.
 
-For further questions, please visit our documentation site or contact us at info@nmrxiv.org.
+If you do not recognise this action contact us at info@nmrxiv.org.
 
 Regards,
 
 The nmrXiv Team
 
 @component('mail::button', ['url' =>  $url, 'color' => 'green'])
-View Project
+Restore Project
 @endcomponent
 
 @endcomponent

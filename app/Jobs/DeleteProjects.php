@@ -40,18 +40,16 @@ class DeleteProjects implements ShouldQueue
     public function handle(DeleteProject $deleteProject)
     {
         $project = $this->project;
-        $deleteProject->deletePermanent($project);
-
         $deletedOn = $project->deleted_on;
-        $dueDate = null;
-
+        $diffInDays = null;
+        $coolOffPeriod = (int)env("COOL_OFF_PERIOD", '30');
         if ($deletedOn) {
-            $dueDate = Carbon::parse($deletedOn)->diffInDays(Carbon::now());
-            echo 'Due Date '.$dueDate;
-            if ($dueDate == 23 || $dueDate == 29) {
+            $diffInDays = Carbon::parse($deletedOn)->diffInDays(Carbon::now());
+            //Sending reminder to user 1 week and 1 day before.
+            if ($diffInDays == ($coolOffPeriod - 7) || $diffInDays == ($coolOffPeriod - 1)) {
                 $project->sendNotification('deletionReminder', $this->prepareSendList($project));
             }
-            if ($dueDate >= 30) {
+            if ($diffInDays >= $coolOffPeriod) {
                 $deleteProject->deletePermanent($project);
             }
         }
