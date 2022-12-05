@@ -1,5 +1,5 @@
 @component('mail::message')
-{{ __('You have been invited to join the :project project!', ['project' => $invitation->project->name]) }}
+{{ __('You have been invited to join the project - **:project** by :invitedBy as role :role', ['project' => $invitation->project->name, 'invitedBy' => $invitedBy,'role' => $invitation->role]) }}
 
 {{ __('Message:') }}  
 {{ __(':message', ['message' => $invitation->message]) }}
