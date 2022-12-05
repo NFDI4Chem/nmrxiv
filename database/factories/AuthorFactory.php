@@ -26,7 +26,7 @@ class AuthorFactory extends Factory
     {
         return [
             'title' => $this->faker->title(),
-            'orcid_id' => '0000-0001-6966-0814',
+            'orcid_id' => null,
             'given_name' => $this->faker->firstName(),
             'family_name' => $this->faker->lastName(),
             'email_id' => $this->faker->unique()->safeEmail(),

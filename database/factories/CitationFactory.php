@@ -24,10 +24,14 @@ class CitationFactory extends Factory
      */
     public function definition()
     {
+        $author1 = substr($this->faker->lastName(), 0, 1).' '.$this->faker->firstName();
+        $author2 = substr($this->faker->lastName(), 0, 1).' '.$this->faker->firstName();
+        $author = $author1.', '.$author2;
+
         return [
-            'doi' => '10.1002/mrc.4737',
+            'doi' => null,
             'title' => $this->faker->title(),
-            'authors' => $this->faker->firstName().$this->faker->lastName(),
+            'authors' => $author,
             'abstract' => $this->faker->text(),
             'citation_text' => $this->faker->text(),
         ];

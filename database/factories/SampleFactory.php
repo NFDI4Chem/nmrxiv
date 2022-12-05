@@ -25,7 +25,6 @@ class SampleFactory extends Factory
     {
         $name = $this->faker->sentence($nbWords = 2);
         $slug = Str::slug($name, '-');
-        $dt = Carbon::now();
         $x = json_encode('{}');
 
         return[
@@ -35,10 +34,10 @@ class SampleFactory extends Factory
             'sample_type' => null,
             'source' => $x,
             'isa' => $x,
-            'study_id' => rand(1, 100),
-            'project_id' => rand(1, 100),
-            'created_at' => $dt->subDays(rand(1, 10)),
-            'updated_at' => $dt->subHours(rand(1, 10)),
+            'study_id' => 1,
+            'project_id' => 1,
+            'created_at' => Carbon::now()->timestamp,
+            'updated_at' => Carbon::now()->timestamp,
             'doi' => null,
             'datacite_schema' => null,
             'identifier' => null,
