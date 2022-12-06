@@ -39,9 +39,9 @@ class ProjectInvitation extends Mailable implements ShouldQueue
      */
     public function build()
     {
-        $invitedBy = User::findOrFail($this->invitation->invited_by);
+        $invitedBy = User::find($this->invitation->invited_by);
 
-        return $this->markdown('vendor.mail.project-invitation', ['invitedBy' => $invitedBy->name, 'acceptUrl' => URL::signedRoute('project-invitations.accept', [
+        return $this->markdown('vendor.mail.project-invitation', ['invitedBy' => $invitedBy ? $invitedBy->name : "", 'acceptUrl' => URL::signedRoute('project-invitations.accept', [
             'invitation' => $this->invitation,
         ])])->subject(__('Project Invitation'));
     }
