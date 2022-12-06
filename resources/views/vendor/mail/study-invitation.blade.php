@@ -23,8 +23,9 @@
 @endcomponent
 
 {{ __('If you did not expect to receive an invitation to this project, you may discard this email.') }}
-@endcomponent
 
 Regards,
 
 The nmrXiv Team
+@endcomponent
+
