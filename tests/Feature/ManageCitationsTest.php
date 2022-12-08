@@ -2,12 +2,10 @@
 
 namespace Tests\Feature;
 
-use Tests\TestCase;
-use App\Models\User;
-use App\Models\Project;
 use App\Models\Citation;
-use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Models\Project;
+use App\Models\User;
+use Tests\TestCase;
 
 class ManageCitationsTest extends TestCase
 {
@@ -39,8 +37,8 @@ class ManageCitationsTest extends TestCase
         $this->assertDatabaseHas('citation_project', $citations[0]['pivot']);
         unset($citations[0]['pivot']);
         $this->assertDatabaseHas('citations', $citations[0]);
-
     }
+
     /**
      * Test if a citation can be deleted.
      *
@@ -132,7 +130,6 @@ class ManageCitationsTest extends TestCase
      * Prepare request body for citation
      *
      * @param  \App\Models\Citation  $citation
-     * 
      * @return array $body
      */
     public function prepareBody($citation)
@@ -141,7 +138,7 @@ class ManageCitationsTest extends TestCase
         if ($citation) {
             $body = [
                 'citations' => [[
-                    'id'  => $citation->id,
+                    'id' => $citation->id,
                     'doi' => $citation->doi,
                     'title' => $citation->title,
                     'authors' => $citation->authors,
@@ -158,10 +155,10 @@ class ManageCitationsTest extends TestCase
      * Make Request to update citation
      *
      * @param  \App\Models\Citation  $citation
-     * 
      * @return array $body
      */
-    public function updateCitation($body, $projectId){
+    public function updateCitation($body, $projectId)
+    {
         return $this->withHeaders([
             'Accept' => 'application/json',
         ])->post('citations/'.$projectId, $body);
@@ -171,10 +168,10 @@ class ManageCitationsTest extends TestCase
      * Make Request to detach citation
      *
      * @param  \App\Models\Citation  $citation
-     * 
      * @return array $body
      */
-    public function detachCitation($body, $projectId){
+    public function detachCitation($body, $projectId)
+    {
         return $this->withHeaders([
             'Accept' => 'application/json',
         ])->delete('citations/'.$projectId.'/delete', $body);

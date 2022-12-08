@@ -32,7 +32,7 @@ class ProjectArchivalNotifyAdmins extends Mailable
         return $this->markdown('vendor.mail.project-archival-notify-admins', [
             'url' => url(config('app.url').'/dashboard/projects/'.$this->project->id),
             'projectName' => $this->project->name,
-            'projectId'  => $this->project->id,
+            'projectId' => $this->project->id,
         ])->subject(__('A project has been archived'.' - '.$this->project->name));
     }
 }
