@@ -194,8 +194,8 @@ class ManageAuthorsTest extends TestCase
     /**
      * Make Request to update author
      *
-     * @param  \App\Models\Author  $author
-     * @return array $body
+     * @param  \App\Models\Author  $body
+     * @return \Illuminate\Http\Response
      */
     public function updateAuthor($body, $projectId)
     {
@@ -207,8 +207,8 @@ class ManageAuthorsTest extends TestCase
     /**
      * Make Request to detach author
      *
-     * @param  \App\Models\Author  $author
-     * @return array $body
+     * @param  \App\Models\Author  $body
+     * @return \Illuminate\Http\Response
      */
     public function detachAuthor($body, $projectId)
     {
