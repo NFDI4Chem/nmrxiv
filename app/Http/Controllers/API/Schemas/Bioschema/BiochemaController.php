@@ -173,15 +173,23 @@ class BiochemaController extends Controller
 
         $molecules = [];
         foreach ($sample->molecules as &$molecule) {
+            $inchiKey = $molecule->INCHI_KEY;
+            $pubchemLink = 'https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/inchikey/'.$inchiKey.'/property/IUPACName/JSON';
+            $json = file_get_contents($pubchemLink);
+            $jsonDecode = json_decode($json, true);
+            $cid = $jsonDecode['PropertyTable']['Properties'][0]['CID'];
+            $iupacName = $jsonDecode['PropertyTable']['Properties'][0]['IUPACName'];
+
             $moleculeSchema = Schema::MolecularEntity();
-            $moleculeSchema['@id'] = $molecule->INCHI_KEY;
+            $moleculeSchema['@id'] = $inchiKey;
             $moleculeSchema['dct:conformsTo'] = $MoleculeconfromsTo;
-            $moleculeSchema->name($molecule->name);
+            $moleculeSchema->name($molecule->CAS_NUMBER);
+            $moleculeSchema->url('https://pubchem.ncbi.nlm.nih.gov/compound/'.$cid);
             $moleculeSchema->inChI($molecule->STANDARD_INCHI);
+            $moleculeSchema->iupacName($iupacName);
             $moleculeSchema->molecularFormula($molecule->FORMULA);
             $moleculeSchema->molecularWeight($molecule->MOLECULAR_WEIGHT);
             $moleculeSchema->smiles([$molecule->SMILES, $molecule->SMILES_CHIRAL, $molecule->CANONICAL_SMILES]);
-            $moleculeSchema->alternateName($molecule->CAS_NUMBER);
             $moleculeSchema->hasRepresentation($molecule->MOL);
             array_push($molecules, $moleculeSchema);
         }
