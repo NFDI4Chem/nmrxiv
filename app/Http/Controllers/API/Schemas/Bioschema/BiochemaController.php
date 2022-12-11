@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API\Schemas\Bioschema;
 use App\Http\Controllers\Controller;
 use App\Models\Bioschema\BioSchema;
 use App\Models\Dataset;
+use App\Models\NMRium;
 use App\Models\Project;
 use App\Models\Study;
 use App\Models\User;
@@ -115,18 +116,39 @@ class BiochemaController extends Controller
 
         $DatasetconfromsTo = [];
         $DatasetconfromsTo['http://purl.org/dc/terms/conformsTo'] = $creativeWorkDataset;
+
+        $nmrium = NMRium::where([['dataset_id', $dataset->id]])->firstOrFail();
+        $info = json_decode($nmrium->nmrium_info)->spectra[0]->info;
+
+        $nucleus = $info->nucleus;
+        $solvent = $info->solvent;
+        $dimension = $info->dimension;
+        $probeName = $info->probeName;
+        $experiment = $info->experiment;
+        $temperature = $info->temperature;
+        $baseFrequency = $info->baseFrequency;
+        $fieldStrength = $info->fieldStrength;
+        $numberOfScans = $info->numberOfScans;
+        $pulseSequence = $info->pulseSequence;
+        $spectralWidth = $info->spectralWidth;
+        $numberOfPoints = $info->numberOfPoints;
+        $relaxationTime = $info->relaxationTime;
+        $acquisitionTime = $info->acquisitionTime;
+
         $datasetSchema = Schema::Dataset();
         $datasetSchema['@id'] = $dataset->uuid;
         $datasetSchema['dct:conformsTo'] = $DatasetconfromsTo;
-        $datasetSchema->description($dataset->description);
+        $datasetSchema->description('[nucleus:'.$nucleus.', solvent:'.$solvent.', dimension:'.$dimension.', probeName:'.$probeName.', experiment:'.$experiment.', temperature:'.$temperature.', baseFrequency:'.$baseFrequency.', fieldStrength:'.$fieldStrength.', numberOfScans:'.$numberOfScans.', pulseSequence:'.$pulseSequence.', spectralWidth:'.$spectralWidth.', numberOfPoints:'.$numberOfPoints.', relaxationTime:'.$relaxationTime.', acquisitionTime:'.$acquisitionTime);
+        $datasetSchema->keywords([$nucleus, $solvent, $dimension.'D', $experiment]);
         $datasetSchema->license($study->license->url);
         $datasetSchema->name($dataset->name);
-        $datasetSchema->url($dataset->public_url);
-        $datasetSchema->datePublished($dataset->updated_at);
+        $datasetSchema->url(env('APP_URL').'/D'.$dataset->identifier);
+        $datasetSchema->datePublished($dataset->release_date);
         $datasetSchema->includedInDataCatalog($dataCatalog);
         $datasetSchema->measurementTechnique('https://terminology.nfdi4chem.de/ts/ontologies/chmo/terms?iri=http%3A%2F%2Fpurl.obolibrary.org%2Fobo%2FCHMO_0000591');
         $datasetSchema->dateCreated($dataset->created_at);
-
+        $datasetSchema->dateModified($dataset->updated_at);
+        $datasetSchema->isAccessibleForFree(true);
         $projectSchema = $this->project($project);
         $datasetSchema->isPartOf([$projectSchema]);
 
@@ -197,7 +219,7 @@ class BiochemaController extends Controller
         $sampleSchema = BioSchema::Sample();
         $sampleSchema['@id'] = $sample->uuid;
         $sampleSchema['dct:conformsTo'] = $SampleconfromsTo;
-        $sampleSchema->url(env('APP_URL').'/S'.$sample->study_id);
+        $sampleSchema->url(env('APP_URL').'/S'.$study->identifier);
         $sampleSchema->additionalProperty(['molecules' => $molecules]);
         $sampleSchema->description($sample->description);
         $sampleSchema->name($sample->name);
