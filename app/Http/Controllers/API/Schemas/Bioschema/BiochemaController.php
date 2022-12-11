@@ -50,7 +50,7 @@ class BiochemaController extends Controller
     {
         $datasetSchema = Schema::Dataset();
         $datasetSchema->name($dataset->name);
-        $datasetSchema->url($dataset->public_url);
+        $datasetSchema->url(env('APP_URL').'/D'.$dataset->identifier);
 
         return  $datasetSchema;
     }
@@ -80,7 +80,7 @@ class BiochemaController extends Controller
 
         $studySchema = BioSchema::Study();
         $studySchema->name($study->name);
-        $studySchema->url($study->public_url);
+        $studySchema->url(env('APP_URL').'/S'.$study->identifier);
         $studySchema->about($sampleSchema);
 
         $datasets = ['datasets' => []];
@@ -227,15 +227,15 @@ class BiochemaController extends Controller
         $studySchema = BioSchema::Study();
         $studySchema['@id'] = $study->uuid;
         $studySchema['dct:conformsTo'] = $this->conforms();
-        $studySchema->datePublished($study->updated_at);
+        $studySchema->datePublished($study->release_date);
         $studySchema->description($study->description);
         $studySchema->name($study->name);
         $studySchema->studyDomain('Chemistry');
         $studySchema->studySubject('Small molecules');
+        $studySchema->about($sampleSchema);
         $studySchema->dateCreated($study->created_at);
         $studySchema->keywords($tags);
-        $studySchema->url($study->public_url);
-        $studySchema->about($sampleSchema);
+        $studySchema->url(env('APP_URL').'/S'.$study->identifier);
         $studySchema->license($study->license->url);
         $studySchema->hasPart($datasets);
 
@@ -266,6 +266,17 @@ class BiochemaController extends Controller
             $authorSchema->affiliation($author->affiliation);
             array_push($authors, $authorSchema);
         }
+
+        $citations = [];
+        foreach ($project->citations as &$citation) {
+            $citationSchema = Schema::creativeWork();
+            $citationSchema->abstract($citation->abstract);
+            $citationSchema->author($citation->authors);
+            $citationSchema->headline($citation->title);
+            $citationSchema->identifier($citation->doi);
+            array_push($citations, $citationSchema);
+        }
+
         $tags = [];
         foreach ($project->tags as &$tag) {
             $tag = $tag->name;
@@ -282,18 +293,19 @@ class BiochemaController extends Controller
             array_push($studies['studies'], $studySchema);
         }
 
-        $projectSchema = BioSchema::Project();
+        $projectSchema = BioSchema::Study();
         $projectSchema['@id'] = $project->uuid;
         $projectSchema['dct:conformsTo'] = $this->conforms();
         $projectSchema['author'] = $authors;
-        $projectSchema->datePublished($project->updated_at);
+        $projectSchema->datePublished($project->release_date);
         $projectSchema->description($project->description);
         $projectSchema->name($project->name);
-        $projectSchema->projectDomain('Chemistry');
-        $projectSchema->projectSubject('Small molecules');
+        $projectSchema->studyDomain('Chemistry');
+        $projectSchema->studySubject('Small molecules');
+        $projectSchema['citation'] = $citations;
         $projectSchema->dateCreated($project->created_at);
         $projectSchema->keywords($tags);
-        $projectSchema->url($project->public_url);
+        $projectSchema->url(env('APP_URL').'/P'.$project->identifier);
         $projectSchema->license($project->license->url);
         $projectSchema->hasPart($studies);
 
