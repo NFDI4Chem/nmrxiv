@@ -197,9 +197,10 @@ class BiochemaController extends Controller
         $sampleSchema = BioSchema::Sample();
         $sampleSchema['@id'] = $sample->uuid;
         $sampleSchema['dct:conformsTo'] = $SampleconfromsTo;
+        $sampleSchema->url(env('APP_URL').'/S'.$sample->study_id);
+        $sampleSchema->additionalProperty(['molecules' => $molecules]);
         $sampleSchema->description($sample->description);
         $sampleSchema->name($sample->name);
-        $sampleSchema->additionalProperty(['molecules' => $molecules]);
 
         $studySchema = BioSchema::Study();
         $studySchema['@id'] = $study->uuid;
