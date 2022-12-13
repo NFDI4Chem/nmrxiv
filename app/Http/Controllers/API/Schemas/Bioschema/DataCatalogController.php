@@ -29,19 +29,19 @@ class DataCatalogController extends Controller
         $confromsTo['http://purl.org/dc/terms/conformsTo'] = $creativeWork;
 
         $nmrXivProvider = Schema::organization();
-        $nmrXivProvider->name('NFDI4Chem'); 
-        $nmrXivProvider->url('https://www.nfdi4chem.de/'); 
+        $nmrXivProvider->name(env('NMRXIV_PROVIDER')); 
+        $nmrXivProvider->url(env('NMRXIV_PROVIDER_URL')); 
 
         $dataCatalog = Schema::dataCatalog();
-        $dataCatalog['@id'] = url('https://nmrxiv.org');
+        $dataCatalog['@id'] = url(env('APP_URL'));
         $dataCatalog['dct:conformsTo'] = $confromsTo;
-        $dataCatalog->description('nmrXiv is currently developed as the FAIR, consensus-driven NMR data repository and computational platform. The ultimate goal is to accelerate broader coordination and data sharing among natural product (NP) researchers by enabling the storage, management, sharing and analysis of NMR data.');
+        $dataCatalog->description(env('APP_DESCRIPTION'));
         $dataCatalog->keywords(['NMR', 'Nuclear Magnetic Resonance Spectroscopy', 'FAIR NMR', '1D NMR', '2D NMR', 'COSY', 'HSQC', 'HMBC', 'NOESY', 'Sepctral raw data', 'Bruker NMR', 'JOEL', 'NMReData', 'NMRium']);
         $dataCatalog->name(env('APP_NAME'));
         $dataCatalog->provider($nmrXivProvider);
-        $dataCatalog->url('https://nmrxiv.org');
+        $dataCatalog->url(env('APP_URL'));
 
-        $dataCatalog->measurementTechnique('https://www.ebi.ac.uk/ols/ontologies/chmo/terms?iri=http%3A%2F%2Fpurl.obolibrary.org%2Fobo%2FCHMO_0000591');
+        $dataCatalog->measurementTechnique(env('MEASUREMENT_TECHNIQUE'));
 
         return $dataCatalog;
     }
