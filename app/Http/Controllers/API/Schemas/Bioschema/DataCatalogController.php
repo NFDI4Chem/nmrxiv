@@ -115,7 +115,7 @@ class DataCatalogController extends Controller
         $joel = $this->getDefinedTerm('JEOL', [], 'NMR:1400258', 'http://nmrML.org/nmrCV#NMR:1400258', $nmrcv);
         $nmreData = $this->getDefinedTerm('NMReDATA', [], 'format:3906', 'http://edamontology.org/format_3906', $nmrcv);
 
-        $keywords = [$pulsedNMR, $nmr, $oneDNMR, $twoDNMR, $cosy, $hsqc, $hmbc, $noesy, $spectralRawData, $brukerNMR, $joel, $nmreData];
+        $keywords = [$pulsedNMR, $nmr, $oneDNMR, $twoDNMR, $cosy, $hsqc, $hmbc, $noesy, $brukerNMR, $joel, $nmreData];
 
         return $keywords;
     }
