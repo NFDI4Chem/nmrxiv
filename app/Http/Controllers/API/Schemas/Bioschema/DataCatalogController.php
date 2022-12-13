@@ -29,13 +29,13 @@ class DataCatalogController extends Controller
         $confromsTo['http://purl.org/dc/terms/conformsTo'] = $creativeWork;
 
         $nmrXivProvider = Schema::organization();
-        $nmrXivProvider->name('NFDI4Chem');
-        $nmrXivProvider->url('https://www.nfdi4chem.de/');
+        $nmrXivProvider->name('NFDI4Chem'); 
+        $nmrXivProvider->url('https://www.nfdi4chem.de/'); 
 
         $dataCatalog = Schema::dataCatalog();
         $dataCatalog['@id'] = url('https://nmrxiv.org');
         $dataCatalog['dct:conformsTo'] = $confromsTo;
-        $dataCatalog->description(env('APP_DESCRIPTION'), 'nmrXiv is currently developed as the FAIR, consensus-driven NMR data repository and computational platform. The ultimate goal is to accelerate broader coordination and data sharing among natural product (NP) researchers by enabling the storage, management, sharing and analysis of NMR data.');
+        $dataCatalog->description('nmrXiv is currently developed as the FAIR, consensus-driven NMR data repository and computational platform. The ultimate goal is to accelerate broader coordination and data sharing among natural product (NP) researchers by enabling the storage, management, sharing and analysis of NMR data.');
         $dataCatalog->keywords(['NMR', 'Nuclear Magnetic Resonance Spectroscopy', 'FAIR NMR', '1D NMR', '2D NMR', 'COSY', 'HSQC', 'HMBC', 'NOESY', 'Sepctral raw data', 'Bruker NMR', 'JOEL', 'NMReData', 'NMRium']);
         $dataCatalog->name(env('APP_NAME'));
         $dataCatalog->provider($nmrXivProvider);
