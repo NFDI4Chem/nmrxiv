@@ -103,18 +103,17 @@ class DataCatalogController extends Controller
         $nmrcv = $this->getDefinedTermSet('nuclear magnetic resonance CV', 'http://nmrml.org/cv/');
 
         //Prepare Defined Term
-        $pulsedNMR = $this->getDefinedTerm('pulsed nuclear magnetic resonance spectroscopy', ['NMR', 'pulsed nuclear magnetic resonance spectrometry', 'nuclear magnetic resonance spectroscopy', 'NMR spectrometry', 'nuclear magnetic resonance spectrometry', 'NMR spectroscopy'], 'CHMO:0000613', 'https://ontobee.org/ontology/CHMO?iri=http://purl.obolibrary.org/obo/CHMO_0000613', $chmo);
-        $nmr = $this->getDefinedTerm('NMR', ['Nuclear Overhauser Effect Spectroscopy', 'Rotational Frame Nuclear Overhauser Effect Spectroscopy', 'ROESY', 'Nuclear magnetic resonance spectroscopy', 'NOESY', 'NMR spectroscopy', 'Heteronuclear Overhauser Effect Spectroscopy', 'HOESY'], 'topic:0593', 'https://bioportal.bioontology.org/ontologies/EDAM?p=classes&conceptid=topic_0593', $edam);
-        $oneDNMR = $this->getDefinedTerm('one-dimensional nuclear magnetic resonance spectroscopy', ['1D NMR spectroscopy', '1-D NMR', '1D nuclear magnetic resonance spectrometry', 'one-dimensional nuclear magnetic resonance spectroscopy', 'one-dimensional nuclear magnetic resonance spectrometry', '1D NMR', '1D nuclear magnetic resonance spectroscopy', '1D NMR spectrometry'], 'CHMO:0000592', 'http://purl.obolibrary.org/obo/CHMO_0000592', $chmo);
-        $twoDNMR = $this->getDefinedTerm('two-dimensional nuclear magnetic resonance spectroscopy', ['2-D NMR', '2D NMR', 'two-dimensional nuclear magnetic resonance spectroscopy', '2D NMR spectroscopy', '2D nuclear magnetic resonance spectrometry', 'two-dimensional NMR', '2D NMR spectrometry', '2D nuclear magnetic resonance', 'two-dimensional nuclear magnetic resonance spectrometry'], 'CHMO:0000598', 'http://purl.obolibrary.org/obo/CHMO_0000598', $chmo);
+        $pulsedNMR = $this->getDefinedTerm('pulsed nuclear magnetic resonance spectroscopy', ['NMR', 'nuclear magnetic resonance spectroscopy', 'NMR spectroscopy'], 'CHMO:0000613', 'https://ontobee.org/ontology/CHMO?iri=http://purl.obolibrary.org/obo/CHMO_0000613', $chmo);
+        $nmr = $this->getDefinedTerm('NMR', ['Nuclear magnetic resonance spectroscopy', 'NMR spectroscopy'], 'topic:0593', 'https://bioportal.bioontology.org/ontologies/EDAM?p=classes&conceptid=topic_0593', $edam);
+        $oneDNMR = $this->getDefinedTerm('one-dimensional nuclear magnetic resonance spectroscopy', ['1D NMR spectroscopy', '1-D NMR', 'one-dimensional nuclear magnetic resonance spectroscopy', '1D NMR', '1D nuclear magnetic resonance spectroscopy'], 'CHMO:0000592', 'http://purl.obolibrary.org/obo/CHMO_0000592', $chmo);
+        $twoDNMR = $this->getDefinedTerm('two-dimensional nuclear magnetic resonance spectroscopy', ['2-D NMR', '2D NMR', 'two-dimensional nuclear magnetic resonance spectroscopy', '2D NMR spectroscopy', 'two-dimensional NMR', '2D nuclear magnetic resonance'], 'CHMO:0000598', 'http://purl.obolibrary.org/obo/CHMO_0000598', $chmo);
         $cosy = $this->getDefinedTerm('correlation spectroscopy spectrum', ['COSY spectra', 'COSY spectrum', 'COSY NMR spectrum', 'COSY NMR spectra'], 'CHMO:0002450', 'http://purl.obolibrary.org/obo/CHMO_0002450', $chmo);
         $hsqc = $this->getDefinedTerm('heteronuclear single quantum coherence', ['HSQC'], 'CHMO:0000604', 'http://purl.obolibrary.org/obo/CHMO_0000604', $chmo);
         $hmbc = $this->getDefinedTerm('heteronuclear multiple bond coherence', ['HMBC NMR', 'HMBC'], 'CHMO:0000601', 'http://purl.obolibrary.org/obo/CHMO_0000601', $chmo);
         $noesy = $this->getDefinedTerm('two-dimensional nuclear Overhauser enhancement spectrum', ['2D NOESY-NMR spectrum', '2D NOESY-NMR spectra', '2D NOESY spectra', '2D NOESY spectrum'], 'CHMO:0001171', 'http://purl.obolibrary.org/obo/CHMO_0001171', $chmo);
-        $spectralRawData = $this->getDefinedTerm('Raw NMR data', [], 'data_0938', 'http://edamontology.org/data_0938', $edam);
         $brukerNMR = $this->getDefinedTerm('Bruker', [], 'NMR:1400256', 'http://nmrML.org/nmrCV#NMR:1400256', $nmrcv);
         $joel = $this->getDefinedTerm('JEOL', [], 'NMR:1400258', 'http://nmrML.org/nmrCV#NMR:1400258', $nmrcv);
-        $nmreData = $this->getDefinedTerm('NMReDATA', [], 'http://edamontology.org/format_3906', 'http://edamontology.org/format_3906', $nmrcv);
+        $nmreData = $this->getDefinedTerm('NMReDATA', [], 'format:3906', 'http://edamontology.org/format_3906', $nmrcv);
 
         $keywords = [$pulsedNMR, $nmr, $oneDNMR, $twoDNMR, $cosy, $hsqc, $hmbc, $noesy, $spectralRawData, $brukerNMR, $joel, $nmreData];
 
