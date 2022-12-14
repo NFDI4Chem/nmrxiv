@@ -50,7 +50,7 @@ class BiochemaController extends Controller
     {
         $datasetSchema = Schema::Dataset();
         $datasetSchema->name($dataset->name);
-        $datasetSchema->url(env('APP_URL').'/D'.$dataset->identifier);
+        $datasetSchema->url(env('APP_URL').'/'.explode(':', $dataset->identifier ? $dataset->identifier : ':')[1]);
 
         return  $datasetSchema;
     }
@@ -70,23 +70,25 @@ class BiochemaController extends Controller
     public function studyLite($study)
     {
         $sample = $study->sample;
-        $sampleSchema = BioSchema::Sample();
-        $sampleSchema->name($sample->name);
-        $inchi = [];
+        $sampleSchema = BioSchema::BioSample();
+        $molecules = [];
         foreach ($sample->molecules as &$molecule) {
-            array_push($inchi, $molecule->STANDARD_INCHI);
+            $moleculeSchema = Schema::MolecularEntity();
+            $moleculeSchema->inChI($molecule->STANDARD_INCHI);
+            array_push($molecules, $moleculeSchema);
         }
-        $sampleSchema->additionalProperty(['standard-inchi' => $inchi]);
+        $sampleSchema->hasBioChemEntityPart($molecules);
+        $sampleSchema->name($sample->name);
 
         $studySchema = BioSchema::Study();
         $studySchema->name($study->name);
-        $studySchema->url(env('APP_URL').'/S'.$study->identifier);
+        $studySchema->url(env('APP_URL').'/'.explode(':', $study->identifier ? $study->identifier : ':')[1]);
         $studySchema->about($sampleSchema);
 
-        $datasets = ['datasets' => []];
+        $datasets = [];
         foreach ($study->datasets as &$dataset) {
             $datasetSchema = $this->datasetLite($dataset);
-            array_push($datasets['datasets'], $datasetSchema);
+            array_push($datasets, $datasetSchema);
         }
 
         $studySchema->hasPart($datasets);
@@ -142,7 +144,7 @@ class BiochemaController extends Controller
         $datasetSchema->keywords([$nucleus, $solvent, $dimension.'D', $experiment]);
         $datasetSchema->license($study->license->url);
         $datasetSchema->name($dataset->name);
-        $datasetSchema->url(env('APP_URL').'/D'.$dataset->identifier);
+        $datasetSchema->url(env('APP_URL').'/'.explode(':', $dataset->identifier ? $dataset->identifier : ':')[1]);
         $datasetSchema->datePublished($dataset->release_date);
         $datasetSchema->includedInDataCatalog($dataCatalog);
         $datasetSchema->measurementTechnique('https://terminology.nfdi4chem.de/ts/ontologies/chmo/terms?iri=http%3A%2F%2Fpurl.obolibrary.org%2Fobo%2FCHMO_0000591');
@@ -175,14 +177,14 @@ class BiochemaController extends Controller
             array_push($tags, $tag);
         }
 
-        $datasets = ['datasets' => []];
+        $datasets = [];
         foreach ($study->datasets as &$dataset) {
             $datasetSchema = $this->datasetLite($dataset);
-            array_push($datasets['datasets'], $datasetSchema);
+            array_push($datasets, $datasetSchema);
         }
 
         $creativeWorkSample = Schema::creativeWork();
-        $creativeWorkSample['@id'] = 'https://bioschemas.org/profiles/Sample/0.2-RELEASE-2018_11_10';
+        $creativeWorkSample['@id'] = 'https://bioschemas.org/types/BioSample/0.1-RELEASE-2019_06_19';
         $SampleconfromsTo = [];
         $SampleconfromsTo['http://purl.org/dc/terms/conformsTo'] = $creativeWorkSample;
 
@@ -215,14 +217,13 @@ class BiochemaController extends Controller
             $moleculeSchema->hasRepresentation($molecule->MOL);
             array_push($molecules, $moleculeSchema);
         }
-
-        $sampleSchema = BioSchema::Sample();
+        $sampleSchema = BioSchema::BioSample();
         $sampleSchema['@id'] = $sample->uuid;
         $sampleSchema['dct:conformsTo'] = $SampleconfromsTo;
-        $sampleSchema->url(env('APP_URL').'/S'.$study->identifier);
-        $sampleSchema->additionalProperty(['molecules' => $molecules]);
-        $sampleSchema->description($sample->description);
         $sampleSchema->name($sample->name);
+        $sampleSchema->description($sample->description);
+        $sampleSchema->url(env('APP_URL').'/'.explode(':', $study->identifier ? $study->identifier : ':')[1]);
+        $sampleSchema->hasBioChemEntityPart($molecules);
 
         $studySchema = BioSchema::Study();
         $studySchema['@id'] = $study->uuid;
@@ -235,7 +236,7 @@ class BiochemaController extends Controller
         $studySchema->about($sampleSchema);
         $studySchema->dateCreated($study->created_at);
         $studySchema->keywords($tags);
-        $studySchema->url(env('APP_URL').'/S'.$study->identifier);
+        $studySchema->url(env('APP_URL').'/'.explode(':', $study->identifier ? $study->identifier : ':')[1]);
         $studySchema->license($study->license->url);
         $studySchema->hasPart($datasets);
 
@@ -282,15 +283,15 @@ class BiochemaController extends Controller
             $tag = $tag->name;
             array_push($tags, $tag);
         }
-        $studies = ['studies' => []];
+        $studies = [];
         foreach ($project->studies as &$study) {
-            $datasets = ['datasets' => []];
+            $datasets = [];
             foreach ($study->datasets as &$dataset) {
                 $datasetSchema = $this->datasetLite($dataset);
-                array_push($datasets['datasets'], $datasetSchema);
+                array_push($datasets, $datasetSchema);
             }
             $studySchema = $this->studyLite($study);
-            array_push($studies['studies'], $studySchema);
+            array_push($studies, $studySchema);
         }
 
         $projectSchema = BioSchema::Study();
@@ -305,7 +306,7 @@ class BiochemaController extends Controller
         $projectSchema['citation'] = $citations;
         $projectSchema->dateCreated($project->created_at);
         $projectSchema->keywords($tags);
-        $projectSchema->url(env('APP_URL').'/P'.$project->identifier);
+        $projectSchema->url(env('APP_URL').'/'.explode(':', $project->identifier ? $project->identifier : ':')[1]);
         $projectSchema->license($project->license->url);
         $projectSchema->hasPart($studies);
 
