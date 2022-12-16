@@ -5,35 +5,14 @@ namespace App\Models\Bioschema;
 use Spatie\SchemaOrg\BaseType;
 
 /**
- * A biological material entity that is representative of a whole.
- * Comments: Typically samples are intended to be representative of the
- * whole or aspects thereof. Examples of samples include biomedical
- * samples (blood, urine) and plant specimens held at herbaria.
+ * Any biological, chemical, or biochemical thing. For example: a protein;
+ * a gene; a chemical; a synthetic chemical.
  *
- * @see https://bioschemas.org/types/BioSample/0.1-RELEASE-2019_06_19
+ * @see https://bioschemas.org/types/BioChemEntity/0.7-RELEASE-2019_06_19
  * @link http://www.w3.org/wiki/WebSchemas/SchemaDotOrgSources
  */
-class BioSample extends BaseType
+class BioChemEntity extends BaseType
 {
-    /**
-     * A property-value pair representing an additional characteristics of the
-     * entitity, e.g. a product feature or another characteristic for which there
-     * is no matching property in schema.org. Note: Publishers should be aware that
-     * applications designed to use specific schema.org properties (e.g. http://schema.org/width,
-     * http://schema.org/color, http://schema.org/gtin13, …) will typically expect
-     * such data to be provided using those properties, rather than using the generic
-     * property/value mechanism.
-     *
-     * @param  \Spatie\SchemaOrg\Contracts\PropertyValueContract|\Spatie\SchemaOrg\Contracts\PropertyValueContract[]  $additionalProperty
-     * @return static
-     *
-     * @see https://schema.org/additionalProperty
-     */
-    public function additionalProperty($additionalProperty)
-    {
-        return $this->setProperty('additionalProperty', $additionalProperty);
-    }
-
     /**
      * Indicates a BioChemEntity that (in some sense) has this BioChemEntity as a part.
      * Inverse property: isPartOfBioChemEntity

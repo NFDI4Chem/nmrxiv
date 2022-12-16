@@ -7,6 +7,7 @@ use App\Models\Bioschema\BioSchema;
 use App\Models\Dataset;
 use App\Models\NMRium;
 use App\Models\Project;
+use App\Models\Sample;
 use App\Models\Study;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -206,9 +207,9 @@ class BiochemaController extends Controller
      * Implement Bioschemas' MolecularEntity on molecules found in a sample.
      *
      * @link https://bioschemas.org/profiles/MolecularEntity/0.5-RELEASE
-     * @link https://bioschemas.org/types/BioSample/0.1-RELEASE-2019_06_19
+     * @link https://bioschemas.org/types/BioChemEntity/0.7-RELEASE-2019_06_19
      *
-     * @param  App\Models\BioSample  $sample
+     * @param  App\Models\BioChemEntity  $sample
      * @return array $molecules
      */
     public function getMolecules($sample)
@@ -225,7 +226,7 @@ class BiochemaController extends Controller
             $moleculeSchema = Schema::MolecularEntity();
             $moleculeSchema['@id'] = $inchiKey;
             $moleculeSchema['dct:conformsTo'] = $this->conformsTo(['https://bioschemas.org/profiles/MolecularEntity/0.5-RELEASE']);
-            $moleculeSchema['identifie'] = $inchiKey;
+            $moleculeSchema['identifier'] = $inchiKey;
             $moleculeSchema->name($molecule->CAS_NUMBER);
             $moleculeSchema->url('https://pubchem.ncbi.nlm.nih.gov/compound/'.$cid);
             $moleculeSchema->inChI($molecule->STANDARD_INCHI);
@@ -243,9 +244,9 @@ class BiochemaController extends Controller
     }
 
     /**
-     * Implement Bioschemas' BioSample on samples found in studies.
+     * Implement Bioschemas' BioChemEntity on samples found in studies.
      *
-     * @link https://bioschemas.org/types/BioSample/0.1-RELEASE-2019_06_19
+     * @link https://bioschemas.org/types/BioChemEntity/0.7-RELEASE-2019_06_19
      * @link https://bioschemas.org/profiles/Study/0.2-DRAFT
      *
      * @param  App\Models\Study  $study
@@ -255,9 +256,9 @@ class BiochemaController extends Controller
     {
         $sample = $study->sample;
 
-        $sampleSchema = BioSchema::BioSample();
+        $sampleSchema = BioSchema::BioChemEntity();
         $sampleSchema['@id'] = $study->doi;
-        $sampleSchema['dct:conformsTo'] = $this->conformsTo(['https://bioschemas.org/types/BioSample/0.1-RELEASE-2019_06_19']);
+        $sampleSchema['dct:conformsTo'] = $this->conformsTo(['https://bioschemas.org/types/BioChemEntity/0.7-RELEASE-2019_06_19']);
         $sampleSchema['identifie'] = explode(':', $study->identifier ? $study->identifier : ':')[1];
         $sampleSchema->name($sample->name);
         $sampleSchema->description($sample->description);
@@ -337,9 +338,9 @@ class BiochemaController extends Controller
      * included in the lite studies.
      *
      * @link https://bioschemas.org/profiles/MolecularEntity/0.5-RELEASE
-     * @link https://bioschemas.org/types/BioSample/0.1-RELEASE-2019_06_19
+     * @link https://bioschemas.org/types/BioChemEntity/0.7-RELEASE-2019_06_19
      *
-     * @param  App\Models\BioSample  $sample
+     * @param  App\Models\BioChemEntity  $sample
      * @return object $molecules
      */
     public function moleculesLite($sample)
@@ -356,10 +357,10 @@ class BiochemaController extends Controller
     }
 
     /**
-     * Implement Bioschemas' BioSample with only few properties to be
+     * Implement Bioschemas' BioChemEntity with only few properties to be
      * included in the lite studies.
      *
-     * @link https://bioschemas.org/types/BioSample/0.1-RELEASE-2019_06_19
+     * @link https://bioschemas.org/types/BioChemEntity/0.7-RELEASE-2019_06_19
      * @link https://bioschemas.org/profiles/Study/0.2-DRAFT
      *
      * @param  App\Models\Study  $study
@@ -367,7 +368,7 @@ class BiochemaController extends Controller
      */
     public function sampleLite($study)
     {
-        $sampleSchema = BioSchema::BioSample();
+        $sampleSchema = BioSchema::BioChemEntity();
         $sample = $study->sample;
         $molecules = $this->moleculesLite($sample);
 
