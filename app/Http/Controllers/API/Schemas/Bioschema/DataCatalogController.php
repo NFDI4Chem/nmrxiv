@@ -25,8 +25,7 @@ class DataCatalogController extends Controller
         $creativeWork = Schema::creativeWork();
         $creativeWork['@id'] = 'https://bioschemas.org/profiles/DataCatalog/0.3-RELEASE-2019_07_01';
 
-        $confromsTo = [];
-        $confromsTo['http://purl.org/dc/terms/conformsTo'] = $creativeWork;
+        $confromsTo = $creativeWork;
 
         $keywords = $this->prepareKeywords();
         $contributors = $this->prepareContributors();
