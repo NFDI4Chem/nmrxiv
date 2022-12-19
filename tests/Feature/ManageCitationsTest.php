@@ -155,7 +155,8 @@ class ManageCitationsTest extends TestCase
      * Make Request to update citation
      *
      * @param  \App\Models\Citation  $citation
-     * @return array $body
+     * @param  int  $projectId
+     * @return \Illuminate\Http\Response
      */
     public function updateCitation($body, $projectId)
     {
@@ -168,7 +169,8 @@ class ManageCitationsTest extends TestCase
      * Make Request to detach citation
      *
      * @param  \App\Models\Citation  $citation
-     * @return array $body
+     * @param  int  $projectId
+     * @return \Illuminate\Http\Response
      */
     public function detachCitation($body, $projectId)
     {
