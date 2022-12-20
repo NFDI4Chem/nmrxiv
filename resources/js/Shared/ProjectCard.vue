@@ -57,7 +57,7 @@
                         ]"
                     >
                         <div
-                            style="min-height: 168px; max-height: 168px"
+                            style="min-height: 168px;"
                             class="flex-1 p-3"
                         >
                             <small
