@@ -117,6 +117,7 @@ class ProjectController extends Controller
         }
 
         $team = $project->nonPersonalTeam;
+        $user = Auth::user();
         $license = null;
         if ($project->license_id) {
             $license = $getLicense->getLicensebyId($project->license_id);
@@ -127,7 +128,8 @@ class ProjectController extends Controller
             'team' => $team ? $team->load(['users', 'owner']) : null,
             'members' => $project->allUsers(),
             'availableRoles' => array_values(Jetstream::$roles),
-            'role' => $project->userProjectRole(Auth::user()->email),
+            'role' => $project->userProjectRole($user->email),
+            'teamRole' => $user->belongsToTeam($team) ? $user->teamRole($team) : null,
             'license' => $license ? $license[0] : null,
             'projectPermissions' => [
                 'canDeleteProject' => Gate::check('deleteProject', $project),
