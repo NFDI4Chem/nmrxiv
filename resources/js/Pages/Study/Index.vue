@@ -257,6 +257,10 @@ export default {
             default: null,
             type: String,
         },
+        teamRole: {
+            default: null,
+            type: String,
+        }
     },
     data() {
         return {
