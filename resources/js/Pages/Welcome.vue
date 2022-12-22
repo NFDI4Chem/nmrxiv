@@ -919,6 +919,9 @@
             </div>
         </footer>
     </div>
+    <component :is="'script'" type="application/ld+json">{{
+        schema
+    }}</component>
 </template>
 
 <script>
@@ -1159,6 +1162,21 @@ export default {
             features,
             footerNavigation,
         };
+    },
+
+    data() {
+        return {
+            schema: {},
+        };
+    },
+
+    async created() {
+        try {
+            const res = await axios.get(route("bioschema.datacatalog"));
+            this.schema = res.data;
+        } catch (e) {
+            console.error(e);
+        }
     },
 };
 </script>
