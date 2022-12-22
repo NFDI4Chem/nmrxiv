@@ -1583,7 +1583,7 @@
                     <span v-if="!currentStep">
                         <Link
                             class="inline-flex items-center px-2.5 py-1 border border-gray-300 shadow-sm text-md font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                            :href="route('dashboard')"
+                            :href='this.returnUrl'
                         >
                             Cancel
                         </Link>
@@ -1603,7 +1603,7 @@
                             </jet-secondary-button>
                             <Link
                                 class="inline-flex items-center px-2.5 py-1 border border-gray-300 shadow-sm text-md font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                                :href="route('dashboard')"
+                                :href='this.returnUrl'
                             >
                                 Cancel
                             </Link>
@@ -1657,7 +1657,7 @@
                                 Back
                             </jet-button>
                             <Link
-                                :href="route('dashboard')"
+                                :href='this.returnUrl'
                                 class="inline-flex items-center px-2.5 py-1 border border-gray-300 shadow-sm text-md font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                             >
                                 Cancel
@@ -1879,6 +1879,7 @@ export default {
             confirmPublicAccess: false,
 
             studiesExist: false,
+            returnUrl: '/dashboard',
         };
     },
     computed: {
@@ -1925,6 +1926,7 @@ export default {
     mounted() {
         const initialise = (data) => {
             this.fetchDrafts().then((response) => {
+                this.returnUrl = this.url + this.returnUrl + (data.return_url ? data.return_url : "");
                 this.drafts = response.data.drafts;
                 this.sharedDrafts = response.data.sharedDrafts;
                 if (data.draft_id) {
