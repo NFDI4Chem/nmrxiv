@@ -189,6 +189,7 @@
                                                                             class="w-full"
                                                                             :href="hit.public_url
                                                                             "
+                                                                            @click="open = false" 
                                                                         >
                                                                             <FolderIcon
                                                                                 :class="[
