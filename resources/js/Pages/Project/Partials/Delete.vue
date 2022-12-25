@@ -35,8 +35,8 @@
                             time before they are permanently deleted. Please
                             enter your password to confirm you would like to
                             delete your project, and if there is no action in
-                            the next 30 days, the project will be deleted
-                            permanently.
+                            the next {{ collOffPeriod }} days, the project will
+                            be deleted permanently.
 
                             <div class="mt-4">
                                 <jet-input
@@ -116,6 +116,12 @@ export default {
 
             hasPassword: false,
         };
+    },
+
+    computed: {
+        collOffPeriod() {
+            return String(this.$page.props.collOffPeriod);
+        },
     },
 
     methods: {
