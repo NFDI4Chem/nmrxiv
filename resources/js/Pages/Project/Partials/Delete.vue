@@ -35,7 +35,7 @@
                             time before they are permanently deleted. Please
                             enter your password to confirm you would like to
                             delete your project, and if there is no action in
-                            the next {{ collOffPeriod }} days, the project will
+                            the next {{ coolOffPeriod }} days, the project will
                             be deleted permanently.
 
                             <div class="mt-4">
@@ -119,8 +119,8 @@ export default {
     },
 
     computed: {
-        collOffPeriod() {
-            return String(this.$page.props.collOffPeriod);
+        coolOffPeriod() {
+            return String(this.$page.props.coolOffPeriod);
         },
     },
 
