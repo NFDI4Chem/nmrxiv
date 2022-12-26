@@ -220,6 +220,12 @@ export default {
                     description: "",
                     icon: "",
                 },
+                {
+                    name: "download",
+                    description: "",
+                    icon: "",
+                },
+
             ],
         };
     },
