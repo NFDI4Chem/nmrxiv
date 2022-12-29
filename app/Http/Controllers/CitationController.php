@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Project;
-use App\Models\Citation;
-use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Gate;
 use App\Actions\Project\UpdateProject;
-use Illuminate\Support\Facades\Validator;
+use App\Models\Citation;
+use App\Models\Project;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Validator;
 
 class CitationController extends Controller
 {
@@ -85,7 +85,7 @@ class CitationController extends Controller
         if (! Gate::forUser($request->user())->check('updateProject', $project)) {
             throw new AuthorizationException;
         }
-        
+
         $citation = $request->get('citations');
 
         if (count($citation) > 0) {
