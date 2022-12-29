@@ -1166,17 +1166,14 @@ export default {
 
     data() {
         return {
-            schema: {},
+            schema: [],
         };
     },
 
-    async created() {
-        try {
-            const res = await axios.get(route("bioschema.datacatalog"));
-            this.schema = res.data;
-        } catch (e) {
-            console.error(e);
-        }
+    mounted() {
+        axios.get(route("bioschema.datacatalog")).then((response) => {
+            this.schema = response.data;
+        });
     },
 };
 </script>
