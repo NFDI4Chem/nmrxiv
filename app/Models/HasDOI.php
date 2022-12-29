@@ -20,8 +20,23 @@ trait HasDOI
                 $url = 'https://www.nmrxiv.org/';
                 $publicationYear = Carbon::now()->year;
                 $citations = [];
+                $tags = [];
                 $citationDois = [];
                 $license = $this->license;
+                $dates = [
+                    [
+                        'date' => $this->release_date,
+                        'dateType' => 'Available',
+                    ],
+                    [
+                        'date' => $this->created_at,
+                        'dateType' => 'Submitted',
+                    ],
+                    [
+                        'date' => $this->updated_at,
+                        'dateType' => 'Updated',
+                    ],
+                ];
 
                 if ($this instanceof Project) {
                     $users = $this->allUsers();
@@ -30,6 +45,7 @@ trait HasDOI
                     $url = $url.'P'.$identifier;
                     $resourceType = 'Project';
                     $citations = $this->citation ? $this->citation : [];
+                    $tags = $this->tags ? $this->tags : [];
 
                     if (! $citations == []) {
                         foreach ($citations as $citation) {
@@ -47,6 +63,7 @@ trait HasDOI
                     $url = $url.'S'.$identifier;
                     $resourceType = 'Study';
                     $citations = $this->project->citation ? $this->project->citation : [];
+                    $tags = $this->tags ? $this->tags : [];
 
                     if (! $citations == []) {
                         foreach ($citations as $citation) {
@@ -77,23 +94,28 @@ trait HasDOI
                 }
 
                 $creators = [];
-                foreach ($authors as $user) {
-                    array_push($creators, [
-                        'name' => $user->family_name.', '.$user->given_name,
+                $contributors = [];
+
+                foreach ($authors as $author) {
+                    $creator = [
+                        'creatorName' => $author->family_name.', '.$author->given_name,
                         'nameType' => 'Personal',
-                        'givenName' => $user->given_name,
-                        'familyName' => $user->family_name,
-                        'nameIdentifiers' => $user->orcid_id ? $user->orcid_id : null,
+                        'givenName' => $author->given_name,
+                        'familyName' => $author->family_name,
+                        'nameIdentifiers' => $author->orcid_id ? $author->orcid_id : null,
                         'nameIdentifierScheme' => 'ORCID',
                         'schemeURI' => 'https://orcid.org',
-                        'affiliation' => $user->affiliation ? $user->affiliation : null,
-                    ]);
+                        'affiliation' => $author->affiliation ? $author->affiliation : null,
+                    ];
+                    array_push($creators, $creator);
+
+                    $creator->contributorType = $author->contributor_type;
+                    array_push($contributors, $creator);
                 }
 
-                $contributors = [];
                 foreach ($users as $user) {
                     array_push($contributors, [
-                        'contributorType' => 'Other',
+                        'contributorType' => 'DataCurator',
                         'name' => $user->last_name.', '.$user->first_name,
                         'nameType' => 'Personal',
                         'givenName' => $user->first_name,
@@ -137,9 +159,11 @@ trait HasDOI
                             'title' => $this->name,
                         ],
                     ],
-                    'publisher' => 'nmrXiv',
-                    'contributors' => $contributors,
+                    'publisher' => env('APP_NAME'),
                     'publicationYear' => $publicationYear,
+                    'subject' => $tags,
+                    'contributors' => $contributors,
+                    'dates' => $dates,
                     'language' => 'en',
                     'resourceType' => $this->resourceType,
                     'resourceTypeGeneral' => 'Dataset',
