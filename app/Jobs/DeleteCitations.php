@@ -2,12 +2,12 @@
 
 namespace App\Jobs;
 
-use App\Models\CitationProject;
 use Illuminate\Bus\Queueable;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
 
 class DeleteCitations implements ShouldQueue
 {
@@ -38,7 +38,7 @@ class DeleteCitations implements ShouldQueue
     public function handle()
     {
         foreach ($this->citations as $citation) {
-            if (! CitationProject::where('citation_id', $citation->id)->exists()) {
+            if (! DB::table('citation_project')->where('citation_id', $citation->id)->exists()) {
                 $citation->delete();
             }
         }
