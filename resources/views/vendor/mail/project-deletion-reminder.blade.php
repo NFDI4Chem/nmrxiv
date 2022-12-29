@@ -8,16 +8,16 @@ You may recover deleted projects and the data stored in them for a limited time 
 
 {{ __("If you'd like to recover your project, you must cancel the project's permanent deletion before **:dueDate** ", ['dueDate' => $dueDate]) }}
 
-{{ __('Please note, you will be unable to recover your project, if you donot take any action before the due data.', ['dueDate' => $dueDate]) }}
+{{ __('Please note, you will be unable to recover your project if you do not take any action before the due date.', ['dueDate' => $dueDate]) }}
 
 To recover your deleted project:
 
-Go to thrash section,
+Go to the thrash folder,
 Select the project you want to recover, and click Project settings > Restore.
 
 Follow our [documentation](https://docs.nmrxiv.org/) to learn more.
 
-If you do not recognise this action contact us at info@nmrxiv.org.
+If you do not recognize this action contact us at info@nmrxiv.org.
 
 Regards,
 
