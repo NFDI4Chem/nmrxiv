@@ -19,7 +19,7 @@ Please find the details below.
 {{ __(':doi', ['doi' => $project->doi]) }}
 
 {{ __('**Citation**:') }}  
-{{ __(':citation', ['citation' => $citation]) }}
+{{ __('Get citations to your project in various formats [here](:url)', ['url' =>  $url]) }}
 
 {{ __('**Public URL**:') }}  
 {{ __(':publicUrl', ['publicUrl' => $publicUrl]) }}
