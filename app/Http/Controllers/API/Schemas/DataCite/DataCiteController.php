@@ -9,7 +9,7 @@ use App\Models\Study;
 use App\Models\User;
 use Illuminate\Http\Request;
 
-class DataciteController extends Controller
+class DataCiteController extends Controller
 {
     /**
      * Implement DataCite metadata schema on nmrXiv project, study, and dataset to enable exporting
@@ -73,8 +73,8 @@ class DataciteController extends Controller
     public function modelSchemaByID(Request $request, $identifier)
     {
         $resolvedModel = resolveIdentifier($identifier);
-        $model = $resolvedModel['model'];
 
+        $model = $resolvedModel['model'];
         $modelDatacite = $model->datacite_schema;
 
         return $modelDatacite;
