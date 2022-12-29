@@ -169,7 +169,6 @@ class ManageAuthorsTest extends TestCase
      * Prepare request body for author
      *
      * @param  \App\Models\Author  $author
-     * 
      * @return array $body
      */
     public function prepareBody($author)
@@ -196,10 +195,11 @@ class ManageAuthorsTest extends TestCase
      * Make Request to update author
      *
      * @param  \App\Models\Author  $author
-     * 
-     * @return array $body
+     * @param  int  $projectId
+     * @return \Illuminate\Http\Response
      */
-    public function updateAuthor($body, $projectId){
+    public function updateAuthor($body, $projectId)
+    {
         return $this->withHeaders([
             'Accept' => 'application/json',
         ])->post('authors/'.$projectId, $body);
@@ -209,10 +209,11 @@ class ManageAuthorsTest extends TestCase
      * Make Request to detach author
      *
      * @param  \App\Models\Author  $author
-     * 
-     * @return array $body
+     * @param  int  $projectId
+     * @return \Illuminate\Http\Response
      */
-    public function detachAuthor($body, $projectId){
+    public function detachAuthor($body, $projectId)
+    {
         return $this->withHeaders([
             'Accept' => 'application/json',
         ])->delete('authors/'.$projectId.'/delete', $body);
