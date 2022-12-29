@@ -635,7 +635,7 @@
         </template>
         <template #footer>
             <div class="flex">
-                <jet-secondary-button class="float-left" @click="onClose">
+                <jet-secondary-button class="float-left" @click="onClose()">
                     Close
                 </jet-secondary-button>
             </div>
@@ -1058,7 +1058,6 @@ export default {
             this.authorsForm.post(route("author.save", this.project.id), {
                 preserveScroll: true,
                 onSuccess: () => {
-                    Inertia.reload({ only: ["project"] });
                     this.loadInitial();
                     this.form.reset();
                     this.form.contributor_type = {};

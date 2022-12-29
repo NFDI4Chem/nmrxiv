@@ -11,7 +11,7 @@ Or click on the button below.
 
 Follow our [documentation](https://docs.nmrxiv.org/) to learn more.
 
-If you do not recognise this action contact us at info@nmrxiv.org.
+If you do not recognize this action, contact us at info@nmrxiv.org.
 
 Regards,
 
