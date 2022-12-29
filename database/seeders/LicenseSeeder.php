@@ -273,7 +273,7 @@ class LicenseSeeder extends Seeder
         License::truncate();
         if ($licenses) {
             foreach ($licenses as $license) {
-                $license = License::create([
+                $license = License::factory()->create([
                     'title' => $license['title'],
                     'slug' => $license['slug'],
                     'spdx_id' => $license['spdx_id'],
