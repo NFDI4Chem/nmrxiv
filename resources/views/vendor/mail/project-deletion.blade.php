@@ -12,12 +12,12 @@ You may recover deleted projects and the data stored in them for a limited time 
 
 To recover your deleted project:
 
-Go to thrash section,
+Go to the thrash folder,
 Select the project you want to recover, and click Project settings > Restore.
 
 Follow our [documentation](https://docs.nmrxiv.org/) to learn more.
 
-If you do not recognise this action contact us at info@nmrxiv.org.
+If you do not recognize this action contact us at info@nmrxiv.org.
 
 Regards,
 

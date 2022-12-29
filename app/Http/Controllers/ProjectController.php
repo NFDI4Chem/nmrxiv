@@ -18,6 +18,7 @@ use App\Models\Validation;
 use Auth;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Auth\StatefulGuard;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
@@ -82,7 +83,7 @@ class ProjectController extends Controller
 
     public function publicProjectsView(Request $request)
     {
-        $projects = ProjectResource::collection(Project::where('is_public', true)->filter($request->only('search', 'sort', 'mode'))->paginate(12)->withQueryString());
+        $projects = ProjectResource::collection(Project::where([['is_public', true], ['is_archived', false]])->filter($request->only('search', 'sort', 'mode'))->paginate(12)->withQueryString());
 
         return Inertia::render('Public/Projects', [
             'filters' => $request->all('search', 'sort', 'mode'),
