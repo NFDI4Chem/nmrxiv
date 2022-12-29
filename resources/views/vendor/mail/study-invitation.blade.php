@@ -28,4 +28,3 @@ Regards,
 
 The nmrXiv Team
 @endcomponent
-
