@@ -72,6 +72,7 @@ class HandleInertiaRequests extends Middleware
             'SCOUT_PREFIX' => (env('SCOUT_PREFIX')),
             'europemcWSApi' => (env('EUROPEMC_WS_API')),
             'dataciteURL' => env('DATACITE_ENDPOINT'),
+            'collOffPeriod' => env('COOL_OFF_PERIOD'),
         ]);
     }
 }

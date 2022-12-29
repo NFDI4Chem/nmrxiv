@@ -2,7 +2,7 @@
 
 Dear admin,
 
-Deletion failed for below project.
+Deletion failed for the below project.
 
 {{ __('Project Name - **:project**', ['project' => $projectName]) }}
 {{ __('Project ID - **:projectId**', ['projectId' => $projectId]) }}
