@@ -184,7 +184,7 @@ class ManageAnnouncementTest extends TestCase
     {
         return $this->withHeaders([
             'Accept' => 'application/json',
-        ])->post('admin/announcements/create', $body);
+        ])->post('admin/announcements', $body);
     }
 
     /**
@@ -198,7 +198,7 @@ class ManageAnnouncementTest extends TestCase
     {
         return $this->withHeaders([
             'Accept' => 'application/json',
-        ])->post('admin/announcements/edit/'.$announcementId, $body);
+        ])->put('admin/announcements/'.$announcementId, $body);
     }
 
     /**
@@ -211,6 +211,6 @@ class ManageAnnouncementTest extends TestCase
     {
         return $this->withHeaders([
             'Accept' => 'application/json',
-        ])->delete('admin/announcements/delete/'.$announcementId);
+        ])->delete('admin/announcements/'.$announcementId);
     }
 }
