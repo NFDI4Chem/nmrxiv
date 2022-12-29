@@ -1,8 +1,10 @@
 @component('mail::message')
-{{ __('You have been invited to join the study **:study** by :invitedBy as role :role', ['study' => $invitation->study->name, 'invitedBy' => $invitedBy,'role' => $invitation->role]) }}
+{{ __('You have been invited to join the study **:study** (role: :role)  by :invitedBy.', ['study' => $invitation->study->name, 'invitedBy' => $invitation->invited_by,'role' => $invitation->role]) }}
 
+@if($invitation->message)
 {{ __('Message:') }}  
 {{ __(':message', ['message' => $invitation->message]) }}
+@endif
 
 @if (Laravel\Fortify\Features::enabled(Laravel\Fortify\Features::registration()))
 {{ __('If you do not have an account, you may create one by clicking the button below. After creating an account, you may click the invitation acceptance button in this email to accept the project invitation:') }}
