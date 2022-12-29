@@ -18,6 +18,7 @@ use App\Models\Validation;
 use Auth;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Auth\StatefulGuard;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
