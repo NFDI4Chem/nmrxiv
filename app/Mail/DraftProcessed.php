@@ -43,7 +43,6 @@ class DraftProcessed extends Mailable
             'releasedToday' => $releasedToday,
             'releaseDate' => explode(' ', $releaseDate)[0],
             'publicUrl' => url(config('app.url').'/'.explode(':', $this->project->identifier)[1]),
-            'citation' => '', // Have to be detemined on how to pass
         ])->subject(__('Submission Processed'.' - '.$this->project->name));
     }
 }
