@@ -73,6 +73,9 @@ class HandleInertiaRequests extends Middleware
             'europemcWSApi' => (env('EUROPEMC_WS_API')),
             'dataciteURL' => env('DATACITE_ENDPOINT'),
             'collOffPeriod' => env('COOL_OFF_PERIOD'),
+            'orcidSearchApi' => env('ORCID_ID_SEARCH_API'),
+            'orcidPersonApi' => env('ORCID_ID_PERSON_API'),
+            'orcidEmploymentApi' => env('ORCID_ID_EMPLOYMENT_API'),
         ]);
     }
 }

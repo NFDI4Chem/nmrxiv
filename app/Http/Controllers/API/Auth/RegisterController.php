@@ -21,6 +21,7 @@ class RegisterController extends Controller
         $user = User::create([
             'name' => $validatedData['name'],
             'email' => $validatedData['email'],
+            'orcid_id' => $request->orcid_id,
             'password' => Hash::make($validatedData['password']),
         ]);
 
