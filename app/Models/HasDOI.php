@@ -14,6 +14,7 @@ trait HasDOI
             $identifier = $this->getIdentifier($this, 'identifier');
 
             if ($this->doi == null) {
+                $prefix = '10.57992/nmrxiv.'; //todo: replace by env value.
                 $authors = [];
                 $users = [];
                 $suffix = null;
@@ -23,6 +24,7 @@ trait HasDOI
                 $tags = [];
                 $citationDois = [];
                 $license = $this->license;
+                $relatedIdentifier = [];
                 $dates = [
                     [
                         'date' => $this->release_date,
@@ -55,6 +57,28 @@ trait HasDOI
                             ]);
                         }
                     }
+                    $pID = explode(':', $this->identifier ? $this->identifier : ':')[1];
+                    $pDOI = $prefix.$pID;
+                    foreach ($this->studies as &$study) {
+                        $sID = explode(':', $study->identifier ? $study->identifier : ':')[1];
+                        $sDOI = $pDOI.'.'.$sID;
+                        $relatedIdentifierDetails = [
+                            'RelatedIdentifier' => $sDOI,
+                            'relatedIdentifierType' => 'DOI',
+                            'relationType' => 'HasPart',
+                        ];
+                        array_push($relatedIdentifier, $relatedIdentifierDetails);
+                        foreach ($study->datasets as &$dataset) {
+                            $dID = explode(':', $dataset->identifier ? $dataset->identifier : ':')[1];
+                            $dDOI = $sDOI.'.'.$dID;
+                            $relatedIdentifierDetails = [
+                                'RelatedIdentifier' => $dDOI,
+                                'relatedIdentifierType' => 'DOI',
+                                'relationType' => 'HasPart',
+                            ];
+                            array_push($relatedIdentifier, $relatedIdentifierDetails);
+                        }
+                    }
                 } elseif ($this instanceof Study) {
                     $users = $this->allUsers();
                     $authors = $this->project->authors ? $this->project->authors : [];
@@ -72,6 +96,27 @@ trait HasDOI
                                 'doi' => $citationDoi,
                             ]);
                         }
+                    }
+                    $sID = explode(':', $this->identifier ? $this->identifier : ':')[1];
+                    $project = $this->project;
+                    $pID = explode(':', $project->identifier ? $project->identifier : ':')[1];
+                    $pDOI = $prefix.$pID;
+                    $sDOI = $pDOI.'.'.$sID;
+                    $relatedIdentifierDetails = [
+                        'RelatedIdentifier' => $pDOI,
+                        'relatedIdentifierType' => 'DOI',
+                        'relationType' => 'IsPartOf',
+                    ];
+                    array_push($relatedIdentifier, $relatedIdentifierDetails);
+                    foreach ($this->datasets as &$dataset) {
+                        $dID = explode(':', $dataset->identifier ? $dataset->identifier : ':')[1];
+                        $dDOI = $sDOI.'.'.$dID;
+                        $relatedIdentifierDetails = [
+                            'RelatedIdentifier' => $dDOI,
+                            'relatedIdentifierType' => 'DOI',
+                            'relationType' => 'HasPart',
+                        ];
+                        array_push($relatedIdentifier, $relatedIdentifierDetails);
                     }
                 } elseif ($this instanceof Dataset) {
                     $users = $this->study->allUsers();
@@ -91,6 +136,25 @@ trait HasDOI
                             ]);
                         }
                     }
+                    $dID = explode(':', $this->identifier ? $this->identifier : ':')[1];
+                    $project = $this->project;
+                    $pID = explode(':', $project->identifier ? $project->identifier : ':')[1];
+                    $pDOI = $prefix.$pID;
+                    $relatedIdentifierDetails = [
+                        'RelatedIdentifier' => $pID,
+                        'relatedIdentifierType' => 'DOI',
+                        'relationType' => 'IsPartOf',
+                    ];
+                    array_push($relatedIdentifier, $relatedIdentifierDetails);
+                    $study = $this->study;
+                    $sID = explode(':', $study->identifier ? $study->identifier : ':')[1];
+                    $sDOI = $pDOI.'.'.$sID;
+                    $relatedIdentifierDetails = [
+                        'RelatedIdentifier' => $sDOI,
+                        'relatedIdentifierType' => 'DOI',
+                        'relationType' => 'IsPartOf',
+                    ];
+                    array_push($relatedIdentifier, $relatedIdentifierDetails);
                 }
 
                 $creators = [];
@@ -165,6 +229,7 @@ trait HasDOI
                     'contributors' => $contributors,
                     'dates' => $dates,
                     'language' => 'en',
+                    'relatedIdentifier' => $relatedIdentifier,
                     'resourceType' => $this->resourceType,
                     'resourceTypeGeneral' => 'Dataset',
                     'rights' => $rights,
