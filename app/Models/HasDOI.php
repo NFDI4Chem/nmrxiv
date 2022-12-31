@@ -19,7 +19,6 @@ trait HasDOI
                 $users = [];
                 $suffix = null;
                 $url = 'https://www.nmrxiv.org/';
-                $publicationYear = Carbon::now()->year;
                 $citations = [];
                 $tags = [];
                 $citationDois = [];
@@ -41,6 +40,7 @@ trait HasDOI
                 ];
 
                 if ($this instanceof Project) {
+                    $name = $this->name;
                     $users = $this->allUsers();
                     $authors = $this->authors ? $this->authors : [];
                     $suffix = 'P'.$identifier;
@@ -80,6 +80,7 @@ trait HasDOI
                         }
                     }
                 } elseif ($this instanceof Study) {
+                    $name = $this->name;
                     $users = $this->allUsers();
                     $authors = $this->project->authors ? $this->project->authors : [];
                     $projectIdentifier = $this->getIdentifier($this->project, 'identifier');
@@ -155,6 +156,7 @@ trait HasDOI
                         'relationType' => 'IsPartOf',
                     ];
                     array_push($relatedIdentifier, $relatedIdentifierDetails);
+                    $name = $project->name.'/'.$this->name;
                 }
 
                 $creators = [];
@@ -220,11 +222,11 @@ trait HasDOI
                     'creators' => $creators,
                     'titles' => [
                         [
-                            'title' => $this->name,
+                            'title' => $name,
                         ],
                     ],
                     'publisher' => env('APP_NAME'),
-                    'publicationYear' => $publicationYear,
+                    'publicationYear' => Carbon::now()->year,
                     'subject' => $tags,
                     'contributors' => $contributors,
                     'dates' => $dates,
