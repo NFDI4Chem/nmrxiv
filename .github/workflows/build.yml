@@ -18,7 +18,7 @@ jobs:
   phpunit:
     runs-on: ubuntu-latest
     container:
-      image: kirschbaumdevelopment/laravel-test-runner
+      image: kirschbaumdevelopment/laravel-test-runner:8.2
 
     services:
       postgres:
@@ -30,8 +30,7 @@ jobs:
         ports:
         - 5432:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
-
-      # in case you want to use postgres, uncomment below
+        
     steps:
     - uses: actions/checkout@v1
       with:
