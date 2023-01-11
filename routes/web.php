@@ -258,10 +258,10 @@ Route::group([
             Route::get('announcements', [AnnouncementController::class, 'index'])
             ->name('console.announcements');
 
-            Route::post('announcements/create', [AnnouncementController::class, 'create'])
+            Route::post('announcements', [AnnouncementController::class, 'create'])
             ->name('console.announcements.create');
 
-            Route::post('announcements/{announcement}', [AnnouncementController::class, 'update'])
+            Route::put('announcements/{announcement}', [AnnouncementController::class, 'update'])
             ->name('console.announcements.edit');
 
             Route::delete('announcements/{announcement}', [AnnouncementController::class, 'destroy'])

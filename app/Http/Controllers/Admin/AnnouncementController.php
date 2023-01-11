@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Announcement;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -78,7 +79,7 @@ class AnnouncementController extends Controller
             });
         });
 
-        return redirect()->route('console.announcements')->with('success', 'Announcement created successfully');
+        return $request->wantsJson() ? new JsonResponse("{'success': 'Announcement created successfully'}", 200) : redirect()->route('console.announcements')->with('success', 'Announcement created successfully');
     }
 
     /**
@@ -113,7 +114,7 @@ class AnnouncementController extends Controller
             ]);
         $announcement->save();
 
-        return redirect()->route('console.announcements')->with('success', 'Announcement updated successfully');
+        return $request->wantsJson() ? new JsonResponse("{'success': 'Announcement updated successfully'}", 200) : redirect()->route('console.announcements')->with('success', 'Announcement updated successfully');
     }
 
     /**
@@ -127,6 +128,6 @@ class AnnouncementController extends Controller
     {
         $announcement->delete();
 
-        return redirect()->route('console.announcements')->with('success', 'Announcement deleted successfully');
+        return $request->wantsJson() ? new JsonResponse("{'success': 'Announcement deleted successfully'}", 200) : redirect()->route('console.announcements')->with('success', 'Announcement deleted successfully');
     }
 }
