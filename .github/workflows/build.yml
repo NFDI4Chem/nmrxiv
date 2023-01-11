@@ -18,7 +18,7 @@ jobs:
   app-tests:
       runs-on: ubuntu-latest
       services:
-        pgsql:
+        postgres:
           image: postgres:10.8
           env:
             POSTGRES_USER: postgres
