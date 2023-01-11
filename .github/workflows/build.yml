@@ -18,33 +18,31 @@ jobs:
   app-tests:
       runs-on: ubuntu-latest
       services:
-        pgsql:
-          image: postgres:13
-          env:
-            POSTGRES_ALLOW_EMPTY_PASSWORD: yes
-            POSTGRES_DATABASE: nmrxiv
-          ports:
-            - 5432
-          #options: --health-cmd="postgresadmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+        postgres:
+            image: postgres:13
+            env:
+              POSTGRES_USER: postgres
+              POSTGRES_PASSWORD: postgres
+              POSTGRES_DB: test
+            ports:
+            - 5432:5432
+            options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
       steps:
-        - uses: actions/checkout@v2
-        - name: Copy .env
-          run: php -r "file_exists('.env') || copy('.env.example', '.env');"
-        - name: Install Composer Dependencies
-          run: composer install -q --no-ansi --no-interaction --no-scripts --no-suggest --no-progress --prefer-dist
-        - name: Install NPM Dependencies
-          run: npm install
-        - name: Generate key
-          run: php artisan key:generate
-        - name: Execute tests (Unit and Feature tests) using PHPUnit
-          env:
-            DB_CONNECTION: pgsql
-            DB_HOST: pgsql
-            DB_PORT: 5432
-            DB_DATABASE: nmrxiv
-            DB_USERNAME: sail
-            DB_PASSWORD: password
-          run: php artisan test
+      - uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+  
+      - name: Install composer dependencies
+        run: |
+          composer install --no-scripts
+  
+      - name: Prepare Laravel Application
+        run: |
+          cp .env.ci .env
+          php artisan key:generate
+  
+      - name: Run Testsuite
+        run: vendor/bin/phpunit tests/
 
   setup-build-publish-deploy:
     name: Deploy to Dev
