@@ -17,7 +17,9 @@ env:
 jobs:
   phpunit:
     runs-on: ubuntu-latest
-          
+    container:
+      image: kirschbaumdevelopment/laravel-test-runner
+
     services:
       postgres:
         image: postgres:10.8
@@ -29,22 +31,46 @@ jobs:
         - 5432:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
+      # in case you want to use postgres, uncomment below
     steps:
     - uses: actions/checkout@v1
       with:
         fetch-depth: 1
 
+    - name: Get Composer Cache Directory
+      id: composer-cache
+      run: |
+        echo "::set-output name=dir::$(composer config cache-files-dir)"
+    - uses: actions/cache@v1
+      with:
+        path: ${{ steps.composer-cache.outputs.dir }}
+        key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-composer-
+    - name: Get yarn cache
+      id: yarn-cache
+      run: echo "::set-output name=dir::$(yarn cache dir)"
+
+    - uses: actions/cache@v1
+      with:
+        path: ${{ steps.yarn-cache.outputs.dir }}
+        key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-yarn-
     - name: Install composer dependencies
       run: |
-        composer install -q --no-ansi --no-interaction --no-scripts --no-suggest --no-progress --prefer-dist
-
+        composer install --no-scripts
     - name: Prepare Laravel Application
       run: |
         cp .env.ci .env
         php artisan key:generate
+    - name: Install front-end dependencies
+      run: |
+        npm install
+        npm run dev
+    - name: Run Testsuite
+      run: vendor/bin/phpunit tests/
 
-    - name: Run Test
-      run: php artisan test
 
   setup-build-publish-deploy:
     name: Deploy to Dev
