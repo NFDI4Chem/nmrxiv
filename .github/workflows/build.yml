@@ -37,8 +37,8 @@ jobs:
         - name: Generate key
           run: php artisan key:generate
         - name: Execute tests (Unit and Feature tests) using PHPUnit
-          env:
-            DB_PORT: ${{ job.services.postgres.ports[5432] }}
+          # env:
+          #   DB_PORT: ${{ job.services.postgres.ports[5432] }}
           run: php artisan test
 
   setup-build-publish-deploy:
