@@ -58,8 +58,7 @@ jobs:
           ${{ runner.os }}-yarn-
     - name: Install composer dependencies
       run: |
-        composer self-update --1
-        composer install --no-scripts
+        composer install --ignore-platform-reqs
     - name: Prepare Laravel Application
       run: |
         cp .env.ci .env
