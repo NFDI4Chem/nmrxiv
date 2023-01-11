@@ -15,6 +15,7 @@ class StudyInvitation extends Model
         'email',
         'role',
         'message',
+        'invited_by',
     ];
 
     /**
