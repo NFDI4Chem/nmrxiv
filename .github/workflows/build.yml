@@ -18,14 +18,14 @@ jobs:
   app-tests:
       runs-on: ubuntu-latest
       services:
-        mysql:
+        postgres:
           image: postgres:13
           env:
             POSTGRES_ALLOW_EMPTY_PASSWORD: yes
             POSTGRES_DATABASE: nmrxiv
           ports:
             - 5432
-          #options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+          options: --health-cmd="postgresadmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
       steps:
         - uses: actions/checkout@v2
         - name: Copy .env
