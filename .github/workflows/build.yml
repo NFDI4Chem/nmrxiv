@@ -2,7 +2,7 @@ name : Deploy to Dev
 
 on:
   push:
-    branches: [cd-workflow]
+    branches: [development]
 
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
