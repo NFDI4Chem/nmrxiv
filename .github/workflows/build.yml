@@ -48,6 +48,7 @@ jobs:
         echo MEILISEARCH_KEY='${{ secrets.development.MEILISEARCH_KEY }}' >> .env
         echo MEILISEARCH_PUBLICKEY='${{ secrets.development.MEILISEARCH_PUBLICKEY }}' >> .env
 
+        cat .env
         php artisan key:generate
         php artisan migrate --seed
     - name: Install front-end dependencies
