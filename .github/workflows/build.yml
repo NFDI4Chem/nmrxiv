@@ -66,6 +66,7 @@ jobs:
     - name: Install front-end dependencies
       run: |
         npm install
+        npm run dev
     - name: Run Testsuite
       run: php artisan test
 
