@@ -43,10 +43,10 @@ jobs:
       run: |
         php -r "file_exists('.env') || copy('.env.ci.dev', '.env');"
 
-        echo AWS_ACCESS_KEY_ID='${{ secrets.development.AWS_ACCESS_KEY_ID }}' >> .env
-        echo AWS_SECRET_ACCESS_KEY='${{ secrets.development.AWS_SECRET_ACCESS_KEY }}' >> .env
-        echo MEILISEARCH_KEY='${{ secrets.development.MEILISEARCH_KEY }}' >> .env
-        echo MEILISEARCH_PUBLICKEY='${{ secrets.development.MEILISEARCH_PUBLICKEY }}' >> .env
+        echo AWS_ACCESS_KEY_ID='${{ secrets.AWS_ACCESS_KEY_ID }}' >> .env
+        echo AWS_SECRET_ACCESS_KEY='${{ secrets.AWS_SECRET_ACCESS_KEY }}' >> .env
+        echo MEILISEARCH_KEY='${{ secrets.MEILISEARCH_KEY }}' >> .env
+        echo MEILISEARCH_PUBLICKEY='${{ secrets.MEILISEARCH_PUBLICKEY }}' >> .env
 
         cat .env
         php artisan key:generate
