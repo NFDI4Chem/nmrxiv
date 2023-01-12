@@ -49,7 +49,7 @@ jobs:
         npm run build
         php artisan migrate --seed
     - name: Run Testsuite
-      run: php artisan test --testsuite=Feature --stop-on-failure --parallel
+      run: php artisan test --parallel
 
 
   setup-build-publish-deploy:
