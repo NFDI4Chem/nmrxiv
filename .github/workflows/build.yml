@@ -47,8 +47,11 @@ jobs:
         echo AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY_DEV }} >> .env
         echo MEILISEARCH_KEY=${{ secrets.MEILISEARCH_KEY_DEV }} >> .env
         echo MEILISEARCH_PUBLICKEY=${{ secrets.MEILISEARCH_PUBLICKEY_DEV }} >> .env
+        echo TWITTER_CLIENT_ID=${{ secrets.TWITTER_CLIENT_ID_DEV }} >> .env
+        echo TWITTER_CLIENT_SECRET=${{ secrets.TWITTER_CLIENT_SECRET_DEV }} >> .env
+        echo GITHUB_CLIENT_ID=${{ secrets.CLIENT_ID_GITHUB_DEV }} >> .env
+        echo GITHUB_CLIENT_SECRET=${{ secrets.CLIENT_SECRET_GITHUB_DEV }} >> .env
 
-        cat .env
         php artisan key:generate
         php artisan migrate --seed
     - name: Install front-end dependencies
