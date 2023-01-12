@@ -41,7 +41,7 @@ jobs:
         composer install --ignore-platform-reqs
     - name: Prepare Laravel Application
       run: |
-        cp .env.ci.dev .env
+        php -r "file_exists('.env') || copy('.env.ci.dev', '.env');"
         php artisan key:generate
         php artisan migrate --seed
     - name: Install front-end dependencies
