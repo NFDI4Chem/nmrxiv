@@ -67,6 +67,7 @@ jobs:
       run: |
         npm install
         npm run build
+        php artisan migrate
     - name: Run Testsuite
       run: php artisan test
 
