@@ -22,7 +22,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:10.8
+        image: postgres:13
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
@@ -32,30 +32,30 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v3
       with:
         fetch-depth: 1
 
-    - name: Get Composer Cache Directory
-      id: composer-cache
-      run: |
-        echo "::set-output name=dir::$(composer config cache-files-dir)"
-    - uses: actions/cache@v1
-      with:
-        path: ${{ steps.composer-cache.outputs.dir }}
-        key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-composer-
-    - name: Get yarn cache
-      id: yarn-cache
-      run: echo "::set-output name=dir::$(yarn cache dir)"
+    # - name: Get Composer Cache Directory
+    #   id: composer-cache
+    #   run: |
+    #     echo "::set-output name=dir::$(composer config cache-files-dir)"
+    # - uses: actions/cache@v1
+    #   with:
+    #     path: ${{ steps.composer-cache.outputs.dir }}
+    #     key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+    #     restore-keys: |
+    #       ${{ runner.os }}-composer-
+    # - name: Get yarn cache
+    #   id: yarn-cache
+    #   run: echo "::set-output name=dir::$(yarn cache dir)"
 
-    - uses: actions/cache@v1
-      with:
-        path: ${{ steps.yarn-cache.outputs.dir }}
-        key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-yarn-
+    # - uses: actions/cache@v1
+    #   with:
+    #     path: ${{ steps.yarn-cache.outputs.dir }}
+    #     key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+    #     restore-keys: |
+    #       ${{ runner.os }}-yarn-
     - name: Install composer dependencies
       run: |
         composer install --ignore-platform-reqs
@@ -67,7 +67,7 @@ jobs:
       run: |
         npm install
         npm run build
-        php artisan migrate
+        php artisan migrate:refresh --seed
     - name: Run Testsuite
       run: php artisan test
 
