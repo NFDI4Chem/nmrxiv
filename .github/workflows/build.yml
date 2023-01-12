@@ -2,7 +2,7 @@ name : Deploy to Dev
 
 on:
   push:
-    branches: [development]
+    branches: [cd-workflow]
 
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
@@ -41,7 +41,7 @@ jobs:
         composer install --ignore-platform-reqs
     - name: Prepare Laravel Application
       run: |
-        cp .env.ci .env
+        cp .env.ci.dev .env
         php artisan key:generate
         php artisan migrate --seed
     - name: Install front-end dependencies
