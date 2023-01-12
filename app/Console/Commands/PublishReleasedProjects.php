@@ -4,9 +4,11 @@ namespace App\Console\Commands;
 
 use App\Actions\Project\PublishProject;
 use App\Models\Project;
+use App\Notifications\DraftProcessedNotification;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 
 class PublishReleasedProjects extends Command
 {
@@ -41,6 +43,7 @@ class PublishReleasedProjects extends Command
                 if ($release_date->isToday()) {
                     $publisher->publish($project);
                 }
+                Notification::send($project->owner, new DraftProcessedNotification($project));
             }
         });
     }

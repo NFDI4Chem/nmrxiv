@@ -323,7 +323,7 @@ export default {
         openDatasetCreateDialog() {
             this.emitter.emit("openDatasetCreateDialog", {
                 draft_id: this.project.draft_id,
-                return_url: '/studies/' + this.project.id + '/datasets',
+                return_url: '/studies/' + this.study.id + '/datasets',
             });
         },
         updateDataSet() {
