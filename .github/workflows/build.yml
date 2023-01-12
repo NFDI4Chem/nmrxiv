@@ -2,7 +2,7 @@ name : Deploy to Dev
 
 on:
   push:
-    branches: [cd-workflow]
+    branches: [development]
 
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
@@ -43,12 +43,12 @@ jobs:
       run: |
         cp .env.ci .env
         php artisan key:generate
+        php artisan migrate --seed
     - name: Install front-end dependencies
       run: |
         npm install
         npm run build
-        php artisan migrate --seed
-    - name: Run Testsuite
+    - name: Run Test
       run: php artisan test --parallel
 
 
