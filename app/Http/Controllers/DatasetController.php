@@ -125,7 +125,7 @@ class DatasetController extends Controller
     public function publicDatasetsView(Request $request)
     {
         // $datasets = Cache::rememberForever('datasets', function () {
-        $datasets = DatasetResource::collection(Dataset::with('project')->where('is_public', true)->filter($request->only('search', 'sort', 'mode'))->paginate(12)->withQueryString());
+        $datasets = DatasetResource::collection(Dataset::with('project')->where([['is_public', true], ['is_archived', false]])->filter($request->only('search', 'sort', 'mode'))->paginate(12)->withQueryString());
         // });
 
         return Inertia::render('Public/Datasets', [
