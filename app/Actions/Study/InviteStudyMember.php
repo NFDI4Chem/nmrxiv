@@ -34,6 +34,7 @@ class InviteStudyMember
             'email' => $email,
             'role' => $role,
             'message' => $message,
+            'invited_by' => $user->name,
         ]);
 
         Mail::to($email)->send(new StudyInvitation($invitation));

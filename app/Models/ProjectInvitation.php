@@ -15,6 +15,7 @@ class ProjectInvitation extends Model
         'email',
         'role',
         'message',
+        'invited_by',
     ];
 
     /**
