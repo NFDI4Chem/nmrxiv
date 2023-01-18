@@ -42,10 +42,11 @@ class TeamInvitationNotification extends Notification implements ShouldQueue
      */
     public function toArray($notifiable)
     {
+        $title = "Invitation from team - ".$this->invitation->team->name;
         $message = 'You have been invited to join the '.$this->invitation->team->name.' team (role '.$this->invitation['role'].') by '.$this->invitation['invited_by'].'. Please check your mail to accept or decline the invitation.';
 
         return [
-            'title' => 'Team Invitation',
+            'title' => $title,
             'message' => $message,
         ];
     }
