@@ -187,9 +187,12 @@
                                                                     >
                                                                         <Link
                                                                             class="w-full"
-                                                                            :href="hit.public_url
+                                                                            :href="
+                                                                                hit.public_url
                                                                             "
-                                                                            @click="open = false" 
+                                                                            @click="
+                                                                                open = false
+                                                                            "
                                                                         >
                                                                             <FolderIcon
                                                                                 :class="[
@@ -405,6 +408,10 @@ export default {
     computed: {
         index() {
             return this.$page.props.SCOUT_PREFIX + "projects";
+        },
+
+        mailTo() {
+            return "mailto:" + String(this.$page.props.mailFromAddress);
         },
     },
 
