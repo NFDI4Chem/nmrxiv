@@ -9,6 +9,7 @@ env:
   GKE_CLUSTER: nmrxiv-dev
   GKE_ZONE: europe-west3-a
   DEPLOYMENT_NAME: nmrxiv-nmrxiv-app
+  SCHEDULER_DEPLOYMENT_NAME: nmrxiv-scheduler
   WORKER_DEPLOYMENT_NAME: nmrxiv-worker
   REPOSITORY_NAME: nmrxiv-dev
   APP_IMAGE: nmrxiv-app
@@ -68,5 +69,6 @@ jobs:
       run: |-
         kubectl rollout restart deployment/$DEPLOYMENT_NAME
         kubectl rollout restart deployment/$WORKER_DEPLOYMENT_NAME
+        kubectl rollout restart deployment/$SCHEDULER_DEPLOYMENT_NAME --timeout=300s
         kubectl rollout status deployment/$DEPLOYMENT_NAME --timeout=300s
         kubectl get services -o wide
