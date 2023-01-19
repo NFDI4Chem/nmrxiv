@@ -322,7 +322,7 @@
                                 leave-to-class="transform opacity-0 scale-95"
                             >
                                 <MenuItems
-                                    class="origin-top-right absolute right-0 mt-2 w-56 text-sm leading-5 text-gray-700 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 focus:outline-none"
+                                    class="origin-top-right absolute right-0 mt-2 w-72 text-sm leading-5 text-gray-700 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 focus:outline-none"
                                 >
                                     <span v-if="hasUnreadNotification() > 0">
                                         <div
