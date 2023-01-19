@@ -26,8 +26,8 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('nmrxiv:publish')->daily();
         $schedule->command('nmrxiv:delete-projects')->daily();
-        $schedule->command('nmrxiv:delete-citations')->daily();
-        $schedule->command('nmrxiv:delete-authors')->daily();
+        $schedule->command('nmrxiv:delete-citations')->weekly();
+        $schedule->command('nmrxiv:delete-authors')->weekly();
     }
 
     /**
