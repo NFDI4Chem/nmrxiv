@@ -2,12 +2,12 @@
 
 namespace App\Notifications;
 
-use App\Models\TeamInvitation;
+use App\Models\ProjectInvitation;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 
-class TeamInvitationNotification extends Notification implements ShouldQueue
+class ProjectInviteNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -18,7 +18,7 @@ class TeamInvitationNotification extends Notification implements ShouldQueue
      *
      * @return void
      */
-    public function __construct(TeamInvitation $invitation)
+    public function __construct(ProjectInvitation $invitation)
     {
         $this->invitation = $invitation;
     }
@@ -42,8 +42,8 @@ class TeamInvitationNotification extends Notification implements ShouldQueue
      */
     public function toArray($notifiable)
     {
-        $title = 'Invitation from team - '.$this->invitation->team->name;
-        $message = 'You have been invited to join the '.$this->invitation->team->name.' team (role: '.$this->invitation['role'].') by '.$this->invitation['invited_by'].'. Please check your mail to accept or decline the invitation.';
+        $title = 'Invitation from project - '.$this->invitation->project->name;
+        $message = 'You have been invited to join the project - '.$this->invitation->project->name.' (role: '.$this->invitation['role'].') by '.$this->invitation['invited_by'].'. Please check your mail to accept or decline the invitation.';
 
         return [
             'title' => $title,
