@@ -73,6 +73,7 @@ class HandleInertiaRequests extends Middleware
             'europemcWSApi' => (env('EUROPEMC_WS_API')),
             'dataciteURL' => env('DATACITE_ENDPOINT'),
             'collOffPeriod' => env('COOL_OFF_PERIOD'),
+            'mailFromAddress' => env('MAIL_FROM_ADDRESS'),
         ]);
     }
 }
