@@ -283,7 +283,7 @@
             <div class="mt-6 flex">
                 <a
                     id="tour-step-get-in-touch"
-                    href="mailTo()"
+                    :href="mailTo"
                     class="text-sm font-medium text-indigo-600 hover:text-indigo-500"
                     >Or get in touch<span aria-hidden="true"> &rarr;</span></a
                 >
