@@ -696,7 +696,6 @@ export default {
 
             if (this.editor.getSmiles() == "") {
                 this.errorMessage = "The entered SMILES is not valid.";
-                console.log(this.errorMessage);
             }
         },
         getSVGString(molecule) {
