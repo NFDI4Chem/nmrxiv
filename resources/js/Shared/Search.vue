@@ -187,9 +187,12 @@
                                                                     >
                                                                         <Link
                                                                             class="w-full"
-                                                                            :href="hit.public_url
+                                                                            :href="
+                                                                                hit.public_url
                                                                             "
-                                                                            @click="open = false" 
+                                                                            @click="
+                                                                                open = false
+                                                                            "
                                                                         >
                                                                             <FolderIcon
                                                                                 :class="[
