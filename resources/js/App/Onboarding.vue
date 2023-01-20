@@ -253,7 +253,7 @@
                                                     >Chat bubble is on the
                                                     bottom left corner or email
                                                     us at
-                                                    <a href="mailTo()"
+                                                    <a :href="mailTo"
                                                         >{{ mailFromAddress }}
                                                     </a></small
                                                 >
