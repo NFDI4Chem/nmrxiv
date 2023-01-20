@@ -493,6 +493,31 @@
                                                         >
                                                             Load Structure
                                                         </button>
+                                                        <div
+                                                            v-if="errorMessage"
+                                                            class="rounded-md bg-red-50 p-4 mb-2"
+                                                        >
+                                                            <div class="flex">
+                                                                <div
+                                                                    class="flex-shrink-0"
+                                                                >
+                                                                    <ExclamationTriangleIcon
+                                                                        class="h-5 w-5 text-red-400"
+                                                                        aria-hidden="true"
+                                                                    />
+                                                                </div>
+                                                                <div
+                                                                    class="ml-3"
+                                                                >
+                                                                    <div
+                                                                        class="mt-2 text-sm text-red-900"
+                                                                        v-html="
+                                                                            errorMessage
+                                                                        "
+                                                                    ></div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div class="relative">
@@ -646,6 +671,9 @@ export default {
             smiles: "",
             percentage: 0,
             editor: "",
+            form: this.$inertia.form({
+                errorMessage: "The entered SMILES is not valid.",
+            }),
         };
     },
     computed: {
@@ -681,6 +709,12 @@ export default {
         loadSmiles() {
             if (this.smiles && this.smiles != "") {
                 this.editor.setSmiles(this.smiles);
+            }
+
+            if (this.editor.getSmiles() == "") {
+                this.errorMessage = "The entered SMILES is not valid.";
+                this.form.errorMessage = this.errorMessage;
+                console.log(this.errorMessage);
             }
         },
         getSVGString(molecule) {
