@@ -176,7 +176,7 @@
                                             />
                                         </div>
                                     </div>
-                                    <div class="break-all sm:col-span-6">
+                                    <div class="sm:col-span-6">
                                         <select-rich
                                             v-model:selected="
                                                 form.contributor_type
