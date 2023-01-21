@@ -176,7 +176,7 @@
                                             />
                                         </div>
                                     </div>
-                                    <div class="sm:col-span-6">
+                                    <div class="break-all sm:col-span-6">
                                         <select-rich
                                             v-model:selected="
                                                 form.contributor_type
@@ -751,97 +751,97 @@ export default {
                 {
                     title: "Researcher",
                     description:
-                        "A person involved in analysing data or the results of an experiment or formal study. May indicate an <br> intern or assistant to one of the authors who helped with research but who was not so “key” as to be listed as an author.",
+                        "A person involved in analysing data or the results of an experiment or formal study.<br> May indicate an intern or assistant to one of the authors who helped with research<br> but who was not so “key” as to be listed as an author.",
                 },
                 {
                     title: "ContactPerson",
                     description:
-                        "Person with knowledge of how to access, troubleshoot, or otherwise field <br> issues related to the resource",
+                        "Person with knowledge of how to access, troubleshoot, or otherwise field issues<br> related to the resource.",
                 },
                 {
                     title: "DataCollector",
                     description:
-                        "Person/institution responsible for finding or gathering/collecting data under the <br> guidelines of the author(s) or Principal Investigator(PI)",
+                        "Person/institution responsible for finding or gathering/collecting data under the <br> guidelines of the author(s) or Principal Investigator(PI).",
                 },
                 {
                     title: "DataCurator",
                     description:
-                        "Person tasked with reviewing, enhancing, cleaning, or standardizing metadata and the associated data <br> submitted for storage, use, and maintenance within a data centre or repository",
+                        "Person tasked with reviewing, enhancing, cleaning, or standardizing metadata and<br> the associated data submitted for storage, use, and maintenance within a data centre<br> or repository.",
                 },
                 {
                     title: "DataManager",
                     description:
-                        "Person (or organisation with a staff of data managers, such as a data centre) <br> responsible for maintaining the finished resource",
+                        "Person (or organisation with a staff of data managers, such as a data centre) <br> responsible for maintaining the finished resource.",
                 },
                 {
                     title: "Distributor",
                     description:
-                        "Institution tasked with responsibility to generate/disseminate copies <br> of the resource in either electronic or print form",
+                        "Institution tasked with responsibility to generate/disseminate copies of the resource<br> in either electronic or print form.",
                 },
                 {
                     title: "Editor",
                     description:
-                        "A person who oversees the details related to the publication format <br> of the resource ",
+                        "A person who oversees the details related to the publication format of the resource.",
                 },
                 {
                     title: "HostingInstitution",
                     description:
-                        "Typically, the organisation allowing the resource to be available on the internet through <br> the provision of its hardware/software/operating support",
+                        "Typically, the organisation allowing the resource to be available on the internet<br> through the provision of its hardware/software/operating support.",
                 },
                 {
                     title: "Producer",
                     description:
-                        "Typically, a person or organisation responsible for the artistry and form <br> of a media product",
+                        "Typically, a person or organisation responsible for the artistry and form of a media<br> product.",
                 },
                 {
                     title: "ProjectLeader",
                     description:
-                        "Person officially designated as head of project team or subproject team instrumental <br> in the work necessary to development of the resource",
+                        "Person officially designated as head of project team or subproject team<br> instrumental in the work necessary to development of the resource.",
                 },
                 {
                     title: "ProjectManager",
                     description:
-                        "Person on the membership list of a designated project/project team",
+                        "Person on the membership list of a designated project/project team.",
                 },
                 {
                     title: "RegistrationAgency",
                     description:
-                        "Institution/organisation officially appointed by a Registration Authority to handle specific <br> tasks within a defined area of responsibility",
+                        "Institution/organisation officially appointed by a Registration Authority to handle<br> specific tasks within a defined area of responsibility.",
                 },
                 {
                     title: "RelatedPerson",
                     description:
-                        "A person without a specifically defined role in the development of the resource, but who is <br> someone the author wishes to recognize",
+                        "A person without a specifically defined role in the development of the resource,<br> but who is someone the author wishes to recognize.",
                 },
                 {
                     title: "ResearchGroup",
                     description:
-                        "Typically refers to a group of individuals with a lab, department, or division that has a specifically <br> defined focus of activity.",
+                        "Typically refers to a group of individuals with a lab, department, or division that<br> has a specifically defined focus of activity.",
                 },
                 {
                     title: "RightsHolder",
                     description:
-                        "Person or institution owning or managing property rights, including intellectual property rights over the resource",
+                        "Person or institution owning or managing property rights, including intellectual<br> property rights over the resource.",
                 },
                 {
                     title: "Sponsor",
                     description:
-                        "Person or organisation that issued a contract or under the auspices of which a work has been written,<br> printed, published, developed, etc",
+                        "Person or organisation that issued a contract or under the auspices of which<br> a work has been written,<br> printed, published, developed, etc.",
                 },
                 {
                     title: "Supervisor",
                     description:
-                        "Designated administrator over one or more groups/teams working to produce a resource, or over one or <br> more steps of a development process",
+                        "Designated administrator over one or more groups/teams working to produce<br> a resource, or over one or more steps of a development process.",
                 },
                 {
                     title: "WorkPackageLeader",
                     description:
-                        "A Work Package is a recognized data product, not all of which is included in publication. The package, instead, may include notes, discarded documents,<br> etc.The Work Package Leader is responsible for ensuring the comprehensive contents, versioning, and availability of the Work Package during the development of the resource. ",
+                        "A Work Package is a recognized data product, not all of which is included in<br> publication. The package, instead, may include notes, discarded documents,<br> etc.The Work Package Leader is responsible for ensuring the comprehensive<br> contents, versioning, and availability of the Work Package during the development<br> of the resource.",
                 },
                 {
                     title: "Other",
                     description:
-                        "Any person or institution making a significant contribution to the development and/or maintenance of the resource, but whose contribution is not adequately described by any of the other values for contributorType",
+                        "Any person or institution making a significant contribution to the development<br> and/or maintenance of the resource, but whose contribution is not adequately<br> described by any of the other values for contributorType.",
                 },
             ],
         };
