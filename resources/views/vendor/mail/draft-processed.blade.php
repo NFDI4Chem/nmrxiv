@@ -32,7 +32,7 @@ You will recieve an email confirmation with further details once your project ha
 
 Follow our [documentation](https://docs.nmrxiv.org/) to learn more.
 
-If you do not recognise this action contact us at info@nmrxiv.org.
+If you do not recognise this action contact us at {{env('MAIL_FROM_ADDRESS')}}.
 
 Regards,
 
