@@ -149,7 +149,6 @@ class DraftController extends Controller
         $validation = $request->validate([
             'name' => ['required', 'string', 'max:255',  Rule::unique('drafts')
             ->where('owner_id', $input['owner_id'])->ignore($draft->id), $rule, ],
-            'description' => ['required', 'string', 'min:20'],
         ]);
 
         $draftFolders = FileSystemObject::with('children')
