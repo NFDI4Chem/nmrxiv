@@ -86,6 +86,20 @@
                                 "
                                 class="mb-3"
                             >
+                                <div class="py-2 mb-2 block">
+                                    <p class="font-bold text-xl">
+                                        {{
+                                            $page.props.selectedFileSystemObject
+                                                .name
+                                        }}
+                                        <a
+                                            :href="downloadURL"
+                                            class="ml-4 cursor-pointer relative inline-flex items-center px-4 py-1 rounded-full border border-gray-300 bg-white text-sm font-black text-dark hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 float-right"
+                                        >
+                                            Download
+                                        </a>
+                                    </p>
+                                </div>
                                 <ul
                                     role="list"
                                     class="mb-3 grid grid-cols-1 gap-5 sm:gap-6 sm:grid-cols-2 lg:grid-cols-4"
@@ -181,7 +195,24 @@ export default {
     data() {
         return {};
     },
-    computed: {},
+    computed: {
+        url() {
+            return String(this.$page.props.url);
+        },
+        downloadURL() {
+            return (
+                this.url +
+                "/" +
+                this.project.data.owner.username +
+                "/download/" +
+                this.project.data.slug +
+                "?key=" +
+                this.$page.props.selectedFileSystemObject.name +
+                "&uuid=" +
+                this.$page.props.selectedFileSystemObject.uuid
+            );
+        },
+    },
     mounted() {
         this.$page.props.selectedFileSystemObject = this.project.data.files;
         this.$page.props.selectedFolder = "/";
