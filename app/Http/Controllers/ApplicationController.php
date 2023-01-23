@@ -45,44 +45,56 @@ class ApplicationController extends Controller
                 $tab = 'dataset';
             }
 
-            if ($tab == 'info') {
-                return Inertia::render('Public/Project/Show', [
-                    'project' => (new ProjectResource($project))->lite(false, ['users', 'authors', 'citations']),
-                    'tab' => $tab,
-                ]);
-            } elseif ($tab == 'studies') {
-                return Inertia::render('Public/Project/Studies', [
-                    'project' => (new ProjectResource($project))->lite(false, []),
-                    'tab' => $tab,
-                ]);
-            } elseif ($tab == 'files') {
-                return Inertia::render('Public/Project/Files', [
-                    'project' => (new ProjectResource($project))->lite(false, ['files']),
-                    'tab' => $tab,
-                ]);
-            } elseif ($tab == 'license') {
-                return Inertia::render('Public/Project/License', [
-                    'project' => (new ProjectResource($project))->lite(false, ['license']),
-                    'tab' => $tab,
-                ]);
-            } elseif ($tab == 'study') {
-                return Inertia::render('Public/Project/Study', [
-                    'project' => (new ProjectResource($project))->lite(false, []),
-                    'tab' => $tab,
-                    'study' => (new StudyResource($study))->lite(false, ['tags', 'sample', 'datasets', 'molecules']),
-                ]);
-            } elseif ($tab == 'dataset') {
-                return Inertia::render('Public/Project/Dataset', [
-                    'project' => (new ProjectResource($project))->lite(false, []),
-                    'tab' => $tab,
-                    'study' => (new StudyResource($study))->lite(false, ['tags', 'sample', 'molecules']),
-                    'dataset' => (new DatasetResource($dataset)),
-                ]);
-            } else {
-                return Inertia::render('Public/Project/Show', [
-                    'project' => (new ProjectResource($project))->lite(false, ['users', 'authors', 'citations']),
-                    'tab' => 'info',
-                ]);
+            switch ($tab) {
+                case 'info':
+                    return Inertia::render('Public/Project/Show', [
+                        'project' => (new ProjectResource($project))->lite(false, ['users', 'authors', 'citations']),
+                        'tab' => $tab,
+                    ]);
+                    break;
+                case 'studies':
+                    return Inertia::render('Public/Project/Studies', [
+                        'project' => (new ProjectResource($project))->lite(false, []),
+                        'tab' => $tab,
+                    ]);
+                    break;
+                case 'files':
+                    return Inertia::render('Public/Project/Files', [
+                        'project' => (new ProjectResource($project))->lite(false, ['files']),
+                        'tab' => $tab,
+                    ]);
+                    break;
+                case 'license':
+                    return Inertia::render('Public/Project/License', [
+                        'project' => (new ProjectResource($project))->lite(false, ['license']),
+                        'tab' => $tab,
+                    ]);
+                    break;
+                case 'study':
+                    return Inertia::render('Public/Project/License', [
+                        'project' => (new ProjectResource($project))->lite(false, ['license']),
+                        'tab' => $tab,
+                    ]);
+                    break;
+                case 'dataset':
+                    return Inertia::render('Public/Project/Dataset', [
+                        'project' => (new ProjectResource($project))->lite(false, []),
+                        'tab' => $tab,
+                        'study' => (new StudyResource($study))->lite(false, ['tags', 'sample', 'molecules']),
+                        'dataset' => (new DatasetResource($dataset)),
+                    ]);
+                    break;
+                case 'download':
+                    return Inertia::render('Public/Project/Download', [
+                        'project' => (new ProjectResource($project))->lite(false, ['files']),
+                        'tab' => $tab,
+                    ]);
+                    break;
+                default:
+                    return Inertia::render('Public/Project/Show', [
+                        'project' => (new ProjectResource($project))->lite(false, ['users', 'authors', 'citations']),
+                        'tab' => 'info',
+                    ]);
             }
         } else {
             abort(404, 'Page not found');
