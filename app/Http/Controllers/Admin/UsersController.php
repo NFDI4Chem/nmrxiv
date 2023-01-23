@@ -199,4 +199,21 @@ class UsersController extends Controller
 
         return back(303)->with('status', 'profile-photo-deleted');
     }
+
+    /**
+     * Mark notification as read.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function markNotificationAsRead(User $user, Request $request)
+    {
+        $input = $request->all();
+        $id = $input['id'];
+        if ($id) {
+            $user->markNotificationAsRead($id);
+        }
+
+        return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('status', 'notification-markedAsRead');
+    }
 }

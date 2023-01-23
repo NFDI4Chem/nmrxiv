@@ -4,6 +4,8 @@ namespace App\Actions\Study;
 
 use App\Events\InvitingStudyMember;
 use App\Mail\StudyInvitation;
+use App\Models\User;
+use App\Notifications\StudyInviteNotification;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
@@ -38,6 +40,12 @@ class InviteStudyMember
         ]);
 
         Mail::to($email)->send(new StudyInvitation($invitation));
+
+        $invitedUser = User::where('email', $invitation->email)->first();
+
+        if ($invitedUser) {
+            $invitedUser->notify(new StudyInviteNotification($invitation));
+        }
     }
 
     /**

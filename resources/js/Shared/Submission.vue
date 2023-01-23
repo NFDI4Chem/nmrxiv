@@ -447,19 +447,20 @@
                                             class="hidden flex-shrink-0 w-80 bg-white border-r border-blue-gray-200 md:flex md:flex-col"
                                         >
                                             <div
-                                                class="border-gray-200 px-4 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 tracking-wider flex-shrink-0 border-b border-blue-gray-200 "
+                                                class="border-gray-200 px-4 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 tracking-wider flex-shrink-0 border-b border-blue-gray-200"
                                             >
                                                 STUDY ({{ studies.length }})
                                                 <div
                                                     class="float-right cursor-pointer tooltip"
                                                     @click="autoImport()"
                                                 >
-                                                        <ArrowDownOnSquareStackIcon
-                                                            class="w-5 h-5 mr-1 text-gray-600 hover:text-gray-500"
-                                                        />
+                                                    <ArrowDownOnSquareStackIcon
+                                                        class="w-5 h-5 mr-1 text-gray-600 hover:text-gray-500"
+                                                    />
                                                     <span
                                                         class="bg-gray-900 text-center text-white px-2 py-1 shadow-lg rounded-md tooltiptextbottom"
-                                                        >Click to auto import spectra</span
+                                                        >Click to auto import
+                                                        spectra</span
                                                     >
                                                 </div>
                                             </div>
@@ -1575,7 +1576,7 @@
                     <span v-if="!currentStep">
                         <Link
                             class="inline-flex items-center px-2.5 py-1 border border-gray-300 shadow-sm text-md font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                            :href='this.returnUrl'
+                            :href="this.returnUrl"
                         >
                             Cancel
                         </Link>
@@ -1595,7 +1596,7 @@
                             </jet-secondary-button>
                             <Link
                                 class="inline-flex items-center px-2.5 py-1 border border-gray-300 shadow-sm text-md font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                                :href='this.returnUrl'
+                                :href="this.returnUrl"
                             >
                                 Cancel
                             </Link>
@@ -1649,7 +1650,7 @@
                                 Back
                             </jet-button>
                             <Link
-                                :href='this.returnUrl'
+                                :href="this.returnUrl"
                                 class="inline-flex items-center px-2.5 py-1 border border-gray-300 shadow-sm text-md font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                             >
                                 Cancel
@@ -1873,7 +1874,7 @@ export default {
             confirmPublicAccess: false,
 
             studiesExist: false,
-            returnUrl: '/dashboard',
+            returnUrl: "/dashboard",
         };
     },
     computed: {
@@ -1920,7 +1921,10 @@ export default {
     mounted() {
         const initialise = (data) => {
             this.fetchDrafts().then((response) => {
-                this.returnUrl = this.url + this.returnUrl + (data.return_url ? data.return_url : "");
+                this.returnUrl =
+                    this.url +
+                    this.returnUrl +
+                    (data.return_url ? data.return_url : "");
                 this.drafts = response.data.drafts;
                 this.sharedDrafts = response.data.sharedDrafts;
                 if (data.draft_id) {

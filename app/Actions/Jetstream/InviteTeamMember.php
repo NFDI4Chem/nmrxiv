@@ -4,6 +4,8 @@ namespace App\Actions\Jetstream;
 
 use App\Events\InvitingTeamMember;
 use App\Mail\TeamInvitation;
+use App\Models\User;
+use App\Notifications\TeamInvitationNotification;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
@@ -35,9 +37,16 @@ class InviteTeamMember implements InvitesTeamMembers
             'email' => $email,
             'role' => $role,
             'invited_by' => $user->name,
+            'team_name' => $team->name,
         ]);
 
         Mail::to($email)->send(new TeamInvitation($invitation));
+
+        $invitedUser = User::where('email', $invitation->email)->first();
+
+        if ($invitedUser) {
+            $invitedUser->notify(new TeamInvitationNotification($invitation));
+        }
 
         return redirect()->route('dashboard')->with('success', 'Invitation sent successfully');
     }
