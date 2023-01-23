@@ -59,6 +59,8 @@ class HandleInertiaRequests extends Middleware
             'user.roles' => fn () => $user ?
                 $user->getRoleNames()
                 : null,
+            'user.notifications' => fn () => $user ?
+                $user->unreadNotifications : null,
             'twitter' => (env('TWITTER_CLIENT_ID') !== null && env('TWITTER_CLIENT_ID') !== ''),
             'github' => (env('GITHUB_CLIENT_ID') !== null && env('GITHUB_CLIENT_ID') !== ''),
             'orcid' => (env('ORCID_CLIENT_ID') !== null && env('ORCID_CLIENT_ID') !== ''),
