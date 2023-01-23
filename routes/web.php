@@ -99,6 +99,9 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::get('projects/status/{project}/queue', [ProjectController::class, 'status'])
             ->name('project.status');
 
+    Route::post('users/notification/{user}/markAsRead', [UsersController::class, 'markNotificationAsRead'])
+        ->name('users.markNotificationAsRead');
+
     Route::get('dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
 
     Route::group([

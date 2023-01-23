@@ -117,4 +117,9 @@ class User extends Authenticatable implements MustVerifyEmail
             $query->whereRole($role);
         });
     }
+
+    public function markNotificationAsRead($id)
+    {
+        $this->notifications->where('id', $id)->markAsRead();
+    }
 }
