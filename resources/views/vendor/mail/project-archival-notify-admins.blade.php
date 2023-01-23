@@ -18,4 +18,8 @@ The nmrXiv Team
 View Project
 @endcomponent
 
+@component('mail::subcopy')
+You are recieving this mail because you are part of the admin list in nmrXiv.
+@endcomponent
+
 @endcomponent
