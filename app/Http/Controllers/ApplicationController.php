@@ -84,12 +84,6 @@ class ApplicationController extends Controller
                         'dataset' => (new DatasetResource($dataset)),
                     ]);
                     break;
-                case 'download':
-                    return Inertia::render('Public/Project/Download', [
-                        'project' => (new ProjectResource($project))->lite(false, ['files']),
-                        'tab' => $tab,
-                    ]);
-                    break;
                 default:
                     return Inertia::render('Public/Project/Show', [
                         'project' => (new ProjectResource($project))->lite(false, ['users', 'authors', 'citations']),
