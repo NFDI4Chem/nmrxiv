@@ -56,10 +56,7 @@
                             'flex-1 bg-white flex flex-col justify-between',
                         ]"
                     >
-                        <div
-                            style="min-height: 168px;"
-                            class="flex-1 p-3"
-                        >
+                        <div style="min-height: 168px" class="flex-1 p-3">
                             <small
                                 v-if="project.identifier"
                                 class="text-gray-500"
@@ -105,9 +102,7 @@
                                         </p>
                                     </dd>
                                 </div>
-                                <p
-                                    class="text-xs text-gray-500 line-clamp-3"
-                                >
+                                <p class="text-xs text-gray-500 line-clamp-3">
                                     {{ project.description }}
                                 </p>
                             </Link>

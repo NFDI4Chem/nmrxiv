@@ -42,8 +42,8 @@ class PublishReleasedProjects extends Command
                 $release_date = Carbon::parse($project->release_date);
                 if ($release_date->isToday()) {
                     $publisher->publish($project);
+                    Notification::send($project->owner, new DraftProcessedNotification($project));
                 }
-                Notification::send($project->owner, new DraftProcessedNotification($project));
             }
         });
     }
