@@ -120,6 +120,40 @@
                 />
                 <jet-input-error :message="form.errors.username" class="mt-2" />
             </div>
+
+            <!-- Orcid Id -->
+            <div class="col-span-6 sm:col-span-4">
+                <jet-label for="orcid" value="ORCID iD" />
+                <div class="mt-1 flex rounded-md shadow-sm">
+                    <div
+                        class="relative flex items-stretch flex-grow focus-within:z-10"
+                    >
+                        <jet-input
+                            id="orcid"
+                            v-model="form.orcid_id"
+                            type="text"
+                            class="rounded-l-md focus:ring-indigo-200 focus:border-indigo-200 block w-full rounded-none sm:text-medium border-gray-300"
+                        />
+                    </div>
+                    <div
+                        class="tooltip -ml-px relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500 cursor-pointer"
+                    >
+                        <button type="button" class="" @click="findOrcidID()">
+                            <img
+                                alt="ORCID logo"
+                                src="https://orcid.org/assets/vectors/orcid.logo.icon.svg"
+                                width="20"
+                                height="20"
+                            />
+                        </button>
+                        <span
+                            class="bg-gray-900 text-center text-white px-2 py-1 shadow-lg rounded-md tooltiptextbottom"
+                            >Click to find ORCID iD</span
+                        >
+                    </div>
+                </div>
+                <jet-input-error :message="this.error.orcid" class="mt-2" />
+            </div>
         </template>
 
         <template #actions>
@@ -135,6 +169,11 @@
             </jet-button>
         </template>
     </jet-form-section>
+    <!-- Find ORCID iD Modal -->
+    <select-orcid-id
+        ref="selectOrcidIdElement"
+        v-model:selected="this.form.orcid_id"
+    />
 </template>
 
 <script>
@@ -145,6 +184,8 @@ import JetInputError from "@/Jetstream/InputError.vue";
 import JetLabel from "@/Jetstream/Label.vue";
 import JetActionMessage from "@/Jetstream/ActionMessage.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
+import SelectOrcidId from "@/Shared/SelectOrcidId.vue";
+import { ref } from "vue";
 
 export default {
     components: {
@@ -155,6 +196,7 @@ export default {
         JetInputError,
         JetLabel,
         JetSecondaryButton,
+        SelectOrcidId,
     },
 
     props: ["user"],
@@ -167,14 +209,32 @@ export default {
                 last_name: this.user.last_name,
                 email: this.user.email,
                 username: this.user.username,
+                orcid_id: this.user.orcid_id,
                 photo: null,
             }),
-
+            error: {},
             photoPreview: null,
+        };
+    },
+    setup() {
+        const selectOrcidIdElement = ref(null);
+        return {
+            selectOrcidIdElement,
         };
     },
 
     methods: {
+        findOrcidID() {
+            this.error.orcid = "";
+            if (this.form.first_name && this.form.last_name) {
+                this.selectOrcidIdElement.findOrcidID(
+                    this.form.first_name,
+                    this.form.last_name
+                );
+            } else {
+                this.error.orcid = "Please enter first name and last name";
+            }
+        },
         updateProfileInformation() {
             if (this.$refs.photo) {
                 this.form.photo = this.$refs.photo.files[0];
