@@ -17,7 +17,7 @@ Select the project you want to recover, and click Project settings > Restore.
 
 Follow our [documentation](https://docs.nmrxiv.org/) to learn more.
 
-If you do not recognize this action contact us at info@nmrxiv.org.
+If you do not recognize this action contact us at {{env('MAIL_FROM_ADDRESS')}}.
 
 Regards,
 

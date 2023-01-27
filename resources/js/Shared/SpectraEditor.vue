@@ -375,6 +375,10 @@ export default {
                 ? String(this.$page.props.nmriumURL + "?id=" + Math.random())
                 : "http://nmriumdev.nmrxiv.org?id=" + Math.random();
         },
+
+        mailFromAddress() {
+            return String(this.$page.props.mailFromAddress);
+        },
     },
     methods: {
         registerEvents() {
@@ -574,7 +578,7 @@ export default {
                         this.updateLoadingStatus(false);
                         this.infoLog("Error saving spectra info");
                         console.error(
-                            "Error saving the nmrium info. Please contact us at info@nmrxiv.org if the error persist."
+                            "Error saving the nmrium info. Please contact us at {{mailFromAddress}} if the error persist."
                         );
                         this.autoSaving = false;
                     });
