@@ -253,10 +253,9 @@
                                                     >Chat bubble is on the
                                                     bottom left corner or email
                                                     us at
-                                                    <a
-                                                        href="mailto:info@nmrxiv.org"
-                                                        >info@nmrxiv.org</a
-                                                    ></small
+                                                    <a :href="mailTo"
+                                                        >{{ mailFromAddress }}
+                                                    </a></small
                                                 >
                                             </p>
                                             <div class="mt-8">
@@ -547,7 +546,6 @@ import {
     TagIcon,
 } from "@heroicons/vue/24/outline";
 import axios from "axios";
-import { Inertia } from "@inertiajs/inertia";
 
 export default {
     components: {
@@ -585,6 +583,14 @@ export default {
     computed: {
         currentStep() {
             return this.steps.find((s) => s.status == "current").id;
+        },
+
+        mailFromAddress() {
+            return String(this.$page.props.mailFromAddress);
+        },
+
+        mailTo() {
+            return "mailto:" + String(this.$page.props.mailFromAddress);
         },
     },
     mounted() {
