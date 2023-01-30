@@ -262,7 +262,7 @@ class DraftController extends Controller
                     $study = Study::create([
                         'name' => $folder->name,
                         'slug' => Str::slug($folder->name, '-'),
-                        'description' => 'This study contains NMR spectra obtained for the sample: '.$folder->name,
+                        'description' => '',
                         'url' => Str::random(40),
                         'uuid' => Str::uuid(),
                         'team_id' => $project->team_id,
@@ -340,7 +340,7 @@ class DraftController extends Controller
                     $study = Study::create([
                         'name' => 'Untitled',
                         'slug' => Str::slug('Untitled', '-'),
-                        'description' => 'Untitled study for the dataset - '.$folder->name,
+                        'description' => '',
                         'url' => Str::random(40),
                         'uuid' => Str::uuid(),
                         'team_id' => $project->team_id,
@@ -371,7 +371,7 @@ class DraftController extends Controller
                         $ds = Dataset::create([
                             'name' => $folder->name,
                             'slug' => Str::slug($folder->name, '-'),
-                            'description' => $folder->name,
+                            'description' => '',
                             'url' => Str::random(40),
                             'uuid' => Str::uuid(),
                             'team_id' => $project->team_id,
