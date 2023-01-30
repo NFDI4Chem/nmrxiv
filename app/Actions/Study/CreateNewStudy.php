@@ -25,7 +25,6 @@ class CreateNewStudy
         ];
         Validator::make($input, [
             'name' => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string', 'min:20'],
             'project_id' => ['required'],
             'license' => ['required_if:is_public,"true"'],
         ], $errorMessages)->validate();
