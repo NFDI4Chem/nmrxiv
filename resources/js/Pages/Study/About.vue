@@ -693,11 +693,13 @@ export default {
             if (this.smiles && this.smiles != "") {
                 this.editor.setSmiles(this.smiles);
             }
-
-            if (this.editor.getSmiles() == "") {
+            try {
+                let mol = OCL.Molecule.fromSmiles(this.smiles);
+            } catch (e) {
                 this.errorMessage = "The entered SMILES is not valid.";
             }
         },
+
         getSVGString(molecule) {
             if (molecule.MOL) {
                 let mol = OCL.Molecule.fromMolfile(
