@@ -68,6 +68,35 @@
                                             />
                                         </div>
                                     </div>
+
+                                    <div class="sm:col-span-2">
+                                        <label
+                                            for="given-name"
+                                            class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
+                                        >
+                                            First Name
+                                        </label>
+                                        <div class="mt-1">
+                                            <input
+                                                id="given-name"
+                                                v-model="form.given_name"
+                                                type="text"
+                                                name="given-name"
+                                                :class="[
+                                                    isEdit
+                                                        ? 'shadow-sm focus:ring-red-500 focus:border-red-500 block w-full sm:text-sm border-red-500 rounded-md bg-gray-100'
+                                                        : '',
+                                                    'shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md',
+                                                ]"
+                                            />
+                                        </div>
+                                        <jet-input-error
+                                            :message="
+                                                authorsForm.errors.given_name
+                                            "
+                                            class="mt-2"
+                                        />
+                                    </div>
                                     <div class="sm:col-span-2">
                                         <label
                                             for="family-name"
@@ -98,34 +127,6 @@
                                         />
                                     </div>
 
-                                    <div class="sm:col-span-2">
-                                        <label
-                                            for="given-name"
-                                            class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
-                                        >
-                                            Given Name
-                                        </label>
-                                        <div class="mt-1">
-                                            <input
-                                                id="given-name"
-                                                v-model="form.given_name"
-                                                type="text"
-                                                name="given-name"
-                                                :class="[
-                                                    isEdit
-                                                        ? 'shadow-sm focus:ring-red-500 focus:border-red-500 block w-full sm:text-sm border-red-500 rounded-md bg-gray-100'
-                                                        : '',
-                                                    'shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md',
-                                                ]"
-                                            />
-                                        </div>
-                                        <jet-input-error
-                                            :message="
-                                                authorsForm.errors.given_name
-                                            "
-                                            class="mt-2"
-                                        />
-                                    </div>
                                     <div class="sm:col-span-3">
                                         <label
                                             for="email"
@@ -439,7 +440,9 @@
                     style="height: 60vh"
                     class="sm:rounded-md overflow-y-scroll"
                 >
-                <p class="text-xs font-large text-red-800 mb-1">*Click and drag authors to sort order. </p>
+                    <p class="text-xs font-large text-red-800 mb-1">
+                        *Click and drag authors to sort order.
+                    </p>
                     <draggable
                         v-model="this.authors"
                         @start="drag = true"
@@ -465,8 +468,8 @@
                                                     class="text-sm font-medium text-teal-900"
                                                 >
                                                     {{ element.title }}
-                                                    {{ element.family_name }}
                                                     {{ element.given_name }}
+                                                    {{ element.family_name }}
                                                 </p>
                                                 <button
                                                     class="ml-2 flex flex-shrink-0"
@@ -977,8 +980,8 @@ export default {
             let authorsList = [];
             authors.forEach((author) => {
                 authorsList.push({
-                    family_name: author.firstName,
-                    given_name: author.lastName,
+                    family_name: author.lastName,
+                    given_name: author.firstName,
                     orcid_id:
                         author.authorId && author.authorId.type == "ORCID"
                             ? author.authorId.value
