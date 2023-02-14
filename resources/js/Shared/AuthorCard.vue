@@ -15,8 +15,8 @@
                     <div class="mb-1 flex items-center justify-between">
                         <p class="text-sm font-medium text-teal-900">
                             {{ author.title }}
-                            {{ author.family_name }}
                             {{ author.given_name }}
+                            {{ author.family_name }}
                         </p>
                         <button
                             v-if="author.pivot && author.pivot.contributor_type"
