@@ -10,7 +10,7 @@ return [
     'beta' => [
         'project' => [
             'title' => 'required',
-            'description' => 'required',
+            'description' => 'required|min:20',
             'keywords' => 'required',
             'citations' => 'array|min:1',
             'authors' => 'required|array|min:1',
@@ -19,7 +19,7 @@ return [
         ],
         'study' => [
             'title' => 'required',
-            'description' => 'required',
+            'description' => '',
             'keywords' => 'array|min:1',
             'composition' => 'array|min:1',
             'sample' => 'required',

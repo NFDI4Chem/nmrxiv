@@ -149,7 +149,6 @@ class DraftController extends Controller
         $validation = $request->validate([
             'name' => ['required', 'string', 'max:255',  Rule::unique('drafts')
             ->where('owner_id', $input['owner_id'])->ignore($draft->id), $rule, ],
-            'description' => ['required', 'string', 'min:20'],
         ]);
 
         $draftFolders = FileSystemObject::with('children')
@@ -263,7 +262,7 @@ class DraftController extends Controller
                     $study = Study::create([
                         'name' => $folder->name,
                         'slug' => Str::slug($folder->name, '-'),
-                        'description' => $folder->name,
+                        'description' => '',
                         'url' => Str::random(40),
                         'uuid' => Str::uuid(),
                         'team_id' => $project->team_id,
@@ -341,7 +340,7 @@ class DraftController extends Controller
                     $study = Study::create([
                         'name' => 'Untitled',
                         'slug' => Str::slug('Untitled', '-'),
-                        'description' => 'Untitled study for the dataset - '.$folder->name,
+                        'description' => '',
                         'url' => Str::random(40),
                         'uuid' => Str::uuid(),
                         'team_id' => $project->team_id,
@@ -372,7 +371,7 @@ class DraftController extends Controller
                         $ds = Dataset::create([
                             'name' => $folder->name,
                             'slug' => Str::slug($folder->name, '-'),
-                            'description' => $folder->name,
+                            'description' => '',
                             'url' => Str::random(40),
                             'uuid' => Str::uuid(),
                             'team_id' => $project->team_id,

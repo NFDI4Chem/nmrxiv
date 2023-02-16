@@ -354,14 +354,14 @@
                                     >
                                         <label
                                             for="description"
-                                            class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
+                                            class="block text-sm font-medium text-gray-700"
                                         >
                                             <span
                                                 @click="
                                                     draftForm.description =
                                                         'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore'
                                                 "
-                                                >Project Description</span
+                                                >Project Description (Optional)</span
                                             >
                                         </label>
                                         <div class="mt-1">
@@ -389,7 +389,7 @@
                                             for="description"
                                             class="block text-sm font-medium text-gray-700"
                                         >
-                                            Keywords
+                                            Keywords (Optional)
                                         </label>
                                         <div>
                                             <vue-tags-input
