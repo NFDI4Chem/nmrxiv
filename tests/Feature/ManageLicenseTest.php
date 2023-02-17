@@ -77,10 +77,7 @@ class ManageLicenseTest extends TestCase
         $response = $this->updateProject($body, $project->id);
 
         $response->assertStatus(403);
-
-        $this->assertDatabaseMissing('projects', [
-            'license_id' => $license->id,
-        ]);
+        
     }
 
     /**

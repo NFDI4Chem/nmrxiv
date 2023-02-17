@@ -2,13 +2,15 @@
 
 namespace Tests\Feature;
 
-use App\Models\Citation;
-use App\Models\Project;
-use App\Models\User;
 use Tests\TestCase;
+use App\Models\User;
+use App\Models\Project;
+use App\Models\Citation;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class ManageCitationsTest extends TestCase
 {
+    use RefreshDatabase;
     /**
      * Test if a citation can be updated.
      *
