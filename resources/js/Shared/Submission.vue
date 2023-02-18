@@ -361,7 +361,8 @@
                                                     draftForm.description =
                                                         'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore'
                                                 "
-                                                >Project Description (Optional)</span
+                                                >Project Description
+                                                (Optional)</span
                                             >
                                         </label>
                                         <div class="mt-1">
@@ -449,7 +450,8 @@
                                             <div
                                                 class="border-gray-200 px-4 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 tracking-wider flex-shrink-0 border-b border-blue-gray-200"
                                             >
-                                                STUDY ({{ studies.length }})
+                                                Studies (total number:
+                                                {{ studies.length }})
                                                 <div
                                                     class="float-right cursor-pointer tooltip"
                                                     @click="autoImport()"
