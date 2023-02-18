@@ -2207,11 +2207,12 @@ export default {
 
         loadSmiles() {
             if (this.smiles && this.smiles != "") {
-                this.editor.setSmiles(this.smiles);
-            }
-
-            if (this.editor.getSmiles() == "") {
-                this.errorMessage = "The entered SMILES is not valid.";
+                try {
+                    let mol = OCL.Molecule.fromSmiles(this.smiles);
+                    this.editor.setSmiles(this.smiles);
+                } catch (e) {
+                    this.errorMessage = "The entered SMILES is not valid.";
+                }
             }
         },
 
