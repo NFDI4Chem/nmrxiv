@@ -246,7 +246,7 @@ export default {
                 first_name: this.user ? this.user.first_name : "",
                 last_name: this.user ? this.user.last_name : "",
                 email: this.user ? this.user.email : "",
-                username:  this.user ? this.user.username : "",
+                username: this.user ? this.user.username : "",
                 orcid_id: this.user ? this.user.orcid_id : "",
                 password: null,
                 password_confirmation: null,
