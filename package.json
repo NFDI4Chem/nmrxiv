@@ -47,6 +47,7 @@
         "marked": "^4.0.4",
         "mitt": "^3.0.0",
         "openchemlib": "^7.4.3",
+        "pluralize": "^8.0.0",
         "popper.js": "^1.16.1",
         "vue-instantsearch": "^4.3.3",
         "vue-simple-context-menu": "^4.0.4",

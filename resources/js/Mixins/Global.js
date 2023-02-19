@@ -1,5 +1,6 @@
 import * as marked from "marked";
 import { copyText } from "vue3-clipboard";
+import pluralize from "pluralize";
 
 export default {
     methods: {
@@ -108,6 +109,9 @@ export default {
         },
         isEmpty(obj) {
             return Object.keys(obj).length === 0;
+        },
+        pluralize(value, number) {
+            return pluralize(value, number);
         },
     },
 
