@@ -17,6 +17,7 @@ env:
 
 jobs:
   php-unit-test:
+    name: Run test
     runs-on: ubuntu-latest
     container:
       image: kirschbaumdevelopment/laravel-test-runner:8.2
@@ -64,7 +65,7 @@ jobs:
 
 
   setup-build-publish-deploy:
-    name: Deploy to Dev
+    name: Build & deploy to development
     if: github.ref == 'refs/heads/development'
     runs-on: ubuntu-latest
     needs: php-unit-test
