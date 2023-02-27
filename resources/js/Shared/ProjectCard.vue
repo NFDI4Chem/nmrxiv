@@ -56,10 +56,7 @@
                             'flex-1 bg-white flex flex-col justify-between',
                         ]"
                     >
-                        <div
-                            style="min-height: 168px; max-height: 168px"
-                            class="flex-1 p-3"
-                        >
+                        <div style="min-height: 168px" class="flex-1 p-3">
                             <small
                                 v-if="project.identifier"
                                 class="text-gray-500"
@@ -75,9 +72,37 @@
                                 >
                                     {{ project.name }}
                                 </p>
-                                <p
-                                    class="my-2 text-sm text-gray-500 line-clamp-3"
-                                >
+                                <div>
+                                    <dd
+                                        class="text-xs text-gray-900 space-y-5 mt-1"
+                                    >
+                                        <p>
+                                            <span
+                                                v-for="tag in project.tags"
+                                                :key="tag.id"
+                                                class="mr-1"
+                                            >
+                                                <span
+                                                    class="mb-1 inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-indigo-100 text-indigo-800"
+                                                >
+                                                    <svg
+                                                        class="-ml-0.5 mr-1.5 h-2 w-2 text-indigo-400"
+                                                        fill="currentColor"
+                                                        viewBox="0 0 8 8"
+                                                    >
+                                                        <circle
+                                                            cx="4"
+                                                            cy="4"
+                                                            r="3"
+                                                        />
+                                                    </svg>
+                                                    {{ tag.name["en"] }}
+                                                </span>
+                                            </span>
+                                        </p>
+                                    </dd>
+                                </div>
+                                <p class="text-xs text-gray-500 line-clamp-3">
                                     {{ project.description }}
                                 </p>
                             </Link>

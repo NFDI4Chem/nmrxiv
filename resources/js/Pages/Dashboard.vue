@@ -283,7 +283,7 @@
             <div class="mt-6 flex">
                 <a
                     id="tour-step-get-in-touch"
-                    href="mailto:info@nmrxiv.org"
+                    :href="mailTo"
                     class="text-sm font-medium text-indigo-600 hover:text-indigo-500"
                     >Or get in touch<span aria-hidden="true"> &rarr;</span></a
                 >
@@ -302,11 +302,15 @@ import { useMagicKeys } from "@vueuse/core";
 import { getCurrentInstance } from "vue";
 import { watchEffect } from "vue";
 import { Link } from "@inertiajs/inertia-vue3";
+import { Inertia } from "@inertiajs/inertia";
+import { computed } from "vue";
+
 const { meta, u } = useMagicKeys();
 
 export default {
     components: {
         AppLayout,
+        computed,
         TeamProjects,
         Create,
         Onboarding,
@@ -332,6 +336,16 @@ export default {
         return {
             openDatasetCreateDialog,
         };
+    },
+
+    computed: {
+        mailFromAddress() {
+            return String(this.$page.props.mailFromAddress);
+        },
+
+        mailTo() {
+            return "mailto:" + String(this.$page.props.mailFromAddress);
+        },
     },
 
     mounted() {

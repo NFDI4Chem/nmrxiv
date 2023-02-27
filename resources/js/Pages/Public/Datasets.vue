@@ -1,5 +1,5 @@
 <template>
-    <app-layout title="Datasets">
+    <app-layout title="Spectra">
         <template #header>
             <div class="bg-white mb-0">
                 <div class="px-8">
@@ -8,16 +8,16 @@
                             <div
                                 class="text-4xl mb-3 font-bold tracking-tight text-gray-900"
                             >
-                                Datasets
+                                Spectra
                             </div>
                             <p>
-                                Explore, analyze, and share raw spectral data
-                                and assignements. Learn more about
+                                Explore, analyze, and share raw spectra and
+                                assignements. Learn more about
                                 <a
                                     class="text-teal-900"
                                     href="https://docs.nmrxiv.org/docs/introduction/intro"
                                     target="_blank"
-                                    >datasets</a
+                                    >spectra</a
                                 >.
                             </p>
                         </div>
@@ -47,7 +47,7 @@
         <div class="min-h-[calc(100vh-500px)] px-12 mb-24 mx-auto">
             <div class="relative border-gray-200 pt-4">
                 <div class="mx-auto flex items-center justify-between">
-                    <Menu as="div" class="relative inline-block text-left">
+                    <Menu as="div" class="relative inline-block text-left z-10">
                         <div>
                             <MenuButton
                                 class="group inline-flex justify-center text-sm font-medium text-gray-700 hover:text-gray-900"
@@ -319,7 +319,7 @@ export default {
         form: {
             deep: true,
             handler: throttle(function () {
-                this.$inertia.get("/datasets", pickBy(this.form), {
+                this.$inertia.get("/spectra", pickBy(this.form), {
                     preserveState: true,
                 });
             }, 150),

@@ -41,6 +41,7 @@ class UsersController extends Controller
                         'profile_photo_url' => $user->profile_photo_url,
                         'verified_at' => $user->email_verified_at,
                         'role' => $user->getRoleNames(),
+                        'orcid_id' => $user->orcid_id,
                     ];
                 }),
             'roles' => Role::orderBy('name')
@@ -95,7 +96,10 @@ class UsersController extends Controller
                 'first_name' => $user->first_name,
                 'last_name' => $user->last_name,
                 'email' => $user->email,
+                'username' => $user->username,
                 'profile_photo_url' => $user->profile_photo_url,
+                'orcid_id' => $user->orcid_id,
+
             ],
         ]);
     }
@@ -194,5 +198,22 @@ class UsersController extends Controller
         $user->deleteProfilePhoto();
 
         return back(303)->with('status', 'profile-photo-deleted');
+    }
+
+    /**
+     * Mark notification as read.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function markNotificationAsRead(User $user, Request $request)
+    {
+        $input = $request->all();
+        $id = $input['id'];
+        if ($id) {
+            $user->markNotificationAsRead($id);
+        }
+
+        return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('status', 'notification-markedAsRead');
     }
 }

@@ -18,7 +18,7 @@
             <button
                 type="button"
                 v-else
-                @click="(displayAddAuthorForms = false), (isEdit = false)"
+                @click="onBack"
                 class="inline-flex float-right items-center rounded-md border border-transparent bg-gray-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
             >
                 <ArrowSmallRightIcon class="w-5 h-5 mr-1 text-white" />
@@ -159,7 +159,7 @@
                                             for="orcid"
                                             class="block text-sm font-medium text-gray-700"
                                         >
-                                            ORCID ID
+                                            ORCID iD
                                         </label>
                                         <div class="mt-1">
                                             <input
@@ -301,7 +301,7 @@
                                             for="name"
                                             class="block text-sm font-medium text-gray-700"
                                         >
-                                            DOI or ORCID ID
+                                            DOI or ORCID iD
                                         </label>
                                         <div
                                             class="mt-1 flex rounded-md shadow-sm"
@@ -312,6 +312,7 @@
                                                 type="text"
                                                 name="name"
                                                 autocomplete="off"
+                                                placeholder="DOI or ORCID iD e.g. 10.1186/s13321-022-00614-7 or 0000-0001-6033-2910"
                                                 class="flex-1 focus:ring-teal-500 focus:border-teal-500 block w-full min-w-0 rounded sm:text-sm border-gray-300"
                                             />
                                         </div>
@@ -372,12 +373,15 @@
                                                 <label
                                                     for="items"
                                                     class="font-medium text-teal-900"
-                                                    >{{ author.firstName }}
-                                                    {{ author.lastName }}
+                                                    >{{ author.lastName }}
+                                                    {{ author.firstName }}
                                                 </label>
                                                 <p
                                                     v-if="
-                                                        author.authorAffiliationDetailsList
+                                                        author.authorAffiliationDetailsList &&
+                                                        author
+                                                            .authorAffiliationDetailsList
+                                                            .authorAffiliation[0]
                                                     "
                                                     id="items-description"
                                                     class="text-xs font-medium text-gray-900"
@@ -397,6 +401,9 @@
                                                     "
                                                     class="text-xs leading-6 font-medium text-teal-900"
                                                 >
+                                                    <b class="text-gray-500"
+                                                        >ORCID iD:</b
+                                                    >
                                                     {{ author.authorId.value }}
                                                 </div>
                                             </div>
@@ -544,7 +551,7 @@
                                                     class="text-xs font-medium text-teal-900"
                                                 >
                                                     <b class="text-gray-500"
-                                                        >ORCID:</b
+                                                        >ORCID iD:</b
                                                     >
                                                     {{ element.orcid_id }}
                                                 </p>
@@ -575,21 +582,7 @@
                 v-if="authors.length == 0 && !displayAddAuthorForms"
             >
                 <div class="text-center">
-                    <svg
-                        class="mx-auto h-12 w-12 text-gray-400"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        aria-hidden="true"
-                    >
-                        <path
-                            vector-effect="non-scaling-stroke"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"
-                        />
-                    </svg>
+                    <FolderPlusIcon class="mx-auto h-12 w-12 text-gray-400" />
                     <h3 class="mt-2 text-sm font-medium text-gray-900">
                         No Authors Listed
                     </h3>
@@ -603,17 +596,7 @@
                             class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                         >
                             <!-- Heroicon name: mini/plus -->
-                            <svg
-                                class="-ml-1 mr-2 h-5 w-5"
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 20 20"
-                                fill="currentColor"
-                                aria-hidden="true"
-                            >
-                                <path
-                                    d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z"
-                                />
-                            </svg>
+                            <PlusIcon class="w-5 h-5 mr-1 text-white" />
                             Add Author
                         </button>
                     </div>
@@ -653,7 +636,7 @@
         </template>
         <template #footer>
             <div class="flex">
-                <jet-secondary-button class="float-left" @click="onClose">
+                <jet-secondary-button class="float-left" @click="onClose()">
                     Close
                 </jet-secondary-button>
             </div>
@@ -705,6 +688,7 @@ import {
     PencilIcon,
     ArrowSmallRightIcon,
     PlusIcon,
+    FolderPlusIcon,
 } from "@heroicons/vue/24/solid";
 import JetInputError from "@/Jetstream/InputError.vue";
 import LoadingButton from "@/Shared/LoadingButton.vue";
@@ -721,6 +705,7 @@ export default {
         JetButton,
         PencilIcon,
         ArrowSmallRightIcon,
+        FolderPlusIcon,
         PlusIcon,
         TrashIcon,
         JetInputError,
@@ -767,102 +752,97 @@ export default {
                 {
                     title: "Researcher",
                     description:
-                        "A person involved in analysing data or the results of an experiment or formal study. May indicate an <br> intern or assistant to one of the authors who helped with research but who was not so “key” as to be listed as an author.",
+                        "A person involved in analysing data or the results of an experiment or formal study.<br> May indicate an intern or assistant to one of the authors who helped with research<br> but who was not so “key” as to be listed as an author.",
                 },
                 {
                     title: "ContactPerson",
                     description:
-                        "Person with knowledge of how to access, troubleshoot, or otherwise field <br> issues related to the resource",
+                        "Person with knowledge of how to access, troubleshoot, or otherwise field issues<br> related to the resource.",
                 },
                 {
                     title: "DataCollector",
                     description:
-                        "Person/institution responsible for finding or gathering/collecting data under the <br> guidelines of the author(s) or Principal Investigator(PI)",
+                        "Person/institution responsible for finding or gathering/collecting data under the <br> guidelines of the author(s) or Principal Investigator(PI).",
                 },
                 {
                     title: "DataCurator",
                     description:
-                        "Person tasked with reviewing, enhancing, cleaning, or standardizing metadata and the associated data <br> submitted for storage, use, and maintenance within a data centre or repository",
+                        "Person tasked with reviewing, enhancing, cleaning, or standardizing metadata and<br> the associated data submitted for storage, use, and maintenance within a data centre<br> or repository.",
                 },
                 {
                     title: "DataManager",
                     description:
-                        "Person (or organisation with a staff of data managers, such as a data centre) <br> responsible for maintaining the finished resource",
+                        "Person (or organisation with a staff of data managers, such as a data centre) <br> responsible for maintaining the finished resource.",
                 },
                 {
                     title: "Distributor",
                     description:
-                        "Institution tasked with responsibility to generate/disseminate copies <br> of the resource in either electronic or print form",
+                        "Institution tasked with responsibility to generate/disseminate copies of the resource<br> in either electronic or print form.",
                 },
                 {
                     title: "Editor",
                     description:
-                        "A person who oversees the details related to the publication format <br> of the resource ",
+                        "A person who oversees the details related to the publication format of the resource.",
                 },
                 {
                     title: "HostingInstitution",
                     description:
-                        "Typically, the organisation allowing the resource to be available on the internet through <br> the provision of its hardware/software/operating support",
+                        "Typically, the organisation allowing the resource to be available on the internet<br> through the provision of its hardware/software/operating support.",
                 },
                 {
                     title: "Producer",
                     description:
-                        "Typically, a person or organisation responsible for the artistry and form <br> of a media product",
+                        "Typically, a person or organisation responsible for the artistry and form of a media<br> product.",
                 },
                 {
                     title: "ProjectLeader",
                     description:
-                        "Person officially designated as head of project team or subproject team instrumental <br> in the work necessary to development of the resource",
+                        "Person officially designated as head of project team or subproject team<br> instrumental in the work necessary to development of the resource.",
                 },
                 {
                     title: "ProjectManager",
                     description:
-                        "Person on the membership list of a designated project/project team",
+                        "Person on the membership list of a designated project/project team.",
                 },
                 {
                     title: "RegistrationAgency",
                     description:
-                        "Institution/organisation officially appointed by a Registration Authority to handle specific <br> tasks within a defined area of responsibility",
+                        "Institution/organisation officially appointed by a Registration Authority to handle<br> specific tasks within a defined area of responsibility.",
                 },
                 {
                     title: "RelatedPerson",
                     description:
-                        "A person without a specifically defined role in the development of the resource, but who is <br> someone the author wishes to recognize",
-                },
-                {
-                    title: "Researcher",
-                    description:
-                        "A person involved in analysing data or the results of an experiment or formal study. May indicate an intern or assistant to one of the authors who helped with research but who was not so “key” as to be listed as an author.",
+                        "A person without a specifically defined role in the development of the resource,<br> but who is someone the author wishes to recognize.",
                 },
                 {
                     title: "ResearchGroup",
                     description:
-                        "Typically refers to a group of individuals with a lab, department, or division that has a specifically <br> defined focus of activity.",
+                        "Typically refers to a group of individuals with a lab, department, or division that<br> has a specifically defined focus of activity.",
                 },
                 {
                     title: "RightsHolder",
                     description:
-                        "Person or institution owning or managing property rights, including intellectual property rights over the resource",
+                        "Person or institution owning or managing property rights, including intellectual<br> property rights over the resource.",
                 },
                 {
                     title: "Sponsor",
                     description:
-                        "Person or organisation that issued a contract or under the auspices of which a work has been written,<br> printed, published, developed, etc",
+                        "Person or organisation that issued a contract or under the auspices of which<br> a work has been written,<br> printed, published, developed, etc.",
                 },
                 {
                     title: "Supervisor",
                     description:
-                        "Designated administrator over one or more groups/teams working to produce a resource, or over one or <br> more steps of a development process",
+                        "Designated administrator over one or more groups/teams working to produce<br> a resource, or over one or more steps of a development process.",
                 },
                 {
                     title: "WorkPackageLeader",
                     description:
-                        "A Work Package is a recognized data product, not all of which is included in publication. The package, instead, may include notes, discarded documents,<br> etc.The Work Package Leader is responsible for ensuring the comprehensive contents, versioning, and availability of the Work Package during the development of the resource. ",
+                        "A Work Package is a recognized data product, not all of which is included in<br> publication. The package, instead, may include notes, discarded documents,<br> etc.The Work Package Leader is responsible for ensuring the comprehensive<br> contents, versioning, and availability of the Work Package during the development<br> of the resource.",
                 },
                 {
                     title: "Other",
                     description:
-                        "Any person or institution making a significant contribution to the development and/or maintenance of the resource, but whose contribution is not adequately described by any of the other values for contributorType",
+                        "Any person or institution making a significant contribution to the development<br> and/or maintenance of the resource, but whose contribution is not adequately<br> described by any of the other values for contributorType.",
                 },
             ],
         };
@@ -986,11 +966,12 @@ export default {
                         author.authorId && author.authorId.type == "ORCID"
                             ? author.authorId.value
                             : "",
-                    affiliation: author.authorAffiliationDetailsList
-                        .authorAffiliation[0].affiliation
-                        ? author.authorAffiliationDetailsList
-                              .authorAffiliation[0].affiliation
-                        : "",
+                    affiliation:
+                        author.authorAffiliationDetailsList &&
+                        author.authorAffiliationDetailsList.authorAffiliation[0]
+                            ? author.authorAffiliationDetailsList
+                                  .authorAffiliation[0].affiliation
+                            : "",
                 });
             });
             return authorsList;
@@ -1078,7 +1059,6 @@ export default {
             this.authorsForm.post(route("author.save", this.project.id), {
                 preserveScroll: true,
                 onSuccess: () => {
-                    Inertia.reload({ only: ["project"] });
                     this.loadInitial();
                     this.form.reset();
                     this.form.contributor_type = {};
@@ -1167,6 +1147,17 @@ export default {
                 this.form.reset(),
                 (this.form.contributor_type = {});
             this.form.contributor_type = this.contributorType[0];
+        },
+        onBack() {
+            if (this.selectedAuthor) {
+                this.authors.splice(
+                    this.selectedAuthor.pivot.sort_order,
+                    0,
+                    this.selectedAuthor
+                );
+            }
+            this.displayAddAuthorForms = false;
+            this.isEdit = false;
         },
     },
 };

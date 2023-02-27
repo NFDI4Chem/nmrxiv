@@ -10,7 +10,7 @@
                     </div>
                     <div class="text-sm float-left">
                         <span class="text-gray-400 pt-2">
-                            https://doi.org/{{ study.data.doi }}
+                            <img :src="'badge/doi/' + study.data.identifier" />
                         </span>
                     </div>
                     <div class="float-right">
@@ -295,7 +295,7 @@
                             <span
                                 class="pr-3 text-md bg-white font-medium text-gray-400"
                             >
-                                Datasets
+                                Spectra
                             </span>
                         </div>
                     </div>
@@ -328,7 +328,12 @@
                         </select>
                         <div v-if="selectedDataset" class="text-sm my-2">
                             <span class="text-gray-400 pt-2">
-                                DOI: https://doi.org/{{ selectedDataset.doi }}
+                                <img
+                                    :src="
+                                        'badge/doi/' +
+                                        selectedDataset.identifier
+                                    "
+                                />
                             </span>
                         </div>
                     </div>
@@ -398,8 +403,6 @@ export default {
                     "\n  " + molecule.MOL.replaceAll('"', "")
                 );
                 return mol.toSVG(200, 200);
-            } else {
-                console.log(molecule);
             }
         },
     },

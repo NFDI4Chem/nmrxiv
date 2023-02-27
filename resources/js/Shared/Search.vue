@@ -1,7 +1,7 @@
 <template>
     <button
         type="button"
-        class="hidden -ml-4 sm:flex items-center w-96 text-left space-x-3 px-4 h-12 bg-white ring-1 ring-slate-900/10 hover:ring-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm rounded-lg text-slate-400 dark:bg-slate-800 dark:ring-0 dark:text-slate-300 dark:highlight-white/5 dark:hover:bg-slate-700"
+        class="hidden -ml-4 sm:flex items-center w-96 text-left space-x-3 px-4 h-12 bg-white ring-1 ring-slate-900/10 hover:ring-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-sm rounded-lg text-slate-400"
         @click="open = true"
     >
         <svg
@@ -188,12 +188,10 @@
                                                                         <Link
                                                                             class="w-full"
                                                                             :href="
-                                                                                '/projects/' +
-                                                                                hit
-                                                                                    .owner
-                                                                                    .username +
-                                                                                '/' +
-                                                                                hit.slug
+                                                                                hit.public_url
+                                                                            "
+                                                                            @click="
+                                                                                open = false
                                                                             "
                                                                         >
                                                                             <FolderIcon
@@ -339,29 +337,6 @@ import {
     TransitionRoot,
 } from "@headlessui/vue";
 
-const projects = [
-    //   { id: 1, name: "Workflow Inc. / Website Redesign", url: "#" },
-    // More projects...
-];
-const recent = [];
-// [projects[0]];
-const quickActions = [
-    {
-        name: "Ask a question...",
-        icon: DocumentPlusIcon,
-        shortcut: "N",
-        url: "mailto:info@nmrxiv.org",
-    },
-    {
-        name: "Learn Spectral analysis...",
-        icon: TagIcon,
-        shortcut: "F",
-        url: "https://docs.nmrxiv.org",
-    },
-    //   { name: "Add hashtag...", icon: HashtagIcon, shortcut: "H", url: "#" },
-    //   { name: "Add label...", icon: TagIcon, shortcut: "L", url: "#" },
-];
-
 const { meta, k } = useMagicKeys();
 const open = ref(false);
 
@@ -390,8 +365,6 @@ export default {
 
         return {
             open,
-            recent,
-            quickActions,
             onSelect(item) {
                 window.location = item.url;
             },
@@ -399,6 +372,24 @@ export default {
     },
     data: function () {
         return {
+            projects: [],
+            recent: [],
+            quickActions: [
+                {
+                    name: "Ask a question...",
+                    icon: DocumentPlusIcon,
+                    shortcut: "N",
+                    url: this.mailTo,
+                },
+                {
+                    name: "Learn Spectral analysis...",
+                    icon: TagIcon,
+                    shortcut: "F",
+                    url: "https://docs.nmrxiv.org",
+                },
+                //   { name: "Add hashtag...", icon: HashtagIcon, shortcut: "H", url: "#" },
+                //   { name: "Add label...", icon: TagIcon, shortcut: "L", url: "#" },
+            ],
             selected: null,
             department: "all",
             query: null,
@@ -410,6 +401,10 @@ export default {
     computed: {
         index() {
             return this.$page.props.SCOUT_PREFIX + "projects";
+        },
+
+        mailTo() {
+            return "mailto:" + String(this.$page.props.mailFromAddress);
         },
     },
 

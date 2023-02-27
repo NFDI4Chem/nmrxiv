@@ -109,14 +109,14 @@
                                     <a
                                         href="https://docs.nmrxiv.org/docs/submission-guides/data-model/dataset"
                                         target="_blank"
-                                        >Learn more about dataset
+                                        >Learn more about spectra
                                     </a>
                                 </div>
                                 <div>
                                     <label
                                         for="location"
                                         class="block text-sm font-medium text-gray-700"
-                                        >Select Experiment
+                                        >Select Spectra
                                     </label>
                                     <select
                                         id="location"
@@ -167,7 +167,7 @@
                                     class="inline-flex mt-1 items-center px-2.5 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                                     @click="openDatasetCreateDialog()"
                                 >
-                                    + Manage Datasets
+                                    + Manage Spectra
                                 </button>
                                 <div
                                     class="text-xs cursor-pointer hover:text-blue-700 mt-2"
@@ -323,6 +323,7 @@ export default {
         openDatasetCreateDialog() {
             this.emitter.emit("openDatasetCreateDialog", {
                 draft_id: this.project.draft_id,
+                return_url: "/studies/" + this.study.id + "/datasets",
             });
         },
         updateDataSet() {

@@ -83,7 +83,7 @@ import {
 const subNavigation = [
     { name: "About", route: "dashboard.studies", icon: CircleStackIcon },
     {
-        name: "Datasets",
+        name: "Spectra",
         route: "dashboard.study.datasets",
         icon: Squares2X2Icon,
     },
