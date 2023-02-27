@@ -39,17 +39,9 @@
                                             class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                                             @click="openStudyDetailsPane"
                                         >
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                viewBox="0 0 20 20"
-                                                fill="currentColor"
-                                                aria-hidden="true"
-                                                class="w-4 h-4 mr-2 text-gray-600"
-                                            >
-                                                <path
-                                                    d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"
-                                                ></path>
-                                            </svg>
+                                            <PencilIcon
+                                                class="w-4 h-4 mr-1 text-gray-600"
+                                            />
                                             <span>Edit</span>
                                         </button>
                                     </div>
@@ -88,17 +80,9 @@
                                             class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                                             @click="openStudyDetailsPane"
                                         >
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                viewBox="0 0 20 20"
-                                                fill="currentColor"
-                                                aria-hidden="true"
-                                                class="w-4 h-4 mr-2 text-gray-600"
-                                            >
-                                                <path
-                                                    d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"
-                                                ></path>
-                                            </svg>
+                                            <PencilIcon
+                                                class="w-4 h-4 mr-1 text-gray-600"
+                                            />
                                             <span>Edit</span>
                                         </button>
                                     </div>
@@ -156,17 +140,9 @@
                                             class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                                             @click="openStudyDetailsPane"
                                         >
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                viewBox="0 0 20 20"
-                                                fill="currentColor"
-                                                aria-hidden="true"
-                                                class="w-4 h-4 mr-2 text-gray-600"
-                                            >
-                                                <path
-                                                    d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"
-                                                ></path>
-                                            </svg>
+                                            <PencilIcon
+                                                class="w-4 h-4 mr-1 text-gray-600"
+                                            />
                                             <span>Edit</span>
                                         </button>
                                     </div>
@@ -336,7 +312,7 @@
                                                                                 class="text-sm"
                                                                             >
                                                                                 <a
-                                                                                    class="font-medium text-gray-900"
+                                                                                    class="break-all font-medium text-gray-900"
                                                                                     >{{
                                                                                         molecule.STANDARD_INCHI
                                                                                     }}</a
@@ -460,6 +436,13 @@
                                                                 please checkout
                                                                 <a
                                                                     href="https://en.wikipedia.org/wiki/Simplified_molecular-input_line-entry_system"
+                                                                    class="text-gray-400"
+                                                                    target="_blank"
+                                                                    >here</a
+                                                                >
+                                                                and
+                                                                <a
+                                                                    href="https://www.daylight.com/dayhtml/doc/theory/theory.smiles.html"
                                                                     class="text-gray-400"
                                                                     target="_blank"
                                                                     >here</a
@@ -637,7 +620,7 @@ export default {
     data() {
         return {
             smiles: "",
-            percentage: 1,
+            percentage: 0,
             editor: "",
         };
     },
@@ -682,8 +665,6 @@ export default {
                     "\n  " + molecule.MOL.replaceAll('"', "")
                 );
                 return mol.toSVG(200, 200);
-            } else {
-                console.log(molecule);
             }
         },
         deleteMolecule(mol) {

@@ -2,12 +2,18 @@
 
 namespace App\Models;
 
+use App\Notifications\ProjectArchivalNotification;
+use App\Notifications\ProjectArchivalNotificationToAdmins;
+use App\Notifications\ProjectDeletionFailureNotification;
+use App\Notifications\ProjectDeletionNotification;
+use App\Notifications\ProjectDeletionReminderNotification;
 use App\Traits\CacheClear;
 use Auth;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Notification;
 use Laravel\Scout\Searchable;
 use Maize\Markable\Markable;
 use Maize\Markable\Models\Bookmark;
@@ -46,6 +52,7 @@ class Project extends Model implements Auditable
         'project_photo_path',
         'license_id',
         'release_date',
+        'deleted_on',
     ];
 
     protected static $marks = [
@@ -292,7 +299,9 @@ class Project extends Model implements Auditable
      */
     public function shouldBeSearchable()
     {
-        return $this->is_public;
+        if ($this->is_public && ! $this->is_archived) {
+            return true;
+        }
     }
 
     /**
@@ -303,7 +312,7 @@ class Project extends Model implements Auditable
     public function authors()
     {
         return $this->belongsToMany(Author::class)
-            ->withPivot('contributor_type','sort_order');
+            ->withPivot('contributor_type', 'sort_order');
     }
 
     public function scopeFilter($query, array $filters)
@@ -327,5 +336,33 @@ class Project extends Model implements Auditable
     public function citations()
     {
         return $this->belongsToMany(Citation::class);
+    }
+
+    /**
+     * Send Notification via email.
+     *
+     * @param  string  $notifyType (deletion / deletionReminder / archival / archivalAdmin)
+     * @param  array  sendTo
+     * @return void
+     */
+    public function sendNotification($notifyType, $sendTo)
+    {
+        switch($notifyType) {
+            case 'deletion':
+                Notification::send($sendTo, new ProjectDeletionNotification($this));
+                break;
+            case 'deletionReminder':
+                Notification::send($sendTo, new ProjectDeletionReminderNotification($this));
+                break;
+            case 'archival':
+                Notification::send($sendTo, new ProjectArchivalNotification($this));
+                break;
+            case 'archivalAdmin':
+                Notification::send($sendTo, new ProjectArchivalNotificationToAdmins($this));
+                break;
+            case 'deletionFailure':
+                Notification::send($sendTo, new ProjectDeletionFailureNotification($this));
+                break;
+        }
     }
 }

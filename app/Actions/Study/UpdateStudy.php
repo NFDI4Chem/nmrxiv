@@ -23,7 +23,6 @@ class UpdateStudy
         ];
         Validator::make($input, [
             'name' => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string', 'min:20'],
             'license' => ['required_if:is_public,"true"'],
         ], $errorMessages)->validate();
 

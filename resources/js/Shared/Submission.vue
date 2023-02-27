@@ -107,6 +107,15 @@
                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     ></path>
                 </svg>
+                <div v-if="datasetsToImport && datasetsToImport.length > 0">
+                    <br />
+                    Processing
+                    {{
+                        datasetsToImport.filter((f) => f.status == true)
+                            .length + 1
+                    }}
+                    of {{ datasetsToImport.length }} spectra
+                </div>
             </div>
             <div v-if="!loading">
                 <div v-if="drafts.length > 0 && !currentDraft">
@@ -345,14 +354,15 @@
                                     >
                                         <label
                                             for="description"
-                                            class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
+                                            class="block text-sm font-medium text-gray-700"
                                         >
                                             <span
                                                 @click="
                                                     draftForm.description =
                                                         'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore'
                                                 "
-                                                >Project Description</span
+                                                >Project Description
+                                                (Optional)</span
                                             >
                                         </label>
                                         <div class="mt-1">
@@ -380,7 +390,7 @@
                                             for="description"
                                             class="block text-sm font-medium text-gray-700"
                                         >
-                                            Keywords
+                                            Keywords (Optional)
                                         </label>
                                         <div>
                                             <vue-tags-input
@@ -438,26 +448,28 @@
                                             class="hidden flex-shrink-0 w-80 bg-white border-r border-blue-gray-200 md:flex md:flex-col"
                                         >
                                             <div
-                                                class="border-gray-200 px-4 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider flex-shrink-0 border-b border-blue-gray-200"
+                                                class="border-gray-200 px-4 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 tracking-wider flex-shrink-0 border-b border-blue-gray-200"
                                             >
-                                                STUDY ({{ studies.length }})
-
-                                                <span
-                                                    class="float-right"
-                                                    @click="toggleAutoImport()"
+                                                {{
+                                                    pluralize(
+                                                        "STUDY",
+                                                        studies.length
+                                                    )
+                                                }}
+                                                ({{ studies.length }})
+                                                <div
+                                                    class="float-right cursor-pointer tooltip"
+                                                    @click="autoImport()"
                                                 >
-                                                    <PlayIcon
-                                                        v-if="
-                                                            !$page.props
-                                                                .autoimport
-                                                        "
-                                                        class="w-5 h-5"
-                                                    ></PlayIcon>
-                                                    <PauseIcon
-                                                        v-else
-                                                        class="w-5 h-5"
-                                                    ></PauseIcon>
-                                                </span>
+                                                    <ArrowDownOnSquareStackIcon
+                                                        class="w-5 h-5 mr-1 text-gray-600 hover:text-gray-500"
+                                                    />
+                                                    <span
+                                                        class="bg-gray-900 text-center text-white px-2 py-1 shadow-lg rounded-md tooltiptextbottom"
+                                                        >Click to auto import
+                                                        spectra</span
+                                                    >
+                                                </div>
                                             </div>
                                             <div
                                                 id="tour-step-side-panel-studies"
@@ -478,12 +490,6 @@
                                                             : 'hover:bg-gray-200 hover:bg-opacity-50',
                                                         'cursor-pointer flex p-4 pr-5 border-b border-blue-gray-200',
                                                     ]"
-                                                    @click="
-                                                        selectStudy(
-                                                            study,
-                                                            $index
-                                                        )
-                                                    "
                                                 >
                                                     <svg
                                                         xmlns="http://www.w3.org/2000/svg"
@@ -501,7 +507,18 @@
                                                         <p
                                                             class="font-medium text-blue-gray-900 pr-4"
                                                         >
-                                                            {{ study.name }}
+                                                            <a
+                                                                @click="
+                                                                    selectStudy(
+                                                                        study,
+                                                                        $index
+                                                                    )
+                                                                "
+                                                                class="hover:font-bold"
+                                                                >{{
+                                                                    study.name
+                                                                }}</a
+                                                            >
                                                             <span
                                                                 v-if="
                                                                     study.sample
@@ -521,18 +538,42 @@
                                                         <div
                                                             class="mt-1 text-blue-gray-500"
                                                         >
-                                                            <div
-                                                                v-for="ds in study.datasets"
+                                                            <span
+                                                                v-for="(
+                                                                    ds, $dsIndex
+                                                                ) in study.datasets"
                                                                 :key="ds.id"
-                                                                :class="[
-                                                                    ds.has_nmrium
-                                                                        ? 'bg-green-100 text-gray-800'
-                                                                        : 'bg-gray-100 text-gray-800',
-                                                                    'w-64 inline-flex truncate break-words items-center px-3 py-0.5 rounded-full text-xs font-medium mr-1',
-                                                                ]"
                                                             >
-                                                                {{ ds.name }}
-                                                            </div>
+                                                                <div
+                                                                    @click="
+                                                                        selectStudy(
+                                                                            study,
+                                                                            $index,
+                                                                            $dsIndex
+                                                                        )
+                                                                    "
+                                                                    :class="[
+                                                                        ds.has_nmrium
+                                                                            ? 'bg-green-100 text-gray-800'
+                                                                            : 'bg-gray-100 text-gray-800',
+                                                                        'w-64 inline-flex truncate break-words items-center px-3 py-0.5 rounded-full text-xs font-medium mr-1 hover:bg-teal-700',
+                                                                    ]"
+                                                                >
+                                                                    <a
+                                                                        >{{
+                                                                            ds.name
+                                                                        }}
+                                                                        <span
+                                                                            v-if="
+                                                                                ds.type
+                                                                            "
+                                                                            >({{
+                                                                                ds.type
+                                                                            }})</span
+                                                                        ></a
+                                                                    >
+                                                                </div>
+                                                            </span>
                                                         </div>
                                                     </div>
                                                 </a>
@@ -629,7 +670,7 @@
                                                             <div
                                                                 v-if="
                                                                     currentTab.name ==
-                                                                    'Meta Data'
+                                                                    'Metadata'
                                                                 "
                                                                 class="px-4 sm:px-6"
                                                             >
@@ -781,7 +822,7 @@
                                                                             for="location"
                                                                             class="block text-sm font-medium text-gray-700"
                                                                             >Select
-                                                                            Experiment
+                                                                            Spectra
                                                                         </label>
                                                                         <select
                                                                             id="tour-step-select-exp"
@@ -812,6 +853,15 @@
                                                                                 {{
                                                                                     dataset.name
                                                                                 }}
+                                                                                <span
+                                                                                    v-if="
+                                                                                        dataset.type
+                                                                                    "
+                                                                                >
+                                                                                    ({{
+                                                                                        dataset.type
+                                                                                    }})
+                                                                                </span>
                                                                             </option>
                                                                         </select>
                                                                     </div>
@@ -1379,7 +1429,7 @@
                                                                     <div
                                                                         v-if="
                                                                             selectedStudy.molecules &&
-                                                                            selectStudy
+                                                                            selectedStudy
                                                                                 .molecules
                                                                                 .length ==
                                                                                 0
@@ -1419,7 +1469,7 @@
                                                                     <div
                                                                         v-if="
                                                                             selectedStudy.molecules &&
-                                                                            selectStudy
+                                                                            selectedStudy
                                                                                 .molecules
                                                                                 .length >
                                                                                 0
@@ -1533,7 +1583,7 @@
                     <span v-if="!currentStep">
                         <Link
                             class="inline-flex items-center px-2.5 py-1 border border-gray-300 shadow-sm text-md font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                            :href="route('dashboard')"
+                            :href="this.returnUrl"
                         >
                             Cancel
                         </Link>
@@ -1553,7 +1603,7 @@
                             </jet-secondary-button>
                             <Link
                                 class="inline-flex items-center px-2.5 py-1 border border-gray-300 shadow-sm text-md font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                                :href="route('dashboard')"
+                                :href="this.returnUrl"
                             >
                                 Cancel
                             </Link>
@@ -1607,7 +1657,7 @@
                                 Back
                             </jet-button>
                             <Link
-                                :href="route('dashboard')"
+                                :href="this.returnUrl"
                                 class="inline-flex items-center px-2.5 py-1 border border-gray-300 shadow-sm text-md font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                             >
                                 Cancel
@@ -1687,6 +1737,7 @@ import {
     PlayIcon,
     PauseIcon,
     PencilIcon,
+    ArrowDownOnSquareStackIcon,
 } from "@heroicons/vue/24/solid";
 import { Link } from "@inertiajs/inertia-vue3";
 
@@ -1706,6 +1757,7 @@ export default {
         ClipboardDocumentIcon,
         QuestionMarkCircleIcon,
         ExclamationTriangleIcon,
+        ArrowDownOnSquareStackIcon,
         TrashIcon,
         PlayIcon,
         PauseIcon,
@@ -1720,6 +1772,7 @@ export default {
             loadingStep: false,
             currentDraft: null,
             errorMessage: null,
+            datasetsToImport: null,
 
             draftForm: this.$inertia.form({
                 _method: "POST",
@@ -1761,7 +1814,7 @@ export default {
             tabs: [
                 { name: "Experiments (Spectra)", current: true },
                 { name: "Sample Info", current: false },
-                { name: "Meta Data", current: false },
+                { name: "Metadata", current: false },
             ],
 
             createDatasetForm: this.$inertia.form({
@@ -1828,6 +1881,7 @@ export default {
             confirmPublicAccess: false,
 
             studiesExist: false,
+            returnUrl: "/dashboard",
         };
     },
     computed: {
@@ -1853,6 +1907,12 @@ export default {
             );
         },
 
+        url() {
+            return String(this.$page.props.url)
+                ? String(this.$page.props.url)
+                : "https://dev.nmrxiv.org";
+        },
+
         getMax() {
             if (this.selectedStudy) {
                 let totalCount = 0;
@@ -1868,6 +1928,10 @@ export default {
     mounted() {
         const initialise = (data) => {
             this.fetchDrafts().then((response) => {
+                this.returnUrl =
+                    this.url +
+                    this.returnUrl +
+                    (data.return_url ? data.return_url : "");
                 this.drafts = response.data.drafts;
                 this.sharedDrafts = response.data.sharedDrafts;
                 if (data.draft_id) {
@@ -2208,7 +2272,7 @@ export default {
             this.selectedDataset = dataset;
         },
 
-        selectStudy(study, index) {
+        selectStudy(study, index, datasetIndex = null) {
             this.selectedStudyIndex = index;
             this.selectedStudy = study;
             this.studyForm.name = this.selectedStudy.name;
@@ -2220,8 +2284,13 @@ export default {
                 });
             });
             this.studyForm.tags = tags;
-            this.selectedDSIndex = 0;
-            this.selectDataset(this.selectedStudy.datasets[0]);
+            if (!datasetIndex) {
+                this.selectedDSIndex = 0;
+                this.selectDataset(this.selectedStudy.datasets[0]);
+            } else {
+                this.selectedDSIndex = datasetIndex;
+                this.selectDataset(this.selectedStudy.datasets[datasetIndex]);
+            }
         },
 
         createNewDraft() {
@@ -2365,6 +2434,29 @@ export default {
             }
         },
 
+        fetchProjectData() {
+            axios
+                .get("/dashboard/drafts/" + this.currentDraft.id + "/info")
+                .then((response) => {
+                    this.project = response.data.project;
+                    this.studies = response.data.studies;
+                    if (
+                        this.project &&
+                        this.studies &&
+                        this.studies.length > 0
+                    ) {
+                        this.selectStudy(this.studies[0], 0);
+                        this.selectedDataset = this.selectedStudy.datasets[0];
+                        this.loadingStep = false;
+                        this.selectStep(2);
+                    } else {
+                        if (this.studies.length == 0) {
+                            this.loadingStep = false;
+                        }
+                    }
+                });
+        },
+
         selectStep(id) {
             this.steps.forEach((step) => {
                 if (parseInt(step.id) < id) {
@@ -2395,10 +2487,86 @@ export default {
             this.openCreateDatasetDialog = !this.openCreateDatasetDialog;
         },
 
-        toggleAutoImport() {
-            this.$page.props.autoimport = !this.$page.props.autoimport;
-            if (this.$page.props.autoimport) {
-                this.selectStudy(this.studies[0], 0);
+        autoImport() {
+            this.loadingStep = true;
+            this.datasetsToImport = [];
+            this.studies.forEach((study) => {
+                study.datasets.forEach((dataset) => {
+                    if (!dataset.has_nmrium) {
+                        this.datasetsToImport.push({
+                            projectSlug: this.project.slug,
+                            studySlug: study.slug,
+                            datasetSlug: dataset.slug,
+                            datasetId: dataset.id,
+                            status: false,
+                        });
+                    }
+                });
+            });
+            this.fetchNMRium();
+        },
+
+        fetchNMRium() {
+            let datasetDetails = this.datasetsToImport.filter(
+                (f) => f.status == false
+            )[0];
+            if (datasetDetails) {
+                this.loadingStep = true;
+                let ownerUserName = this.$page.props.team
+                    ? this.$page.props.team.owner.username
+                    : this.project.owner.username;
+                axios
+                    .post("https://nodejsdev.nmrxiv.org/spectra-parser", {
+                        urls: [
+                            this.url +
+                                "/" +
+                                ownerUserName +
+                                "/datasets/" +
+                                datasetDetails.projectSlug +
+                                "/" +
+                                datasetDetails.studySlug +
+                                "/" +
+                                datasetDetails.datasetSlug,
+                        ],
+                        snapshot: false,
+                    })
+                    .then((response) => {
+                        axios
+                            .post(
+                                "/dashboard/datasets/" +
+                                    datasetDetails.datasetId +
+                                    "/nmriumInfo",
+                                response.data.data
+                            )
+                            .then((res) => {
+                                this.loadingStep = false;
+                                this.datasetsToImport.filter(
+                                    (f) =>
+                                        f.datasetId == datasetDetails.datasetId
+                                )[0].status = true;
+                                this.fetchNMRium();
+                            })
+                            .catch((err) => {
+                                this.loadingStep = false;
+                                this.datasetsToImport.filter(
+                                    (f) =>
+                                        f.datasetId == datasetDetails.datasetId
+                                )[0].status = true;
+                                this.fetchNMRium();
+                            });
+                    })
+                    .catch((error) => {
+                        this.loadingStep = false;
+                        this.datasetsToImport.filter(
+                            (f) => f.datasetId == datasetDetails.datasetId
+                        )[0].status = true;
+                        this.fetchNMRium();
+                    });
+            } else {
+                if (this.datasetsToImport.length > 0) {
+                    this.datasetsToImport = null;
+                    this.fetchProjectData();
+                }
             }
         },
 

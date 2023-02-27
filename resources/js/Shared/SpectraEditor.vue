@@ -375,6 +375,10 @@ export default {
                 ? String(this.$page.props.nmriumURL + "?id=" + Math.random())
                 : "http://nmriumdev.nmrxiv.org?id=" + Math.random();
         },
+
+        mailFromAddress() {
+            return String(this.$page.props.mailFromAddress);
+        },
     },
     methods: {
         registerEvents() {
@@ -399,7 +403,6 @@ export default {
                 this.version = e.data.data.version;
                 if (e.data.type == "nmr-wrapper:data-change") {
                     let actionType = e.data.data.actionType;
-                    // console.log(actionType);
                     if (
                         actionType == "" ||
                         (actionType == "INITIATE" &&
@@ -422,7 +425,12 @@ export default {
                     if (this.study && this.dataset) {
                         if (this.dataset.dataset_photo_url == "") {
                             this.infoLog("Saving Preview");
-                            this.exportPreview();
+                            setTimeout(
+                                function () {
+                                    this.exportPreview();
+                                }.bind(this),
+                                500
+                            );
                         }
                         this.updateDataSet();
                     }
@@ -523,12 +531,15 @@ export default {
             this.dataset.type = null;
             this.selectedSpectraData = null;
             this.reset = true;
+            let ownerUserName = this.$page.props.team
+                ? this.$page.props.team.owner.username
+                : this.project.owner.username;
             const iframe = window.frames.submissionNMRiumIframe;
             if (!url) {
                 url =
                     this.url +
                     "/" +
-                    this.$page.props.team.owner.username +
+                    ownerUserName +
                     "/datasets/" +
                     this.project.slug +
                     "/" +
@@ -557,15 +568,19 @@ export default {
                             version: this.version ? this.version : 3,
                         }
                     )
-                    .catch((err) => {
-                        this.updateLoadingStatus(false);
-                        this.autoSaving = false;
-                    })
                     .then((response) => {
                         this.infoLog("Spectra saved successfully", true);
                         this.updateLoadingStatus(false);
                         this.autoSaving = false;
                         this.dataset.has_nmrium = response.data.has_nmrium;
+                    })
+                    .catch((err) => {
+                        this.updateLoadingStatus(false);
+                        this.infoLog("Error saving spectra info");
+                        console.error(
+                            "Error saving the nmrium info. Please contact us at {{mailFromAddress}} if the error persist."
+                        );
+                        this.autoSaving = false;
                     });
             }
         },

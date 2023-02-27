@@ -161,16 +161,19 @@
                         <span class="ml-2">Private</span>
                     </span>
                 </div>
-                <a class="cursor-pointer" @click="getLink(project)">
+                <a>
                     <div
-                        class="flex justify-between items-center bg-white shadow-md border rounded-lg px-6 py-6 cursor-pointer"
+                        class="flex justify-between items-center bg-white shadow-md border rounded-lg px-6 py-6"
                     >
-                        <div class="flex-grow">
+                        <div
+                            @click="getLink(project)"
+                            class="flex-grow cursor-pointer"
+                        >
                             <div class="flex justify-between items-baseline">
                                 <div class="font-bold text-lg text-gray-600">
                                     <div class="flex items-center">
                                         <span
-                                            class="flex max-w-2xl break-words block"
+                                            class="cursor-pointer flex max-w-2xl break-words block"
                                         >
                                             <span class="-ml-2 mr-1">
                                                 <StarIcon
@@ -224,7 +227,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="flex items-baseline mt-1 pl-5">
+                            <div class="flex items-baseline mt-1">
                                 <span class="text-sm text-gray-600">
                                     <div
                                         v-if="
@@ -233,58 +236,123 @@
                                             project.owner_id !=
                                                 $page.props.user.id
                                         "
-                                        class="text-sm text-gray-600 pr-5"
+                                        class="text-sm text-gray-600"
                                     >
                                         <span
                                             class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
                                         >
                                             Shared by:
-                                            {{ project.owner.first_name }}
-                                            {{ project.owner.last_name }}</span
+                                            {{
+                                                project.owner
+                                                    ? project.owner.first_name
+                                                    : ""
+                                            }}
+                                            {{
+                                                project.owner
+                                                    ? project.owner.last_name
+                                                    : ""
+                                            }}</span
                                         >
                                     </div>
                                 </span>
-                                <div class="grid grid-cols-1 pt-1">
-                                    <div class="text-sm text-gray-600 pr-5">
-                                        <span class="text-gray-400"
-                                            >Last updated on</span
-                                        >
-                                        {{ formatDate(project.updated_at) }}
-                                    </div>
-                                    <div class="text-sm text-gray-600 pr-5">
-                                        <span class="text-gray-400"
-                                            >Created on</span
-                                        >
-                                        {{ formatDate(project.created_at) }}
-                                    </div>
-                                    <span
-                                        v-if="
-                                            !project.is_public &&
-                                            project.is_published
-                                        "
-                                        class="inline-flex items-center mt-2 px-3 py-0.5 rounded-full text-sm font-medium bg-yellow-100 text-red-800 capitalize"
+                            </div>
+                            <div class="grid grid-cols-1">
+                                <div>
+                                    <dd
+                                        class="text-xs text-gray-900 space-y-5 mt-1"
                                     >
-                                        PUBLISHED -&emsp;
-                                        <b
-                                            >Release date:
-                                            {{
-                                                formatDate(project.release_date)
-                                            }}</b
-                                        >
-                                    </span>
+                                        <p>
+                                            <span
+                                                v-for="tag in project.tags"
+                                                :key="tag.id"
+                                                class="mr-2"
+                                            >
+                                                <span
+                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-indigo-100 text-indigo-800"
+                                                >
+                                                    <svg
+                                                        class="-ml-0.5 mr-1.5 h-2 w-2 text-indigo-400"
+                                                        fill="currentColor"
+                                                        viewBox="0 0 8 8"
+                                                    >
+                                                        <circle
+                                                            cx="4"
+                                                            cy="4"
+                                                            r="3"
+                                                        />
+                                                    </svg>
+                                                    {{ tag.name["en"] }}
+                                                </span>
+                                            </span>
+                                        </p>
+                                    </dd>
                                 </div>
+                                <div
+                                    class="text-xs text-gray-400 pr-5 mb-1 mt-1 truncate ..."
+                                >
+                                    {{ project.description }}
+                                </div>
+                                <div class="text-xs text-gray-400 pr-5">
+                                    <span class="font-bold text-gray-600"
+                                        >Last updated on</span
+                                    >
+                                    {{ formatDate(project.updated_at) }}
+                                </div>
+                                <div class="text-xs text-gray-400 pr-5">
+                                    <span class="font-bold text-gray-600"
+                                        >Created on</span
+                                    >
+                                    {{ formatDate(project.created_at) }}
+                                </div>
+                                <span
+                                    v-if="
+                                        !project.is_public &&
+                                        project.is_published
+                                    "
+                                    class="inline-flex items-center mt-2 px-3 py-0.5 rounded-full text-sm font-medium bg-yellow-100 text-red-800 capitalize"
+                                >
+                                    PUBLISHED -&emsp;
+                                    <b
+                                        >Release date:
+                                        {{
+                                            formatDate(project.release_date)
+                                        }}</b
+                                    >
+                                </span>
                             </div>
                         </div>
-                        <div class="border-l">
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 24 24"
-                                class="h-8 w-8 text-gray-600 fill-current ml-4"
+                        <div class="border-l cursor-pointer">
+                            <a
+                                target="_blank"
+                                :href="
+                                    route('dashboard.projects', [project.id])
+                                "
+                                class="text-gray-500 hover:text-gray-900"
                             >
-                                <path
-                                    d="M9.3 8.7a1 1 0 0 1 1.4-1.4l4 4a1 1 0 0 1 0 1.4l-4 4a1 1 0 0 1-1.4-1.4l3.29-3.3-3.3-3.3z"
-                                ></path>
-                            </svg>
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke-width="1.5"
+                                    stroke="currentColor"
+                                    class="h-5 w-5 text-gray-600 ml-4"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
+                                    />
+                                </svg>
+                            </a>
+                            <!-- <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                class="h-8 w-8 text-gray-600 fill-current ml-4"
+              >
+                <path
+                  d="M9.3 8.7a1 1 0 0 1 1.4-1.4l4 4a1 1 0 0 1 0 1.4l-4 4a1 1 0 0 1-1.4-1.4l3.29-3.3-3.3-3.3z"
+                ></path>
+              </svg> -->
                         </div>
                     </div>
                 </a>

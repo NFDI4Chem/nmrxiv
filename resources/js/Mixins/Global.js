@@ -1,5 +1,6 @@
 import * as marked from "marked";
 import { copyText } from "vue3-clipboard";
+import pluralize from "pluralize";
 
 export default {
     methods: {
@@ -105,6 +106,12 @@ export default {
             var re =
                 /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
             return re.test(email);
+        },
+        isEmpty(obj) {
+            return Object.keys(obj).length === 0;
+        },
+        pluralize(value, number) {
+            return pluralize(value, number);
         },
     },
 

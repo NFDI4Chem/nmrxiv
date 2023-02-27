@@ -37,7 +37,7 @@
                         {{ author.affiliation }}
                     </p>
                     <p v-if="author.orcid_id" class="text-xs text-teal-900">
-                        <b class="text-gray-500">ORCID:</b>
+                        <b class="text-gray-500">ORCID iD:</b>
                         {{ author.orcid_id }}
                     </p>
                     <p v-if="author.email_id" class="text-xs text-gray-500">

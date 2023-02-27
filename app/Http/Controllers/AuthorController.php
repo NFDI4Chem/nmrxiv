@@ -5,8 +5,11 @@ namespace App\Http\Controllers;
 use App\Actions\Project\UpdateProject;
 use App\Models\Author;
 use App\Models\Project;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 
 class AuthorController extends Controller
@@ -21,6 +24,10 @@ class AuthorController extends Controller
      */
     public function save(Request $request, UpdateProject $updater, Project $project)
     {
+        if (! Gate::forUser($request->user())->check('updateProject', $project)) {
+            throw new AuthorizationException;
+        }
+
         $authors = $request->get('authors');
         if (count($authors) > 0) {
             $processedAuthors = [];
@@ -78,6 +85,10 @@ class AuthorController extends Controller
      */
     public function destroy(Request $request, UpdateProject $updater, Project $project)
     {
+        if (! Gate::forUser($request->user())->check('updateProject', $project)) {
+            throw new AuthorizationException;
+        }
+
         $authors = $request->get('authors');
 
         if (count($authors) > 0) {
@@ -99,6 +110,10 @@ class AuthorController extends Controller
      */
     public function updateRole(Request $request, UpdateProject $updater, Project $project)
     {
+        if (! Gate::forUser($request->user())->check('updateProject', $project)) {
+            throw new AuthorizationException;
+        }
+
         $contributorTypes = Config::get('doi.'.Config::get('doi.default').'.contributor_types');
         $roleExist = in_array($request->role, $contributorTypes);
 
