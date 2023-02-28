@@ -113,6 +113,15 @@ export default {
         pluralize(value, number) {
             return pluralize(value, number);
         },
+
+        /*Extract Doi from URL*/
+        extractDoi(query) {
+            query = query.trim();
+            if (query.indexOf("https://doi.org/") > -1) {
+                query = query.substr(16);
+            }
+            return query;
+        },
     },
 
     computed: {
