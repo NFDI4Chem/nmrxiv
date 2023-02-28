@@ -950,7 +950,7 @@ export default {
                 .finally(() => {
                     if (this.fetchedAuthors.length == 0) {
                         this.error =
-                            "Something went wrong. Please check the input and try again.";
+                            "No data found. Please enter the details manually.";
                     }
                     this.loading = false;
                 });
