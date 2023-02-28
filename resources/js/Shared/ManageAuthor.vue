@@ -311,7 +311,7 @@
                                                 type="text"
                                                 name="name"
                                                 autocomplete="off"
-                                                placeholder="DOI or ORCID iD e.g. 10.1186/s13321-022-00614-7 or 0000-0001-6033-2910"
+                                                placeholder="DOI or ORCID iD e.g. 10.1186/s19991-022-00987-0 or 0000-0001-6033-8976"
                                                 class="flex-1 focus:ring-teal-500 focus:border-teal-500 block w-full min-w-0 rounded sm:text-sm border-gray-300"
                                             />
                                         </div>
@@ -918,7 +918,7 @@ export default {
         fetchAuthors() {
             this.loading = true;
             this.error = "";
-            this.query = this.query.trim();
+            this.query = this.extractDoi(this.query);
             let isDOI = new RegExp(/\b(10[.][0-9]{4,}(?:[.][0-9]+)*)\b/g).test(
                 this.query
             );
