@@ -336,6 +336,15 @@
                                     >
                                         Reset
                                     </jet-secondary-button>
+                                    <jet-secondary-button
+                                        class="ml-2 float-right"
+                                        :disabled="
+                                            !this.$page.props.user.orcid_id
+                                        "
+                                        @click="this.addCurrentUser"
+                                    >
+                                        Add me
+                                    </jet-secondary-button>
                                 </div>
                                 <jet-input-error
                                     :message="error"
@@ -890,6 +899,7 @@ export default {
             this.form.contributor_type = {};
             this.form.contributor_type = this.contributorType[0];
             this.isEdit = false;
+            this.error = "";
         },
         /*Edit author*/
         edit(author) {
@@ -1158,6 +1168,26 @@ export default {
             }
             this.displayAddAuthorForms = false;
             this.isEdit = false;
+        },
+        /*Add current user as Author*/
+        addCurrentUser() {
+            if (this.$page.props.user && this.$page.props.user.orcid_id) {
+                let user = {};
+                let affiliation = {};
+                this.fetchedAuthors = [];
+                user.firstName = this.$page.props.user.first_name;
+                user.lastName = this.$page.props.user.last_name;
+                user.authorId = {};
+                user.authorId.type = "ORCID";
+                user.authorId.value = this.$page.props.user.orcid_id;
+                user.authorAffiliationDetailsList = {};
+                user.authorAffiliationDetailsList.authorAffiliation = [];
+                affiliation.affiliation = this.$page.props.user.affiliation;
+                user.authorAffiliationDetailsList.authorAffiliation.push(
+                    affiliation
+                );
+                this.fetchedAuthors.push(user);
+            }
         },
     },
 };

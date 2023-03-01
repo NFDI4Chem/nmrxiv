@@ -84,12 +84,13 @@ export default {
         JetDialogModal,
         LoadingButton,
     },
-    props: ["selected"],
-    emits: ["update:selected"],
+    props: ["orcidId", "affiliation"],
+    emits: ["update:orcidId", "update:affiliation"],
     data() {
         return {
             show: false,
-            selectedOrcidId: this.selected,
+            selectedOrcidId: this.orcidId,
+            selectedAffiliation: this.affiliation,
             loading: false,
             orcidIdSearchResults: [],
         };
@@ -235,7 +236,10 @@ export default {
             this.selectedOrcidId = item.orcidId
                 ? item.orcidId.substr(18, item.orcidId.length)
                 : "";
-            this.$emit("update:selected", this.selectedOrcidId);
+            this.selectedAffiliation = item.employer ? item.employer : "";
+            this.$emit("update:orcidId", this.selectedOrcidId);
+            this.$emit("update:affiliation", this.selectedAffiliation);
+
             this.show = false;
         },
     },

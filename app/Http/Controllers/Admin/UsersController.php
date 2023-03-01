@@ -42,6 +42,7 @@ class UsersController extends Controller
                         'verified_at' => $user->email_verified_at,
                         'role' => $user->getRoleNames(),
                         'orcid_id' => $user->orcid_id,
+                        'affiliation' => $user->affiliation,
                     ];
                 }),
             'roles' => Role::orderBy('name')
