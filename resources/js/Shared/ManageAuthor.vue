@@ -29,7 +29,7 @@
             <div>
                 <div v-if="displayAddAuthorForms">
                     <div
-                        class="relative grid grid-cols-1 gap-x-14 max-w-7xl mx-auto lg:grid-cols-2 divide-x"
+                        class="relative grid grid-cols-1 gap-x-5 max-w-7xl mx-auto lg:grid-cols-2"
                     >
                         <!--Add Manual Section-->
                         <div
@@ -68,6 +68,35 @@
                                             />
                                         </div>
                                     </div>
+
+                                    <div class="sm:col-span-2">
+                                        <label
+                                            for="given-name"
+                                            class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
+                                        >
+                                            First Name
+                                        </label>
+                                        <div class="mt-1">
+                                            <input
+                                                id="given-name"
+                                                v-model="form.given_name"
+                                                type="text"
+                                                name="given-name"
+                                                :class="[
+                                                    isEdit
+                                                        ? 'shadow-sm focus:ring-red-500 focus:border-red-500 block w-full sm:text-sm border-red-500 rounded-md bg-gray-100'
+                                                        : '',
+                                                    'shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md',
+                                                ]"
+                                            />
+                                        </div>
+                                        <jet-input-error
+                                            :message="
+                                                authorsForm.errors.given_name
+                                            "
+                                            class="mt-2"
+                                        />
+                                    </div>
                                     <div class="sm:col-span-2">
                                         <label
                                             for="family-name"
@@ -98,34 +127,6 @@
                                         />
                                     </div>
 
-                                    <div class="sm:col-span-2">
-                                        <label
-                                            for="given-name"
-                                            class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
-                                        >
-                                            Given Name
-                                        </label>
-                                        <div class="mt-1">
-                                            <input
-                                                id="given-name"
-                                                v-model="form.given_name"
-                                                type="text"
-                                                name="given-name"
-                                                :class="[
-                                                    isEdit
-                                                        ? 'shadow-sm focus:ring-red-500 focus:border-red-500 block w-full sm:text-sm border-red-500 rounded-md bg-gray-100'
-                                                        : '',
-                                                    'shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md',
-                                                ]"
-                                            />
-                                        </div>
-                                        <jet-input-error
-                                            :message="
-                                                authorsForm.errors.given_name
-                                            "
-                                            class="mt-2"
-                                        />
-                                    </div>
                                     <div class="sm:col-span-3">
                                         <label
                                             for="email"
@@ -284,7 +285,7 @@
                         </div>
                         <!-- Import Section -->
                         <div
-                            class="pb-36 px-4 sm:px-6 lg:pb-5 lg:px-0 lg:row-start-1 lg:col-start-2"
+                            class="pb-36 lg:px-1 lg:row-start-1 lg:col-start-2 border-l"
                         >
                             <div class="pl-2">
                                 <p
@@ -949,7 +950,7 @@ export default {
                 .finally(() => {
                     if (this.fetchedAuthors.length == 0) {
                         this.error =
-                            "Something went wrong. Please check the input and try again.";
+                            "No data found. Please enter the details manually.";
                     }
                     this.loading = false;
                 });
@@ -959,8 +960,8 @@ export default {
             let authorsList = [];
             authors.forEach((author) => {
                 authorsList.push({
-                    family_name: author.firstName,
-                    given_name: author.lastName,
+                    family_name: author.lastName,
+                    given_name: author.firstName,
                     orcid_id:
                         author.authorId && author.authorId.type == "ORCID"
                             ? author.authorId.value
