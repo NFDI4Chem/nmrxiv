@@ -601,9 +601,6 @@
             </div>
         </div>
     </app-layout>
-    <component :is="'script'" type="application/ld+json">{{
-        schema
-    }}</component>
 </template>
 
 <script>
@@ -658,10 +655,8 @@ export default {
             manageCitationElement,
         };
     },
+
     mounted() {
-        axios.get(route("bioschema.modelID", project.identifier)).then((response) => {
-            this.schema = response.data;
-        });
         const urlSearchParams = new URLSearchParams(window.location.search);
         const params = Object.fromEntries(urlSearchParams.entries());
         let editOperation = params["edit"];
@@ -681,11 +676,7 @@ export default {
             }
         }
     },
-    data() {
-        return {
-            schema: [],
-        };
-    },
+    data() {},
 
     computed: {
         canDeleteProject() {

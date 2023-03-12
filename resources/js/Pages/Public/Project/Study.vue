@@ -283,6 +283,9 @@
                         </div>
                     </div>
                 </div>
+                <component :is="'script'" type="application/ld+json">{{
+                    schema
+                }}</component>
                 <div class="mt-4">
                     <div class="relative">
                         <div
@@ -373,8 +376,10 @@ export default {
         return {
             selectedDataset: null,
             selectedSpectraData: null,
+            schema: [],
         };
     },
+
     computed: {
         shareURL() {
             return this.selectedDataset.public_url;
@@ -395,6 +400,12 @@ export default {
         if (!this.selectedDataset) {
             this.selectedDataset = this.study.data.datasets[0];
         }
+
+        axios
+            .get("/api/v1/schemas/bioschema/" + this.study.identifier)
+            .then((response) => {
+                this.schema = response.data;
+            });
     },
     methods: {
         getSVGString(molecule) {

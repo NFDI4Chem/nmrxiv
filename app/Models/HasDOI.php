@@ -175,7 +175,7 @@ trait HasDOI
                     ];
                     array_push($creators, $creator);
 
-                    $creator->contributorType = $author->contributor_type;
+                    $creator['contributorType'] = $author->contributor_type;
                     array_push($contributors, $creator);
                 }
 

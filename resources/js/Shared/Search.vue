@@ -187,7 +187,8 @@
                                                                     >
                                                                         <Link
                                                                             class="w-full"
-                                                                            :href="hit.public_url
+                                                                            :href="
+                                                                                hit.public_url
                                                                             "
                                                                         >
                                                                             <FolderIcon
