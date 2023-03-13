@@ -116,9 +116,9 @@ export default {
 
         /*Extract Doi from URL*/
         extractDoi(query) {
-            if(query.indexOf("http") > -1){
+            if (query.indexOf("http") > -1) {
                 var url = new URL(query);
-                query = (url.pathname).replace('/','');
+                query = url.pathname.replace("/", "");
             }
             return query.trim();
         },

@@ -2,9 +2,8 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Models\Author;
-
+use Illuminate\Console\Command;
 
 class ReverseAuthorsFirstAndLastName extends Command
 {
@@ -36,8 +35,8 @@ class ReverseAuthorsFirstAndLastName extends Command
             $authors = Author::all();
         }
 
-        foreach ($authors as $author){
-            if($author->given_name && $author->family_name){
+        foreach ($authors as $author) {
+            if ($author->given_name && $author->family_name) {
                 $given_name_tmp = $author->given_name;
                 $family_name_tmp = $author->family_name;
                 $author->given_name = $family_name_tmp;
