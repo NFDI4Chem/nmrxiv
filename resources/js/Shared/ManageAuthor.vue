@@ -382,8 +382,8 @@
                                                 <label
                                                     for="items"
                                                     class="font-medium text-teal-900"
-                                                    >{{ author.lastName }}
-                                                    {{ author.firstName }}
+                                                    >{{ author.firstName }}
+                                                    {{ author.lastName }}
                                                 </label>
                                                 <p
                                                     v-if="
