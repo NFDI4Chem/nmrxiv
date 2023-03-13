@@ -113,6 +113,15 @@ export default {
         pluralize(value, number) {
             return pluralize(value, number);
         },
+
+        /*Extract Doi from URL*/
+        extractDoi(query) {
+            if(query.indexOf("http") > -1){
+                var url = new URL(query);
+                query = (url.pathname).replace('/','');
+            }
+            return query.trim();
+        },
     },
 
     computed: {
