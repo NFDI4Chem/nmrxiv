@@ -116,11 +116,11 @@ export default {
 
         /*Extract Doi from URL*/
         extractDoi(query) {
-            query = query.trim();
-            if (query.indexOf("https://doi.org/") > -1) {
-                query = query.substr(16);
+            if(query.indexOf("http") > -1){
+                var url = new URL(query);
+                query = (url.pathname).replace('/','');
             }
-            return query;
+            return query.trim();
         },
     },
 
