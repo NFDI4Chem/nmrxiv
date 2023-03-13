@@ -100,6 +100,7 @@ class UsersController extends Controller
                 'username' => $user->username,
                 'profile_photo_url' => $user->profile_photo_url,
                 'orcid_id' => $user->orcid_id,
+                'affiliation' => $user->affiliation,
 
             ],
         ]);
