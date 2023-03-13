@@ -24,7 +24,7 @@ services:
             - redis
             - meilisearch
             - selenium
-            - minio
+        #   - minio
     pgsql:
         image: "postgres:13"
         ports:
