@@ -49,6 +49,7 @@ class RegistrationTest extends TestCase
             'password' => 'password',
             'password_confirmation' => 'password',
             'orcid_id' => 'test',
+            'affiliation' => 'affiliation',
             'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature(),
         ]);
 
