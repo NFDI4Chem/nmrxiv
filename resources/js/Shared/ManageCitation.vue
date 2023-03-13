@@ -58,7 +58,7 @@
                                                 v-model="form.doi"
                                                 type="text"
                                                 name="doi"
-                                                placeholder="DOI ID e.g. 10.1186/s13321-022-00614-7"
+                                                placeholder="DOI ID e.g. 10.1186/s19991-022-00987-0"
                                                 :class="[
                                                     isEdit
                                                         ? 'shadow-sm focus:ring-red-500 focus:border-red-500 block w-full sm:text-sm border-red-500 rounded-md bg-gray-100'
@@ -113,7 +113,7 @@
                                                 v-model="form.authors"
                                                 type="text"
                                                 name="authors"
-                                                placeholder="e.g. Pupier N, Nuzillard JM, Wist J, Schlörer NE."
+                                                placeholder="e.g. Pupier S, Nuzillard MK, Wist P, Schlörer AK."
                                                 :class="[
                                                     isEdit
                                                         ? 'shadow-sm focus:ring-red-500 focus:border-red-500 block w-full sm:text-sm border-red-500 rounded-md bg-gray-100'
@@ -258,7 +258,7 @@
                                                 v-model="query"
                                                 type="text"
                                                 name="query"
-                                                placeholder="DOI ID e.g. 10.1186/s13321-022-00614-7"
+                                                placeholder="DOI ID e.g. 10.1186/s19991-022-00987-0"
                                                 autocomplete="off"
                                                 class="flex-1 focus:ring-teal-500 focus:border-teal-500 block w-full min-w-0 rounded sm:text-sm border-gray-300"
                                             />
@@ -638,7 +638,7 @@ export default {
         fetchCitations() {
             this.loading = true;
             this.error = "";
-            this.query = this.query.trim();
+            this.query = this.extractDoi(this.query);
             let isDOI = new RegExp(/\b(10[.][0-9]{4,}(?:[.][0-9]+)*)\b/g).test(
                 this.query
             );
