@@ -224,8 +224,8 @@
                                             :disabled="
                                                 !(
                                                     this.form &&
-                                                    this.form.family_name &&
-                                                    this.form.given_name
+                                                    this.form.given_name &&
+                                                    this.form.family_name
                                                 )
                                             "
                                             @click="save('addManually')"
@@ -237,8 +237,8 @@
                                             :disabled="
                                                 !(
                                                     this.form &&
-                                                    this.form.family_name &&
-                                                    this.form.given_name
+                                                    this.form.given_name &&
+                                                    this.form.family_name
                                                 )
                                             "
                                             @click="
@@ -258,8 +258,8 @@
                                             :disabled="
                                                 !(
                                                     this.form &&
-                                                    this.form.family_name &&
-                                                    this.form.given_name
+                                                    this.form.given_name &&
+                                                    this.form.family_name
                                                 )
                                             "
                                             @click="save('addManually')"
@@ -271,8 +271,8 @@
                                             :disabled="
                                                 !(
                                                     this.form &&
-                                                    this.form.family_name &&
-                                                    this.form.given_name
+                                                    this.form.given_name &&
+                                                    this.form.family_name
                                                 )
                                             "
                                             @click="onCancelEdit()"
@@ -312,7 +312,7 @@
                                                 type="text"
                                                 name="name"
                                                 autocomplete="off"
-                                                placeholder="DOI or ORCID iD e.g. 10.1186/s13321-022-00614-7 or 0000-0001-6033-2910"
+                                                placeholder="DOI or ORCID iD e.g. 10.1186/s19991-022-00987-0 or 0000-0001-6033-8976"
                                                 class="flex-1 focus:ring-teal-500 focus:border-teal-500 block w-full min-w-0 rounded sm:text-sm border-gray-300"
                                             />
                                         </div>
@@ -382,8 +382,8 @@
                                                 <label
                                                     for="items"
                                                     class="font-medium text-teal-900"
-                                                    >{{ author.lastName }}
-                                                    {{ author.firstName }}
+                                                    >{{ author.firstName }}
+                                                    {{ author.lastName }}
                                                 </label>
                                                 <p
                                                     v-if="
@@ -906,14 +906,14 @@ export default {
             this.selectedAuthor = author;
             this.authors = this.authors.filter((author) => {
                 return (
-                    author.family_name + author.given_name !=
-                    this.selectedAuthor.family_name +
-                        this.selectedAuthor.given_name
+                    author.given_name + author.family_name !=
+                    this.selectedAuthor.given_name +
+                        this.selectedAuthor.family_name
                 );
             });
             this.form.title = author.title;
-            this.form.family_name = author.family_name;
             this.form.given_name = author.given_name;
+            this.form.family_name = author.family_name;
             this.form.email_id = author.email_id;
             this.form.affiliation = author.affiliation;
             this.form.orcid_id = author.orcid_id;
@@ -929,7 +929,7 @@ export default {
         fetchAuthors() {
             this.loading = true;
             this.error = "";
-            this.query = this.query.trim();
+            this.query = this.extractDoi(this.query);
             let isDOI = new RegExp(/\b(10[.][0-9]{4,}(?:[.][0-9]+)*)\b/g).test(
                 this.query
             );
@@ -970,8 +970,8 @@ export default {
             let authorsList = [];
             authors.forEach((author) => {
                 authorsList.push({
-                    family_name: author.lastName,
                     given_name: author.firstName,
+                    family_name: author.lastName,
                     orcid_id:
                         author.authorId && author.authorId.type == "ORCID"
                             ? author.authorId.value
@@ -1021,12 +1021,13 @@ export default {
             if (!this.form.hasErrors) {
                 let newAuthor = {
                     title: this.form.title ? this.form.title.trim() : null,
-                    family_name: this.form.family_name
-                        ? this.form.family_name.trim()
-                        : null,
                     given_name: this.form.given_name
                         ? this.form.given_name.trim()
                         : null,
+                    family_name: this.form.family_name
+                        ? this.form.family_name.trim()
+                        : null,
+
                     email_id: this.form.email_id
                         ? this.form.email_id.trim()
                         : null,
@@ -1059,7 +1060,7 @@ export default {
         /*Make request to save API*/
         executeQuery() {
             this.authorsForm.authors = this.authors;
-            const keys = ["family_name", "given_name"];
+            const keys = ["given_name", "family_name"];
             this.authorsForm.authors = this.authorsForm.authors.filter(
                 (value, index, self) =>
                     self.findIndex((v) =>
@@ -1086,8 +1087,8 @@ export default {
             this.authorsForm.authors = [
                 {
                     id: author.id,
-                    family_name: author.family_name,
                     given_name: author.given_name,
+                    family_name: author.family_name,
                     orcid_id: author.orcid_id,
                     affiliation: author.affiliation,
                 },

@@ -112,8 +112,6 @@ export default {
                                 first_name +
                                 " AND family-name:" +
                                 last_name,
-                            start: 0,
-                            row: 100,
                         },
                     })
                     .then((res) => {
