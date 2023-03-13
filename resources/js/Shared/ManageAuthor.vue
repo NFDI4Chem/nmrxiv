@@ -224,8 +224,8 @@
                                             :disabled="
                                                 !(
                                                     this.form &&
-                                                    this.form.family_name &&
-                                                    this.form.given_name
+                                                    this.form.given_name &&
+                                                    this.form.family_name
                                                 )
                                             "
                                             @click="save('addManually')"
@@ -237,8 +237,8 @@
                                             :disabled="
                                                 !(
                                                     this.form &&
-                                                    this.form.family_name &&
-                                                    this.form.given_name
+                                                    this.form.given_name &&
+                                                    this.form.family_name
                                                 )
                                             "
                                             @click="
@@ -258,8 +258,8 @@
                                             :disabled="
                                                 !(
                                                     this.form &&
-                                                    this.form.family_name &&
-                                                    this.form.given_name
+                                                    this.form.given_name &&
+                                                    this.form.family_name
                                                 )
                                             "
                                             @click="save('addManually')"
@@ -271,8 +271,8 @@
                                             :disabled="
                                                 !(
                                                     this.form &&
-                                                    this.form.family_name &&
-                                                    this.form.given_name
+                                                    this.form.given_name &&
+                                                    this.form.family_name
                                                 )
                                             "
                                             @click="onCancelEdit()"
@@ -336,6 +336,15 @@
                                     >
                                         Reset
                                     </jet-secondary-button>
+                                    <jet-secondary-button
+                                        class="ml-2 float-right"
+                                        :disabled="
+                                            !this.$page.props.user.orcid_id
+                                        "
+                                        @click="this.addCurrentUser"
+                                    >
+                                        Add me
+                                    </jet-secondary-button>
                                 </div>
                                 <jet-input-error
                                     :message="error"
@@ -373,8 +382,8 @@
                                                 <label
                                                     for="items"
                                                     class="font-medium text-teal-900"
-                                                    >{{ author.lastName }}
-                                                    {{ author.firstName }}
+                                                    >{{ author.firstName }}
+                                                    {{ author.lastName }}
                                                 </label>
                                                 <p
                                                     v-if="
@@ -890,20 +899,21 @@ export default {
             this.form.contributor_type = {};
             this.form.contributor_type = this.contributorType[0];
             this.isEdit = false;
+            this.error = "";
         },
         /*Edit author*/
         edit(author) {
             this.selectedAuthor = author;
             this.authors = this.authors.filter((author) => {
                 return (
-                    author.family_name + author.given_name !=
-                    this.selectedAuthor.family_name +
-                        this.selectedAuthor.given_name
+                    author.given_name + author.family_name !=
+                    this.selectedAuthor.given_name +
+                        this.selectedAuthor.family_name
                 );
             });
             this.form.title = author.title;
-            this.form.family_name = author.family_name;
             this.form.given_name = author.given_name;
+            this.form.family_name = author.family_name;
             this.form.email_id = author.email_id;
             this.form.affiliation = author.affiliation;
             this.form.orcid_id = author.orcid_id;
@@ -960,8 +970,8 @@ export default {
             let authorsList = [];
             authors.forEach((author) => {
                 authorsList.push({
-                    family_name: author.lastName,
                     given_name: author.firstName,
+                    family_name: author.lastName,
                     orcid_id:
                         author.authorId && author.authorId.type == "ORCID"
                             ? author.authorId.value
@@ -1011,12 +1021,13 @@ export default {
             if (!this.form.hasErrors) {
                 let newAuthor = {
                     title: this.form.title ? this.form.title.trim() : null,
-                    family_name: this.form.family_name
-                        ? this.form.family_name.trim()
-                        : null,
                     given_name: this.form.given_name
                         ? this.form.given_name.trim()
                         : null,
+                    family_name: this.form.family_name
+                        ? this.form.family_name.trim()
+                        : null,
+
                     email_id: this.form.email_id
                         ? this.form.email_id.trim()
                         : null,
@@ -1049,7 +1060,7 @@ export default {
         /*Make request to save API*/
         executeQuery() {
             this.authorsForm.authors = this.authors;
-            const keys = ["family_name", "given_name"];
+            const keys = ["given_name", "family_name"];
             this.authorsForm.authors = this.authorsForm.authors.filter(
                 (value, index, self) =>
                     self.findIndex((v) =>
@@ -1076,8 +1087,8 @@ export default {
             this.authorsForm.authors = [
                 {
                     id: author.id,
-                    family_name: author.family_name,
                     given_name: author.given_name,
+                    family_name: author.family_name,
                     orcid_id: author.orcid_id,
                     affiliation: author.affiliation,
                 },
@@ -1158,6 +1169,26 @@ export default {
             }
             this.displayAddAuthorForms = false;
             this.isEdit = false;
+        },
+        /*Add current user as Author*/
+        addCurrentUser() {
+            if (this.$page.props.user && this.$page.props.user.orcid_id) {
+                let user = {};
+                let affiliation = {};
+                this.fetchedAuthors = [];
+                user.firstName = this.$page.props.user.first_name;
+                user.lastName = this.$page.props.user.last_name;
+                user.authorId = {};
+                user.authorId.type = "ORCID";
+                user.authorId.value = this.$page.props.user.orcid_id;
+                user.authorAffiliationDetailsList = {};
+                user.authorAffiliationDetailsList.authorAffiliation = [];
+                affiliation.affiliation = this.$page.props.user.affiliation;
+                user.authorAffiliationDetailsList.authorAffiliation.push(
+                    affiliation
+                );
+                this.fetchedAuthors.push(user);
+            }
         },
     },
 };
