@@ -190,7 +190,8 @@
     <!-- Find ORCID iD Modal -->
     <select-orcid-id
         ref="selectOrcidIdElement"
-        v-model:selected="this.form.orcid_id"
+        v-model:orcidId="this.form.orcid_id"
+        v-model:affiliation="this.form.affiliation"
     />
 </template>
 
@@ -239,6 +240,7 @@ export default {
                 email: "",
                 username: "",
                 orcid_id: "",
+                affiliation: "",
                 password: "",
                 password_confirmation: "",
                 terms: false,
