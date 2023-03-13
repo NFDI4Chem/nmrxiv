@@ -25,6 +25,8 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
             'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
             'username' => ['required', 'string', 'max:255', Rule::unique('users')->ignore($user->id)],
             'photo' => ['nullable', 'mimes:jpg,jpeg,png', 'max:1024'],
+            'orcid_id' => ['nullable', 'string', 'max:255'],
+            'affiliation' => ['nullable', 'string', 'max:255'],
         ])->validateWithBag('updateProfileInformation');
 
         if (isset($input['photo'])) {
@@ -42,6 +44,7 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
                 'name' => $input['username'] ? $input['username'] : $user->name,
                 'email' => $input['email'],
                 'orcid_id' => $input['orcid_id'],
+                'affiliation' => $input['affiliation'],
             ])->save();
         }
     }

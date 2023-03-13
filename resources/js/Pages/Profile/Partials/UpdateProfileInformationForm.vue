@@ -154,6 +154,22 @@
                 </div>
                 <jet-input-error :message="this.error.orcid" class="mt-2" />
             </div>
+
+            <!-- Affiliation -->
+            <div class="col-span-6 sm:col-span-4">
+                <jet-label for="affiliation" value="Affiliation" />
+                <jet-input
+                    id="affiliation"
+                    v-model="form.affiliation"
+                    type="text"
+                    class="mt-1 block w-full"
+                    autocomplete="affiliation"
+                />
+                <jet-input-error
+                    :message="form.errors.affiliation"
+                    class="mt-2"
+                />
+            </div>
         </template>
 
         <template #actions>
@@ -210,6 +226,7 @@ export default {
                 email: this.user.email,
                 username: this.user.username,
                 orcid_id: this.user.orcid_id,
+                affiliation: this.user.affiliation,
                 photo: null,
             }),
             error: {},
