@@ -189,6 +189,7 @@
     <select-orcid-id
         ref="selectOrcidIdElement"
         v-model:selected="this.form.orcid_id"
+        v-model:affiliation="this.form.affiliation"
     />
 </template>
 
