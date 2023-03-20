@@ -86,7 +86,7 @@
                                 "
                                 class="mb-3"
                             >
-                                <div class="py-2 mb-2 block">
+                                <div v-if="$page.props.selectedFileSystemObject.uuid" class="py-2 mb-2 block">
                                     <p class="font-bold text-xl">
                                         {{
                                             $page.props.selectedFileSystemObject
@@ -193,7 +193,9 @@ export default {
     },
     props: ["project", "tab"],
     data() {
-        return {};
+        return {
+            selectedFileSystemObject: null,
+        };
     },
     computed: {
         url() {
