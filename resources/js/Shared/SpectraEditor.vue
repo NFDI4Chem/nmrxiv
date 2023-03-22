@@ -121,35 +121,165 @@
                         :key="spectra.id"
                         class="min-w-full border divide-y divide-gray-300"
                     >
-                        <thead class="bg-gray-50">
+                        <thead class="bg-teal-500">
+                            <tr>
+                                <th
+                                    scope="col"
+                                    colspan="2"
+                                    class="py-3.5 pl-4 pr-3 text-left text-sm font-bold text-black-900 sm:pl-6 lg:pl-8"
+                                >
+                                    Spectra :
+                                    {{ spectra.id }}
+                                </th>
+                            </tr>
+                        </thead>
+                        <thead class="bg-teal-100">
+                            <tr>
+                                <th
+                                    scope="col"
+                                    class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-black-900 sm:pl-6 lg:pl-8"
+                                >
+                                    Field
+                                </th>
+                                <th
+                                    scope="col"
+                                    class="px-1 py-3.5 text-left text-sm font-semibold text-black-900"
+                                >
+                                    Value
+                                </th>
+                            </tr>
+                        </thead>
+                        <thead class="bg-red-50">
                             <tr>
                                 <th
                                     scope="col"
                                     colspan="2"
                                     class="py-3.5 pl-4 pr-3 text-left text-sm font-bold text-blue-900 sm:pl-6 lg:pl-8"
                                 >
-                                    Spectra ::
-                                    {{ spectra.id }}
+                                    Sample Details
                                 </th>
                             </tr>
                         </thead>
-                        <thead class="bg-gray-50">
+
+                        <tbody class="divide-y divide-gray-300 bg-white">
+                            <tr
+                                v-for="(value, key) in this.extractMI(spectra)[
+                                    'sample'
+                                ]"
+                            >
+                                <td
+                                    class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8"
+                                >
+                                    {{ key }}
+                                </td>
+                                <td
+                                    class="whitespace-nowrap px-1 py-4 text-sm text-gray-500"
+                                >
+                                    {{ value }}
+                                </td>
+                            </tr>
+                        </tbody>
+                        <thead class="bg-red-50">
                             <tr>
                                 <th
                                     scope="col"
-                                    class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 lg:pl-8"
+                                    colspan="2"
+                                    class="py-3.5 pl-4 pr-3 text-left text-sm font-bold text-blue-900 sm:pl-6 lg:pl-8"
                                 >
-                                    Field
-                                </th>
-                                <th
-                                    scope="col"
-                                    class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                >
-                                    Value
+                                    Device
                                 </th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-200 bg-white">
+
+                        <tbody class="divide-y divide-gray-300 bg-white">
+                            <tr
+                                v-for="(value, key) in this.extractMI(spectra)[
+                                    'devices'
+                                ]"
+                            >
+                                <td
+                                    class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8"
+                                >
+                                    {{ key }}
+                                </td>
+                                <td
+                                    class="whitespace-nowrap px-1 py-4 text-sm text-gray-500"
+                                >
+                                    {{ value }}
+                                </td>
+                            </tr>
+                        </tbody>
+                        <thead class="bg-red-50">
+                            <tr>
+                                <th
+                                    scope="col"
+                                    colspan="2"
+                                    class="py-3.5 pl-4 pr-3 text-left text-sm font-bold text-blue-900 sm:pl-6 lg:pl-8"
+                                >
+                                    Settings
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-300 bg-white">
+                            <tr
+                                v-for="(value, key) in this.extractMI(spectra)[
+                                    'settings'
+                                ]"
+                            >
+                                <td
+                                    class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8"
+                                >
+                                    {{ key }}
+                                </td>
+                                <td
+                                    class="whitespace-nowrap px-1 py-4 text-sm text-gray-500"
+                                >
+                                    {{ value }}
+                                </td>
+                            </tr>
+                        </tbody>
+                        <thead class="bg-red-50">
+                            <tr>
+                                <th
+                                    scope="col"
+                                    colspan="2"
+                                    class="py-3.5 pl-4 pr-3 text-left text-sm font-bold text-blue-900 sm:pl-6 lg:pl-8"
+                                >
+                                    Measurements Details
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-300 bg-white">
+                            <tr
+                                v-for="(value, key) in this.extractMI(spectra)[
+                                    'measurements'
+                                ]"
+                            >
+                                <td
+                                    class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8"
+                                >
+                                    {{ key }}
+                                </td>
+                                <td
+                                    class="whitespace-nowrap px-1 py-4 text-sm text-gray-500"
+                                >
+                                    {{ value }}
+                                </td>
+                            </tr>
+                        </tbody>
+
+                        <thead class="bg-gray-200">
+                            <tr>
+                                <th
+                                    scope="col"
+                                    colspan="2"
+                                    class="py-3.5 pl-4 pr-3 text-left text-sm font-bold text-blue-900 sm:pl-6 lg:pl-8"
+                                >
+                                    Spectrum
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-300 bg-white">
                             <tr
                                 v-for="key in Object.keys(spectra.info)"
                                 :key="key"
@@ -160,14 +290,15 @@
                                     {{ key }}
                                 </td>
                                 <td
-                                    class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"
+                                    class="whitespace-nowrap px-1 py-4 text-sm text-gray-500"
                                 >
                                     {{ spectra.info[key] }}
                                 </td>
                             </tr>
+
                             <tr>
                                 <td
-                                    class="whitespace-nowrap py-2 pl-2 pr-3 text-sm font-medium text-gray-900 sm:pl-6 bg-gray-100 lg:pl-8"
+                                    class="whitespace-nowrap py-2 pl-2 pr-3 text-sm font-medium text-gray-900 sm:pl-6 bg-gray-200 lg:pl-8"
                                     colspan="2"
                                 >
                                     Meta
@@ -183,7 +314,7 @@
                                     {{ key }}
                                 </td>
                                 <td
-                                    class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"
+                                    class="whitespace-nowrap px-1 py-4 text-sm text-gray-500"
                                 >
                                     {{ spectra.meta[key] }}
                                 </td>
@@ -653,6 +784,56 @@ export default {
         showVersions() {
             this.versionsElement.toggleVersions();
         },
+
+        inArray(needle, haystack) {
+            var length = haystack.length;
+            for (var i = 0; i < length; i++) {
+                if (haystack[i] == needle) {
+                    return true;
+                }
+            }
+            return false;
+        },
+
+        extractMI(spectra) {
+            let miObject = {
+                sample: ["solvent"],
+                devices: ["origin", "probeName"],
+                settings: [
+                    "temperature",
+                    "pulseSequence",
+                    "baseFrequency",
+                    "fieldStrength",
+                    "dimension",
+                ],
+                measurements: [
+                    "numberOfScans",
+                    "spectralWidth",
+                    "numberOfPoints",
+                    "relaxationTime",
+                    "acquisitionTime",
+                ],
+            };
+
+            let mi = {
+                sample: {},
+                devices: {},
+                settings: {},
+                measurements: {},
+            };
+
+            for (const [key, array] of Object.entries(miObject)) {
+                array.forEach((value) => {
+                    if (this.inArray(value, Object.keys(spectra.info))) {
+                        mi[key][value] = spectra.info[value];
+                    }
+                });
+            }
+            return mi;
+        },
     },
 };
 </script>
+<style scoped>
+/* … */
+</style>
