@@ -5,6 +5,7 @@
 [![GitHub issues](https://img.shields.io/github/issues/NFDI4Chem/nmrxiv.svg)](https://GitHub.com/NFDI4Chem/nmrxiv/issues/)
 [![GitHub contributors](https://img.shields.io/github/contributors/NFDI4Chem/nmrxiv.svg)](https://GitHub.com/NFDI4Chem/nmrxiv/graphs/contributors/)
 ![Workflow](https://github.com/NFDI4Chem/nmrxiv/actions/workflows/build.yml/badge.svg)
+![Workflow](https://github.com/NFDI4Chem/nmrxiv/actions/workflows/release-please.yml/badge.svg)
 
 ## About nmrXiv
 
