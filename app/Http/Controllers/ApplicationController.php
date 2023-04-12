@@ -71,9 +71,10 @@ class ApplicationController extends Controller
                     ]);
                     break;
                 case 'study':
-                    return Inertia::render('Public/Project/License', [
-                        'project' => (new ProjectResource($project))->lite(false, ['license']),
+                    return Inertia::render('Public/Project/Study', [
+                        'project' => (new ProjectResource($project))->lite(false, []),
                         'tab' => $tab,
+                        'study' => (new StudyResource($study))->lite(false, ['tags', 'sample', 'datasets', 'molecules']),
                     ]);
                     break;
                 case 'dataset':
