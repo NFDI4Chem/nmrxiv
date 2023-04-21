@@ -375,6 +375,10 @@ export default {
                 ? String(this.$page.props.nmriumURL + "?id=" + Math.random())
                 : "http://nmriumdev.nmrxiv.org?id=" + Math.random();
         },
+
+        mailFromAddress() {
+            return String(this.$page.props.mailFromAddress);
+        },
     },
     methods: {
         registerEvents() {
@@ -385,20 +389,20 @@ export default {
                 ) {
                     return;
                 }
-                if (e.data.type == "nmr-wrapper:error") {
+                if (e.data.data.type == "nmr-wrapper:error") {
                     this.spectraError = e.data.data;
                     this.updateLoadingStatus(false);
                     return;
                 }
-                if (e.data.type == "nmr-wrapper:action-response") {
+                if (e.data.data.type == "nmr-wrapper:action-response") {
                     let actionType = e.data.data.type;
                     if (actionType == "exportSpectraViewerAsBlob") {
                         this.saveStudyPreview(e.data.data.data);
                     }
                 }
                 this.version = e.data.data.version;
-                if (e.data.type == "nmr-wrapper:data-change") {
-                    let actionType = e.data.data.actionType;
+                if (e.data.data.type == "nmr-wrapper:data-change") {
+                    let actionType = e.data.data.data.actionType;
                     if (
                         actionType == "" ||
                         (actionType == "INITIATE" &&
@@ -409,13 +413,13 @@ export default {
                         this.infoLog("Spectra loaded successfully...", true);
                         return;
                     }
-                    this.selectedSpectraData = e.data.data.spectra;
+                    this.selectedSpectraData = e.data.data.data.spectra;
                     if (
                         actionType == "ADD_MOLECULE" ||
                         actionType == "DELETE_MOLECULE" ||
-                        e.data.data.molecules
+                        e.data.data.data.molecules
                     ) {
-                        this.currentMolecules = e.data.data.molecules;
+                        this.currentMolecules = e.data.data.data.molecules;
                     }
 
                     if (this.study && this.dataset) {
@@ -547,7 +551,7 @@ export default {
                 data: [url],
                 type: "url",
             };
-            iframe.postMessage({ type: `nmr-wrapper:load`, data }, "*");
+            iframe.postMessage({ type: `nmr-wrapper:load`, data: data }, "*");
         },
         updateDataSet() {
             // console.log("updating dataset");
@@ -574,7 +578,7 @@ export default {
                         this.updateLoadingStatus(false);
                         this.infoLog("Error saving spectra info");
                         console.error(
-                            "Error saving the nmrium info. Please contact us at info@nmrxiv.org if the error persist."
+                            "Error saving the nmrium info. Please contact us at {{mailFromAddress}} if the error persist."
                         );
                         this.autoSaving = false;
                     });

@@ -5,10 +5,13 @@ namespace Tests\Feature;
 use App\Models\Citation;
 use App\Models\Project;
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class ManageCitationsTest extends TestCase
 {
+    use RefreshDatabase;
+
     /**
      * Test if a citation can be updated.
      *

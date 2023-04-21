@@ -81,16 +81,12 @@ class DatasetController extends Controller
                 foreach ($spectra as $spectrum) {
                     $experimentDetailsExists = array_key_exists('experiment', $spectrum['info']);
                     if ($experimentDetailsExists) {
-                        $experiment = ['experiment'];
-                        if (is_null($experiment)) {
-                            $nucleus = $spectrum['info']['nucleus'];
-                            if (is_array($nucleus)) {
-                                $nucleus = implode('-', $nucleus);
-                            }
-                            $dataset->type = implode(',', array_unique(array_map('trim', explode(',', $nucleus.', '.$dataset->type))));
-                        } else {
-                            $dataset->type = $spectrum['info']['experiment'];
+                        $experiment = $spectrum['info']['experiment'];
+                        $nucleus = $spectrum['info']['nucleus'];
+                        if (is_array($nucleus)) {
+                            $nucleus = implode('-', $nucleus);
                         }
+                        $dataset->type = $experiment.','.$nucleus;
                     }
                 }
 

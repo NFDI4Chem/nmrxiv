@@ -23,7 +23,6 @@ class ProjectInvitation extends Mailable implements ShouldQueue
     /**
      * Create a new message instance.
      *
-     * @param  \App\Models\ProjectInvitation  $invitation
      * @return void
      */
     public function __construct(ProjectInvitationModel $invitation)

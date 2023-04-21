@@ -22,7 +22,6 @@ class UsersController extends Controller
     /**
      * Render the index page with list of users.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Pages\Console\Users\Index
      */
     public function index(Request $request)
@@ -41,6 +40,8 @@ class UsersController extends Controller
                         'profile_photo_url' => $user->profile_photo_url,
                         'verified_at' => $user->email_verified_at,
                         'role' => $user->getRoleNames(),
+                        'orcid_id' => $user->orcid_id,
+                        'affiliation' => $user->affiliation,
                     ];
                 }),
             'roles' => Role::orderBy('name')
@@ -69,8 +70,6 @@ class UsersController extends Controller
     /**
      * Store the newly created user.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Actions\Fortify\CreateNewUser  $creator
      * @return \Illuminate\Http\RedirectResponse
      */
     public function store(Request $request, CreateNewUser $creator)
@@ -84,7 +83,6 @@ class UsersController extends Controller
     /**
      * Render the edit user page.
      *
-     * @param  \App\Models\User  $user
      * @return \Pages\Console\Users\Edit
      */
     public function edit(User $user)
@@ -95,7 +93,11 @@ class UsersController extends Controller
                 'first_name' => $user->first_name,
                 'last_name' => $user->last_name,
                 'email' => $user->email,
+                'username' => $user->username,
                 'profile_photo_url' => $user->profile_photo_url,
+                'orcid_id' => $user->orcid_id,
+                'affiliation' => $user->affiliation,
+
             ],
         ]);
     }
@@ -103,8 +105,6 @@ class UsersController extends Controller
     /**
      * Save the updated user info.
      *
-     * @param  \App\Models\User  $user
-     * @param  \Illuminate\Http\Request  $request
      * @param  \App\Actions\Fortify\UpdateUserProfileInformation  $updater
      * @return \Illuminate\Http\RedirectResponse
      */
@@ -118,8 +118,6 @@ class UsersController extends Controller
     /**
      * Save the updated password for the user.
      *
-     * @param  \App\Models\User  $user
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse
      */
     public function updatePassword(User $user, Request $request)
@@ -138,8 +136,6 @@ class UsersController extends Controller
     /**
      * Save the updated role for the user.
      *
-     * @param  \App\Models\User  $user
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse
      */
     public function updateRole(User $user, Request $request)
@@ -166,7 +162,6 @@ class UsersController extends Controller
     /**
      * Check if user has password.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function checkPassword(Request $request)
@@ -185,8 +180,6 @@ class UsersController extends Controller
     /**
      * Delete the profile photo.
      *
-     * @param  \App\Models\User  $user
-     * @param  \Illuminate\Http\Request  $request
      *  @return \Illuminate\Http\RedirectResponse
      */
     public function destroyPhoto(User $user, Request $request)
@@ -194,5 +187,22 @@ class UsersController extends Controller
         $user->deleteProfilePhoto();
 
         return back(303)->with('status', 'profile-photo-deleted');
+    }
+
+    /**
+     * Mark notification as read.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function markNotificationAsRead(User $user, Request $request)
+    {
+        $input = $request->all();
+        $id = $input['id'];
+        if ($id) {
+            $user->markNotificationAsRead($id);
+        }
+
+        return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('status', 'notification-markedAsRead');
     }
 }
