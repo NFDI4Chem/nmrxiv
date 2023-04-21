@@ -25,10 +25,10 @@ class DataCatalogController extends Controller
         $creativeWork = Schema::creativeWork();
         $creativeWork['@id'] = 'https://bioschemas.org/profiles/DataCatalog/0.3-RELEASE-2019_07_01';
 
-        $confromsTo = [];
-        $confromsTo['http://purl.org/dc/terms/conformsTo'] = $creativeWork;
+        $confromsTo = $creativeWork;
 
         $keywords = $this->prepareKeywords();
+        $contributors = $this->prepareContributors();
 
         $nmrXivProvider = Schema::organization();
         $nmrXivProvider->name(env('NMRXIV_PROVIDER'));
@@ -39,10 +39,11 @@ class DataCatalogController extends Controller
         $dataCatalog['dct:conformsTo'] = $confromsTo;
         $dataCatalog->description(env('APP_DESCRIPTION'));
         $dataCatalog->keywords($keywords);
-        //$dataCatalog->keywords(['NMR', 'Nuclear Magnetic Resonance Spectroscopy', 'FAIR NMR', '1D NMR', '2D NMR', 'COSY', 'HSQC', 'HMBC', 'NOESY', 'Sepctral raw data', 'Bruker NMR', 'JOEL', 'NMReData', 'NMRium']);
         $dataCatalog->name(env('APP_NAME'));
         $dataCatalog->provider($nmrXivProvider);
         $dataCatalog->url(env('APP_URL'));
+        $dataCatalog->identifier(env('APP_URL'));
+        $dataCatalog->contributor($contributors);
 
         $dataCatalog->measurementTechnique(env('MEASUREMENT_TECHNIQUE'));
 
@@ -118,5 +119,57 @@ class DataCatalogController extends Controller
         $keywords = [$pulsedNMR, $nmr, $oneDNMR, $twoDNMR, $cosy, $hsqc, $hmbc, $noesy, $brukerNMR, $joel, $nmreData];
 
         return $keywords;
+    }
+
+    /**
+     * Get Person from given and family names.
+     *
+     *
+     * @param  string  $givenName
+     * @param  string  $familyName
+     * @return object $Person
+     */
+    public function getPerson($givenName, $familyName)
+    {
+        $contributor = Schema::Person();
+        $contributor->givenName($givenName);
+        $contributor->familyName($familyName);
+
+        return $contributor;
+    }
+
+    /**
+     * Prepare Contributors.
+     *
+     * @param null
+     * @return array $contributors
+     */
+    public function prepareContributors()
+    {
+        $Annett = $this->getPerson('Annett', 'Schröter');
+        $Christian = $this->getPerson('Christian', 'Popp');
+        $Christoph = $this->getPerson('Christoph', 'Steinbeck');
+        $Darina = $this->getPerson('Darina', 'Storozhuk');
+        $David = $this->getPerson('David', 'Rauh');
+        $Guido = $this->getPerson('Guido', 'Pauli');
+        $Hamed = $this->getPerson('Hamed', 'Musallam');
+        $Johannes = $this->getPerson('Johannes', 'Liermann');
+        $Julien = $this->getPerson('Julien', 'Wist');
+        $Kohulan = $this->getPerson('Kohulan', 'Rajan');
+        $Luc = $this->getPerson('Luc', 'Patiny');
+        $Markus = $this->getPerson('Markus', 'Lange');
+        $Nazar = $this->getPerson('Nazar', 'Stefaniuk');
+        $Nils = $this->getPerson('Nils', 'Schlörer');
+        $Nisha = $this->getPerson('Nisha', 'Sharma');
+        $Noura = $this->getPerson('Noura', 'Rayya');
+        $Pascal = $this->getPerson('Pascal', 'Scherreiks');
+        $Stephan = $this->getPerson('Stephan', 'Kuhn');
+        $Steffen = $this->getPerson('Steffen', 'Neumann');
+        $Tillmann = $this->getPerson('Tillmann', 'Fischer');
+        $Venkata = $this->getPerson('Venkata Chandrasekhar', 'Nainala');
+
+        $contributors = [$Annett, $Christian, $Christoph, $Darina, $Guido, $Hamed, $Johannes, $Julien, $Kohulan, $Luc, $Markus, $Nazar, $Nils, $Nisha, $Noura, $Pascal, $Stephan, $Steffen, $Tillmann, $Venkata];
+
+        return $contributors;
     }
 }
