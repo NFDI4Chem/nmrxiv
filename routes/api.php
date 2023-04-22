@@ -7,7 +7,7 @@ use App\Http\Controllers\API\FileSystemController;
 use App\Http\Controllers\API\ProjectController;
 use App\Http\Controllers\API\Schemas\Bioschema\BiochemaController;
 use App\Http\Controllers\API\Schemas\Bioschema\DataCatalogController;
-use App\Http\Controllers\API\Schemas\Datacite\DataciteController;
+use App\Http\Controllers\API\Schemas\Datacite\DataCiteController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -37,9 +37,9 @@ Route::prefix('v1')->group(function () {
 
     Route::prefix('schemas')->group(function () {
         Route::prefix('bioschema')->group(function () {
-            Route::get('/', [DataCatalogController::class, 'dataCatalogSchema']);
-            Route::get('/{username}/{project}/{study?}/{dataset?}', [BiochemaController::class, 'modelSchemaByName']);
-            Route::get('/{id}', [BiochemaController::class, 'modelSchemaByID']);
+            Route::get('/', [DataCatalogController::class, 'dataCatalogSchema'])->name('bioschema.datacatalog');
+            Route::get('/{username}/{project}/{study?}/{dataset?}', [BiochemaController::class, 'modelSchemaByName'])->name('bioschema.modelName');
+            Route::get('/{id}', [BiochemaController::class, 'modelSchemaByID'])->name('bioschema.modelID');
         });
 
         Route::prefix('datacite')->group(function () {
