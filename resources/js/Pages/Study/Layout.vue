@@ -85,6 +85,25 @@
                                         @click="toogleStarred"
                                     />
                                     {{ study.name }}
+                                    <button
+                                        v-if="canUpdateStudy"
+                                        type="button"
+                                        class="inline-flex items-center shadow-sm px-4 py-1.5 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                        @click="toggleDetails"
+                                    >
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            viewBox="0 0 20 20"
+                                            fill="currentColor"
+                                            aria-hidden="true"
+                                            class="w-4 h-4 mr-2 text-gray-600"
+                                        >
+                                            <path
+                                                d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"
+                                            ></path>
+                                        </svg>
+                                        <span>Edit</span>
+                                    </button>
                                 </div>
                                 <div
                                     class="mt-1 flex flex-col sm:flex-row sm:flex-wrap sm:mt-0 sm:space-x-6"
@@ -429,6 +448,15 @@ export default {
             studyDetailsElement,
         };
     },
+
+    computed: {
+        canUpdateStudy() {
+            return this.studyPermissions
+                ? this.studyPermissions.canUpdateStudy
+                : false;
+        },
+    },
+
     data() {
         return {};
     },

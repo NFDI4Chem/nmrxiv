@@ -14,7 +14,6 @@ class StudyMemberController extends Controller
     /**
      * Add a new team member to a study.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $studyId
      * @return \Illuminate\Http\RedirectResponse
      */
@@ -36,7 +35,6 @@ class StudyMemberController extends Controller
     /**
      * Update the given study member's role.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $studyId
      * @param  int  $userId
      * @return \Illuminate\Http\RedirectResponse
@@ -56,7 +54,6 @@ class StudyMemberController extends Controller
     /**
      * Remove the given user from the given study.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $studyId
      * @param  int  $userId
      * @return \Illuminate\Http\RedirectResponse

@@ -23,7 +23,6 @@ class ProjectPolicy
     /**
      * Determine whether the user can view any models.
      *
-     * @param  \App\Models\User  $user
      * @return mixed
      */
     public function viewAny(User $user)
@@ -34,8 +33,6 @@ class ProjectPolicy
     /**
      * Determine whether the user can view the model.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Project  $project
      * @return mixed
      */
     public function viewProject(User $user, Project $project)
@@ -54,7 +51,6 @@ class ProjectPolicy
     /**
      * Determine whether the user can create models.
      *
-     * @param  \App\Models\User  $user
      * @return mixed
      */
     public function createProject(User $user)
@@ -65,8 +61,6 @@ class ProjectPolicy
     /**
      * Determine whether the user can update the model.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Project  $project
      * @return mixed
      */
     public function updateProject(User $user, Project $project)
@@ -81,8 +75,6 @@ class ProjectPolicy
     /**
      * Determine whether the user can delete the model.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Project  $project
      * @return mixed
      */
     public function deleteProject(User $user, Project $project)
@@ -93,8 +85,6 @@ class ProjectPolicy
     /**
      * Determine whether the user can add project members.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Project  $project
      * @return mixed
      */
     public function addProjectMember(User $user, Project $project)
@@ -105,8 +95,6 @@ class ProjectPolicy
     /**
      * Determine whether the user can update project member permissions.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Project  $project
      * @return mixed
      */
     public function updateProjectMember(User $user, Project $project)
@@ -117,8 +105,6 @@ class ProjectPolicy
     /**
      * Determine whether the user can remove project members.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Project  $project
      * @return mixed
      */
     public function removeProjectMember(User $user, Project $project)

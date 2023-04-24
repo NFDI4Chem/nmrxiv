@@ -13,7 +13,6 @@ class StudyInvitationController extends Controller
     /**
      * Accept a study invitation.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  \Laravel\Jetstream\StudyInvitation  $invitation
      * @return \Illuminate\Http\RedirectResponse
      */
@@ -36,7 +35,6 @@ class StudyInvitationController extends Controller
     /**
      * Cancel the given study invitation.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  \Laravel\Jetstream\StudyInvitation  $invitation
      * @return \Illuminate\Http\RedirectResponse
      */

@@ -99,6 +99,9 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::get('projects/status/{project}/queue', [ProjectController::class, 'status'])
             ->name('project.status');
 
+    Route::post('users/notification/{user}/markAsRead', [UsersController::class, 'markNotificationAsRead'])
+        ->name('users.markNotificationAsRead');
+
     Route::get('dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
 
     Route::group([
@@ -258,10 +261,10 @@ Route::group([
             Route::get('announcements', [AnnouncementController::class, 'index'])
             ->name('console.announcements');
 
-            Route::post('announcements/create', [AnnouncementController::class, 'create'])
+            Route::post('announcements', [AnnouncementController::class, 'create'])
             ->name('console.announcements.create');
 
-            Route::post('announcements/{announcement}', [AnnouncementController::class, 'update'])
+            Route::put('announcements/{announcement}', [AnnouncementController::class, 'update'])
             ->name('console.announcements.edit');
 
             Route::delete('announcements/{announcement}', [AnnouncementController::class, 'destroy'])
