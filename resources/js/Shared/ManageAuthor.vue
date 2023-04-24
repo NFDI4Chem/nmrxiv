@@ -1175,7 +1175,6 @@ export default {
             if (this.$page.props.user && this.$page.props.user.orcid_id) {
                 let user = {};
                 let affiliation = {};
-                this.fetchedAuthors = [];
                 user.firstName = this.$page.props.user.first_name;
                 user.lastName = this.$page.props.user.last_name;
                 user.authorId = {};
