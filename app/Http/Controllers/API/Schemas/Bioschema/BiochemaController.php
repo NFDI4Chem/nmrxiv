@@ -10,6 +10,7 @@ use App\Models\Project;
 use App\Models\Sample;
 use App\Models\Study;
 use App\Models\User;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
 use Spatie\SchemaOrg\Schema;
 
@@ -40,27 +41,35 @@ class BiochemaController extends Controller
             $project = Project::where([['slug', $projectName], ['owner_id', $user->id]])->firstOrFail();
         }
         if ($project) {
-            $projectSchema = $this->project($project);
-            if ($studyName) {
-                // send study back with project info added to it\
-                $study = Study::where([['slug', $studyName], ['owner_id', $user->id], ['project_id', $project->id]])->firstOrFail();
-                if ($study) {
-                    $studySchema = $this->study($study, $project);
-                    if ($datasetName) {
-                        $dataset = Dataset::where([['slug', $datasetName], ['owner_id', $user->id], ['project_id', $project->id], ['study_id', $study->id]])->firstOrFail();
-                        // send dataset with project and study details
-                        if ($dataset) {
-                            $datasetSchema = $this->dataset($dataset, $study, $project);
+            if ($project->is_public) {
+                $projectSchema = $this->project($project);
+                if ($studyName) {
+                    // send study back with project info added to it\
+                    $study = Study::where([['slug', $studyName], ['owner_id', $user->id], ['project_id', $project->id]])->firstOrFail();
+                    if ($study) {
+                        if ($study->is_public) {
+                            $studySchema = $this->study($study, $project);
+                            if ($datasetName) {
+                                $dataset = Dataset::where([['slug', $datasetName], ['owner_id', $user->id], ['project_id', $project->id], ['study_id', $study->id]])->firstOrFail();
+                                // send dataset with project and study details
+                                if ($dataset) {
+                                    $datasetSchema = $this->dataset($dataset, $study, $project);
 
-                            return $datasetSchema;
+                                    return $datasetSchema;
+                                }
+                            }
+
+                            return $studySchema;
+                        } else {
+                            throw new AuthorizationException;
                         }
                     }
-
-                    return $studySchema;
                 }
-            }
 
-            return $projectSchema;
+                return $projectSchema;
+            } else {
+                throw new AuthorizationException;
+            }
         }
     }
 
@@ -80,20 +89,24 @@ class BiochemaController extends Controller
         $namespace = $resolvedModel['namespace'];
         $model = $resolvedModel['model'];
 
-        if ($namespace == 'Project') {
-            $projectSchema = $this->project($model);
+        if ($model->is_public) {
+            if ($namespace == 'Project') {
+                $projectSchema = $this->project($model);
 
-            return $projectSchema;
-        } elseif ($namespace == 'Study') {
-            $studySchema = $this->study($model);
+                return $projectSchema;
+            } elseif ($namespace == 'Study') {
+                $studySchema = $this->study($model);
 
-            return $studySchema;
-        } elseif ($namespace == 'Dataset') {
-            $project = $model->project;
-            $study = $model->study;
-            $datasetSchema = $this->dataset($model, $study, $project);
+                return $studySchema;
+            } elseif ($namespace == 'Dataset') {
+                $project = $model->project;
+                $study = $model->study;
+                $datasetSchema = $this->dataset($model, $study, $project);
 
-            return $datasetSchema;
+                return $datasetSchema;
+            }
+        } else {
+            throw new AuthorizationException;
         }
     }
 
