@@ -281,7 +281,8 @@ class BiochemaController extends Controller
     /**
      * Get NMRium info from a dataset.
      *
-     * @link https://bioschemas.org/profiles/Dataset/1.0-RELEASE     * @link https://bioschemas.org/profiles/Study/0.2-DRAFT
+     * @link https://bioschemas.org/profiles/Dataset/1.0-RELEASE
+     * @link https://bioschemas.org/profiles/Study/0.2-DRAFT
      *
      * @param  App\Models\Dataset  $dataset
      * @return array $nmriumInfo
@@ -324,6 +325,30 @@ class BiochemaController extends Controller
             $experimentProperty, $temperatureProperty, $baseFrequencyProperty, $fieldStrengthProperty, $numberOfScansProperty, $pulseSequenceProperty, $spectralWidthProperty, $numberOfPointsProperty, $relaxationTimeProperty, ];
 
         return [$keywords, $variables];
+    }
+
+    /**
+     * Get Dataset download details info from a dataset.
+     *
+     * @link https://bioschemas.org/profiles/Dataset/1.0-RELEASE
+     * @link https://schema.org/distribution
+     * @link https://schema.org/DataDownload
+     *
+     * @param  App\Models\Dataset  $dataset
+     * return object $distribution
+     */
+    public function getDistribution($dataset)
+    {
+        $url = env('APP_URL');
+        $user = $dataset->user;
+        $slug = $dataset->project->slug;
+        $contentURL = $url.'/'.$user.'/datasets/'.$slug;
+
+        $distribution = Schema::distribution();
+        $distribution['@type'] = Schema::DataDownload();
+        $distribution->name($dataset->project->name);
+        $distribution->encodingFormat('zip');
+        $distribution->contentURL($contentURL);
     }
 
     /**
@@ -459,6 +484,7 @@ class BiochemaController extends Controller
         $datasetSchema->dateCreated($dataset->created_at);
         $datasetSchema->dateModified($dataset->updated_at);
         $datasetSchema->datePublished($dataset->release_date);
+        $datasetSchema->distribution($this->getDistribution($dataset));
         $datasetSchema->includedInDataCatalog($this->DataCatalogLite());
         $datasetSchema->measurementTechnique(env('MEASUREMENT_TECHNIQUE'));
         $datasetSchema->variableMeasured($this->getNMRiumInfo($dataset)[1]);
