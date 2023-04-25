@@ -751,6 +751,7 @@ export default {
             authors: [],
             fetchedAuthors: [],
             selectedAuthor: null,
+            singular: null,
             loading: false,
             confirmDelete: false,
             error: "",
@@ -944,7 +945,7 @@ export default {
                     },
                 })
                 .then((res) => {
-                    this.fetchedAuthors = isDOI
+                    this.singular = isDOI
                         ? res.data.resultList.result[0].authorList.author
                         : res.data.resultList.result[0].authorList.author.filter(
                               (a) =>
@@ -956,12 +957,17 @@ export default {
                 .catch(() => {
                     this.error =
                         "Something went wrong. Please check the input and try again.";
+                    this.singular = null;
+                    this.loading = false;
                 })
                 .finally(() => {
-                    if (this.fetchedAuthors.length == 0) {
+                    if (this.singular.length == 0) {
                         this.error =
                             "No data found. Please enter the details manually.";
                     }
+                    this.singular.forEach((item) =>
+                        this.fetchedAuthors.push(item)
+                    );
                     this.loading = false;
                 });
         },
