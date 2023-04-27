@@ -170,6 +170,22 @@
                     class="mt-2"
                 />
             </div>
+
+            <div 
+            class="col-span-6 sm:col-span-4">
+                <jet-label for="license" value="Deafult License" />
+                
+                    <select-rich
+                    
+                        v-model:selected="form.license"
+                        :items="licenses"
+                    />
+            </div>
+
+            <div>
+                <div class="mt-6 grid grid-cols-1 gap-x-4 sm:grid-cols-1"></div>
+                <jet-input-error :message="form.errors.license" class="mt-2" />
+            </div>
         </template>
 
         <template #actions>
@@ -203,6 +219,8 @@ import JetActionMessage from "@/Jetstream/ActionMessage.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import SelectOrcidId from "@/Shared/SelectOrcidId.vue";
 import { ref } from "vue";
+import SelectRich from "@/Shared/SelectRich.vue";
+
 
 export default {
     components: {
@@ -214,6 +232,7 @@ export default {
         JetLabel,
         JetSecondaryButton,
         SelectOrcidId,
+        SelectRich,
     },
 
     props: ["user"],
@@ -229,9 +248,15 @@ export default {
                 orcid_id: this.user.orcid_id,
                 affiliation: this.user.affiliation,
                 photo: null,
+                license: null,
+                license_id: null,
+                tag: "",
+                tags: [],
             }),
             error: {},
             photoPreview: null,
+            open: false,
+            licenses: [],
         };
     },
     setup() {
@@ -256,6 +281,10 @@ export default {
         updateProfileInformation() {
             if (this.$refs.photo) {
                 this.form.photo = this.$refs.photo.files[0];
+            }
+
+            if (this.form.license) {
+                this.form.license_id = this.form.license.id;
             }
 
             this.form.post(route("user-profile-information.update"), {
@@ -298,6 +327,48 @@ export default {
                 this.$refs.photo.value = null;
             }
         },
+
+        assignTags() {
+            if (this.user) {
+                let tags = [];
+                this.user.tags.forEach((t) => {
+                    tags.push({
+                        text: t.name["en"],
+                    });
+                });
+                this.form.tags = tags;
+            }
+        },
+
+        loadLicenses() {
+            if (this.$page.props.licenses) {
+                this.licenses = this.$page.props.licenses;
+                this.form.license = this.licenses.find(
+                    (l) => l.id == this.user.license_id
+                );
+            } else {
+                axios.get(route("licenses")).then((res) => {
+                    this.licenses = res.data;
+                    this.$page.props.licenses = res.data;
+                    this.form.license = this.licenses.find(
+                        (l) => l.id == this.user.license_id
+                    );
+                });
+            }
+        },
+
+        toggleDetails() {
+            this.loadLicenses();
+            this.open = !this.open;
+            //this.getTags();
+        },
+    },
+
+    mounted() {
+        const initialise = () => {
+            this.loadLicenses();
+            this.open = true;
+        };
     },
 };
 </script>
