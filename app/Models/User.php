@@ -122,4 +122,14 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         $this->notifications->where('id', $id)->markAsRead();
     }
+
+    /**
+     * Get the license of the user.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function license()
+    {
+        return $this->belongsTo(License::class, 'license_id');
+    }
 }
