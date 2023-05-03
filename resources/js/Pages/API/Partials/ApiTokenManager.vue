@@ -100,23 +100,21 @@
                                     >
                                         Last used {{ token.last_used_ago }}
                                     </div>
-
-                                    <button
+                                    <jet-secondary-button
                                         v-if="availablePermissions.length > 0"
-                                        class="cursor-pointer ml-6 text-sm text-gray-400 underline"
+                                        class="cursor-pointer ml-6 text-sm text-gray-500"
                                         @click="
                                             manageApiTokenPermissions(token)
                                         "
                                     >
                                         Permissions
-                                    </button>
-
-                                    <button
+                                    </jet-secondary-button>
+                                    <jet-secondary-button
                                         class="cursor-pointer ml-6 text-sm text-red-500"
                                         @click="confirmApiTokenDeletion(token)"
                                     >
                                         Delete
-                                    </button>
+                                    </jet-secondary-button>
                                 </div>
                             </div>
                         </div>
