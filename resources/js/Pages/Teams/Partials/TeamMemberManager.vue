@@ -164,13 +164,13 @@
 
                             <div class="flex items-center">
                                 <!-- Cancel Team Invitation -->
-                                <button
+                                <jet-secondary-button
                                     v-if="userPermissions.canRemoveTeamMembers"
                                     class="cursor-pointer ml-6 text-sm text-red-500 focus:outline-none"
                                     @click="cancelTeamInvitation(invitation)"
                                 >
                                     Cancel
-                                </button>
+                                </jet-secondary-button>
                             </div>
                         </div>
                     </div>
@@ -212,6 +212,7 @@
 
                             <div class="flex items-center">
                                 <!-- Manage Team Member Role -->
+
                                 <button
                                     v-if="
                                         userPermissions.canAddTeamMembers &&
@@ -231,22 +232,22 @@
                                 </div>
 
                                 <!-- Leave Team -->
-                                <button
+                                <jet-secondary-button
                                     v-if="$page.props.user.id === user.id"
                                     class="cursor-pointer ml-6 text-sm text-red-500"
                                     @click="confirmLeavingTeam"
                                 >
                                     Leave
-                                </button>
+                                </jet-secondary-button>
 
                                 <!-- Remove Team Member -->
-                                <button
+                                <jet-secondary-button
                                     v-if="userPermissions.canRemoveTeamMembers"
                                     class="cursor-pointer ml-6 text-sm text-red-500"
                                     @click="confirmTeamMemberRemoval(user)"
                                 >
                                     Remove
-                                </button>
+                                </jet-secondary-button>
                             </div>
                         </div>
                     </div>
