@@ -47,12 +47,12 @@
                             <div class="absolute top-0 right-0 -mr-12 pt-2">
                                 <button
                                     type="button"
-                                    class="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
+                                    class="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-black"
                                     @click="sidebarOpen = false"
                                 >
                                     <span class="sr-only">Close sidebar</span>
                                     <XMarkIcon
-                                        class="h-6 w-6 text-white"
+                                        class="h-6 w-6 text-black"
                                         aria-hidden="true"
                                     />
                                 </button>
@@ -249,21 +249,19 @@
             <div
                 class="sticky top-0 z-10 flex-shrink-0 flex h-16 bg-white shadow"
             >
-                <button
-                    type="button"
-                    class="hidden md:inline-flex p-4 rounded mx-1 mr-3 border-red-200 text-gray-500"
+                <jet-secondary-button
                     @click="toggleCollapseSidebar()"
+                    class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition"
                 >
-                    <Bars3Icon class="h-6 w-6" aria-hidden="true" />
-                </button>
-                <button
-                    type="button"
+                    <ArrowsRightLeftIcon class="h-6 w-6" aria-hidden="true" />
+                </jet-secondary-button>
+                <jet-secondary-button
                     class="px-4 border-r border-gray-200 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-teal-500 md:hidden"
                     @click="sidebarOpen = true"
                 >
-                    <span class="sr-only">Open sidebar</span>
-                    <Bars3Icon class="h-6 w-6" aria-hidden="true" />
-                </button>
+                    <ArrowsRightLeftIcon class="h-6 w-6" aria-hidden="true" />
+                </jet-secondary-button>
+
                 <div class="flex-1 px-4 py-2 flex justify-between">
                     <div class="flex-1 flex">
                         <search
@@ -371,7 +369,8 @@
                                 id="tour-step-documentation"
                                 href="https://docs.nmrxiv.org/docs/category/submission-guides"
                                 target="_blank"
-                                ><svg
+                            >
+                                <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     viewBox="0 0 24 24"
                                     class="h-6 w-6"
@@ -383,8 +382,9 @@
                                     <path
                                         d="M12 21V5a5 5 0 0 1 4-2h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4.34a2 2 0 0 0-1.42.59l-.83.82A2 2 0 0 1 12 21z"
                                         class="fill-current text-gray-600"
-                                    ></path></svg
-                            ></a>
+                                    ></path>
+                                </svg>
+                            </a>
                             <span
                                 class="bg-gray-900 text-center text-white px-2 py-1 shadow-lg rounded-md tooltiptextbottom"
                                 >Submission guides</span
@@ -409,8 +409,9 @@
                                         fill-rule="evenodd"
                                         d="M18 3a1 1 0 00-1.447-.894L8.763 6H5a3 3 0 000 6h.28l1.771 5.316A1 1 0 008 18h1a1 1 0 001-1v-4.382l6.553 3.276A1 1 0 0018 15V3z"
                                         clip-rule="evenodd"
-                                    /></svg
-                            ></a>
+                                    />
+                                </svg>
+                            </a>
                             <span
                                 class="bg-gray-900 text-center text-white px-2 py-1 shadow-lg rounded-md tooltiptextbottom"
                                 >Start&nbsp;tour</span
@@ -791,8 +792,10 @@ import {
     FolderIcon,
     Squares2X2Icon,
     TrashIcon,
+    ArrowsRightLeftIcon,
 } from "@heroicons/vue/24/outline";
 import { MagnifyingGlassIcon, PlusIcon } from "@heroicons/vue/24/solid";
+import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 
 const userNavigation = [];
 
@@ -899,6 +902,8 @@ export default {
         StudyCreate,
         Submission,
         Notification,
+        JetSecondaryButton,
+        ArrowsRightLeftIcon,
     },
     props: {
         title: String,
