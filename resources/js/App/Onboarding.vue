@@ -335,38 +335,24 @@
 
                             <div class="grid grid-cols-4 gap-4">
                                 <div class="p-4 py-4">
-                                    <button
+                                    <jet-secondary-button
                                         v-if="currentStep != 1"
-                                        type="button"
                                         class="py-2 px-3 border rounded-md"
                                         @click="selectStep(currentStep - 1)"
                                     >
-                                        <div class="flex flex-row align-middle">
-                                            <svg
-                                                class="w-5 mr-1"
-                                                fill="currentColor"
-                                                viewBox="0 0 20 20"
-                                                xmlns="http://www.w3.org/2000/svg"
-                                            >
-                                                <path
-                                                    fill-rule="evenodd"
-                                                    d="M7.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l2.293 2.293a1 1 0 010 1.414z"
-                                                    clip-rule="evenodd"
-                                                ></path>
-                                            </svg>
-                                            <p class="ml-2">Prev</p>
-                                        </div>
-                                    </button>
-                                    <button
+                                        <ArrowLongLeftIcon
+                                            class="flex-shrink-0 mr-1.5 h-5 w-5 text-black-300"
+                                            aria-hidden="true"
+                                        />
+                                        Prev
+                                    </jet-secondary-button>
+                                    <jet-secondary-button
                                         v-else
-                                        type="button"
                                         class="py-2 px-3 border rounded-md"
                                         @click="onboardingComplete"
                                     >
-                                        <div class="flex flex-row align-middle">
-                                            <p class="mx-2">Skip</p>
-                                        </div>
-                                    </button>
+                                        Skip
+                                    </jet-secondary-button>
                                 </div>
                                 <div class="col-span-2">
                                     <nav
@@ -451,65 +437,35 @@
                                 <div class="p-4 py-4 text-right">
                                     <div v-if="currentStep < steps.length">
                                         <div v-if="currentStep == 1">
-                                            <button
-                                                type="button"
+                                            <jet-secondary-button
                                                 class="py-2 px-3 bg-indigo-600 text-white rounded-md"
                                                 autofocus
                                                 @click="
                                                     selectStep(currentStep + 1)
                                                 "
                                             >
-                                                <div
-                                                    class="flex flex-row align-middle"
-                                                >
-                                                    <span class="mr-1"
-                                                        >Let's&nbsp;go</span
-                                                    >
-                                                    <svg
-                                                        class="w-5 ml-2"
-                                                        fill="currentColor"
-                                                        viewBox="0 0 20 20"
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                    >
-                                                        <path
-                                                            fill-rule="evenodd"
-                                                            d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z"
-                                                            clip-rule="evenodd"
-                                                        ></path>
-                                                    </svg>
-                                                </div>
-                                            </button>
+                                                Let's go
+                                                <ArrowLongRightIcon
+                                                    class="flex-shrink-0 mr-1.5 h-5 w-5 text-black-300"
+                                                    aria-hidden="true"
+                                                />
+                                            </jet-secondary-button>
                                         </div>
                                         <div v-else>
-                                            <button
+                                            <jet-secondary-button
                                                 ref="next"
-                                                type="button"
                                                 class="py-2 px-3 bg-indigo-600 text-white rounded-md"
                                                 autofocus
                                                 @click="
                                                     selectStep(currentStep + 1)
                                                 "
                                             >
-                                                <div
-                                                    class="flex flex-row align-middle"
-                                                >
-                                                    <span class="mr-1"
-                                                        >Next</span
-                                                    >
-                                                    <svg
-                                                        class="w-5 ml-2"
-                                                        fill="currentColor"
-                                                        viewBox="0 0 20 20"
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                    >
-                                                        <path
-                                                            fill-rule="evenodd"
-                                                            d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z"
-                                                            clip-rule="evenodd"
-                                                        ></path>
-                                                    </svg>
-                                                </div>
-                                            </button>
+                                                Next
+                                                <ArrowLongRightIcon
+                                                    class="flex-shrink-0 mr-1.5 h-5 w-5 text-black-300"
+                                                    aria-hidden="true"
+                                                />
+                                            </jet-secondary-button>
                                         </div>
                                     </div>
                                 </div>
@@ -536,7 +492,11 @@ import {
     TransitionRoot,
 } from "@headlessui/vue";
 
-import { MagnifyingGlassIcon } from "@heroicons/vue/24/solid";
+import {
+    MagnifyingGlassIcon,
+    ArrowLongLeftIcon,
+    ArrowLongRightIcon,
+} from "@heroicons/vue/24/solid";
 import {
     DocumentPlusIcon,
     FolderIcon,
@@ -546,6 +506,7 @@ import {
     TagIcon,
 } from "@heroicons/vue/24/outline";
 import axios from "axios";
+import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 
 export default {
     components: {
@@ -567,6 +528,9 @@ export default {
         HashtagIcon,
         TagIcon,
         ArrowTopRightOnSquareIcon,
+        JetSecondaryButton,
+        ArrowLongLeftIcon,
+        ArrowLongRightIcon,
     },
     props: [],
     data() {
