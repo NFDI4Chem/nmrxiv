@@ -58,25 +58,16 @@
                                 />
                                 {{ project.name }}
 
-                                <button
+                                <jet-secondary-button
                                     v-if="canUpdateProject"
-                                    type="button"
-                                    class="inline-flex items-center shadow-sm px-4 py-1.5 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                    class="inline-flex border-transparent items-center shadow-sm px-4 py-1.5 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                                     @click="toggleDetails"
                                 >
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        viewBox="0 0 20 20"
-                                        fill="currentColor"
-                                        aria-hidden="true"
-                                        class="w-4 h-4 mr-2 text-gray-600"
-                                    >
-                                        <path
-                                            d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"
-                                        ></path>
-                                    </svg>
+                                    <PencilIcon
+                                        class="w-4 h-4 mr-1 text-gray-600"
+                                    />
                                     <span>Edit</span>
-                                </button>
+                                </jet-secondary-button>
                             </div>
 
                             <div class="inline-flex items-center mt-3">
@@ -350,9 +341,9 @@
                             >
                                 Description
                             </span>
-                            <button
+
+                            <jet-secondary-button
                                 v-if="canUpdateProject"
-                                type="button"
                                 class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                                 @click="toggleDetails"
                             >
@@ -360,7 +351,7 @@
                                     class="w-4 h-4 mr-1 text-gray-600"
                                 />
                                 <span>Edit</span>
-                            </button>
+                            </jet-secondary-button>
                         </div>
                     </div>
                     <dd class="mt-1 text-gray-900 space-y-5">
@@ -386,9 +377,8 @@
                             >
                                 Keywords
                             </span>
-                            <button
+                            <jet-secondary-button
                                 v-if="canUpdateProject"
-                                type="button"
                                 class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                                 @click="toggleDetails"
                             >
@@ -396,7 +386,7 @@
                                     class="w-4 h-4 mr-1 text-gray-600"
                                 />
                                 <span>Edit</span>
-                            </button>
+                            </jet-secondary-button>
                         </div>
                     </div>
                     <dd class="mt-1 text-md text-gray-900 space-y-5">
@@ -437,9 +427,8 @@
                             >
                                 License
                             </span>
-                            <button
+                            <jet-secondary-button
                                 v-if="canUpdateProject"
-                                type="button"
                                 class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                                 @click="toggleDetails"
                             >
@@ -447,7 +436,7 @@
                                     class="w-4 h-4 mr-1 text-gray-600"
                                 />
                                 <span>Edit</span>
-                            </button>
+                            </jet-secondary-button>
                         </div>
                     </div>
                     <div>
@@ -481,9 +470,8 @@
                             >
                                 Citation
                             </span>
-                            <button
+                            <jet-secondary-button
                                 v-if="canUpdateProject"
-                                type="button"
                                 class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                                 @click="toggleManageCitation"
                             >
@@ -491,7 +479,7 @@
                                     class="w-4 h-4 mr-1 text-gray-600"
                                 />
                                 <span>Edit</span>
-                            </button>
+                            </jet-secondary-button>
                         </div>
                     </div>
                     <dd
@@ -562,9 +550,8 @@
                             >
                                 Author
                             </span>
-                            <button
+                            <jet-secondary-button
                                 v-if="canUpdateProject"
-                                type="button"
                                 class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                                 @click="toggleManageAuthor"
                             >
@@ -572,7 +559,7 @@
                                     class="w-4 h-4 mr-1 text-gray-600"
                                 />
                                 <span>Edit</span>
-                            </button>
+                            </jet-secondary-button>
                         </div>
                     </div>
                     <dd class="mt-2 text-md text-gray-900 space-y-5">
@@ -615,6 +602,7 @@ import ManageCitation from "@/Shared/ManageCitation.vue";
 import Citation from "@/Shared/Citation.vue";
 import Publish from "@/Shared/Publish.vue";
 import AuthorCard from "@/Shared/AuthorCard.vue";
+import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 
 export default {
     components: {
@@ -632,6 +620,7 @@ export default {
         Citation,
         Publish,
         AuthorCard,
+        JetSecondaryButton,
     },
     props: [
         "project",
