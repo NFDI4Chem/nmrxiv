@@ -39,9 +39,8 @@
                                             <div
                                                 class="ml-3 h-7 flex items-center"
                                             >
-                                                <button
-                                                    type="button"
-                                                    class="rounded-md hover:text-black text-white"
+                                                <jet-secondary-button
+                                                    class="rounded-md hover:text-red text-red"
                                                     @click="open = false"
                                                 >
                                                     <span class="sr-only"
@@ -51,7 +50,7 @@
                                                         class="h-6 w-6"
                                                         aria-hidden="true"
                                                     />
-                                                </button>
+                                                </jet-secondary-button>
                                             </div>
                                         </div>
                                     </div>
@@ -106,7 +105,7 @@
                                                                     }"
                                                                     as="template"
                                                                 >
-                                                                    <button
+                                                                    <jet-secondary-button
                                                                         :class="[
                                                                             selected
                                                                                 ? 'text-gray-900 bg-gray-100 hover:bg-gray-200'
@@ -115,7 +114,7 @@
                                                                         ]"
                                                                     >
                                                                         Write
-                                                                    </button>
+                                                                    </jet-secondary-button>
                                                                 </Tab>
                                                                 <Tab
                                                                     v-slot="{
@@ -123,7 +122,7 @@
                                                                     }"
                                                                     as="template"
                                                                 >
-                                                                    <button
+                                                                    <jet-secondary-button
                                                                         :class="[
                                                                             selected
                                                                                 ? 'text-gray-900 bg-gray-100 hover:bg-gray-200'
@@ -132,7 +131,7 @@
                                                                         ]"
                                                                     >
                                                                         Preview
-                                                                    </button>
+                                                                    </jet-secondary-button>
                                                                 </Tab>
                                                             </TabList>
                                                             <TabPanels
@@ -416,8 +415,7 @@
                                                                 "
                                                             />
                                                         </div>
-                                                        <button
-                                                            type="button"
+                                                        <jet-secondary-button
                                                             class="-ml-px relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500"
                                                             @click="
                                                                 copyToClipboard(
@@ -431,7 +429,7 @@
                                                                     class="h-5 w-5"
                                                                     aria-hidden="true"
                                                             /></span>
-                                                        </button>
+                                                        </jet-secondary-button>
                                                     </div>
                                                 </div>
                                                 <div
@@ -462,8 +460,7 @@
                                                                 "
                                                             />
                                                         </div>
-                                                        <button
-                                                            type="button"
+                                                        <jet-secondary-button
                                                             class="-ml-px relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500"
                                                             @click="
                                                                 copyToClipboard(
@@ -477,7 +474,7 @@
                                                                     class="h-5 w-5"
                                                                     aria-hidden="true"
                                                             /></span>
-                                                        </button>
+                                                        </jet-secondary-button>
                                                     </div>
                                                 </div>
                                                 <!-- <div>
