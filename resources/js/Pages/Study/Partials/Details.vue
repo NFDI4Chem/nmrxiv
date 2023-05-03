@@ -38,10 +38,9 @@
                                             </DialogTitle>
                                             <div
                                                 class="ml-3 h-7 flex items-center"
-                                            >
-                                                <button
-                                                    type="button"
-                                                    class="rounded-md hover:text-white"
+                                            > 
+                                            <jet-secondary-button
+                                                    class="rounded-md hover:text-red text-red"
                                                     @click="open = false"
                                                 >
                                                     <span class="sr-only"
@@ -51,7 +50,7 @@
                                                         class="h-6 w-6"
                                                         aria-hidden="true"
                                                     />
-                                                </button>
+                                                </jet-secondary-button>
                                             </div>
                                         </div>
                                     </div>
@@ -106,7 +105,7 @@
                                                                     }"
                                                                     as="template"
                                                                 >
-                                                                    <button
+                                                                <jet-secondary-button
                                                                         :class="[
                                                                             selected
                                                                                 ? 'text-gray-900 bg-gray-100 hover:bg-gray-200'
@@ -115,7 +114,7 @@
                                                                         ]"
                                                                     >
                                                                         Write
-                                                                    </button>
+                                                                    </jet-secondary-button>
                                                                 </Tab>
                                                                 <Tab
                                                                     v-slot="{
@@ -123,7 +122,7 @@
                                                                     }"
                                                                     as="template"
                                                                 >
-                                                                    <button
+                                                                <jet-secondary-button
                                                                         :class="[
                                                                             selected
                                                                                 ? 'text-gray-900 bg-gray-100 hover:bg-gray-200'
@@ -132,7 +131,7 @@
                                                                         ]"
                                                                     >
                                                                         Preview
-                                                                    </button>
+                                                                    </jet-secondary-button>
                                                                 </Tab>
                                                             </TabList>
                                                             <TabPanels
