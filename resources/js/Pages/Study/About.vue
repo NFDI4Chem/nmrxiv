@@ -33,17 +33,17 @@
                                         >
                                             Description
                                         </span>
-                                        <button
-                                            v-if="canUpdateStudy"
-                                            type="button"
+                                        <jet-secondary-button
+                                        v-if="canUpdateStudy"
                                             class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                                            @click="openStudyDetailsPane"
-                                        >
+                                            @click="openStudyDetailsPane">
                                             <PencilIcon
                                                 class="w-4 h-4 mr-1 text-gray-600"
                                             />
                                             <span>Edit</span>
-                                        </button>
+
+                                        </jet-secondary-button>
+                                        
                                     </div>
                                 </div>
                                 <dd
@@ -74,17 +74,17 @@
                                         >
                                             Keywords
                                         </span>
-                                        <button
-                                            v-if="canUpdateStudy"
-                                            type="button"
+                                        <jet-secondary-button
+                                        v-if="canUpdateStudy"
                                             class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                                            @click="openStudyDetailsPane"
-                                        >
+                                            @click="openStudyDetailsPane">
                                             <PencilIcon
                                                 class="w-4 h-4 mr-1 text-gray-600"
                                             />
                                             <span>Edit</span>
-                                        </button>
+
+                                        </jet-secondary-button>
+                                        
                                     </div>
                                 </div>
                                 <dd
@@ -134,17 +134,17 @@
                                         >
                                             License
                                         </span>
-                                        <button
-                                            v-if="canUpdateStudy"
-                                            type="button"
+                                        <jet-secondary-button
+                                        v-if="canUpdateStudy"
                                             class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                                            @click="openStudyDetailsPane"
-                                        >
+                                            @click="openStudyDetailsPane">
                                             <PencilIcon
                                                 class="w-4 h-4 mr-1 text-gray-600"
                                             />
                                             <span>Edit</span>
-                                        </button>
+
+                                        </jet-secondary-button>
+                                        
                                     </div>
                                 </div>
                                 <div>
@@ -334,8 +334,8 @@
                                                                                 ></span>
                                                                             </div>
                                                                         </div>
-                                                                        <button
-                                                                            v-if="
+                                                                        <jet-secondary-button
+                                                                        v-if="
                                                                                 canUpdateStudy
                                                                             "
                                                                             class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
@@ -343,15 +343,15 @@
                                                                                 deleteMolecule(
                                                                                     molecule
                                                                                 )
-                                                                            "
-                                                                        >
+                                                                            ">
                                                                             <TrashIcon
                                                                                 class="w-4 h-4 inline mr-1"
                                                                             ></TrashIcon
                                                                             >Delete
-                                                                        </button>
-                                                                        <button
-                                                                            v-if="
+
+                                                                        </jet-secondary-button>
+                                                                        <jet-secondary-button
+                                                                        v-if="
                                                                                 canUpdateStudy
                                                                             "
                                                                             class="inline-flex ml-2 items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
@@ -363,9 +363,12 @@
                                                                         >
                                                                             <PencilIcon
                                                                                 class="w-4 h-4 inline mr-1"
-                                                                            ></PencilIcon
-                                                                            >Edit
-                                                                        </button>
+                                                                            ></PencilIcon>
+                                                                            Edit
+
+                                                                        </jet-secondary-button>
+                                                                        
+                                                                        
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -459,16 +462,17 @@
                                                             class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md"
                                                             @blur="loadSmiles"
                                                         />
-                                                        <button
-                                                            v-if="
+                                                        <jet-secondary-button
+                                                        v-if="
                                                                 smiles &&
                                                                 smiles != ''
                                                             "
                                                             class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mt-2"
-                                                            @click="loadSmiles"
-                                                        >
+                                                            @click="loadSmiles">
                                                             Load Structure
-                                                        </button>
+                                                            
+                                                        </jet-secondary-button>
+                                                        
                                                     </div>
                                                 </div>
                                                 <div class="relative">
@@ -520,13 +524,13 @@
                                                         track-color="#999"
                                                     />
                                                 </div>
-                                                <button
-                                                    type="button"
+                                                <jet-secondary-button
                                                     class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                                                    @click="saveMolecule"
-                                                >
-                                                    ADD
-                                                </button>
+                                                    @click="saveMolecule">
+                                                    Add
+
+                                                </jet-secondary-button>
+                                                
                                             </div>
                                         </div>
                                         <div v-if="study">
@@ -596,6 +600,8 @@ import StudyContent from "@/Pages/Study/Content.vue";
 import slider from "vue3-slider";
 import OCL from "openchemlib/full";
 import ToolTip from "@/Shared/ToolTip.vue";
+import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
+
 export default {
     components: {
         StudyContent,
@@ -605,6 +611,7 @@ export default {
         TrashIcon,
         PencilIcon,
         InformationCircleIcon,
+        JetSecondaryButton,
     },
     props: [
         "study",
