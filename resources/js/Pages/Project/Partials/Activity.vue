@@ -42,17 +42,15 @@
                                 <div
                                     class="absolute top-0 left-0 -ml-8 pt-4 pr-2 flex sm:-ml-10 sm:pr-4"
                                 >
-                                    <button
-                                        type="button"
-                                        class="rounded-md text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
+                                    <jet-secondary-button
+                                        class="rounded-md text-gray-300 hover:text-red-500 focus:outline-none focus:ring-2 focus:ring-white"
                                         @click="open = false"
                                     >
-                                        <span class="sr-only">Close panel</span>
                                         <XMarkIcon
-                                            class="h-6 w-6"
+                                            class="h-4 w-3"
                                             aria-hidden="true"
                                         />
-                                    </button>
+                                    </jet-secondary-button>
                                 </div>
                             </TransitionChild>
                             <div class="h-full bg-white p-8 overflow-y-auto">
@@ -254,6 +252,7 @@ import {
 } from "@headlessui/vue";
 import { HeartIcon, XMarkIcon } from "@heroicons/vue/24/outline";
 import { PencilIcon, PlusSmallIcon } from "@heroicons/vue/24/solid";
+import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 
 export default {
     components: {
@@ -265,6 +264,7 @@ export default {
         PencilIcon,
         PlusSmallIcon,
         XMarkIcon,
+        JetSecondaryButton,
     },
     props: ["study", "project"],
     data() {
