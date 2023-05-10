@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div> 
+        <div>
             <div class="mb-2 float-right">
                 <small>
                     <a
@@ -370,7 +370,7 @@ export default {
         url() {
             return String(this.$page.props.url);
         },
-        nmriumURL() {  
+        nmriumURL() {
             return this.$page.props.nmriumURL
                 ? String(this.$page.props.nmriumURL + "?id=" + Math.random())
                 : "http://nmriumdev.nmrxiv.org?id=" + Math.random();
@@ -381,9 +381,9 @@ export default {
         },
     },
     methods: {
-        registerEvents() {    
+        registerEvents() {
             const saveNMRiumUpdates = (e) => {
-                const {data, type} = e.data;
+                const { data, type } = e.data;
                 if (
                     e.origin != "https://nmriumdev.nmrxiv.org" &&
                     e.origin != "https://nmrium.nmrxiv.org"
@@ -393,7 +393,7 @@ export default {
                 if (type == "nmr-wrapper:error") {
                     this.spectraError = e.data;
                     this.updateLoadingStatus(false);
-                    
+
                     return;
                 }
                 if (type == "nmr-wrapper:action-response") {
@@ -420,7 +420,7 @@ export default {
                     if (
                         actionType == "ADD_MOLECULE" ||
                         actionType == "DELETE_MOLECULE" ||
-                       state.data.molecules
+                        state.data.molecules
                     ) {
                         this.currentMolecules = state.data.molecules;
                     }
@@ -480,9 +480,15 @@ export default {
                         .then((response) => {
                             this.updateLoadingStatus(false);
                             nmrium_info = JSON.parse(response.nmrium_info);
-                            if (nmrium_info && nmrium_info['data']["spectra"]) {
-                                if (this.isString(nmrium_info['data']["spectra"])) {
-                                    spectra = JSON.parse(nmrium_info.data.spectra);
+                            if (nmrium_info && nmrium_info["data"]["spectra"]) {
+                                if (
+                                    this.isString(
+                                        nmrium_info["data"]["spectra"]
+                                    )
+                                ) {
+                                    spectra = JSON.parse(
+                                        nmrium_info.data.spectra
+                                    );
                                 } else {
                                     spectra = nmrium_info.data.spectra;
                                 }
@@ -496,7 +502,9 @@ export default {
                                 }
                                 let mols = [];
                                 if (this.isString(nmrium_info.data.molecules)) {
-                                    mols = JSON.parse(nmrium_info.data.molecules);
+                                    mols = JSON.parse(
+                                        nmrium_info.data.molecules
+                                    );
                                 } else {
                                     mols = nmrium_info.data.molecules;
                                 }
