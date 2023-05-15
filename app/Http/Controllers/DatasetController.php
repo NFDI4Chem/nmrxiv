@@ -44,10 +44,10 @@ class DatasetController extends Controller
             $user = Auth::user();
             $data = $request->get('data');
             $version = $request->get('version');
+            $spectra = $request->get('spectra');
+            $molecules = $request->get('molecules');
 
-            $spectra = $data['spectra'];
             $nmriumInfo = $spectra;
-            $molecules = $data['molecules'];
             $molecularInfo = $molecules;
 
             $nmrium = $dataset->nmrium;
