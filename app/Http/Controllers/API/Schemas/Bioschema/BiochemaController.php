@@ -192,9 +192,9 @@ class BiochemaController extends Controller
     }
 
     /**
-     * Implement Schema' Article on a model's citations.
+     * Implement Schema' CreativeWork on a model's citations.
      *
-     * @link https://schema.org/Article
+     * @link https://schema.org/CreativeWork
      *
      * @param  object  $model
      * @return array $citations
@@ -203,7 +203,7 @@ class BiochemaController extends Controller
     {
         $citations = [];
         foreach ($model->citations as &$citation) {
-            $citationSchema = Schema::Article();
+            $citationSchema = Schema::CreativeWork();
             $citationSchema->abstract($citation->abstract);
             $citationSchema->author($citation->authors);
             $citationSchema->headline($citation->title);
