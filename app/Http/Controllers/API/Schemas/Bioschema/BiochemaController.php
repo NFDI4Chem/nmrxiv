@@ -24,7 +24,7 @@ class BiochemaController extends Controller
      /**
       * Implement Bioschemas upon request by model's name to generate a project, study, or dataset schema.
       *
-      * @link https://bioschemas.org/profiles/Study/0.2-DRAFT
+      * @link https://bioschemas.org/profiles/Study/0.3-DRAFT
       * @link https://bioschemas.org/profiles/Dataset/1.0-RELEASE
       *
       * @param  Illuminate\Http\Request  $request
@@ -76,7 +76,7 @@ class BiochemaController extends Controller
     /**
      * Implement Bioschemas upon request by model id to generate a project, study, or dataset schema.
      *
-     * @link https://bioschemas.org/profiles/Study/0.2-DRAFT
+     * @link https://bioschemas.org/profiles/Study/0.3-DRAFT
      * @link https://bioschemas.org/profiles/Dataset/1.0-RELEASE
      *
      * @param  Illuminate\Http\Request  $request
@@ -258,7 +258,7 @@ class BiochemaController extends Controller
      * Implement Bioschemas' BioChemEntity on samples found in studies.
      *
      * @link https://bioschemas.org/types/BioSample/0.1-RELEASE-2019_06_19
-     * @link https://bioschemas.org/profiles/Study/0.2-DRAFT
+     * @link https://bioschemas.org/profiles/Study/0.3-DRAFT
      *
      * @param  App\Models\Study  $study
      * @return object $sampleSchema
@@ -282,7 +282,7 @@ class BiochemaController extends Controller
      * Get NMRium info from a dataset.
      *
      * @link https://bioschemas.org/profiles/Dataset/1.0-RELEASE
-     * @link https://bioschemas.org/profiles/Study/0.2-DRAFT
+     * @link https://bioschemas.org/profiles/Study/0.3-DRAFT
      *
      * @param  App\Models\Dataset  $dataset
      * @return array $nmriumInfo
@@ -396,7 +396,7 @@ class BiochemaController extends Controller
      * included in the lite studies.
      *
      * @link https://bioschemas.org/types/BioChemEntity/0.7-RELEASE-2019_06_19
-     * @link https://bioschemas.org/profiles/Study/0.2-DRAFT
+     * @link https://bioschemas.org/profiles/Study/0.3-DRAFT
      *
      * @param  App\Models\Study  $study
      * @return object $sampleSchema
@@ -417,7 +417,7 @@ class BiochemaController extends Controller
      * Implement Bioschemas' Dataset with only few properties to be included
      * in the project schema or the study schema.
      *
-     * @link https://bioschemas.org/profiles/Study/0.2-DRAFT
+     * @link https://bioschemas.org/profiles/Study/0.3-DRAFT
      *
      * @param  App\Models\Study  $study
      * @return array $datasets
@@ -439,7 +439,7 @@ class BiochemaController extends Controller
      * Implement Bioschemas' study with only few properties, including the sample and molecules,
      * to be included in the project schema.
      *
-     * @link https://bioschemas.org/profiles/Study/0.2-DRAFT
+     * @link https://bioschemas.org/profiles/Study/0.3-DRAFT
      *
      * @param  App\Models\Project  $project
      * @return array $studies
@@ -463,7 +463,7 @@ class BiochemaController extends Controller
      * Implement Bioschemas' Dataset, along with the project and study it belongs to.
      *
      * @link https://bioschemas.org/profiles/Dataset/1.0-RELEASE
-     * @link https://bioschemas.org/profiles/Study/0.2-DRAFT
+     * @link https://bioschemas.org/profiles/Study/0.3-DRAFT
      *
      * @param  App\Models\Dataset  $dataset
      * @param  App\Models\Study  $study
@@ -500,7 +500,7 @@ class BiochemaController extends Controller
      * Implement Bioschemas' Study, including the sample and molecules, along
      * with the project it belongs to and, briefly, the datasets it contains.
      *
-     * @link https://bioschemas.org/profiles/Study/0.2-DRAFT
+     * @link https://bioschemas.org/profiles/Study/0.3-DRAFT
      *
      * @param  App\Models\Study  $study
      * @return object $studySchema
@@ -509,7 +509,7 @@ class BiochemaController extends Controller
     {
         $studySchema = BioSchema::Study();
         $studySchema['@id'] = $study->doi;
-        $studySchema['dct:conformsTo'] = $this->conformsTo(['https://bioschemas.org/profiles/Study/0.2-DRAFT', 'https://isa-specs.readthedocs.io/en/latest/isamodel.html#study']);
+        $studySchema['dct:conformsTo'] = $this->conformsTo(['https://bioschemas.org/profiles/Study/0.3-DRAFT', 'https://isa-specs.readthedocs.io/en/latest/isamodel.html#study']);
         $studySchema['identifier'] = explode(':', $study->identifier ? $study->identifier : ':')[1];
         $studySchema->name($study->name);
         $studySchema->description($study->description);
@@ -532,7 +532,7 @@ class BiochemaController extends Controller
       * Implement Bioschemas' project along with brief details about
       * the studies and datasets it contains.
       *
-      * @link https://bioschemas.org/profiles/Study/0.2-DRAFT
+      * @link https://bioschemas.org/profiles/Study/0.3-DRAFT
       * @link https://bioschemas.org/profiles/Dataset/1.0-RELEASE
       * @link https://bioschemas.org/profiles/Sample/0.2-RELEASE-2018_11_10
       * @link https://bioschemas.org/types/MolecularEntity/0.3-RELEASE-2019_09_02
@@ -544,7 +544,7 @@ class BiochemaController extends Controller
      {
         $projectSchema = BioSchema::Study();
         $projectSchema['@id'] = $project->doi;
-        $projectSchema['dct:conformsTo'] = $this->conformsTo(['https://bioschemas.org/profiles/Study/0.2-DRAFT', 'https://isa-specs.readthedocs.io/en/latest/isamodel.html#investigation']);
+        $projectSchema['dct:conformsTo'] = $this->conformsTo(['https://bioschemas.org/profiles/Study/0.3-DRAFT', 'https://isa-specs.readthedocs.io/en/latest/isamodel.html#investigation']);
         $projectSchema['identifier'] = explode(':', $project->identifier ? $project->identifier : ':')[1];
         $projectSchema->name($project->name);
         $projectSchema->description($project->description);
