@@ -241,7 +241,7 @@ class BiochemaController extends Controller
             $moleculeSchema['identifier'] = $inchiKey;
             $moleculeSchema->name($molecule->CAS_NUMBER);
             $moleculeSchema->url('https://pubchem.ncbi.nlm.nih.gov/compound/'.$cid);
-            $moleculeSchema->inChI($molecule->STANDARD_INCHI);
+            $moleculeSchema->inChI('InChI='.$molecule->STANDARD_INCHI);
             $moleculeSchema->inChIKey($inchiKey);
             $moleculeSchema->iupacName($iupacName);
             $moleculeSchema->molecularFormula($molecule->FORMULA);
@@ -383,7 +383,7 @@ class BiochemaController extends Controller
         $molecules = [];
         foreach ($sample->molecules as &$molecule) {
             $moleculeSchema = Schema::MolecularEntity();
-            $moleculeSchema->inChI($molecule->STANDARD_INCHI);
+            $moleculeSchema->inChI('InChI='.$molecule->STANDARD_INCHI);
             $moleculeSchema->description('Percentage composition: '.$molecule->pivot->percentage_composition.'%');
             array_push($molecules, $moleculeSchema);
         }
