@@ -43,10 +43,10 @@ class DataCatalogController extends Controller
         $dataCatalog->provider($nmrXivProvider);
         $dataCatalog->url(env('APP_URL'));
         $dataCatalog->identifier(env('APP_URL'));
-        $dataCatalog->license("https://mit-license.org/");
+        $dataCatalog->license('https://mit-license.org/');
         $dataCatalog->contributor($contributors);
-        $dataCatalog->isAccessibleForFree(True);
-        
+        $dataCatalog->isAccessibleForFree(true);
+
         $dataCatalog->measurementTechnique(env('MEASUREMENT_TECHNIQUE'));
 
         return $dataCatalog;

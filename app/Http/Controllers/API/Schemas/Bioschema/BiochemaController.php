@@ -69,6 +69,7 @@ class BiochemaController extends Controller
                         }
                     }
                 }
+
                 return $projectSchema;
             } else {
                 throw new AuthorizationException;
@@ -473,7 +474,7 @@ class BiochemaController extends Controller
     public function dataset($dataset)
     {
         $project = $dataset->project;
-        $study =  $dataset->study;
+        $study = $dataset->study;
 
         $datasetSchema = Schema::Dataset();
         $datasetSchema['@id'] = $dataset->doi;
