@@ -53,7 +53,11 @@ class BiochemaController extends Controller
                                 $dataset = Dataset::where([['slug', $datasetName], ['owner_id', $user->id], ['project_id', $project->id], ['study_id', $study->id]])->firstOrFail();
                                 // send dataset with project and study details
                                 if ($dataset) {
-                                    $datasetSchema = $this->dataset($dataset, $study, $project);
+                                    if ($dataset->is_public) {
+                                        $datasetSchema = $this->dataset($dataset, $study, $project);
+                                    } else {
+                                        throw new AuthorizationException;
+                                    }
 
                                     return $datasetSchema;
                                 }
@@ -65,7 +69,6 @@ class BiochemaController extends Controller
                         }
                     }
                 }
-
                 return $projectSchema;
             } else {
                 throw new AuthorizationException;
@@ -218,7 +221,6 @@ class BiochemaController extends Controller
      * Implement Bioschemas' MolecularEntity on molecules found in a sample.
      *
      * @link https://bioschemas.org/profiles/MolecularEntity/0.5-RELEASE
-     * @link https://bioschemas.org/types/BioChemEntity/0.7-RELEASE-2019_06_19
      *
      * @param  App\Models\BioSample  $sample
      * @return array $molecules
@@ -255,9 +257,9 @@ class BiochemaController extends Controller
     }
 
     /**
-     * Implement Bioschemas' BioChemEntity on samples found in studies.
+     * Implement Bioschemas' ChemicalSubstance on samples found in studies.
      *
-     * @link https://bioschemas.org/types/BioSample/0.1-RELEASE-2019_06_19
+     * @link https://bioschemas.org/profiles/ChemicalSubstance/0.4-RELEASE
      * @link https://bioschemas.org/profiles/Study/0.3-DRAFT
      *
      * @param  App\Models\Study  $study
@@ -266,9 +268,9 @@ class BiochemaController extends Controller
     public function getSample($study)
     {
         $sample = $study->sample;
-        $sampleSchema = BioSchema::BioSample();
+        $sampleSchema = BioSchema::ChemicalSubstance();
         $sampleSchema['@id'] = $study->doi;
-        $sampleSchema['dct:conformsTo'] = $this->conformsTo(['https://bioschemas.org/types/BioSample/0.1-RELEASE-2019_06_19']);
+        $sampleSchema['dct:conformsTo'] = $this->conformsTo(['https://bioschemas.org/profiles/ChemicalSubstance/0.4-RELEASE']);
         $sampleSchema['identifie'] = explode(':', $study->identifier ? $study->identifier : ':')[1];
         $sampleSchema->name($sample->name);
         $sampleSchema->description($sample->description);
@@ -395,7 +397,7 @@ class BiochemaController extends Controller
      * Implement Bioschemas' BioSample with only few properties to be
      * included in the lite studies.
      *
-     * @link https://bioschemas.org/types/BioChemEntity/0.7-RELEASE-2019_06_19
+     * @link https://bioschemas.org/profiles/ChemicalSubstance/0.4-RELEASE
      * @link https://bioschemas.org/profiles/Study/0.3-DRAFT
      *
      * @param  App\Models\Study  $study
@@ -403,7 +405,7 @@ class BiochemaController extends Controller
      */
     public function sampleLite($study)
     {
-        $sampleSchema = BioSchema::BioChemEntity();
+        $sampleSchema = BioSchema::ChemicalSubstance();
         $sample = $study->sample;
         $molecules = $this->moleculesLite($sample);
 
