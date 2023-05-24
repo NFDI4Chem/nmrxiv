@@ -48,13 +48,13 @@ class BiochemaController extends Controller
                     $study = Study::where([['slug', $studyName], ['owner_id', $user->id], ['project_id', $project->id]])->firstOrFail();
                     if ($study) {
                         if ($study->is_public) {
-                            $studySchema = $this->study($study, $project);
+                            $studySchema = $this->study($study);
                             if ($datasetName) {
                                 $dataset = Dataset::where([['slug', $datasetName], ['owner_id', $user->id], ['project_id', $project->id], ['study_id', $study->id]])->firstOrFail();
                                 // send dataset with project and study details
                                 if ($dataset) {
                                     if ($dataset->is_public) {
-                                        $datasetSchema = $this->dataset($dataset, $study, $project);
+                                        $datasetSchema = $this->dataset($dataset);
                                     } else {
                                         throw new AuthorizationException;
                                     }
@@ -102,9 +102,8 @@ class BiochemaController extends Controller
 
                 return $studySchema;
             } elseif ($namespace == 'Dataset') {
-                $project = $model->project;
-                $study = $model->study;
-                $datasetSchema = $this->dataset($model, $study, $project);
+
+                $datasetSchema = $this->dataset($model);
 
                 return $datasetSchema;
             }
@@ -342,12 +341,11 @@ class BiochemaController extends Controller
     public function getDistribution($dataset)
     {
         $url = env('APP_URL');
-        $user = $dataset->user;
+        $user = $dataset->owner;
         $slug = $dataset->project->slug;
         $contentURL = $url.'/'.$user.'/datasets/'.$slug;
 
-        $distribution = Schema::distribution();
-        $distribution['@type'] = Schema::DataDownload();
+        $distribution = Schema::DataDownload();
         $distribution->name($dataset->project->name);
         $distribution->encodingFormat('zip');
         $distribution->contentURL($contentURL);
@@ -472,8 +470,11 @@ class BiochemaController extends Controller
      * @param  App\Models\Project  $project
      * @return object $datasetSchema
      */
-    public function dataset($dataset, $study, $project)
+    public function dataset($dataset)
     {
+        $project = $dataset->project;
+        $study =  $dataset->study;
+
         $datasetSchema = Schema::Dataset();
         $datasetSchema['@id'] = $dataset->doi;
         $datasetSchema['dct:conformsTo'] = $this->conformsTo(['https://bioschemas.org/profiles/Dataset/1.0-RELEASE', 'https://isa-specs.readthedocs.io/en/latest/isamodel.html#assay']);
@@ -492,7 +493,7 @@ class BiochemaController extends Controller
         $datasetSchema->variableMeasured($this->getNMRiumInfo($dataset)[1]);
         $datasetSchema->isAccessibleForFree(true);
         $projectSchema = $this->project($project);
-        $studySchema = $this->study($study, $project);
+        $studySchema = $this->study($study);
         $datasetSchema->isPartOf([$projectSchema, $studySchema]);
 
         return $datasetSchema;
@@ -507,8 +508,9 @@ class BiochemaController extends Controller
      * @param  App\Models\Study  $study
      * @return object $studySchema
      */
-    public function study($study, $project)
+    public function study($study)
     {
+        $project = $study->project;
         $studySchema = BioSchema::Study();
         $studySchema['@id'] = $study->doi;
         $studySchema['dct:conformsTo'] = $this->conformsTo(['https://bioschemas.org/profiles/Study/0.3-DRAFT', 'https://isa-specs.readthedocs.io/en/latest/isamodel.html#study']);
