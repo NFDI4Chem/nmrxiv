@@ -18,7 +18,7 @@ To get more details about nmrXiv, visit our [documentation site](https://docs.nm
 
 ## Help Desk
 
-If you discover any issue or need any support please raise a ticket at our [Help Desk](https://helpdesk.nfdi4chem.de/).
+If you discover any issue or need any support please raise a ticket at our [Help Desk](https://helpdesk.nfdi4chem.de/) or or write to us at info@nmrxiv.org.
 
 ## Features and Bugs
 
