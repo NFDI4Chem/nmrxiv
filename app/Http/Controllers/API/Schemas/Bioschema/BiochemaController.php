@@ -490,6 +490,15 @@ class BiochemaController extends Controller
         return $schemas;
     }
 
+    public function preparePublisher()
+    {
+        $publisher = Schema::Organization();
+        $publisher->name(env('APP_NAME'));
+        $publisher->url(env('APP_URL'));
+
+        return $publisher;
+    }
+
     /**
      * Implement Bioschemas' Dataset, along with the project and study it belongs to.
      *
@@ -547,6 +556,7 @@ class BiochemaController extends Controller
         $studySchema->description($study->description);
         $studySchema->keywords($this->getTags($study));
         $studySchema->license($study->license->url);
+        $studySchema->publisher($this->preparePublisher());
         $studySchema->url(env('APP_URL').'/'.explode(':', $study->identifier ? $study->identifier : ':')[1]);
         $studySchema->dateCreated($study->created_at);
         $studySchema->dateModified($study->updated_at);
@@ -582,6 +592,7 @@ class BiochemaController extends Controller
         $projectSchema->description($project->description);
         $projectSchema->keywords($this->getTags($project));
         $projectSchema->license($project->license->url);
+        $projectSchema->publisher($this->preparePublisher());
         $projectSchema->url(env('APP_URL').'/'.explode(':', $project->identifier ? $project->identifier : ':')[1]);
         $projectSchema->dateCreated($project->created_at);
         $projectSchema->dateModified($project->updated_at);
