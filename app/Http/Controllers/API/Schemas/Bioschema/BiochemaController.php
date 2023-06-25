@@ -144,7 +144,7 @@ class BiochemaController extends Controller
     {
         $confromsToList = [];
         foreach ($urls as &$url) {
-            $creativeWork = Schema::creativeWork();
+            $creativeWork = Schema::CreativeWork();
             $creativeWork['@id'] = $url;
             $confromsTo = $creativeWork;
             array_push($confromsToList, $confromsTo);
@@ -365,7 +365,7 @@ class BiochemaController extends Controller
      */
     public function DataCatalogLite()
     {
-        $dataCatalogSchema = Schema::dataCatalog();
+        $dataCatalogSchema = Schema::DataCatalog();
         $dataCatalogSchema->name(env('APP_NAME'));
         $dataCatalogSchema->url(env('APP_URL'));
 

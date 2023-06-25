@@ -22,7 +22,7 @@ class DataCatalogController extends Controller
      */
     public function dataCatalogSchema(Request $request)
     {
-        $creativeWork = Schema::creativeWork();
+        $creativeWork = Schema::CreativeWork();
         $creativeWork['@id'] = 'https://bioschemas.org/profiles/DataCatalog/0.3-RELEASE-2019_07_01';
 
         $confromsTo = $creativeWork;
@@ -30,11 +30,11 @@ class DataCatalogController extends Controller
         $keywords = $this->prepareKeywords();
         $contributors = $this->prepareContributors();
 
-        $nmrXivProvider = Schema::organization();
+        $nmrXivProvider = Schema::Organization();
         $nmrXivProvider->name(env('NMRXIV_PROVIDER'));
         $nmrXivProvider->url(env('NMRXIV_PROVIDER_URL'));
 
-        $dataCatalog = Schema::dataCatalog();
+        $dataCatalog = Schema::DataCatalog();
         $dataCatalog['@id'] = url(env('APP_URL'));
         $dataCatalog['dct:conformsTo'] = $confromsTo;
         $dataCatalog->description(env('APP_DESCRIPTION'));
