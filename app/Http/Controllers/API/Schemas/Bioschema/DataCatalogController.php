@@ -23,7 +23,7 @@ class DataCatalogController extends Controller
     public function dataCatalogSchema(Request $request)
     {
         $creativeWork = Schema::CreativeWork();
-        $creativeWork['@id'] = 'https://bioschemas.org/profiles/DataCatalog/0.3-RELEASE-2019_07_01';
+        $creativeWork['@id'] = 'https://schema.org/DataCatalog"';
 
         $confromsTo = $creativeWork;
 
@@ -102,12 +102,11 @@ class DataCatalogController extends Controller
     {
         //Prepare Defined Term Set
         $chmo = $this->getDefinedTermSet('Chemical Methods Ontology', 'http://purl.obolibrary.org/obo/chmo.owl');
-        $edam = $this->getDefinedTermSet('Bioinformatics operations, data types, formats, identifiers and topics', 'http://edamontology.org');
         $nmrcv = $this->getDefinedTermSet('nuclear magnetic resonance CV', 'http://nmrml.org/cv/');
 
         //Prepare Defined Term
+        $nmr = $this->getDefinedTerm('nuclear magnetic resonance spectroscopy', ['NMR', 'NMR spectroscopy', 'nuclear magnetic resonance (NMR) spectroscopy'], 'CHMO:0000591', 'http://purl.obolibrary.org/obo/CHMO_0000591', $chmo);
         $pulsedNMR = $this->getDefinedTerm('pulsed nuclear magnetic resonance spectroscopy', ['NMR', 'nuclear magnetic resonance spectroscopy', 'NMR spectroscopy'], 'CHMO:0000613', 'https://ontobee.org/ontology/CHMO?iri=http://purl.obolibrary.org/obo/CHMO_0000613', $chmo);
-        $nmr = $this->getDefinedTerm('NMR', ['Nuclear magnetic resonance spectroscopy', 'NMR spectroscopy'], 'topic:0593', 'https://bioportal.bioontology.org/ontologies/EDAM?p=classes&conceptid=topic_0593', $edam);
         $oneDNMR = $this->getDefinedTerm('one-dimensional nuclear magnetic resonance spectroscopy', ['1D NMR spectroscopy', '1-D NMR', 'one-dimensional nuclear magnetic resonance spectroscopy', '1D NMR', '1D nuclear magnetic resonance spectroscopy'], 'CHMO:0000592', 'http://purl.obolibrary.org/obo/CHMO_0000592', $chmo);
         $twoDNMR = $this->getDefinedTerm('two-dimensional nuclear magnetic resonance spectroscopy', ['2-D NMR', '2D NMR', 'two-dimensional nuclear magnetic resonance spectroscopy', '2D NMR spectroscopy', 'two-dimensional NMR', '2D nuclear magnetic resonance'], 'CHMO:0000598', 'http://purl.obolibrary.org/obo/CHMO_0000598', $chmo);
         $cosy = $this->getDefinedTerm('correlation spectroscopy spectrum', ['COSY spectra', 'COSY spectrum', 'COSY NMR spectrum', 'COSY NMR spectra'], 'CHMO:0002450', 'http://purl.obolibrary.org/obo/CHMO_0002450', $chmo);
@@ -118,7 +117,7 @@ class DataCatalogController extends Controller
         $joel = $this->getDefinedTerm('JEOL', [], 'NMR:1400258', 'http://nmrML.org/nmrCV#NMR:1400258', $nmrcv);
         $nmreData = $this->getDefinedTerm('NMReDATA', [], 'format:3906', 'http://edamontology.org/format_3906', $nmrcv);
 
-        $keywords = [$pulsedNMR, $nmr, $oneDNMR, $twoDNMR, $cosy, $hsqc, $hmbc, $noesy, $brukerNMR, $joel, $nmreData];
+        $keywords = [$nmr, $pulsedNMR, $oneDNMR, $twoDNMR, $cosy, $hsqc, $hmbc, $noesy, $brukerNMR, $joel, $nmreData];
 
         return $keywords;
     }
@@ -131,9 +130,10 @@ class DataCatalogController extends Controller
      * @param  string  $familyName
      * @return object $Person
      */
-    public function getPerson($givenName, $familyName)
+    public function getPerson($id, $givenName, $familyName)
     {
         $contributor = Schema::Person();
+        $contributor->identifier($id);
         $contributor->givenName($givenName);
         $contributor->familyName($familyName);
 
@@ -148,29 +148,29 @@ class DataCatalogController extends Controller
      */
     public function prepareContributors()
     {
-        $Annett = $this->getPerson('Annett', 'Schröter');
-        $Christian = $this->getPerson('Christian', 'Popp');
-        $Christoph = $this->getPerson('Christoph', 'Steinbeck');
-        $Darina = $this->getPerson('Darina', 'Storozhuk');
-        $David = $this->getPerson('David', 'Rauh');
-        $Guido = $this->getPerson('Guido', 'Pauli');
-        $Hamed = $this->getPerson('Hamed', 'Musallam');
-        $Johannes = $this->getPerson('Johannes', 'Liermann');
-        $Julien = $this->getPerson('Julien', 'Wist');
-        $Kohulan = $this->getPerson('Kohulan', 'Rajan');
-        $Luc = $this->getPerson('Luc', 'Patiny');
-        $Markus = $this->getPerson('Markus', 'Lange');
-        $Nazar = $this->getPerson('Nazar', 'Stefaniuk');
-        $Nils = $this->getPerson('Nils', 'Schlörer');
-        $Nisha = $this->getPerson('Nisha', 'Sharma');
-        $Noura = $this->getPerson('Noura', 'Rayya');
-        $Pascal = $this->getPerson('Pascal', 'Scherreiks');
-        $Stephan = $this->getPerson('Stephan', 'Kuhn');
-        $Steffen = $this->getPerson('Steffen', 'Neumann');
-        $Tillmann = $this->getPerson('Tillmann', 'Fischer');
-        $Venkata = $this->getPerson('Venkata Chandrasekhar', 'Nainala');
+        $Annett = $this->getPerson('0000-0002-2542-0867', 'Annett', 'Schröter');
+        $Christian = $this->getPerson(null, 'Christian', 'Popp');
+        $Christoph = $this->getPerson('0000-0001-6966-0814', 'Christoph', 'Steinbeck');
+        $Darina = $this->getPerson(null, 'Darina', 'Storozhuk');
+        $David = $this->getPerson('0000-0001-7499-1693', 'David', 'Rauh');
+        $Guido = $this->getPerson('0000-0003-1022-4326', 'Guido', 'Pauli');
+        $Hamed = $this->getPerson(null, 'Hamed', 'Musallam');
+        $Johannes = $this->getPerson('0000-0003-2060-842X', 'Johannes', 'Liermann');
+        $Julien = $this->getPerson('0000-0002-3416-2572', 'Julien', 'Wist');
+        $Kohulan = $this->getPerson('0000-0003-1066-7792', 'Kohulan', 'Rajan');
+        $Luc = $this->getPerson('0000-0002-4943-2643', 'Luc', 'Patiny');
+        $Markus = $this->getPerson(null, 'Markus', 'Lange');
+        $Nazar = $this->getPerson('0000-0002-5870-8496', 'Nazar', 'Stefaniuk');
+        $Nils = $this->getPerson('0000-0002-0990-9582', 'Nils', 'Schlörer');
+        $Nisha = $this->getPerson('0009-0006-4755-1039', 'Nisha', 'Sharma');
+        $Noura = $this->getPerson('0009-0001-5998-5030', 'Noura', 'Rayya');
+        $Pascal = $this->getPerson(null, 'Pascal', 'Scherreiks');
+        $Stefan = $this->getPerson('0000-0002-5990-4157', 'Stefan', 'Kuhn');
+        $Steffen = $this->getPerson('0000-0002-7899-7192', 'Steffen', 'Neumann');
+        $Tillmann = $this->getPerson('0000-0003-4480-8661', 'Tillmann', 'Fischer');
+        $Venkata = $this->getPerson('0000-0002-2564-3243', 'Venkata Chandrasekhar', 'Nainala');
 
-        $contributors = [$Annett, $Christian, $Christoph, $Darina, $Guido, $Hamed, $Johannes, $Julien, $Kohulan, $Luc, $Markus, $Nazar, $Nils, $Nisha, $Noura, $Pascal, $Stephan, $Steffen, $Tillmann, $Venkata];
+        $contributors = [$Annett, $Christian, $Christoph, $Darina, $Guido, $Hamed, $Johannes, $Julien, $Kohulan, $Luc, $Markus, $Nazar, $Nils, $Nisha, $Noura, $Pascal, $Stefan, $Steffen, $Tillmann, $Venkata];
 
         return $contributors;
     }
