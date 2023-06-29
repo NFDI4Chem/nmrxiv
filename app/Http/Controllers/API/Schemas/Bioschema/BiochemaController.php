@@ -271,7 +271,6 @@ class BiochemaController extends Controller
         $sampleSchema = BioSchema::ChemicalSubstance();
         $sampleSchema['@id'] = $study->doi;
         $sampleSchema['dct:conformsTo'] = $this->conformsTo(['https://bioschemas.org/profiles/ChemicalSubstance/0.4-RELEASE']);
-        $sampleSchema['identifier'] = explode(':', $study->identifier ? $study->identifier : ':')[1];
         $sampleSchema->name($sample->name);
         $sampleSchema->description($sample->description);
         $sampleSchema->url(env('APP_URL').'/'.explode(':', $study->identifier ? $study->identifier : ':')[1]);
@@ -516,7 +515,6 @@ class BiochemaController extends Controller
         $datasetSchema = Schema::Dataset();
         $datasetSchema['@id'] = $dataset->doi;
         $datasetSchema['dct:conformsTo'] = $this->conformsTo(['https://bioschemas.org/profiles/Dataset/1.0-RELEASE', 'https://isa-specs.readthedocs.io/en/latest/isamodel.html#assay']);
-        $datasetSchema['identifier'] = explode(':', $dataset->identifier ? $dataset->identifier : ':')[1];
         $datasetSchema->name($dataset->name);
         $datasetSchema->description($dataset->description);
         $datasetSchema->keywords($this->getNMRiumInfo($dataset)[0]);
@@ -551,7 +549,6 @@ class BiochemaController extends Controller
         $studySchema = BioSchema::Study();
         $studySchema['@id'] = $study->doi;
         $studySchema['dct:conformsTo'] = $this->conformsTo(['https://bioschemas.org/profiles/Study/0.3-DRAFT', 'https://isa-specs.readthedocs.io/en/latest/isamodel.html#study']);
-        $studySchema['identifier'] = explode(':', $study->identifier ? $study->identifier : ':')[1];
         $studySchema->name($study->name);
         $studySchema->description($study->description);
         $studySchema->keywords($this->getTags($study));
@@ -587,7 +584,6 @@ class BiochemaController extends Controller
         $projectSchema = BioSchema::Study();
         $projectSchema['@id'] = $project->doi;
         $projectSchema['dct:conformsTo'] = $this->conformsTo(['https://bioschemas.org/profiles/Study/0.3-DRAFT', 'https://isa-specs.readthedocs.io/en/latest/isamodel.html#investigation']);
-        $projectSchema['identifier'] = explode(':', $project->identifier ? $project->identifier : ':')[1];
         $projectSchema->name($project->name);
         $projectSchema->description($project->description);
         $projectSchema->keywords($this->getTags($project));
