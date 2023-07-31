@@ -271,7 +271,7 @@ class BiochemaController extends Controller
         $sampleSchema = BioSchema::ChemicalSubstance();
         $sampleSchema['@id'] = $study->doi;
         $sampleSchema['dct:conformsTo'] = $this->conformsTo(['https://bioschemas.org/profiles/ChemicalSubstance/0.4-RELEASE']);
-        $sampleSchema->name($sample->name);
+        $sampleSchema->name($study->project->name.'.'.$sample->name);
         $sampleSchema->description($sample->description);
         $sampleSchema->url(env('APP_URL').'/'.explode(':', $study->identifier ? $study->identifier : ':')[1]);
         $sampleSchema->hasBioChemEntityPart($this->getMolecules($sample));
@@ -293,8 +293,11 @@ class BiochemaController extends Controller
         $nmrium = NMRium::where([['dataset_id', $dataset->id]])->firstOrFail();
         $info = json_decode($nmrium->nmrium_info)->spectra[0]->info;
 
-        $nucleus = $info->nucleus;
         $solvent = $info->solvent;
+        $nucleus = $info->nucleus;
+        if (is_string($nucleus)) {
+            $nucleus = [$nucleus];
+        }
         $dimension = $info->dimension;
         $probeName = $info->probeName;
         $experiment = $info->experiment;
@@ -307,28 +310,28 @@ class BiochemaController extends Controller
         $numberOfPoints = $info->numberOfPoints;
         $relaxationTime = $info->relaxationTime;
 
-        $nucleusProperty = $this->getPropertyValue('acquisition nucleus', 'NMR:1400083', $nucleus, null);
         $solventProperty = $this->getPropertyValue('NMR solvent', 'NMR:1000330', $solvent, null);
+        $nucleusProperty = $this->getPropertyValue('acquisition nucleus', 'NMR:1400083', $nucleus, null);
         $dimensionProperty = $this->getPropertyValue('NMR spectrum by dimensionality', 'NMR:1000117', $dimension, null);
-        $probeNameProperty = $this->getPropertyValue('NMR probe', 'OBI_0000516', $probeName, null);
-        $experimentProperty = $this->getPropertyValue('NMR by nucleus type', 'FIX_0000132', $experiment, null);
-        $temperatureProperty = $this->getPropertyValue('Temperature', 'NCIT_C25206', $temperature, 'https://ontobee.org/ontology/UO?iri=http://purl.obolibrary.org/obo/UO_0000012');
+        $probeNameProperty = $this->getPropertyValue('NMR probe', 'OBI:0000516', $probeName, null);
+        $experimentProperty = $this->getPropertyValue('pulsed nuclear magnetic resonance spectroscopy', 'CHMO:0000613', $experiment, null);
+        $temperatureProperty = $this->getPropertyValue('Temperature', 'NCIT:C25206', $temperature, 'https://ontobee.org/ontology/UO?iri=http://purl.obolibrary.org/obo/UO_0000012');
         $baseFrequencyProperty = $this->getPropertyValue('irradiation frequency', 'NMR:1400026', $baseFrequency, 'http://purl.obolibrary.org/obo/UO_0000325');
         $fieldStrengthProperty = $this->getPropertyValue('magnetic field strength', 'MR:1400253', $fieldStrength, 'http://purl.obolibrary.org/obo/UO_0000228');
         $numberOfScansProperty = $this->getPropertyValue('number of scans', 'NMR:1400087', $numberOfScans, 'scans');
         $pulseSequenceProperty = $this->getPropertyValue('nuclear magnetic resonance pulse sequence', 'CHMO:0001841', $pulseSequence, null);
-        $spectralWidthProperty = $this->getPropertyValue('Spectral Width', 'NCIT_C156496', $spectralWidth, null); //todo: add unit
+        $spectralWidthProperty = $this->getPropertyValue('Spectral Width', 'NCIT:C156496', $spectralWidth, null); //todo: add unit
         $numberOfPointsProperty = $this->getPropertyValue('number of data points', 'NMR:1000176', $numberOfPoints, 'points');
-        $relaxationTimeProperty = $this->getPropertyValue('relaxation time measurement', 'FIX_0000202', $relaxationTime, 'http://purl.obolibrary.org/obo/UO_0000010');
+        $relaxationTimeProperty = $this->getPropertyValue('relaxation time measurement', 'FIX:0000202', $relaxationTime, 'http://purl.obolibrary.org/obo/UO_0000010');
 
         $keywords = [$solvent, $dimension.'D', $experiment];
         foreach ($nucleus as $e) {
             array_push($keywords, $e);
         }
-        $variables = [$nucleusProperty, $solventProperty, $dimensionProperty, $probeNameProperty,
+        $variables = [$solventProperty, $nucleusProperty,  $dimensionProperty, $probeNameProperty,
             $experimentProperty, $temperatureProperty, $baseFrequencyProperty, $fieldStrengthProperty, $numberOfScansProperty, $pulseSequenceProperty, $spectralWidthProperty, $numberOfPointsProperty, $relaxationTimeProperty, ];
 
-        return [$keywords, $variables];
+        return [$keywords, $variables, $experiment];
     }
 
     /**
@@ -372,94 +375,6 @@ class BiochemaController extends Controller
     }
 
     /**
-     * Implement Bioschemas' MolecularEntity with only few properties to be
-     * included in the lite studies.
-     *
-     * @link https://bioschemas.org/profiles/MolecularEntity/0.5-RELEASE
-     * @link https://bioschemas.org/types/BioSample/0.1-RELEASE-2019_06_19
-     *
-     * @param  App\Models\BioSample  $sample
-     * @return object $molecules
-     */
-    public function moleculesLite($sample)
-    {
-        $molecules = [];
-        foreach ($sample->molecules as &$molecule) {
-            $moleculeSchema = Schema::MolecularEntity();
-            $moleculeSchema->inChI('InChI='.$molecule->STANDARD_INCHI);
-            $moleculeSchema->description('Percentage composition: '.$molecule->pivot->percentage_composition.'%');
-            array_push($molecules, $moleculeSchema);
-        }
-
-        return $molecules;
-    }
-
-    /**
-     * Implement Bioschemas' BioSample with only few properties to be
-     * included in the lite studies.
-     *
-     * @link https://bioschemas.org/profiles/ChemicalSubstance/0.4-RELEASE
-     * @link https://bioschemas.org/profiles/Study/0.3-DRAFT
-     *
-     * @param  App\Models\Study  $study
-     * @return object $sampleSchema
-     */
-    public function sampleLite($study)
-    {
-        $sampleSchema = BioSchema::ChemicalSubstance();
-        $sample = $study->sample;
-        $molecules = $this->moleculesLite($sample);
-
-        $sampleSchema->name($sample->name);
-        $sampleSchema->hasBioChemEntityPart($molecules);
-
-        return $sampleSchema;
-    }
-
-    /**
-     * Implement Bioschemas' Dataset with only few properties to be included
-     * in the project schema or the study schema.
-     *
-     * @link https://bioschemas.org/profiles/Study/0.3-DRAFT
-     *
-     * @param  App\Models\Study  $study
-     * @return array $datasets
-     */
-    public function datasetsLite($study)
-    {
-        $datasets = [];
-        foreach ($study->datasets as &$dataset) {
-            $datasetSchema = Schema::Dataset();
-            $datasetSchema->name($dataset->name);
-            $datasetSchema->url(env('APP_URL').'/'.explode(':', $dataset->identifier ? $dataset->identifier : ':')[1]);
-            array_push($datasets, $datasetSchema);
-        }
-
-        return $datasets;
-    }
-
-    /**
-     * Implement Bioschemas' study with only few properties, including the sample and molecules,
-     * to be included in the project schema.
-     *
-     * @link https://bioschemas.org/profiles/Study/0.3-DRAFT
-     *
-     * @param  App\Models\Study  $study
-     * @return array $studySchema
-     */
-    public function studyLite($study)
-    {
-
-            $studySchema = BioSchema::Study();
-            $studySchema->name($study->name);
-            $studySchema->url(env('APP_URL').'/'.explode(':', $study->identifier ? $study->identifier : ':')[1]);
-            $studySchema->about($this->sampleLite($study));
-            $studySchema->hasPart($this->datasetsLite($study));
-
-        return $studySchema;
-    }
-
-    /**
      * Implement Bioschemas' study with only few properties, including the sample and molecules,
      * to be included in the project schema.
      *
@@ -468,22 +383,24 @@ class BiochemaController extends Controller
      * @param  App\Models\Project  $project
      * @return object $projectSchema
      */
-    public function projectLite($project)
-    {
-        $projectSchema = BioSchema::Study();
-        $projectSchema->name($project->name);
-        $projectSchema->url(env('APP_URL').'/'.explode(':', $project->identifier ? $project->identifier : ':')[1]);
-        $projectSchema->hasPart($this->prepareStudies($project));
-
-        return $projectSchema;
-    }
-
     public function prepareStudies($project)
     {
         $schemas = [];
         foreach ($project->studies as $study) {
             $studySchema = $this->studyLite($study);
+            $studySchema->hasPart($this->prepareDatasets($study));
             array_push($schemas, $studySchema);
+        }
+
+        return $schemas;
+    }
+
+    public function prepareDatasets($study)
+    {
+        $schemas = [];
+        foreach ($study->datasets as $dataset) {
+            $datasetSchema = $this->datasetLite($dataset);
+            array_push($schemas, $datasetSchema);
         }
 
         return $schemas;
@@ -509,13 +426,13 @@ class BiochemaController extends Controller
      * @param  App\Models\Project  $project
      * @return object $datasetSchema
      */
-    public function dataset($dataset)
+    public function datasetLite($dataset)
     {
-
+        $prefix = $dataset->study->project->name.'.'.$dataset->study->name.'.';
         $datasetSchema = Schema::Dataset();
         $datasetSchema['@id'] = $dataset->doi;
         $datasetSchema['dct:conformsTo'] = $this->conformsTo(['https://bioschemas.org/profiles/Dataset/1.0-RELEASE', 'https://isa-specs.readthedocs.io/en/latest/isamodel.html#assay']);
-        $datasetSchema->name($dataset->name);
+        $datasetSchema->name($prefix.$this->getNMRiumInfo($dataset)[2]);
         $datasetSchema->description($dataset->description);
         $datasetSchema->keywords($this->getNMRiumInfo($dataset)[0]);
         $datasetSchema->license($dataset->study->license->url);
@@ -528,9 +445,17 @@ class BiochemaController extends Controller
         $datasetSchema->measurementTechnique(env('MEASUREMENT_TECHNIQUE'));
         $datasetSchema->variableMeasured($this->getNMRiumInfo($dataset)[1]);
         $datasetSchema->isAccessibleForFree(true);
+
+        return $datasetSchema;
+    }
+
+    public function dataset($dataset)
+    {
+        $datasetSchema = $this->datasetLite($dataset);
         $projectSchema = $this->projectLite($dataset->project);
         $studySchema = $this->studyLite($dataset->study);
-        $datasetSchema->isPartOf([$projectSchema, $studySchema]);
+        $studySchema->isPartOf($projectSchema);
+        $datasetSchema->isPartOf($studySchema);
 
         return $datasetSchema;
     }
@@ -544,16 +469,16 @@ class BiochemaController extends Controller
      * @param  App\Models\Study  $study
      * @return object $studySchema
      */
-    public function study($study)
+    public function studyLite($study)
     {
+        $prefix = $study->project->name.'.';
         $studySchema = BioSchema::Study();
         $studySchema['@id'] = $study->doi;
         $studySchema['dct:conformsTo'] = $this->conformsTo(['https://bioschemas.org/profiles/Study/0.3-DRAFT', 'https://isa-specs.readthedocs.io/en/latest/isamodel.html#study']);
-        $studySchema->name($study->name);
+        $studySchema->name($prefix.$study->name);
         $studySchema->description($study->description);
         $studySchema->keywords($this->getTags($study));
         $studySchema->license($study->license->url);
-        $studySchema->publisher($this->preparePublisher());
         $studySchema->url(env('APP_URL').'/'.explode(':', $study->identifier ? $study->identifier : ':')[1]);
         $studySchema->dateCreated($study->created_at);
         $studySchema->dateModified($study->updated_at);
@@ -561,8 +486,15 @@ class BiochemaController extends Controller
         $studySchema->about($this->getSample($study));
         $studySchema->studyDomain('Chemistry');
         $studySchema->studySubject('Small molecules');
+
+        return $studySchema;
+    }
+
+    public function study($study)
+    {
+        $studySchema = $this->studyLite($study);
         $studySchema->isPartOf($this->projectLite($study->project));
-        $studySchema->hasPart($this->datasetsLite($study));
+        $studySchema->hasPart($this->prepareDatasets($study));
 
         return $studySchema;
     }
@@ -579,7 +511,7 @@ class BiochemaController extends Controller
       * @param  App\Models\Project  $project
       * @return object $projectSchema
       */
-     public function project($project)
+     public function projectLite($project)
      {
         $projectSchema = BioSchema::Study();
         $projectSchema['@id'] = $project->doi;
@@ -595,6 +527,13 @@ class BiochemaController extends Controller
         $projectSchema->datePublished($project->release_date);
         $projectSchema->author($this->getAuthors($project));
         $projectSchema->citation($this->getCitations($project));
+
+        return $projectSchema;
+    }
+
+    public function project($project)
+    {
+        $projectSchema = $this->projectLite($project);
         $projectSchema->hasPart($this->prepareStudies($project));
 
         return $projectSchema;
