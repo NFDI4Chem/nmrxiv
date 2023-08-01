@@ -50,8 +50,6 @@ class Dataset extends Model implements Auditable
 
     /**
      * Get the dataset identifier
-     *
-     * @return \Illuminate\Database\Eloquent\Casts\Attribute
      */
     protected function identifier(): Attribute
     {
@@ -80,7 +78,7 @@ class Dataset extends Model implements Auditable
 
     protected function getPrivateUrlAttribute()
     {
-        return  env('APP_URL', null).'/datasets/'.urlencode($this->url);
+        return env('APP_URL', null).'/datasets/'.urlencode($this->url);
     }
 
     public function study()

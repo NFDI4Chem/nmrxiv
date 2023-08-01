@@ -52,7 +52,7 @@ class BiochemaController extends Controller
         $datasetSchema->name($dataset->name);
         $datasetSchema->url(env('APP_URL').'/'.explode(':', $dataset->identifier ? $dataset->identifier : ':')[1]);
 
-        return  $datasetSchema;
+        return $datasetSchema;
     }
 
     /**

@@ -22,7 +22,6 @@ class UsersController extends Controller
     /**
      * Render the index page with list of users.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Pages\Console\Users\Index
      */
     public function index(Request $request)
@@ -71,8 +70,6 @@ class UsersController extends Controller
     /**
      * Store the newly created user.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Actions\Fortify\CreateNewUser  $creator
      * @return \Illuminate\Http\RedirectResponse
      */
     public function store(Request $request, CreateNewUser $creator)
@@ -86,7 +83,6 @@ class UsersController extends Controller
     /**
      * Render the edit user page.
      *
-     * @param  \App\Models\User  $user
      * @return \Pages\Console\Users\Edit
      */
     public function edit(User $user)
@@ -109,8 +105,6 @@ class UsersController extends Controller
     /**
      * Save the updated user info.
      *
-     * @param  \App\Models\User  $user
-     * @param  \Illuminate\Http\Request  $request
      * @param  \App\Actions\Fortify\UpdateUserProfileInformation  $updater
      * @return \Illuminate\Http\RedirectResponse
      */
@@ -124,8 +118,6 @@ class UsersController extends Controller
     /**
      * Save the updated password for the user.
      *
-     * @param  \App\Models\User  $user
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse
      */
     public function updatePassword(User $user, Request $request)
@@ -144,8 +136,6 @@ class UsersController extends Controller
     /**
      * Save the updated role for the user.
      *
-     * @param  \App\Models\User  $user
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse
      */
     public function updateRole(User $user, Request $request)
@@ -172,7 +162,6 @@ class UsersController extends Controller
     /**
      * Check if user has password.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function checkPassword(Request $request)
@@ -191,8 +180,6 @@ class UsersController extends Controller
     /**
      * Delete the profile photo.
      *
-     * @param  \App\Models\User  $user
-     * @param  \Illuminate\Http\Request  $request
      *  @return \Illuminate\Http\RedirectResponse
      */
     public function destroyPhoto(User $user, Request $request)

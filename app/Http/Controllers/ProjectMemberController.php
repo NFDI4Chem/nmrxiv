@@ -14,7 +14,6 @@ class ProjectMemberController extends Controller
     /**
      * Add a new team member to a project.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $projectId
      * @return \Illuminate\Http\RedirectResponse
      */
@@ -36,7 +35,6 @@ class ProjectMemberController extends Controller
     /**
      * Update the given project member's role.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $projectId
      * @param  int  $userId
      * @return \Illuminate\Http\RedirectResponse
@@ -56,7 +54,6 @@ class ProjectMemberController extends Controller
     /**
      * Remove the given user from the given project.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $projectId
      * @param  int  $userId
      * @return \Illuminate\Http\RedirectResponse

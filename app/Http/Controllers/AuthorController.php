@@ -17,9 +17,7 @@ class AuthorController extends Controller
     /**
      * Save and sync updated author details for a project.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  \Actions\Project\UpdateProject  $updater
-     * @param  \App\Models\Project  $project
      * @return \Illuminate\Http\RedirectResponse
      */
     public function save(Request $request, UpdateProject $updater, Project $project)
@@ -78,9 +76,7 @@ class AuthorController extends Controller
     /**
      * Delete author for a project.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  \Actions\Project\UpdateProject  $updater
-     * @param  \App\Models\Project  $project
      * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy(Request $request, UpdateProject $updater, Project $project)
@@ -103,9 +99,7 @@ class AuthorController extends Controller
     /**
      * Update existing Contributor type for a given author in a project.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  \Actions\Project\UpdateProject  $updater
-     * @param  \App\Models\Project  $project
      * @return \Illuminate\Http\RedirectResponse
      */
     public function updateRole(Request $request, UpdateProject $updater, Project $project)

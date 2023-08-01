@@ -15,7 +15,6 @@ class UpdateProject
     /**
      * Create a project.
      *
-     * @param  array  $input
      * @return \App\Models\Project
      */
     public function update(Project $project, array $input)
@@ -139,7 +138,6 @@ class UpdateProject
     /**
      * Attach authors to a project.
      *
-     * @param  \App\Models\Project  $project
      * @param  array  $authors
      * @return void
      */
@@ -161,7 +159,6 @@ class UpdateProject
     /**
      * Detach authors from a project.
      *
-     * @param  \App\Models\Project  $project
      * @param  array  $authors
      * @return void
      */
@@ -175,7 +172,6 @@ class UpdateProject
     /**
      * Update existing Contributor type for a given author in a project.
      *
-     * @param  \App\Models\Project  $project
      * @param  string  $authorId
      * @param  string  $role
      * @return void
@@ -190,7 +186,6 @@ class UpdateProject
     /**
      * Attach citations to a project.
      *
-     * @param  \App\Models\Project  $project
      * @param  \App\Models\User  $user
      * @param  array  $citations
      * @return void
@@ -210,7 +205,6 @@ class UpdateProject
     /**
      * Detach citation from a project.
      *
-     * @param  \App\Models\Project  $project
      * @param  array  $authors
      * @return void
      */

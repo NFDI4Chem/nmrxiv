@@ -115,7 +115,7 @@ class ApplicationController extends Controller
             ];
             $coloreCode = $colorMap[$resolvedModel['namespace']];
             if ($model && $model->doi) {
-                return  response('<svg xmlns="http://www.w3.org/2000/svg"
+                return response('<svg xmlns="http://www.w3.org/2000/svg"
              width="'.$_w.'" height="20">
                 <linearGradient id="b" x2="0" y2="100%">
                     <stop offset="0" stop-color="#bbb" stop-opacity=".1"/>
