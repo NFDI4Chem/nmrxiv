@@ -376,7 +376,7 @@ export default {
         return {
             selectedDataset: null,
             selectedSpectraData: null,
-            schema: [],
+            schema: {},
         };
     },
     computed: {
@@ -401,7 +401,7 @@ export default {
         }
 
         axios
-            .get("/api/v1/schemas/bioschema/" + this.study.identifier)
+            .get(route("bioschema.ID", this.study.data.identifier))
             .then((response) => {
                 this.schema = response.data;
             });

@@ -1166,7 +1166,7 @@ export default {
 
     data() {
         return {
-            schema: [],
+            schema: {},
         };
     },
 

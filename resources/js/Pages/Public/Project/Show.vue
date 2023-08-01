@@ -201,13 +201,13 @@ export default {
     props: ["project", "tab"],
     data() {
         return {
-            schema: [],
+            schema: {},
         };
     },
     computed: {},
     mounted() {
         axios
-            .get("/api/v1/schemas/bioschema/" + this.project.identifier)
+            .get(route("bioschema.ID", this.project.data.identifier))
             .then((response) => {
                 this.schema = response.data;
             });
