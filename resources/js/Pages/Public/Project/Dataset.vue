@@ -328,6 +328,9 @@
             </div>
         </template>
     </project-layout>
+    <component :is="'script'" type="application/ld+json">{{
+        schema
+    }}</component>
 </template>
 
 <script>
@@ -351,6 +354,7 @@ export default {
     data() {
         return {
             selectedSpectraData: null,
+            schema: {},
         };
     },
     computed: {
@@ -361,7 +365,13 @@ export default {
             return String(this.$page.props.url);
         },
     },
-    mounted() {},
+    mounted() {
+        axios
+            .get(route("bioschema.ID", this.dataset.data.identifier))
+            .then((response) => {
+                this.schema = response.data;
+            });
+    },
     methods: {
         getSVGString(molecule) {
             if (molecule.MOL) {
