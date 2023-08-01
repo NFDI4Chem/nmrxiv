@@ -13,7 +13,6 @@ class ProjectInvitationController extends Controller
     /**
      * Accept a project invitation.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  \Laravel\Jetstream\ProjectInvitation  $invitation
      * @return \Illuminate\Http\RedirectResponse
      */
@@ -36,7 +35,6 @@ class ProjectInvitationController extends Controller
     /**
      * Cancel the given project invitation.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  \Laravel\Jetstream\ProjectInvitation  $invitation
      * @return \Illuminate\Http\RedirectResponse
      */

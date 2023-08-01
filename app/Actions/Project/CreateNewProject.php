@@ -15,7 +15,6 @@ class CreateNewProject
     /**
      * Create a project.
      *
-     * @param  array  $input
      * @return \App\Models\Project
      */
     public function create(array $input)

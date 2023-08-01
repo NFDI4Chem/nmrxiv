@@ -16,7 +16,6 @@ class UpdateStudyMemberRole
      * @param  mixed  $user
      * @param  mixed  $study
      * @param  int  $studyMemberId
-     * @param  string  $role
      * @return void
      */
     public function update($user, $study, $studyMemberId, string $role)
