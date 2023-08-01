@@ -42,11 +42,13 @@ class DatasetController extends Controller
     {
         if ($dataset) {
             $user = Auth::user();
-            $spectra = $request->get('spectra');
-            $nmriumInfo = $spectra;
-            $molecules = $request->get('molecules');
-            $molecularInfo = $molecules;
+            $data = $request->get('data');
             $version = $request->get('version');
+            $spectra = $request->get('spectra');
+            $molecules = $request->get('molecules');
+
+            $nmriumInfo = $spectra;
+            $molecularInfo = $molecules;
 
             $nmrium = $dataset->nmrium;
             if ($nmrium) {

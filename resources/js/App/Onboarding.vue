@@ -546,6 +546,7 @@ import {
     TagIcon,
 } from "@heroicons/vue/24/outline";
 import axios from "axios";
+import { Inertia } from "@inertiajs/inertia";
 
 export default {
     components: {

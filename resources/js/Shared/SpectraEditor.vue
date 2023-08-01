@@ -383,26 +383,29 @@ export default {
     methods: {
         registerEvents() {
             const saveNMRiumUpdates = (e) => {
+                const { data, type } = e.data;
                 if (
                     e.origin != "https://nmriumdev.nmrxiv.org" &&
                     e.origin != "https://nmrium.nmrxiv.org"
                 ) {
                     return;
                 }
-                if (e.data.data.type == "nmr-wrapper:error") {
-                    this.spectraError = e.data.data;
+                if (type == "nmr-wrapper:error") {
+                    this.spectraError = e.data;
                     this.updateLoadingStatus(false);
+
                     return;
                 }
-                if (e.data.data.type == "nmr-wrapper:action-response") {
-                    let actionType = e.data.data.type;
+                if (type == "nmr-wrapper:action-response") {
+                    let actionType = e.data.type;
                     if (actionType == "exportSpectraViewerAsBlob") {
-                        this.saveStudyPreview(e.data.data.data);
+                        this.saveStudyPreview(data);
                     }
                 }
-                this.version = e.data.data.version;
-                if (e.data.data.type == "nmr-wrapper:data-change") {
-                    let actionType = e.data.data.data.actionType;
+                if (type == "nmr-wrapper:data-change") {
+                    const state = data.state;
+                    this.version = state.version;
+                    let actionType = state.data.actionType;
                     if (
                         actionType == "" ||
                         (actionType == "INITIATE" &&
@@ -413,13 +416,13 @@ export default {
                         this.infoLog("Spectra loaded successfully...", true);
                         return;
                     }
-                    this.selectedSpectraData = e.data.data.data.spectra;
+                    this.selectedSpectraData = state.data.spectra;
                     if (
                         actionType == "ADD_MOLECULE" ||
                         actionType == "DELETE_MOLECULE" ||
-                        e.data.data.data.molecules
+                        state.data.molecules
                     ) {
-                        this.currentMolecules = e.data.data.data.molecules;
+                        this.currentMolecules = state.data.molecules;
                     }
 
                     if (this.study && this.dataset) {
@@ -437,11 +440,9 @@ export default {
                 }
             };
             if (!this.$props.eventRegistered) {
-                // console.log("registering");
                 window.addEventListener("message", saveNMRiumUpdates);
                 this.$props.eventRegistered = true;
             } else {
-                // console.log("unregistering");
                 window.removeEventListener("message", saveNMRiumUpdates);
                 this.$props.eventRegistered = false;
             }
@@ -478,26 +479,34 @@ export default {
                         )
                         .then((response) => {
                             this.updateLoadingStatus(false);
-                            nmrium_info = JSON.parse(response.data.nmrium_info);
-                            if (nmrium_info && nmrium_info["spectra"]) {
-                                if (this.isString(nmrium_info["spectra"])) {
-                                    spectra = JSON.parse(nmrium_info.spectra);
+                            nmrium_info = JSON.parse(response.nmrium_info);
+                            if (nmrium_info && nmrium_info["data"]["spectra"]) {
+                                if (
+                                    this.isString(
+                                        nmrium_info["data"]["spectra"]
+                                    )
+                                ) {
+                                    spectra = JSON.parse(
+                                        nmrium_info.data.spectra
+                                    );
                                 } else {
-                                    spectra = nmrium_info.spectra;
+                                    spectra = nmrium_info.data.spectra;
                                 }
                             }
                             if (spectra && spectra.length <= 0) {
                                 this.loadFromURL(url);
                             } else {
-                                let nmriumVersion = 3;
+                                let nmriumVersion = 4;
                                 if (nmrium_info && nmrium_info["version"]) {
                                     nmriumVersion = nmrium_info["version"];
                                 }
                                 let mols = [];
-                                if (this.isString(nmrium_info.molecules)) {
-                                    mols = JSON.parse(nmrium_info.molecules);
+                                if (this.isString(nmrium_info.data.molecules)) {
+                                    mols = JSON.parse(
+                                        nmrium_info.data.molecules
+                                    );
                                 } else {
-                                    mols = nmrium_info.molecules;
+                                    mols = nmrium_info.data.molecules;
                                 }
                                 if (mols && mols.length > 0) {
                                     this.currentMolecules = mols;
@@ -551,10 +560,9 @@ export default {
                 data: [url],
                 type: "url",
             };
-            iframe.postMessage({ 'type': `nmr-wrapper:load`, 'data' : data }, "*");
+            iframe.postMessage({ type: `nmr-wrapper:load`, data: data }, "*");
         },
         updateDataSet() {
-            // console.log("updating dataset");
             if (this.dataset != null && this.selectedSpectraData.length > 0) {
                 this.updateLoadingStatus(true);
                 axios
@@ -565,7 +573,7 @@ export default {
                         {
                             spectra: this.selectedSpectraData,
                             molecules: this.currentMolecules,
-                            version: this.version ? this.version : 3,
+                            version: this.version || 4,
                         }
                     )
                     .then((response) => {
