@@ -89,6 +89,10 @@
                                     called-from="projectView"
                                     model="project"
                                 />
+                                <ToolTip
+                                    class="inline h-4 w-4 ml-0"
+                                    text="The avatars (left) correspond to the users with whom the project is shared. Click there to edit sharing options."
+                                ></ToolTip>
                                 <a
                                     class="cursor-pointer hover:text-teal-900 inline-flex items-center ml-7"
                                     @click="toggleDetails"
