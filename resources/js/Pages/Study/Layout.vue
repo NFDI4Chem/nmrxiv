@@ -109,7 +109,7 @@
                                     class="mt-1 flex flex-col sm:flex-row sm:flex-wrap sm:mt-0 sm:space-x-6"
                                 >
                                     <div
-                                        class="mt-2 flex items-center text-sm text-gray-500"
+                                        class="mt-2 flex items-center text-sm text-gray-700"
                                     >
                                         <access-dialogue
                                             :available-roles="availableRoles"

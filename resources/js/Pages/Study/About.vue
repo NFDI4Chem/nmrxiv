@@ -510,6 +510,10 @@
                                                     >
                                                         Percentage composition
                                                         ({{ percentage }}%)
+                                                        <ToolTip
+                                                            class="inline h-4 w-12 ml-0"
+                                                            text="If the molecule percentage is unknown, please keep it as 0"
+                                                        ></ToolTip>
                                                     </label>
                                                     <slider
                                                         v-model="percentage"
