@@ -970,10 +970,10 @@ export default {
             this.notificationElement.toggleShowNotificationDialog(notification);
         },
         hasUnreadNotification() {
-            return this.$page.props.user.notifications.length > 0;
+            return this.$page.props.user.notifications ? this.$page.props.user.notifications.length > 0 : false;
         },
         countNotification() {
-            return this.$page.props.user.notifications.length;
+            return this.$page.props.user.notifications ? this.$page.props.user.notifications.length : 0;
         },
     },
 };
