@@ -469,6 +469,13 @@
                                                         >
                                                             Load Structure
                                                         </button>
+                                                        <jet-input-error
+                                                            :message="
+                                                                this
+                                                                    .errorMessage
+                                                            "
+                                                            class="mt-2"
+                                                        />
                                                     </div>
                                                 </div>
                                                 <div class="relative">
@@ -596,6 +603,7 @@ import StudyContent from "@/Pages/Study/Content.vue";
 import slider from "vue3-slider";
 import OCL from "openchemlib/full";
 import ToolTip from "@/Shared/ToolTip.vue";
+import JetInputError from "@/Jetstream/InputError.vue";
 export default {
     components: {
         StudyContent,
@@ -605,6 +613,7 @@ export default {
         TrashIcon,
         PencilIcon,
         InformationCircleIcon,
+        JetInputError,
     },
     props: [
         "study",
@@ -622,6 +631,7 @@ export default {
             smiles: "",
             percentage: 0,
             editor: "",
+            errorMessage: "",
         };
     },
     computed: {
@@ -656,7 +666,12 @@ export default {
         },
         loadSmiles() {
             if (this.smiles && this.smiles != "") {
-                this.editor.setSmiles(this.smiles);
+                try {
+                    let mol = OCL.Molecule.fromSmiles(this.smiles);
+                    this.editor.setSmiles(this.smiles);
+                } catch (e) {
+                    this.errorMessage = "The entered SMILES is not valid.";
+                }
             }
         },
         getSVGString(molecule) {

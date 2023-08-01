@@ -1341,6 +1341,13 @@
                                                                                 Load
                                                                                 Structure
                                                                             </button>
+                                                                            <jet-input-error
+                                                                                :message="
+                                                                                    this
+                                                                                        .errorMessage
+                                                                                "
+                                                                                class="mt-2"
+                                                                            />
                                                                         </div>
                                                                         <div
                                                                             class="relative"
@@ -1773,6 +1780,7 @@ export default {
             currentDraft: null,
             errorMessage: null,
             datasetsToImport: null,
+            errorMessage: "",
 
             draftForm: this.$inertia.form({
                 _method: "POST",
@@ -2206,7 +2214,12 @@ export default {
 
         loadSmiles() {
             if (this.smiles && this.smiles != "") {
-                this.editor.setSmiles(this.smiles);
+                try {
+                    let mol = OCL.Molecule.fromSmiles(this.smiles);
+                    this.editor.setSmiles(this.smiles);
+                } catch (e) {
+                    this.errorMessage = "The entered SMILES is not valid.";
+                }
             }
         },
 
