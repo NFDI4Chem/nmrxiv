@@ -428,7 +428,7 @@ class BiochemaController extends Controller
      */
     public function datasetLite($dataset)
     {
-        $prefix = $dataset->study->project->name.'.'.$dataset->study->name.'.';
+        $prefix = $dataset->study->project->name.':'.$dataset->study->name.'.';
         $datasetSchema = Schema::Dataset();
         $datasetSchema['@id'] = $dataset->doi;
         $datasetSchema['dct:conformsTo'] = $this->conformsTo(['https://bioschemas.org/profiles/Dataset/1.0-RELEASE', 'https://isa-specs.readthedocs.io/en/latest/isamodel.html#assay']);
@@ -471,7 +471,7 @@ class BiochemaController extends Controller
      */
     public function studyLite($study)
     {
-        $prefix = $study->project->name.'.';
+        $prefix = $study->project->name.':';
         $studySchema = BioSchema::Study();
         $studySchema['@id'] = $study->doi;
         $studySchema['dct:conformsTo'] = $this->conformsTo(['https://bioschemas.org/profiles/Study/0.3-DRAFT', 'https://isa-specs.readthedocs.io/en/latest/isamodel.html#study']);
