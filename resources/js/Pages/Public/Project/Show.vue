@@ -184,6 +184,9 @@
             </div>
         </template>
     </project-layout>
+    <component :is="'script'" type="application/ld+json">{{
+        schema
+    }}</component>
 </template>
 
 <script>
@@ -197,10 +200,18 @@ export default {
     },
     props: ["project", "tab"],
     data() {
-        return {};
+        return {
+            schema: {},
+        };
     },
     computed: {},
-    mounted() {},
+    mounted() {
+        axios
+            .get(route("bioschema.ID", this.project.data.identifier))
+            .then((response) => {
+                this.schema = response.data;
+            });
+    },
     methods: {
         getOrcidLink(orcidId) {
             var link = "#";
