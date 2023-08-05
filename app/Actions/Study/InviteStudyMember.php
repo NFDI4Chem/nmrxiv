@@ -20,8 +20,6 @@ class InviteStudyMember
      *
      * @param  mixed  $user
      * @param  mixed  $study
-     * @param  string  $email
-     * @param  string|null  $role
      * @return void
      */
     public function invite($user, $study, string $email, string $role = null, string $message = null)
@@ -52,8 +50,6 @@ class InviteStudyMember
      * Validate the invite member operation.
      *
      * @param  mixed  $study
-     * @param  string  $email
-     * @param  string|null  $role
      * @return void
      */
     protected function validate($study, string $email, ?string $role, ?string $message)
@@ -91,7 +87,6 @@ class InviteStudyMember
      * Ensure that the user is not already on the study.
      *
      * @param  mixed  $study
-     * @param  string  $email
      * @return \Closure
      */
     protected function ensureUserIsNotAlreadyOnStudy($study, string $email)

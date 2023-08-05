@@ -26,7 +26,7 @@ class DatasetFactory extends Factory
         $name = $this->faker->word();
         $slug = Str::slug($name, '-');
 
-        return[
+        return [
             'name' => $name,
             'slug' => $slug,
             'color' => $this->faker->rgbCssColor(),
