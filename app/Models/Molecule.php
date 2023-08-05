@@ -53,8 +53,6 @@ class Molecule extends Model
 
     /**
      * Get the molecule identifier
-     *
-     * @return \Illuminate\Database\Eloquent\Casts\Attribute
      */
     protected function identifier(): Attribute
     {

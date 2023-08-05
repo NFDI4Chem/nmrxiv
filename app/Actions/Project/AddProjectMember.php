@@ -16,8 +16,6 @@ class AddProjectMember
      *
      * @param  mixed  $user
      * @param  mixed  $project
-     * @param  string  $email
-     * @param  string|null  $role
      * @return void
      */
     public function add($user, $project, string $email, string $role = null)
@@ -41,8 +39,6 @@ class AddProjectMember
      * Validate the add member operation.
      *
      * @param  mixed  $project
-     * @param  string  $email
-     * @param  string|null  $role
      * @return void
      */
     protected function validate($project, string $email, ?string $role)
@@ -76,7 +72,6 @@ class AddProjectMember
      * Ensure that the user is not already on the project.
      *
      * @param  mixed  $project
-     * @param  string  $email
      * @return \Closure
      */
     protected function ensureUserIsNotAlreadyOnProject($project, string $email)

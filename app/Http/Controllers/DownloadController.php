@@ -17,8 +17,8 @@ class DownloadController extends Controller
 {
     public function downloadSet(Request $request, $username, $project, $study = null, $dataset = null)
     {
-        if(str_contains($dataset, '.zip')){
-            $dataset = str_replace(".zip", "", $dataset);
+        if (str_contains($dataset, '.zip')) {
+            $dataset = str_replace('.zip', '', $dataset);
         }
         $user = User::where('username', $username)->firstOrFail();
         if ($project) {

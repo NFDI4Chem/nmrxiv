@@ -15,7 +15,6 @@ class AnnouncementController extends Controller
     /**
      * Show all the list of Announcements created.
      *
-     * @param
      * @return \Pages\Announcement\Index
      */
     public function index(Request $request)
@@ -85,8 +84,6 @@ class AnnouncementController extends Controller
     /**
      * Update the specified announcement in the storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Announcement  $announcement
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, Announcement $announcement)
@@ -120,8 +117,6 @@ class AnnouncementController extends Controller
     /**
      * Remove the specified announcement from the storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Announcement  $announcement
      * @return \Illuminate\Http\Response
      */
     public function destroy(Request $request, Announcement $announcement)

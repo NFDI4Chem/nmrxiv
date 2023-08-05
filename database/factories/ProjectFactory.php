@@ -26,7 +26,7 @@ class ProjectFactory extends Factory
         $name = $this->faker->sentence($nbWords = 4);
         $slug = Str::slug($name, '-');
 
-        return[
+        return [
             'name' => $name,
             'slug' => $slug,
             'color' => $this->faker->rgbCssColor(),

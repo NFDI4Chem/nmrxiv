@@ -84,8 +84,6 @@ class Study extends Model implements Auditable
 
     /**
      * Get the study identifier
-     *
-     * @return \Illuminate\Database\Eloquent\Casts\Attribute
      */
     protected function identifier(): Attribute
     {
@@ -137,7 +135,7 @@ class Study extends Model implements Auditable
 
     protected function getPrivateUrlAttribute()
     {
-        return  env('APP_URL', null).'/studies/'.urlencode($this->url);
+        return env('APP_URL', null).'/studies/'.urlencode($this->url);
     }
 
     public function draft()
@@ -168,7 +166,6 @@ class Study extends Model implements Auditable
     /**
      * Get the user study role
      *
-     * @param  string  $email
      * @return bool
      */
     public function userStudyRole(string $email)
@@ -198,7 +195,6 @@ class Study extends Model implements Auditable
     /**
      * Get the user with the given email if belongs to the study
      *
-     * @param  string  $email
      * @return bool
      */
     public function userWithEmail(string $email)
@@ -231,7 +227,6 @@ class Study extends Model implements Auditable
     /**
      * Determine if the given email address belongs to a user on the project.
      *
-     * @param  string  $email
      * @return bool
      */
     public function hasUserWithEmail(string $email)
