@@ -37,3 +37,12 @@ The code for this web application is released under the [MIT license](https://op
 
 
 <p align="left"><a href="https://nfdi4chem.de/" target="_blank"><img src="https://www.nfdi4chem.de/wp-content/themes/wptheme/assets/img/logo.svg" width="50%" alt="NFDI4Chem Logo"></a></p>
+
+## Acknowledgments
+
+Funded by the German Research Foundation (DFG).
+
+<img src="./public/img/dfg_logo_schriftzug_blau_foerderung_en.gif" alt="N4C logo" width="50%" />
+
+Project number 441958208
+
