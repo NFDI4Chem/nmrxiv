@@ -26,7 +26,7 @@ class CreateNewProject
 
         Validator::make($input, [
             'name' => ['required', 'string', 'max:255',  Rule::unique('projects')
-            ->where('owner_id', $input['owner_id']), ],
+                ->where('owner_id', $input['owner_id']), ],
             'license' => ['required_if:is_public,"true"'],
         ], $errorMessages)->validate();
 

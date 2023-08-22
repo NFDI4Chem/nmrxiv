@@ -367,7 +367,7 @@ export default {
     },
     mounted() {
         axios
-            .get(route("bioschema.ID", this.dataset.data.identifier))
+            .get(route("bioschema.id", this.dataset.data.identifier))
             .then((response) => {
                 this.schema = response.data;
             });

@@ -20,4 +20,14 @@ class LicenseController extends Controller
 
         return $licenses;
     }
+
+    /**
+     * Return License for particular ID.
+     */
+    public function getLicensebyId(Request $request, $id)
+    {
+        $license = License::select('id', 'title', 'description')->where('id', $id)->get();
+
+        return $license;
+    }
 }

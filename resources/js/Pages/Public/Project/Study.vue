@@ -401,7 +401,7 @@ export default {
         }
 
         axios
-            .get(route("bioschema.ID", this.study.data.identifier))
+            .get(route("bioschema.id", this.study.data.identifier))
             .then((response) => {
                 this.schema = response.data;
             });
