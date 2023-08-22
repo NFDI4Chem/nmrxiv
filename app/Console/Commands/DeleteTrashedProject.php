@@ -32,7 +32,7 @@ class DeleteTrashedProject extends Command
         $ids = $this->argument('ids') ? explode(',', $this->argument('ids')) : null;
         if ($ids) {
             $projects = Project::whereIn('id', $ids)
-            ->where('is_deleted', true)->get();
+                ->where('is_deleted', true)->get();
         } else {
             $projects = Project::where('is_deleted', true)->get();
         }

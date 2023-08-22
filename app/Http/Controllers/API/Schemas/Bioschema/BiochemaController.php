@@ -21,21 +21,21 @@ use Spatie\SchemaOrg\Schema;
  */
 class BiochemaController extends Controller
 {
-     /**
-      * Implement Bioschemas upon request by model's name to generate a project, study, or dataset schema.
-      *
-      * @link https://bioschemas.org/profiles/Study/0.3-DRAFT
-      * @link https://bioschemas.org/profiles/Dataset/1.0-RELEASE
-      *
-      * @param  Illuminate\Http\Request  $request
-      * @param  App\Models\User  $username
-      * @param  App\Models\Project  $projectName
-      * @param  App\Models\Study  $studyName Optional
-      * @param  App\Models\Dataset  $datasetName Optional
-      * @return object
-      */
-     public function modelSchemaByName(Request $request, $username, $projectName, $studyName = null, $datasetName = null)
-     {
+    /**
+     * Implement Bioschemas upon request by model's name to generate a project, study, or dataset schema.
+     *
+     * @link https://bioschemas.org/profiles/Study/0.3-DRAFT
+     * @link https://bioschemas.org/profiles/Dataset/1.0-RELEASE
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @param  App\Models\User  $username
+     * @param  App\Models\Project  $projectName
+     * @param  App\Models\Study  $studyName Optional
+     * @param  App\Models\Dataset  $datasetName Optional
+     * @return object
+     */
+    public function modelSchemaByName(Request $request, $username, $projectName, $studyName = null, $datasetName = null)
+    {
         $user = User::where('username', $username)->firstOrFail();
         if ($user) {
             $project = Project::where([['slug', $projectName], ['owner_id', $user->id]])->firstOrFail();
@@ -113,16 +113,16 @@ class BiochemaController extends Controller
         }
     }
 
-     /**
-      * Get Property value from ontologies.
-      *
-      * @param  string  $ontologyID
-      * @param  string  $value
-      * @param  string  $unitUrl
-      * @return object $propertyValue
-      */
-     public function getPropertyValue($name, $ontologyID, $value, $unitUrl)
-     {
+    /**
+     * Get Property value from ontologies.
+     *
+     * @param  string  $ontologyID
+     * @param  string  $value
+     * @param  string  $unitUrl
+     * @return object $propertyValue
+     */
+    public function getPropertyValue($name, $ontologyID, $value, $unitUrl)
+    {
         $propertyValue = Schema::PropertyValue();
         $propertyValue->name($name);
         $propertyValue->propertyID($ontologyID);
@@ -499,20 +499,20 @@ class BiochemaController extends Controller
         return $studySchema;
     }
 
-     /**
-      * Implement Bioschemas' project along with brief details about
-      * the studies and datasets it contains.
-      *
-      * @link https://bioschemas.org/profiles/Study/0.3-DRAFT
-      * @link https://bioschemas.org/profiles/Dataset/1.0-RELEASE
-      * @link https://bioschemas.org/profiles/Sample/0.2-RELEASE-2018_11_10
-      * @link https://bioschemas.org/types/MolecularEntity/0.3-RELEASE-2019_09_02
-      *
-      * @param  App\Models\Project  $project
-      * @return object $projectSchema
-      */
-     public function projectLite($project)
-     {
+    /**
+     * Implement Bioschemas' project along with brief details about
+     * the studies and datasets it contains.
+     *
+     * @link https://bioschemas.org/profiles/Study/0.3-DRAFT
+     * @link https://bioschemas.org/profiles/Dataset/1.0-RELEASE
+     * @link https://bioschemas.org/profiles/Sample/0.2-RELEASE-2018_11_10
+     * @link https://bioschemas.org/types/MolecularEntity/0.3-RELEASE-2019_09_02
+     *
+     * @param  App\Models\Project  $project
+     * @return object $projectSchema
+     */
+    public function projectLite($project)
+    {
         $projectSchema = BioSchema::Study();
         $projectSchema['@id'] = $project->doi;
         $projectSchema['dct:conformsTo'] = $this->conformsTo(['https://bioschemas.org/profiles/Study/0.3-DRAFT', 'https://isa-specs.readthedocs.io/en/latest/isamodel.html#investigation']);

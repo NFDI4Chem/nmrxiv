@@ -84,11 +84,11 @@ class SanitizeProjects extends Command
                 ]);
 
                 $projectFSObjects = FileSystemObject::with('children')
-                        ->where([
-                            ['project_id', $project->id],
-                            ['level', 0],
-                        ])
-                        ->get();
+                    ->where([
+                        ['project_id', $project->id],
+                        ['level', 0],
+                    ])
+                    ->get();
 
                 foreach ($projectFSObjects as $FSObject) {
                     $this->moveFolder($FSObject, $project, $draft);
@@ -159,11 +159,11 @@ class SanitizeProjects extends Command
                 ]);
 
                 $projectFSObjects = FileSystemObject::with('children')
-                        ->where([
-                            ['project_id', $project->id],
-                            ['level', 0],
-                        ])
-                        ->get();
+                    ->where([
+                        ['project_id', $project->id],
+                        ['level', 0],
+                    ])
+                    ->get();
 
                 foreach ($projectFSObjects as $FSObject) {
                     $this->moveFolder($FSObject, $project, $draft);
@@ -187,11 +187,11 @@ class SanitizeProjects extends Command
 
         foreach ($privateProjects as $project) {
             $projectFSObjects = FileSystemObject::with('children')
-                    ->where([
-                        ['project_id', $project->id],
-                        ['level', 0],
-                    ])
-                    ->get();
+                ->where([
+                    ['project_id', $project->id],
+                    ['level', 0],
+                ])
+                ->get();
             if ($projectFSObjects->isEmpty()) {
                 $projectFSObjects = FileSystemObject::with('children')
                     ->where([

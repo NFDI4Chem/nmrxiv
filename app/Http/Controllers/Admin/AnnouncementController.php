@@ -23,8 +23,8 @@ class AnnouncementController extends Controller
             'announcements' => Announcement::with('owner')->orderby('created_at', 'DESC')
                 ->when($request->input('search'), function ($query, $search) {
                     $query->where('message', 'like', "%{$search}%")
-                    ->orWhere('title', 'like', "%{$search}%")
-                    ->orWhere('status', 'like', "%{$search}%");
+                        ->orWhere('title', 'like', "%{$search}%")
+                        ->orWhere('status', 'like', "%{$search}%");
                 })
                 ->get()
                 ->transform(function ($announcements) {
