@@ -32,58 +32,10 @@
                     </div>
                     <button class="float-right" @click="toggleFullScreen">
                         <span v-if="fullScreen">
-                            <svg
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="M9 19V15M9 15H5M9 15L4 20"
-                                    stroke="black"
-                                    stroke-width="2"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                />
-                                <path
-                                    d="M15 5V9M15 9H19M15 9L20 4"
-                                    stroke="black"
-                                    stroke-width="2"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                />
-                                <path
-                                    d="M9 5V9M9 9H5M9 9L4 4"
-                                    stroke="black"
-                                    stroke-width="2"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                />
-                                <path
-                                    d="M15 19V15M15 15H19M15 15L20 20"
-                                    stroke="black"
-                                    stroke-width="2"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                />
-                            </svg>
+                            <ArrowsPointingInIcon class="w-6 h-6" />
                         </span>
                         <span v-else>
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                class="h-6 w-6"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                                stroke-width="2"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
-                                />
-                            </svg>
+                            <ArrowsPointingOutIcon class="w-6 h-6" />
                         </span>
                     </button>
                 </div>
@@ -418,6 +370,8 @@ import {
     ExclamationCircleIcon,
     TrashIcon,
     ArrowDownTrayIcon,
+    ArrowsPointingInIcon,
+    ArrowsPointingOutIcon,
 } from "@heroicons/vue/24/solid";
 
 export default {
@@ -438,6 +392,8 @@ export default {
         SelectInput,
         TrashIcon,
         ToolTip,
+        ArrowsPointingInIcon,
+        ArrowsPointingOutIcon,
     },
     props: ["draft", "readonly"],
     data() {

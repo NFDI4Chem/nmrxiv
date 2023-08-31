@@ -34,16 +34,9 @@
                 type="button"
                 class="inline-flex items-center px-0 py-2 ronded-md font-medium text-dark sm:text-sm"
             >
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-5 w-5"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                >
-                    <path
-                        d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z"
-                    /></svg
-                >&nbsp; SHARE
+                <UserPlusIcon class="h-5 w-5" />
+
+                &nbsp; SHARE
             </button>
         </span>
     </div>
@@ -110,20 +103,8 @@
                                     class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none sm:text-sm"
                                     @click="addUser = true"
                                 >
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        class="h-4 w-4"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                        stroke-width="2"
-                                    >
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
-                                        /></svg
-                                    >&nbsp; SHARE
+                                    <UserPlusIcon class="h-4 w-4" />
+                                    &nbsp; SHARE
                                 </button>
                                 <button
                                     v-if="addUser && canChangeRole"
@@ -131,20 +112,7 @@
                                     class="inline-flex items-center px-4 py-2 border shadow-sm font-medium rounded-md text-dark bg-white-600 hover:bg-white-700 focus:outline-none sm:text-sm"
                                     @click="addUser = false"
                                 >
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        class="h-6 w-6"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                        stroke-width="2"
-                                    >
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            d="M11 17l-5-5m0 0l5-5m-5 5h12"
-                                        />
-                                    </svg>
+                                    <ArrowLeftIcon class="h-5 w-5" />
                                 </button>
                             </div>
                         </div>
@@ -202,20 +170,10 @@
                                                         <p
                                                             class="mt-2 flex items-center text-sm text-gray-500"
                                                         >
-                                                            <svg
+                                                            <EnvelopeIcon
                                                                 class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
-                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                viewBox="0 0 20 20"
-                                                                fill="currentColor"
-                                                                aria-hidden="true"
-                                                            >
-                                                                <path
-                                                                    d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"
-                                                                />
-                                                                <path
-                                                                    d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"
-                                                                />
-                                                            </svg>
+                                                            />
+
                                                             <span>{{
                                                                 person.email
                                                             }}</span>
@@ -416,20 +374,10 @@
                                                                 <p
                                                                     class="mt-2 flex items-center text-sm text-gray-500"
                                                                 >
-                                                                    <svg
+                                                                    <EnvelopeIcon
                                                                         class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
-                                                                        xmlns="http://www.w3.org/2000/svg"
-                                                                        viewBox="0 0 20 20"
-                                                                        fill="currentColor"
-                                                                        aria-hidden="true"
-                                                                    >
-                                                                        <path
-                                                                            d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"
-                                                                        />
-                                                                        <path
-                                                                            d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"
-                                                                        />
-                                                                    </svg>
+                                                                    />
+
                                                                     <span
                                                                         class="truncate"
                                                                         >{{
@@ -496,20 +444,10 @@
                                                                 <p
                                                                     class="mt-2 flex items-center text-sm text-gray-500"
                                                                 >
-                                                                    <svg
+                                                                    <EnvelopeIcon
                                                                         class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
-                                                                        xmlns="http://www.w3.org/2000/svg"
-                                                                        viewBox="0 0 20 20"
-                                                                        fill="currentColor"
-                                                                        aria-hidden="true"
-                                                                    >
-                                                                        <path
-                                                                            d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"
-                                                                        />
-                                                                        <path
-                                                                            d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"
-                                                                        />
-                                                                    </svg>
+                                                                    />
+
                                                                     <span
                                                                         class="truncate"
                                                                         >{{
@@ -667,23 +605,13 @@
                                                         >
                                                             {{ role.name }}
                                                         </div>
-                                                        <svg
+                                                        <CheckCircleIcon
                                                             v-if="
                                                                 addMemberForm.role ==
                                                                 role.key
                                                             "
                                                             class="ml-2 h-5 w-5 text-green-400"
-                                                            fill="none"
-                                                            stroke-linecap="round"
-                                                            stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            stroke="currentColor"
-                                                            viewBox="0 0 24 24"
-                                                        >
-                                                            <path
-                                                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                                                            ></path>
-                                                        </svg>
+                                                        />
                                                     </div>
                                                     <div
                                                         class="mt-2 text-xs text-gray-600"
@@ -741,7 +669,11 @@
 
 <script>
 import { computed, ref } from "vue";
-import { UsersIcon } from "@heroicons/vue/24/outline";
+import {
+    UsersIcon,
+    UserPlusIcon,
+    CheckCircleIcon,
+} from "@heroicons/vue/24/outline";
 import JetActionMessage from "@/Jetstream/ActionMessage.vue";
 import JetActionSection from "@/Jetstream/ActionSection.vue";
 import JetButton from "@/Jetstream/Button.vue";
@@ -766,7 +698,11 @@ import {
     TransitionRoot,
 } from "@headlessui/vue";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
-import { ChevronDownIcon } from "@heroicons/vue/24/solid";
+import {
+    ChevronDownIcon,
+    ArrowLeftIcon,
+    EnvelopeIcon,
+} from "@heroicons/vue/24/solid";
 
 export default {
     components: {
@@ -797,6 +733,10 @@ export default {
         JetSecondaryButton,
         JetSectionBorder,
         JetTextArea,
+        UserPlusIcon,
+        ArrowLeftIcon,
+        EnvelopeIcon,
+        CheckCircleIcon,
     },
     props: {
         members: Object,

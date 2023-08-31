@@ -45,20 +45,8 @@
                                 class="px-6 py-4 bg-white shadow-md rounded-lg"
                             >
                                 <div class="flex items-center">
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        viewBox="0 0 24 24"
-                                        class="h-6 w-6"
-                                    >
-                                        <path
-                                            d="M3 6l9 4v12l-9-4V6zm14-3v2c0 1.1-2.24 2-5 2s-5-.9-5-2V3c0 1.1 2.24 2 5 2s5-.9 5-2z"
-                                            class="fill-current text-gray-400"
-                                        ></path>
-                                        <polygon
-                                            points="21 6 12 10 12 22 21 18"
-                                            class="fill-current text-gray-600"
-                                        ></polygon>
-                                    </svg>
+                                    <CubeTransparentIcon class="h-6 w-6" />
+
                                     <div
                                         class="ml-3 font-semibold text-sm text-gray-600 uppercase tracking-wider"
                                     >
@@ -142,11 +130,13 @@
 <script>
 import ProjectLayout from "@/Pages/Public/Project/Layout.vue";
 import StudyCard from "@/Shared/StudyCardPublic.vue";
+import { CubeTransparentIcon } from "@heroicons/vue/24/outline";
 
 export default {
     components: {
         ProjectLayout,
         StudyCard,
+        CubeTransparentIcon,
     },
     props: ["project", "tab"],
     data() {

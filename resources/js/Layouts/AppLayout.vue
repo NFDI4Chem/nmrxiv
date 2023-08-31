@@ -302,7 +302,7 @@
                                         class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition"
                                     >
                                         <BellIcon
-                                            class="w-6 h-6 fill-current text-gray-600"
+                                            class="w-6 h-6 text-gray-600"
                                         />
                                         <span
                                             v-if="hasUnreadNotification()"
@@ -371,20 +371,9 @@
                                 id="tour-step-documentation"
                                 href="https://docs.nmrxiv.org/docs/category/submission-guides"
                                 target="_blank"
-                                ><svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 24 24"
-                                    class="h-6 w-6"
-                                >
-                                    <path
-                                        d="M12 21a2 2 0 0 1-1.41-.59l-.83-.82A2 2 0 0 0 8.34 19H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h4a5 5 0 0 1 4 2v16z"
-                                        class="fill-current text-gray-400"
-                                    ></path>
-                                    <path
-                                        d="M12 21V5a5 5 0 0 1 4-2h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4.34a2 2 0 0 0-1.42.59l-.83.82A2 2 0 0 1 12 21z"
-                                        class="fill-current text-gray-600"
-                                    ></path></svg
-                            ></a>
+                            >
+                                <BookOpenIcon class="w-6 h-6 text-gray-600" />
+                            </a>
                             <span
                                 class="bg-gray-900 text-center text-white px-2 py-1 shadow-lg rounded-md tooltiptextbottom"
                                 >Submission guides</span
@@ -399,18 +388,9 @@
                                 class="cursor-pointer text-gray-600"
                                 target="_blank"
                                 @click="startTour"
-                                ><svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    class="h-5 w-5"
-                                    viewBox="0 0 20 20"
-                                    fill="currentColor"
-                                >
-                                    <path
-                                        fill-rule="evenodd"
-                                        d="M18 3a1 1 0 00-1.447-.894L8.763 6H5a3 3 0 000 6h.28l1.771 5.316A1 1 0 008 18h1a1 1 0 001-1v-4.382l6.553 3.276A1 1 0 0018 15V3z"
-                                        clip-rule="evenodd"
-                                    /></svg
-                            ></a>
+                            >
+                                <MegaphoneIcon class="w-6 h-6 text-gray-600" />
+                            </a>
                             <span
                                 class="bg-gray-900 text-center text-white px-2 py-1 shadow-lg rounded-md tooltiptextbottom"
                                 >Start&nbsp;tour</span
@@ -459,19 +439,9 @@
                                         <span class="flex md:block hidden">{{
                                             $page.props.user.first_name
                                         }}</span>
-
-                                        <svg
-                                            class="ml-2 -mr-0.5 h-4 w-4"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            viewBox="0 0 20 20"
-                                            fill="currentColor"
-                                        >
-                                            <path
-                                                fill-rule="evenodd"
-                                                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                                clip-rule="evenodd"
-                                            />
-                                        </svg>
+                                        <ChevronDownIcon
+                                            class="ml-2 w-3 h-3 text-gray-800"
+                                        />
                                     </MenuButton>
                                 </span>
                             </div>
@@ -497,19 +467,9 @@
                                     <span class="flex md:block hidden">{{
                                         $page.props.user.current_team.name
                                     }}</span>
-
-                                    <svg
-                                        class="ml-2 -mr-0.5 h-4 w-4"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        viewBox="0 0 20 20"
-                                        fill="currentColor"
-                                    >
-                                        <path
-                                            fill-rule="evenodd"
-                                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                            clip-rule="evenodd"
-                                        />
-                                    </svg>
+                                    <ChevronDownIcon
+                                        class="ml-2 w-3 h-3 text-gray-800"
+                                    />
                                 </MenuButton>
                             </div>
                             <transition
@@ -568,19 +528,10 @@
                                         >
                                             <jet-dropdown-link as="button">
                                                 <div class="flex items-center">
-                                                    <svg
+                                                    <CheckCircleIcon
                                                         class="mr-2 h-5 w-5 text-gray-400"
-                                                        fill="none"
-                                                        stroke-linecap="round"
-                                                        stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        stroke="currentColor"
-                                                        viewBox="0 0 24 24"
-                                                    >
-                                                        <path
-                                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                                                        ></path>
-                                                    </svg>
+                                                    />
+
                                                     <div>
                                                         {{
                                                             $page.props.user
@@ -624,39 +575,17 @@
                                                         <div
                                                             class="flex items-center"
                                                         >
-                                                            <svg
-                                                                v-if="
+                                                            <CheckCircleIcon
+                                                                :class="[
                                                                     team.id ==
                                                                     $page.props
                                                                         .user
                                                                         .current_team_id
-                                                                "
-                                                                class="mr-2 h-5 w-5 text-green-400"
-                                                                fill="none"
-                                                                stroke-linecap="round"
-                                                                stroke-linejoin="round"
-                                                                stroke-width="2"
-                                                                stroke="currentColor"
-                                                                viewBox="0 0 24 24"
-                                                            >
-                                                                <path
-                                                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                                                                ></path>
-                                                            </svg>
-                                                            <svg
-                                                                v-else
-                                                                class="mr-2 h-5 w-5 text-gray-400"
-                                                                fill="none"
-                                                                stroke-linecap="round"
-                                                                stroke-linejoin="round"
-                                                                stroke-width="2"
-                                                                stroke="currentColor"
-                                                                viewBox="0 0 24 24"
-                                                            >
-                                                                <path
-                                                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                                                                ></path>
-                                                            </svg>
+                                                                        ? 'mr-2 h-5 w-5 text-green-400'
+                                                                        : 'mr-2 h-5 w-5 text-gray-400',
+                                                                ]"
+                                                            />
+
                                                             <div>
                                                                 {{ team.name }}
                                                             </div>
@@ -777,12 +706,9 @@ import {
     TransitionRoot,
 } from "@headlessui/vue";
 import {
-    BookmarkSquareIcon,
-    FireIcon,
     HomeIcon,
-    InboxIcon,
-    UserIcon,
     BellIcon,
+    BookOpenIcon,
     Bars3Icon,
     XMarkIcon,
     ClockIcon,
@@ -791,6 +717,9 @@ import {
     FolderIcon,
     Squares2X2Icon,
     TrashIcon,
+    MegaphoneIcon,
+    ChevronDownIcon,
+    CheckCircleIcon,
 } from "@heroicons/vue/24/outline";
 import { MagnifyingGlassIcon, PlusIcon } from "@heroicons/vue/24/solid";
 
@@ -899,6 +828,10 @@ export default {
         StudyCreate,
         Submission,
         Notification,
+        BookOpenIcon,
+        MegaphoneIcon,
+        ChevronDownIcon,
+        CheckCircleIcon,
     },
     props: {
         title: String,

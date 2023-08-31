@@ -23,44 +23,14 @@
                     :key="i"
                     class="flex items-center"
                 >
-                    <div>
-                        <svg
-                            v-if="session.agent.is_desktop"
-                            fill="none"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                            class="w-8 h-8 text-gray-500"
-                        >
-                            <path
-                                d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                            ></path>
-                        </svg>
-
-                        <svg
-                            v-else
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 24 24"
-                            stroke-width="2"
-                            stroke="currentColor"
-                            fill="none"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            class="w-8 h-8 text-gray-500"
-                        >
-                            <path d="M0 0h24v24H0z" stroke="none"></path>
-                            <rect
-                                x="7"
-                                y="4"
-                                width="10"
-                                height="16"
-                                rx="1"
-                            ></rect>
-                            <path d="M11 5h2M12 17v.01"></path>
-                        </svg>
-                    </div>
+                    <ComputerDesktopIcon
+                        v-if="session.agent.is_desktop"
+                        class="w-8 h-8 text-gray-500"
+                    />
+                    <DevicePhoneMobileIcon
+                        v-else
+                        class="w-8 h-8 text-gray-500"
+                    />
 
                     <div class="ml-3">
                         <div class="text-sm text-gray-600">
@@ -149,7 +119,10 @@ import JetDialogModal from "@/Jetstream/DialogModal.vue";
 import JetInput from "@/Jetstream/Input.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
-
+import {
+    ComputerDesktopIcon,
+    DevicePhoneMobileIcon,
+} from "@heroicons/vue/24/outline";
 export default {
     components: {
         JetActionMessage,
@@ -159,6 +132,8 @@ export default {
         JetInput,
         JetInputError,
         JetSecondaryButton,
+        ComputerDesktopIcon,
+        DevicePhoneMobileIcon,
     },
     props: ["sessions"],
 
