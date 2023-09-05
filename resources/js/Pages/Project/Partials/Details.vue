@@ -416,22 +416,14 @@
                                                                 "
                                                             />
                                                         </div>
-                                                        <button
-                                                            type="button"
-                                                            class="-ml-px relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500"
+                                                        <copy-to-clipboard-button
                                                             @click="
                                                                 copyToClipboard(
                                                                     project.public_url,
                                                                     'projectPublicURLCopy'
                                                                 )
                                                             "
-                                                        >
-                                                            <span
-                                                                ><ClipboardDocumentIcon
-                                                                    class="h-5 w-5"
-                                                                    aria-hidden="true"
-                                                            /></span>
-                                                        </button>
+                                                        ></copy-to-clipboard-button>
                                                     </div>
                                                 </div>
                                                 <div
@@ -462,22 +454,14 @@
                                                                 "
                                                             />
                                                         </div>
-                                                        <button
-                                                            type="button"
-                                                            class="-ml-px relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500"
+                                                        <copy-to-clipboard-button
                                                             @click="
                                                                 copyToClipboard(
                                                                     project.doi,
                                                                     'projectDOICopy'
                                                                 )
                                                             "
-                                                        >
-                                                            <span
-                                                                ><ClipboardDocumentIcon
-                                                                    class="h-5 w-5"
-                                                                    aria-hidden="true"
-                                                            /></span>
-                                                        </button>
+                                                        ></copy-to-clipboard-button>
                                                     </div>
                                                 </div>
                                                 <!-- <div>
@@ -879,6 +863,7 @@ import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import SelectRich from "@/Shared/SelectRich.vue";
 import JetButton from "@/Jetstream/Button.vue";
 import VueTagsInput from "@sipec/vue3-tags-input";
+import CopyToClipboardButton from "@/Shared/CopyToClipboardButton.vue";
 import { Inertia } from "@inertiajs/inertia";
 const publishingOptions = [
     {
@@ -938,6 +923,7 @@ export default defineComponent({
         ChevronDownIcon,
         SelectRich,
         VueTagsInput,
+        CopyToClipboardButton,
     },
     props: ["project", "role", "projectPermissions"],
     setup() {

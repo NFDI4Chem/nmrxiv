@@ -67,9 +67,7 @@
                                                                 "
                                                             />
                                                         </div>
-                                                        <button
-                                                            type="button"
-                                                            class="-ml-px relative inline-flex items-center space-x-2 px-2 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500"
+                                                        <copy-to-clipboard-button
                                                             @click="
                                                                 copyToClipboard(
                                                                     shareURL,
@@ -77,12 +75,7 @@
                                                                 )
                                                             "
                                                         >
-                                                            <span
-                                                                ><ClipboardDocumentIcon
-                                                                    class="h-5 w-5"
-                                                                    aria-hidden="true"
-                                                            /></span>
-                                                        </button>
+                                                        </copy-to-clipboard-button>
                                                     </div>
                                                 </MenuItem>
                                             </div>
@@ -230,18 +223,17 @@
 <script>
 import StudyContent from "@/Pages/Study/Content.vue";
 import LoadingButton from "@/Shared/LoadingButton.vue";
-import { ShareIcon, ClipboardDocumentIcon } from "@heroicons/vue/24/solid";
+import { ShareIcon } from "@heroicons/vue/24/solid";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import SpectraViewer from "@/Shared/SpectraViewer.vue";
 import SpectraEditor from "@/Shared/SpectraEditor.vue";
 import Citation from "@/Shared/Citation.vue";
-
+import CopyToClipboardButton from "@/Shared/CopyToClipboardButton.vue";
 export default {
     components: {
         StudyContent,
         LoadingButton,
         ShareIcon,
-        ClipboardDocumentIcon,
         Menu,
         MenuButton,
         MenuItem,
@@ -249,6 +241,7 @@ export default {
         SpectraEditor,
         SpectraViewer,
         Citation,
+        CopyToClipboardButton,
     },
     props: [
         "study",
