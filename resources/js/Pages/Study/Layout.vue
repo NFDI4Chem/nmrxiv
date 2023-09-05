@@ -85,17 +85,11 @@
                                         @click="toogleStarred"
                                     />
                                     {{ study.name }}
-                                    <button
+                                    <edit-button
                                         v-if="canUpdateStudy"
-                                        type="button"
-                                        class="inline-flex items-center shadow-sm px-4 py-1.5 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                        class="rounded-full ml-2"
                                         @click="toggleDetails"
-                                    >
-                                        <PencilIcon
-                                            class="w-4 h-4 mr-1 text-gray-600"
-                                        />
-                                        <span>Edit</span>
-                                    </button>
+                                    ></edit-button>
                                 </div>
                                 <div
                                     class="mt-1 flex flex-col sm:flex-row sm:flex-wrap sm:mt-0 sm:space-x-6"
@@ -261,7 +255,6 @@ import { ref } from "vue";
 import {
     CalendarIcon,
     ChevronRightIcon,
-    PencilIcon,
     FlagIcon,
     StarIcon,
     GlobeEuropeAfricaIcon,
@@ -278,6 +271,8 @@ import AccessDialogue from "@/Shared/AccessDialogue.vue";
 import Citation from "@/Shared/Citation.vue";
 import { Inertia } from "@inertiajs/inertia";
 import ToolTip from "@/Shared/ToolTip.vue";
+import EditButton from "@/Shared/EditButton.vue";
+
 export default {
     components: {
         Link,
@@ -289,7 +284,6 @@ export default {
         MenuItems,
         CalendarIcon,
         ChevronRightIcon,
-        PencilIcon,
         StarIcon,
         AccessDialogue,
         Citation,
@@ -301,6 +295,7 @@ export default {
         PencilSquareIcon,
         CubeTransparentIcon,
         HashtagIcon,
+        EditButton,
     },
     props: [
         "study",

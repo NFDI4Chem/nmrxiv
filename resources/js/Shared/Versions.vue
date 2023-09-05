@@ -187,7 +187,7 @@ import {
     TransitionRoot,
 } from "@headlessui/vue";
 import { HeartIcon, XMarkIcon } from "@heroicons/vue/24/outline";
-import { PencilIcon, PlusSmallIcon } from "@heroicons/vue/24/solid";
+import { PlusSmallIcon } from "@heroicons/vue/24/solid";
 
 export default {
     components: {
@@ -196,7 +196,6 @@ export default {
         TransitionChild,
         TransitionRoot,
         HeartIcon,
-        PencilIcon,
         PlusSmallIcon,
         XMarkIcon,
     },

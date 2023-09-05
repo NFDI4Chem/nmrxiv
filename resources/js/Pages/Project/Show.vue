@@ -57,18 +57,12 @@
                                     @click="toogleStarred"
                                 />
                                 {{ project.name }}
-
-                                <button
+                                <edit-button
                                     v-if="canUpdateProject"
-                                    type="button"
-                                    class="inline-flex items-center shadow-sm px-4 py-1.5 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                    class="rounded-full ml-2"
                                     @click="toggleDetails"
                                 >
-                                    <PencilIcon
-                                        class="w-4 h-4 mr-1 text-gray-600"
-                                    />
-                                    <span>Edit</span>
-                                </button>
+                                </edit-button>
                             </div>
 
                             <div class="inline-flex items-center mt-3">
@@ -223,17 +217,12 @@
                             >
                                 Description
                             </span>
-                            <button
+                            <edit-button
                                 v-if="canUpdateProject"
-                                type="button"
-                                class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                class="border border-gray-300 rounded-full"
                                 @click="toggleDetails"
                             >
-                                <PencilIcon
-                                    class="w-4 h-4 mr-1 text-gray-600"
-                                />
-                                <span>Edit</span>
-                            </button>
+                            </edit-button>
                         </div>
                     </div>
                     <dd class="mt-1 text-gray-900 space-y-5">
@@ -259,17 +248,11 @@
                             >
                                 Keywords
                             </span>
-                            <button
+                            <edit-button
                                 v-if="canUpdateProject"
-                                type="button"
-                                class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                class="border border-gray-300 rounded-full"
                                 @click="toggleDetails"
-                            >
-                                <PencilIcon
-                                    class="w-4 h-4 mr-1 text-gray-600"
-                                />
-                                <span>Edit</span>
-                            </button>
+                            ></edit-button>
                         </div>
                     </div>
                     <dd class="mt-1 text-md text-gray-900 space-y-5">
@@ -310,17 +293,11 @@
                             >
                                 License
                             </span>
-                            <button
+                            <edit-button
                                 v-if="canUpdateProject"
-                                type="button"
-                                class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                class="border border-gray-300 rounded-full"
                                 @click="toggleDetails"
-                            >
-                                <PencilIcon
-                                    class="w-4 h-4 mr-1 text-gray-600"
-                                />
-                                <span>Edit</span>
-                            </button>
+                            ></edit-button>
                         </div>
                     </div>
                     <div>
@@ -354,17 +331,11 @@
                             >
                                 Citation
                             </span>
-                            <button
+                            <edit-button
                                 v-if="canUpdateProject"
-                                type="button"
-                                class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                class="border border-gray-300 rounded-full"
                                 @click="toggleManageCitation"
-                            >
-                                <PencilIcon
-                                    class="w-4 h-4 mr-1 text-gray-600"
-                                />
-                                <span>Edit</span>
-                            </button>
+                            ></edit-button>
                         </div>
                     </div>
                     <dd
@@ -435,17 +406,11 @@
                             >
                                 Author
                             </span>
-                            <button
+                            <edit-button
                                 v-if="canUpdateProject"
-                                type="button"
-                                class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                class="border border-gray-300 rounded-full"
                                 @click="toggleManageAuthor"
-                            >
-                                <PencilIcon
-                                    class="w-4 h-4 mr-1 text-gray-600"
-                                />
-                                <span>Edit</span>
-                            </button>
+                            ></edit-button>
                         </div>
                     </div>
                     <dd class="mt-2 text-md text-gray-900 space-y-5">
@@ -483,7 +448,6 @@ import ProjectDetails from "./Partials/Details.vue";
 import { ref } from "vue";
 import {
     StarIcon,
-    PencilIcon,
     CalendarIcon,
     FlagIcon,
     GlobeEuropeAfricaIcon,
@@ -501,6 +465,7 @@ import ManageCitation from "@/Shared/ManageCitation.vue";
 import Citation from "@/Shared/Citation.vue";
 import Publish from "@/Shared/Publish.vue";
 import AuthorCard from "@/Shared/AuthorCard.vue";
+import EditButton from "@/Shared/EditButton.vue";
 
 export default {
     components: {
@@ -509,7 +474,6 @@ export default {
         StudyIndex,
         ProjectDetails,
         StarIcon,
-        PencilIcon,
         AccessDialogue,
         ManageAuthor,
         ToolTip,
@@ -525,6 +489,7 @@ export default {
         PencilSquareIcon,
         CubeTransparentIcon,
         HashtagIcon,
+        EditButton,
     },
     props: [
         "project",

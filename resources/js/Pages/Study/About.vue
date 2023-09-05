@@ -33,17 +33,12 @@
                                         >
                                             Description
                                         </span>
-                                        <button
+                                        <edit-button
                                             v-if="canUpdateStudy"
-                                            type="button"
-                                            class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                            class="rounded-full border border-gray-300"
                                             @click="openStudyDetailsPane"
                                         >
-                                            <PencilIcon
-                                                class="w-4 h-4 mr-1 text-gray-600"
-                                            />
-                                            <span>Edit</span>
-                                        </button>
+                                        </edit-button>
                                     </div>
                                 </div>
                                 <dd
@@ -74,17 +69,12 @@
                                         >
                                             Keywords
                                         </span>
-                                        <button
+                                        <edit-button
                                             v-if="canUpdateStudy"
-                                            type="button"
-                                            class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                            class="rounded-full border border-gray-300"
                                             @click="openStudyDetailsPane"
                                         >
-                                            <PencilIcon
-                                                class="w-4 h-4 mr-1 text-gray-600"
-                                            />
-                                            <span>Edit</span>
-                                        </button>
+                                        </edit-button>
                                     </div>
                                 </div>
                                 <dd
@@ -134,17 +124,12 @@
                                         >
                                             License
                                         </span>
-                                        <button
+                                        <edit-button
                                             v-if="canUpdateStudy"
-                                            type="button"
-                                            class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                            class="rounded-full border border-gray-300"
                                             @click="openStudyDetailsPane"
                                         >
-                                            <PencilIcon
-                                                class="w-4 h-4 mr-1 text-gray-600"
-                                            />
-                                            <span>Edit</span>
-                                        </button>
+                                        </edit-button>
                                     </div>
                                 </div>
                                 <div>
@@ -350,22 +335,17 @@
                                                                             ></TrashIcon
                                                                             >Delete
                                                                         </button>
-                                                                        <button
+                                                                        <edit-button
                                                                             v-if="
                                                                                 canUpdateStudy
                                                                             "
-                                                                            class="inline-flex ml-2 items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                                                            class="ml-2 border border-gray-300 rounded text-gray-700"
                                                                             @click="
                                                                                 editMolecule(
                                                                                     molecule
                                                                                 )
                                                                             "
-                                                                        >
-                                                                            <PencilIcon
-                                                                                class="w-4 h-4 inline mr-1"
-                                                                            ></PencilIcon
-                                                                            >Edit
-                                                                        </button>
+                                                                        ></edit-button>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -600,7 +580,6 @@
 import {
     PlusSmallIcon,
     TrashIcon,
-    PencilIcon,
     InformationCircleIcon,
 } from "@heroicons/vue/24/solid";
 import StudyContent from "@/Pages/Study/Content.vue";
@@ -608,6 +587,7 @@ import slider from "vue3-slider";
 import OCL from "openchemlib/full";
 import ToolTip from "@/Shared/ToolTip.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
+import EditButton from "@/Shared/EditButton.vue";
 export default {
     components: {
         StudyContent,
@@ -615,9 +595,9 @@ export default {
         PlusSmallIcon,
         slider,
         TrashIcon,
-        PencilIcon,
         InformationCircleIcon,
         JetInputError,
+        EditButton,
     },
     props: [
         "study",

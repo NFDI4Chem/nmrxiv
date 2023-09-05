@@ -1219,19 +1219,14 @@
                                                                                                         ></TrashIcon
                                                                                                         >Delete
                                                                                                     </button>
-                                                                                                    <button
-                                                                                                        class="inline-flex ml-2 items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                                                                                    <edit-button
+                                                                                                        class="ml-2 border border-gray-300 rounded"
                                                                                                         @click="
                                                                                                             editMolecule(
                                                                                                                 molecule
                                                                                                             )
                                                                                                         "
-                                                                                                    >
-                                                                                                        <PencilIcon
-                                                                                                            class="w-4 h-4 inline mr-1"
-                                                                                                        ></PencilIcon
-                                                                                                        >Edit
-                                                                                                    </button>
+                                                                                                    ></edit-button>
                                                                                                 </div>
                                                                                             </div>
                                                                                         </div>
@@ -1719,12 +1714,12 @@ import FileSystemBrowser from "./FileSystemBrowser.vue";
 import {
     ExclamationTriangleIcon,
     TrashIcon,
-    PencilIcon,
     ArrowDownOnSquareStackIcon,
     RectangleStackIcon,
 } from "@heroicons/vue/24/solid";
 import { FolderPlusIcon } from "@heroicons/vue/24/outline";
 import { Link } from "@inertiajs/inertia-vue3";
+import EditButton from "@/Shared/EditButton.vue";
 
 export default {
     components: {
@@ -1735,7 +1730,6 @@ export default {
         VueTagsInput,
         slider,
         SelectRich,
-        PencilIcon,
         JetInputError,
         FileSystemBrowser,
         ExclamationTriangleIcon,
@@ -1745,6 +1739,7 @@ export default {
         Validation,
         RectangleStackIcon,
         FolderPlusIcon,
+        EditButton,
     },
     props: [],
     data() {

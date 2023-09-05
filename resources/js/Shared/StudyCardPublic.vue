@@ -118,18 +118,13 @@
 </template>
 
 <script>
-import { LockClosedIcon } from "@heroicons/vue/24/solid";
-import { LockOpenIcon } from "@heroicons/vue/24/solid";
-import { PencilIcon } from "@heroicons/vue/24/solid";
-import { EnvelopeIcon } from "@heroicons/vue/24/solid";
+import { LockClosedIcon, LockOpenIcon } from "@heroicons/vue/24/solid";
 import { Link } from "@inertiajs/inertia-vue3";
 
 export default {
     components: {
         LockClosedIcon,
         LockOpenIcon,
-        EnvelopeIcon,
-        PencilIcon,
         Link,
     },
     props: ["study", "project"],
