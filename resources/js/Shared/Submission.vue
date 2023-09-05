@@ -491,16 +491,9 @@
                                                         'cursor-pointer flex p-4 pr-5 border-b border-blue-gray-200',
                                                     ]"
                                                 >
-                                                    <svg
-                                                        xmlns="http://www.w3.org/2000/svg"
+                                                    <RectangleStackIcon
                                                         class="flex-shrink-0 -mt-0.5 h-6 w-6 text-blue-gray-400"
-                                                        viewBox="0 0 20 20"
-                                                        fill="currentColor"
-                                                    >
-                                                        <path
-                                                            d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"
-                                                        />
-                                                    </svg>
+                                                    />
                                                     <div
                                                         class="ml-3 text-sm w-full"
                                                     >
@@ -1259,21 +1252,9 @@
                                                                             <div
                                                                                 class="text-center my-10 py-10"
                                                                             >
-                                                                                <svg
+                                                                                <FolderPlusIcon
                                                                                     class="mx-auto h-12 w-12 text-gray-400"
-                                                                                    fill="none"
-                                                                                    viewBox="0 0 24 24"
-                                                                                    stroke="currentColor"
-                                                                                    aria-hidden="true"
-                                                                                >
-                                                                                    <path
-                                                                                        vector-effect="non-scaling-stroke"
-                                                                                        stroke-linecap="round"
-                                                                                        stroke-linejoin="round"
-                                                                                        stroke-width="2"
-                                                                                        d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"
-                                                                                    />
-                                                                                </svg>
+                                                                                />
                                                                                 <h3
                                                                                     class="mt-2 text-sm font-medium text-gray-900"
                                                                                 >
@@ -1736,16 +1717,13 @@ import Validation from "@/Shared/Validation.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import FileSystemBrowser from "./FileSystemBrowser.vue";
 import {
-    XCircleIcon,
-    ClipboardDocumentIcon,
-    QuestionMarkCircleIcon,
     ExclamationTriangleIcon,
     TrashIcon,
-    PlayIcon,
-    PauseIcon,
     PencilIcon,
     ArrowDownOnSquareStackIcon,
+    RectangleStackIcon,
 } from "@heroicons/vue/24/solid";
+import { FolderPlusIcon } from "@heroicons/vue/24/outline";
 import { Link } from "@inertiajs/inertia-vue3";
 
 export default {
@@ -1757,19 +1735,16 @@ export default {
         VueTagsInput,
         slider,
         SelectRich,
-        XCircleIcon,
         PencilIcon,
         JetInputError,
         FileSystemBrowser,
-        ClipboardDocumentIcon,
-        QuestionMarkCircleIcon,
         ExclamationTriangleIcon,
         ArrowDownOnSquareStackIcon,
         TrashIcon,
-        PlayIcon,
-        PauseIcon,
         SpectraEditor,
         Validation,
+        RectangleStackIcon,
+        FolderPlusIcon,
     },
     props: [],
     data() {

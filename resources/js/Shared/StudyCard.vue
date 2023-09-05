@@ -106,25 +106,9 @@
                             v-if="study.is_public"
                             class="flex items-center mt-1"
                         >
-                            <svg
-                                class="h-3 w-3 mr-1 text-green-400 inline"
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 64 64"
-                                width="512"
-                                height="512"
-                            >
-                                <g id="globe">
-                                    <path
-                                        d="M53.85,47.85A27,27,0,0,1,24,57.8V56l3-3V49l4-4V42l4,4h5l2-2h8Z"
-                                    />
-                                    <path
-                                        d="M42,20.59v2.56L38.07,27H31l-5.36,5.26L31,37.51v5.06L27.44,39H22.86L16,32.11V24.2L11.8,20h-4A27,27,0,0,1,32,5a26.55,26.55,0,0,1,7.06.94L36,9H30v4l4,4h4.33Z"
-                                    />
-                                    <path
-                                        d="M32,60A28,28,0,1,1,60,32,28,28,0,0,1,32,60ZM32,6A26,26,0,1,0,58,32,26,26,0,0,0,32,6Z"
-                                    />
-                                </g>
-                            </svg>
+                            <GlobeEuropeAfricaIcon
+                                class="h-3 w-3 mr-1 inline"
+                            />
 
                             <p class="text-xs text-gray-600">Public</p>
                         </div>
@@ -146,21 +130,16 @@
 </template>
 
 <script>
-import { LockClosedIcon } from "@heroicons/vue/24/solid";
-import { LockOpenIcon } from "@heroicons/vue/24/solid";
-import { PencilIcon } from "@heroicons/vue/24/solid";
-import { EnvelopeIcon } from "@heroicons/vue/24/solid";
+import { LockClosedIcon, GlobeEuropeAfricaIcon } from "@heroicons/vue/24/solid";
 import { Link } from "@inertiajs/inertia-vue3";
 import { StarIcon } from "@heroicons/vue/24/solid";
 
 export default {
     components: {
         LockClosedIcon,
-        LockOpenIcon,
-        EnvelopeIcon,
-        PencilIcon,
         StarIcon,
         Link,
+        GlobeEuropeAfricaIcon,
     },
     props: ["study"],
     setup() {},

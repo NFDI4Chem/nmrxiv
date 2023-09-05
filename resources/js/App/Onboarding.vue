@@ -342,19 +342,11 @@
                                         @click="selectStep(currentStep - 1)"
                                     >
                                         <div class="flex flex-row align-middle">
-                                            <svg
-                                                class="w-5 mr-1"
-                                                fill="currentColor"
-                                                viewBox="0 0 20 20"
-                                                xmlns="http://www.w3.org/2000/svg"
-                                            >
-                                                <path
-                                                    fill-rule="evenodd"
-                                                    d="M7.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l2.293 2.293a1 1 0 010 1.414z"
-                                                    clip-rule="evenodd"
-                                                ></path>
-                                            </svg>
-                                            <p class="ml-2">Prev</p>
+                                            <ArrowSmallLeftIcon
+                                                class="mr-1.5 w-5"
+                                                aria-hidden="true"
+                                            />
+                                            Prev
                                         </div>
                                     </button>
                                     <button
@@ -465,18 +457,10 @@
                                                     <span class="mr-1"
                                                         >Let's&nbsp;go</span
                                                     >
-                                                    <svg
-                                                        class="w-5 ml-2"
-                                                        fill="currentColor"
-                                                        viewBox="0 0 20 20"
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                    >
-                                                        <path
-                                                            fill-rule="evenodd"
-                                                            d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z"
-                                                            clip-rule="evenodd"
-                                                        ></path>
-                                                    </svg>
+                                                    <ArrowSmallRightIcon
+                                                        class="w-5"
+                                                        aria-hidden="true"
+                                                    />
                                                 </div>
                                             </button>
                                         </div>
@@ -496,18 +480,10 @@
                                                     <span class="mr-1"
                                                         >Next</span
                                                     >
-                                                    <svg
-                                                        class="w-5 ml-2"
-                                                        fill="currentColor"
-                                                        viewBox="0 0 20 20"
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                    >
-                                                        <path
-                                                            fill-rule="evenodd"
-                                                            d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z"
-                                                            clip-rule="evenodd"
-                                                        ></path>
-                                                    </svg>
+                                                    <ArrowSmallRightIcon
+                                                        class="w-5"
+                                                        aria-hidden="true"
+                                                    />
                                                 </div>
                                             </button>
                                         </div>
@@ -536,15 +512,11 @@ import {
     TransitionRoot,
 } from "@headlessui/vue";
 
-import { MagnifyingGlassIcon } from "@heroicons/vue/24/solid";
 import {
-    DocumentPlusIcon,
-    FolderIcon,
-    FolderPlusIcon,
-    HashtagIcon,
-    ArrowTopRightOnSquareIcon,
-    TagIcon,
-} from "@heroicons/vue/24/outline";
+    ArrowSmallLeftIcon,
+    ArrowSmallRightIcon,
+} from "@heroicons/vue/24/solid";
+import { ArrowTopRightOnSquareIcon } from "@heroicons/vue/24/outline";
 import axios from "axios";
 import { Inertia } from "@inertiajs/inertia";
 
@@ -561,13 +533,10 @@ export default {
         DialogPanel,
         TransitionChild,
         TransitionRoot,
-        MagnifyingGlassIcon,
-        DocumentPlusIcon,
-        FolderIcon,
-        FolderPlusIcon,
-        HashtagIcon,
-        TagIcon,
+
         ArrowTopRightOnSquareIcon,
+        ArrowSmallLeftIcon,
+        ArrowSmallRightIcon,
     },
     props: [],
     data() {

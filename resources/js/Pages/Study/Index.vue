@@ -120,20 +120,7 @@
                     </div> -->
                     <div class="px-6 py-4 bg-white shadow-md rounded-lg">
                         <div class="flex items-center">
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 24 24"
-                                class="h-6 w-6"
-                            >
-                                <path
-                                    d="M3 6l9 4v12l-9-4V6zm14-3v2c0 1.1-2.24 2-5 2s-5-.9-5-2V3c0 1.1 2.24 2 5 2s5-.9 5-2z"
-                                    class="fill-current text-gray-400"
-                                ></path>
-                                <polygon
-                                    points="21 6 12 10 12 22 21 18"
-                                    class="fill-current text-gray-600"
-                                ></polygon>
-                            </svg>
+                            <CubeTransparentIcon class="h-6 w-6" />
                             <div
                                 class="ml-3 font-semibold text-sm text-gray-600 uppercase tracking-wider"
                             >
@@ -145,20 +132,9 @@
                             @click.prevent="reset()"
                             class="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 mt-6 focus:ring-offset-2 focus:ring-teal-500"
                         >
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke-width="1.5"
-                                stroke="currentColor"
+                            <MagnifyingGlassIcon
                                 class="mx-auto h-12 w-12 text-gray-400"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-                                />
-                            </svg>
+                            />
                             <span
                                 class="mt-2 block text-sm font-medium text-gray-900"
                             >
@@ -237,7 +213,10 @@ import { Link } from "@inertiajs/inertia-vue3";
 import StudyCreate from "@/Pages/Study/Partials/Create.vue";
 import StudyCard from "@/Shared/StudyCard.vue";
 import JetButton from "@/Jetstream/Button.vue";
-import { ArrowLongLeftIcon, ArrowLongRightIcon } from "@heroicons/vue/24/solid";
+import {
+    CubeTransparentIcon,
+    MagnifyingGlassIcon,
+} from "@heroicons/vue/24/solid";
 
 export default {
     components: {
@@ -245,8 +224,8 @@ export default {
         StudyCreate,
         StudyCard,
         JetButton,
-        ArrowLongLeftIcon,
-        ArrowLongRightIcon,
+        CubeTransparentIcon,
+        MagnifyingGlassIcon,
     },
     props: {
         project: {

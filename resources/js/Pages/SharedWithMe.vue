@@ -30,19 +30,10 @@
                                                     <div
                                                         class="flex items-center"
                                                     >
-                                                        <svg
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                            viewBox="0 0 20 20"
-                                                            fill="currentColor"
-                                                            aria-hidden="true"
-                                                            class="flex-shrink-0 h-5 w-5 text-gray-400"
-                                                        >
-                                                            <path
-                                                                fill-rule="evenodd"
-                                                                d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                                                                clip-rule="evenodd"
-                                                            ></path></svg
-                                                        ><a
+                                                        <ChevronRightIcon
+                                                            class="h-4 w-4 text-gray-600"
+                                                        />
+                                                        <a
                                                             class="ml-4 text-sm font-medium text-gray-500 hover:text-gray-700"
                                                             >Shared With Me</a
                                                         >
@@ -67,20 +58,7 @@
             <team-projects :mode="'listing'" :projects="projects">
                 <template #emptyText
                     ><div class="text-center py-12">
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            class="mx-auto h-24 w-24 text-gray-400"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                            stroke-width="2"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-                            />
-                        </svg>
+                        <CubeIcon class="mx-auto h-24 w-24 text-gray-400" />
                         <h3 class="mt-2 text-sm font-medium text-gray-900">
                             No Projects Shared.
                         </h3>
@@ -125,13 +103,15 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import TeamProjects from "@/Pages/Project/Index.vue";
 import StudyCard from "@/Shared/StudyCard.vue";
 import { Link } from "@inertiajs/inertia-vue3";
-
+import { ChevronRightIcon, CubeIcon } from "@heroicons/vue/24/outline";
 export default {
     components: {
         AppLayout,
         TeamProjects,
         StudyCard,
         Link,
+        ChevronRightIcon,
+        CubeIcon,
     },
     props: ["user", "team", "projects", "studies"],
 };

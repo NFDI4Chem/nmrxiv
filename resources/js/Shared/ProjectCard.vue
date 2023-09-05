@@ -26,18 +26,7 @@
                                             class="relative inline-flex items-center px-1 py-1 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-900 hover:bg-gray-50"
                                             @click="toggleUpVote()"
                                         >
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                class="h-5 w-5"
-                                                viewBox="0 0 20 20"
-                                                fill="currentColor"
-                                            >
-                                                <path
-                                                    fill-rule="evenodd"
-                                                    d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z"
-                                                    clip-rule="evenodd"
-                                                />
-                                            </svg>
+                                            <ChevronUpIcon class="h-4 w-4" />
                                         </button>
                                         <a
                                             class="-ml-px relative inline-flex items-center px-2 py-1 rounded-r-md border border-gray-300 bg-white text-sm font-black text-dark hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
@@ -260,18 +249,9 @@
                                                     class="relative inline-flex items-center px-1 py-1 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-900 hover:bg-gray-50"
                                                     @click="toggleUpVote()"
                                                 >
-                                                    <svg
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                        class="h-5 w-5"
-                                                        viewBox="0 0 20 20"
-                                                        fill="currentColor"
-                                                    >
-                                                        <path
-                                                            fill-rule="evenodd"
-                                                            d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z"
-                                                            clip-rule="evenodd"
-                                                        />
-                                                    </svg>
+                                                    <ChevronUpIcon
+                                                        class="h-4 w-4"
+                                                    />
                                                 </button>
                                                 <a
                                                     class="-ml-px relative inline-flex items-center px-2 py-1 rounded-r-md border border-gray-300 bg-white text-sm font-black text-dark hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
@@ -320,20 +300,9 @@
                             <div
                                 class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0"
                             >
-                                <!-- Heroicon name: solid/calendar -->
-                                <svg
+                                <CalendarIcon
                                     class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 20 20"
-                                    fill="currentColor"
-                                    aria-hidden="true"
-                                >
-                                    <path
-                                        fill-rule="evenodd"
-                                        d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
-                                        clip-rule="evenodd"
-                                    />
-                                </svg>
+                                />
                                 <p>
                                     <time datetime="2020-03-16"
                                         >{{ formatDate(project.created_at) }}
@@ -349,30 +318,30 @@
 </template>
 
 <script>
-import { LockClosedIcon } from "@heroicons/vue/24/solid";
-import { LockOpenIcon, ArrowDownTrayIcon } from "@heroicons/vue/24/solid";
-import { PencilIcon } from "@heroicons/vue/24/solid";
-import { EnvelopeIcon } from "@heroicons/vue/24/solid";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
-import { EllipsisVerticalIcon, ScaleIcon } from "@heroicons/vue/24/solid";
 import { Inertia } from "@inertiajs/inertia";
 import { Head, Link } from "@inertiajs/inertia-vue3";
-
+import {
+    ChevronUpIcon,
+    CalendarIcon,
+    ArrowDownTrayIcon,
+    EllipsisVerticalIcon,
+    ScaleIcon,
+} from "@heroicons/vue/24/solid";
 export default {
     components: {
         Head,
         Link,
-        LockClosedIcon,
-        LockOpenIcon,
-        ArrowDownTrayIcon,
-        EnvelopeIcon,
-        PencilIcon,
-        ScaleIcon,
+
         Menu,
         MenuButton,
         MenuItem,
         MenuItems,
+        ArrowDownTrayIcon,
+        ScaleIcon,
         EllipsisVerticalIcon,
+        ChevronUpIcon,
+        CalendarIcon,
     },
     props: ["project", "mode"],
     setup() {},

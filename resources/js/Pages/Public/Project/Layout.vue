@@ -44,18 +44,9 @@
                                             class="relative inline-flex items-center px-1 py-1 rounded-l-full border border-gray-300 bg-white text-sm font-medium text-gray-900 hover:bg-gray-50"
                                             @click="toggleUpVote()"
                                         >
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                class="h-5 w-5"
-                                                viewBox="0 0 20 20"
-                                                fill="currentColor"
-                                            >
-                                                <path
-                                                    fill-rule="evenodd"
-                                                    d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z"
-                                                    clip-rule="evenodd"
-                                                />
-                                            </svg>
+                                            <ChevronUpIcon
+                                                class="h-4 w-4 ml-1 text-gray-900"
+                                            />
                                         </button>
                                         <a
                                             class="-ml-px relative inline-flex items-center px-4 py-1 rounded-r-full border border-gray-300 bg-white text-sm font-black text-dark hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
@@ -207,12 +198,13 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import { Link } from "@inertiajs/inertia-vue3";
 import { Inertia } from "@inertiajs/inertia";
-import { ArrowDownTrayIcon } from "@heroicons/vue/24/solid";
+import { ArrowDownTrayIcon, ChevronUpIcon } from "@heroicons/vue/24/solid";
 export default {
     components: {
         AppLayout,
         Link,
         ArrowDownTrayIcon,
+        ChevronUpIcon,
     },
     props: ["project", "selectedTab"],
     data() {

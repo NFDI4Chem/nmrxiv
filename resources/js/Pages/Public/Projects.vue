@@ -56,7 +56,7 @@
                                     >{{ form.sort }}</span
                                 >
                                 <ChevronDownIcon
-                                    class="flex-shrink-0 -mr-1 ml-1 h-5 w-5 text-gray-400 group-hover:text-gray-500"
+                                    class="-mr-1 ml-1 h-5 w-5 text-gray-400 group-hover:text-gray-500"
                                     aria-hidden="true"
                                 />
                             </MenuButton>
@@ -192,21 +192,7 @@
                 <div
                     class="text-center rounded-lg border-2 border-dashed border-gray-300 p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 mt-5"
                 >
-                    <svg
-                        class="mx-auto h-12 w-12 text-gray-400"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        aria-hidden="true"
-                    >
-                        <path
-                            vector-effect="non-scaling-stroke"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"
-                        />
-                    </svg>
+                    <FolderPlusIcon class="mx-auto h-12 w-12 text-gray-400" />
                     <h3 class="mt-2 text-sm font-medium text-gray-900">
                         No projects
                     </h3>
@@ -236,7 +222,7 @@ import {
     TransitionRoot,
 } from "@headlessui/vue";
 import throttle from "lodash/throttle";
-import { XMarkIcon } from "@heroicons/vue/24/outline";
+import { XMarkIcon, FolderPlusIcon } from "@heroicons/vue/24/outline";
 import {
     ChevronDownIcon,
     QueueListIcon,
@@ -274,6 +260,7 @@ export default {
         ProjectSearch,
         Pagination,
         Squares2X2Icon,
+        FolderPlusIcon,
     },
     props: {
         projects: {
