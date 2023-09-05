@@ -97,44 +97,7 @@
                                                     </label>
                                                     <div class="mt-1">
                                                         <TabGroup>
-                                                            <TabList
-                                                                class="flex items-center"
-                                                            >
-                                                                <Tab
-                                                                    v-slot="{
-                                                                        selected,
-                                                                    }"
-                                                                    as="template"
-                                                                >
-                                                                    <button
-                                                                        :class="[
-                                                                            selected
-                                                                                ? 'text-gray-900 bg-gray-100 hover:bg-gray-200'
-                                                                                : 'text-gray-500 hover:text-gray-900 bg-white hover:bg-gray-100',
-                                                                            'px-3 py-1.5 border border-transparent text-sm font-medium rounded-md',
-                                                                        ]"
-                                                                    >
-                                                                        Write
-                                                                    </button>
-                                                                </Tab>
-                                                                <Tab
-                                                                    v-slot="{
-                                                                        selected,
-                                                                    }"
-                                                                    as="template"
-                                                                >
-                                                                    <button
-                                                                        :class="[
-                                                                            selected
-                                                                                ? 'text-gray-900 bg-gray-100 hover:bg-gray-200'
-                                                                                : 'text-gray-500 hover:text-gray-900 bg-white hover:bg-gray-100',
-                                                                            'ml-2 px-3 py-1.5 border border-transparent text-sm font-medium rounded-md',
-                                                                        ]"
-                                                                    >
-                                                                        Preview
-                                                                    </button>
-                                                                </Tab>
-                                                            </TabList>
+                                                            <description-tabs></description-tabs>
                                                             <TabPanels
                                                                 class="mt-2"
                                                             >
@@ -845,7 +808,6 @@ import {
     ListboxOptions,
     Tab,
     TabGroup,
-    TabList,
     TabPanel,
     TabPanels,
 } from "@headlessui/vue";
@@ -865,6 +827,7 @@ import JetButton from "@/Jetstream/Button.vue";
 import VueTagsInput from "@sipec/vue3-tags-input";
 import CopyToClipboardButton from "@/Shared/CopyToClipboardButton.vue";
 import { Inertia } from "@inertiajs/inertia";
+import DescriptionTabs from "@/Shared/DescriptionTabs.vue";
 const publishingOptions = [
     {
         value: "viewer",
@@ -915,7 +878,6 @@ export default defineComponent({
         ListboxOptions,
         Tab,
         TabGroup,
-        TabList,
         TabPanel,
         TabPanels,
         ClipboardDocumentIcon,
@@ -924,6 +886,7 @@ export default defineComponent({
         SelectRich,
         VueTagsInput,
         CopyToClipboardButton,
+        DescriptionTabs,
     },
     props: ["project", "role", "projectPermissions"],
     setup() {

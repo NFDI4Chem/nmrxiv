@@ -34,36 +34,7 @@
                     </div>
                     <div class="sm:col-span-6">
                         <TabGroup v-slot="{ $selectedIndex }">
-                            <TabList class="flex items-center">
-                                <Tab
-                                    v-slot="{ selected }"
-                                    as="template"
-                                    class="after:content-['*'] after:ml-0.5 after:text-red-500"
-                                >
-                                    <button
-                                        :class="[
-                                            selected
-                                                ? 'text-gray-900 bg-gray-100 hover:bg-gray-200'
-                                                : 'text-gray-500 hover:text-gray-900 bg-white hover:bg-gray-100',
-                                            'px-3 py-1.5 border border-transparent text-sm font-medium rounded-md',
-                                        ]"
-                                    >
-                                        Write
-                                    </button>
-                                </Tab>
-                                <Tab v-slot="{ selected }" as="template">
-                                    <button
-                                        :class="[
-                                            selected
-                                                ? 'text-gray-900 bg-gray-100 hover:bg-gray-200'
-                                                : 'text-gray-500 hover:text-gray-900 bg-white hover:bg-gray-100',
-                                            'ml-2 px-3 py-1.5 border border-transparent text-sm font-medium rounded-md',
-                                        ]"
-                                    >
-                                        Preview
-                                    </button>
-                                </Tab>
-                            </TabList>
+                            <description-tabs></description-tabs>
                             <TabPanels class="mt-2">
                                 <TabPanel class="p-0.5 -m-0.5 rounded-lg">
                                     <label for="comment" class="sr-only"
@@ -268,7 +239,6 @@ import { Link } from "@inertiajs/inertia-vue3";
 import {
     Tab,
     TabGroup,
-    TabList,
     TabPanel,
     TabPanels,
     Switch,
@@ -281,12 +251,11 @@ import { ref } from "vue";
 
 import SelectRich from "@/Shared/SelectRich.vue";
 import axios from "axios";
-
+import DescriptionTabs from "@/Shared/DescriptionTabs.vue";
 export default {
     components: {
         Tab,
         TabGroup,
-        TabList,
         TabPanel,
         TabPanels,
         Switch,
@@ -301,6 +270,7 @@ export default {
         SelectRich,
         GlobeEuropeAfricaIcon,
         LockClosedIcon,
+        DescriptionTabs,
     },
 
     props: [],
