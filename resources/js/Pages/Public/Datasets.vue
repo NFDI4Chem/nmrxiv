@@ -47,7 +47,7 @@
         <div class="min-h-[calc(100vh-500px)] px-12 mb-24 mx-auto">
             <div class="relative border-gray-200 pt-4">
                 <div class="mx-auto flex items-center justify-between">
-                    <Menu as="div" class="relative inline-block text-left z-10">
+                    <Menu as="div" class="relative inline-block text-left">
                         <div>
                             <MenuButton
                                 class="group inline-flex justify-center text-sm font-medium text-gray-700 hover:text-gray-900"
@@ -72,7 +72,7 @@
                             leave-to-class="transform opacity-0 scale-95"
                         >
                             <MenuItems
-                                class="origin-top-left absolute left-0 mt-2 w-40 rounded-md shadow-2xl bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
+                                class="z-10 origin-top-left absolute left-0 mt-2 w-40 rounded-md shadow-2xl bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
                             >
                                 <div class="py-1">
                                     <MenuItem
@@ -83,7 +83,7 @@
                                         <a
                                             @click="form.sort = option.value"
                                             :class="[
-                                                option.current
+                                                form.sort == option.value
                                                     ? 'font-medium text-gray-900'
                                                     : 'text-gray-500',
                                                 active ? 'bg-gray-100' : '',
@@ -291,8 +291,8 @@ export default {
     data() {
         return {
             sortOptions: [
-                { name: "Creation", value: "creation", current: true },
-                { name: "Newest", value: "newest", current: false },
+                { name: "Creation", value: "creation" },
+                { name: "Newest", value: "newest" },
             ],
             open: ref(false),
             form: {
