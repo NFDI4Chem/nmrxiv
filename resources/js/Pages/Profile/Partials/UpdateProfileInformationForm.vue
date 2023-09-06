@@ -139,18 +139,8 @@
                         class="tooltip -ml-px relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500 cursor-pointer"
                         @click="findOrcidID()"
                     >
-                        <button type="button" class="">
-                            <img
-                                alt="ORCID logo"
-                                src="https://orcid.org/assets/vectors/orcid.logo.icon.svg"
-                                width="20"
-                                height="20"
-                            />
-                        </button>
-                        <span
-                            class="bg-gray-900 text-center text-white px-2 py-1 shadow-lg rounded-md tooltiptextbottom"
-                            >Click to find ORCID iD</span
-                        >
+                    <orcid-button></orcid-button>
+                        
                     </div>
                 </div>
                 <jet-input-error :message="this.error.orcid" class="mt-2" />
@@ -204,6 +194,7 @@ import JetActionMessage from "@/Jetstream/ActionMessage.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import SelectOrcidId from "@/Shared/SelectOrcidId.vue";
 import { ref } from "vue";
+import OrcidButton from "@/Shared/OrcidButton.vue";
 
 export default {
     components: {
@@ -215,6 +206,7 @@ export default {
         JetLabel,
         JetSecondaryButton,
         SelectOrcidId,
+        OrcidButton
     },
 
     props: ["user"],
