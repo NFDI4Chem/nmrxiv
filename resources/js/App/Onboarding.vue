@@ -337,7 +337,6 @@
                                     <JetSecondaryButton
                                         v-if="currentStep != 1"
                                         class="font-bold"
-
                                         @click="selectStep(currentStep - 1)"
                                     >
                                         <ArrowSmallLeftIcon
@@ -345,13 +344,12 @@
                                         />back</JetSecondaryButton
                                     >
                                     <JetSecondaryButton
-                                    v-else
-                                    class="font-bold"
-                                        @click="onboardingComplete">
+                                        v-else
+                                        class="font-bold"
+                                        @click="onboardingComplete"
+                                    >
                                         Skip
                                     </JetSecondaryButton>
-
-                               
                                 </div>
                                 <div class="col-span-2">
                                     <nav
@@ -441,25 +439,25 @@
                                                 autofocus
                                                 @click="
                                                     selectStep(currentStep + 1)
-                                                ">Let's go
+                                                "
+                                                >Let's go
                                                 <ArrowSmallRightIcon
-                                                        class="w-5"
-                                                        aria-hidden="true"
-                                                    /></JetSecondaryButton>
-                                            
+                                                    class="w-5"
+                                                    aria-hidden="true"
+                                            /></JetSecondaryButton>
                                         </div>
                                         <div v-else>
                                             <JetSecondaryButton
-                                            ref="next"
+                                                ref="next"
                                                 class="bg-indigo-600 text-white font-bold"
                                                 autofocus
                                                 @click="
                                                     selectStep(currentStep + 1)
-                                                ">Next<ArrowSmallRightIcon
-                                                        class="w-5"
-                                                        aria-hidden="true"
-                                                    /></JetSecondaryButton>
-                                            
+                                                "
+                                                >Next<ArrowSmallRightIcon
+                                                    class="w-5"
+                                                    aria-hidden="true"
+                                            /></JetSecondaryButton>
                                         </div>
                                     </div>
                                 </div>

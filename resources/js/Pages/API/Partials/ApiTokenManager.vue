@@ -100,23 +100,19 @@
                                     >
                                         Last used {{ token.last_used_ago }}
                                     </div>
-
-                                    <button
+                                    <WordButton
                                         v-if="availablePermissions.length > 0"
-                                        class="cursor-pointer ml-6 text-sm text-gray-400 underline"
+                                        class="underline"
                                         @click="
                                             manageApiTokenPermissions(token)
                                         "
+                                        >Permissions</WordButton
                                     >
-                                        Permissions
-                                    </button>
-
-                                    <button
-                                        class="cursor-pointer ml-6 text-sm text-red-500"
+                                    <WordButton
+                                        class="text-red-500"
                                         @click="confirmApiTokenDeletion(token)"
+                                        >Delete</WordButton
                                     >
-                                        Delete
-                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -238,6 +234,7 @@ import JetInputError from "@/Jetstream/InputError.vue";
 import JetLabel from "@/Jetstream/Label.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import JetSectionBorder from "@/Jetstream/SectionBorder.vue";
+import WordButton from "@/Shared/WordButton.vue";
 
 export default {
     components: {
@@ -254,6 +251,7 @@ export default {
         JetLabel,
         JetSecondaryButton,
         JetSectionBorder,
+        WordButton,
     },
 
     props: ["tokens", "availablePermissions", "defaultPermissions"],

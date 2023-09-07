@@ -37,22 +37,15 @@
                                 placeholder="Search…"
                             />
                         </div>
-                        <button
-                            class="ml-3 text-sm text-gray-500 hover:text-gray-700 focus:text-indigo-500"
-                            type="button"
+                        <WordButton
+                            class="focus:text-indigo-500"
                             @click="reset()"
+                            >Hi</WordButton
                         >
-                            Reset
-                        </button>
                     </div>
-                    <button
-                        class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring focus:ring-gray-300 disabled:opacity-25 transition"
-                        type="button"
-                        @click="openAnnouncementCreateDialog()"
+                    <JetButton @click="openAnnouncementCreateDialog()"
+                        >Create Announcement</JetButton
                     >
-                        <span>Create</span>&nbsp;
-                        <span class="hidden md:inline">Announcement</span>
-                    </button>
                 </div>
                 <div>
                     <div class="bg-white rounded-md shadow overflow-x-auto">
@@ -242,13 +235,13 @@ import AnnouncementCreate from "@/Pages/Announcement/Partials/Create.vue";
 import AnnouncementEdit from "@/Pages/Announcement/Partials/Edit.vue";
 import JetConfirmationModal from "@/Jetstream/ConfirmationModal.vue";
 import JetDangerButton from "@/Jetstream/DangerButton.vue";
-import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import JetDialogModal from "@/Jetstream/DialogModal.vue";
 import { ref, watch } from "vue";
 import { Inertia } from "@inertiajs/inertia";
 import ToggleButton from "@/Shared/ToggleButton.vue";
 import UploadButton from "@/Shared/UploadButton.vue";
-
+import WordButton from "@/Shared/WordButton.vue";
+import JetButton from "@/Jetstream/Button.vue";
 export default {
     components: {
         AppLayout,
@@ -258,10 +251,11 @@ export default {
         AnnouncementEdit,
         JetConfirmationModal,
         JetDangerButton,
-        JetSecondaryButton,
         JetDialogModal,
         ToggleButton,
         UploadButton,
+        WordButton,
+        JetButton,
     },
     props: {
         announcements: Array,

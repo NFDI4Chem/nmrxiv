@@ -48,15 +48,13 @@
             </div>
 
             <div class="flex items-center justify-end mt-4">
-                <button
-                    type="button"
-                    class="text-sm text-gray-600 hover:text-gray-900 underline cursor-pointer"
-                    @click.prevent="toggleRecovery"
-                >
+                <WordButton class="underline" @click.prevent="toggleRecovery">
                     <template v-if="!recovery"> Use a recovery code </template>
 
-                    <template v-else> Use an authentication code </template>
-                </button>
+                    <template v-else>
+                        Use an authentication code
+                    </template></WordButton
+                >
 
                 <jet-button
                     class="ml-4"
@@ -78,6 +76,7 @@ import JetButton from "@/Jetstream/Button.vue";
 import JetInput from "@/Jetstream/Input.vue";
 import JetLabel from "@/Jetstream/Label.vue";
 import JetValidationErrors from "@/Jetstream/ValidationErrors.vue";
+import WordButton from "@/Shared/WordButton.vue";
 
 export default {
     components: {
@@ -88,6 +87,7 @@ export default {
         JetInput,
         JetLabel,
         JetValidationErrors,
+        WordButton,
     },
 
     data() {
