@@ -275,7 +275,9 @@ import {
     ArrowDownTrayIcon,
     CalendarIcon,
     EllipsisVerticalIcon,
+    ScaleIcon,
 } from "@heroicons/vue/24/solid";
+
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import { Inertia } from "@inertiajs/inertia";
 import { Head, Link } from "@inertiajs/inertia-vue3";
