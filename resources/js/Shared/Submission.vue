@@ -1419,11 +1419,12 @@
                                                                         "
                                                                     >
                                                                         <template>
-                                                                            <upload-button>Create
-                                                                                    a
-                                                                                    new
-                                                                                    database</upload-button>
-                                                                            
+                                                                            <upload-button
+                                                                                >Create
+                                                                                a
+                                                                                new
+                                                                                database</upload-button
+                                                                            >
                                                                         </template>
                                                                     </div>
                                                                     <div
@@ -1718,7 +1719,7 @@ export default {
         RectangleStackIcon,
         FolderPlusIcon,
         EditButton,
-        UploadButton
+        UploadButton,
     },
     props: [],
     data() {

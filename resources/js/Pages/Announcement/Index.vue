@@ -45,14 +45,14 @@
                             Reset
                         </button>
                     </div>
-                    <Button
+                    <button
                         class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring focus:ring-gray-300 disabled:opacity-25 transition"
                         type="button"
                         @click="openAnnouncementCreateDialog()"
                     >
                         <span>Create</span>&nbsp;
                         <span class="hidden md:inline">Announcement</span>
-                    </Button>
+                    </button>
                 </div>
                 <div>
                     <div class="bg-white rounded-md shadow overflow-x-auto">
@@ -220,9 +220,9 @@
                 </div>
             </span>
             <span v-else>
-                <upload-button
-                @click="openAnnouncementCreateDialog()">
-                Create a new announcement</upload-button>
+                <upload-button @click="openAnnouncementCreateDialog()">
+                    Create a new announcement</upload-button
+                >
             </span>
             <announcement-create
                 ref="announcementCreateElement"
@@ -248,6 +248,7 @@ import { ref, watch } from "vue";
 import { Inertia } from "@inertiajs/inertia";
 import ToggleButton from "@/Shared/ToggleButton.vue";
 import UploadButton from "@/Shared/UploadButton.vue";
+
 export default {
     components: {
         AppLayout,
@@ -260,7 +261,7 @@ export default {
         JetSecondaryButton,
         JetDialogModal,
         ToggleButton,
-        UploadButton
+        UploadButton,
     },
     props: {
         announcements: Array,

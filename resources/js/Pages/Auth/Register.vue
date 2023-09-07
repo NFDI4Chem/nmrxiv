@@ -89,10 +89,10 @@
                         />
                     </div>
                     <div
-                    @click="findOrcidID()"
+                        @click="findOrcidID()"
                         class="tooltip -ml-px relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500 cursor-pointer"
                     >
-                    <orcid-button></orcid-button>
+                        <orcid-button></orcid-button>
                     </div>
                 </div>
                 <jet-input-error :message="this.error.orcid" class="mt-2" />
@@ -220,7 +220,7 @@ export default {
         JetInputError,
         SelectOrcidId,
         ref,
-        OrcidButton
+        OrcidButton,
     },
 
     data() {

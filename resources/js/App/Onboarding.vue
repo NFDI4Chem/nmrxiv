@@ -19,7 +19,6 @@
                 <TransitionChild
                     as="template"
                     enter="ease-out duration-300"
-                    enter-from="opacity-0 scale-95"
                     enter-to="opacity-100 scale-100"
                     leave="ease-in duration-200"
                     leave-from="opacity-100 scale-100"
@@ -335,30 +334,24 @@
 
                             <div class="grid grid-cols-4 gap-4">
                                 <div class="p-4 py-4">
-                                    <button
+                                    <JetSecondaryButton
                                         v-if="currentStep != 1"
-                                        type="button"
-                                        class="py-2 px-3 border rounded-md"
+                                        class="font-bold"
+
                                         @click="selectStep(currentStep - 1)"
                                     >
-                                        <div class="flex flex-row align-middle">
-                                            <ArrowSmallLeftIcon
-                                                class="mr-1.5 w-5"
-                                                aria-hidden="true"
-                                            />
-                                            Prev
-                                        </div>
-                                    </button>
-                                    <button
-                                        v-else
-                                        type="button"
-                                        class="py-2 px-3 border rounded-md"
-                                        @click="onboardingComplete"
+                                        <ArrowSmallLeftIcon
+                                            class="mr-1.5 w-5"
+                                        />back</JetSecondaryButton
                                     >
-                                        <div class="flex flex-row align-middle">
-                                            <p class="mx-2">Skip</p>
-                                        </div>
-                                    </button>
+                                    <JetSecondaryButton
+                                    v-else
+                                    class="font-bold"
+                                        @click="onboardingComplete">
+                                        Skip
+                                    </JetSecondaryButton>
+
+                               
                                 </div>
                                 <div class="col-span-2">
                                     <nav
@@ -443,49 +436,30 @@
                                 <div class="p-4 py-4 text-right">
                                     <div v-if="currentStep < steps.length">
                                         <div v-if="currentStep == 1">
-                                            <button
-                                                type="button"
-                                                class="py-2 px-3 bg-indigo-600 text-white rounded-md"
+                                            <JetSecondaryButton
+                                                class="bg-indigo-600 text-white font-bold"
                                                 autofocus
                                                 @click="
                                                     selectStep(currentStep + 1)
-                                                "
-                                            >
-                                                <div
-                                                    class="flex flex-row align-middle"
-                                                >
-                                                    <span class="mr-1"
-                                                        >Let's&nbsp;go</span
-                                                    >
-                                                    <ArrowSmallRightIcon
+                                                ">Let's go
+                                                <ArrowSmallRightIcon
                                                         class="w-5"
                                                         aria-hidden="true"
-                                                    />
-                                                </div>
-                                            </button>
+                                                    /></JetSecondaryButton>
+                                            
                                         </div>
                                         <div v-else>
-                                            <button
-                                                ref="next"
-                                                type="button"
-                                                class="py-2 px-3 bg-indigo-600 text-white rounded-md"
+                                            <JetSecondaryButton
+                                            ref="next"
+                                                class="bg-indigo-600 text-white font-bold"
                                                 autofocus
                                                 @click="
                                                     selectStep(currentStep + 1)
-                                                "
-                                            >
-                                                <div
-                                                    class="flex flex-row align-middle"
-                                                >
-                                                    <span class="mr-1"
-                                                        >Next</span
-                                                    >
-                                                    <ArrowSmallRightIcon
+                                                ">Next<ArrowSmallRightIcon
                                                         class="w-5"
                                                         aria-hidden="true"
-                                                    />
-                                                </div>
-                                            </button>
+                                                    /></JetSecondaryButton>
+                                            
                                         </div>
                                     </div>
                                 </div>
@@ -500,6 +474,8 @@
 
 <script>
 import JetApplicationLogo from "@/Jetstream/ApplicationLogo.vue";
+import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
+
 import { computed, ref } from "vue";
 import {
     Combobox,
@@ -533,7 +509,7 @@ export default {
         DialogPanel,
         TransitionChild,
         TransitionRoot,
-
+        JetSecondaryButton,
         ArrowTopRightOnSquareIcon,
         ArrowSmallLeftIcon,
         ArrowSmallRightIcon,

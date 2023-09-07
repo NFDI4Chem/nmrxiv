@@ -1,7 +1,5 @@
 <template>
-    <button
-        :type="type"
-    >
+    <button :type="type">
         <slot></slot>
         <img
             alt="ORCID logo"

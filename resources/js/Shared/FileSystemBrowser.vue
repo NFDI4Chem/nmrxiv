@@ -43,8 +43,8 @@
             <div v-if="!readonly" :class="[fullScreen ? 'px-6 py-4' : '', '']">
                 <form class="py-2 mb-3">
                     <div id="fs-dropzone-message" class="text-center">
-                       <upload-button>
-                        <span
+                        <upload-button>
+                            <span
                                 class="mt-2 block text-sm font-medium text-gray-900"
                             >
                                 Drop Files or Folders to upload to
@@ -94,8 +94,7 @@
                                     ></div>
                                 </div>
                             </div>
-                       </upload-button>
-                       
+                        </upload-button>
                     </div>
                 </form>
             </div>
@@ -372,7 +371,7 @@ export default {
         ToolTip,
         ArrowsPointingInIcon,
         ArrowsPointingOutIcon,
-        UploadButton
+        UploadButton,
     },
     props: ["draft", "readonly"],
     data() {
