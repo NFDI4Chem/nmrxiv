@@ -34,13 +34,12 @@
                                     {{ selectedNotificationForm.message }}
                                 </p>
                                 <div class="mt-3 flex space-x-7">
-                                    <button
+                                    <WordButton
                                         type="button"
                                         @click="markNotificationAsRead()"
-                                        class="bg-yellow-100 rounded-md text-sm font-medium text-teal-600 hover:text-teal-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                        class="text-teal-600 hover:text-teal-500"
+                                        >Mark As Read</WordButton
                                     >
-                                        Mark As Read
-                                    </button>
                                 </div>
                             </div>
                             <div class="ml-4 flex-shrink-0 flex">
@@ -65,10 +64,12 @@
 
 <script>
 import { EnvelopeIcon, XCircleIcon } from "@heroicons/vue/24/outline";
+import WordButton from "@/Shared/WordButton.vue";
 export default {
     components: {
         EnvelopeIcon,
         XCircleIcon,
+        WordButton,
     },
     props: {
         notification: Object,

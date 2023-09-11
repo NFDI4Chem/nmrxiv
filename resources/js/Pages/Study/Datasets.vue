@@ -155,13 +155,12 @@
                                     class="block text-sm font-medium text-gray-700"
                                     >&nbsp;</label
                                 >
-                                <button
-                                    type="button"
-                                    class="inline-flex mt-1 items-center px-2.5 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                <JetSecondaryButton
                                     @click="openDatasetCreateDialog()"
                                 >
                                     + Manage Spectra
-                                </button>
+                                </JetSecondaryButton>
+
                                 <div
                                     class="text-xs cursor-pointer hover:text-blue-700 mt-2"
                                 >
@@ -229,6 +228,8 @@ import SpectraViewer from "@/Shared/SpectraViewer.vue";
 import SpectraEditor from "@/Shared/SpectraEditor.vue";
 import Citation from "@/Shared/Citation.vue";
 import CopyToClipboardButton from "@/Shared/CopyToClipboardButton.vue";
+import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
+
 export default {
     components: {
         StudyContent,
@@ -242,6 +243,7 @@ export default {
         SpectraViewer,
         Citation,
         CopyToClipboardButton,
+        JetSecondaryButton,
     },
     props: [
         "study",

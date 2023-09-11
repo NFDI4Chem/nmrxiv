@@ -154,13 +154,13 @@
 
                             <div class="flex items-center">
                                 <!-- Cancel Team Invitation -->
-                                <button
+                                <WordButton
                                     v-if="userPermissions.canRemoveTeamMembers"
-                                    class="cursor-pointer ml-6 text-sm text-red-500 focus:outline-none"
+                                    class="text-red-500"
                                     @click="cancelTeamInvitation(invitation)"
                                 >
-                                    Cancel
-                                </button>
+                                    Cancel</WordButton
+                                >
                             </div>
                         </div>
                     </div>
@@ -202,41 +202,44 @@
 
                             <div class="flex items-center">
                                 <!-- Manage Team Member Role -->
-                                <button
+                                <WordButton
                                     v-if="
                                         userPermissions.canAddTeamMembers &&
                                         availableRoles.length
                                     "
-                                    class="ml-2 text-sm text-gray-400 underline"
+                                    class="ml-2 underline"
                                     @click="manageRole(user)"
                                 >
-                                    {{ displayableRole(user.membership.role) }}
-                                </button>
-
-                                <div
-                                    v-else-if="availableRoles.length"
-                                    class="ml-2 text-sm text-gray-400"
+                                    {{
+                                        displayableRole(user.membership.role)
+                                    }}</WordButton
                                 >
-                                    {{ displayableRole(user.membership.role) }}
-                                </div>
+                                <WordButton
+                                    v-else-if="availableRoles.length"
+                                    class="ml-2"
+                                >
+                                    {{
+                                        displayableRole(user.membership.role)
+                                    }}</WordButton
+                                >
 
                                 <!-- Leave Team -->
-                                <button
+                                <WordButton
                                     v-if="$page.props.user.id === user.id"
-                                    class="cursor-pointer ml-6 text-sm text-red-500"
+                                    class="ml-6 text-red-500"
                                     @click="confirmLeavingTeam"
                                 >
-                                    Leave
-                                </button>
+                                    Leave</WordButton
+                                >
 
                                 <!-- Remove Team Member -->
-                                <button
+                                <WordButton
                                     v-if="userPermissions.canRemoveTeamMembers"
-                                    class="cursor-pointer ml-6 text-sm text-red-500"
+                                    class="ml-6 text-red-500"
                                     @click="confirmTeamMemberRemoval(user)"
                                 >
                                     Remove
-                                </button>
+                                </WordButton>
                             </div>
                         </div>
                     </div>
@@ -392,6 +395,8 @@ import JetLabel from "@/Jetstream/Label.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import JetSectionBorder from "@/Jetstream/SectionBorder.vue";
 import { CheckCircleIcon } from "@heroicons/vue/24/outline";
+import WordButton from "@/Shared/WordButton.vue";
+
 export default {
     components: {
         JetActionMessage,
@@ -407,6 +412,7 @@ export default {
         JetSecondaryButton,
         JetSectionBorder,
         CheckCircleIcon,
+        WordButton,
     },
 
     props: ["team", "availableRoles", "userPermissions"],

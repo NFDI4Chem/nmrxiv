@@ -23,31 +23,17 @@
                             placeholder="Search…"
                         />
                     </div>
-                    <button
-                        class="ml-2 inline-flex items-center rounded-full px-6 py-3 shadow rounded-full text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                        @click.prevent="update()"
-                        style="overflow-anchor: none"
-                    >
-                        GO
-                    </button>
-                    <button
-                        @click.prevent="reset()"
-                        class="ml-3 text-sm text-gray-500 hover:text-gray-700 focus:text-indigo-500"
-                        style="overflow-anchor: none"
-                    >
-                        Reset
-                    </button>
+                    <WordButton class="px-4" @click="update()">GO</WordButton>
+                    <WordButton class="px-4" @click="reset()">Reset</WordButton>
                 </div>
             </div>
             <div class="flex-shrink-0 ml-4">
-                <button
+                <JetSecondaryButton
                     v-if="editable && project.draft_id !== null"
-                    type="button"
-                    class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                     @click.prevent="openDatasetCreateDialog()"
+                    >+ Manage Studies</JetSecondaryButton
                 >
-                    + Manage Studies
-                </button>
+
                 <div
                     v-if="editable && project.draft_id !== null"
                     class="text-center text-xs cursor-pointer hover:text-blue-700 mt-2"
@@ -213,6 +199,9 @@ import { Link } from "@inertiajs/inertia-vue3";
 import StudyCreate from "@/Pages/Study/Partials/Create.vue";
 import StudyCard from "@/Shared/StudyCard.vue";
 import JetButton from "@/Jetstream/Button.vue";
+import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
+import WordButton from "@/Shared/WordButton.vue";
+
 import {
     CubeTransparentIcon,
     MagnifyingGlassIcon,
@@ -226,6 +215,8 @@ export default {
         JetButton,
         CubeTransparentIcon,
         MagnifyingGlassIcon,
+        JetSecondaryButton,
+        WordButton,
     },
     props: {
         project: {

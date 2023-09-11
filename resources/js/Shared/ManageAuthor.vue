@@ -6,24 +6,18 @@
     >
         <template #title>
             {{ project.name }} - Manage Authors
-            <button
-                type="button"
+            <IndigoButton
                 v-if="!displayAddAuthorForms"
                 @click="displayAddAuthorForms = true"
-                class="inline-flex float-right items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                class="float-right"
             >
                 <PlusIcon class="w-5 h-5 mr-1 text-white" />
-                Add Author
-            </button>
-            <button
-                type="button"
-                v-else
-                @click="onBack"
-                class="inline-flex float-right items-center rounded-md border border-transparent bg-gray-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                Add Author</IndigoButton
             >
-                <ArrowSmallRightIcon class="w-5 h-5 mr-1 text-white" />
-                Back
-            </button>
+            <JetButton v-else @click="onBack" class="float-right"
+                ><ArrowSmallLeftIcon class="w-5 h-5 mr-1 text-white" />
+                Back</JetButton
+            >
         </template>
         <template #content>
             <div>
@@ -599,15 +593,10 @@
                         Get started by adding a new author.
                     </p>
                     <div class="mt-6">
-                        <button
-                            type="button"
-                            @click="displayAddAuthorForms = true"
-                            class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                        >
-                            <!-- Heroicon name: mini/plus -->
+                        <IndigoButton @click="displayAddAuthorForms = true">
                             <PlusIcon class="w-5 h-5 mr-1 text-white" />
-                            Add Author
-                        </button>
+                            Add Author</IndigoButton
+                        >
                     </div>
                 </div>
             </div>
@@ -695,7 +684,7 @@ import JetButton from "@/Jetstream/Button.vue";
 import {
     TrashIcon,
     PencilIcon,
-    ArrowSmallRightIcon,
+    ArrowSmallLeftIcon,
     PlusIcon,
     FolderPlusIcon,
 } from "@heroicons/vue/24/solid";
@@ -705,7 +694,7 @@ import JetDangerButton from "@/Jetstream/DangerButton.vue";
 import { Inertia } from "@inertiajs/inertia";
 import SelectRich from "@/Shared/SelectRich.vue";
 import Draggable from "vuedraggable";
-
+import IndigoButton from "@/Shared/IndigoButton.vue";
 export default {
     components: {
         JetDialogModal,
@@ -713,7 +702,7 @@ export default {
         JetDangerButton,
         JetButton,
         PencilIcon,
-        ArrowSmallRightIcon,
+        ArrowSmallLeftIcon,
         FolderPlusIcon,
         PlusIcon,
         TrashIcon,
@@ -722,6 +711,7 @@ export default {
         Inertia,
         SelectRich,
         Draggable,
+        IndigoButton,
     },
 
     props: ["project"],

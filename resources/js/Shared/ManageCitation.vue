@@ -6,24 +6,18 @@
     >
         <template #title>
             {{ project.name }} - Manage Citations
-            <button
-                type="button"
+            <IndigoButton
                 v-if="!displayAddCitationForms"
                 @click="displayAddCitationForms = true"
-                class="inline-flex float-right items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                class="float-right"
             >
                 <PlusIcon class="w-5 h-5 mr-1 text-white" />
-                Add Citation
-            </button>
-            <button
-                type="button"
-                v-else
-                @click="onBack"
-                class="inline-flex float-right items-center rounded-md border border-transparent bg-gray-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                Add Citation</IndigoButton
             >
-                <ArrowSmallRightIcon class="w-5 h-5 mr-1 text-white" />
-                Back
-            </button>
+            <JetButton v-else @click="onBack" class="float-right">
+                <ArrowSmallLeftIcon class="w-5 h-5 mr-1 text-white" />
+                Back</JetButton
+            >
         </template>
         <template #content>
             <div>
@@ -503,15 +497,10 @@
                         Get started by adding a new citation.
                     </p>
                     <div class="mt-6">
-                        <button
-                            type="button"
-                            @click="displayAddCitationForms = true"
-                            class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                        >
-                            <!-- Heroicon name: mini/plus -->
+                        <IndigoButton @click="displayAddCitationForms = true">
                             <PlusIcon class="w-5 h-5 mr-1 text-white" />
-                            Add Citation
-                        </button>
+                            Add Citation</IndigoButton
+                        >
                     </div>
                 </div>
             </div>
@@ -564,7 +553,7 @@ import {
     TrashIcon,
     PencilIcon,
     PlusIcon,
-    ArrowSmallRightIcon,
+    ArrowSmallLeftIcon,
     FolderPlusIcon,
 } from "@heroicons/vue/24/solid";
 import JetInputError from "@/Jetstream/InputError.vue";
@@ -572,6 +561,7 @@ import LoadingButton from "@/Shared/LoadingButton.vue";
 import JetDangerButton from "@/Jetstream/DangerButton.vue";
 import { Inertia } from "@inertiajs/inertia";
 import Draggable from "vuedraggable";
+import IndigoButton from "@/Shared/IndigoButton.vue";
 export default {
     components: {
         JetDialogModal,
@@ -582,11 +572,12 @@ export default {
         TrashIcon,
         PlusIcon,
         FolderPlusIcon,
-        ArrowSmallRightIcon,
+        ArrowSmallLeftIcon,
         JetInputError,
         LoadingButton,
         Draggable,
         Inertia,
+        IndigoButton,
     },
 
     props: ["project"],

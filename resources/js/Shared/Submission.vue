@@ -183,12 +183,9 @@
                         </div>
                     </div>
                     <div class="my-6 justify-center items-center flex">
-                        <button
-                            class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring focus:ring-gray-300 disabled:opacity-25 transition"
-                            @click="createNewDraft()"
+                        <JetButton @click="createNewDraft()"
+                            >Create New</JetButton
                         >
-                            Create New
-                        </button>
                     </div>
                 </div>
                 <div v-else>
@@ -787,15 +784,12 @@
                                                                     <div
                                                                         class="mb-6"
                                                                     >
-                                                                        <button
-                                                                            type="button"
-                                                                            class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                                                        <TealButton
                                                                             @click="
                                                                                 saveStudyDetails
                                                                             "
+                                                                            >save</TealButton
                                                                         >
-                                                                            SAVE
-                                                                        </button>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -1206,27 +1200,29 @@
                                                                                                             "
                                                                                                         ></span>
                                                                                                     </div>
-                                                                                                    <button
-                                                                                                        class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                                                                                    <JetSecondaryButton
                                                                                                         @click="
                                                                                                             deleteMolecule(
                                                                                                                 molecule
                                                                                                             )
                                                                                                         "
-                                                                                                    >
-                                                                                                        <TrashIcon
+                                                                                                        ><TrashIcon
                                                                                                             class="w-4 h-4 inline mr-1"
                                                                                                         ></TrashIcon
-                                                                                                        >Delete
-                                                                                                    </button>
-                                                                                                    <edit-button
-                                                                                                        class="ml-2 border border-gray-300 rounded"
+                                                                                                        >Delete</JetSecondaryButton
+                                                                                                    >
+                                                                                                    <JetSecondaryButton
+                                                                                                        class="ml-2"
                                                                                                         @click="
                                                                                                             editMolecule(
                                                                                                                 molecule
                                                                                                             )
                                                                                                         "
-                                                                                                    ></edit-button>
+                                                                                                        ><PencilIcon
+                                                                                                            class="w-4 h-4 inline mr-1"
+                                                                                                        ></PencilIcon
+                                                                                                        >Edit</JetSecondaryButton
+                                                                                                    >
                                                                                                 </div>
                                                                                             </div>
                                                                                         </div>
@@ -1303,20 +1299,20 @@
                                                                                     "
                                                                                 />
                                                                             </div>
-                                                                            <button
+                                                                            <JetSecondaryButton
                                                                                 v-if="
                                                                                     smiles &&
                                                                                     smiles !=
                                                                                         ''
                                                                                 "
-                                                                                class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mt-2"
+                                                                                class="px-2.5 py-1.5 mt-2"
                                                                                 @click="
                                                                                     loadSmiles
                                                                                 "
+                                                                                >Load
+                                                                                Structure</JetSecondaryButton
                                                                             >
-                                                                                Load
-                                                                                Structure
-                                                                            </button>
+
                                                                             <jet-input-error
                                                                                 :message="
                                                                                     this
@@ -1393,15 +1389,12 @@
                                                                                 track-color="#999"
                                                                             />
                                                                         </div>
-                                                                        <button
-                                                                            type="button"
-                                                                            class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                                                        <TealButton
                                                                             @click="
                                                                                 saveMolecule
                                                                             "
+                                                                            >add</TealButton
                                                                         >
-                                                                            ADD
-                                                                        </button>
                                                                     </div>
                                                                 </div>
                                                                 <div
@@ -1694,12 +1687,13 @@ import {
     TrashIcon,
     ArrowDownOnSquareStackIcon,
     RectangleStackIcon,
+    PencilIcon,
 } from "@heroicons/vue/24/solid";
 import { FolderPlusIcon } from "@heroicons/vue/24/outline";
 import { Link } from "@inertiajs/inertia-vue3";
 import EditButton from "@/Shared/EditButton.vue";
 import UploadButton from "@/Shared/UploadButton.vue";
-
+import TealButton from "@/Shared/TealButton.vue";
 export default {
     components: {
         Link,
@@ -1720,6 +1714,8 @@ export default {
         FolderPlusIcon,
         EditButton,
         UploadButton,
+        TealButton,
+        PencilIcon,
     },
     props: [],
     data() {

@@ -21,20 +21,10 @@
                                     placeholder="Search…"
                                 />
                             </div>
-                            <button
-                                type="button"
-                                class="ml-2 inline-flex items-center rounded-full px-6 py-3 shadow rounded-full text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                                @click="update()"
+                            <WordButton class="px-4" @click="update()"
+                                >GO</WordButton
                             >
-                                GO
-                            </button>
-                            <button
-                                @click="reset()"
-                                class="ml-3 text-sm text-gray-500 hover:text-gray-700 focus:text-indigo-500"
-                                type="button"
-                            >
-                                Reset
-                            </button>
+                            <WordButton @click="reset()">Reset</WordButton>
                         </div>
                     </div>
                 </div>
@@ -130,11 +120,14 @@
 import ProjectLayout from "@/Pages/Public/Project/Layout.vue";
 import StudyCard from "@/Shared/StudyCardPublic.vue";
 import { CubeTransparentIcon } from "@heroicons/vue/24/outline";
+import WordButton from "@/Shared/WordButton.vue";
+
 export default {
     components: {
         ProjectLayout,
         StudyCard,
         CubeTransparentIcon,
+        WordButton,
     },
     props: ["project", "tab"],
     data() {

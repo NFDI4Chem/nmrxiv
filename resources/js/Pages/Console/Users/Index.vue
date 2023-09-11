@@ -129,7 +129,7 @@
                                 >
                                     <button
                                         v-if="roles.length"
-                                        class="ml-2 text-sm text-gray-400 underline"
+                                        class="text-sm text-gray-400 underline"
                                         @click="manageRole(user)"
                                     >
                                         <span

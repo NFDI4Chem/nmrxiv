@@ -11,22 +11,21 @@
                 @input="$emit('update:modelValue', $event.target.value)"
             />
         </div>
-        <button
-            class="ml-3 text-sm text-gray-500 hover:text-gray-700 focus:text-indigo-500"
-            type="button"
+        <WordButton
+            class="px-4 ml-3 hover:text-gray-700"
             @click="$emit('reset')"
+            >Reset</WordButton
         >
-            Reset
-        </button>
     </div>
 </template>
 
 <script>
 import Dropdown from "@/Shared/Dropdown.vue";
-
+import WordButton from "@/Shared/WordButton.vue";
 export default {
     components: {
         Dropdown,
+        WordButton,
     },
     props: {
         modelValue: String,

@@ -3,6 +3,13 @@
         class="cursor-pointer flex flex-row-reverse justify-end"
         @click="open = true"
     >
+        <span v-if="members.length > 0 && !team">
+            <WordButton class="px-4 py-2">
+                <UserPlusIcon class="h-5 w-5" />
+
+                &nbsp; SHARE</WordButton
+            >
+        </span>
         <img
             v-if="members.length > 0"
             class="w-8 h-8 -ml-4 rounded-full border-2 border-white"
@@ -29,16 +36,6 @@
             :src="team.owner.profile_photo_url"
             :alt="team.owner.first_name"
         />
-        <span v-if="members.length == 0 && !team">
-            <button
-                type="button"
-                class="inline-flex items-center px-0 py-2 ronded-md font-medium text-dark sm:text-sm"
-            >
-                <UserPlusIcon class="h-5 w-5" />
-
-                &nbsp; SHARE
-            </button>
-        </span>
     </div>
     <TransitionRoot :show="open" as="template" appear @after-leave="query = ''">
         <Dialog as="div" class="relative z-10 p-4" @close="open = false">
@@ -97,23 +94,19 @@
                             <div
                                 class="mt-5 sm:mt-0 sm:ml-6 sm:flex-shrink-0 sm:flex sm:items-center"
                             >
-                                <button
+                                <JetButton
                                     v-if="!addUser && canChangeRole"
-                                    type="button"
-                                    class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none sm:text-sm"
                                     @click="addUser = true"
                                 >
                                     <UserPlusIcon class="h-4 w-4" />
-                                    &nbsp; SHARE
-                                </button>
-                                <button
+                                    &nbsp; SHARE</JetButton
+                                >
+                                <JetSecondaryButton
                                     v-if="addUser && canChangeRole"
-                                    type="button"
-                                    class="inline-flex items-center px-4 py-2 border shadow-sm font-medium rounded-md text-dark bg-white-600 hover:bg-white-700 focus:outline-none sm:text-sm"
                                     @click="addUser = false"
                                 >
-                                    <ArrowLeftIcon class="h-5 w-5" />
-                                </button>
+                                    <ArrowLeftIcon class="h-5 w-5"
+                                /></JetSecondaryButton>
                             </div>
                         </div>
 
@@ -204,16 +197,16 @@
                                                         </span>
                                                     </div>
                                                     <div v-else>
-                                                        <button
-                                                            class="cursor-pointer mr-3 text-sm text-red-500 hover:text-red-700"
+                                                        <WordButton
+                                                            class="mr-3 text-red-500 hover:text-red-700"
                                                             @click="
                                                                 removeModelMember(
                                                                     person
                                                                 )
                                                             "
+                                                            >Remove</WordButton
                                                         >
-                                                            Remove
-                                                        </button>
+
                                                         <Menu
                                                             as="div"
                                                             class="relative inline-block text-left"
@@ -502,18 +495,15 @@
                                                 <div class="text-gray-600">
                                                     {{ invitation.email }}
                                                 </div>
-                                                <div class="flex items-center">
-                                                    <button
-                                                        class="cursor-pointer ml-6 text-sm text-red-500 focus:outline-none"
-                                                        @click="
-                                                            cancelModelInvitation(
-                                                                invitation
-                                                            )
-                                                        "
-                                                    >
-                                                        Cancel
-                                                    </button>
-                                                </div>
+                                                <WordButton
+                                                    class="text-red-500"
+                                                    @click="
+                                                        cancelModelInvitation(
+                                                            invitation
+                                                        )
+                                                    "
+                                                    >Cancel</WordButton
+                                                >
                                             </div>
                                         </div>
                                     </template>
@@ -686,6 +676,7 @@ import JetInputError from "@/Jetstream/InputError.vue";
 import JetLabel from "@/Jetstream/Label.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import JetSectionBorder from "@/Jetstream/SectionBorder.vue";
+import WordButton from "@/Shared/WordButton.vue";
 import {
     Combobox,
     ComboboxInput,
@@ -735,6 +726,7 @@ export default {
         ArrowLeftIcon,
         EnvelopeIcon,
         CheckCircleIcon,
+        WordButton,
     },
     props: {
         members: Object,

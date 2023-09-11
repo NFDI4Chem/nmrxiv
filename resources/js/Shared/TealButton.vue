@@ -1,7 +1,7 @@
 <template>
     <button
         :type="type"
-        class="inline-flex items-center font-semibold text-sm text-gray-500 hover:text-gray-700 cursor-pointer uppercase"
+        class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 uppercase"
     >
         <slot></slot>
     </button>

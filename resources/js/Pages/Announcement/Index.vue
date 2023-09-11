@@ -38,9 +38,9 @@
                             />
                         </div>
                         <WordButton
-                            class="focus:text-indigo-500"
+                            class="focus:text-indigo-500 px-4"
                             @click="reset()"
-                            >Hi</WordButton
+                            >Reset</WordButton
                         >
                     </div>
                     <JetButton @click="openAnnouncementCreateDialog()"
