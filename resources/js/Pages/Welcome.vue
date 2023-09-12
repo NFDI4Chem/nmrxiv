@@ -955,7 +955,6 @@ import {
 } from "@heroicons/vue/24/outline";
 import { ChevronDownIcon } from "@heroicons/vue/24/solid";
 import ToolTip from "@/Shared/ToolTip.vue";
-
 const Search = [
     {
         name: "Browse",
