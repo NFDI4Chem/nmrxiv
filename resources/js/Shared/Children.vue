@@ -316,7 +316,7 @@ export default {
         composeIcon(file) {
             if (file.instrument_type) {
                 if (file.instrument_type == "bruker") {
-                    return '<img class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700 border rounded-md" src="https://pbs.twimg.com/profile_images/649199086424473600/zo-TVJZH_400x400.jpg" alt=""/>';
+                    return '<img class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700 border rounded-md" src="/img/bruker.jpeg" alt=""/>';
                 } else if (file.instrument_type == "varian") {
                     return '<img class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700 border rounded-md" src="https://upload.wikimedia.org/wikipedia/en/5/58/Varian-inc-logo.JPG" alt=""/>';
                 } else if (file.instrument_type == "joel") {

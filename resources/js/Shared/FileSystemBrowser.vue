@@ -10,7 +10,7 @@
     >
         <div>
             <div :class="[fullScreen ? 'px-6 py-4' : '', 'flex']">
-                <div class="w-full">
+                <div class="w-full px-5">
                     <div
                         class="float-left text-sm cursor-pointer hover:text-blue-700 mt-2 mr-10"
                     >
@@ -88,7 +88,10 @@
                     </button>
                 </div>
             </div>
-            <div v-if="!readonly" :class="[fullScreen ? 'px-6 py-4' : '', '']">
+            <div
+                v-if="!readonly"
+                :class="[fullScreen ? 'px-6 py-4' : 'px-5', '']"
+            >
                 <form class="py-2 mb-3">
                     <div id="fs-dropzone-message" class="text-center">
                         <div
@@ -168,12 +171,15 @@
                 :class="[
                     fullScreen
                         ? 'overflow-scroll h-full relative px-6 py-4'
-                        : '',
+                        : 'px-5',
                     'min-w-0 flex-1 bg-white border-t border-gray-200 lg:flex',
                 ]"
             >
                 <aside
-                    class="py-3 px-2 lg:block lg:flex-shrink-0 lg:order-first overflow-scroll"
+                    :class="[
+                        height ? height : '',
+                        'py-5 pr-4 lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col overflow-y-scroll border-r',
+                    ]"
                 >
                     <children :file="file"></children>
                     <div
@@ -291,7 +297,12 @@
                         </template>
                     </jet-dialog-modal>
                 </aside>
-                <section class="p-6 flex-1 flex flex-col lg:order-last">
+                <section
+                    :class="[
+                        height ? height : '',
+                        'p-6 flex-1 flex flex-col lg:order-last overflow-y-scroll',
+                    ]"
+                >
                     <div
                         v-if="
                             $page.props.selectedFileSystemObject &&
@@ -439,7 +450,7 @@ export default {
         TrashIcon,
         ToolTip,
     },
-    props: ["draft", "readonly"],
+    props: ["draft", "readonly", "height"],
     data() {
         return {
             status: "",
@@ -501,16 +512,17 @@ export default {
         },
         updateBusyStatus(status) {
             this.busy = status;
-            this.$emit("loading", this.busy);
+            // console.log("raising")
+            // this.$emit("loading", this.busy);
         },
         loadFiles() {
             this.updateBusyStatus(true);
             axios.get(this.url).then((response) => {
-                this.updateBusyStatus(false);
                 this.file = response.data.file;
                 this.file.has_children = true;
                 this.$page.props.selectedFileSystemObject = this.file;
                 this.$page.props.selectedFolder = "/";
+                this.updateBusyStatus(true);
             });
         },
         annotate() {

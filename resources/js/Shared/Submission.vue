@@ -2490,7 +2490,7 @@ export default {
             } else if (id == 2) {
                 this.$nextTick(function () {
                     if (this.$refs.spectraEditorREF) {
-                        this.$refs.spectraEditorREF.registerEvents();
+                        // this.$refs.spectraEditorREF.registerEvents();
                     }
                 });
             }

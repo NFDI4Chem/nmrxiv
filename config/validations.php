@@ -20,13 +20,14 @@ return [
         'study' => [
             'title' => 'required',
             'description' => '',
+            'nmrium_info' => 'required',
             'keywords' => 'array|min:1',
             'composition' => 'array|min:1',
             'sample' => 'required',
         ],
         'dataset' => [
             'files' => 'required',
-            'nmrium_info' => 'required',
+            'nmrium_info' => '',
             'assay' => '',
             'assignments' => 'array|min:1',
         ],

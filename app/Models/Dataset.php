@@ -111,9 +111,9 @@ class Dataset extends Model implements Auditable
         return $this->belongsTo(Team::class, 'Team_id');
     }
 
-    public function nmrium()
+    public function nmrium(): MorphOne
     {
-        return $this->hasOne(NMRium::class);
+        return $this->morphOne(NMRium::class, 'nmriumable');
     }
 
     public function fsObject()

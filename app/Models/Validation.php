@@ -142,6 +142,7 @@ class Validation extends Model
                     'description' => $study->description,
                     'keywords' => $study->tags->pluck('id')->toArray(),
                     'composition' => $study->sample->molecules->pluck('id')->toArray(),
+                    'nmrium_info' => $study->has_nmrium ? $study->has_nmrium : null,
                     'sample' => $study->sample,
                 ];
 

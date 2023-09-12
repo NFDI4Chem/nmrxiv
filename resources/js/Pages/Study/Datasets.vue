@@ -93,7 +93,7 @@
                         </div>
                     </div>
                     <div class="p-6">
-                        <div
+                        <!-- <div
                             class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6"
                         >
                             <div
@@ -179,9 +179,9 @@
                                     </a>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
 
-                        <div v-if="selectedDataset" class="my-7">
+                        <div v-if="selectedDataset" class="mb-7">
                             <SpectraEditor
                                 v-if="canUpdateStudy"
                                 :dataset="selectedDataset"

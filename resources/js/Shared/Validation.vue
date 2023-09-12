@@ -61,7 +61,7 @@
                 >
             </div>
         </div>
-        <div class="overflow-hidden bg-white shadow sm:rounded-md">
+        <div class="border overflow-hidden bg-white shadow sm:rounded-md mb-12">
             <ul
                 v-if="validation"
                 role="list"
@@ -279,7 +279,7 @@
                                 <p
                                     class="truncate text-md font-bold text-indigo-600"
                                 >
-                                    Studies
+                                    Samples
                                 </p>
                             </div>
                             <div

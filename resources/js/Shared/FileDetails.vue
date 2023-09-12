@@ -24,7 +24,18 @@
                     <dd
                         class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"
                     >
-                        {{ bytesToSize(JSON.parse(file.info).size) }}
+                        {{ bytesToSize(fileInfo.size) }}
+                    </dd>
+                    <dt class="text-sm font-medium text-gray-500">ETag</dt>
+                    <dd
+                        class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"
+                    >
+                        <div v-if="fileInfo.ETag">
+                            {{ fileInfo.ETag.replace(/"/g, "") }}
+                        </div>
+                        <div v-else>
+                            -
+                        </div>
                     </dd>
                 </div>
                 <div></div>
@@ -76,12 +87,6 @@
                         </ul>
                     </dd>
                 </div>
-                <!-- <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-          <dt class="text-sm font-medium text-gray-500">Updated at</dt>
-          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-            {{ formatDateTime(file.updated_at) }}
-          </dd>
-        </div> -->
             </dl>
         </div>
     </div>
@@ -128,8 +133,9 @@ export default {
         url() {
             return String(this.$page.props.url);
         },
+        fileInfo(){
+            return JSON.parse(this.file.info)
+        }
     },
-    mounted() {},
-    methods: {},
 };
 </script>
