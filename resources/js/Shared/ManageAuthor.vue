@@ -1099,7 +1099,7 @@ export default {
             this.authorsForm.delete(route("author.delete", this.project.id), {
                 preserveScroll: true,
                 onSuccess: () => {
-                    Inertia.reload({ only: ["project"] });
+                    Inertia.reload();
                     this.loadInitial();
                     this.authorsForm.reset();
                     this.confirmDelete = false;
@@ -1130,7 +1130,7 @@ export default {
                 {
                     preserveScroll: true,
                     onSuccess: () => {
-                        Inertia.reload({ only: ["project"] });
+                        Inertia.reload();
                         this.loadInitial();
                         this.updateRoleForm.reset();
                         this.showManageRoleDialog = false;

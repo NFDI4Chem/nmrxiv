@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Laravel\Scout\Searchable;
 use Maize\Markable\Markable;
 use Maize\Markable\Models\Bookmark;
@@ -161,6 +162,11 @@ class Study extends Model implements Auditable
     public function studyInvitations()
     {
         return $this->hasMany(StudyInvitation::class);
+    }
+
+    public function nmrium(): MorphOne
+    {
+        return $this->morphOne(NMRium::class, 'nmriumable');
     }
 
     /**

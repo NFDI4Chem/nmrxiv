@@ -747,7 +747,7 @@ export default {
             this.citationsForm.post(route("citation.save", this.project.id), {
                 preserveScroll: true,
                 onSuccess: () => {
-                    Inertia.reload({ only: ["project"] });
+                    Inertia.reload();
                     this.citationsForm.reset();
                     this.loadInitial();
                     this.form.reset();
@@ -841,7 +841,7 @@ export default {
                 {
                     preserveScroll: true,
                     onSuccess: () => {
-                        Inertia.reload({ only: ["project"] });
+                        Inertia.reload();
                         this.loadInitial();
                         this.citationsForm.reset();
                         this.confirmDelete = false;

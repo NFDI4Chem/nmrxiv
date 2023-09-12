@@ -75,8 +75,8 @@ class DatasetController extends Controller
                 } else {
                     $nmrium = NMRium::create([
                         'nmrium_info' => json_encode($nmriumData),
-                        'dataset_id' => $dataset->id,
                     ]);
+                    $dataset->nmrium()->save($nmrium);
                     $dataset->has_nmrium = true;
                 }
 

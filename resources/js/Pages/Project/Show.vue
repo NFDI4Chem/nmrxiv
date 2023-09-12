@@ -577,7 +577,7 @@
                     </div>
                     <dd class="mt-2 text-md text-gray-900 space-y-5">
                         <div class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-3">
-                            <author-card :authors="this.project.authors" />
+                            <author-card :authors="project.authors" />
                         </div>
                     </dd>
                 </div>

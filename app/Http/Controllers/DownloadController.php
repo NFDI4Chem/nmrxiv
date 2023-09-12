@@ -20,6 +20,9 @@ class DownloadController extends Controller
         if (str_contains($dataset, '.zip')) {
             $dataset = str_replace('.zip', '', $dataset);
         }
+        if (str_contains($study, '.zip')) {
+            $study = str_replace('.zip', '', $study);
+        }
         $user = User::where('username', $username)->firstOrFail();
         if ($project) {
             $project = Project::where([['slug', $project], ['owner_id', $user->id]])->firstOrFail();

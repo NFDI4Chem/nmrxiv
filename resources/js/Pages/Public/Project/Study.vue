@@ -98,7 +98,13 @@
                     </div>
                 </h1>
                 <br />
-                <div class="mt-4">
+                <div
+                    v-if="
+                        study.data.description &&
+                        study.data.description.length > 0
+                    "
+                    class="mt-4"
+                >
                     <div class="relative">
                         <div
                             class="absolute inset-0 flex items-center"
@@ -300,7 +306,7 @@
                         </div>
                     </div>
                     <div class="mt-3">
-                        <label
+                        <!-- <label
                             for="location"
                             class="block text-sm font-medium text-gray-700"
                             >Select
@@ -325,8 +331,8 @@
                                     }})</span
                                 >
                             </option>
-                        </select>
-                        <div v-if="selectedDataset" class="text-sm my-2">
+                        </select> -->
+                        <!-- <div v-if="selectedDataset" class="text-sm my-2">
                             <span class="text-gray-400 pt-2">
                                 <img
                                     :src="
@@ -335,7 +341,7 @@
                                     "
                                 />
                             </span>
-                        </div>
+                        </div> -->
                     </div>
                     <div class="mt-3">
                         <SpectraViewer
