@@ -78,7 +78,7 @@ return [
             'sslmode' => 'prefer',
             'dump' => [
                 'use_single_transaction',
-                'timeout' => 320 * 5, // 26 minute timeout
+                'timeout' => 620 * 50, // 51 minute timeout
             ],
         ],
 
