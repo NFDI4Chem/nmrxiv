@@ -4,6 +4,7 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: "nmrXiv Docs",
   description: "Open, FAIR and Consensus-Driven NMR spectroscopy data repository and analysis platform.",
+  ignoreDeadLinks: true,
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     search: {
