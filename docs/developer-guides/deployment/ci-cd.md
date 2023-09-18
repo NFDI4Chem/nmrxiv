@@ -1,4 +1,4 @@
-# Continous Integration and Continous Deployment
+# Continous Integration and Continous Deployment 
 
 To simplify the process of development, releasing of software, and also keeping the [agile](https://en.wikipedia.org/wiki/Agile_software_development) development practices in mind, we have a [CI/CD](https://en.wikipedia.org/wiki/CI/CD) workflow intact with our repository which will enforce the automation of the whole deployment process. 
 The workflow focuses on automating the software delivery process so that the team can easily deploy their code to [production](https://www.nmrxiv.org/) at any time without compromising on quality.
