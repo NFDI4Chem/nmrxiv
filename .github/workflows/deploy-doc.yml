@@ -3,7 +3,7 @@ on:
   workflow_dispatch: {}
   push:
     branches:
-      - vitepress
+      - development
 jobs:
   deploy:
     runs-on: ubuntu-latest
