@@ -1,8 +1,6 @@
 # Google Kubernetes Engine (GKE)
 nmrXiv application is deployed and setup in Google Kubernetes Engine. This page provides the complete guide on how the current deployment is setup in Google Cloud Platform.
 
-<img src="/img/google.PNG"/>
-
 ### Google Artifact Registry:
 nmrXiv docker container images are public and is stored in Google Artifact. 
 To pull the latest image for application and Nginx use the below command:
