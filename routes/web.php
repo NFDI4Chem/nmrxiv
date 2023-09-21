@@ -102,6 +102,9 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::post('users/notification/{user}/markAsRead', [UsersController::class, 'markNotificationAsRead'])
         ->name('users.markNotificationAsRead');
 
+    Route::post('users/notification/markAllAsRead', [UsersController::class, 'markAllNotificationAsRead'])
+        ->name('users.markAllNotificationAsRead');
+
     Route::get('dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
 
     Route::group([

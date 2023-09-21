@@ -205,4 +205,19 @@ class UsersController extends Controller
 
         return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('status', 'notification-markedAsRead');
     }
+
+    /**
+     * Mark all notification as read.
+     *
+     * @param  User  $user
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function markAllNotificationAsRead(Request $request)
+    {
+        $user = Auth::user();
+
+        $user->unreadNotifications()->update(['read_at' => now()]);
+
+        return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('status', 'all-notification-markedAsRead');
+    }
 }

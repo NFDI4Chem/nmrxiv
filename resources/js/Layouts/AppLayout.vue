@@ -294,78 +294,23 @@
                         :notification="$page.props.user.notifications"
                     />
                     <div class="ml-4 flex items-center md:ml-6">
-                        <Menu as="div" class="ml-3 relative">
-                            <div>
-                                <span>
-                                    <MenuButton
-                                        type="button"
-                                        class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition"
-                                    >
-                                        <BellIcon
-                                            class="w-6 h-6 fill-current text-gray-600"
-                                        />
-                                        <span
-                                            v-if="hasUnreadNotification()"
-                                            class="inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full"
-                                        >
-                                            {{ countNotification() }}</span
-                                        >
-                                    </MenuButton>
-                                </span>
-                            </div>
-                            <transition
-                                enter-active-class="transition ease-out duration-100"
-                                enter-from-class="transform opacity-0 scale-95"
-                                enter-to-class="transform opacity-100 scale-100"
-                                leave-active-class="transition ease-in duration-75"
-                                leave-from-class="transform opacity-100 scale-100"
-                                leave-to-class="transform opacity-0 scale-95"
+                        <div>
+                            <button
+                                @click="openShowNotificationDialog"
+                                type="button"
+                                class="m-3"
                             >
-                                <MenuItems
-                                    class="origin-top-right absolute right-0 mt-2 w-72 text-sm leading-5 text-gray-700 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 focus:outline-none"
-                                >
-                                    <span v-if="hasUnreadNotification() > 0">
-                                        <div
-                                            class="block px-4 p-2 text-xs text-gray-400"
-                                        >
-                                            Unread Notifications
-                                        </div>
-                                        <template
-                                            v-for="notification in $page.props
-                                                .user.notifications"
-                                            :key="notification"
-                                        >
-                                            <MenuItem
-                                                v-on:click="
-                                                    openShowNotificationDialog(
-                                                        notification
-                                                    )
-                                                "
-                                                class="border-t border-gray-100"
-                                            >
-                                                <a
-                                                    href="#"
-                                                    class="block px-4 py-2 hover:bg-gray-100"
-                                                >
-                                                    {{
-                                                        notification.data[
-                                                            "title"
-                                                        ]
-                                                    }}
-                                                </a>
-                                            </MenuItem>
-                                        </template>
-                                    </span>
-                                    <span v-else>
-                                        <div
-                                            class="block px-4 py-2 text-m text-gray-600"
-                                        >
-                                            No unread notifications
-                                        </div>
-                                    </span>
-                                </MenuItems>
-                            </transition>
-                        </Menu>
+                                <BellIcon
+                                    class="w-6 h-6 fill-current text-gray-600"
+                                />
+                            </button>
+                        </div>
+                        <span
+                            v-if="hasUnreadNotification()"
+                            class="inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full"
+                        >
+                            {{ countNotification() }}</span
+                        >
                         <div class="tooltip">
                             <a
                                 id="tour-step-documentation"
