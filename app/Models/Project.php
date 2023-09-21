@@ -109,8 +109,6 @@ class Project extends Model implements Auditable
 
     /**
      * Get the project identifier
-     *
-     * @return \Illuminate\Database\Eloquent\Casts\Attribute
      */
     protected function identifier(): Attribute
     {
@@ -191,7 +189,6 @@ class Project extends Model implements Auditable
     /**
      * Determine if the given email address belongs to a user on the project.
      *
-     * @param  string  $email
      * @return bool
      */
     public function hasUserWithEmail(string $email)
@@ -204,7 +201,6 @@ class Project extends Model implements Auditable
     /**
      * Get the user with the given email if belongs to the project
      *
-     * @param  string  $email
      * @return bool
      */
     public function userWithEmail(string $email)
@@ -217,7 +213,6 @@ class Project extends Model implements Auditable
     /**
      * Get the user project role
      *
-     * @param  string  $email
      * @return bool
      */
     public function userProjectRole(string $email)
@@ -299,7 +294,9 @@ class Project extends Model implements Auditable
      */
     public function shouldBeSearchable()
     {
-        return $this->is_public;
+        if ($this->is_public && ! $this->is_archived) {
+            return true;
+        }
     }
 
     /**
@@ -345,7 +342,7 @@ class Project extends Model implements Auditable
      */
     public function sendNotification($notifyType, $sendTo)
     {
-        switch($notifyType) {
+        switch ($notifyType) {
             case 'deletion':
                 Notification::send($sendTo, new ProjectDeletionNotification($this));
                 break;

@@ -23,8 +23,8 @@ class Sample extends Model
     public function molecules()
     {
         return $this->belongsToMany(Molecule::class)
-                    ->withPivot('percentage_composition')
-                    ->withTimestamps();
+            ->withPivot('percentage_composition')
+            ->withTimestamps();
     }
 
     /**

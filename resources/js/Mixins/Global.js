@@ -1,5 +1,6 @@
 import * as marked from "marked";
 import { copyText } from "vue3-clipboard";
+import pluralize from "pluralize";
 
 export default {
     methods: {
@@ -108,6 +109,18 @@ export default {
         },
         isEmpty(obj) {
             return Object.keys(obj).length === 0;
+        },
+        pluralize(value, number) {
+            return pluralize(value, number);
+        },
+
+        /*Extract Doi from URL*/
+        extractDoi(query) {
+            if (query.indexOf("http") > -1) {
+                var url = new URL(query);
+                query = url.pathname.replace("/", "");
+            }
+            return query.trim();
         },
     },
 

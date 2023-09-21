@@ -27,7 +27,7 @@ class SampleFactory extends Factory
         $slug = Str::slug($name, '-');
         $x = json_encode('{}');
 
-        return[
+        return [
             'name' => $name,
             'description' => null,
             'slug' => $slug,
