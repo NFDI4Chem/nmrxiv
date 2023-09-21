@@ -19,14 +19,14 @@ class Kernel extends ConsoleKernel
     /**
      * Define the application's command schedule.
      *
-     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
      * @return void
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('telescope:prune')->daily();
         $schedule->command('nmrxiv:publish')->daily();
         $schedule->command('nmrxiv:delete-projects')->daily();
+        $schedule->command('nmrxiv:delete-citations')->weekly();
+        $schedule->command('nmrxiv:delete-authors')->weekly();
     }
 
     /**

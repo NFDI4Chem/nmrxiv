@@ -351,7 +351,7 @@ export default {
                                 nmrium_info = JSON.parse(
                                     response.data.nmrium_info
                                 );
-                                let nmriumVersion = 3;
+                                let nmriumVersion = 4;
                                 if (nmrium_info && nmrium_info["version"]) {
                                     nmriumVersion = nmrium_info["version"];
                                 }

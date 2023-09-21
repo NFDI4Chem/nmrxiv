@@ -17,7 +17,6 @@ class FileSystemController extends Controller
     /**
      * Create a new draft signed URL.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function signedDraftStorageURL(Request $request)
@@ -285,7 +284,6 @@ class FileSystemController extends Controller
     /**
      * Create a new signed URL.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function signedStorageURL(Request $request)
@@ -511,8 +509,6 @@ class FileSystemController extends Controller
     /**
      * Create a command for the PUT operation.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Aws\S3\S3Client  $client
      * @param  string  $bucket
      * @param  string  $key
      * @return \Aws\Command
@@ -535,7 +531,6 @@ class FileSystemController extends Controller
     /**
      * Get the headers that should be used when making the signed request.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  \GuzzleHttp\Psr7\Request
      * @return array
      */

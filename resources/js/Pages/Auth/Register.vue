@@ -25,6 +25,9 @@
                         </p>
                     </div>
                 </div>
+            </div>
+            <!-- First Name -->
+            <div class="mt-4">
                 <jet-label for="first_name" value="First Name" />
                 <jet-input
                     id="first_name"
@@ -36,7 +39,7 @@
                     autocomplete="first_name"
                 />
             </div>
-
+            <!-- Last Name -->
             <div class="mt-4">
                 <jet-label for="last_name" value="Last Name" />
                 <jet-input
@@ -49,7 +52,7 @@
                     autocomplete="last_name"
                 />
             </div>
-
+            <!-- Email -->
             <div class="mt-4">
                 <jet-label for="email" value="Email" />
                 <jet-input
@@ -60,7 +63,7 @@
                     required
                 />
             </div>
-
+            <!-- Username -->
             <div class="mt-4">
                 <jet-label for="username" value="Username" />
                 <jet-input
@@ -71,7 +74,40 @@
                     required
                 />
             </div>
-
+            <!-- ORCID iD -->
+            <div class="mt-4">
+                <jet-label for="orcid" value="ORCID iD" />
+                <div class="mt-1 flex rounded-md shadow-sm">
+                    <div
+                        class="relative flex items-stretch flex-grow focus-within:z-10"
+                    >
+                        <jet-input
+                            id="orcid"
+                            v-model="form.orcid_id"
+                            type="text"
+                            class="rounded-l-md focus:ring-indigo-200 focus:border-indigo-200 block w-full rounded-none sm:text-medium border-gray-300"
+                        />
+                    </div>
+                    <div
+                        class="tooltip -ml-px relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500 cursor-pointer"
+                    >
+                        <button type="button" class="" @click="findOrcidID()">
+                            <img
+                                alt="ORCID logo"
+                                src="https://orcid.org/assets/vectors/orcid.logo.icon.svg"
+                                width="20"
+                                height="20"
+                            />
+                        </button>
+                        <span
+                            class="bg-gray-900 text-center text-white px-2 py-1 shadow-lg rounded-md tooltiptextbottom"
+                            >Click to find ORCID iD</span
+                        >
+                    </div>
+                </div>
+                <jet-input-error :message="this.error.orcid" class="mt-2" />
+            </div>
+            <!-- Password -->
             <div class="mt-4">
                 <jet-label for="password" value="Password" />
                 <jet-input
@@ -83,7 +119,7 @@
                     autocomplete="new-password"
                 />
             </div>
-
+            <!-- Confirm Password -->
             <div class="mt-4">
                 <jet-label
                     for="password_confirmation"
@@ -151,6 +187,12 @@
             </div>
         </form>
     </jet-authentication-card>
+    <!-- Find ORCID iD Modal -->
+    <select-orcid-id
+        ref="selectOrcidIdElement"
+        v-model:orcidId="this.form.orcid_id"
+        v-model:affiliation="this.form.affiliation"
+    />
 </template>
 
 <script>
@@ -163,6 +205,12 @@ import JetLabel from "@/Jetstream/Label.vue";
 import JetValidationErrors from "@/Jetstream/ValidationErrors.vue";
 import { Head, Link } from "@inertiajs/inertia-vue3";
 import AnnouncementBanner from "@/Shared/AnnouncementBanner.vue";
+import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
+import JetDialogModal from "@/Jetstream/DialogModal.vue";
+import LoadingButton from "@/Shared/LoadingButton.vue";
+import JetInputError from "@/Jetstream/InputError.vue";
+import SelectOrcidId from "@/Shared/SelectOrcidId.vue";
+import { ref } from "vue";
 
 export default {
     components: {
@@ -176,6 +224,12 @@ export default {
         JetValidationErrors,
         Link,
         AnnouncementBanner,
+        JetSecondaryButton,
+        JetDialogModal,
+        LoadingButton,
+        JetInputError,
+        SelectOrcidId,
+        ref,
     },
 
     data() {
@@ -185,14 +239,37 @@ export default {
                 last_name: "",
                 email: "",
                 username: "",
+                orcid_id: "",
+                affiliation: "",
                 password: "",
                 password_confirmation: "",
                 terms: false,
             }),
+            orcidIdSearchResults: [],
+            showOrcidIdDialog: false,
+            loading: false,
+            error: {},
+        };
+    },
+    setup() {
+        const selectOrcidIdElement = ref(null);
+        return {
+            selectOrcidIdElement,
         };
     },
 
     methods: {
+        findOrcidID() {
+            this.error.orcid = "";
+            if (this.form.first_name && this.form.last_name) {
+                this.selectOrcidIdElement.findOrcidID(
+                    this.form.first_name,
+                    this.form.last_name
+                );
+            } else {
+                this.error.orcid = "Please enter first name and last name";
+            }
+        },
         submit() {
             this.form.post(this.route("register"), {
                 onFinish: () =>

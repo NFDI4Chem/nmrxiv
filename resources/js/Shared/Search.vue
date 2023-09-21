@@ -187,7 +187,11 @@
                                                                     >
                                                                         <Link
                                                                             class="w-full"
-                                                                            :href="hit.public_url
+                                                                            :href="
+                                                                                hit.public_url
+                                                                            "
+                                                                            @click="
+                                                                                open = false
                                                                             "
                                                                         >
                                                                             <FolderIcon
@@ -333,29 +337,6 @@ import {
     TransitionRoot,
 } from "@headlessui/vue";
 
-const projects = [
-    //   { id: 1, name: "Workflow Inc. / Website Redesign", url: "#" },
-    // More projects...
-];
-const recent = [];
-// [projects[0]];
-const quickActions = [
-    {
-        name: "Ask a question...",
-        icon: DocumentPlusIcon,
-        shortcut: "N",
-        url: "mailto:info@nmrxiv.org",
-    },
-    {
-        name: "Learn Spectral analysis...",
-        icon: TagIcon,
-        shortcut: "F",
-        url: "https://docs.nmrxiv.org",
-    },
-    //   { name: "Add hashtag...", icon: HashtagIcon, shortcut: "H", url: "#" },
-    //   { name: "Add label...", icon: TagIcon, shortcut: "L", url: "#" },
-];
-
 const { meta, k } = useMagicKeys();
 const open = ref(false);
 
@@ -384,8 +365,6 @@ export default {
 
         return {
             open,
-            recent,
-            quickActions,
             onSelect(item) {
                 window.location = item.url;
             },
@@ -393,6 +372,24 @@ export default {
     },
     data: function () {
         return {
+            projects: [],
+            recent: [],
+            quickActions: [
+                {
+                    name: "Ask a question...",
+                    icon: DocumentPlusIcon,
+                    shortcut: "N",
+                    url: this.mailTo,
+                },
+                {
+                    name: "Learn Spectral analysis...",
+                    icon: TagIcon,
+                    shortcut: "F",
+                    url: "https://docs.nmrxiv.org",
+                },
+                //   { name: "Add hashtag...", icon: HashtagIcon, shortcut: "H", url: "#" },
+                //   { name: "Add label...", icon: TagIcon, shortcut: "L", url: "#" },
+            ],
             selected: null,
             department: "all",
             query: null,
@@ -404,6 +401,10 @@ export default {
     computed: {
         index() {
             return this.$page.props.SCOUT_PREFIX + "projects";
+        },
+
+        mailTo() {
+            return "mailto:" + String(this.$page.props.mailFromAddress);
         },
     },
 

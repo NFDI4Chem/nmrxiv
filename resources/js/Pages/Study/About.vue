@@ -39,17 +39,9 @@
                                             class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                                             @click="openStudyDetailsPane"
                                         >
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                viewBox="0 0 20 20"
-                                                fill="currentColor"
-                                                aria-hidden="true"
-                                                class="w-4 h-4 mr-2 text-gray-600"
-                                            >
-                                                <path
-                                                    d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"
-                                                ></path>
-                                            </svg>
+                                            <PencilIcon
+                                                class="w-4 h-4 mr-1 text-gray-600"
+                                            />
                                             <span>Edit</span>
                                         </button>
                                     </div>
@@ -88,17 +80,9 @@
                                             class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                                             @click="openStudyDetailsPane"
                                         >
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                viewBox="0 0 20 20"
-                                                fill="currentColor"
-                                                aria-hidden="true"
-                                                class="w-4 h-4 mr-2 text-gray-600"
-                                            >
-                                                <path
-                                                    d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"
-                                                ></path>
-                                            </svg>
+                                            <PencilIcon
+                                                class="w-4 h-4 mr-1 text-gray-600"
+                                            />
                                             <span>Edit</span>
                                         </button>
                                     </div>
@@ -156,17 +140,9 @@
                                             class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                                             @click="openStudyDetailsPane"
                                         >
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                viewBox="0 0 20 20"
-                                                fill="currentColor"
-                                                aria-hidden="true"
-                                                class="w-4 h-4 mr-2 text-gray-600"
-                                            >
-                                                <path
-                                                    d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"
-                                                ></path>
-                                            </svg>
+                                            <PencilIcon
+                                                class="w-4 h-4 mr-1 text-gray-600"
+                                            />
                                             <span>Edit</span>
                                         </button>
                                     </div>
@@ -493,6 +469,13 @@
                                                         >
                                                             Load Structure
                                                         </button>
+                                                        <jet-input-error
+                                                            :message="
+                                                                this
+                                                                    .errorMessage
+                                                            "
+                                                            class="mt-2"
+                                                        />
                                                     </div>
                                                 </div>
                                                 <div class="relative">
@@ -620,6 +603,7 @@ import StudyContent from "@/Pages/Study/Content.vue";
 import slider from "vue3-slider";
 import OCL from "openchemlib/full";
 import ToolTip from "@/Shared/ToolTip.vue";
+import JetInputError from "@/Jetstream/InputError.vue";
 export default {
     components: {
         StudyContent,
@@ -629,6 +613,7 @@ export default {
         TrashIcon,
         PencilIcon,
         InformationCircleIcon,
+        JetInputError,
     },
     props: [
         "study",
@@ -646,6 +631,7 @@ export default {
             smiles: "",
             percentage: 0,
             editor: "",
+            errorMessage: "",
         };
     },
     computed: {
@@ -680,7 +666,12 @@ export default {
         },
         loadSmiles() {
             if (this.smiles && this.smiles != "") {
-                this.editor.setSmiles(this.smiles);
+                try {
+                    let mol = OCL.Molecule.fromSmiles(this.smiles);
+                    this.editor.setSmiles(this.smiles);
+                } catch (e) {
+                    this.errorMessage = "The entered SMILES is not valid.";
+                }
             }
         },
         getSVGString(molecule) {

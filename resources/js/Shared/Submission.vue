@@ -354,14 +354,15 @@
                                     >
                                         <label
                                             for="description"
-                                            class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
+                                            class="block text-sm font-medium text-gray-700"
                                         >
                                             <span
                                                 @click="
                                                     draftForm.description =
                                                         'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore'
                                                 "
-                                                >Project Description</span
+                                                >Project Description
+                                                (Optional)</span
                                             >
                                         </label>
                                         <div class="mt-1">
@@ -389,7 +390,7 @@
                                             for="description"
                                             class="block text-sm font-medium text-gray-700"
                                         >
-                                            Keywords
+                                            Keywords (Optional)
                                         </label>
                                         <div>
                                             <vue-tags-input
@@ -447,29 +448,28 @@
                                             class="hidden flex-shrink-0 w-80 bg-white border-r border-blue-gray-200 md:flex md:flex-col"
                                         >
                                             <div
-                                                class="border-gray-200 px-4 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider flex-shrink-0 border-b border-blue-gray-200"
+                                                class="border-gray-200 px-4 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 tracking-wider flex-shrink-0 border-b border-blue-gray-200"
                                             >
-                                                STUDY ({{ studies.length }})
-
-                                                <span
-                                                    class="float-right"
+                                                {{
+                                                    pluralize(
+                                                        "STUDY",
+                                                        studies.length
+                                                    )
+                                                }}
+                                                ({{ studies.length }})
+                                                <div
+                                                    class="float-right cursor-pointer tooltip"
                                                     @click="autoImport()"
                                                 >
-                                                    <svg
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                        fill="none"
-                                                        viewBox="0 0 24 24"
-                                                        stroke-width="1.5"
-                                                        stroke="currentColor"
-                                                        class="w-5 h-5"
+                                                    <ArrowDownOnSquareStackIcon
+                                                        class="w-5 h-5 mr-1 text-gray-600 hover:text-gray-500"
+                                                    />
+                                                    <span
+                                                        class="bg-gray-900 text-center text-white px-2 py-1 shadow-lg rounded-md tooltiptextbottom"
+                                                        >Click to auto import
+                                                        spectra</span
                                                     >
-                                                        <path
-                                                            stroke-linecap="round"
-                                                            stroke-linejoin="round"
-                                                            d="M7.5 7.5h-.75A2.25 2.25 0 004.5 9.75v7.5a2.25 2.25 0 002.25 2.25h7.5a2.25 2.25 0 002.25-2.25v-7.5a2.25 2.25 0 00-2.25-2.25h-.75m-6 3.75l3 3m0 0l3-3m-3 3V1.5m6 9h.75a2.25 2.25 0 012.25 2.25v7.5a2.25 2.25 0 01-2.25 2.25h-7.5a2.25 2.25 0 01-2.25-2.25v-.75"
-                                                        />
-                                                    </svg>
-                                                </span>
+                                                </div>
                                             </div>
                                             <div
                                                 id="tour-step-side-panel-studies"
@@ -1341,6 +1341,13 @@
                                                                                 Load
                                                                                 Structure
                                                                             </button>
+                                                                            <jet-input-error
+                                                                                :message="
+                                                                                    this
+                                                                                        .errorMessage
+                                                                                "
+                                                                                class="mt-2"
+                                                                            />
                                                                         </div>
                                                                         <div
                                                                             class="relative"
@@ -1583,7 +1590,7 @@
                     <span v-if="!currentStep">
                         <Link
                             class="inline-flex items-center px-2.5 py-1 border border-gray-300 shadow-sm text-md font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                            :href="route('dashboard')"
+                            :href="this.returnUrl"
                         >
                             Cancel
                         </Link>
@@ -1603,7 +1610,7 @@
                             </jet-secondary-button>
                             <Link
                                 class="inline-flex items-center px-2.5 py-1 border border-gray-300 shadow-sm text-md font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                                :href="route('dashboard')"
+                                :href="this.returnUrl"
                             >
                                 Cancel
                             </Link>
@@ -1657,7 +1664,7 @@
                                 Back
                             </jet-button>
                             <Link
-                                :href="route('dashboard')"
+                                :href="this.returnUrl"
                                 class="inline-flex items-center px-2.5 py-1 border border-gray-300 shadow-sm text-md font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                             >
                                 Cancel
@@ -1737,6 +1744,7 @@ import {
     PlayIcon,
     PauseIcon,
     PencilIcon,
+    ArrowDownOnSquareStackIcon,
 } from "@heroicons/vue/24/solid";
 import { Link } from "@inertiajs/inertia-vue3";
 
@@ -1756,6 +1764,7 @@ export default {
         ClipboardDocumentIcon,
         QuestionMarkCircleIcon,
         ExclamationTriangleIcon,
+        ArrowDownOnSquareStackIcon,
         TrashIcon,
         PlayIcon,
         PauseIcon,
@@ -1771,6 +1780,7 @@ export default {
             currentDraft: null,
             errorMessage: null,
             datasetsToImport: null,
+            errorMessage: "",
 
             draftForm: this.$inertia.form({
                 _method: "POST",
@@ -1879,6 +1889,7 @@ export default {
             confirmPublicAccess: false,
 
             studiesExist: false,
+            returnUrl: "/dashboard",
         };
     },
     computed: {
@@ -1925,6 +1936,10 @@ export default {
     mounted() {
         const initialise = (data) => {
             this.fetchDrafts().then((response) => {
+                this.returnUrl =
+                    this.url +
+                    this.returnUrl +
+                    (data.return_url ? data.return_url : "");
                 this.drafts = response.data.drafts;
                 this.sharedDrafts = response.data.sharedDrafts;
                 if (data.draft_id) {
@@ -2199,7 +2214,12 @@ export default {
 
         loadSmiles() {
             if (this.smiles && this.smiles != "") {
-                this.editor.setSmiles(this.smiles);
+                try {
+                    let mol = OCL.Molecule.fromSmiles(this.smiles);
+                    this.editor.setSmiles(this.smiles);
+                } catch (e) {
+                    this.errorMessage = "The entered SMILES is not valid.";
+                }
             }
         },
 

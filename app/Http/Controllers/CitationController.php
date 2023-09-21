@@ -16,9 +16,7 @@ class CitationController extends Controller
     /**
      * Save and sync updated citation details for a project.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  \Actions\Project\UpdateProject  $updater
-     * @param  \App\Models\Project  $project
      * @return \Illuminate\Http\RedirectResponse
      */
     public function save(Request $request, UpdateProject $updater, Project $project)
@@ -75,9 +73,7 @@ class CitationController extends Controller
     /**
      * Delete citation for a project.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  \Actions\Project\UpdateProject  $updater
-     * @param  \App\Models\Project  $project
      * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy(Request $request, UpdateProject $updater, Project $project)

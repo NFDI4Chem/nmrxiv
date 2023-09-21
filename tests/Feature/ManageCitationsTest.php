@@ -5,10 +5,13 @@ namespace Tests\Feature;
 use App\Models\Citation;
 use App\Models\Project;
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class ManageCitationsTest extends TestCase
 {
+    use RefreshDatabase;
+
     /**
      * Test if a citation can be updated.
      *
@@ -155,7 +158,8 @@ class ManageCitationsTest extends TestCase
      * Make Request to update citation
      *
      * @param  \App\Models\Citation  $citation
-     * @return array $body
+     * @param  int  $projectId
+     * @return \Illuminate\Http\Response
      */
     public function updateCitation($body, $projectId)
     {
@@ -168,7 +172,8 @@ class ManageCitationsTest extends TestCase
      * Make Request to detach citation
      *
      * @param  \App\Models\Citation  $citation
-     * @return array $body
+     * @param  int  $projectId
+     * @return \Illuminate\Http\Response
      */
     public function detachCitation($body, $projectId)
     {

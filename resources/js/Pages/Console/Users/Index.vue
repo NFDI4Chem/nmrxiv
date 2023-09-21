@@ -104,6 +104,9 @@
                                             <div class="text-sm text-gray-500">
                                                 {{ user.email }}
                                             </div>
+                                            <div class="text-sm text-teal-500">
+                                                {{ user.orcid_id }}
+                                            </div>
                                         </div>
                                     </div>
                                 </td>
