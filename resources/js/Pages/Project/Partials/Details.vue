@@ -1026,7 +1026,7 @@ export default defineComponent({
             }
         },
         toggleDetails() {
-            if (this.$page.props.licenses) {
+            if (this.$page.props.licenses && this.$page.props.licenses.length > 0) {
                 this.licenses = this.$page.props.licenses;
                 this.form.license = this.licenses.find(
                     (l) => l.id == this.project.license_id
