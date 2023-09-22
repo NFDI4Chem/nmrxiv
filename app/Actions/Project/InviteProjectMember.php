@@ -2,16 +2,17 @@
 
 namespace App\Actions\Project;
 
-use App\Events\InvitingProjectMember;
-use App\Mail\ProjectInvitation;
 use App\Models\User;
-use App\Notifications\ProjectInviteNotification;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Validator;
+use App\Events\ProjectInvite;
+use App\Mail\ProjectInvitation;
 use Illuminate\Validation\Rule;
 use Laravel\Jetstream\Jetstream;
 use Laravel\Jetstream\Rules\Role;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Mail;
+use App\Events\InvitingProjectMember;
+use Illuminate\Support\Facades\Validator;
+use App\Notifications\ProjectInviteNotification;
 
 class InviteProjectMember
 {
@@ -28,7 +29,7 @@ class InviteProjectMember
 
         $this->validate($project, $email, $role, $message);
 
-        InvitingProjectMember::dispatch($project, $email, $role, $message);
+        //InvitingProjectMember::dispatch($project, $email, $role, $message);
 
         $invitation = $project->projectInvitations()->create([
             'email' => $email,
@@ -42,7 +43,7 @@ class InviteProjectMember
         $invitedUser = User::where('email', $invitation->email)->first();
 
         if ($invitedUser) {
-            $invitedUser->notify(new ProjectInviteNotification($invitation));
+            event(new ProjectInvite($invitedUser, $invitation));
         }
     }
 

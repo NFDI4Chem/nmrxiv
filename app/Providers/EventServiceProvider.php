@@ -3,11 +3,19 @@
 namespace App\Providers;
 
 use App\Events\DraftProcessed;
-use App\Listeners\SendDraftProcessedNotification;
+use App\Listeners\StudyInvite as StudyInviteListener;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Auth\Events\Registered;
+use App\Events\StudyInvite as StudyInviteEvent;
+use App\Listeners\SendDraftProcessedNotification;
+use App\Events\ProjectInvite as ProjectInviteEvent;
+use App\Events\ProjectArchival as ProjectArchivalEvent;
+use App\Events\ProjectDeletion as ProjectDeletionEvent;
+use App\Listeners\ProjectInvite as ProjectInviteListener;
+use App\Listeners\ProjectArchival as ProjectArchivalListener;
+use App\Listeners\ProjectDeletion as ProjectDeletionListener;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
-use Illuminate\Support\Facades\Event;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -27,6 +35,19 @@ class EventServiceProvider extends ServiceProvider
             // add your listeners (aka providers) here
             \SocialiteProviders\Orcid\OrcidExtendSocialite::class.'@handle',
         ],
+        ProjectDeletionEvent::class => [
+            ProjectDeletionListener::class,
+        ],
+        ProjectArchivalEvent::class => [
+            ProjectArchivalListener::class,
+        ],
+        ProjectInviteEvent::class => [
+            ProjectInviteListener::class,
+        ],
+        StudyInviteEvent::class => [
+            StudyInviteListener::class,
+        ]
+
     ];
 
     /**

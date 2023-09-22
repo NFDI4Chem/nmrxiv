@@ -2,16 +2,17 @@
 
 namespace App\Actions\Study;
 
-use App\Events\InvitingStudyMember;
-use App\Mail\StudyInvitation;
 use App\Models\User;
-use App\Notifications\StudyInviteNotification;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Validator;
+use App\Events\StudyInvite;
+use App\Mail\StudyInvitation;
 use Illuminate\Validation\Rule;
 use Laravel\Jetstream\Jetstream;
 use Laravel\Jetstream\Rules\Role;
+use App\Events\InvitingStudyMember;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
+use App\Notifications\StudyInviteNotification;
 
 class InviteStudyMember
 {
@@ -28,7 +29,7 @@ class InviteStudyMember
 
         $this->validate($study, $email, $role, $message);
 
-        InvitingStudyMember::dispatch($study, $email, $role, $message);
+        //InvitingStudyMember::dispatch($study, $email, $role, $message);
 
         $invitation = $study->studyInvitations()->create([
             'email' => $email,
@@ -42,7 +43,8 @@ class InviteStudyMember
         $invitedUser = User::where('email', $invitation->email)->first();
 
         if ($invitedUser) {
-            $invitedUser->notify(new StudyInviteNotification($invitation));
+            //$invitedUser->notify(new StudyInviteNotification($invitation));
+            event(new StudyInvite($invitedUser, $invitation));
         }
     }
 
