@@ -298,7 +298,7 @@
                             <button
                                 @click="openShowNotificationDialog"
                                 type="button"
-                                class="m-3"
+                                class="m-1"
                             >
                                 <BellIcon
                                     class="w-6 h-6 fill-current text-gray-600"
