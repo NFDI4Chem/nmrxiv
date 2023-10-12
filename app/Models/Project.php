@@ -26,11 +26,11 @@ class Project extends Model implements Auditable
 {
     use CacheClear;
     use HasDOI;
-    use Searchable;
-    use Markable;
     use HasFactory;
-    use \OwenIt\Auditing\Auditable;
     use HasTags;
+    use Markable;
+    use \OwenIt\Auditing\Auditable;
+    use Searchable;
 
     protected $fillable = [
         'name',

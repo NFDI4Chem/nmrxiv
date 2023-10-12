@@ -18,13 +18,13 @@ use Storage;
 
 class Study extends Model implements Auditable
 {
-    use Searchable;
     use CacheClear;
-    use HasFactory;
-    use Markable;
     use HasDOI;
+    use HasFactory;
     use HasTags;
+    use Markable;
     use \OwenIt\Auditing\Auditable;
+    use Searchable;
 
     protected $fillable = [
         'name',
