@@ -2213,6 +2213,7 @@ export default {
         },
 
         loadSmiles() {
+            this.errorMessage = "";
             if (this.smiles && this.smiles != "") {
                 try {
                     let mol = OCL.Molecule.fromSmiles(this.smiles);
