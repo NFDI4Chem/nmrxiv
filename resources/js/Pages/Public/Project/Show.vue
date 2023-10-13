@@ -7,6 +7,9 @@
                 <h3 class="text-xl font-extrabold text-blue-gray-900">
                     About project
                 </h3>
+                <span class="text-gray-400 pt-2">
+                    <img :src="'badge/doi/' + project.data.identifier" />
+                </span>
                 <div class="mt-2 space-y-8 divide-y divide-y-blue-gray-200">
                     <div
                         class="grid grid-cols-1 gap-y-6 sm:grid-cols-6 sm:gap-x-6"
