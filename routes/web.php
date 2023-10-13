@@ -141,8 +141,10 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
             ->name('dashboard.project.update');
         Route::get('projects/{project}/activity', [ProjectController::class, 'activity'])
             ->name('dashboard.project.activity');
-        Route::get('projects/{project}/validation', [ProjectController::class, 'validation'])
-            ->name('dashboard.project.validation');
+        Route::get('projects/{project}/checkvalidation', [ProjectController::class, 'checkvalidation'])
+            ->name('dashboard.project.checkvalidation');
+        Route::post('projects/{project}/updateValidation', [ProjectController::class, 'updateValidation'])
+            ->name('dashboard.project.updateValidation');
 
         Route::post('projects/{project}/publish', [ProjectController::class, 'publish'])
             ->name('dashboard.project.publish');

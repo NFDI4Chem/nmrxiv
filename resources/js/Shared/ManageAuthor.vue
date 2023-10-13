@@ -1071,6 +1071,7 @@ export default {
                 preserveScroll: true,
                 onSuccess: () => {
                     this.loadInitial();
+                    Inertia.reload({ only: ["project"] });
                     this.form.reset();
                     this.form.contributor_type = {};
                     this.form.contributor_type = this.contributorType[0];

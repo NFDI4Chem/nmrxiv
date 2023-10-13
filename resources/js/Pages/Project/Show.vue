@@ -607,7 +607,7 @@ import { Link } from "@inertiajs/inertia-vue3";
 import { Inertia } from "@inertiajs/inertia";
 import StudyIndex from "@/Pages/Study/Index.vue";
 import ProjectDetails from "./Partials/Details.vue";
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { StarIcon, PencilIcon, CalendarIcon } from "@heroicons/vue/24/solid";
 import ManageAuthor from "@/Shared/ManageAuthor.vue";
 import ToolTip from "@/Shared/ToolTip.vue";
@@ -642,6 +642,14 @@ export default {
         "role",
         "license",
     ],
+    watch: {
+        project: {
+            handler() {
+                this.updateValidation();
+            },
+        },
+    },
+
     setup() {
         const projectDetailsElement = ref(null);
         const manageAuthorElement = ref(null);
@@ -673,7 +681,11 @@ export default {
         }
     },
     data() {
-        return {};
+        return {
+            form: this.$inertia.form({
+                _method: "POST",
+            }),
+        };
     },
     computed: {
         canDeleteProject() {
@@ -733,6 +745,19 @@ export default {
                 target = "_blank";
             }
             return target;
+        },
+        updateValidation() {
+            axios
+                .post(
+                    route("dashboard.project.updateValidation", [
+                        this.project.id,
+                    ]),
+                    this.form
+                )
+                .catch((err) => {
+                    console.log(err);
+                })
+                .then((response) => {});
         },
     },
 };

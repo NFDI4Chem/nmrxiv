@@ -217,7 +217,7 @@ class ProjectController extends Controller
         return response()->json(['audit' => $project->audits()->with('user')->orderBy('created_at', 'desc')->get()]);
     }
 
-    public function validation(Request $request, Project $project)
+    public function checkvalidation(Request $request, Project $project)
     {
         if (! Gate::forUser($request->user())->check('viewProject', $project)) {
             throw new AuthorizationException;
@@ -247,6 +247,35 @@ class ProjectController extends Controller
             'project' => $project->load('projectInvitations', 'tags', 'authors', 'citations'),
             'validation' => $validation->fresh(),
         ]);
+    }
+
+    public function updateValidation(Request $request, Project $project)
+    {
+        if (! Gate::forUser($request->user())->check('viewProject', $project)) {
+            throw new AuthorizationException;
+        }
+
+        $validation = $project->validation;
+
+        if (! $validation) {
+            $validation = new Validation();
+            $validation->save();
+            $project->validation()->associate($validation);
+            $project->save();
+
+            foreach ($project->studies as $study) {
+                $study->validation()->associate($validation);
+                $study->save();
+                foreach ($study->datasets as $dataset) {
+                    $dataset->validation()->associate($validation);
+                    $dataset->save();
+                }
+            }
+        }
+        $validation->process();
+        $validation->fresh();
+        $project->fresh();
+
     }
 
     public function publish(Request $request, Project $project)
