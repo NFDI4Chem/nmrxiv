@@ -57,7 +57,6 @@
                                     @click="toogleStarred"
                                 />
                                 {{ project.name }}
-
                                 <button
                                     v-if="canUpdateProject"
                                     type="button"
@@ -78,6 +77,12 @@
                                     <span>Edit</span>
                                 </button>
                             </div>
+
+                            <span class="text-gray-400 pt-2">
+                                <img
+                                    :src="'/badge/doi/' + project.identifier"
+                                />
+                            </span>
 
                             <div class="inline-flex items-center mt-3">
                                 <access-dialogue
