@@ -1,4 +1,3 @@
-import DefaultTheme from 'vitepress/theme'
-import './custom.css'
+import { Theme } from "@hempworks/pilgrim";
 
-export default DefaultTheme
+export default Theme

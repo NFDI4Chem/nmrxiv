@@ -1,11 +1,15 @@
-import { defineConfig } from 'vitepress'
+import { defineConfigWithTheme } from "vitepress";
+import type { ThemeConfig } from '@hempworks/pilgrim'
+import config from '@hempworks/pilgrim/config'
 
 // https://vitepress.dev/reference/site-config
-export default defineConfig({
+export default defineConfigWithTheme<ThemeConfig>({
+  extends: config,
   title: "nmrXiv Docs",
   description: "Open, FAIR and Consensus-Driven NMR spectroscopy data repository and analysis platform.",
   ignoreDeadLinks: true,
   base: '/nmrxiv/',
+  cleanUrls: false,
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     search: {
@@ -16,7 +20,8 @@ export default defineConfig({
 
     nav: [
       { text: 'Home', link: '/' },
-      { text: 'Docs', link: '/introduction/intro.md' }
+      { text: 'Docs', link: '/introduction/intro.md' },
+      { text: 'GitHub', link: 'https://github.com/NFDI4Chem/nmrxiv' }
     ],
 
     sidebar: [
@@ -131,5 +136,14 @@ export default defineConfig({
       copyright: `© ${new Date().getFullYear()} nmrXiv, Inc. All rights reserved.`
     }
 
+  },
+    vite: {
+      server: {
+          host: true,
+          fs: {
+              // for when developing with locally linked theme
+              allow: ['../..']
+          }
+      },
   }
 })
