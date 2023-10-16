@@ -65,7 +65,7 @@
                                 />
                             </Link>
                         </div>
-                        <div class="mt-1 flex-1 h-0 overflow-y-auto">
+                        <div v-if="editableTeamRole" class="mt-1 flex-1 h-0 overflow-y-auto">
                             <div class="my-4 mx-4">
                                 <create mode="button"></create>
                                 <span
@@ -173,7 +173,7 @@
                     </Link>
                 </div>
                 <div class="flex-grow flex flex-col -mt-1.5">
-                    <div class="px-4 flex flex-col mt-3 mb-1 text-center">
+                    <div v-if="editableTeamRole"  class="px-4 flex flex-col mt-3 mb-1 text-center">
                         <create mode="button"></create>
                         <span
                             class="text-xs cursor-pointer hover:text-blue-700 mt-2"
@@ -869,6 +869,20 @@ export default {
         };
     },
     computed: {
+        editableTeamRole() {
+            if (this.$page.props.teamRole && this.$page.props.teamRole.name) {
+                if (
+                    this.$page.props.teamRole.key == "owner" ||
+                    this.$page.props.teamRole.key == "collaborator"
+                ) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                return true;
+            }
+        },
         filteredNavigation() {
             if (this.$page.props.user.first_name) {
                 return this.navigation;

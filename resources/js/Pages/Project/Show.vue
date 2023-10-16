@@ -552,6 +552,7 @@
                     :editable="editable"
                     :project="project"
                     :role="role"
+                    :teamRole="teamRole"
                 />
             </div>
         </div>
@@ -600,6 +601,7 @@ export default {
         "availableRoles",
         "projectPermissions",
         "role",
+        "teamRole",
         "license",
     ],
     setup() {
@@ -637,13 +639,9 @@ export default {
     },
     computed: {
         canDeleteProject() {
-            if (this.role) {
-                if (this.role == "owner" || this.role == "creator") {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
+            return this.projectPermissions
+                ? this.projectPermissions.canDeleteProject
+                : false;
         },
         canUpdateProject() {
             return this.projectPermissions
