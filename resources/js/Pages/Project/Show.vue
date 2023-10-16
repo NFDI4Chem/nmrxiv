@@ -78,7 +78,8 @@
                                 </button>
                             </div>
 
-                            <span class="text-gray-400 pt-2">
+                            <span v-if="project.identifier"
+                                class="text-gray-400 pt-2">
                                 <img
                                     :src="'/badge/doi/' + project.identifier"
                                 />
