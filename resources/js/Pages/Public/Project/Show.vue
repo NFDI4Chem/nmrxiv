@@ -7,6 +7,9 @@
                 <h3 class="text-xl font-extrabold text-blue-gray-900">
                     About project
                 </h3>
+                <span class="text-gray-400 pt-2">
+                    <img :src="'badge/doi/' + project.data.identifier" />
+                </span>
                 <div class="mt-2 space-y-8 divide-y divide-y-blue-gray-200">
                     <div
                         class="grid grid-cols-1 gap-y-6 sm:grid-cols-6 sm:gap-x-6"
@@ -114,67 +117,11 @@
                                     <div
                                         class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-2"
                                     >
-                                        <div
-                                            v-for="citation in project.data
-                                                .citations"
-                                            :key="citation.id"
-                                            class="relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm flex items-top space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-teal-500"
-                                        >
-                                            <div class="flex-1 min-w-0">
-                                                <a
-                                                    class="focus:outline-none cursor-pointer"
-                                                    :href="
-                                                        getCitationLink(
-                                                            citation.doi
-                                                        )
-                                                    "
-                                                    :target="
-                                                        getTarget(citation.doi)
-                                                    "
-                                                >
-                                                    <span
-                                                        class="absolute inset-0"
-                                                        aria-hidden="true"
-                                                    ></span>
-                                                    <p
-                                                        class="text-sm font-medium text-gray-900"
-                                                    >
-                                                        {{ citation.title }}
-                                                    </p>
-                                                    <p
-                                                        class="text-sm text-teal-500"
-                                                    >
-                                                        {{ citation.authors }}
-                                                    </p>
-                                                    <p
-                                                        class="text-sm text-gray-500"
-                                                    >
-                                                        {{
-                                                            citation.citation_text
-                                                        }}
-                                                    </p>
-                                                    <p
-                                                        v-if="citation.doi"
-                                                        class="text-sm font-sm text-gray-500"
-                                                    >
-                                                        DOI -
-                                                        <a
-                                                            :href="citation.doi"
-                                                            class="text-teal-900"
-                                                            >{{
-                                                                citation.doi
-                                                            }}</a
-                                                        >
-                                                    </p>
-                                                    <p
-                                                        class="text-sm text-gray-500 truncate ..."
-                                                    >
-                                                        {{ citation.abstract }}
-                                                        ...
-                                                    </p>
-                                                </a>
-                                            </div>
-                                        </div>
+                                        <citation-card
+                                            :citations="
+                                                this.project.data.citations
+                                            "
+                                        />
                                     </div>
                                 </dd>
                             </div>
@@ -192,11 +139,13 @@
 <script>
 import ProjectLayout from "@/Pages/Public/Project/Layout.vue";
 import AuthorCard from "@/Shared/AuthorCard.vue";
+import CitationCard from "@/Shared/CitationCard.vue";
 
 export default {
     components: {
         ProjectLayout,
         AuthorCard,
+        CitationCard,
     },
     props: ["project", "tab"],
     data() {
@@ -212,28 +161,6 @@ export default {
                 this.schema = response.data;
             });
     },
-    methods: {
-        getOrcidLink(orcidId) {
-            var link = "#";
-            if (orcidId) {
-                link = "https://orcid.org/" + orcidId;
-            }
-            return link;
-        },
-        getCitationLink(doi) {
-            var link = "#";
-            if (doi) {
-                link = "https://doi.org/" + doi;
-            }
-            return link;
-        },
-        getTarget(id) {
-            var target = null;
-            if (id) {
-                target = "_blank";
-            }
-            return target;
-        },
-    },
+    methods: {},
 };
 </script>

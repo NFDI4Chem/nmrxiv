@@ -364,14 +364,13 @@
                                                     >
                                                         Abstract
                                                     </p>
-                                                    <p
+                                                    <div
                                                         id="citation-abstract"
                                                         class="text-xs text-gray-500"
-                                                    >
-                                                        {{
+                                                        v-html="
                                                             fetchedCitations.abstract
-                                                        }}
-                                                    </p>
+                                                        "
+                                                    ></div>
                                                 </div>
                                             </div>
                                         </div>
@@ -474,12 +473,11 @@
                                             <div
                                                 class="sm:flex sm:justify-between"
                                             >
-                                                <p
+                                                <div
                                                     v-if="element.abstract"
                                                     class="text-xs font-medium text-gray-900"
-                                                >
-                                                    {{ element.abstract }}
-                                                </p>
+                                                    v-html="element.abstract"
+                                                ></div>
                                             </div>
                                         </div>
                                     </li>
