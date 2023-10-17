@@ -1,11 +1,5 @@
 <template>
-    <jet-dialog-modal
-        :show="show"
-        @close="show = false"
-        v-model="this.selectedOrcidId"
-        :value="item"
-        as="div"
-    >
+    <jet-dialog-modal :show="show" @close="show = false">
         <template #title> Select ORCID iD </template>
 
         <template #content>

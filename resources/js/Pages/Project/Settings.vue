@@ -92,7 +92,7 @@
 
 <script>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import { Link } from "@inertiajs/inertia-vue3";
+import { Link } from "@inertiajs/vue3";
 import ProjectDelete from "@/Pages/Project/Partials/Delete.vue";
 import ProjectRestore from "@/Pages/Project/Partials/Restore.vue";
 import ProjectArchive from "@/Pages/Project/Partials/Archive.vue";
