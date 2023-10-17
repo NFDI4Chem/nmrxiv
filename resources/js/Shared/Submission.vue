@@ -1746,7 +1746,7 @@ import {
     PencilIcon,
     ArrowDownOnSquareStackIcon,
 } from "@heroicons/vue/24/solid";
-import { Link } from "@inertiajs/inertia-vue3";
+import { Link } from "@inertiajs/vue3";
 
 export default {
     components: {
@@ -1974,7 +1974,7 @@ export default {
     methods: {
         hidePrimer() {
             axios.post("/primer/skip").then(() => {
-                Inertia.reload({
+                router.reload({
                     only: ["user", "user.permissions", "user.roles"],
                 });
             });

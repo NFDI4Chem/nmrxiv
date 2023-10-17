@@ -89,16 +89,14 @@
                         />
                     </div>
                     <div
+                        @click="findOrcidID()"
                         class="tooltip -ml-px relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500 cursor-pointer"
                     >
-                        <button type="button" class="" @click="findOrcidID()">
-                            <img
-                                alt="ORCID logo"
-                                src="https://orcid.org/assets/vectors/orcid.logo.icon.svg"
-                                width="20"
-                                height="20"
-                            />
-                        </button>
+                        <img
+                            alt="ORCID logo"
+                            src="https://orcid.org/assets/vectors/orcid.logo.icon.svg"
+                            class="w-6"
+                        />
                         <span
                             class="bg-gray-900 text-center text-white px-2 py-1 shadow-lg rounded-md tooltiptextbottom"
                             >Click to find ORCID iD</span
@@ -203,7 +201,7 @@ import JetInput from "@/Jetstream/Input.vue";
 import JetCheckbox from "@/Jetstream/Checkbox.vue";
 import JetLabel from "@/Jetstream/Label.vue";
 import JetValidationErrors from "@/Jetstream/ValidationErrors.vue";
-import { Head, Link } from "@inertiajs/inertia-vue3";
+import { Head, Link } from "@inertiajs/vue3";
 import AnnouncementBanner from "@/Shared/AnnouncementBanner.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import JetDialogModal from "@/Jetstream/DialogModal.vue";

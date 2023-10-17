@@ -126,17 +126,24 @@ export default {
 
     computed: {
         editable() {
-            if(this.role){
-                if(this.role == "creator" || this.role == "owner" || this.role == "collaborator") {
+            if (this.role) {
+                if (
+                    this.role == "creator" ||
+                    this.role == "owner" ||
+                    this.role == "collaborator"
+                ) {
                     return true;
                 }
             }
-            if(this.teamRole && this.teamRole.key){
-                if(this.teamRole.key == "creator" || this.teamRole.key == "owner" || this.teamRole.key == "collaborator") {
+            if (this.teamRole && this.teamRole.key) {
+                if (
+                    this.teamRole.key == "creator" ||
+                    this.teamRole.key == "owner" ||
+                    this.teamRole.key == "collaborator"
+                ) {
                     return true;
                 }
-            }
-            else {
+            } else {
                 return false;
             }
         },

@@ -2,10 +2,8 @@
 
 namespace App\Listeners;
 
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Support\Facades\Notification;
 use App\Notifications\ProjectDeletionNotification;
+use Illuminate\Support\Facades\Notification;
 
 class ProjectDeletion
 {
@@ -14,7 +12,7 @@ class ProjectDeletion
      */
     public function __construct()
     {
-        
+
     }
 
     /**

@@ -78,8 +78,10 @@
                                 </button>
                             </div>
 
-                            <span v-if="project.identifier"
-                                class="text-gray-400 pt-2">
+                            <span
+                                v-if="project.identifier"
+                                class="text-gray-400 pt-2"
+                            >
                                 <img
                                     :src="'/badge/doi/' + project.identifier"
                                 />
@@ -568,8 +570,8 @@
 <script>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import AccessDialogue from "@/Shared/AccessDialogue.vue";
-import { Link } from "@inertiajs/inertia-vue3";
-import { Inertia } from "@inertiajs/inertia";
+import { Link } from "@inertiajs/vue3";
+import { router } from "@inertiajs/vue3";
 import StudyIndex from "@/Pages/Study/Index.vue";
 import ProjectDetails from "./Partials/Details.vue";
 import { ref } from "vue";
@@ -671,7 +673,7 @@ export default {
                     }
                 })
                 .then(function (response) {
-                    Inertia.reload({ only: ["project"] });
+                    router.reload({ only: ["project"] });
                 });
         },
         toggleDetails() {
