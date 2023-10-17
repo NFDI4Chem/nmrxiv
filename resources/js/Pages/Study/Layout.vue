@@ -121,10 +121,6 @@
                                             :model="model"
                                             called-from="studyView"
                                         />
-                                        <ToolTip
-                                            class="inline h-4 w-12 ml-0"
-                                            text="The avatars (left) correspond to the users with whom the study is shared. Click there to edit sharing options."
-                                        ></ToolTip>
                                         <a
                                             class="cursor-pointer inline-flex items-center"
                                             @click="toggleDetails"
@@ -406,7 +402,6 @@ import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import AccessDialogue from "@/Shared/AccessDialogue.vue";
 import Citation from "@/Shared/Citation.vue";
 import { router } from "@inertiajs/vue3";
-import ToolTip from "@/Shared/ToolTip.vue";
 
 export default {
     components: {
@@ -430,7 +425,6 @@ export default {
         StarIcon,
         AccessDialogue,
         Citation,
-        ToolTip,
     },
     props: [
         "study",
