@@ -400,7 +400,7 @@
                                         services to analyse data. Additionally,
                                         get community support for any of your
                                         NMR spectra-related queries or provide
-                                        one yourself. 
+                                        one yourself.
                                     </p>
                                     <div class="mt-6">
                                         <Link
@@ -919,10 +919,13 @@
             </div>
         </footer>
     </div>
+    <component :is="'script'" type="application/ld+json">{{
+        schema
+    }}</component>
 </template>
 
 <script>
-import { Head, Link } from "@inertiajs/inertia-vue3";
+import { Head, Link } from "@inertiajs/vue3";
 import JetApplicationLogo from "@/Jetstream/ApplicationLogo.vue";
 import Projects from "@/Shared/Projects.vue";
 import { defineComponent, h } from "vue";
@@ -1159,6 +1162,18 @@ export default {
             features,
             footerNavigation,
         };
+    },
+
+    data() {
+        return {
+            schema: {},
+        };
+    },
+
+    mounted() {
+        axios.get(route("bioschema.datacatalog")).then((response) => {
+            this.schema = response.data;
+        });
     },
 };
 </script>

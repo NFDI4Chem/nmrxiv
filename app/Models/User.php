@@ -17,12 +17,12 @@ class User extends Authenticatable implements MustVerifyEmail
     use HasApiTokens;
     use HasFactory;
     use HasProfilePhoto;
-    use HasTeams;
     use HasProjects;
+    use HasRoles;
     use HasStudies;
+    use HasTeams;
     use Notifiable;
     use TwoFactorAuthenticatable;
-    use HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -30,7 +30,7 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var array
      */
     protected $fillable = [
-        'name', 'first_name', 'last_name', 'username', 'email', 'password', 'onboarded',
+        'name', 'first_name', 'last_name', 'username', 'email', 'password', 'onboarded', 'orcid_id', 'affiliation',
     ];
 
     /**
@@ -116,5 +116,10 @@ class User extends Authenticatable implements MustVerifyEmail
         })->when($filters['role'] ?? null, function ($query, $role) {
             $query->whereRole($role);
         });
+    }
+
+    public function markNotificationAsRead($id)
+    {
+        $this->notifications->where('id', $id)->markAsRead();
     }
 }

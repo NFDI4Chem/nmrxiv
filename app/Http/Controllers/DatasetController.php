@@ -42,11 +42,13 @@ class DatasetController extends Controller
     {
         if ($dataset) {
             $user = Auth::user();
-            $spectra = $request->get('spectra');
-            $nmriumInfo = $spectra;
-            $molecules = $request->get('molecules');
-            $molecularInfo = $molecules;
+            $data = $request->get('data');
             $version = $request->get('version');
+            $spectra = $request->get('spectra');
+            $molecules = $request->get('molecules');
+
+            $nmriumInfo = $spectra;
+            $molecularInfo = $molecules;
 
             $nmrium = $dataset->nmrium;
             if ($nmrium) {
@@ -80,17 +82,13 @@ class DatasetController extends Controller
 
                 foreach ($spectra as $spectrum) {
                     $experimentDetailsExists = array_key_exists('experiment', $spectrum['info']);
-                    if($experimentDetailsExists ){
-                        $experiment = ['experiment'];
-                        if (is_null($experiment)) {
-                            $nucleus = $spectrum['info']['nucleus'];
-                            if (is_array($nucleus)) {
-                                $nucleus = implode('-', $nucleus);
-                            }
-                            $dataset->type = implode(',', array_unique(array_map('trim', explode(',', $nucleus.', '.$dataset->type))));
-                        } else {
-                            $dataset->type = $spectrum['info']['experiment'];
+                    if ($experimentDetailsExists) {
+                        $experiment = $spectrum['info']['experiment'];
+                        $nucleus = $spectrum['info']['nucleus'];
+                        if (is_array($nucleus)) {
+                            $nucleus = implode('-', $nucleus);
                         }
+                        $dataset->type = $experiment.','.$nucleus;
                     }
                 }
 
@@ -125,7 +123,7 @@ class DatasetController extends Controller
     public function publicDatasetsView(Request $request)
     {
         // $datasets = Cache::rememberForever('datasets', function () {
-        $datasets = DatasetResource::collection(Dataset::with('project')->where('is_public', true)->filter($request->only('search', 'sort', 'mode'))->paginate(12)->withQueryString());
+        $datasets = DatasetResource::collection(Dataset::with('project')->where([['is_public', true], ['is_archived', false]])->filter($request->only('search', 'sort', 'mode'))->paginate(12)->withQueryString());
         // });
 
         return Inertia::render('Public/Datasets', [

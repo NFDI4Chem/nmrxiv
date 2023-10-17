@@ -2,12 +2,17 @@
 
 namespace App\Models;
 
+use App\Events\ProjectArchival;
+use App\Events\ProjectDeletion;
+use App\Notifications\ProjectDeletionFailureNotification;
+use App\Notifications\ProjectDeletionReminderNotification;
 use App\Traits\CacheClear;
 use Auth;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Notification;
 use Laravel\Scout\Searchable;
 use Maize\Markable\Markable;
 use Maize\Markable\Models\Bookmark;
@@ -20,11 +25,11 @@ class Project extends Model implements Auditable
 {
     use CacheClear;
     use HasDOI;
-    use Searchable;
-    use Markable;
     use HasFactory;
-    use \OwenIt\Auditing\Auditable;
     use HasTags;
+    use Markable;
+    use \OwenIt\Auditing\Auditable;
+    use Searchable;
 
     protected $fillable = [
         'name',
@@ -46,6 +51,7 @@ class Project extends Model implements Auditable
         'project_photo_path',
         'license_id',
         'release_date',
+        'deleted_on',
     ];
 
     protected static $marks = [
@@ -102,8 +108,6 @@ class Project extends Model implements Auditable
 
     /**
      * Get the project identifier
-     *
-     * @return \Illuminate\Database\Eloquent\Casts\Attribute
      */
     protected function identifier(): Attribute
     {
@@ -184,7 +188,6 @@ class Project extends Model implements Auditable
     /**
      * Determine if the given email address belongs to a user on the project.
      *
-     * @param  string  $email
      * @return bool
      */
     public function hasUserWithEmail(string $email)
@@ -197,7 +200,6 @@ class Project extends Model implements Auditable
     /**
      * Get the user with the given email if belongs to the project
      *
-     * @param  string  $email
      * @return bool
      */
     public function userWithEmail(string $email)
@@ -210,7 +212,6 @@ class Project extends Model implements Auditable
     /**
      * Get the user project role
      *
-     * @param  string  $email
      * @return bool
      */
     public function userProjectRole(string $email)
@@ -292,7 +293,9 @@ class Project extends Model implements Auditable
      */
     public function shouldBeSearchable()
     {
-        return $this->is_public;
+        if ($this->is_public && ! $this->is_archived) {
+            return true;
+        }
     }
 
     /**
@@ -327,5 +330,30 @@ class Project extends Model implements Auditable
     public function citations()
     {
         return $this->belongsToMany(Citation::class);
+    }
+
+    /**
+     * Send Notification via email.
+     *
+     * @param  string  $notifyType (deletion / deletionReminder / archival / archivalAdmin)
+     * @param  array  sendTo
+     * @return void
+     */
+    public function sendNotification($notifyType, $sendTo)
+    {
+        switch ($notifyType) {
+            case 'deletion':
+                event(new ProjectDeletion($this, $sendTo));
+                break;
+            case 'deletionReminder':
+                Notification::send($sendTo, new ProjectDeletionReminderNotification($this));
+                break;
+            case 'archival':
+                event(new ProjectArchival($this, $sendTo));
+                break;
+            case 'deletionFailure':
+                Notification::send($sendTo, new ProjectDeletionFailureNotification($this));
+                break;
+        }
     }
 }

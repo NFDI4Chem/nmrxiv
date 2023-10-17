@@ -351,7 +351,7 @@ export default {
                                 nmrium_info = JSON.parse(
                                     response.data.nmrium_info
                                 );
-                                let nmriumVersion = 3;
+                                let nmriumVersion = 4;
                                 if (nmrium_info && nmrium_info["version"]) {
                                     nmriumVersion = nmrium_info["version"];
                                 }
@@ -409,7 +409,9 @@ export default {
             this.selectedSpectraData = null;
             this.reset = true;
             const iframe = window.frames.NMRiumIframe;
-            let ownerUserName = this.$page.props.team ? this.$page.props.team.owner.username : this.project.owner.username
+            let ownerUserName = this.$page.props.team
+                ? this.$page.props.team.owner.username
+                : this.project.owner.username;
             if (!url) {
                 url =
                     this.url +

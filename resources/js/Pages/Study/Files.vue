@@ -296,7 +296,7 @@
 
 <script>
 import { Dropzone } from "dropzone";
-import { Inertia } from "@inertiajs/inertia";
+import { router } from "@inertiajs/vue3";
 import StudyContent from "@/Pages/Study/Content.vue";
 import FileDetails from "@/Shared/FileDetails.vue";
 import axiosRetry from "axios-retry";
@@ -442,7 +442,7 @@ export default {
                 },
                 queuecomplete: function () {
                     vm.status = "UPLOAD COMPLETE";
-                    Inertia.reload();
+                    router.reload();
                     this.$page.props.selectedFileSystemObject = this.files[0];
                 },
             };

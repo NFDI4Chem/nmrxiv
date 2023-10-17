@@ -1,5 +1,6 @@
 import * as marked from "marked";
 import { copyText } from "vue3-clipboard";
+import pluralize from "pluralize";
 
 export default {
     methods: {
@@ -109,16 +110,39 @@ export default {
         isEmpty(obj) {
             return Object.keys(obj).length === 0;
         },
+        pluralize(value, number) {
+            return pluralize(value, number);
+        },
+
+        /*Extract Doi from URL*/
+        extractDoi(query) {
+            if (query.indexOf("http") > -1) {
+                var url = new URL(query);
+                query = url.pathname.replace("/", "");
+            }
+            return query.trim();
+        },
     },
 
     computed: {
         editable() {
             if (this.role) {
-                return (
+                if (
                     this.role == "creator" ||
                     this.role == "owner" ||
                     this.role == "collaborator"
-                );
+                ) {
+                    return true;
+                }
+            }
+            if (this.teamRole && this.teamRole.key) {
+                if (
+                    this.teamRole.key == "creator" ||
+                    this.teamRole.key == "owner" ||
+                    this.teamRole.key == "collaborator"
+                ) {
+                    return true;
+                }
             } else {
                 return false;
             }
@@ -133,6 +157,8 @@ export default {
                 } else {
                     return false;
                 }
+            } else {
+                return true;
             }
         },
     },

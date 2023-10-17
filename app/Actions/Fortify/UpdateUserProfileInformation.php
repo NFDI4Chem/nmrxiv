@@ -13,7 +13,6 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
      * Validate and update the given user's profile information.
      *
      * @param  mixed  $user
-     * @param  array  $input
      * @return void
      */
     public function update($user, array $input)
@@ -25,6 +24,8 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
             'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
             'username' => ['required', 'string', 'max:255', Rule::unique('users')->ignore($user->id)],
             'photo' => ['nullable', 'mimes:jpg,jpeg,png', 'max:1024'],
+            'orcid_id' => ['nullable', 'string', 'max:255'],
+            'affiliation' => ['nullable', 'string', 'max:255'],
         ])->validateWithBag('updateProfileInformation');
 
         if (isset($input['photo'])) {
@@ -41,6 +42,8 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
                 'username' => $input['username'],
                 'name' => $input['username'] ? $input['username'] : $user->name,
                 'email' => $input['email'],
+                'orcid_id' => $input['orcid_id'],
+                'affiliation' => $input['affiliation'],
             ])->save();
         }
     }
@@ -49,7 +52,6 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
      * Update the given verified user's profile information.
      *
      * @param  mixed  $user
-     * @param  array  $input
      * @return void
      */
     protected function updateVerifiedUser($user, array $input)
@@ -57,10 +59,11 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
         $user->forceFill([
             'first_name' => $input['first_name'],
             'last_name' => $input['last_name'],
-            'name' => $input['name'] ? $input['name'] : $user->name,
             'username' => $input['username'],
+            'name' => $input['username'] ? $input['username'] : $user->name,
             'email' => $input['email'],
-            'email_verified_at' => null,
+            'orcid_id' => $input['orcid_id'],
+            'affiliation' => $input['affiliation'],
         ])->save();
 
         $user->sendEmailVerificationNotification();

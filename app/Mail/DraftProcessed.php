@@ -5,6 +5,7 @@ namespace App\Mail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Carbon;
 
 class DraftProcessed extends Mailable
 {
@@ -29,8 +30,19 @@ class DraftProcessed extends Mailable
      */
     public function build()
     {
+        $releasedToday = false;
+        $releaseDate = Carbon::parse($this->project->release_date);
+
+        if ($releaseDate->isToday()) {
+            $releasedToday = true;
+        }
+
         return $this->markdown('vendor.mail.draft-processed', [
             'url' => url(config('app.url').'/dashboard/projects/'.$this->project->id),
+            'project' => $this->project,
+            'releasedToday' => $releasedToday,
+            'releaseDate' => explode(' ', $releaseDate)[0],
+            'publicUrl' => url(config('app.url').'/'.explode(':', $this->project->identifier)[1]),
         ])->subject(__('Submission Processed'.' - '.$this->project->name));
     }
 }

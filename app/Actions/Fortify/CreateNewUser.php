@@ -17,7 +17,6 @@ class CreateNewUser implements CreatesNewUsers
     /**
      * Create a newly registered user.
      *
-     * @param  array  $input
      * @return \App\Models\User
      */
     public function create(array $input)
@@ -38,7 +37,10 @@ class CreateNewUser implements CreatesNewUsers
                 'last_name' => $input['last_name'],
                 'email' => $input['email'],
                 'username' => $input['username'],
+                'orcid_id' => $input['orcid_id'],
+                'affiliation' => $input['affiliation'],
                 'password' => Hash::make($input['password']),
+
             ]), function (User $user) {
                 $this->createTeam($user);
             });
@@ -48,7 +50,6 @@ class CreateNewUser implements CreatesNewUsers
     /**
      * Create a personal team for the user.
      *
-     * @param  \App\Models\User  $user
      * @return void
      */
     protected function createTeam(User $user)

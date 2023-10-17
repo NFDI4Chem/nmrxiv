@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use App\Actions\Project\UpdateProject;
 use App\Models\Citation;
 use App\Models\Project;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 
 class CitationController extends Controller
@@ -13,13 +16,15 @@ class CitationController extends Controller
     /**
      * Save and sync updated citation details for a project.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  \Actions\Project\UpdateProject  $updater
-     * @param  \App\Models\Project  $project
      * @return \Illuminate\Http\RedirectResponse
      */
     public function save(Request $request, UpdateProject $updater, Project $project)
     {
+        if (! Gate::forUser($request->user())->check('updateProject', $project)) {
+            throw new AuthorizationException;
+        }
+
         $user = $request->user();
         $citations = $request->get('citations');
         //dd($citations);
@@ -68,13 +73,15 @@ class CitationController extends Controller
     /**
      * Delete citation for a project.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  \Actions\Project\UpdateProject  $updater
-     * @param  \App\Models\Project  $project
      * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy(Request $request, UpdateProject $updater, Project $project)
     {
+        if (! Gate::forUser($request->user())->check('updateProject', $project)) {
+            throw new AuthorizationException;
+        }
+
         $citation = $request->get('citations');
 
         if (count($citation) > 0) {
@@ -84,15 +91,3 @@ class CitationController extends Controller
         return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('success', 'Citation deleted successfully');
     }
 }
-
-// foreach ($input as $item) {
-    //     $citation = Citation::firstOrCreate([
-    //         'doi' => array_key_exists('doi', $item) ? $item['doi'] : null,
-    //         'title' => array_key_exists('title', $item) ? $item['title'] : null,
-    //         'authors' => array_key_exists('authors', $item) ? $item['authors'] : null,
-    //         'abstract' => array_key_exists('abstract', $item) ? $item['abstract'] : null,
-    //         'citation_text' => array_key_exists('citation_text', $item) ? $item['citation_text'] : null,
-    //     ]);
-    //     array_push($citations, $citation->id);
-// }
-// $updater->updateCitation($project, $citations, $user);

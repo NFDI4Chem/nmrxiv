@@ -18,7 +18,6 @@ class TeamController extends Controller
     /**
      * Delete the given team.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $teamId
      * @return \Illuminate\Http\RedirectResponse
      */

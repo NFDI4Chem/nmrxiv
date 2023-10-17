@@ -3,7 +3,9 @@
 namespace App\Actions\Project;
 
 use App\Events\InvitingProjectMember;
+use App\Events\ProjectInvite;
 use App\Mail\ProjectInvitation;
+use App\Models\User;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
@@ -18,8 +20,6 @@ class InviteProjectMember
      *
      * @param  mixed  $user
      * @param  mixed  $project
-     * @param  string  $email
-     * @param  string|null  $role
      * @return void
      */
     public function invite($user, $project, string $email, string $role = null, string $message = null)
@@ -28,23 +28,28 @@ class InviteProjectMember
 
         $this->validate($project, $email, $role, $message);
 
-        InvitingProjectMember::dispatch($project, $email, $role, $message);
+        //InvitingProjectMember::dispatch($project, $email, $role, $message);
 
         $invitation = $project->projectInvitations()->create([
             'email' => $email,
             'role' => $role,
             'message' => $message,
+            'invited_by' => $user->name,
         ]);
 
         Mail::to($email)->send(new ProjectInvitation($invitation));
+
+        $invitedUser = User::where('email', $invitation->email)->first();
+
+        if ($invitedUser) {
+            event(new ProjectInvite($invitedUser, $invitation));
+        }
     }
 
     /**
      * Validate the invite member operation.
      *
      * @param  mixed  $project
-     * @param  string  $email
-     * @param  string|null  $role
      * @return void
      */
     protected function validate($project, string $email, ?string $role, ?string $message)
@@ -82,7 +87,6 @@ class InviteProjectMember
      * Ensure that the user is not already on the project.
      *
      * @param  mixed  $project
-     * @param  string  $email
      * @return \Closure
      */
     protected function ensureUserIsNotAlreadyOnProject($project, string $email)

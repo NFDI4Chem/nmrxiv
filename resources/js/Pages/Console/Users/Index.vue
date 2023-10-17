@@ -104,6 +104,9 @@
                                             <div class="text-sm text-gray-500">
                                                 {{ user.email }}
                                             </div>
+                                            <div class="text-sm text-teal-500">
+                                                {{ user.orcid_id }}
+                                            </div>
                                         </div>
                                     </div>
                                 </td>
@@ -264,7 +267,7 @@ import JetDialogModal from "@/Jetstream/DialogModal.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import JetButton from "@/Jetstream/Button.vue";
 import BreadCrumbs from "../../../Jetstream/BreadCrumbs.vue";
-import { Link } from "@inertiajs/inertia-vue3";
+import { Link } from "@inertiajs/vue3";
 
 export default {
     components: {

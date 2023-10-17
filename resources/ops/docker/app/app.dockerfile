@@ -11,6 +11,7 @@ RUN docker-php-ext-install sockets
 RUN pecl install apcu
 RUN docker-php-ext-enable apcu
 RUN docker-php-ext-install pcntl
+RUN apk update && apk add postgresql-client
 
 RUN set -ex \
   && apk --no-cache add \

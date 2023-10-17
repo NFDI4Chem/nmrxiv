@@ -94,16 +94,32 @@
                                         />
                                     </div>
                                     <div
-                                        class="mt-6 sm:flex-1 sm:min-w-0 sm:flex sm:items-center sm:justify-end sm:space-x-6 sm:pb-1"
+                                        class="mt-6 sm:flex-1 sm:min-w-0 sm:flex sm:justify-center sm:space-x-0 sm:pb-1"
                                     >
                                         <div
                                             class="sm:hidden 2xl:block min-w-0 flex-1"
                                         >
-                                            <h1
-                                                class="text-2xl font-bold text-gray-900 break-words"
+                                            <div
+                                                class="text-2xl font-bold text-gray-900 break-words float-left"
                                             >
                                                 {{ project.data.name }}
-                                            </h1>
+                                            </div>
+                                            <div class="flex-1 float-left">
+                                                <a
+                                                    :href="downloadURL"
+                                                    :class="[
+                                                        active
+                                                            ? 'bg-gray-100 text-gray-600'
+                                                            : 'text-gray-500',
+                                                        'block ml-2 mt-1 text-sm cursor-pointer hover:text-gray-900',
+                                                    ]"
+                                                >
+                                                    <ArrowDownTrayIcon
+                                                        class="h-5 w-5 inline"
+                                                        aria-hidden="true"
+                                                    />
+                                                </a>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -189,12 +205,14 @@
 
 <script>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import { Link } from "@inertiajs/inertia-vue3";
-import { Inertia } from "@inertiajs/inertia";
+import { Link } from "@inertiajs/vue3";
+import { router } from "@inertiajs/vue3";
+import { ArrowDownTrayIcon } from "@heroicons/vue/24/solid";
 export default {
     components: {
         AppLayout,
         Link,
+        ArrowDownTrayIcon,
     },
     props: ["project", "selectedTab"],
     data() {
@@ -259,7 +277,7 @@ export default {
                         }
                     })
                     .then(function (response) {
-                        Inertia.reload({ only: ["project"] });
+                        router.reload({ only: ["project"] });
                     });
             } else {
                 this.$inertia.visit(route("login"));

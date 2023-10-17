@@ -10,8 +10,8 @@
 
 <script>
 import { ref, onMounted, onUnmounted } from "vue";
-import { Inertia } from "@inertiajs/inertia";
-import { usePage } from "@inertiajs/inertia-vue3";
+import { router } from "@inertiajs/vue3";
+import { usePage } from "@inertiajs/vue3";
 
 export default {
     props: {
@@ -21,7 +21,7 @@ export default {
     },
     setup({ closeUrl }) {
         const mask = ref(null);
-        const firstPage = usePage().url.value === usePage().inline?.value.url;
+        const firstPage = usePage().url === usePage().inline?.url;
 
         function escapeToClose(event) {
             if (event.keyCode == 27) {
@@ -37,7 +37,7 @@ export default {
 
         function close() {
             if (firstPage) {
-                Inertia.get(closeUrl);
+                router.get(closeUrl);
             } else {
                 window.history.back();
             }

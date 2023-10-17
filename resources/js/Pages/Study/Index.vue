@@ -233,7 +233,7 @@
 </template>
 
 <script>
-import { Link } from "@inertiajs/inertia-vue3";
+import { Link } from "@inertiajs/vue3";
 import StudyCreate from "@/Pages/Study/Partials/Create.vue";
 import StudyCard from "@/Shared/StudyCard.vue";
 import JetButton from "@/Jetstream/Button.vue";
@@ -254,6 +254,10 @@ export default {
             type: Object,
         },
         role: {
+            default: null,
+            type: String,
+        },
+        teamRole: {
             default: null,
             type: String,
         },
@@ -279,6 +283,7 @@ export default {
         openDatasetCreateDialog() {
             this.emitter.emit("openDatasetCreateDialog", {
                 draft_id: this.project.draft_id,
+                return_url: "/projects/" + this.project.id,
             });
         },
         fetchStudies(url) {
