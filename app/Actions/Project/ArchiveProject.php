@@ -3,7 +3,6 @@
 namespace App\Actions\Project;
 
 use App\Models\Project;
-use App\Models\User;
 
 class ArchiveProject
 {
@@ -24,7 +23,6 @@ class ArchiveProject
         $project->save();
         if ($project->is_archived) {
             $project->sendNotification('archival', $this->prepareSendList($project));
-            $project->sendNotification('archivalAdmin', User::role(['super-admin'])->get());
         }
     }
 

@@ -150,7 +150,7 @@ import { LockClosedIcon } from "@heroicons/vue/24/solid";
 import { LockOpenIcon } from "@heroicons/vue/24/solid";
 import { PencilIcon } from "@heroicons/vue/24/solid";
 import { EnvelopeIcon } from "@heroicons/vue/24/solid";
-import { Link } from "@inertiajs/inertia-vue3";
+import { Link } from "@inertiajs/vue3";
 import { StarIcon } from "@heroicons/vue/24/solid";
 
 export default {
