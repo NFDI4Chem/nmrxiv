@@ -205,8 +205,8 @@
 
 <script>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import { Link } from "@inertiajs/inertia-vue3";
-import { Inertia } from "@inertiajs/inertia";
+import { Link } from "@inertiajs/vue3";
+import { router } from "@inertiajs/vue3";
 import { ArrowDownTrayIcon } from "@heroicons/vue/24/solid";
 export default {
     components: {
@@ -277,7 +277,7 @@ export default {
                         }
                     })
                     .then(function (response) {
-                        Inertia.reload({ only: ["project"] });
+                        router.reload({ only: ["project"] });
                     });
             } else {
                 this.$inertia.visit(route("login"));

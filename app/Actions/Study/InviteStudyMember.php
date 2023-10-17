@@ -2,17 +2,17 @@
 
 namespace App\Actions\Study;
 
-use App\Models\User;
+use App\Events\InvitingStudyMember;
 use App\Events\StudyInvite;
 use App\Mail\StudyInvitation;
-use Illuminate\Validation\Rule;
-use Laravel\Jetstream\Jetstream;
-use Laravel\Jetstream\Rules\Role;
-use App\Events\InvitingStudyMember;
+use App\Models\User;
+use App\Notifications\StudyInviteNotification;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
-use App\Notifications\StudyInviteNotification;
+use Illuminate\Validation\Rule;
+use Laravel\Jetstream\Jetstream;
+use Laravel\Jetstream\Rules\Role;
 
 class InviteStudyMember
 {

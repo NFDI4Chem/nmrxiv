@@ -2,9 +2,9 @@ import "./bootstrap";
 import "../css/app.css";
 
 import { createApp, h } from "vue";
-import { createInertiaApp } from "@inertiajs/inertia-vue3";
+import { createInertiaApp } from "@inertiajs/vue3";
+
 import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
-import { InertiaProgress } from "@inertiajs/progress";
 import helpers from "./Mixins/Global.js";
 import Children from "@/Shared/Children.vue";
 import InstantSearch from "vue-instantsearch/vue3/es";
@@ -19,14 +19,17 @@ const appName =
 const emitter = mitt();
 
 createInertiaApp({
+    progress: {
+        color: "#4B5563",
+    },
     title: (title) => `${title} - ${appName}`,
     resolve: (name) =>
         resolvePageComponent(
             `./Pages/${name}.vue`,
             import.meta.glob("./Pages/**/*.vue")
         ),
-    setup({ el, app, props, plugin }) {
-        const application = createApp({ render: () => h(app, props) })
+    setup({ el, App, props, plugin }) {
+        const application = createApp({ render: () => h(App, props) })
             .use(plugin)
             .component("Children", Children)
             .component("vue-simple-context-menu", VueSimpleContextMenu)
@@ -39,5 +42,3 @@ createInertiaApp({
         return application;
     },
 });
-
-InertiaProgress.init({ color: "#4B5563" });

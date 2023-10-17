@@ -9,7 +9,9 @@ use Illuminate\Foundation\Events\Dispatchable;
 class ProjectDeletion implements ShouldBroadcastNow
 {
     use Dispatchable;
+
     public $project;
+
     public $sendTo;
 
     /**

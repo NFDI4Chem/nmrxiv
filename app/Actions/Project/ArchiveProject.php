@@ -3,7 +3,6 @@
 namespace App\Actions\Project;
 
 use App\Models\Project;
-use App\Models\User;
 
 class ArchiveProject
 {

@@ -209,10 +209,10 @@
         </template>
     </jet-form-section>
     <!-- Find ORCID iD Modal -->
-    <select-orcid-id
+    <!-- <select-orcid-id
         ref="selectOrcidIdElement"
-        v-model:selected="this.form.orcid_id"
-    />
+        :orcidId="form.orcid_id"
+    /> -->
 </template>
 
 <script>
@@ -224,7 +224,6 @@ import JetLabel from "@/Jetstream/Label.vue";
 import JetActionMessage from "@/Jetstream/ActionMessage.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import SelectOrcidId from "@/Shared/SelectOrcidId.vue";
-import { ref } from "vue";
 
 export default {
     components: {

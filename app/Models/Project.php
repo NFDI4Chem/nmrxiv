@@ -2,26 +2,24 @@
 
 namespace App\Models;
 
-use Auth;
-use Storage;
-use Carbon\Carbon;
-use Spatie\Tags\HasTags;
-use App\Traits\CacheClear;
-use Maize\Markable\Markable;
-use Laravel\Scout\Searchable;
 use App\Events\ProjectArchival;
 use App\Events\ProjectDeletion;
-use Maize\Markable\Models\Like;
-use Maize\Markable\Models\Bookmark;
-use Illuminate\Database\Eloquent\Model;
-use OwenIt\Auditing\Contracts\Auditable;
-use Illuminate\Support\Facades\Notification;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use App\Notifications\ProjectArchivalNotification;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Notifications\ProjectDeletionFailureNotification;
-use App\Notifications\ProjectArchivalNotificationToAdmins;
 use App\Notifications\ProjectDeletionReminderNotification;
+use App\Traits\CacheClear;
+use Auth;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Notification;
+use Laravel\Scout\Searchable;
+use Maize\Markable\Markable;
+use Maize\Markable\Models\Bookmark;
+use Maize\Markable\Models\Like;
+use OwenIt\Auditing\Contracts\Auditable;
+use Spatie\Tags\HasTags;
+use Storage;
 
 class Project extends Model implements Auditable
 {

@@ -2,17 +2,16 @@
 
 namespace App\Actions\Project;
 
-use App\Models\User;
+use App\Events\InvitingProjectMember;
 use App\Events\ProjectInvite;
 use App\Mail\ProjectInvitation;
+use App\Models\User;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Laravel\Jetstream\Jetstream;
 use Laravel\Jetstream\Rules\Role;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Mail;
-use App\Events\InvitingProjectMember;
-use Illuminate\Support\Facades\Validator;
-use App\Notifications\ProjectInviteNotification;
 
 class InviteProjectMember
 {

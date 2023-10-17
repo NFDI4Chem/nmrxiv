@@ -318,7 +318,7 @@
 import { instantMeiliSearch } from "@meilisearch/instant-meilisearch";
 import { ref, watchEffect } from "vue";
 import { MagnifyingGlassIcon } from "@heroicons/vue/24/solid";
-import { Link } from "@inertiajs/inertia-vue3";
+import { Link } from "@inertiajs/vue3";
 import { useMagicKeys } from "@vueuse/core";
 import {
     DocumentPlusIcon,
