@@ -90,7 +90,7 @@
 
 <script>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import { Link } from "@inertiajs/inertia-vue3";
+import { Link } from "@inertiajs/vue3";
 import Blocks from "@/Shared/Blocks.vue";
 import { EllipsisVerticalIcon } from "@heroicons/vue/24/solid";
 

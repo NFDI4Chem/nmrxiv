@@ -7,7 +7,7 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class InvitingProjectMember
+class InvitingTeamMember
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 

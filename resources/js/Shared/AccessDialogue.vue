@@ -827,7 +827,7 @@ export default {
             updateRoleForm: this.$inertia.form({
                 role: null,
             }),
-            removeModelMemberForm: this.$inertia.form(),
+            removeModelMemberForm: this.$inertia.form({}),
         };
     },
     computed: {

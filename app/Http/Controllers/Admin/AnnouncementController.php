@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Announcement;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -14,7 +15,6 @@ class AnnouncementController extends Controller
     /**
      * Show all the list of Announcements created.
      *
-     * @param
      * @return \Pages\Announcement\Index
      */
     public function index(Request $request)
@@ -23,8 +23,8 @@ class AnnouncementController extends Controller
             'announcements' => Announcement::with('owner')->orderby('created_at', 'DESC')
                 ->when($request->input('search'), function ($query, $search) {
                     $query->where('message', 'like', "%{$search}%")
-                    ->orWhere('title', 'like', "%{$search}%")
-                    ->orWhere('status', 'like', "%{$search}%");
+                        ->orWhere('title', 'like', "%{$search}%")
+                        ->orWhere('status', 'like', "%{$search}%");
                 })
                 ->get()
                 ->transform(function ($announcements) {
@@ -78,14 +78,12 @@ class AnnouncementController extends Controller
             });
         });
 
-        return redirect()->route('console.announcements')->with('success', 'Announcement created successfully');
+        return $request->wantsJson() ? new JsonResponse("{'success': 'Announcement created successfully'}", 200) : redirect()->route('console.announcements')->with('success', 'Announcement created successfully');
     }
 
     /**
      * Update the specified announcement in the storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Announcement  $announcement
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, Announcement $announcement)
@@ -113,20 +111,18 @@ class AnnouncementController extends Controller
             ]);
         $announcement->save();
 
-        return redirect()->route('console.announcements')->with('success', 'Announcement updated successfully');
+        return $request->wantsJson() ? new JsonResponse("{'success': 'Announcement updated successfully'}", 200) : redirect()->route('console.announcements')->with('success', 'Announcement updated successfully');
     }
 
     /**
      * Remove the specified announcement from the storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Announcement  $announcement
      * @return \Illuminate\Http\Response
      */
     public function destroy(Request $request, Announcement $announcement)
     {
         $announcement->delete();
 
-        return redirect()->route('console.announcements')->with('success', 'Announcement deleted successfully');
+        return $request->wantsJson() ? new JsonResponse("{'success': 'Announcement deleted successfully'}", 200) : redirect()->route('console.announcements')->with('success', 'Announcement deleted successfully');
     }
 }

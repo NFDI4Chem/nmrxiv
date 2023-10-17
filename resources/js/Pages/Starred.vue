@@ -92,7 +92,10 @@
                 >
             </team-projects>
         </div>
-        <div v-if="studies.length > 0" class="px-12 border-t py-8 mx-auto max-w-4xl">
+        <div
+            v-if="studies.length > 0"
+            class="px-12 border-t py-8 mx-auto max-w-4xl"
+        >
             <div>
                 <h2 class="text-lg">Studies</h2>
             </div>
@@ -118,7 +121,7 @@
 <script>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import TeamProjects from "@/Pages/Project/Index.vue";
-import { Link } from "@inertiajs/inertia-vue3";
+import { Link } from "@inertiajs/vue3";
 import StudyCard from "@/Shared/StudyCard.vue";
 
 export default {

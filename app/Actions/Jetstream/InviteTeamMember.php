@@ -2,14 +2,16 @@
 
 namespace App\Actions\Jetstream;
 
+use App\Events\InvitingTeamMember;
+use App\Mail\TeamInvitation;
+use App\Models\User;
+use App\Notifications\TeamInvitationNotification;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Laravel\Jetstream\Contracts\InvitesTeamMembers;
-use Laravel\Jetstream\Events\InvitingTeamMember;
 use Laravel\Jetstream\Jetstream;
-use Laravel\Jetstream\Mail\TeamInvitation;
 use Laravel\Jetstream\Rules\Role;
 
 class InviteTeamMember implements InvitesTeamMembers
@@ -19,8 +21,6 @@ class InviteTeamMember implements InvitesTeamMembers
      *
      * @param  mixed  $user
      * @param  mixed  $team
-     * @param  string  $email
-     * @param  string|null  $role
      * @return void
      */
     public function invite($user, $team, string $email, string $role = null)
@@ -34,9 +34,17 @@ class InviteTeamMember implements InvitesTeamMembers
         $invitation = $team->teamInvitations()->create([
             'email' => $email,
             'role' => $role,
+            'invited_by' => $user->name,
+            'team_name' => $team->name,
         ]);
 
         Mail::to($email)->send(new TeamInvitation($invitation));
+
+        $invitedUser = User::where('email', $invitation->email)->first();
+
+        if ($invitedUser) {
+            $invitedUser->notify(new TeamInvitationNotification($invitation));
+        }
 
         return redirect()->route('dashboard')->with('success', 'Invitation sent successfully');
     }
@@ -45,8 +53,6 @@ class InviteTeamMember implements InvitesTeamMembers
      * Validate the invite member operation.
      *
      * @param  mixed  $team
-     * @param  string  $email
-     * @param  string|null  $role
      * @return void
      */
     protected function validate($team, string $email, ?string $role)
@@ -83,7 +89,6 @@ class InviteTeamMember implements InvitesTeamMembers
      * Ensure that the user is not already on the team.
      *
      * @param  mixed  $team
-     * @param  string  $email
      * @return \Closure
      */
     protected function ensureUserIsNotAlreadyOnTeam($team, string $email)

@@ -441,8 +441,8 @@ export default {
                 role: null,
             }),
 
-            leaveTeamForm: this.$inertia.form(),
-            removeTeamMemberForm: this.$inertia.form(),
+            leaveTeamForm: this.$inertia.form({}),
+            removeTeamMemberForm: this.$inertia.form({}),
 
             currentlyManagingRole: false,
             managingRoleFor: null,

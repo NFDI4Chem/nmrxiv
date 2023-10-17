@@ -76,6 +76,10 @@ return [
             'prefix_indexes' => true,
             'schema' => 'public',
             'sslmode' => 'prefer',
+            'dump' => [
+                'use_single_transaction',
+                'timeout' => 620 * 100, // 51 minute timeout
+            ],
         ],
 
         'sqlsrv' => [
