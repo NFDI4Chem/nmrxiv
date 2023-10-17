@@ -185,6 +185,7 @@ return [
                 'maxProcesses' => 10,
                 'balanceMaxShift' => 1,
                 'balanceCooldown' => 3,
+                'timeout' => 9000,
             ],
         ],
 
@@ -193,6 +194,7 @@ return [
                 'maxProcesses' => 10,
                 'balanceMaxShift' => 1,
                 'balanceCooldown' => 3,
+                'timeout' => 9000,
             ],
         ],
 

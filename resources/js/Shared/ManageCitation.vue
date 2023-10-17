@@ -364,14 +364,13 @@
                                                     >
                                                         Abstract
                                                     </p>
-                                                    <p
+                                                    <div
                                                         id="citation-abstract"
                                                         class="text-xs text-gray-500"
-                                                    >
-                                                        {{
+                                                        v-html="
                                                             fetchedCitations.abstract
-                                                        }}
-                                                    </p>
+                                                        "
+                                                    ></div>
                                                 </div>
                                             </div>
                                         </div>
@@ -474,12 +473,11 @@
                                             <div
                                                 class="sm:flex sm:justify-between"
                                             >
-                                                <p
+                                                <div
                                                     v-if="element.abstract"
                                                     class="text-xs font-medium text-gray-900"
-                                                >
-                                                    {{ element.abstract }}
-                                                </p>
+                                                    v-html="element.abstract"
+                                                ></div>
                                             </div>
                                         </div>
                                     </li>
@@ -570,7 +568,7 @@ import {
 import JetInputError from "@/Jetstream/InputError.vue";
 import LoadingButton from "@/Shared/LoadingButton.vue";
 import JetDangerButton from "@/Jetstream/DangerButton.vue";
-import { Inertia } from "@inertiajs/inertia";
+import { router } from "@inertiajs/vue3";
 import Draggable from "vuedraggable";
 export default {
     components: {
@@ -586,7 +584,6 @@ export default {
         JetInputError,
         LoadingButton,
         Draggable,
-        Inertia,
     },
 
     props: ["project"],
@@ -747,7 +744,7 @@ export default {
             this.citationsForm.post(route("citation.save", this.project.id), {
                 preserveScroll: true,
                 onSuccess: () => {
-                    Inertia.reload({ only: ["project"] });
+                    router.reload({ only: ["project"] });
                     this.citationsForm.reset();
                     this.loadInitial();
                     this.form.reset();
@@ -841,7 +838,7 @@ export default {
                 {
                     preserveScroll: true,
                     onSuccess: () => {
-                        Inertia.reload({ only: ["project"] });
+                        router.reload({ only: ["project"] });
                         this.loadInitial();
                         this.citationsForm.reset();
                         this.confirmDelete = false;

@@ -385,7 +385,7 @@
 </template>
 
 <script>
-import { Link } from "@inertiajs/inertia-vue3";
+import { Link } from "@inertiajs/vue3";
 import { computed, ref } from "vue";
 import { MagnifyingGlassIcon } from "@heroicons/vue/20/solid";
 import { ChevronRightIcon, UsersIcon } from "@heroicons/vue/24/outline";

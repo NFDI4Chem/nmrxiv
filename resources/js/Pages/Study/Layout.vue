@@ -386,7 +386,7 @@
 
 <script>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import { Link } from "@inertiajs/inertia-vue3";
+import { Link } from "@inertiajs/vue3";
 import StudyDetails from "./Partials/Details.vue";
 import { StarIcon } from "@heroicons/vue/24/solid";
 import { ref } from "vue";
@@ -405,8 +405,9 @@ import {
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import AccessDialogue from "@/Shared/AccessDialogue.vue";
 import Citation from "@/Shared/Citation.vue";
-import { Inertia } from "@inertiajs/inertia";
+import { router } from "@inertiajs/vue3";
 import ToolTip from "@/Shared/ToolTip.vue";
+
 export default {
     components: {
         Link,
@@ -478,7 +479,7 @@ export default {
                     }
                 })
                 .then(function (response) {
-                    Inertia.reload({ only: ["study"] });
+                    router.reload({ only: ["study"] });
                 });
         },
     },

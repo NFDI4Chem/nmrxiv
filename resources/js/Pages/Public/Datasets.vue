@@ -216,7 +216,7 @@
 
 <script>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import { Link } from "@inertiajs/inertia-vue3";
+import { Link } from "@inertiajs/vue3";
 import DatasetSearch from "@/Shared/DatasetSearch.vue";
 import DatasetCard from "@/Shared/DatasetCard.vue";
 import { ref } from "vue";

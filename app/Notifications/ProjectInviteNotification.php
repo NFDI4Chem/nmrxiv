@@ -42,7 +42,7 @@ class ProjectInviteNotification extends Notification implements ShouldQueue
      */
     public function toArray($notifiable)
     {
-        $title = 'Invitation from project - '.$this->invitation->project->name;
+        $title = 'Invitation from project - <b>'.$this->invitation->project->name.'</b>';
         $message = 'You have been invited to join the project - '.$this->invitation->project->name.' (role: '.$this->invitation['role'].') by '.$this->invitation['invited_by'].'. Please check your mail to accept or decline the invitation.';
 
         return [
