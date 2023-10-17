@@ -233,7 +233,7 @@
 </template>
 
 <script>
-import { Link } from "@inertiajs/inertia-vue3";
+import { Link } from "@inertiajs/vue3";
 import StudyCreate from "@/Pages/Study/Partials/Create.vue";
 import StudyCard from "@/Shared/StudyCard.vue";
 import JetButton from "@/Jetstream/Button.vue";
@@ -260,7 +260,7 @@ export default {
         teamRole: {
             default: null,
             type: String,
-        }
+        },
     },
     data() {
         return {

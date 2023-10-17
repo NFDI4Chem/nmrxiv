@@ -3,11 +3,9 @@
 namespace App\Listeners;
 
 use App\Models\User;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Support\Facades\Notification;
 use App\Notifications\ProjectArchivalNotification;
 use App\Notifications\ProjectArchivalNotificationToAdmins;
+use Illuminate\Support\Facades\Notification;
 
 class ProjectArchival
 {

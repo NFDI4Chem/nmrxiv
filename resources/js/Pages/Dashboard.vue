@@ -301,8 +301,7 @@ import Onboarding from "@/App/Onboarding.vue";
 import { useMagicKeys } from "@vueuse/core";
 import { getCurrentInstance } from "vue";
 import { watchEffect } from "vue";
-import { Link } from "@inertiajs/inertia-vue3";
-import { Inertia } from "@inertiajs/inertia";
+import { Link } from "@inertiajs/vue3";
 import { computed } from "vue";
 
 const { meta, u } = useMagicKeys();

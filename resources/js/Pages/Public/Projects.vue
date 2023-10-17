@@ -242,7 +242,7 @@ import {
     QueueListIcon,
     Squares2X2Icon,
 } from "@heroicons/vue/24/solid";
-import { Link } from "@inertiajs/inertia-vue3";
+import { Link } from "@inertiajs/vue3";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import ProjectCard from "@/Shared/ProjectCard.vue";
 import ProjectSearch from "@/Shared/ProjectSearch.vue";

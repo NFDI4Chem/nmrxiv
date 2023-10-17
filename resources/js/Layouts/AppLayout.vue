@@ -65,7 +65,10 @@
                                 />
                             </Link>
                         </div>
-                        <div v-if="editableTeamRole" class="mt-1 flex-1 h-0 overflow-y-auto">
+                        <div
+                            v-if="editableTeamRole"
+                            class="mt-1 flex-1 h-0 overflow-y-auto"
+                        >
                             <div class="my-4 mx-4">
                                 <create mode="button"></create>
                                 <span
@@ -173,7 +176,10 @@
                     </Link>
                 </div>
                 <div class="flex-grow flex flex-col -mt-1.5">
-                    <div v-if="editableTeamRole"  class="px-4 flex flex-col mt-3 mb-1 text-center">
+                    <div
+                        v-if="editableTeamRole"
+                        class="px-4 flex flex-col mt-3 mb-1 text-center"
+                    >
                         <create mode="button"></create>
                         <span
                             class="text-xs cursor-pointer hover:text-blue-700 mt-2"
@@ -294,16 +300,19 @@
                         :notification="$page.props.user.notifications"
                     />
                     <div class="ml-4 flex items-center md:ml-6">
-                        <div>
-                            <button
+                        <div class="ml-5 tooltip">
+                            <a
+                                class="cursor-pointer"
                                 @click="openShowNotificationDialog"
-                                type="button"
-                                class="m-1"
                             >
                                 <BellIcon
                                     class="w-6 h-6 fill-current text-gray-600"
                                 />
-                            </button>
+                            </a>
+                            <span
+                                class="bg-gray-900 text-center text-white px-2 py-1 shadow-lg rounded-md tooltiptextbottom"
+                                >View Notifications</span
+                            >
                         </div>
                         <span
                             v-if="hasUnreadNotification()"
@@ -311,7 +320,7 @@
                         >
                             {{ countNotification() }}</span
                         >
-                        <div class="tooltip">
+                        <div class="ml-5 tooltip">
                             <a
                                 id="tour-step-documentation"
                                 href="https://docs.nmrxiv.org/docs/category/submission-guides"
@@ -698,7 +707,7 @@ import JetApplicationLogo from "@/Jetstream/ApplicationLogo.vue";
 import Search from "@/Shared/Search.vue";
 import Create from "@/Shared/CreateButton.vue";
 import JetApplicationMark from "@/Jetstream/ApplicationMark.vue";
-import { Head, Link } from "@inertiajs/inertia-vue3";
+import { Head, Link } from "@inertiajs/vue3";
 import JetBanner from "@/Jetstream/Banner.vue";
 import JetDropdown from "@/Jetstream/Dropdown.vue";
 import JetDropdownLink from "@/Jetstream/DropdownLink.vue";
@@ -722,11 +731,7 @@ import {
     TransitionRoot,
 } from "@headlessui/vue";
 import {
-    BookmarkSquareIcon,
-    FireIcon,
     HomeIcon,
-    InboxIcon,
-    UserIcon,
     BellIcon,
     Bars3Icon,
     XMarkIcon,
