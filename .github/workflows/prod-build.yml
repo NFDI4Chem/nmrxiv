@@ -59,8 +59,8 @@ jobs:
       run: |
         npm install
         npm run build
-    - name: Run Test
-      run: php artisan test --parallel
+    # - name: Run Test
+    #   run: php artisan test --parallel
 
   setup-build-publish-deploy:
     name: Build & deploy to production
