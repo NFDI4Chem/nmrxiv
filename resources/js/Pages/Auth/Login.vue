@@ -113,7 +113,7 @@ import JetCheckbox from "@/Jetstream/Checkbox.vue";
 import JetLabel from "@/Jetstream/Label.vue";
 import JetValidationErrors from "@/Jetstream/ValidationErrors.vue";
 import SingleSignOn from "@/App/SingleSignOn.vue";
-import { Head, Link } from "@inertiajs/inertia-vue3";
+import { Head, Link } from "@inertiajs/vue3";
 import AnnouncementBanner from "@/Shared/AnnouncementBanner.vue";
 
 export default {

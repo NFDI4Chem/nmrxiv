@@ -29,10 +29,14 @@
                     <template v-if="!loading">
                         <span v-if="hasPassword">
                             Are you sure you want to delete your project? Once
-                            your project is deleted, all of its resources and
-                            data will be permanently deleted. Please enter your
-                            password to confirm you would like to permanently
-                            delete your project.
+                            your project is deleted, all its resources and data
+                            will be moved to the trash. You may recover deleted
+                            projects and the data stored in them for a limited
+                            time before they are permanently deleted. Please
+                            enter your password to confirm you would like to
+                            delete your project, and if there is no action in
+                            the next {{ coolOffPeriod }} days, the project will
+                            be deleted permanently.
 
                             <div class="mt-4">
                                 <jet-input
@@ -84,7 +88,7 @@ import JetInput from "@/Jetstream/Input.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import LoadingButton from "@/Shared/LoadingButton.vue";
-import { Link } from "@inertiajs/inertia-vue3";
+import { Link } from "@inertiajs/vue3";
 
 export default {
     components: {
@@ -112,6 +116,12 @@ export default {
 
             hasPassword: false,
         };
+    },
+
+    computed: {
+        coolOffPeriod() {
+            return String(this.$page.props.coolOffPeriod);
+        },
     },
 
     methods: {

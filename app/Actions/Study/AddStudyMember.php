@@ -16,8 +16,6 @@ class AddStudyMember
      *
      * @param  mixed  $user
      * @param  mixed  $study
-     * @param  string  $email
-     * @param  string|null  $role
      * @return void
      */
     public function add($user, $study, string $email, string $role = null)
@@ -41,8 +39,6 @@ class AddStudyMember
      * Validate the add member operation.
      *
      * @param  mixed  $study
-     * @param  string  $email
-     * @param  string|null  $role
      * @return void
      */
     protected function validate($study, string $email, ?string $role)
@@ -76,7 +72,6 @@ class AddStudyMember
      * Ensure that the user is not already on the study.
      *
      * @param  mixed  $study
-     * @param  string  $email
      * @return \Closure
      */
     protected function ensureUserIsNotAlreadyOnStudy($study, string $email)

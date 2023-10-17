@@ -35,7 +35,7 @@ class SanitizeDatasets extends Command
                 $nmrium = $dataset->nmrium;
                 $nmriumInfo = json_decode($nmrium['nmrium_info'], true);
                 if ($nmriumInfo && ! empty($nmriumInfo)) {
-                    $spectra = $nmriumInfo['spectra'];
+                    $spectra = $nmriumInfo['data']['spectra'];
                     foreach ($spectra as $spectrum) {
                         $experiment = $spectrum['info']['experiment'];
                         if (is_null($experiment)) {

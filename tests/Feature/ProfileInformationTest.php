@@ -22,9 +22,12 @@ class ProfileInformationTest extends TestCase
             'last_name' => 'Name',
             'username' => 'test',
             'email' => 'test@example.com',
+            'orcid_id' => 'test',
+            'affiliation' => 'test',
         ]);
 
-        $this->assertEquals('Test Name', $user->fresh()->name);
+        $this->assertEquals('Test', $user->fresh()->first_name);
+        $this->assertEquals('Name', $user->fresh()->last_name);
         $this->assertEquals('test@example.com', $user->fresh()->email);
     }
 }

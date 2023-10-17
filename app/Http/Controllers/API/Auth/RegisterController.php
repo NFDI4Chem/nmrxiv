@@ -16,11 +16,15 @@ class RegisterController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
+            'orcid_id' => string,
+            'affiliation' => string,
         ]);
 
         $user = User::create([
             'name' => $validatedData['name'],
             'email' => $validatedData['email'],
+            'orcid_id' => $validatedData['orcid_id'],
+            'affiliation' => $validatedData['affiliation'],
             'password' => Hash::make($validatedData['password']),
         ]);
 

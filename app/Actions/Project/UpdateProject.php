@@ -15,7 +15,6 @@ class UpdateProject
     /**
      * Create a project.
      *
-     * @param  array  $input
      * @return \App\Models\Project
      */
     public function update(Project $project, array $input)
@@ -25,7 +24,7 @@ class UpdateProject
         ];
         Validator::make($input, [
             'name' => ['required', 'string', 'max:255',  Rule::unique('projects')
-            ->where('owner_id', $input['owner_id'])->ignore($project->id), ],
+                ->where('owner_id', $input['owner_id'])->ignore($project->id), ],
             'description' => ['required', 'string', 'min:20'],
             'license' => ['required_if:is_public,"true"'],
         ], $errorMessages)->validate();
@@ -139,7 +138,6 @@ class UpdateProject
     /**
      * Attach authors to a project.
      *
-     * @param  \App\Models\Project  $project
      * @param  array  $authors
      * @return void
      */
@@ -161,7 +159,6 @@ class UpdateProject
     /**
      * Detach authors from a project.
      *
-     * @param  \App\Models\Project  $project
      * @param  array  $authors
      * @return void
      */
@@ -175,7 +172,6 @@ class UpdateProject
     /**
      * Update existing Contributor type for a given author in a project.
      *
-     * @param  \App\Models\Project  $project
      * @param  string  $authorId
      * @param  string  $role
      * @return void
@@ -190,7 +186,6 @@ class UpdateProject
     /**
      * Attach citations to a project.
      *
-     * @param  \App\Models\Project  $project
      * @param  \App\Models\User  $user
      * @param  array  $citations
      * @return void
@@ -210,7 +205,6 @@ class UpdateProject
     /**
      * Detach citation from a project.
      *
-     * @param  \App\Models\Project  $project
      * @param  array  $authors
      * @return void
      */

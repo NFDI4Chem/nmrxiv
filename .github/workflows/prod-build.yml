@@ -122,4 +122,5 @@ jobs:
         kubectl rollout restart deployment/$DEPLOYMENT_NAME
         kubectl rollout status deployment/$DEPLOYMENT_NAME --timeout=300s
         kubectl rollout restart deployment/$WORKER_DEPLOYMENT_NAME
+        kubectl rollout restart deployment/$SCHEDULER_DEPLOYMENT_NAME
         kubectl get services -o wide

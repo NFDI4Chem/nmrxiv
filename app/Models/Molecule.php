@@ -53,8 +53,6 @@ class Molecule extends Model
 
     /**
      * Get the molecule identifier
-     *
-     * @return \Illuminate\Database\Eloquent\Casts\Attribute
      */
     protected function identifier(): Attribute
     {
@@ -66,7 +64,7 @@ class Molecule extends Model
     public function samples()
     {
         return $this->belongsToMany(Sample::class)
-                ->withPivot('percentage_composition')
-                ->withTimestamps();
+            ->withPivot('percentage_composition')
+            ->withTimestamps();
     }
 }

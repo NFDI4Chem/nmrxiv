@@ -29,7 +29,7 @@
             <div>
                 <div v-if="displayAddAuthorForms">
                     <div
-                        class="relative grid grid-cols-1 gap-x-14 max-w-7xl mx-auto lg:grid-cols-2 divide-x"
+                        class="relative grid grid-cols-1 gap-x-5 max-w-7xl mx-auto lg:grid-cols-2"
                     >
                         <!--Add Manual Section-->
                         <div
@@ -68,6 +68,35 @@
                                             />
                                         </div>
                                     </div>
+
+                                    <div class="sm:col-span-2">
+                                        <label
+                                            for="given-name"
+                                            class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
+                                        >
+                                            First Name
+                                        </label>
+                                        <div class="mt-1">
+                                            <input
+                                                id="given-name"
+                                                v-model="form.given_name"
+                                                type="text"
+                                                name="given-name"
+                                                :class="[
+                                                    isEdit
+                                                        ? 'shadow-sm focus:ring-red-500 focus:border-red-500 block w-full sm:text-sm border-red-500 rounded-md bg-gray-100'
+                                                        : '',
+                                                    'shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md',
+                                                ]"
+                                            />
+                                        </div>
+                                        <jet-input-error
+                                            :message="
+                                                authorsForm.errors.given_name
+                                            "
+                                            class="mt-2"
+                                        />
+                                    </div>
                                     <div class="sm:col-span-2">
                                         <label
                                             for="family-name"
@@ -98,34 +127,6 @@
                                         />
                                     </div>
 
-                                    <div class="sm:col-span-2">
-                                        <label
-                                            for="given-name"
-                                            class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
-                                        >
-                                            Given Name
-                                        </label>
-                                        <div class="mt-1">
-                                            <input
-                                                id="given-name"
-                                                v-model="form.given_name"
-                                                type="text"
-                                                name="given-name"
-                                                :class="[
-                                                    isEdit
-                                                        ? 'shadow-sm focus:ring-red-500 focus:border-red-500 block w-full sm:text-sm border-red-500 rounded-md bg-gray-100'
-                                                        : '',
-                                                    'shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md',
-                                                ]"
-                                            />
-                                        </div>
-                                        <jet-input-error
-                                            :message="
-                                                authorsForm.errors.given_name
-                                            "
-                                            class="mt-2"
-                                        />
-                                    </div>
                                     <div class="sm:col-span-3">
                                         <label
                                             for="email"
@@ -223,8 +224,8 @@
                                             :disabled="
                                                 !(
                                                     this.form &&
-                                                    this.form.family_name &&
-                                                    this.form.given_name
+                                                    this.form.given_name &&
+                                                    this.form.family_name
                                                 )
                                             "
                                             @click="save('addManually')"
@@ -236,8 +237,8 @@
                                             :disabled="
                                                 !(
                                                     this.form &&
-                                                    this.form.family_name &&
-                                                    this.form.given_name
+                                                    this.form.given_name &&
+                                                    this.form.family_name
                                                 )
                                             "
                                             @click="
@@ -257,8 +258,8 @@
                                             :disabled="
                                                 !(
                                                     this.form &&
-                                                    this.form.family_name &&
-                                                    this.form.given_name
+                                                    this.form.given_name &&
+                                                    this.form.family_name
                                                 )
                                             "
                                             @click="save('addManually')"
@@ -270,8 +271,8 @@
                                             :disabled="
                                                 !(
                                                     this.form &&
-                                                    this.form.family_name &&
-                                                    this.form.given_name
+                                                    this.form.given_name &&
+                                                    this.form.family_name
                                                 )
                                             "
                                             @click="onCancelEdit()"
@@ -284,7 +285,7 @@
                         </div>
                         <!-- Import Section -->
                         <div
-                            class="pb-36 px-4 sm:px-6 lg:pb-5 lg:px-0 lg:row-start-1 lg:col-start-2"
+                            class="pb-36 lg:px-1 lg:row-start-1 lg:col-start-2 border-l"
                         >
                             <div class="pl-2">
                                 <p
@@ -311,7 +312,7 @@
                                                 type="text"
                                                 name="name"
                                                 autocomplete="off"
-                                                placeholder="DOI or ORCID iD e.g. 10.1186/s13321-022-00614-7 or 0000-0001-6033-2910"
+                                                placeholder="DOI or ORCID iD e.g. 10.1186/s19991-022-00987-0 or 0000-0001-6033-8976"
                                                 class="flex-1 focus:ring-teal-500 focus:border-teal-500 block w-full min-w-0 rounded sm:text-sm border-gray-300"
                                             />
                                         </div>
@@ -334,6 +335,15 @@
                                         "
                                     >
                                         Reset
+                                    </jet-secondary-button>
+                                    <jet-secondary-button
+                                        class="ml-2 float-right"
+                                        :disabled="
+                                            !this.$page.props.user.orcid_id
+                                        "
+                                        @click="this.addCurrentUser"
+                                    >
+                                        Add me
                                     </jet-secondary-button>
                                 </div>
                                 <jet-input-error
@@ -372,8 +382,8 @@
                                                 <label
                                                     for="items"
                                                     class="font-medium text-teal-900"
-                                                    >{{ author.lastName }}
-                                                    {{ author.firstName }}
+                                                    >{{ author.firstName }}
+                                                    {{ author.lastName }}
                                                 </label>
                                                 <p
                                                     v-if="
@@ -635,7 +645,7 @@
         </template>
         <template #footer>
             <div class="flex">
-                <jet-secondary-button class="float-left" @click="onClose">
+                <jet-secondary-button class="float-left" @click="onClose()">
                     Close
                 </jet-secondary-button>
             </div>
@@ -692,7 +702,7 @@ import {
 import JetInputError from "@/Jetstream/InputError.vue";
 import LoadingButton from "@/Shared/LoadingButton.vue";
 import JetDangerButton from "@/Jetstream/DangerButton.vue";
-import { Inertia } from "@inertiajs/inertia";
+import { router } from "@inertiajs/vue3";
 import SelectRich from "@/Shared/SelectRich.vue";
 import Draggable from "vuedraggable";
 
@@ -709,7 +719,6 @@ export default {
         TrashIcon,
         JetInputError,
         LoadingButton,
-        Inertia,
         SelectRich,
         Draggable,
     },
@@ -751,97 +760,97 @@ export default {
                 {
                     title: "Researcher",
                     description:
-                        "A person involved in analysing data or the results of an experiment or formal study. May indicate an <br> intern or assistant to one of the authors who helped with research but who was not so “key” as to be listed as an author.",
+                        "A person involved in analysing data or the results of an experiment or formal study.<br> May indicate an intern or assistant to one of the authors who helped with research<br> but who was not so “key” as to be listed as an author.",
                 },
                 {
                     title: "ContactPerson",
                     description:
-                        "Person with knowledge of how to access, troubleshoot, or otherwise field <br> issues related to the resource",
+                        "Person with knowledge of how to access, troubleshoot, or otherwise field issues<br> related to the resource.",
                 },
                 {
                     title: "DataCollector",
                     description:
-                        "Person/institution responsible for finding or gathering/collecting data under the <br> guidelines of the author(s) or Principal Investigator(PI)",
+                        "Person/institution responsible for finding or gathering/collecting data under the <br> guidelines of the author(s) or Principal Investigator(PI).",
                 },
                 {
                     title: "DataCurator",
                     description:
-                        "Person tasked with reviewing, enhancing, cleaning, or standardizing metadata and the associated data <br> submitted for storage, use, and maintenance within a data centre or repository",
+                        "Person tasked with reviewing, enhancing, cleaning, or standardizing metadata and<br> the associated data submitted for storage, use, and maintenance within a data centre<br> or repository.",
                 },
                 {
                     title: "DataManager",
                     description:
-                        "Person (or organisation with a staff of data managers, such as a data centre) <br> responsible for maintaining the finished resource",
+                        "Person (or organisation with a staff of data managers, such as a data centre) <br> responsible for maintaining the finished resource.",
                 },
                 {
                     title: "Distributor",
                     description:
-                        "Institution tasked with responsibility to generate/disseminate copies <br> of the resource in either electronic or print form",
+                        "Institution tasked with responsibility to generate/disseminate copies of the resource<br> in either electronic or print form.",
                 },
                 {
                     title: "Editor",
                     description:
-                        "A person who oversees the details related to the publication format <br> of the resource ",
+                        "A person who oversees the details related to the publication format of the resource.",
                 },
                 {
                     title: "HostingInstitution",
                     description:
-                        "Typically, the organisation allowing the resource to be available on the internet through <br> the provision of its hardware/software/operating support",
+                        "Typically, the organisation allowing the resource to be available on the internet<br> through the provision of its hardware/software/operating support.",
                 },
                 {
                     title: "Producer",
                     description:
-                        "Typically, a person or organisation responsible for the artistry and form <br> of a media product",
+                        "Typically, a person or organisation responsible for the artistry and form of a media<br> product.",
                 },
                 {
                     title: "ProjectLeader",
                     description:
-                        "Person officially designated as head of project team or subproject team instrumental <br> in the work necessary to development of the resource",
+                        "Person officially designated as head of project team or subproject team<br> instrumental in the work necessary to development of the resource.",
                 },
                 {
                     title: "ProjectManager",
                     description:
-                        "Person on the membership list of a designated project/project team",
+                        "Person on the membership list of a designated project/project team.",
                 },
                 {
                     title: "RegistrationAgency",
                     description:
-                        "Institution/organisation officially appointed by a Registration Authority to handle specific <br> tasks within a defined area of responsibility",
+                        "Institution/organisation officially appointed by a Registration Authority to handle<br> specific tasks within a defined area of responsibility.",
                 },
                 {
                     title: "RelatedPerson",
                     description:
-                        "A person without a specifically defined role in the development of the resource, but who is <br> someone the author wishes to recognize",
+                        "A person without a specifically defined role in the development of the resource,<br> but who is someone the author wishes to recognize.",
                 },
                 {
                     title: "ResearchGroup",
                     description:
-                        "Typically refers to a group of individuals with a lab, department, or division that has a specifically <br> defined focus of activity.",
+                        "Typically refers to a group of individuals with a lab, department, or division that<br> has a specifically defined focus of activity.",
                 },
                 {
                     title: "RightsHolder",
                     description:
-                        "Person or institution owning or managing property rights, including intellectual property rights over the resource",
+                        "Person or institution owning or managing property rights, including intellectual<br> property rights over the resource.",
                 },
                 {
                     title: "Sponsor",
                     description:
-                        "Person or organisation that issued a contract or under the auspices of which a work has been written,<br> printed, published, developed, etc",
+                        "Person or organisation that issued a contract or under the auspices of which<br> a work has been written,<br> printed, published, developed, etc.",
                 },
                 {
                     title: "Supervisor",
                     description:
-                        "Designated administrator over one or more groups/teams working to produce a resource, or over one or <br> more steps of a development process",
+                        "Designated administrator over one or more groups/teams working to produce<br> a resource, or over one or more steps of a development process.",
                 },
                 {
                     title: "WorkPackageLeader",
                     description:
-                        "A Work Package is a recognized data product, not all of which is included in publication. The package, instead, may include notes, discarded documents,<br> etc.The Work Package Leader is responsible for ensuring the comprehensive contents, versioning, and availability of the Work Package during the development of the resource. ",
+                        "A Work Package is a recognized data product, not all of which is included in<br> publication. The package, instead, may include notes, discarded documents,<br> etc.The Work Package Leader is responsible for ensuring the comprehensive<br> contents, versioning, and availability of the Work Package during the development<br> of the resource.",
                 },
                 {
                     title: "Other",
                     description:
-                        "Any person or institution making a significant contribution to the development and/or maintenance of the resource, but whose contribution is not adequately described by any of the other values for contributorType",
+                        "Any person or institution making a significant contribution to the development<br> and/or maintenance of the resource, but whose contribution is not adequately<br> described by any of the other values for contributorType.",
                 },
             ],
         };
@@ -889,20 +898,21 @@ export default {
             this.form.contributor_type = {};
             this.form.contributor_type = this.contributorType[0];
             this.isEdit = false;
+            this.error = "";
         },
         /*Edit author*/
         edit(author) {
             this.selectedAuthor = author;
             this.authors = this.authors.filter((author) => {
                 return (
-                    author.family_name + author.given_name !=
-                    this.selectedAuthor.family_name +
-                        this.selectedAuthor.given_name
+                    author.given_name + author.family_name !=
+                    this.selectedAuthor.given_name +
+                        this.selectedAuthor.family_name
                 );
             });
             this.form.title = author.title;
-            this.form.family_name = author.family_name;
             this.form.given_name = author.given_name;
+            this.form.family_name = author.family_name;
             this.form.email_id = author.email_id;
             this.form.affiliation = author.affiliation;
             this.form.orcid_id = author.orcid_id;
@@ -918,7 +928,7 @@ export default {
         fetchAuthors() {
             this.loading = true;
             this.error = "";
-            this.query = this.query.trim();
+            this.query = this.extractDoi(this.query);
             let isDOI = new RegExp(/\b(10[.][0-9]{4,}(?:[.][0-9]+)*)\b/g).test(
                 this.query
             );
@@ -949,7 +959,7 @@ export default {
                 .finally(() => {
                     if (this.fetchedAuthors.length == 0) {
                         this.error =
-                            "Something went wrong. Please check the input and try again.";
+                            "No data found. Please enter the details manually.";
                     }
                     this.loading = false;
                 });
@@ -959,8 +969,8 @@ export default {
             let authorsList = [];
             authors.forEach((author) => {
                 authorsList.push({
-                    family_name: author.firstName,
-                    given_name: author.lastName,
+                    given_name: author.firstName,
+                    family_name: author.lastName,
                     orcid_id:
                         author.authorId && author.authorId.type == "ORCID"
                             ? author.authorId.value
@@ -1010,12 +1020,13 @@ export default {
             if (!this.form.hasErrors) {
                 let newAuthor = {
                     title: this.form.title ? this.form.title.trim() : null,
-                    family_name: this.form.family_name
-                        ? this.form.family_name.trim()
-                        : null,
                     given_name: this.form.given_name
                         ? this.form.given_name.trim()
                         : null,
+                    family_name: this.form.family_name
+                        ? this.form.family_name.trim()
+                        : null,
+
                     email_id: this.form.email_id
                         ? this.form.email_id.trim()
                         : null,
@@ -1048,7 +1059,7 @@ export default {
         /*Make request to save API*/
         executeQuery() {
             this.authorsForm.authors = this.authors;
-            const keys = ["family_name", "given_name"];
+            const keys = ["given_name", "family_name"];
             this.authorsForm.authors = this.authorsForm.authors.filter(
                 (value, index, self) =>
                     self.findIndex((v) =>
@@ -1058,7 +1069,6 @@ export default {
             this.authorsForm.post(route("author.save", this.project.id), {
                 preserveScroll: true,
                 onSuccess: () => {
-                    Inertia.reload({ only: ["project"] });
                     this.loadInitial();
                     this.form.reset();
                     this.form.contributor_type = {};
@@ -1076,8 +1086,8 @@ export default {
             this.authorsForm.authors = [
                 {
                     id: author.id,
-                    family_name: author.family_name,
                     given_name: author.given_name,
+                    family_name: author.family_name,
                     orcid_id: author.orcid_id,
                     affiliation: author.affiliation,
                 },
@@ -1088,7 +1098,7 @@ export default {
             this.authorsForm.delete(route("author.delete", this.project.id), {
                 preserveScroll: true,
                 onSuccess: () => {
-                    Inertia.reload({ only: ["project"] });
+                    router.reload({ only: ["project"] });
                     this.loadInitial();
                     this.authorsForm.reset();
                     this.confirmDelete = false;
@@ -1119,7 +1129,7 @@ export default {
                 {
                     preserveScroll: true,
                     onSuccess: () => {
-                        Inertia.reload({ only: ["project"] });
+                        router.reload({ only: ["project"] });
                         this.loadInitial();
                         this.updateRoleForm.reset();
                         this.showManageRoleDialog = false;
@@ -1158,6 +1168,26 @@ export default {
             }
             this.displayAddAuthorForms = false;
             this.isEdit = false;
+        },
+        /*Add current user as Author*/
+        addCurrentUser() {
+            if (this.$page.props.user && this.$page.props.user.orcid_id) {
+                let user = {};
+                let affiliation = {};
+                this.fetchedAuthors = [];
+                user.firstName = this.$page.props.user.first_name;
+                user.lastName = this.$page.props.user.last_name;
+                user.authorId = {};
+                user.authorId.type = "ORCID";
+                user.authorId.value = this.$page.props.user.orcid_id;
+                user.authorAffiliationDetailsList = {};
+                user.authorAffiliationDetailsList.authorAffiliation = [];
+                affiliation.affiliation = this.$page.props.user.affiliation;
+                user.authorAffiliationDetailsList.authorAffiliation.push(
+                    affiliation
+                );
+                this.fetchedAuthors.push(user);
+            }
         },
     },
 };

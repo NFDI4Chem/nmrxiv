@@ -58,7 +58,7 @@
                                                 v-model="form.doi"
                                                 type="text"
                                                 name="doi"
-                                                placeholder="DOI ID e.g. 10.1186/s13321-022-00614-7"
+                                                placeholder="DOI ID e.g. 10.1186/s19991-022-00987-0"
                                                 :class="[
                                                     isEdit
                                                         ? 'shadow-sm focus:ring-red-500 focus:border-red-500 block w-full sm:text-sm border-red-500 rounded-md bg-gray-100'
@@ -113,7 +113,7 @@
                                                 v-model="form.authors"
                                                 type="text"
                                                 name="authors"
-                                                placeholder="e.g. Pupier N, Nuzillard JM, Wist J, Schlörer NE."
+                                                placeholder="e.g. Pupier S, Nuzillard MK, Wist P, Schlörer AK."
                                                 :class="[
                                                     isEdit
                                                         ? 'shadow-sm focus:ring-red-500 focus:border-red-500 block w-full sm:text-sm border-red-500 rounded-md bg-gray-100'
@@ -258,7 +258,7 @@
                                                 v-model="query"
                                                 type="text"
                                                 name="query"
-                                                placeholder="DOI ID e.g. 10.1186/s13321-022-00614-7"
+                                                placeholder="DOI ID e.g. 10.1186/s19991-022-00987-0"
                                                 autocomplete="off"
                                                 class="flex-1 focus:ring-teal-500 focus:border-teal-500 block w-full min-w-0 rounded sm:text-sm border-gray-300"
                                             />
@@ -364,14 +364,13 @@
                                                     >
                                                         Abstract
                                                     </p>
-                                                    <p
+                                                    <div
                                                         id="citation-abstract"
                                                         class="text-xs text-gray-500"
-                                                    >
-                                                        {{
+                                                        v-html="
                                                             fetchedCitations.abstract
-                                                        }}
-                                                    </p>
+                                                        "
+                                                    ></div>
                                                 </div>
                                             </div>
                                         </div>
@@ -474,12 +473,11 @@
                                             <div
                                                 class="sm:flex sm:justify-between"
                                             >
-                                                <p
+                                                <div
                                                     v-if="element.abstract"
                                                     class="text-xs font-medium text-gray-900"
-                                                >
-                                                    {{ element.abstract }}
-                                                </p>
+                                                    v-html="element.abstract"
+                                                ></div>
                                             </div>
                                         </div>
                                     </li>
@@ -570,7 +568,7 @@ import {
 import JetInputError from "@/Jetstream/InputError.vue";
 import LoadingButton from "@/Shared/LoadingButton.vue";
 import JetDangerButton from "@/Jetstream/DangerButton.vue";
-import { Inertia } from "@inertiajs/inertia";
+import { router } from "@inertiajs/vue3";
 import Draggable from "vuedraggable";
 export default {
     components: {
@@ -586,7 +584,6 @@ export default {
         JetInputError,
         LoadingButton,
         Draggable,
-        Inertia,
     },
 
     props: ["project"],
@@ -638,7 +635,7 @@ export default {
         fetchCitations() {
             this.loading = true;
             this.error = "";
-            this.query = this.query.trim();
+            this.query = this.extractDoi(this.query);
             let isDOI = new RegExp(/\b(10[.][0-9]{4,}(?:[.][0-9]+)*)\b/g).test(
                 this.query
             );
@@ -747,7 +744,7 @@ export default {
             this.citationsForm.post(route("citation.save", this.project.id), {
                 preserveScroll: true,
                 onSuccess: () => {
-                    Inertia.reload({ only: ["project"] });
+                    router.reload({ only: ["project"] });
                     this.citationsForm.reset();
                     this.loadInitial();
                     this.form.reset();
@@ -841,7 +838,7 @@ export default {
                 {
                     preserveScroll: true,
                     onSuccess: () => {
-                        Inertia.reload({ only: ["project"] });
+                        router.reload({ only: ["project"] });
                         this.loadInitial();
                         this.citationsForm.reset();
                         this.confirmDelete = false;
