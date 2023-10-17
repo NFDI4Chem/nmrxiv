@@ -18,6 +18,7 @@ use App\Models\Validation;
 use Auth;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Auth\StatefulGuard;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
@@ -82,7 +83,7 @@ class ProjectController extends Controller
 
     public function publicProjectsView(Request $request)
     {
-        $projects = ProjectResource::collection(Project::where('is_public', true)->filter($request->only('search', 'sort', 'mode'))->paginate(12)->withQueryString());
+        $projects = ProjectResource::collection(Project::where([['is_public', true], ['is_archived', false]])->filter($request->only('search', 'sort', 'mode'))->paginate(12)->withQueryString());
 
         return Inertia::render('Public/Projects', [
             'filters' => $request->all('search', 'sort', 'mode'),
@@ -117,6 +118,7 @@ class ProjectController extends Controller
         }
 
         $team = $project->nonPersonalTeam;
+        $user = Auth::user();
         $license = null;
         if ($project->license_id) {
             $license = $getLicense->getLicensebyId($project->license_id);
@@ -127,7 +129,8 @@ class ProjectController extends Controller
             'team' => $team ? $team->load(['users', 'owner']) : null,
             'members' => $project->allUsers(),
             'availableRoles' => array_values(Jetstream::$roles),
-            'role' => $project->userProjectRole(Auth::user()->email),
+            'role' => $project->userProjectRole($user->email),
+            'teamRole' => $user->belongsToTeam($team) ? $user->teamRole($team) : null,
             'license' => $license ? $license[0] : null,
             'projectPermissions' => [
                 'canDeleteProject' => Gate::check('deleteProject', $project),

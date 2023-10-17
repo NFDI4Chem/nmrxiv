@@ -16,7 +16,6 @@ class UpdateProjectMemberRole
      * @param  mixed  $user
      * @param  mixed  $project
      * @param  int  $projectMemberId
-     * @param  string  $role
      * @return void
      */
     public function update($user, $project, $projectMemberId, string $role)

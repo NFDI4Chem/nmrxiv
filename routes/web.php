@@ -69,9 +69,9 @@ Route::group(['middleware' => 'verified'], function () {
 Route::group(['middleware' => ['auth', 'verified']], function () {
     // License
     Route::get('licenses', [LicenseController::class, 'index'])
-                ->name('licenses');
+        ->name('licenses');
     Route::get('licenses/{id}', [LicenseController::class, 'getLicensebyId'])
-                ->name('license');
+        ->name('license');
 
     // Authors
     Route::post('authors/{project}', [AuthorController::class, 'save'])
@@ -85,19 +85,25 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
 
     //Citation
     Route::post('citations/{project}', [CitationController::class, 'save'])
-    ->name('citation.save');
+        ->name('citation.save');
 
     Route::delete('citations/{project}/delete', [CitationController::class, 'destroy'])
-    ->name('citation.delete');
+        ->name('citation.delete');
 
     Route::post('/onboarding/{status}', [DashboardController::class, 'onboardingStatus'])
-            ->name('onboarding.complete');
+        ->name('onboarding.complete');
 
     Route::post('/primer/skip', [DashboardController::class, 'skipPrimer'])
-            ->name('primer.skip');
+        ->name('primer.skip');
 
     Route::get('projects/status/{project}/queue', [ProjectController::class, 'status'])
-            ->name('project.status');
+        ->name('project.status');
+
+    Route::post('users/notification/{user}/markAsRead', [UsersController::class, 'markNotificationAsRead'])
+        ->name('users.markNotificationAsRead');
+
+    Route::post('users/notification/markAllAsRead', [UsersController::class, 'markAllNotificationAsRead'])
+        ->name('users.markAllNotificationAsRead');
 
     Route::get('dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
 
@@ -221,51 +227,51 @@ Route::group([
 ], function () {
     Route::group(['middleware' => ['auth', 'permission:manage roles|view statistics|manage platform']], function () {
         Route::get('console', [ConsoleController::class, 'index'])
-        ->name('console');
+            ->name('console');
 
         Route::group(['middleware' => ['permission:manage roles|manage platform']], function () {
             // Users
             Route::get('users', [UsersController::class, 'index'])
-            ->name('console.users');
+                ->name('console.users');
 
             Route::get('users/create', [UsersController::class, 'create'])
-            ->name('console.users.create');
+                ->name('console.users.create');
 
             Route::post('users', [UsersController::class, 'store'])
-            ->name('console.users.store');
+                ->name('console.users.store');
 
             Route::get('users/edit/{user}', [UsersController::class, 'edit'])
-            ->name('console.users.edit');
+                ->name('console.users.edit');
 
             Route::put('users/edit/{user}', [UsersController::class, 'update'])
-            ->name('console.users.update');
+                ->name('console.users.update');
 
             Route::put('users/edit/{user}/password', [UsersController::class, 'updatePassword'])
-            ->name('console.users.update-password');
+                ->name('console.users.update-password');
 
             Route::group(['middleware' => ['permission:manage roles']], function () {
                 Route::put('users/edit/{user}/role', [UsersController::class, 'updateRole'])
-                ->name('console.users.update-role');
+                    ->name('console.users.update-role');
             });
 
             Route::delete('users/edit/{user}/photo', [UsersController::class, 'destroyPhoto'])
-            ->name('console.users.destroy-photo');
+                ->name('console.users.destroy-photo');
         });
 
         // Adding routes for announcements section
         Route::group(['middleware' => ['auth', 'permission:manage roles|manage platform']], function () {
             // Announcements
             Route::get('announcements', [AnnouncementController::class, 'index'])
-            ->name('console.announcements');
+                ->name('console.announcements');
 
-            Route::post('announcements/create', [AnnouncementController::class, 'create'])
-            ->name('console.announcements.create');
+            Route::post('announcements', [AnnouncementController::class, 'create'])
+                ->name('console.announcements.create');
 
-            Route::post('announcements/{announcement}', [AnnouncementController::class, 'update'])
-            ->name('console.announcements.edit');
+            Route::put('announcements/{announcement}', [AnnouncementController::class, 'update'])
+                ->name('console.announcements.edit');
 
             Route::delete('announcements/{announcement}', [AnnouncementController::class, 'destroy'])
-            ->name('console.announcements.destroy');
+                ->name('console.announcements.destroy');
         });
     });
 });
@@ -295,7 +301,7 @@ Route::get('projects/{project}/toggleStarred', [ProjectController::class, 'toggl
     ->name('project.toggle-starred');
 
 Route::get('studies/{study}/toggleStarred', [StudyController::class, 'toggleStarred'])
-->name('study.toggle-starred');
+    ->name('study.toggle-starred');
 
 Route::get('projects/{project}/studies', [ProjectController::class, 'publicStudies'])
     ->name('project.studies');
@@ -313,4 +319,4 @@ Route::get('datasets/{owner}/{slug}', [DatasetController::class, 'publicDatasetV
     ->name('public.dataset');
 
 Route::get('spectra', [DatasetController::class, 'publicDatasetsView'])
-->name('public.datasets');
+    ->name('public.datasets');

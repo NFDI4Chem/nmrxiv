@@ -65,11 +65,11 @@ class UnpublishProjects extends Command
                 ]);
 
                 $projectFSObjects = FileSystemObject::with('children')
-                        ->where([
-                            ['project_id', $project->id],
-                            ['level', 0],
-                        ])
-                        ->get();
+                    ->where([
+                        ['project_id', $project->id],
+                        ['level', 0],
+                    ])
+                    ->get();
 
                 foreach ($projectFSObjects as $FSObject) {
                     $this->moveFolder($FSObject, $project, $draft);

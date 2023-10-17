@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Resources\DatasetResource;
 use App\Http\Resources\ProjectResource;
 use App\Http\Resources\StudyResource;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class ApplicationController extends Controller
@@ -45,44 +45,51 @@ class ApplicationController extends Controller
                 $tab = 'dataset';
             }
 
-            if ($tab == 'info') {
-                return Inertia::render('Public/Project/Show', [
-                    'project' => (new ProjectResource($project))->lite(false, ['users', 'authors', 'citations']),
-                    'tab' => $tab,
-                ]);
-            } elseif ($tab == 'studies') {
-                return Inertia::render('Public/Project/Studies', [
-                    'project' => (new ProjectResource($project))->lite(false, []),
-                    'tab' => $tab,
-                ]);
-            } elseif ($tab == 'files') {
-                return Inertia::render('Public/Project/Files', [
-                    'project' => (new ProjectResource($project))->lite(false, ['files']),
-                    'tab' => $tab,
-                ]);
-            } elseif ($tab == 'license') {
-                return Inertia::render('Public/Project/License', [
-                    'project' => (new ProjectResource($project))->lite(false, ['license']),
-                    'tab' => $tab,
-                ]);
-            } elseif ($tab == 'study') {
-                return Inertia::render('Public/Project/Study', [
-                    'project' => (new ProjectResource($project))->lite(false, []),
-                    'tab' => $tab,
-                    'study' => (new StudyResource($study))->lite(false, ['tags', 'sample', 'datasets', 'molecules']),
-                ]);
-            } elseif ($tab == 'dataset') {
-                return Inertia::render('Public/Project/Dataset', [
-                    'project' => (new ProjectResource($project))->lite(false, []),
-                    'tab' => $tab,
-                    'study' => (new StudyResource($study))->lite(false, ['tags', 'sample', 'molecules']),
-                    'dataset' => (new DatasetResource($dataset)),
-                ]);
-            } else {
-                return Inertia::render('Public/Project/Show', [
-                    'project' => (new ProjectResource($project))->lite(false, ['users', 'authors', 'citations']),
-                    'tab' => 'info',
-                ]);
+            switch ($tab) {
+                case 'info':
+                    return Inertia::render('Public/Project/Show', [
+                        'project' => (new ProjectResource($project))->lite(false, ['users', 'authors', 'citations']),
+                        'tab' => $tab,
+                    ]);
+                    break;
+                case 'studies':
+                    return Inertia::render('Public/Project/Studies', [
+                        'project' => (new ProjectResource($project))->lite(false, []),
+                        'tab' => $tab,
+                    ]);
+                    break;
+                case 'files':
+                    return Inertia::render('Public/Project/Files', [
+                        'project' => (new ProjectResource($project))->lite(false, ['files']),
+                        'tab' => $tab,
+                    ]);
+                    break;
+                case 'license':
+                    return Inertia::render('Public/Project/License', [
+                        'project' => (new ProjectResource($project))->lite(false, ['license']),
+                        'tab' => $tab,
+                    ]);
+                    break;
+                case 'study':
+                    return Inertia::render('Public/Project/Study', [
+                        'project' => (new ProjectResource($project))->lite(false, []),
+                        'tab' => $tab,
+                        'study' => (new StudyResource($study))->lite(false, ['tags', 'sample', 'datasets', 'molecules']),
+                    ]);
+                    break;
+                case 'dataset':
+                    return Inertia::render('Public/Project/Dataset', [
+                        'project' => (new ProjectResource($project))->lite(false, []),
+                        'tab' => $tab,
+                        'study' => (new StudyResource($study))->lite(false, ['tags', 'sample', 'molecules']),
+                        'dataset' => (new DatasetResource($dataset)),
+                    ]);
+                    break;
+                default:
+                    return Inertia::render('Public/Project/Show', [
+                        'project' => (new ProjectResource($project))->lite(false, ['users', 'authors', 'citations']),
+                        'tab' => 'info',
+                    ]);
             }
         } else {
             abort(404, 'Page not found');
@@ -96,19 +103,19 @@ class ApplicationController extends Controller
     {
         $resolvedModel = resolveIdentifier($identifier);
         $model = $resolvedModel['model'];
-        if($model){
+        if ($model) {
             $base = 39;
-        $_w = $base + (strlen($model->doi) * 6.7);
-        $_o = 30 + (strlen($model->doi) * 3.5);
-        $_bw = strlen($model->doi) * 7.1;
-        $colorMap = [
-            'Project' => '#019DBB',
-            'Study' => '#E7AD4C',
-            'Dataset' => '#8BC34B',
-        ];
-        $coloreCode = $colorMap[$resolvedModel['namespace']];
-        if ($model && $model->doi) {
-            return  response('<svg xmlns="http://www.w3.org/2000/svg"
+            $_w = $base + (strlen($model->doi) * 6.7);
+            $_o = 30 + (strlen($model->doi) * 3.5);
+            $_bw = strlen($model->doi) * 7.1;
+            $colorMap = [
+                'Project' => '#019DBB',
+                'Study' => '#E7AD4C',
+                'Dataset' => '#8BC34B',
+            ];
+            $coloreCode = $colorMap[$resolvedModel['namespace']];
+            if ($model && $model->doi) {
+                return response('<svg xmlns="http://www.w3.org/2000/svg"
              width="'.$_w.'" height="20">
                 <linearGradient id="b" x2="0" y2="100%">
                     <stop offset="0" stop-color="#bbb" stop-opacity=".1"/>
@@ -143,7 +150,7 @@ class ApplicationController extends Controller
                     </text>
                 </g>
             </svg>')->header('Content-Type', 'image/svg+xml');
-        }
+            }
         }
     }
 }

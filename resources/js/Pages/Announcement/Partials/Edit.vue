@@ -118,7 +118,7 @@ import JetDialogModal from "@/Jetstream/DialogModal.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import JetButton from "@/Jetstream/Button.vue";
 import { CheckCircleIcon, ChevronRightIcon } from "@heroicons/vue/24/solid";
-import { Link } from "@inertiajs/inertia-vue3";
+import { Link } from "@inertiajs/vue3";
 import {
     AtSymbolIcon,
     CodeBracketIcon,
@@ -178,7 +178,7 @@ export default {
     methods: {
         editAnnouncement() {
             //this.editAnnouncementForm.creator_id = this.$page.props.user.id;
-            this.editAnnouncementForm.post(
+            this.editAnnouncementForm.put(
                 route(
                     "console.announcements.edit",
                     this.editAnnouncementForm.id
