@@ -114,7 +114,7 @@ jobs:
       uses: docker/build-push-action@v4
       with:
         context: .
-        file: ./resources/ops/docker/app/app.dockerfile
+        file: ./resources/ops/docker/app/nginx.dockerfile
         push: true
         build-args: |
           RELEASE_VERSION=dev-nginx-latest
