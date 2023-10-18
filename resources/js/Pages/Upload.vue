@@ -2101,7 +2101,7 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import TeamProjects from "@/Pages/Project/Index.vue";
 import Create from "@/Shared/CreateButton.vue";
 import Onboarding from "@/App/Onboarding.vue";
-import { Link } from "@inertiajs/inertia-vue3";
+import { Link } from '@inertiajs/vue3'
 import { computed } from "vue";
 import FileSystemBrowser from "./../Shared/FileSystemBrowser.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
