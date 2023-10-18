@@ -671,7 +671,6 @@
 import ValidationStatus from "@/Shared/ValidationStatus.vue";
 import { Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/vue";
 import { ChevronUpIcon } from "@heroicons/vue/24/solid";
-import { a } from "@inertiajs/inertia-vue3";
 
 export default {
     components: {
@@ -680,7 +679,6 @@ export default {
         DisclosureButton,
         DisclosurePanel,
         ChevronUpIcon,
-        a,
     },
     props: {
         project: Object,

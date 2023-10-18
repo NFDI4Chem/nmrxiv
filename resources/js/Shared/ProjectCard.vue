@@ -68,43 +68,22 @@
                                 class="block cursor-pointer"
                             >
                                 <p
-                                    class="text-lg font-black text-gray-900 line-clamp-2"
+                                    class="text-lg h-14 font-black text-gray-900 line-clamp-2"
                                 >
                                     {{ project.name }}
                                 </p>
-                                <div>
-                                    <dd
-                                        class="text-xs text-gray-900 space-y-5 mt-1"
-                                    >
-                                        <p>
-                                            <span
-                                                v-for="tag in project.tags"
-                                                :key="tag.id"
-                                                class="mr-1"
-                                            >
-                                                <span
-                                                    class="mb-1 inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-indigo-100 text-indigo-800"
-                                                >
-                                                    <svg
-                                                        class="-ml-0.5 mr-1.5 h-2 w-2 text-indigo-400"
-                                                        fill="currentColor"
-                                                        viewBox="0 0 8 8"
-                                                    >
-                                                        <circle
-                                                            cx="4"
-                                                            cy="4"
-                                                            r="3"
-                                                        />
-                                                    </svg>
-                                                    {{ tag.name["en"] }}
-                                                </span>
-                                            </span>
-                                        </p>
-                                    </dd>
-                                </div>
                                 <p class="text-xs text-gray-500 line-clamp-3">
                                     {{ project.description }}
                                 </p>
+                                <div class="mt-1 h-14 overflow-hidden">
+                                    <span
+                                        class="mt-1 inline-flex items-center rounded-full bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10"
+                                        v-for="tag in project.tags"
+                                        :key="tag.id"
+                                    >
+                                        {{ tag.name["en"] }}
+                                    </span>
+                                </div>
                             </Link>
                         </div>
                     </div>
@@ -118,12 +97,12 @@
                                 :src="project.owner.profile_photo_url"
                             />
                         </div>
-                        <div class="flex-auto pl-4">
-                            <p class="text-xs font-xs font-semibold text-black">
-                                <a>
-                                    {{ project.owner.first_name }}
-                                    {{ project.owner.last_name }}</a
-                                >
+                        <div
+                            class="flex-auto pl-4 text-xs font-xs font-semibold text-black"
+                        >
+                            <p class="text-ellipsis overflow-hidden ...">
+                                {{ project.owner.first_name }}
+                                {{ project.owner.last_name }}
                             </p>
                             <div
                                 class="flex-1 space-x-1 text-xs font-xs text-gray-500"
@@ -355,8 +334,8 @@ import { PencilIcon } from "@heroicons/vue/24/solid";
 import { EnvelopeIcon } from "@heroicons/vue/24/solid";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import { EllipsisVerticalIcon, ScaleIcon } from "@heroicons/vue/24/solid";
-import { Inertia } from "@inertiajs/inertia";
-import { Head, Link } from "@inertiajs/inertia-vue3";
+import { router } from "@inertiajs/vue3";
+import { Head, Link } from "@inertiajs/vue3";
 
 export default {
     components: {
@@ -413,7 +392,7 @@ export default {
                         }
                     })
                     .then(function (response) {
-                        Inertia.reload({ only: ["projects"] });
+                        router.reload({ only: ["projects"] });
                     });
             } else {
                 this.$inertia.visit(route("login"));

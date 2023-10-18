@@ -127,11 +127,22 @@ export default {
     computed: {
         editable() {
             if (this.role) {
-                return (
+                if (
                     this.role == "creator" ||
                     this.role == "owner" ||
                     this.role == "collaborator"
-                );
+                ) {
+                    return true;
+                }
+            }
+            if (this.teamRole && this.teamRole.key) {
+                if (
+                    this.teamRole.key == "creator" ||
+                    this.teamRole.key == "owner" ||
+                    this.teamRole.key == "collaborator"
+                ) {
+                    return true;
+                }
             } else {
                 return false;
             }
@@ -146,6 +157,8 @@ export default {
                 } else {
                     return false;
                 }
+            } else {
+                return true;
             }
         },
     },

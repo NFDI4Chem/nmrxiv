@@ -799,7 +799,7 @@
 </template>
 
 <script>
-import { Head, Link } from "@inertiajs/inertia-vue3";
+import { Head, Link } from "@inertiajs/vue3";
 import JetApplicationLogo from "@/Jetstream/ApplicationLogo.vue";
 import Projects from "@/Shared/Projects.vue";
 import { defineComponent, h } from "vue";

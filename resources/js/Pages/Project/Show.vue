@@ -57,7 +57,6 @@
                                     @click="toogleStarred"
                                 />
                                 {{ project.name }}
-
                                 <button
                                     v-if="canUpdateProject"
                                     type="button"
@@ -78,7 +77,6 @@
                                     <span>Edit</span>
                                 </button>
                             </div>
-
                             <div class="inline-flex items-center mt-3">
                                 <access-dialogue
                                     :available-roles="availableRoles"
@@ -89,6 +87,7 @@
                                     called-from="projectView"
                                     model="project"
                                 />
+
                                 <a
                                     class="cursor-pointer hover:text-teal-900 inline-flex items-center ml-7"
                                     @click="toggleDetails"
@@ -304,6 +303,12 @@
                     </div>
                     <div class="flex flex-nowrap justify-between pb-3">
                         <div
+                            v-if="project.identifier"
+                            class="text-gray-400 mt-2"
+                        >
+                            <img :src="'/badge/doi/' + project.identifier" />
+                        </div>
+                        <div
                             class="mt-2 flex items-center text-xs text-gray-400"
                         >
                             <CalendarIcon
@@ -402,22 +407,11 @@
                     <dd class="mt-1 text-md text-gray-900 space-y-5">
                         <p>
                             <span
+                                class="mt-1 inline-flex items-center rounded-full bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10"
                                 v-for="tag in project.tags"
                                 :key="tag.id"
-                                class="mr-2"
                             >
-                                <span
-                                    class="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-indigo-100 text-indigo-800"
-                                >
-                                    <svg
-                                        class="-ml-0.5 mr-1.5 h-2 w-2 text-indigo-400"
-                                        fill="currentColor"
-                                        viewBox="0 0 8 8"
-                                    >
-                                        <circle cx="4" cy="4" r="3" />
-                                    </svg>
-                                    {{ tag.name["en"] }}
-                                </span>
+                                {{ tag.name["en"] }}
                             </span>
                         </p>
                     </dd>
@@ -498,51 +492,9 @@
                         class="mt-2 text-md text-gray-900 space-y-5 focus:pointer-events-auto"
                     >
                         <div class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                            <div
-                                v-for="citation in project.citations"
-                                :key="citation.id"
-                                class="relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm flex items-top space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-teal-500"
-                            >
-                                <div class="flex-1 min-w-0">
-                                    <a
-                                        class="focus:outline-none cursor-pointer"
-                                        :href="getCitationLink(citation.doi)"
-                                        :target="getTarget(citation.doi)"
-                                    >
-                                        <span
-                                            class="absolute inset-0"
-                                            aria-hidden="true"
-                                        ></span>
-                                        <p
-                                            class="text-sm font-medium text-gray-900"
-                                        >
-                                            {{ citation.title }}
-                                        </p>
-                                        <p class="text-sm text-teal-500">
-                                            {{ citation.authors }}
-                                        </p>
-                                        <p class="text-sm text-gray-500">
-                                            {{ citation.citation_text }}
-                                        </p>
-                                        <p
-                                            v-if="citation.doi"
-                                            class="text-sm font-sm text-gray-500"
-                                        >
-                                            DOI -
-                                            <a
-                                                :href="citation.doi"
-                                                class="text-teal-900"
-                                                >{{ citation.doi }}</a
-                                            >
-                                        </p>
-                                        <p
-                                            class="text-sm text-gray-500 truncate ..."
-                                        >
-                                            {{ citation.abstract }} ...
-                                        </p>
-                                    </a>
-                                </div>
-                            </div>
+                            <citation-card
+                                :citations="this.project.citations"
+                            />
                         </div>
                     </dd>
                 </div>
@@ -594,6 +546,7 @@
                     :editable="editable"
                     :project="project"
                     :role="role"
+                    :teamRole="teamRole"
                 />
             </div>
         </div>
@@ -603,8 +556,8 @@
 <script>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import AccessDialogue from "@/Shared/AccessDialogue.vue";
-import { Link } from "@inertiajs/inertia-vue3";
-import { Inertia } from "@inertiajs/inertia";
+import { Link } from "@inertiajs/vue3";
+import { router } from "@inertiajs/vue3";
 import StudyIndex from "@/Pages/Study/Index.vue";
 import ProjectDetails from "./Partials/Details.vue";
 import { ref } from "vue";
@@ -615,6 +568,7 @@ import ManageCitation from "@/Shared/ManageCitation.vue";
 import Citation from "@/Shared/Citation.vue";
 import Publish from "@/Shared/Publish.vue";
 import AuthorCard from "@/Shared/AuthorCard.vue";
+import CitationCard from "@/Shared/CitationCard.vue";
 
 export default {
     components: {
@@ -632,6 +586,7 @@ export default {
         Citation,
         Publish,
         AuthorCard,
+        CitationCard,
     },
     props: [
         "project",
@@ -640,6 +595,7 @@ export default {
         "availableRoles",
         "projectPermissions",
         "role",
+        "teamRole",
         "license",
     ],
     setup() {
@@ -677,13 +633,9 @@ export default {
     },
     computed: {
         canDeleteProject() {
-            if (this.role) {
-                if (this.role == "owner" || this.role == "creator") {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
+            return this.projectPermissions
+                ? this.projectPermissions.canDeleteProject
+                : false;
         },
         canUpdateProject() {
             return this.projectPermissions
@@ -707,7 +659,7 @@ export default {
                     }
                 })
                 .then(function (response) {
-                    Inertia.reload({ only: ["project"] });
+                    router.reload({ only: ["project"] });
                 });
         },
         toggleDetails() {
@@ -719,20 +671,6 @@ export default {
         toggleManageCitation() {
             this.manageCitationElement.toggleDialog();
             //this.emitter.emit("openAddCitationDialog", {});
-        },
-        getCitationLink(doi) {
-            var link = "#";
-            if (doi) {
-                link = "https://doi.org/" + doi;
-            }
-            return link;
-        },
-        getTarget(id) {
-            var target = null;
-            if (id) {
-                target = "_blank";
-            }
-            return target;
         },
     },
 };

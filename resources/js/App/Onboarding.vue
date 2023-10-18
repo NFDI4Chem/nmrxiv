@@ -546,7 +546,7 @@ import {
     TagIcon,
 } from "@heroicons/vue/24/outline";
 import axios from "axios";
-import { Inertia } from "@inertiajs/inertia";
+import { router } from "@inertiajs/vue3";
 
 export default {
     components: {
@@ -618,7 +618,7 @@ export default {
         onboardingComplete() {
             this.open = false;
             axios.post("/onboarding/complete").then((resp) => {
-                Inertia.reload({
+                router.reload({
                     only: ["user", "user.permissions", "user.roles"],
                 });
             });

@@ -879,7 +879,7 @@ import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import SelectRich from "@/Shared/SelectRich.vue";
 import JetButton from "@/Jetstream/Button.vue";
 import VueTagsInput from "@sipec/vue3-tags-input";
-import { Inertia } from "@inertiajs/inertia";
+import { router } from "@inertiajs/vue3";
 const publishingOptions = [
     {
         value: "viewer",
@@ -1026,7 +1026,10 @@ export default defineComponent({
             }
         },
         toggleDetails() {
-            if (this.$page.props.licenses) {
+            if (
+                this.$page.props.licenses &&
+                this.$page.props.licenses.length > 0
+            ) {
                 this.licenses = this.$page.props.licenses;
                 this.form.license = this.licenses.find(
                     (l) => l.id == this.project.license_id
@@ -1075,7 +1078,7 @@ export default defineComponent({
                     this.clearPhotoFileInput();
                     let stale = false;
 
-                    Inertia.reload({ only: ["project"] });
+                    router.reload({ only: ["project"] });
 
                     window.addEventListener("popstate", () => {
                         stale = true;

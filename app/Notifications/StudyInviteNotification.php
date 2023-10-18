@@ -41,7 +41,7 @@ class StudyInviteNotification extends Notification
      */
     public function toArray($notifiable)
     {
-        $title = 'Invitation from study - '.$this->invitation->study->name;
+        $title = 'Invitation from study - <b>'.$this->invitation->study->name.'</b>';
         $message = 'You have been invited to join the study - '.$this->invitation->study->name.' (role: '.$this->invitation['role'].') by '.$this->invitation['invited_by'].'. Please check your mail to accept or decline the invitation.';
 
         return [

@@ -517,6 +517,10 @@
                                                     >
                                                         Percentage composition
                                                         ({{ percentage }}%)
+                                                        <ToolTip
+                                                            class="inline h-4 w-12 ml-0"
+                                                            text="If the molecule percentage is unknown, please keep it as 0."
+                                                        ></ToolTip>
                                                     </label>
                                                     <slider
                                                         v-model="percentage"
@@ -665,6 +669,7 @@ export default {
             this.emitter.emit("openStudyDetails", {});
         },
         loadSmiles() {
+            this.errorMessage = "";
             if (this.smiles && this.smiles != "") {
                 try {
                     let mol = OCL.Molecule.fromSmiles(this.smiles);

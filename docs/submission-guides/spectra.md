@@ -1,0 +1,5 @@
+# Spectra Viewing and Processing
+
+**[nmrXiv](https://nmrxiv.org/)** uses [NMRium](https://www.nmrium.org/) as its spectra viewer and editor. [NMRium](https://www.nmrium.org/) shows up in two places within **[nmrXiv](https://nmrxiv.org/)**: in [Step 2 of the Submission Pipeline](/submission-guides/submission/upload#assignement--meta-data---step-2) and in the [Datasets tab of the studies](/submission-guides/data-model/dataset) after submission.
+
+We recommend checking [NMRium Documentation](https://docs.nmrium.org/) when using **[nmrXiv](https://nmrxiv.org/)**, which includes a Quick Start Guide ([English](https://docs.nmrium.org/) and [German](https://docs.nmrium.org/quickstart/quickstart_de/quickstart_de)), along with details on [General Tools](https://docs.nmrium.org/general/basic/basic_toolbar), processing [1D](https://docs.nmrium.org/20_1d-spectra/loading_a_spectrum/loading_a_spectrum) and [2D](https://docs.nmrium.org/30_2d-spectra/select/select/) spectra, reaching to the [Molecular Assignments](https://docs.nmrium.org/structure_assignment/assign/add).

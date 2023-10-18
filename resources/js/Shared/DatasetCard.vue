@@ -288,8 +288,8 @@ import { PencilIcon } from "@heroicons/vue/24/solid";
 import { EnvelopeIcon } from "@heroicons/vue/24/solid";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import { EllipsisVerticalIcon, ScaleIcon } from "@heroicons/vue/24/solid";
-import { Inertia } from "@inertiajs/inertia";
-import { Head, Link } from "@inertiajs/inertia-vue3";
+import { router } from "@inertiajs/vue3";
+import { Head, Link } from "@inertiajs/vue3";
 
 export default {
     components: {
@@ -337,7 +337,7 @@ export default {
                         }
                     })
                     .then(function (response) {
-                        Inertia.reload({ only: ["datasets"] });
+                        router.reload({ only: ["datasets"] });
                     });
             } else {
                 this.$inertia.visit(route("login"));

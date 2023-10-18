@@ -2,10 +2,9 @@
 
 namespace App\Models;
 
-use App\Notifications\ProjectArchivalNotification;
-use App\Notifications\ProjectArchivalNotificationToAdmins;
+use App\Events\ProjectArchival;
+use App\Events\ProjectDeletion;
 use App\Notifications\ProjectDeletionFailureNotification;
-use App\Notifications\ProjectDeletionNotification;
 use App\Notifications\ProjectDeletionReminderNotification;
 use App\Traits\CacheClear;
 use Auth;
@@ -26,11 +25,11 @@ class Project extends Model implements Auditable
 {
     use CacheClear;
     use HasDOI;
-    use Searchable;
-    use Markable;
     use HasFactory;
-    use \OwenIt\Auditing\Auditable;
     use HasTags;
+    use Markable;
+    use \OwenIt\Auditing\Auditable;
+    use Searchable;
 
     protected $fillable = [
         'name',
@@ -344,16 +343,13 @@ class Project extends Model implements Auditable
     {
         switch ($notifyType) {
             case 'deletion':
-                Notification::send($sendTo, new ProjectDeletionNotification($this));
+                event(new ProjectDeletion($this, $sendTo));
                 break;
             case 'deletionReminder':
                 Notification::send($sendTo, new ProjectDeletionReminderNotification($this));
                 break;
             case 'archival':
-                Notification::send($sendTo, new ProjectArchivalNotification($this));
-                break;
-            case 'archivalAdmin':
-                Notification::send($sendTo, new ProjectArchivalNotificationToAdmins($this));
+                event(new ProjectArchival($this, $sendTo));
                 break;
             case 'deletionFailure':
                 Notification::send($sendTo, new ProjectDeletionFailureNotification($this));

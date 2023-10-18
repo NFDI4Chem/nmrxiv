@@ -100,7 +100,7 @@ import Icon from "@/Shared/Icon.vue";
 import Logo from "@/Shared/Logo.vue";
 import MainMenu from "@/Shared/MainMenu.vue";
 import { computed } from "vue";
-import { usePage } from "@inertiajs/inertia-vue3";
+import { usePage } from "@inertiajs/vue3";
 
 export default {
     components: {
@@ -111,7 +111,7 @@ export default {
         MainMenu,
     },
     setup() {
-        const user = computed(() => usePage().props.value.auth.user);
+        const user = computed(() => usePage().props.auth.user);
         return { user };
     },
 };
