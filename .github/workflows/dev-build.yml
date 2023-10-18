@@ -1,8 +1,12 @@
 name : Deploy to Dev
 
+# on:
+#   push:
+#     branches: [development]
+
 on:
   push:
-    branches: [development]
+    branches: [issue-#877]
 
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
@@ -11,9 +15,10 @@ env:
   DEPLOYMENT_NAME: nmrxiv-nmrxiv-app
   SCHEDULER_DEPLOYMENT_NAME: nmrxiv-scheduler
   WORKER_DEPLOYMENT_NAME: nmrxiv-worker
-  REPOSITORY_NAME: nmrxiv-dev
-  APP_IMAGE: nmrxiv-app
-  NGINX_IMAGE: nmrxiv-nginx
+  DOCKER_HUB_USERNAME : ${{ secrets.DOCKER_HUB_USERNAME  }}
+  DOCKER_HUB_PASSWORD : ${{ secrets.DOCKER_HUB_PASSWORD  }}
+  REPOSITORY_NAME: nmrxiv
+  REPOSITORY_NAMESPACE: nfdi4chem
 
 jobs:
   php-unit-test:
@@ -79,40 +84,46 @@ jobs:
         service_account_key: ${{ secrets.GKE_SA_KEY }}
         project_id: ${{ secrets.GKE_PROJECT }}
 
-    # Configure docker to use the gcloud command-line tool as a credential helper
-    - run: |-
-        gcloud auth configure-docker europe-west3-docker.pkg.dev
-    # Get the GKE credentials so we can deploy to the cluster
+    # Get the GKE credentials
     - uses: google-github-actions/get-gke-credentials@v0.3.0
       with:
         cluster_name: ${{ env.GKE_CLUSTER }}
         location: ${{ env.GKE_ZONE }}
         credentials: ${{ secrets.GKE_SA_KEY }}
 
-    # Build the Docker image
-    - name: Build App Image
-      run: |-
-        docker build -f ./resources/ops/docker/app/app.dockerfile \
-          --tag "europe-west3-docker.pkg.dev/$PROJECT_ID/$REPOSITORY_NAME/$APP_IMAGE:latest" \
-          --build-arg GITHUB_SHA="$GITHUB_SHA" \
-          --build-arg GITHUB_REF="$GITHUB_REF" \
-          .
-    - name: Build Nginx Image
-      run: |-
-        docker build -f ./resources/ops/docker/nginx/nginx.dockerfile \
-          --tag "europe-west3-docker.pkg.dev/$PROJECT_ID/$REPOSITORY_NAME/$NGINX_IMAGE:latest" \
-          --build-arg GITHUB_SHA="$GITHUB_SHA" \
-          --build-arg GITHUB_REF="$GITHUB_REF" \
-          .
-    # Push the Docker image to Google Container Registry
-    - name: Publish App Image to GCR
-      run: |-
-        docker push "europe-west3-docker.pkg.dev/$PROJECT_ID/$REPOSITORY_NAME/$APP_IMAGE:latest"
+    - name: Log in to Docker Hub
+      uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+      with:
+        username: ${{ env.DOCKER_HUB_USERNAME  }}
+        password: ${{ env.DOCKER_HUB_PASSWORD  }}
 
-    - name: Publish Nginx Image to GCR
-      run: |-
-        docker push "europe-west3-docker.pkg.dev/$PROJECT_ID/$REPOSITORY_NAME/$NGINX_IMAGE:latest"
+    # Build and push the app Docker image
+    - name: Build and push App Docker image
+      uses: docker/build-push-action@v4
+      with:
+        context: .
+        file: ./resources/ops/docker/app/app.dockerfile
+        push: true
+        build-args: |
+          RELEASE_VERSION=dev-app-latest
+        tags: ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:dev-app-latest
+        username: ${{ env.DOCKER_HUB_USERNAME  }}
+        password: ${{ env.DOCKER_HUB_PASSWORD  }}
 
+    # Build and push the nginx Docker image
+    - name: Build and push Nginx Docker image
+      uses: docker/build-push-action@v4
+      with:
+        context: .
+        file: ./resources/ops/docker/app/app.dockerfile
+        push: true
+        build-args: |
+          RELEASE_VERSION=dev-nginx-latest
+        tags: ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:dev-nginx-latest
+        username: ${{ env.DOCKER_HUB_USERNAME  }}
+        password: ${{ env.DOCKER_HUB_PASSWORD  }}
+
+    # Deploy the latest Docker image to the GKE cluster
     - name: Deploy
       run: |-
         kubectl rollout restart deployment/$DEPLOYMENT_NAME
