@@ -170,7 +170,7 @@
                             class="flex-grow cursor-pointer"
                         >
                             <div class="flex justify-between items-baseline">
-                                <div class="font-bold text-lg text-gray-600">
+                                <div class="font-bold text-xl text-gray-600">
                                     <div class="flex items-center">
                                         <span
                                             class="cursor-pointer flex max-w-2xl break-words block"
@@ -263,26 +263,11 @@
                                     >
                                         <p>
                                             <span
+                                                class="mt-1 inline-flex items-center rounded-full bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10"
                                                 v-for="tag in project.tags"
                                                 :key="tag.id"
-                                                class="mr-2"
                                             >
-                                                <span
-                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-indigo-100 text-indigo-800"
-                                                >
-                                                    <svg
-                                                        class="-ml-0.5 mr-1.5 h-2 w-2 text-indigo-400"
-                                                        fill="currentColor"
-                                                        viewBox="0 0 8 8"
-                                                    >
-                                                        <circle
-                                                            cx="4"
-                                                            cy="4"
-                                                            r="3"
-                                                        />
-                                                    </svg>
-                                                    {{ tag.name["en"] }}
-                                                </span>
+                                                {{ tag.name["en"] }}
                                             </span>
                                         </p>
                                     </dd>
@@ -292,13 +277,12 @@
                                 >
                                     {{ project.description }}
                                 </div>
-                                <div class="text-xs text-gray-400 pr-5">
+                                <div class="text-xs mt-1 text-gray-400 pr-5">
                                     <span class="font-bold text-gray-600"
-                                        >Last updated on</span
+                                        >Updated on</span
                                     >
                                     {{ formatDate(project.updated_at) }}
-                                </div>
-                                <div class="text-xs text-gray-400 pr-5">
+                                    &middot;
                                     <span class="font-bold text-gray-600"
                                         >Created on</span
                                     >
