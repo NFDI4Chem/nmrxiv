@@ -103,6 +103,15 @@
                                                 class="text-2xl font-bold text-gray-900 break-words float-left"
                                             >
                                                 {{ project.data.name }}
+
+                                                <p class="text-gray-700 pl-1">
+                                        <img
+                                            :src="
+                                                'badge/doi/' +
+                                                project.data.identifier
+                                            "   
+                                        />
+                                    </p>
                                             </div>
                                             <div class="flex-1 float-left">
                                                 <a
@@ -143,6 +152,20 @@
                                             "
                                         />
                                     </p>
+                                    <a
+                                                    :href="downloadURL"
+                                                    :class="[
+                                                        active
+                                                            ? 'bg-gray-100 text-gray-600'
+                                                            : 'text-gray-500',
+                                                        'block ml-2 mt-1 text-sm cursor-pointer hover:text-gray-900',
+                                                    ]"
+                                                >
+                                                    <ArrowDownTrayIcon
+                                                        class="h-5 w-5 inline"
+                                                        aria-hidden="true"
+                                                    />
+                                                </a>
                                     <div class="sm:col-span-12 pt-4">
                                         <a
                                             v-for="tag in project.data.tags"
