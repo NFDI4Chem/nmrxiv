@@ -11,9 +11,10 @@ env:
   DEPLOYMENT_NAME: nmrxiv-nmrxiv-app
   SCHEDULER_DEPLOYMENT_NAME: nmrxiv-scheduler
   WORKER_DEPLOYMENT_NAME: nmrxiv-worker
-  REPOSITORY_NAME: nmrxiv-prod
-  APP_IMAGE: nmrxiv-app
-  NGINX_IMAGE: nmrxiv-nginx
+  DOCKER_HUB_USERNAME : ${{ secrets.DOCKER_HUB_USERNAME  }}
+  DOCKER_HUB_PASSWORD : ${{ secrets.DOCKER_HUB_PASSWORD  }}
+  REPOSITORY_NAME: nmrxiv
+  REPOSITORY_NAMESPACE: nfdi4chem
   
 
 jobs:
@@ -23,6 +24,7 @@ jobs:
   setup-build-publish-deploy:
     name: Build & deploy to production
     if: github.ref == 'refs/heads/prod-helm-deploy'
+    needs: php-unit-test
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
