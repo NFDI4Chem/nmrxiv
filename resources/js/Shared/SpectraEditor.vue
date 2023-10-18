@@ -379,7 +379,7 @@ export default {
         nmriumURL() {
             return this.$page.props.nmriumURL
                 ? String(this.$page.props.nmriumURL + "&id=" + Math.random())
-                : "https://nmriumdev.nmrxiv.org?workspace=embedded&id=" +
+                : "https://nmriumdev.nmrxiv.org?defaultEmptyMessage=''&workspace=embedded&id=" +
                       Math.random();
         },
 
