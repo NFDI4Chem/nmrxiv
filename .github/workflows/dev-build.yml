@@ -1,12 +1,8 @@
 name : Deploy to Dev
 
-# on:
-#   push:
-#     branches: [development]
-
 on:
   push:
-    branches: [issue-#877]
+    branches: [development]
 
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
