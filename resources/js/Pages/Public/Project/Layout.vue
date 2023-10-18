@@ -93,39 +93,8 @@
                                             alt=""
                                         />
                                     </div>
-                                    <div
-                                        class="mt-6 sm:flex-1 sm:min-w-0 sm:flex sm:justify-center sm:space-x-0 sm:pb-1"
-                                    >
-                                        <div
-                                            class="sm:hidden 2xl:block min-w-0 flex-1"
-                                        >
-                                            <div
-                                                class="text-2xl font-bold text-gray-900 break-words float-left"
-                                            >
-                                                {{ project.data.name }}
-                                            </div>
-                                            <div class="flex-1 float-left">
-                                                <a
-                                                    :href="downloadURL"
-                                                    :class="[
-                                                        active
-                                                            ? 'bg-gray-100 text-gray-600'
-                                                            : 'text-gray-500',
-                                                        'block ml-2 mt-1 text-sm cursor-pointer hover:text-gray-900',
-                                                    ]"
-                                                >
-                                                    <ArrowDownTrayIcon
-                                                        class="h-5 w-5 inline"
-                                                        aria-hidden="true"
-                                                    />
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
-                                <div
-                                    class="hidden sm:block 2xl:hidden min-w-0 flex-1"
-                                >
+                                <div class="min-w-0 flex-1">
                                     <h1
                                         class="text-2xl pl-1 font-bold text-gray-900 break-words"
                                     >
@@ -144,15 +113,15 @@
                                         />
                                     </p>
                                     <div class="sm:col-span-12 pt-4">
-                                        <a
+                                        <span
+                                            class="mt-1 inline-flex items-center rounded-full bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10"
                                             v-for="tag in project.data.tags"
                                             :key="tag.id"
                                             target="_blank"
                                             :href="
                                                 '/projects?tag=' + tag.name.en
                                             "
-                                            class="mr-1 float rounded-full border border-gray-200 items-center py-1.5 pl-3 pr-3 text-sm font-medium bg-white text-gray-900 hover:text-white hover:bg-black"
-                                            ><span>{{ tag.name.en }}</span></a
+                                            >{{ tag.name.en }}</span
                                         >
                                     </div>
                                 </div>

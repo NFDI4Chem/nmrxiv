@@ -97,6 +97,7 @@
                                     called-from="projectView"
                                     model="project"
                                 />
+
                                 <a
                                     class="cursor-pointer hover:text-teal-900 inline-flex items-center ml-7"
                                     @click="toggleDetails"
