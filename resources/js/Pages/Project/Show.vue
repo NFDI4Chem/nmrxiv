@@ -77,16 +77,6 @@
                                     <span>Edit</span>
                                 </button>
                             </div>
-
-                            <span
-                                v-if="project.identifier"
-                                class="text-gray-400 pt-2"
-                            >
-                                <img
-                                    :src="'/badge/doi/' + project.identifier"
-                                />
-                            </span>
-
                             <div class="inline-flex items-center mt-3">
                                 <access-dialogue
                                     :available-roles="availableRoles"
@@ -313,6 +303,12 @@
                     </div>
                     <div class="flex flex-nowrap justify-between pb-3">
                         <div
+                            v-if="project.identifier"
+                            class="text-gray-400 mt-2"
+                        >
+                            <img :src="'/badge/doi/' + project.identifier" />
+                        </div>
+                        <div
                             class="mt-2 flex items-center text-xs text-gray-400"
                         >
                             <CalendarIcon
@@ -411,22 +407,11 @@
                     <dd class="mt-1 text-md text-gray-900 space-y-5">
                         <p>
                             <span
+                                class="mt-1 inline-flex items-center rounded-full bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10"
                                 v-for="tag in project.tags"
                                 :key="tag.id"
-                                class="mr-2"
                             >
-                                <span
-                                    class="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-indigo-100 text-indigo-800"
-                                >
-                                    <svg
-                                        class="-ml-0.5 mr-1.5 h-2 w-2 text-indigo-400"
-                                        fill="currentColor"
-                                        viewBox="0 0 8 8"
-                                    >
-                                        <circle cx="4" cy="4" r="3" />
-                                    </svg>
-                                    {{ tag.name["en"] }}
-                                </span>
+                                {{ tag.name["en"] }}
                             </span>
                         </p>
                     </dd>
