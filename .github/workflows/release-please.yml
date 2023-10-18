@@ -6,8 +6,12 @@ on:
       - main
 
 jobs:
+  php-unit-test:
+    uses: NFDI4Chem/nmrxiv/.github/workflows/test.yml@development
+
   release-please:
     runs-on: ubuntu-latest
+    needs: php-unit-test
     steps:
       - uses: google-github-actions/release-please-action@v3
         with:
