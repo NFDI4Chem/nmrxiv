@@ -73,10 +73,10 @@
                     <h3 class="mt-2 text-sm font-medium text-gray-900">
                         No datasets
                     </h3>
-                    <p class="mt-1 text-sm text-gray-500">
-                        Get started by uploading a dataset.
-                    </p>
-                    <div class="mt-6">
+                    <div v-if="editableTeamRole" class="mt-2">
+                        <p class="mb-1 text-sm text-gray-500">
+                            Get started by uploading a dataset.
+                        </p>
                         <create mode="button"></create>
                         <span
                             class="float-center text-xs cursor-pointer hover:text-blue-700 mt-2"
@@ -301,8 +301,7 @@ import Onboarding from "@/App/Onboarding.vue";
 import { useMagicKeys } from "@vueuse/core";
 import { getCurrentInstance } from "vue";
 import { watchEffect } from "vue";
-import { Link } from "@inertiajs/inertia-vue3";
-import { Inertia } from "@inertiajs/inertia";
+import { Link } from "@inertiajs/vue3";
 import { computed } from "vue";
 
 const { meta, u } = useMagicKeys();

@@ -702,7 +702,7 @@ import {
 import JetInputError from "@/Jetstream/InputError.vue";
 import LoadingButton from "@/Shared/LoadingButton.vue";
 import JetDangerButton from "@/Jetstream/DangerButton.vue";
-import { Inertia } from "@inertiajs/inertia";
+import { router } from "@inertiajs/vue3";
 import SelectRich from "@/Shared/SelectRich.vue";
 import Draggable from "vuedraggable";
 
@@ -719,7 +719,6 @@ export default {
         TrashIcon,
         JetInputError,
         LoadingButton,
-        Inertia,
         SelectRich,
         Draggable,
     },
@@ -1099,7 +1098,7 @@ export default {
             this.authorsForm.delete(route("author.delete", this.project.id), {
                 preserveScroll: true,
                 onSuccess: () => {
-                    Inertia.reload();
+                    router.reload({ only: ["project"] });
                     this.loadInitial();
                     this.authorsForm.reset();
                     this.confirmDelete = false;
@@ -1130,7 +1129,7 @@ export default {
                 {
                     preserveScroll: true,
                     onSuccess: () => {
-                        Inertia.reload();
+                        router.reload({ only: ["project"] });
                         this.loadInitial();
                         this.updateRoleForm.reset();
                         this.showManageRoleDialog = false;

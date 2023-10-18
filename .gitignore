@@ -15,3 +15,5 @@ yarn-error.log
 /.idea
 /.vscode
 /resources/ops/kubernetes/secret.yml
+docs/.vitepress/dist
+docs/.vitepress/cache

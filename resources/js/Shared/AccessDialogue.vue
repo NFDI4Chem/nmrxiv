@@ -1,14 +1,28 @@
 <template>
     <div
-        class="cursor-pointer flex flex-row-reverse justify-end"
+        class="cursor-pointer flex flex-row-reverse justify-end mr-2"
         @click="open = true"
     >
-        <img
+        <div
             v-if="members.length > 0"
-            class="w-8 h-8 -ml-4 rounded-full border-2 border-white"
-            src="https://ui-avatars.com/api/?name=+&color=7F9CF5&background=EBF4FF"
+            class="tooltip w-8 h-8 -ml-.5 rounded-full border-2 border-white bg-gray-100"
             alt=""
-        />
+        >
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4 m-1.5 text-gray-400"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+            >
+                <path
+                    d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z"
+                />
+            </svg>
+            <span
+                class="bg-gray-900 text-center text-white px-2 py-1 shadow-lg rounded-md tooltiptextbottom"
+                >Click here to edit sharing options.</span
+            >
+        </div>
         <img
             v-for="user in members"
             :key="user.id"
@@ -29,23 +43,6 @@
             :src="team.owner.profile_photo_url"
             :alt="team.owner.first_name"
         />
-        <span v-if="members.length == 0 && !team">
-            <button
-                type="button"
-                class="inline-flex items-center px-0 py-2 ronded-md font-medium text-dark sm:text-sm"
-            >
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-5 w-5"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                >
-                    <path
-                        d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z"
-                    /></svg
-                >&nbsp; SHARE
-            </button>
-        </span>
     </div>
     <TransitionRoot :show="open" as="template" appear @after-leave="query = ''">
         <Dialog as="div" class="relative z-10 p-4" @close="open = false">
@@ -827,7 +824,7 @@ export default {
             updateRoleForm: this.$inertia.form({
                 role: null,
             }),
-            removeModelMemberForm: this.$inertia.form(),
+            removeModelMemberForm: this.$inertia.form({}),
         };
     },
     computed: {

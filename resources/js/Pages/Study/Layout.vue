@@ -109,7 +109,7 @@
                                     class="mt-1 flex flex-col sm:flex-row sm:flex-wrap sm:mt-0 sm:space-x-6"
                                 >
                                     <div
-                                        class="mt-2 flex items-center text-sm text-gray-500"
+                                        class="mt-2 flex items-center text-sm text-gray-700"
                                     >
                                         <access-dialogue
                                             :available-roles="availableRoles"
@@ -121,6 +121,32 @@
                                             :model="model"
                                             called-from="studyView"
                                         />
+                                        <a
+                                            class="cursor-pointer inline-flex items-center"
+                                            @click="toggleDetails"
+                                        >
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                viewBox="0 0 24 24"
+                                                class="w-4 h-4"
+                                            >
+                                                <path
+                                                    d="M4 15a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h7a1 1 0 0 1 .7.3L13.42 5H21a1 1 0 0 1 .9 1.45L19.61 11l2.27 4.55A1 1 0 0 1 21 17h-8a1 1 0 0 1-.7-.3L10.58 15H4z"
+                                                    class="fill-current text-gray-400"
+                                                ></path>
+                                                <rect
+                                                    width="2"
+                                                    height="20"
+                                                    x="2"
+                                                    y="2"
+                                                    rx="1"
+                                                    class="fill-current text-gray-600"
+                                                ></rect>
+                                            </svg>
+                                            <span class="ml-2"
+                                                >View details</span
+                                            ></a
+                                        >
                                         <div class="ml-3">
                                             <span
                                                 v-if="study.is_public"
@@ -204,17 +230,6 @@
                                     <div
                                         class="mt-2 flex items-center text-sm text-gray-500"
                                     >
-                                        <a
-                                            class="cursor-pointer inline-flex items-center"
-                                            @click="toggleDetails"
-                                            ><ExclamationCircleIcon
-                                                class="h-5 w-5 text-gray-400 group-hover:text-gray-500"
-                                                aria-hidden="true"
-                                            />
-                                            <span class="ml-2"
-                                                >View details</span
-                                            ></a
-                                        >
                                         <span
                                             class="capitalize inline-flex pr-4 ml-7 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
                                         >
@@ -367,7 +382,7 @@
 
 <script>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import { Link } from "@inertiajs/inertia-vue3";
+import { Link } from "@inertiajs/vue3";
 import StudyDetails from "./Partials/Details.vue";
 import { StarIcon } from "@heroicons/vue/24/solid";
 import { ref } from "vue";
@@ -386,7 +401,7 @@ import {
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import AccessDialogue from "@/Shared/AccessDialogue.vue";
 import Citation from "@/Shared/Citation.vue";
-import { Inertia } from "@inertiajs/inertia";
+import { router } from "@inertiajs/vue3";
 
 export default {
     components: {
@@ -458,7 +473,7 @@ export default {
                     }
                 })
                 .then(function (response) {
-                    Inertia.reload({ only: ["study"] });
+                    router.reload({ only: ["study"] });
                 });
         },
     },

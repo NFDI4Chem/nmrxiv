@@ -10,9 +10,9 @@ use Storage;
 
 class Dataset extends Model implements Auditable
 {
+    use HasDOI;
     use HasFactory;
     use \OwenIt\Auditing\Auditable;
-    use HasDOI;
 
     protected $fillable = [
         'name',
