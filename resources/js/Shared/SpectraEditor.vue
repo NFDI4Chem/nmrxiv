@@ -523,7 +523,6 @@ export default {
                     if (this.study.datasets.length > 0) {
                         let urls = [];
                         let url =
-                            this.url +
                             "/" +
                             username +
                             "/datasets/" +
@@ -545,7 +544,6 @@ export default {
                     ? this.$page.props.team.owner.username
                     : this.project.owner.username;
                 let url =
-                    this.url +
                     "/" +
                     username +
                     "/datasets/" +
