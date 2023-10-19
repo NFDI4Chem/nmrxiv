@@ -1,7 +1,7 @@
 <template>
     <div>
         <div>
-            <div class="mb-2 float-right">
+            <!-- <div class="mb-2 float-right">
                 <small>
                     <a
                         class="text-xs cursor-pointer hover:text-blue-700 mr-2"
@@ -28,7 +28,7 @@
                         Preview</a
                     >
                 </small>
-            </div>
+            </div> -->
             <small class="text-gray-400">
                 <span v-if="info">{{ info }}</span>
             </small>
