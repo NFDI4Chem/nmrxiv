@@ -1,4 +1,4 @@
-name : Deploy to Dev
+name : Setup, Build and Publish to Dev
 
 on:
   push:
@@ -88,6 +88,7 @@ jobs:
         location: ${{ env.GKE_ZONE }}
         credentials: ${{ secrets.GKE_SA_KEY }}
 
+    # Login to Docker
     - name: Log in to Docker Hub
       uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
       with:
