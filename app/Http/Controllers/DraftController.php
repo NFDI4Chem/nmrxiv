@@ -96,6 +96,14 @@ class DraftController extends Controller
             ]);
     }
 
+    public function update(Request $request, Draft $draft)
+    {
+        $draft->name = $request->get('name');
+        $draft->save();
+
+        return $draft;
+    }
+
     public function deleteFSO(Request $request, Draft $draft, FileSystemObject $filesystemobject)
     {
         $fsoIds = $this->getChildrenIds($filesystemobject, []);
@@ -131,7 +139,7 @@ class DraftController extends Controller
         // ProcessDraft::dispatch($draft);
 
         return response()->json([
-            'project' => Project::with(['studies.datasets', 'owner'])->where('draft_id', $draft->id)->first(),
+            'project' => Project::with(['studies.datasets', 'owner', 'citations', 'authors'])->where('draft_id', $draft->id)->first(),
             'validation' => $validation,
         ]);
     }
@@ -246,7 +254,6 @@ class DraftController extends Controller
                     ['draft_id', $draft->id],
                     ['status', '<>', 'missing'],
                     ['model_type', 'study'],
-                    ['is_processed', false],
                 ])
                 ->orderBy('type')
                 ->get();
@@ -285,14 +292,13 @@ class DraftController extends Controller
                     $study->sample()->save($sample);
 
                     $folder->study_id = $study->id;
-                    $folder->is_processed = true;
                     $folder->save();
                 }
 
                 $sChildren = $folder->children;
 
                 foreach ($sChildren as $sChild) {
-                    if ($sChild->instrument_type != null) {
+                    if ($sChild->instrument_type != null && $sChild->instrument_type != 'nmredata') {
                         // associate all children with the study_id, project_id, dataset_id
                         // create samples
                         // create assays
@@ -403,7 +409,7 @@ class DraftController extends Controller
             }
 
             return response()->json([
-                'project' => $project->load(['owner']),
+                'project' => $project->load(['owner', 'citations', 'authors']),
                 'studies' => $studies,
             ]);
         });
@@ -438,28 +444,37 @@ class DraftController extends Controller
     {
         foreach ($folders as $folder) {
             if ($folder->type == 'directory') {
-                if ($folder->instrument_type == null) {
-                    if ($this->isBruker($folder)) {
-                        $this->saveInstrumentType($folder, 'bruker');
-                        $this->saveModelType($folder->parent);
-                    } elseif ($this->isVarian($folder)) {
-                        $this->saveInstrumentType($folder, 'varian');
-                        $this->saveModelType($folder->parent);
-                    } else {
-                        $this->processFolder($folder->children);
-                    }
+                if ($this->isBruker($folder)) {
+                    $this->saveInstrumentType($folder, 'bruker');
+                    $this->saveModelType($folder->parent);
+                } elseif ($this->isVarian($folder)) {
+                    $this->saveInstrumentType($folder, 'varian');
+                    $this->saveModelType($folder->parent);
+                } else {
+                    $this->processFolder($folder->children);
                 }
             } else {
-                if ($folder->instrument_type == null) {
-                    if ($this->isJOEL($folder)) {
-                        $this->saveInstrumentType($folder, 'joel');
-                        $this->saveModelType($folder->parent);
-                    } elseif ($this->isJcampDX($folder)) {
-                        $this->saveInstrumentType($folder, 'jcamp');
-                        $this->saveModelType($folder->parent);
-                    }
+                if ($this->isJOEL($folder)) {
+                    $this->saveInstrumentType($folder, 'joel');
+                    $this->saveModelType($folder->parent);
+                } elseif ($this->isJcampDX($folder)) {
+                    $this->saveInstrumentType($folder, 'jcamp');
+                    $this->saveModelType($folder->parent);
+                } elseif ($this->isNMReData($folder)) {
+                    $this->saveInstrumentType($folder, 'nmredata');
+                    $this->saveAnnotationsDetected($folder->parent);
                 }
             }
+        }
+    }
+
+    public function saveAnnotationsDetected($folder)
+    {
+        $study = $folder->study;
+
+        if ($study) {
+            $study->has_nmredata = true;
+            $study->save();
         }
     }
 
@@ -520,6 +535,23 @@ class DraftController extends Controller
         }
 
         if ($isJDX || $isDX) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function isNMReData($folder)
+    {
+        $fileTypes = ['nmredata'];
+        $names = [$folder->name];
+        $extensions = array_map(fn ($s) => substr("$s", (strrpos($s, '.') + 1)), $names);
+        $isNMReData = false;
+        if (array_intersect($fileTypes, $extensions) == $fileTypes) {
+            $isNMReData = true;
+        }
+
+        if ($isNMReData) {
             return true;
         }
 
