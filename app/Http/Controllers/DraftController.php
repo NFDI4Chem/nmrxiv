@@ -433,22 +433,26 @@ class DraftController extends Controller
     {
         foreach ($folders as $folder) {
             if ($folder->type == 'directory') {
-                if ($this->isBruker($folder)) {
-                    $this->saveInstrumentType($folder, 'bruker');
-                    $this->saveModelType($folder->parent);
-                } elseif ($this->isVarian($folder)) {
-                    $this->saveInstrumentType($folder, 'varian');
-                    $this->saveModelType($folder->parent);
-                } else {
-                    $this->processFolder($folder->children);
+                if ($folder->instrument_type != null) {
+                    if ($this->isBruker($folder)) {
+                        $this->saveInstrumentType($folder, 'bruker');
+                        $this->saveModelType($folder->parent);
+                    } elseif ($this->isVarian($folder)) {
+                        $this->saveInstrumentType($folder, 'varian');
+                        $this->saveModelType($folder->parent);
+                    } else {
+                        $this->processFolder($folder->children);
+                    }
                 }
             } else {
-                if ($this->isJOEL($folder)) {
-                    $this->saveInstrumentType($folder, 'joel');
-                    $this->saveModelType($folder->parent);
-                } elseif ($this->isJcampDX($folder)) {
-                    $this->saveInstrumentType($folder, 'jcamp');
-                    $this->saveModelType($folder->parent);
+                if ($folder->instrument_type != null) {
+                    if ($this->isJOEL($folder)) {
+                        $this->saveInstrumentType($folder, 'joel');
+                        $this->saveModelType($folder->parent);
+                    } elseif ($this->isJcampDX($folder)) {
+                        $this->saveInstrumentType($folder, 'jcamp');
+                        $this->saveModelType($folder->parent);
+                    }
                 }
             }
         }
