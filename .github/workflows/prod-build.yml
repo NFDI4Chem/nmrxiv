@@ -1,4 +1,4 @@
-name : Deploy to Production
+name : Setup, Build and Publish to Production
 
 on:
   push:
