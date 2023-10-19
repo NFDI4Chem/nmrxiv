@@ -319,7 +319,8 @@ export default {
         nmriumURL() {
             return this.$page.props.nmriumURL
                 ? String(this.$page.props.nmriumURL + "?id=" + Math.random())
-                : "http://nmriumdev.nmrxiv.org?defaultEmptyMessage=loading&workspace=embedded&id=" + Math.random();
+                : "http://nmriumdev.nmrxiv.org?defaultEmptyMessage=loading&workspace=embedded&id=" +
+                      Math.random();
         },
     },
     methods: {

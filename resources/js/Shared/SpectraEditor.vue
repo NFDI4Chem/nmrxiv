@@ -1,7 +1,7 @@
 <template>
     <div>
         <div>
-            <div class="mb-2 float-right">
+            <!-- <div class="mb-2 float-right">
                 <small>
                     <a
                         class="text-xs cursor-pointer hover:text-blue-700 mr-2"
@@ -28,7 +28,7 @@
                         Preview</a
                     >
                 </small>
-            </div>
+            </div> -->
             <small class="text-gray-400">
                 <span v-if="info">{{ info }}</span>
             </small>
@@ -374,7 +374,9 @@ export default {
     },
     computed: {
         url() {
-            return String(this.$page.props.url);
+            return String(this.$page.props.url)
+                ? String(this.$page.props.url)
+                : "https://dev.nmrxiv.org";
         },
         nmriumURL() {
             return this.$page.props.nmriumURL
@@ -382,7 +384,6 @@ export default {
                 : "https://nmriumdev.nmrxiv.org?defaultEmptyMessage=''&workspace=embedded&id=" +
                       Math.random();
         },
-
         mailFromAddress() {
             return String(this.$page.props.mailFromAddress);
         },
@@ -522,6 +523,7 @@ export default {
                 } else {
                     if (this.study.datasets.length > 0) {
                         let urls = [];
+
                         let url =
                             this.url +
                             "/" +

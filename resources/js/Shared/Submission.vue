@@ -553,6 +553,7 @@
                                                                         )
                                                                     "
                                                                     :class="[
+                                                                        study.has_nmrium ||
                                                                         ds.has_nmrium
                                                                             ? 'bg-green-100 text-gray-800'
                                                                             : 'bg-gray-100 text-gray-800',
@@ -584,18 +585,18 @@
                                                 height: 80vh;
                                                 overflow: scroll !important;
                                             "
-                                            class="flex-1 xl:overflow-y-auto p-2"
+                                            class="flex-1 xl:overflow-y-auto"
                                         >
                                             <div
-                                                class="mx-auto flex flex-col md:px-4 xl:px-0"
+                                                class="mx-auto flex flex-col md:px-0 xl:px-0"
                                             >
                                                 <main class="flex-1">
                                                     <div
-                                                        class="relative mx-auto md:px-4 xl:px-0"
+                                                        class="relative mx-auto md:px-0 xl:px-0"
                                                     >
                                                         <div class="pt-5 pb-16">
                                                             <div
-                                                                class="px-4 sm:px-6"
+                                                                class="px-3 sm:px-3"
                                                             >
                                                                 <h1
                                                                     class="text-3xl font-extrabold text-gray-900"
@@ -635,7 +636,7 @@
                                                                 </select>
                                                             </div>
                                                             <div
-                                                                class="hidden lg:block px-4 sm:px-6"
+                                                                class="hidden lg:block px-3 sm:px-3"
                                                             >
                                                                 <div
                                                                     class="border-b border-gray-200"
@@ -815,9 +816,9 @@
                                                                 class="px-4 sm:px-6 md:px-0"
                                                             >
                                                                 <div
-                                                                    class="p-6"
+                                                                    class="p-3"
                                                                 >
-                                                                    <div>
+                                                                    <!-- <div>
                                                                         <label
                                                                             for="location"
                                                                             class="block text-sm font-medium text-gray-700"
@@ -864,9 +865,9 @@
                                                                                 </span>
                                                                             </option>
                                                                         </select>
-                                                                    </div>
+                                                                    </div> -->
                                                                     <div
-                                                                        class="my-7"
+                                                                        class="my-3"
                                                                     >
                                                                         <SpectraEditor
                                                                             :dataset="

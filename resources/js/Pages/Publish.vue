@@ -18,7 +18,9 @@
                                         ←
                                     </Link>
                                     <span>
-                                    <p class="inline">DRAFT: <b>{{ draft.name }}</b></p>
+                                        <p class="inline">
+                                            DRAFT: <b>{{ draft.name }}</b>
+                                        </p>
                                     </span>
                                 </h3>
                             </div>

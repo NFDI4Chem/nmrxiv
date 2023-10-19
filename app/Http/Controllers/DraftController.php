@@ -326,6 +326,7 @@ class DraftController extends Controller
                             $ds->save();
 
                             $sChild->dataset_id = $ds->id;
+                            $sChild->is_processed = true;
                             $sChild->save();
                         }
                     }
@@ -366,6 +367,7 @@ class DraftController extends Controller
                     $study->sample()->save($sample);
 
                     $folder->study_id = $study->id;
+                    $folder->is_processed = true;
                     $folder->save();
 
                     $ds = Dataset::where([
@@ -390,6 +392,7 @@ class DraftController extends Controller
                         ]);
 
                         $folder->dataset_id = $ds->id;
+                        $folder->is_processed = true;
                         $folder->save();
                     }
                 }

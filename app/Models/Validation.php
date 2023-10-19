@@ -181,9 +181,9 @@ class Validation extends Model
 
                     $values = [
                         'files' => $dataset->fsObject ? $dataset->fsObject->instrument_type : null,
-                        'nmrium_info' => $dataset->has_nmrium ? $dataset->has_nmrium : null,
+                        'nmrium_info' => ($study->has_nmrium || $dataset->has_nmrium) ? $dataset->has_nmrium : null,
                         'assay' => $dataset->assay,
-                        'assignments' => $dataset->has_nmrium ? $dataset->has_nmrium : null,
+                        'assignments' => ($study->has_nmrium || $dataset->has_nmrium) ? $dataset->has_nmrium : null,
                     ];
 
                     $dataset_rules = $rules['dataset'];
