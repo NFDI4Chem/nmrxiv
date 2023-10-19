@@ -374,7 +374,9 @@ export default {
     },
     computed: {
         url() {
-            return String(this.$page.props.url);
+            return String(this.$page.props.url)
+                ? String(this.$page.props.url)
+                : "https://dev.nmrxiv.org";
         },
         nmriumURL() {
             return this.$page.props.nmriumURL
@@ -382,7 +384,6 @@ export default {
                 : "https://nmriumdev.nmrxiv.org?defaultEmptyMessage=''&workspace=embedded&id=" +
                       Math.random();
         },
-
         mailFromAddress() {
             return String(this.$page.props.mailFromAddress);
         },
@@ -520,9 +521,10 @@ export default {
                             }
                         });
                 } else {
+                    let urls = [];
                     if (this.study.datasets.length > 0) {
-                        let urls = [];
                         let url =
+                            this.url +
                             "/" +
                             username +
                             "/datasets/" +
@@ -530,8 +532,8 @@ export default {
                             "/" +
                             this.study.slug;
                         urls.push(url);
-                        this.loadFromURLs(urls);
                     }
+                    this.loadFromURLs(urls);
                 }
             }
         },
@@ -544,6 +546,7 @@ export default {
                     ? this.$page.props.team.owner.username
                     : this.project.owner.username;
                 let url =
+                    this.url +
                     "/" +
                     username +
                     "/datasets/" +
@@ -552,7 +555,6 @@ export default {
                     this.study.slug;
                 urls.push(url);
             }
-
             let data = {
                 data: urls,
                 type: "url",
