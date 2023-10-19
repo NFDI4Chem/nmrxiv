@@ -7,6 +7,7 @@ use App\Actions\Study\CreateNewStudy;
 use App\Actions\Study\UpdateStudy;
 use App\Models\FileSystemObject;
 use App\Models\Molecule;
+use App\Models\NMRium;
 use App\Models\Sample;
 use App\Models\Study;
 use Auth;
@@ -135,6 +136,69 @@ class StudyController extends Controller
         return $sample->molecules;
     }
 
+    public function fetchNMRium(Request $request, Study $study)
+    {
+        if ($study) {
+            $nmrium = $study->nmrium;
+            if ($nmrium) {
+                return json_decode($nmrium->nmrium_info);
+            } else {
+                return null;
+            }
+        }
+    }
+
+    public function nmriumVersions(Request $request, Study $study)
+    {
+        if ($study) {
+            $nmrium = $study->nmrium;
+
+            if ($nmrium) {
+                return $nmrium->versions()->orderBy('created_at', 'DESC')->get()->map(function ($version) {
+                    $user = User::find($version->user_id);
+
+                    return [
+                        'updated_at' => $version->updated_at,
+                        'user' => [
+                            'name' => $user->first_name.' '.$user->last_name,
+                            'profile_photo_url' => $user->profile_photo_url,
+                        ],
+                    ];
+                });
+            }
+        }
+    }
+
+    public function nmriumInfo(Request $request, Study $study)
+    {
+        if ($study) {
+            $user = Auth::user();
+            $data = $request->all();
+            $version = $request->get('version');
+            // $spectra = $request->get('spectra');
+            // $molecules = $request->get('molecules');
+
+            $nmriumInfo = $data;
+            // $molecularInfo = $molecules;
+            $nmrium = $study->nmrium;
+
+            if ($nmrium) {
+                $nmrium->nmrium_info = $nmriumInfo;
+                $study->has_nmrium = true;
+                $nmrium->save();
+            } else {
+                $nmrium = NMRium::create([
+                    'nmrium_info' => json_encode($nmriumInfo),
+                ]);
+                $study->nmrium()->save($nmrium);
+                $study->has_nmrium = true;
+            }
+            $study->save();
+
+            return $study->fresh();
+        }
+    }
+
     public function moleculeDetach(Request $request, Study $study, Molecule $molecule)
     {
         if ($molecule) {
@@ -178,6 +242,25 @@ class StudyController extends Controller
                     ->get(),
             ],
         ]);
+    }
+
+    public function annotations(Request $request, Study $study)
+    {
+        if (! Gate::forUser($request->user())->check('viewStudy', $study)) {
+            throw new AuthorizationException;
+        }
+
+        $studyFSObject = FileSystemObject::with('children')
+            ->where([
+                ['study_id', $study->id],
+                ['level', $study->fsObject->level],
+            ])
+            ->orderBy('type')
+            ->first();
+
+        return $studyFSObject->children->filter(function ($child) {
+            return $child->instrument_type == 'nmredata';
+        })->values();
     }
 
     public function file(Request $request, $code, Study $study, $filename)

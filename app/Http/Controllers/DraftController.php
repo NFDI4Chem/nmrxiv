@@ -246,6 +246,7 @@ class DraftController extends Controller
                     ['draft_id', $draft->id],
                     ['status', '<>', 'missing'],
                     ['model_type', 'study'],
+                    ['is_processed', false],
                 ])
                 ->orderBy('type')
                 ->get();
@@ -284,6 +285,7 @@ class DraftController extends Controller
                     $study->sample()->save($sample);
 
                     $folder->study_id = $study->id;
+                    $folder->is_processed = true;
                     $folder->save();
                 }
 
@@ -319,6 +321,7 @@ class DraftController extends Controller
                             $ds->save();
 
                             $sChild->dataset_id = $ds->id;
+                            $sChild->is_processed = true;
                             $sChild->save();
                         }
                     }
@@ -359,6 +362,7 @@ class DraftController extends Controller
                     $study->sample()->save($sample);
 
                     $folder->study_id = $study->id;
+                    $folder->is_processed = true;
                     $folder->save();
 
                     $ds = Dataset::where([
@@ -383,6 +387,7 @@ class DraftController extends Controller
                         ]);
 
                         $folder->dataset_id = $ds->id;
+                        $folder->is_processed = true;
                         $folder->save();
                     }
                 }
@@ -433,7 +438,7 @@ class DraftController extends Controller
     {
         foreach ($folders as $folder) {
             if ($folder->type == 'directory') {
-                if ($folder->instrument_type != null) {
+                if ($folder->instrument_type == null) {
                     if ($this->isBruker($folder)) {
                         $this->saveInstrumentType($folder, 'bruker');
                         $this->saveModelType($folder->parent);
@@ -445,7 +450,7 @@ class DraftController extends Controller
                     }
                 }
             } else {
-                if ($folder->instrument_type != null) {
+                if ($folder->instrument_type == null) {
                     if ($this->isJOEL($folder)) {
                         $this->saveInstrumentType($folder, 'joel');
                         $this->saveModelType($folder->parent);
