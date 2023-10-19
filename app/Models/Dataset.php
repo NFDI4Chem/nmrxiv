@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use OwenIt\Auditing\Contracts\Auditable;
 use Storage;
 
@@ -111,9 +112,9 @@ class Dataset extends Model implements Auditable
         return $this->belongsTo(Team::class, 'Team_id');
     }
 
-    public function nmrium()
+    public function nmrium(): MorphOne
     {
-        return $this->hasOne(NMRium::class);
+        return $this->morphOne(NMRium::class, 'nmriumable');
     }
 
     public function fsObject()

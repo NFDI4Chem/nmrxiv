@@ -553,6 +553,7 @@
                                                                         )
                                                                     "
                                                                     :class="[
+                                                                        study.has_nmrium ||
                                                                         ds.has_nmrium
                                                                             ? 'bg-green-100 text-gray-800'
                                                                             : 'bg-gray-100 text-gray-800',
@@ -817,7 +818,7 @@
                                                                 <div
                                                                     class="p-6"
                                                                 >
-                                                                    <div>
+                                                                    <!-- <div>
                                                                         <label
                                                                             for="location"
                                                                             class="block text-sm font-medium text-gray-700"
@@ -864,7 +865,7 @@
                                                                                 </span>
                                                                             </option>
                                                                         </select>
-                                                                    </div>
+                                                                    </div> -->
                                                                     <div
                                                                         class="my-7"
                                                                     >

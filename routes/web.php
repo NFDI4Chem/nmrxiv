@@ -187,6 +187,13 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
         Route::delete('/studies/{study}/members/{user}', [StudyMemberController::class, 'removeMember'])
             ->name('study-members.destroy');
 
+        Route::get('studies/{study}/nmriumVersions', [StudyController::class, 'nmriumVersions'])
+            ->name('dashboard.studies.nmriumVersions');
+        Route::get('studies/{study}/nmriumInfo', [StudyController::class, 'fetchNMRium'])
+            ->name('dashboard.studies.nmrium');
+        Route::post('studies/{study}/nmriumInfo', [StudyController::class, 'nmriumInfo'])
+            ->name('dashboard.studies.nmriumInfo');
+
         Route::post('studies/{study}/molecule', [StudyController::class, 'moleculeStore'])
             ->name('study-molecule.store');
         Route::delete('studies/{study}/molecule/{molecule}', [StudyController::class, 'moleculeDetach'])
