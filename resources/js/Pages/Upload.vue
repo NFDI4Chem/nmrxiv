@@ -18,11 +18,15 @@
                                         ←
                                     </Link>
                                     <span v-if="currentStep && currentDraft">
-                                       <p class="inline focus:outline-none focus:ring-0 focus:bg-gray-100 p-2 rounded-md" @blur="updateDraft($event)" contenteditable> {{ currentDraft.name }} </p>
+                                        <p
+                                            class="inline focus:outline-none focus:ring-0 focus:bg-gray-100 p-2 rounded-md"
+                                            @blur="updateDraft($event)"
+                                            contenteditable
+                                        >
+                                            {{ currentDraft.name }}
+                                        </p>
                                     </span>
-                                    <span v-else>
-                                        Submit data to nmrXiv
-                                    </span>
+                                    <span v-else> Submit data to nmrXiv </span>
                                 </h3>
                                 <div class="mt-3 sm:ml-4 sm:mt-0">
                                     <div v-if="showPrimer && currentDraft">
@@ -202,7 +206,10 @@
             <div>
                 <div v-if="!loading">
                     <div class="mx-auto">
-                        <div class=" px-12" v-if="drafts.length > 0 && !currentDraft">
+                        <div
+                            class="px-12"
+                            v-if="drafts.length > 0 && !currentDraft"
+                        >
                             <div class="my-8 mx-12 mx-auto max-w-none">
                                 <div
                                     class="bg-white border rounded-lg shadow-md"
@@ -279,7 +286,7 @@
                                                         >
                                                             ID: {{ draft.key }}
                                                         </p>
-                                                       <p
+                                                        <p
                                                             class="text-sm text-gray-500 truncate"
                                                         >
                                                             Created at:
@@ -289,7 +296,7 @@
                                                                 )
                                                             }}
                                                         </p>
-                                                         <!-- <p
+                                                        <!-- <p
                                                             class="text-sm text-gray-500 truncate"
                                                         >
                                                             Updated at:
@@ -320,8 +327,7 @@
                                     </ul>
                                 </div>
                             </div>
-                            <div>
-                            </div>
+                            <div></div>
                         </div>
                         <div v-else>
                             <div class="pt-6" v-if="showPrimer">
@@ -2101,7 +2107,7 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import TeamProjects from "@/Pages/Project/Index.vue";
 import Create from "@/Shared/CreateButton.vue";
 import Onboarding from "@/App/Onboarding.vue";
-import { Link } from '@inertiajs/vue3'
+import { Link } from "@inertiajs/vue3";
 import { computed } from "vue";
 import FileSystemBrowser from "./../Shared/FileSystemBrowser.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
@@ -2330,15 +2336,17 @@ export default {
     },
 
     methods: {
-        updateDraft(e){
-            console.log(e.target.innerText)
-            this.currentDraft.name = e.target.innerText
-            axios.put( "/dashboard/drafts/" +
-                            this.currentDraft.id 
-                    , this.currentDraft)
-                    .then((response) => {
-                        this.currentDraft = response.data
-                    });
+        updateDraft(e) {
+            console.log(e.target.innerText);
+            this.currentDraft.name = e.target.innerText;
+            axios
+                .put(
+                    "/dashboard/drafts/" + this.currentDraft.id,
+                    this.currentDraft
+                )
+                .then((response) => {
+                    this.currentDraft = response.data;
+                });
         },
         getTarget(id) {
             var target = null;
@@ -2677,7 +2685,7 @@ export default {
                         //     this.draftForm.description;
                         // this.publishForm.project.tags = this.draftForm.tags;
                         // this.trackProject();
-                        window.location = "/publish/" + this.currentDraft.id
+                        window.location = "/publish/" + this.currentDraft.id;
                     }
                 });
         },
@@ -2763,7 +2771,7 @@ export default {
             this.selectStep(1);
         },
         updateLoadingStatus(status) {
-            console.log(status)
+            console.log(status);
             this.loading = status;
         },
         fetchDrafts() {

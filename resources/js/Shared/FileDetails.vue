@@ -33,9 +33,7 @@
                         <div v-if="fileInfo.ETag">
                             {{ fileInfo.ETag.replace(/"/g, "") }}
                         </div>
-                        <div v-else>
-                            -
-                        </div>
+                        <div v-else>-</div>
                     </dd>
                 </div>
                 <div></div>
@@ -133,9 +131,9 @@ export default {
         url() {
             return String(this.$page.props.url);
         },
-        fileInfo(){
-            return JSON.parse(this.file.info)
-        }
+        fileInfo() {
+            return JSON.parse(this.file.info);
+        },
     },
 };
 </script>
