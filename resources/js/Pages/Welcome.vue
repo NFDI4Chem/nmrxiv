@@ -774,21 +774,25 @@
                                     Quick links
                                 </h3>
                                 <ul role="list" class="mt-4 space-y-4">
-                                    <li>
-                                        <Link
-                                            href="/projects"
+                                    <li
+                                        v-for="item in footerNavigation.quicklinks"
+                                        :key="item.name"
+                                    >
+                                    <Link
+                                            :href="item.href"
                                             class="text-base text-gray-500 hover:text-gray-900"
                                         >
-                                            Projects
+                                            {{ item.name }}
                                         </Link>
                                     </li>
                                     <li>
-                                        <Link
-                                            href="/spectra"
+                                        <a
+                                            target="_blank"
+                                            href=https://docs.nmrxiv.org/FAQs.html
                                             class="text-base text-gray-500 hover:text-gray-900"
                                         >
-                                            Spectra
-                                        </Link>
+                                            FAQs
+                                        </a>
                                     </li>
                                 </ul>
                             </div>
@@ -1024,6 +1028,10 @@ const footerNavigation = {
     //   { name: "Browse", href: "/projects" },
     //   { name: "Advanced Search", href: "/projects" },
     // ],
+    quicklinks: [
+        { name: "Projects", href: "/projects"},
+        { name: "Spectra", href: "/spectra"}
+    ],
     support: [
         { name: "Documentation", href: "https://docs.nmrxiv.org" },
         {
