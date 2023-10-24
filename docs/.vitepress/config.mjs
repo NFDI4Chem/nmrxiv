@@ -5,7 +5,7 @@ export default defineConfig({
   title: "nmrXiv",
   description: "FAIR, consensus-driven NMR data repository and computational platform",
   ignoreDeadLinks: true,
-  base: '/nmrxiv/',
+ //base: '/nmrxiv/',
 
   themeConfig: {
     search: {
