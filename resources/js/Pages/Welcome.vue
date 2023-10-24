@@ -367,7 +367,7 @@
                 </div>
             </div>
 
-            <div class="relative pt-16 pb-32">
+            <div class="relative pt-16">
                 <div>
                     <div
                         class="lg:mx-auto lg:max-w-7xl lg:px-8 lg:grid lg:grid-cols-2 lg:grid-flow-col-dense lg:gap-24 overflow-x-hidden pb-10"
@@ -610,6 +610,10 @@
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <div>
+                <FAQs></FAQs>
             </div>
 
             <!-- Gradient Feature Section -->
@@ -955,6 +959,7 @@ import {
 } from "@heroicons/vue/24/outline";
 import { ChevronDownIcon } from "@heroicons/vue/24/solid";
 import ToolTip from "@/Shared/ToolTip.vue";
+import FAQs from "@/App/FAQs.vue";
 
 const Search = [
     {
@@ -1147,6 +1152,7 @@ export default {
         CircleStackIcon,
         ToolTip,
         Projects,
+        FAQs,
     },
 
     props: {
