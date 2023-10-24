@@ -36,7 +36,7 @@
                     the project.
                 </div>
             </div>
-            <div v-if="project.is_public && project.doi != null">
+            <div v-if="project.is_public && project.doi != null" class="p-4">
                 <Citation :model="'project'" :doi="project.doi"></Citation>
             </div>
             <div class="bg-white border-b">

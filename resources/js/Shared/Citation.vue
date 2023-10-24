@@ -1,5 +1,5 @@
 <template>
-    <div v-if="citationText" class="p-4">
+    <div v-if="citationText">
         <div class="rounded-md bg-blue-50 p-4">
             <div class="flex">
                 <div class="flex-shrink-0">

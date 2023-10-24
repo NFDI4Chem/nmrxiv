@@ -144,7 +144,7 @@
                                             - #{{ dataset.id }}
                                         </option>
                                     </select>
-                                    <div class="-mx-4" v-if="selectedDataset">
+                                    <div class="-mx-4 p-4" v-if="selectedDataset">
                                         <Citation
                                             :model="'dataset'"
                                             :doi="selectedDataset.doi"

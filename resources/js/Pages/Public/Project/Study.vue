@@ -4,6 +4,17 @@
             <div
                 class="pb-10 mb-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6"
             >
+            <div
+                        v-if="
+                            study.data.is_public && study.data.doi != null
+                        "
+                        class="pb-4"
+                    >
+                        <Citation
+                            :model="'study'"
+                            :doi="study.data.doi"
+                        ></Citation>
+                    </div>
                 <h1 class="mt-2 text-2xl font-bold break-words text-gray-900">
                     <div class="text-blue-500">
                         {{ study.data.name }}
@@ -459,6 +470,7 @@ import ProjectLayout from "@/Pages/Public/Project/Layout.vue";
 import { ShareIcon, ClipboardDocumentIcon } from "@heroicons/vue/24/solid";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import SpectraViewer from "@/Shared/SpectraViewer.vue";
+import Citation from "@/Shared/Citation.vue";
 
 export default {
     components: {
@@ -470,6 +482,8 @@ export default {
         MenuItem,
         MenuItems,
         SpectraViewer,
+        Citation
+        
     },
     props: ["project", "tab", "study"],
     data() {

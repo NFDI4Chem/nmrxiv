@@ -4,6 +4,9 @@
             <div
                 class="pb-10 mb-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6"
             >
+            <div v-if="project.data.is_public && project.data.doi != null" class="pb-4">
+                    <Citation :model="'project'" :doi="project.data.doi"></Citation>
+                </div>
                 <h3 class="text-xl font-extrabold text-blue-gray-900">
                     About project
                 </h3>
@@ -140,12 +143,14 @@
 import ProjectLayout from "@/Pages/Public/Project/Layout.vue";
 import AuthorCard from "@/Shared/AuthorCard.vue";
 import CitationCard from "@/Shared/CitationCard.vue";
+import Citation from "@/Shared/Citation.vue";
 
 export default {
     components: {
         ProjectLayout,
         AuthorCard,
         CitationCard,
+        Citation
     },
     props: ["project", "tab"],
     data() {
