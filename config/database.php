@@ -79,7 +79,7 @@ return [
             'dump' => [
                 'use_single_transaction',
                 'timeout' => 620 * 100, // 51 minute timeout
-                'exclude_tables' => ['nmrium','versions']
+                'exclude_tables' => ['nmrium', 'versions'],
             ],
         ],
 
