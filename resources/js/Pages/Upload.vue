@@ -266,7 +266,9 @@
                                                 <div
                                                     class="flex items-center space-x-4"
                                                 >
-                                                    <div class="flex-1 min-w-0">
+                                                    <div
+                                                        class="flex-1 min-w-0 mr-auto max-w-2xl"
+                                                    >
                                                         <p
                                                             class="text-lg font-large text-black truncate"
                                                         >
@@ -275,7 +277,7 @@
                                                             }}</b>
                                                         </p>
                                                         <p
-                                                            class="text-sm font-medium text-gray-600 truncate pr-10"
+                                                            class="text-sm font-medium text-gray-700 truncate pr-10"
                                                         >
                                                             {{
                                                                 draft.description
@@ -285,11 +287,7 @@
                                                             class="text-sm font-medium text-gray-500 truncate"
                                                         >
                                                             ID: {{ draft.key }}
-                                                        </p>
-                                                        <p
-                                                            class="text-sm text-gray-500 truncate"
-                                                        >
-                                                            Created at:
+                                                            &middot; Created at:
                                                             {{
                                                                 formatDateTime(
                                                                     draft.created_at
@@ -365,16 +363,28 @@
                                             class="mt-2"
                                         />
                                     </div>
-                                    <div
-                                        class="h-[calc(100vh-135px)]"
-                                        v-if="currentStep.id == '02'"
-                                    >
-                                        <div>
+                                    <div v-if="currentStep.id == '02'">
+                                        <div
+                                            class="h-[calc(100vh-135px)] overflow-hidden"
+                                        >
                                             <div class="flex-1 flex">
                                                 <nav
                                                     aria-label="Sections"
-                                                    class="overflow-y-scroll h-[calc(100vh-135px)] hidden flex-shrink-0 w-64 bg-white border-r border-gray-200 md:flex md:flex-col"
+                                                    class="flex-shrink-0 w-64 h-[calc(100vh-135px)] overflow-y-hidden bg-white border-r border-gray-200 md:flex md:flex-col"
                                                 >
+                                                    <div
+                                                        @click="
+                                                            showSamplesSummary
+                                                        "
+                                                        :class="[
+                                                            displaySamplesSummaryInfo
+                                                                ? 'bg-gray-900 text-white'
+                                                                : 'text-dark',
+                                                            'cursor-pointer border-gray-200 px-4 py-3 border-b bg-gray-50 text-left text-sm font-medium text-gray-500 tracking-wider flex-shrink-0 border-b border-blue-gray-200',
+                                                        ]"
+                                                    >
+                                                        <a> SUMMARY </a>
+                                                    </div>
                                                     <div
                                                         class="border-gray-200 px-4 py-3 border-b bg-gray-50 text-left text-xs font-medium text-gray-500 tracking-wider flex-shrink-0 border-b border-blue-gray-200"
                                                     >
@@ -415,8 +425,9 @@
                                                             ) in studies"
                                                             :key="study.slug"
                                                             :class="[
+                                                                selectedStudy &&
                                                                 selectedStudy.id ==
-                                                                study.id
+                                                                    study.id
                                                                     ? 'bg-gray-800 text-white'
                                                                     : 'hover:bg-gray-200 hover:bg-opacity-50',
                                                                 'cursor-pointer flex py-4 border-b border-blue-gray-200',
@@ -460,24 +471,14 @@
                                                                     class="mt-1 text-blue-gray-500"
                                                                 >
                                                                     <span
-                                                                        v-for="(
-                                                                            ds,
-                                                                            $dsIndex
-                                                                        ) in study.datasets"
+                                                                        v-for="ds in study.datasets"
                                                                         :key="
                                                                             ds.id
                                                                         "
                                                                     >
                                                                         <div
-                                                                            @click="
-                                                                                selectStudy(
-                                                                                    study,
-                                                                                    $index,
-                                                                                    $dsIndex
-                                                                                )
-                                                                            "
                                                                             :class="[
-                                                                                ds.has_nmrium
+                                                                                study.has_nmrium
                                                                                     ? 'bg-green-100 text-gray-800'
                                                                                     : 'bg-gray-100 text-gray-800',
                                                                                 'mb-0.5 inline-flex truncate break-words items-center px-3 py-0.5 rounded-full text-xs font-medium mr-1 hover:bg-teal-700',
@@ -503,22 +504,155 @@
                                                         </a>
                                                     </div>
                                                 </nav>
-                                                <div class="flex-1 p-2">
+                                                <div class="flex-1 px-2">
                                                     <div
-                                                        class="mx-auto flex flex-col md:px-0 xl:px-0"
+                                                        v-if="
+                                                            displaySamplesSummaryInfo
+                                                        "
                                                     >
-                                                        <main class="flex-1">
+                                                        <div
+                                                            class="-mx-2 border-b border-b-gray-900/10 lg:border-t lg:border-t-gray-900/5"
+                                                        >
+                                                            <dl
+                                                                class="mx-auto grid max-w-7xl grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 lg:px-2 xl:px-0"
+                                                            >
+                                                                <div
+                                                                    class="flex items-baseline flex-wrap justify-between gap-y-2 gap-x-4 border-t border-gray-900/5 px-4 py-10 sm:px-6 lg:border-t-0 xl:px-8"
+                                                                >
+                                                                    <dt
+                                                                        class="text-sm font-medium leading-6 text-gray-500"
+                                                                    >
+                                                                        Samples
+                                                                    </dt>
+                                                                    <!-- <dd class="text-xs font-medium text-gray-700">x%</dd> -->
+                                                                    <dd
+                                                                        class="w-full flex-none text-3xl font-medium leading-10 tracking-tight text-gray-900"
+                                                                    >
+                                                                        {{
+                                                                            studies.length
+                                                                        }}
+                                                                    </dd>
+                                                                </div>
+                                                                <div
+                                                                    class="flex items-baseline flex-wrap justify-between gap-y-2 gap-x-4 border-t border-gray-900/5 px-4 py-10 sm:px-6 lg:border-t-0 xl:px-8 sm:border-l"
+                                                                >
+                                                                    <dt
+                                                                        class="text-sm font-medium leading-6 text-gray-500"
+                                                                    >
+                                                                        Spectra
+                                                                    </dt>
+                                                                    <!-- <dd class="text-xs font-medium text-rose-600">x%</dd> -->
+                                                                    <dd
+                                                                        class="w-full flex-none text-3xl font-medium leading-10 tracking-tight text-gray-900"
+                                                                    >
+                                                                        {{
+                                                                            spectraCount
+                                                                        }}
+                                                                    </dd>
+                                                                </div>
+                                                                <div
+                                                                    class="flex items-baseline flex-wrap justify-between gap-y-2 gap-x-4 border-t border-gray-900/5 px-4 py-10 sm:px-6 lg:border-t-0 xl:px-8 lg:border-l"
+                                                                >
+                                                                    <dt
+                                                                        class="text-sm font-medium leading-6 text-gray-500"
+                                                                    >
+                                                                        Molecules
+                                                                    </dt>
+                                                                    <!-- <dd class="text-xs font-medium text-gray-700">x%</dd> -->
+                                                                    <dd
+                                                                        class="w-full flex-none text-3xl font-medium leading-10 tracking-tight text-gray-900"
+                                                                    >
+                                                                        {{
+                                                                            moleculesCount
+                                                                        }}
+                                                                    </dd>
+                                                                </div>
+                                                                <div
+                                                                    class="flex items-baseline flex-wrap justify-between gap-y-2 gap-x-4 border-t border-gray-900/5 px-4 py-10 sm:px-6 lg:border-t-0 xl:px-8 sm:border-l"
+                                                                >
+                                                                    <dt
+                                                                        class="text-sm font-medium leading-6 text-gray-500"
+                                                                    >
+                                                                        Validation
+                                                                    </dt>
+                                                                    <!-- <dd class="text-xs font-medium text-rose-600">x%</dd> -->
+                                                                    <dd
+                                                                        class="w-full flex-none text-3xl font-medium leading-10 tracking-tight text-gray-900"
+                                                                    >
+                                                                        <span
+                                                                            v-if="
+                                                                                project.validation_status
+                                                                            "
+                                                                        >
+                                                                            Success
+                                                                        </span>
+                                                                        <span
+                                                                            v-else
+                                                                        >
+                                                                            Failed
+                                                                        </span>
+                                                                    </dd>
+                                                                </div>
+                                                            </dl>
+                                                        </div>
+                                                        <div
+                                                            class="overflow-y-scroll h-[calc(100vh-153px)] mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8"
+                                                        >
+                                                            <div
+                                                                class="mx-auto grid max-w-2xl grid-cols-1 grid-rows-1 items-start gap-x-8 gap-y-8 lg:mx-0 lg:max-w-none lg:grid-cols-3"
+                                                            >
+                                                                <div
+                                                                    class="lg:col-span-3"
+                                                                >
+                                                                    <div
+                                                                        v-if="
+                                                                            validation
+                                                                        "
+                                                                    >
+                                                                        <a
+                                                                            @click="
+                                                                                fetchValidations
+                                                                            "
+                                                                            class="float-right cursor-pointer"
+                                                                        >
+                                                                            Refresh
+                                                                        </a>
+                                                                        <Validation
+                                                                            :project="
+                                                                                project
+                                                                            "
+                                                                            :validation="
+                                                                                validation
+                                                                            "
+                                                                            :mode="'study'"
+                                                                            @update="
+                                                                                editData
+                                                                            "
+                                                                        ></Validation>
+                                                                    </div>
+                                                                </div>
+
+                                                                <!-- <div
+                                                                    class="shadow-sm p-2 ring-1 ring-gray-900/5 sm:rounded-lg lg:col-span-1 lg:row-span-2 lg:row-end-2"
+                                                                >
+                                                                Lorem ipsum dolor, sit amet consectetur adipisicing elit. Obcaecati, libero totam tempora enim illo atque dolorum rerum praesentium voluptatum, a eos velit eum officiis inventore in vel nesciunt ab excepturi?
+                                                                </div> -->
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div v-else>
+                                                        <div
+                                                            class="mx-auto flex flex-col md:px-0 xl:px-0"
+                                                        >
                                                             <div
                                                                 class="relative mx-auto md:px-0 xl:px-0"
                                                             >
-                                                                <div
-                                                                    class="pt-5 pb-16"
-                                                                >
+                                                                <div>
                                                                     <div
-                                                                        class="px-2 sm:px-2"
+                                                                        class="px-4 py-1.5 -mx-2 bg-gray-50 border-b"
                                                                     >
                                                                         <h1
-                                                                            class="text-3xl font-extrabold text-gray-900"
+                                                                            class="text-2xl font-extrabold text-gray-900"
                                                                         >
                                                                             {{
                                                                                 selectedStudy.name
@@ -526,305 +660,10 @@
                                                                         </h1>
                                                                     </div>
                                                                     <div
-                                                                        class="px-2 sm:px-2"
-                                                                        v-if="
-                                                                            selectedStudy
-                                                                                .sample
-                                                                                .molecules
-                                                                                .length >
-                                                                            0
-                                                                        "
-                                                                    >
-                                                                        <ul
-                                                                            role="list"
-                                                                            class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
-                                                                        >
-                                                                            <li
-                                                                                v-for="molecule in selectedStudy
-                                                                                    .sample
-                                                                                    .molecules"
-                                                                                class="col-span-1 divide-y divide-gray-200 cursor-pointer"
-                                                                            >
-                                                                                <div
-                                                                                    @click="
-                                                                                        selectTab(
-                                                                                            this
-                                                                                                .tabs[1]
-                                                                                        )
-                                                                                    "
-                                                                                    class="rounded-lg bg-white shadow border my-3 flex justify-center items-center"
-                                                                                >
-                                                                                    <span
-                                                                                        v-html="
-                                                                                            getSVGString(
-                                                                                                molecule
-                                                                                            )
-                                                                                        "
-                                                                                    ></span>
-                                                                                </div>
-                                                                            </li>
-
-                                                                            <!-- More people... -->
-                                                                        </ul>
-                                                                    </div>
-                                                                    <div
-                                                                        class="px-2 sm:px-2"
-                                                                        v-else
-                                                                    >
-                                                                        <ul>
-                                                                            <li
-                                                                                class="col-span-1 divide-y divide-gray-200 cursor-pointer"
-                                                                            >
-                                                                                <div
-                                                                                    @click="
-                                                                                        selectTab(
-                                                                                            this
-                                                                                                .tabs[1]
-                                                                                        )
-                                                                                    "
-                                                                                    class="rounded-lg bg-white shadow border my-3 flex justify-center items-center"
-                                                                                >
-                                                                                    <button
-                                                                                        type="button"
-                                                                                        class="relative block w-full rounded-lg border-2 border-dashed border-gray-300 p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                                                                                    >
-                                                                                        <svg
-                                                                                            class="mx-auto h-12 w-12 text-gray-400"
-                                                                                            stroke="currentColor"
-                                                                                            fill="none"
-                                                                                            viewBox="0 0 48 48"
-                                                                                            aria-hidden="true"
-                                                                                        >
-                                                                                            <path
-                                                                                                stroke-linecap="round"
-                                                                                                stroke-linejoin="round"
-                                                                                                stroke-width="2"
-                                                                                                d="M8 14v20c0 4.418 7.163 8 16 8 1.381 0 2.721-.087 4-.252M8 14c0 4.418 7.163 8 16 8s16-3.582 16-8M8 14c0-4.418 7.163-8 16-8s16 3.582 16 8m0 0v14m0-4c0 4.418-7.163 8-16 8S8 28.418 8 24m32 10v6m0 0v6m0-6h6m-6 0h-6"
-                                                                                            />
-                                                                                        </svg>
-                                                                                        <span
-                                                                                            class="mt-2 block text-sm font-semibold text-gray-900"
-                                                                                            >Add
-                                                                                            structure
-                                                                                            details</span
-                                                                                        >
-                                                                                    </button>
-                                                                                </div>
-                                                                            </li>
-                                                                        </ul>
-                                                                    </div>
-                                                                    <div
-                                                                        class="lg:hidden px-2 sm:px-2"
-                                                                    >
-                                                                        <label
-                                                                            for="selected-tab"
-                                                                            class="sr-only"
-                                                                            >Select
-                                                                            a
-                                                                            tab</label
-                                                                        >
-                                                                        <select
-                                                                            id="selected-tab"
-                                                                            name="selected-tab"
-                                                                            class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm rounded-md"
-                                                                        >
-                                                                            <option
-                                                                                v-for="tab in tabs"
-                                                                                :key="
-                                                                                    tab.name
-                                                                                "
-                                                                                :selected="
-                                                                                    tab.current
-                                                                                "
-                                                                            >
-                                                                                {{
-                                                                                    tab.name
-                                                                                }}
-                                                                            </option>
-                                                                        </select>
-                                                                    </div>
-                                                                    <div
-                                                                        class="hidden lg:block px-2 sm:px-2"
+                                                                        class="overflow-y-scroll h-[calc(100vh-153px)]"
                                                                     >
                                                                         <div
-                                                                            class="border-b border-gray-200"
-                                                                        >
-                                                                            <nav
-                                                                                class="-mb-px flex space-x-8"
-                                                                            >
-                                                                                <a
-                                                                                    v-for="tab in tabs"
-                                                                                    :key="
-                                                                                        tab.name
-                                                                                    "
-                                                                                    :class="[
-                                                                                        tab.current
-                                                                                            ? 'border-teal-500 text-teal-600'
-                                                                                            : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700',
-                                                                                        'cursor-pointer whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm',
-                                                                                    ]"
-                                                                                    @click="
-                                                                                        selectTab(
-                                                                                            tab
-                                                                                        )
-                                                                                    "
-                                                                                >
-                                                                                    {{
-                                                                                        tab.name
-                                                                                    }}
-                                                                                </a>
-                                                                            </nav>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div
-                                                                        class="overflow-y-scroll h-[calc(100vh-353px)]"
-                                                                    >
-                                                                        <div
-                                                                            v-if="
-                                                                                currentTab.name ==
-                                                                                'Metadata'
-                                                                            "
-                                                                            class="px-2 sm:px-2"
-                                                                        >
-                                                                            <div
-                                                                                class="pt-4 xl:col-span-2"
-                                                                            >
-                                                                                <div
-                                                                                    class="mb-3"
-                                                                                >
-                                                                                    <label
-                                                                                        for="study-name"
-                                                                                        class="block text-sm font-medium text-gray-700"
-                                                                                    >
-                                                                                        Sample
-                                                                                        Name
-
-                                                                                        <span
-                                                                                            class="float-right border rounded-full px-2 py-1 mb-2"
-                                                                                            @click="
-                                                                                                autoGenerateDescription()
-                                                                                            "
-                                                                                        >
-                                                                                            Auto
-                                                                                            generate
-                                                                                        </span>
-                                                                                    </label>
-                                                                                    <div
-                                                                                        class="mt-1"
-                                                                                    >
-                                                                                        <input
-                                                                                            v-model="
-                                                                                                studyForm.name
-                                                                                            "
-                                                                                            type="text"
-                                                                                            name="study-name"
-                                                                                            class="block w-full shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm border-gray-300 rounded-md"
-                                                                                        />
-                                                                                        <jet-input-error
-                                                                                            :message="
-                                                                                                studyForm
-                                                                                                    .errors
-                                                                                                    .name
-                                                                                            "
-                                                                                            class="mt-2"
-                                                                                        />
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div
-                                                                                    class="mb-3"
-                                                                                >
-                                                                                    <label
-                                                                                        for="description"
-                                                                                        class="block text-sm font-medium text-gray-700"
-                                                                                    >
-                                                                                        Sample
-                                                                                        Description
-                                                                                    </label>
-                                                                                    <div
-                                                                                        class="mt-1"
-                                                                                    >
-                                                                                        <textarea
-                                                                                            id="study-description"
-                                                                                            v-model="
-                                                                                                studyForm.description
-                                                                                            "
-                                                                                            name="study-description"
-                                                                                            rows="3"
-                                                                                            class="block w-full shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm border border-gray-300 rounded-md"
-                                                                                        ></textarea>
-                                                                                        <jet-input-error
-                                                                                            :message="
-                                                                                                studyForm
-                                                                                                    .errors
-                                                                                                    .description
-                                                                                            "
-                                                                                            class="mt-2"
-                                                                                        />
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div
-                                                                                    class="mb-3"
-                                                                                >
-                                                                                    <label
-                                                                                        for="description"
-                                                                                        class="block text-sm font-medium text-gray-700"
-                                                                                    >
-                                                                                        Keywords
-                                                                                    </label>
-                                                                                    <div>
-                                                                                        <vue-tags-input
-                                                                                            v-model="
-                                                                                                studyForm.tag
-                                                                                            "
-                                                                                            placeholder="Type a keyword or keywords separated by comma (,) and press enter"
-                                                                                            :separators="[
-                                                                                                ';',
-                                                                                                ',',
-                                                                                            ]"
-                                                                                            max-width="100%"
-                                                                                            :tags="
-                                                                                                studyForm.tags
-                                                                                            "
-                                                                                            @tags-changed="
-                                                                                                (
-                                                                                                    newTags
-                                                                                                ) =>
-                                                                                                    (studyForm.tags =
-                                                                                                        newTags)
-                                                                                            "
-                                                                                        />
-                                                                                        <jet-input-error
-                                                                                            :message="
-                                                                                                studyForm
-                                                                                                    .errors
-                                                                                                    .tags
-                                                                                            "
-                                                                                            class="mt-2"
-                                                                                        />
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div
-                                                                                    class="mb-6"
-                                                                                >
-                                                                                    <button
-                                                                                        type="button"
-                                                                                        class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                                                                                        @click="
-                                                                                            saveStudyDetails
-                                                                                        "
-                                                                                    >
-                                                                                        SAVE
-                                                                                    </button>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div
-                                                                            id="tour-step-nmrium"
-                                                                            v-if="
-                                                                                currentTab.name ==
-                                                                                'Experiments (Spectra)'
-                                                                            "
-                                                                            class="px-2 sm:px-2 md:px-0"
+                                                                            class="px-2 sm:px-2 md:px-0 pb-24"
                                                                         >
                                                                             <div
                                                                                 class="px-2"
@@ -840,300 +679,374 @@
                                                                                             selectedStudy
                                                                                         "
                                                                                         ref="spectraEditorREF"
+                                                                                        @loading="
+                                                                                            spectraLoading
+                                                                                        "
                                                                                     ></SpectraEditor>
                                                                                 </div>
                                                                             </div>
-                                                                        </div>
-                                                                        <div
-                                                                            v-if="
-                                                                                currentTab.name ==
-                                                                                'Sample Info'
-                                                                            "
-                                                                            class="px-2 sm:px-2 pt-4"
-                                                                        >
-                                                                            <h1
-                                                                                class="text-xl font-bold text-gray-900"
-                                                                            >
-                                                                                Sample
-                                                                                Details
-                                                                            </h1>
-                                                                            <!-- <section
-                                                                aria-labelledby="activity-title"
-                                                                class="mt-2 xl:mt-2"
-                                                            >
-                                                                <div>
-                                                                    <div
-                                                                        class="pt-3"
-                                                                    >
-                                                                        <div>
-                                                                            <label
-                                                                                for="about"
-                                                                                class="block text-sm font-medium text-gray-700"
-                                                                            >
-                                                                                Sample
-                                                                                Collection
-                                                                                Protocol
-                                                                            </label>
                                                                             <div
-                                                                                class="mt-1"
-                                                                            >
-                                                                                <textarea
-                                                                                    id="about"
-                                                                                    readonly
-                                                                                    name="about"
-                                                                                    rows="3"
-                                                                                    class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border border-gray-300 rounded-md"
-                                                                                ></textarea>
-                                                                            </div>
-                                                                            <p
-                                                                                class="mt-2 text-sm text-gray-500"
-                                                                            >
-                                                                                Describe
-                                                                                your
-                                                                                sample
-                                                                                collection
-                                                                                protocol.
-                                                                                Protocol
-                                                                                parameters
-                                                                                can
-                                                                                be
-                                                                                provided
-                                                                                below.
-                                                                            </p>
-                                                                        </div>
-                                                                       <div class="mt-3">
-                                        <h2 class="text-sm font-medium text-gray-500">
-                                          Sample Collection Parameters
-                                        </h2>
-                                        <ul role="list" class="mt-2 leading-8">
-                                          <li class="inline">
-                                            <a
-                                              href="#"
-                                              class="relative inline-flex items-center rounded-full border border-gray-300 px-3 py-0.5"
-                                            >
-                                              <div
-                                                class="absolute flex-shrink-0 flex items-center justify-center"
-                                              >
-                                                <span
-                                                  class="h-1.5 w-1.5 rounded-full bg-rose-500"
-                                                  aria-hidden="true"
-                                                ></span>
-                                              </div>
-                                              <div
-                                                class="ml-3.5 text-sm font-medium text-gray-900"
-                                              >
-                                                Bug
-                                              </div>
-                                            </a>
-                                          </li>
-                                          <li class="inline">
-                                            <a
-                                              href="#"
-                                              class="relative inline-flex items-center rounded-full border border-gray-300 px-3 py-0.5"
-                                            >
-                                              <div
-                                                class="absolute flex-shrink-0 flex items-center justify-center"
-                                              >
-                                                <span
-                                                  class="h-1.5 w-1.5 rounded-full bg-teal-500"
-                                                  aria-hidden="true"
-                                                ></span>
-                                              </div>
-                                              <div
-                                                class="ml-3.5 text-sm font-medium text-gray-900"
-                                              >
-                                                Accessibility
-                                              </div>
-                                            </a>
-                                          </li>
-                                        </ul>
-                                      </div> 
-                                                                    </div>
-                                                                </div>
-                                                            </section> -->
-                                                                            <div
-                                                                                class="py-4 max-w-7xl mx-auto"
+                                                                                class="px-2 sm:px-2"
                                                                             >
                                                                                 <div
-                                                                                    class="sm:flex sm:items-center sm:justify-between"
+                                                                                    class="pt-4 xl:col-span-2"
                                                                                 >
-                                                                                    <h3
-                                                                                        class="text-xl font-bold text-gray-900"
+                                                                                    <h1
+                                                                                        class="text-xl mb-2 font-bold text-gray-900"
                                                                                     >
-                                                                                        Chemical
-                                                                                        composition
-                                                                                        (optional)
-                                                                                    </h3>
-                                                                                </div>
-                                                                                <p
-                                                                                    class="mt-2 pb-3 border-b border-gray-200 text-sm text-gray-500"
+                                                                                        Sample
+                                                                                        Details
+                                                                                    </h1>
+                                                                                    <!-- <div
+                                                                                    class="mb-3"
                                                                                 >
-                                                                                    Residual
-                                                                                    Complexity
-                                                                                    (RC)
-                                                                                    refers
-                                                                                    to
-                                                                                    the
-                                                                                    subtle
-                                                                                    but
-                                                                                    significant
-                                                                                    convolution
-                                                                                    of
-                                                                                    major
-                                                                                    and
-                                                                                    minor
-                                                                                    ("hidden")
-                                                                                    chemical
-                                                                                    species
-                                                                                    in
-                                                                                    materials
-                                                                                    that
-                                                                                    originate
-                                                                                    from
-                                                                                    biochemical
-                                                                                    or
-                                                                                    synthetic
-                                                                                    reaction
-                                                                                    mixtures.
-                                                                                    Certain
-                                                                                    levels
-                                                                                    of
-                                                                                    these
-                                                                                    chemical
-                                                                                    species
-                                                                                    (molecules)
-                                                                                    usually
-                                                                                    remain
-                                                                                    present
-                                                                                    even
-                                                                                    after
-                                                                                    a
-                                                                                    number
-                                                                                    of
-                                                                                    purification
-                                                                                    steps,
-                                                                                    and
-                                                                                    this
-                                                                                    RC
-                                                                                    is
-                                                                                    to
-                                                                                    some
-                                                                                    degree
-                                                                                    conserved
-                                                                                    even
-                                                                                    in
-                                                                                    highly
-                                                                                    purified
-                                                                                    materials.
-                                                                                    In
-                                                                                    principle,
-                                                                                    RC
-                                                                                    affects
-                                                                                    all
-                                                                                    "pure"
-                                                                                    materials,
-                                                                                    including
-                                                                                    synthetic
-                                                                                    compound,
-                                                                                    whenever
-                                                                                    chromatographic
-                                                                                    or
-                                                                                    other
-                                                                                    purification
-                                                                                    steps
-                                                                                    are
-                                                                                    required
-                                                                                    prior
-                                                                                    to
-                                                                                    their
-                                                                                    biological
-                                                                                    evaluation.
-                                                                                    Please
-                                                                                    report
-                                                                                    the
-                                                                                    chemical
-                                                                                    composition
-                                                                                    (if
-                                                                                    known)
-                                                                                    of
-                                                                                    your
-                                                                                    sample.
-                                                                                    If
-                                                                                    unknown
-                                                                                    please
-                                                                                    report
-                                                                                    the
-                                                                                    molecules
-                                                                                    that
-                                                                                    you
-                                                                                    expect
-                                                                                    to
-                                                                                    be
-                                                                                    present
-                                                                                    in
-                                                                                    your
-                                                                                    sample
-                                                                                    with-out
-                                                                                    the
-                                                                                    composition.
-                                                                                </p>
-                                                                            </div>
-
-                                                                            <div
-                                                                                class="grid grid-cols-2 gap-2"
-                                                                            >
-                                                                                <div
-                                                                                    class="pr-2"
-                                                                                >
-                                                                                    <div
-                                                                                        v-if="
-                                                                                            selectedStudy
-                                                                                                .sample
-                                                                                                .molecules
-                                                                                                .length >
-                                                                                            0
-                                                                                        "
-                                                                                        class="flow-root"
+                                                                                    <label
+                                                                                        for="study-name"
+                                                                                        class="block text-sm font-medium text-gray-700"
                                                                                     >
-                                                                                        <ul
-                                                                                            role="list"
-                                                                                            class="-mb-8"
+                                                                                        Sample
+                                                                                        Name
+                                                                                        <span
+                                                                                            class="float-right rounded-full px-2"
+                                                                                            @click="
+                                                                                                autoGenerateDescription()
+                                                                                            "
                                                                                         >
-                                                                                            <li
-                                                                                                v-for="molecule in selectedStudy
-                                                                                                    .sample
-                                                                                                    .molecules"
-                                                                                                :key="
-                                                                                                    molecule.STANDARD_INCHI
+                                                                                            Auto
+                                                                                            generate
+                                                                                        </span>
+                                                                                    </label>
+                                                                                    <div
+                                                                                        class="mt-1"
+                                                                                    >
+                                                                                        <input
+                                                                                            v-model="
+                                                                                                studyForm.name
+                                                                                            "
+                                                                                            @blur="saveStudyDetails"
+                                                                                            type="text"
+                                                                                            name="study-name"
+                                                                                            class="block w-full shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm border-gray-300 rounded-md"
+                                                                                        />
+                                                                                        <jet-input-error
+                                                                                            :message="
+                                                                                                studyForm
+                                                                                                    .errors
+                                                                                                    .name
+                                                                                            "
+                                                                                            class="mt-2"
+                                                                                        />
+                                                                                    </div>
+                                                                                </div> -->
+                                                                                    <div
+                                                                                        class="mb-3"
+                                                                                    >
+                                                                                        <label
+                                                                                            for="description"
+                                                                                            class="block text-sm font-medium text-gray-700"
+                                                                                        >
+                                                                                            Sample
+                                                                                            Description
+                                                                                            <span
+                                                                                                class="float-right rounded-full px-2"
+                                                                                                @click="
+                                                                                                    autoGenerateDescription()
                                                                                                 "
                                                                                             >
-                                                                                                <div
-                                                                                                    class="relative pb-8"
+                                                                                                Auto
+                                                                                                generate
+                                                                                            </span>
+                                                                                        </label>
+                                                                                        <div
+                                                                                            class="mt-1"
+                                                                                        >
+                                                                                            <textarea
+                                                                                                id="study-description"
+                                                                                                v-model="
+                                                                                                    studyForm.description
+                                                                                                "
+                                                                                                @blur="
+                                                                                                    saveStudyDetails
+                                                                                                "
+                                                                                                name="study-description"
+                                                                                                rows="3"
+                                                                                                class="block w-full shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm border border-gray-300 rounded-md"
+                                                                                            ></textarea>
+                                                                                            <jet-input-error
+                                                                                                :message="
+                                                                                                    studyForm
+                                                                                                        .errors
+                                                                                                        .description
+                                                                                                "
+                                                                                                class="mt-2"
+                                                                                            />
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div
+                                                                                        class="mb-3"
+                                                                                    >
+                                                                                        <label
+                                                                                            for="description"
+                                                                                            class="block text-sm font-medium text-gray-700"
+                                                                                        >
+                                                                                            Keywords
+                                                                                        </label>
+                                                                                        <div>
+                                                                                            <vue-tags-input
+                                                                                                v-model="
+                                                                                                    studyForm.tag
+                                                                                                "
+                                                                                                placeholder="Type a keyword or keywords separated by comma (,) and press enter"
+                                                                                                :separators="[
+                                                                                                    ';',
+                                                                                                    ',',
+                                                                                                ]"
+                                                                                                max-width="100%"
+                                                                                                :tags="
+                                                                                                    studyForm.tags
+                                                                                                "
+                                                                                                @blur="
+                                                                                                    saveStudyDetails
+                                                                                                "
+                                                                                                @tags-changed="
+                                                                                                    (
+                                                                                                        newTags
+                                                                                                    ) =>
+                                                                                                        (studyForm.tags =
+                                                                                                            newTags)
+                                                                                                "
+                                                                                            />
+                                                                                            <jet-input-error
+                                                                                                :message="
+                                                                                                    studyForm
+                                                                                                        .errors
+                                                                                                        .tags
+                                                                                                "
+                                                                                                class="mt-2"
+                                                                                            />
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div
+                                                                                    class="py-4 max-w-7xl mx-auto"
+                                                                                >
+                                                                                    <div
+                                                                                        class="sm:flex sm:items-center sm:justify-between"
+                                                                                    >
+                                                                                        <h3
+                                                                                            class="text-xl font-bold text-gray-900"
+                                                                                        >
+                                                                                            Chemical
+                                                                                            composition
+                                                                                            (optional)
+                                                                                        </h3>
+                                                                                    </div>
+                                                                                    <div
+                                                                                        class="rounded-md my-2 bg-yellow-50 p-4"
+                                                                                    >
+                                                                                        <div
+                                                                                            class="flex"
+                                                                                        >
+                                                                                            <div
+                                                                                                class="flex-shrink-0"
+                                                                                            >
+                                                                                                <svg
+                                                                                                    class="h-5 w-5 text-yellow-400"
+                                                                                                    viewBox="0 0 20 20"
+                                                                                                    fill="currentColor"
+                                                                                                    aria-hidden="true"
                                                                                                 >
-                                                                                                    <span
-                                                                                                        class="absolute top-5 left-5 -ml-px h-full w-0.5 bg-gray-200"
-                                                                                                        aria-hidden="true"
-                                                                                                    ></span>
+                                                                                                    <path
+                                                                                                        fill-rule="evenodd"
+                                                                                                        d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z"
+                                                                                                        clip-rule="evenodd"
+                                                                                                    />
+                                                                                                </svg>
+                                                                                            </div>
+                                                                                            <div
+                                                                                                class="ml-3"
+                                                                                            >
+                                                                                                <h3
+                                                                                                    class="text-sm font-medium text-yellow-800"
+                                                                                                >
+                                                                                                    Residual
+                                                                                                    Complexity
+                                                                                                    (RC)
+                                                                                                </h3>
+                                                                                                <div
+                                                                                                    class="mt-2 text-sm text-yellow-700"
+                                                                                                >
+                                                                                                    <p>
+                                                                                                        Residual
+                                                                                                        Complexity
+                                                                                                        (RC)
+                                                                                                        refers
+                                                                                                        to
+                                                                                                        the
+                                                                                                        subtle
+                                                                                                        but
+                                                                                                        significant
+                                                                                                        convolution
+                                                                                                        of
+                                                                                                        major
+                                                                                                        and
+                                                                                                        minor
+                                                                                                        ("hidden")
+                                                                                                        chemical
+                                                                                                        species
+                                                                                                        in
+                                                                                                        materials
+                                                                                                        that
+                                                                                                        originate
+                                                                                                        from
+                                                                                                        biochemical
+                                                                                                        or
+                                                                                                        synthetic
+                                                                                                        reaction
+                                                                                                        mixtures.
+                                                                                                        Certain
+                                                                                                        levels
+                                                                                                        of
+                                                                                                        these
+                                                                                                        chemical
+                                                                                                        species
+                                                                                                        (molecules)
+                                                                                                        usually
+                                                                                                        remain
+                                                                                                        present
+                                                                                                        even
+                                                                                                        after
+                                                                                                        a
+                                                                                                        number
+                                                                                                        of
+                                                                                                        purification
+                                                                                                        steps,
+                                                                                                        and
+                                                                                                        this
+                                                                                                        RC
+                                                                                                        is
+                                                                                                        to
+                                                                                                        some
+                                                                                                        degree
+                                                                                                        conserved
+                                                                                                        even
+                                                                                                        in
+                                                                                                        highly
+                                                                                                        purified
+                                                                                                        materials.
+                                                                                                        In
+                                                                                                        principle,
+                                                                                                        RC
+                                                                                                        affects
+                                                                                                        all
+                                                                                                        "pure"
+                                                                                                        materials,
+                                                                                                        including
+                                                                                                        synthetic
+                                                                                                        compound,
+                                                                                                        whenever
+                                                                                                        chromatographic
+                                                                                                        or
+                                                                                                        other
+                                                                                                        purification
+                                                                                                        steps
+                                                                                                        are
+                                                                                                        required
+                                                                                                        prior
+                                                                                                        to
+                                                                                                        their
+                                                                                                        biological
+                                                                                                        evaluation.
+                                                                                                        Please
+                                                                                                        report
+                                                                                                        the
+                                                                                                        chemical
+                                                                                                        composition
+                                                                                                        (if
+                                                                                                        known)
+                                                                                                        of
+                                                                                                        your
+                                                                                                        sample.
+                                                                                                        If
+                                                                                                        unknown
+                                                                                                        please
+                                                                                                        report
+                                                                                                        the
+                                                                                                        molecules
+                                                                                                        that
+                                                                                                        you
+                                                                                                        expect
+                                                                                                        to
+                                                                                                        be
+                                                                                                        present
+                                                                                                        in
+                                                                                                        your
+                                                                                                        sample
+                                                                                                        with-out
+                                                                                                        the
+                                                                                                        composition.
+                                                                                                    </p>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+
+                                                                                <div
+                                                                                    class="grid grid-cols-2 gap-2"
+                                                                                >
+                                                                                    <div
+                                                                                        class="pr-2"
+                                                                                    >
+                                                                                        <div
+                                                                                            v-if="
+                                                                                                selectedStudy
+                                                                                                    .sample
+                                                                                                    .molecules
+                                                                                                    .length >
+                                                                                                0
+                                                                                            "
+                                                                                            class="flow-root"
+                                                                                        >
+                                                                                            <ul
+                                                                                                role="list"
+                                                                                                class="-mb-8"
+                                                                                            >
+                                                                                                <li
+                                                                                                    v-for="molecule in selectedStudy
+                                                                                                        .sample
+                                                                                                        .molecules"
+                                                                                                    :key="
+                                                                                                        molecule.STANDARD_INCHI
+                                                                                                    "
+                                                                                                >
                                                                                                     <div
-                                                                                                        class="relative flex items-start space-x-3"
+                                                                                                        class="relative pb-8"
                                                                                                     >
+                                                                                                        <span
+                                                                                                            class="absolute top-5 left-5 -ml-px h-full w-0.5 bg-gray-200"
+                                                                                                            aria-hidden="true"
+                                                                                                        ></span>
                                                                                                         <div
-                                                                                                            v-if="
-                                                                                                                molecule &&
-                                                                                                                molecule.pivot
-                                                                                                            "
-                                                                                                            class="relative"
+                                                                                                            class="relative flex items-start space-x-3"
                                                                                                         >
                                                                                                             <div
-                                                                                                                class="rounded-full border p-2 z-10 bg-gray-100 text-sm"
+                                                                                                                v-if="
+                                                                                                                    molecule &&
+                                                                                                                    molecule.pivot
+                                                                                                                "
+                                                                                                                class="relative"
                                                                                                             >
-                                                                                                                {{
-                                                                                                                    molecule
-                                                                                                                        .pivot
-                                                                                                                        .percentage_composition
-                                                                                                                }}%
-                                                                                                            </div>
-                                                                                                            <!-- <span
+                                                                                                                <div
+                                                                                                                    class="rounded-full border p-2 z-10 bg-gray-100 text-sm"
+                                                                                                                >
+                                                                                                                    {{
+                                                                                                                        molecule
+                                                                                                                            .pivot
+                                                                                                                            .percentage_composition
+                                                                                                                    }}%
+                                                                                                                </div>
+                                                                                                                <!-- <span
                                                 class="absolute -bottom-0.5 -right-1 bg-white rounded-tl px-0.5 py-px"
                                               >
                                                 <svg
@@ -1151,255 +1064,253 @@
                                                   ></path>
                                                 </svg>
                                               </span> -->
-                                                                                                        </div>
-                                                                                                        <div
-                                                                                                            class="min-w-0 flex-1"
-                                                                                                        >
-                                                                                                            <div>
-                                                                                                                <div
-                                                                                                                    class="text-sm"
-                                                                                                                >
-                                                                                                                    <a
-                                                                                                                        href="#"
-                                                                                                                        class="font-medium text-gray-900"
-                                                                                                                        >{{
-                                                                                                                            molecule.STANDARD_INCHI
-                                                                                                                        }}</a
-                                                                                                                    >
-                                                                                                                </div>
-                                                                                                                <!-- <p class="mt-0.5 text-sm text-gray-500">
-                                                  Commented 6d ago
-                                                </p> -->
                                                                                                             </div>
                                                                                                             <div
-                                                                                                                class="mt-2 text-sm text-gray-700"
+                                                                                                                class="min-w-0 flex-1"
                                                                                                             >
+                                                                                                                <div>
+                                                                                                                    <div
+                                                                                                                        class="text-sm"
+                                                                                                                    >
+                                                                                                                        <a
+                                                                                                                            href="#"
+                                                                                                                            class="font-medium text-gray-900"
+                                                                                                                            >{{
+                                                                                                                                molecule.STANDARD_INCHI
+                                                                                                                            }}</a
+                                                                                                                        >
+                                                                                                                    </div>
+                                                                                                                </div>
                                                                                                                 <div
-                                                                                                                    class="rounded-md border my-3 flex justify-center items-center"
+                                                                                                                    class="mt-2 text-sm text-gray-700"
                                                                                                                 >
-                                                                                                                    <span
-                                                                                                                        v-html="
-                                                                                                                            getSVGString(
+                                                                                                                    <div
+                                                                                                                        class="rounded-md border my-3 flex justify-center items-center"
+                                                                                                                    >
+                                                                                                                        <span
+                                                                                                                            v-html="
+                                                                                                                                getSVGString(
+                                                                                                                                    molecule
+                                                                                                                                )
+                                                                                                                            "
+                                                                                                                        ></span>
+                                                                                                                    </div>
+                                                                                                                    <button
+                                                                                                                        class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                                                                                                        @click="
+                                                                                                                            deleteMolecule(
                                                                                                                                 molecule
                                                                                                                             )
                                                                                                                         "
-                                                                                                                    ></span>
+                                                                                                                    >
+                                                                                                                        <TrashIcon
+                                                                                                                            class="w-4 h-4 inline mr-1"
+                                                                                                                        ></TrashIcon
+                                                                                                                        >Delete
+                                                                                                                    </button>
+                                                                                                                    <button
+                                                                                                                        class="inline-flex ml-2 items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                                                                                                        @click="
+                                                                                                                            editMolecule(
+                                                                                                                                molecule
+                                                                                                                            )
+                                                                                                                        "
+                                                                                                                    >
+                                                                                                                        <PencilIcon
+                                                                                                                            class="w-4 h-4 inline mr-1"
+                                                                                                                        ></PencilIcon
+                                                                                                                        >Edit
+                                                                                                                    </button>
                                                                                                                 </div>
-                                                                                                                <button
-                                                                                                                    class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                                                                                                    @click="
-                                                                                                                        deleteMolecule(
-                                                                                                                            molecule
-                                                                                                                        )
-                                                                                                                    "
-                                                                                                                >
-                                                                                                                    <TrashIcon
-                                                                                                                        class="w-4 h-4 inline mr-1"
-                                                                                                                    ></TrashIcon
-                                                                                                                    >Delete
-                                                                                                                </button>
-                                                                                                                <button
-                                                                                                                    class="inline-flex ml-2 items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                                                                                                    @click="
-                                                                                                                        editMolecule(
-                                                                                                                            molecule
-                                                                                                                        )
-                                                                                                                    "
-                                                                                                                >
-                                                                                                                    <PencilIcon
-                                                                                                                        class="w-4 h-4 inline mr-1"
-                                                                                                                    ></PencilIcon
-                                                                                                                    >Edit
-                                                                                                                </button>
                                                                                                             </div>
                                                                                                         </div>
                                                                                                     </div>
-                                                                                                </div>
-                                                                                            </li>
-                                                                                        </ul>
+                                                                                                </li>
+                                                                                            </ul>
+                                                                                            <div
+                                                                                                class="rounded-full border p-2 z-10 bg-gray-100 text-sm mt-14 text-center"
+                                                                                            >
+                                                                                                Sample
+                                                                                                chemical
+                                                                                                composition
+                                                                                            </div>
+                                                                                        </div>
                                                                                         <div
-                                                                                            class="rounded-full border p-2 z-10 bg-gray-100 text-sm mt-14 text-center"
+                                                                                            v-else
                                                                                         >
-                                                                                            Sample
-                                                                                            chemical
-                                                                                            composition
+                                                                                            <div
+                                                                                                class="text-center my-10 py-10"
+                                                                                            >
+                                                                                                <svg
+                                                                                                    class="mx-auto h-12 w-12 text-gray-400"
+                                                                                                    fill="none"
+                                                                                                    viewBox="0 0 24 24"
+                                                                                                    stroke="currentColor"
+                                                                                                    aria-hidden="true"
+                                                                                                >
+                                                                                                    <path
+                                                                                                        vector-effect="non-scaling-stroke"
+                                                                                                        stroke-linecap="round"
+                                                                                                        stroke-linejoin="round"
+                                                                                                        stroke-width="2"
+                                                                                                        d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"
+                                                                                                    />
+                                                                                                </svg>
+                                                                                                <h3
+                                                                                                    class="mt-2 text-sm font-medium text-gray-900"
+                                                                                                >
+                                                                                                    No
+                                                                                                    structures
+                                                                                                    associated
+                                                                                                    with
+                                                                                                    the
+                                                                                                    sample
+                                                                                                    yet!
+                                                                                                </h3>
+                                                                                                <p
+                                                                                                    class="mt-1 text-sm text-gray-500"
+                                                                                                >
+                                                                                                    Get
+                                                                                                    started
+                                                                                                    by
+                                                                                                    adding
+                                                                                                    a
+                                                                                                    new
+                                                                                                    molecule.
+                                                                                                </p>
+                                                                                            </div>
                                                                                         </div>
                                                                                     </div>
                                                                                     <div
-                                                                                        v-else
+                                                                                        class="pl-2"
                                                                                     >
                                                                                         <div
-                                                                                            class="text-center my-10 py-10"
+                                                                                            class="sm:col-span-4"
                                                                                         >
-                                                                                            <svg
-                                                                                                class="mx-auto h-12 w-12 text-gray-400"
-                                                                                                fill="none"
-                                                                                                viewBox="0 0 24 24"
-                                                                                                stroke="currentColor"
-                                                                                                aria-hidden="true"
+                                                                                            <label
+                                                                                                for="email"
+                                                                                                class="block text-sm font-medium text-gray-700"
                                                                                             >
-                                                                                                <path
-                                                                                                    vector-effect="non-scaling-stroke"
-                                                                                                    stroke-linecap="round"
-                                                                                                    stroke-linejoin="round"
-                                                                                                    stroke-width="2"
-                                                                                                    d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"
+                                                                                                SMILES
+                                                                                            </label>
+                                                                                            <div
+                                                                                                class="mt-1 mb-2"
+                                                                                            >
+                                                                                                <input
+                                                                                                    id="smiles"
+                                                                                                    v-model="
+                                                                                                        smiles
+                                                                                                    "
+                                                                                                    name="smiles"
+                                                                                                    type="text"
+                                                                                                    class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                                                                                                    @blur="
+                                                                                                        loadSmiles
+                                                                                                    "
                                                                                                 />
-                                                                                            </svg>
-                                                                                            <h3
-                                                                                                class="mt-2 text-sm font-medium text-gray-900"
-                                                                                            >
-                                                                                                No
-                                                                                                structures
-                                                                                                associated
-                                                                                                with
-                                                                                                the
-                                                                                                sample
-                                                                                                yet!
-                                                                                            </h3>
-                                                                                            <p
-                                                                                                class="mt-1 text-sm text-gray-500"
-                                                                                            >
-                                                                                                Get
-                                                                                                started
-                                                                                                by
-                                                                                                adding
-                                                                                                a
-                                                                                                new
-                                                                                                molecule.
-                                                                                            </p>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div
-                                                                                    class="pl-2"
-                                                                                >
-                                                                                    <div
-                                                                                        class="sm:col-span-4"
-                                                                                    >
-                                                                                        <label
-                                                                                            for="email"
-                                                                                            class="block text-sm font-medium text-gray-700"
-                                                                                        >
-                                                                                            SMILES
-                                                                                        </label>
-                                                                                        <div
-                                                                                            class="mt-1 mb-2"
-                                                                                        >
-                                                                                            <input
-                                                                                                id="smiles"
-                                                                                                v-model="
-                                                                                                    smiles
+                                                                                            </div>
+                                                                                            <button
+                                                                                                v-if="
+                                                                                                    smiles &&
+                                                                                                    smiles !=
+                                                                                                        ''
                                                                                                 "
-                                                                                                name="smiles"
-                                                                                                type="text"
-                                                                                                class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                                                                                                @blur="
+                                                                                                class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mt-2"
+                                                                                                @click="
                                                                                                     loadSmiles
                                                                                                 "
+                                                                                            >
+                                                                                                Load
+                                                                                                Structure
+                                                                                            </button>
+                                                                                            <jet-input-error
+                                                                                                :message="
+                                                                                                    this
+                                                                                                        .errorMessage
+                                                                                                "
+                                                                                                class="mt-2"
+                                                                                            />
+                                                                                        </div>
+                                                                                        <div
+                                                                                            class="relative"
+                                                                                        >
+                                                                                            <div
+                                                                                                class="absolute inset-0 flex items-center"
+                                                                                                aria-hidden="true"
+                                                                                            >
+                                                                                                <div
+                                                                                                    class="w-full border-t border-gray-300"
+                                                                                                />
+                                                                                            </div>
+                                                                                            <div
+                                                                                                class="relative flex justify-center"
+                                                                                            >
+                                                                                                <span
+                                                                                                    class="px-2 bg-white text-sm text-gray-500"
+                                                                                                >
+                                                                                                    Or
+                                                                                                </span>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div
+                                                                                            class="float-right text-xs cursor-pointer hover:text-blue-700"
+                                                                                        >
+                                                                                            <a
+                                                                                                href="https://docs.nmrxiv.org/docs/submission-guides/submission/editor"
+                                                                                                target="_blank"
+                                                                                                >Need
+                                                                                                help?
+                                                                                            </a>
+                                                                                        </div>
+                                                                                        <div
+                                                                                            id="structureSearchEditor"
+                                                                                            class="w-full border my-4 rounded-md"
+                                                                                            style="
+                                                                                                height: 400px;
+                                                                                            "
+                                                                                        />
+                                                                                        <div
+                                                                                            class="mt-1 mb-6"
+                                                                                        >
+                                                                                            <label
+                                                                                                for="email"
+                                                                                                class="block text-sm font-medium text-gray-700"
+                                                                                            >
+                                                                                                Percentage
+                                                                                                composition
+                                                                                                ({{
+                                                                                                    percentage
+                                                                                                }}%)
+                                                                                            </label>
+                                                                                            <slider
+                                                                                                v-model="
+                                                                                                    percentage
+                                                                                                "
+                                                                                                :min="
+                                                                                                    0
+                                                                                                "
+                                                                                                :max="
+                                                                                                    getMax
+                                                                                                "
+                                                                                                :height="
+                                                                                                    10
+                                                                                                "
+                                                                                                color="#000"
+                                                                                                track-color="#999"
                                                                                             />
                                                                                         </div>
                                                                                         <button
-                                                                                            v-if="
-                                                                                                smiles &&
-                                                                                                smiles !=
-                                                                                                    ''
-                                                                                            "
-                                                                                            class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mt-2"
+                                                                                            type="button"
+                                                                                            class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                                                                                             @click="
-                                                                                                loadSmiles
+                                                                                                saveMolecule(
+                                                                                                    null
+                                                                                                )
                                                                                             "
                                                                                         >
-                                                                                            Load
-                                                                                            Structure
+                                                                                            ADD
                                                                                         </button>
-                                                                                        <jet-input-error
-                                                                                            :message="
-                                                                                                this
-                                                                                                    .errorMessage
-                                                                                            "
-                                                                                            class="mt-2"
-                                                                                        />
                                                                                     </div>
-                                                                                    <div
-                                                                                        class="relative"
-                                                                                    >
-                                                                                        <div
-                                                                                            class="absolute inset-0 flex items-center"
-                                                                                            aria-hidden="true"
-                                                                                        >
-                                                                                            <div
-                                                                                                class="w-full border-t border-gray-300"
-                                                                                            />
-                                                                                        </div>
-                                                                                        <div
-                                                                                            class="relative flex justify-center"
-                                                                                        >
-                                                                                            <span
-                                                                                                class="px-2 bg-white text-sm text-gray-500"
-                                                                                            >
-                                                                                                Or
-                                                                                            </span>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <span
-                                                                                        class="float-right text-xs cursor-pointer hover:text-blue-700 m-2"
-                                                                                    >
-                                                                                        <a
-                                                                                            href="https://docs.nmrxiv.org/docs/submission-guides/submission/editor"
-                                                                                            target="_blank"
-                                                                                            >Need
-                                                                                            help?
-                                                                                        </a>
-                                                                                    </span>
-                                                                                    <div
-                                                                                        id="structureSearchEditor"
-                                                                                        class="w-full border my-4 rounded-md"
-                                                                                        style="
-                                                                                            height: 400px;
-                                                                                        "
-                                                                                    />
-                                                                                    <div
-                                                                                        class="mt-1 mb-6"
-                                                                                    >
-                                                                                        <label
-                                                                                            for="email"
-                                                                                            class="block text-sm font-medium text-gray-700"
-                                                                                        >
-                                                                                            Percentage
-                                                                                            composition
-                                                                                            ({{
-                                                                                                percentage
-                                                                                            }}%)
-                                                                                        </label>
-                                                                                        <slider
-                                                                                            v-model="
-                                                                                                percentage
-                                                                                            "
-                                                                                            :min="
-                                                                                                0
-                                                                                            "
-                                                                                            :max="
-                                                                                                getMax
-                                                                                            "
-                                                                                            :height="
-                                                                                                10
-                                                                                            "
-                                                                                            color="#000"
-                                                                                            track-color="#999"
-                                                                                        />
-                                                                                    </div>
-                                                                                    <button
-                                                                                        type="button"
-                                                                                        class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                                                                                        @click="
-                                                                                            saveMolecule(
-                                                                                                null
-                                                                                            )
-                                                                                        "
-                                                                                    >
-                                                                                        ADD
-                                                                                    </button>
                                                                                 </div>
                                                                             </div>
                                                                             <div
@@ -1462,9 +1373,36 @@
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                        </main>
+                                                        </div>
                                                     </div>
                                                 </div>
+                                            </div>
+                                        </div>
+                                        <div
+                                            v-if="spectraLoadingStatus"
+                                            class="w-full h-screen mx-84 px-10 fixed block top-0 left-0 bg-white opacity-90 z-50"
+                                        >
+                                            <div
+                                                role="status"
+                                                class="absolute -translate-x-1/2 -translate-y-1/2 top-2/4 left-1/2"
+                                            >
+                                                <svg
+                                                    aria-hidden="true"
+                                                    class="w-8 h-8 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+                                                    viewBox="0 0 100 101"
+                                                    fill="none"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                >
+                                                    <path
+                                                        d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                                                        fill="currentColor"
+                                                    />
+                                                    <path
+                                                        d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                                                        fill="currentFill"
+                                                    />
+                                                </svg>
+                                                {{ spectraLoadingMessage }}
                                             </div>
                                         </div>
                                     </div>
@@ -2107,7 +2045,7 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import TeamProjects from "@/Pages/Project/Index.vue";
 import Create from "@/Shared/CreateButton.vue";
 import Onboarding from "@/App/Onboarding.vue";
-import { Link } from "@inertiajs/vue3";
+import { router, Link } from "@inertiajs/vue3";
 import { computed } from "vue";
 import FileSystemBrowser from "./../Shared/FileSystemBrowser.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
@@ -2190,6 +2128,8 @@ export default {
             loadingStep: false,
             selectedStudy: null,
 
+            displaySamplesSummaryInfo: true,
+
             drafts: [],
 
             draftForm: this.$inertia.form({
@@ -2234,6 +2174,10 @@ export default {
             showPrimer: false,
             returnUrl: "/dashboard",
             validationStatus: true,
+            spectraLoadingStatus: false,
+            spectraLoadingMessage: null,
+
+            validation: null,
 
             steps: [
                 {
@@ -2259,12 +2203,6 @@ export default {
                     href: "#",
                     status: "upcoming",
                 },
-            ],
-
-            tabs: [
-                { name: "Experiments (Spectra)", current: true },
-                { name: "Sample Info", current: false },
-                { name: "Metadata", current: false },
             ],
 
             publishForm: this.$inertia.form({
@@ -2325,19 +2263,27 @@ export default {
         this.showPrimer = !this.primed;
     },
 
-    computed: {
-        mailFromAddress() {
-            return String(this.$page.props.mailFromAddress);
-        },
-
-        mailTo() {
-            return "mailto:" + String(this.$page.props.mailFromAddress);
-        },
-    },
-
     methods: {
+        editData(e) {
+            let i = 0;
+            this.studies.forEach((s) => {
+                if (s.name == e.model.name) {
+                    this.selectStudy(s, i);
+                }
+                i = i + 1;
+            });
+        },
+        fetchProjectData() {
+            this.spectraLoadingStatus = false;
+            router.reload({
+                only: ["project", "studies"],
+            });
+        },
+        spectraLoading(e) {
+            this.spectraLoadingStatus = e.status;
+            this.spectraLoadingMessage = e.message;
+        },
         updateDraft(e) {
-            console.log(e.target.innerText);
             this.currentDraft.name = e.target.innerText;
             axios
                 .put(
@@ -2407,9 +2353,9 @@ export default {
                                 this.studies &&
                                 this.studies.length > 0
                             ) {
-                                this.selectStudy(this.studies[0], 0);
-                                this.selectedDataset =
-                                    this.selectedStudy.datasets[0];
+                                // this.selectStudy(this.studies[0], 0);
+                                // this.selectedDataset =
+                                //     this.selectedStudy.datasets[0];
                                 this.loadingStep = false;
                                 this.selectStep(2);
                             } else {
@@ -2564,6 +2510,10 @@ export default {
                 console.log(molecule);
             }
         },
+        showSamplesSummary() {
+            this.displaySamplesSummaryInfo = true;
+            this.selectedStudy = null;
+        },
         selectStudy(study, index, datasetIndex = null) {
             this.selectedStudyIndex = index;
             this.selectedStudy = study;
@@ -2576,7 +2526,23 @@ export default {
                 });
             });
             this.studyForm.tags = tags;
-
+            let editorState = JSON.parse(
+                JSON.stringify(this.displaySamplesSummaryInfo)
+            );
+            if (this.displaySamplesSummaryInfo) {
+                this.displaySamplesSummaryInfo = false;
+            }
+            this.$nextTick(() => {
+                if (editorState) {
+                    if (this.$refs.spectraEditorREF) {
+                        this.$refs.spectraEditorREF.registerEvents();
+                    }
+                }
+                this.editor = OCL.StructureEditor.createSVGEditor(
+                    "structureSearchEditor",
+                    1
+                );
+            });
             axios
                 .get(
                     "/dashboard/studies/" + this.selectedStudy.id + "/nmredata"
@@ -2633,21 +2599,6 @@ export default {
             } else {
                 this.selectedDSIndex = datasetIndex;
             }
-        },
-        selectTab(tab) {
-            this.tabs.forEach((t) => {
-                if (t.name == tab.name) {
-                    t.current = true;
-                    this.$nextTick(() => {
-                        this.editor = OCL.StructureEditor.createSVGEditor(
-                            "structureSearchEditor",
-                            1
-                        );
-                    });
-                } else {
-                    t.current = false;
-                }
-            });
         },
         toggleManageAuthor() {
             this.manageAuthorElement.toggleDialog();
@@ -2797,15 +2748,24 @@ export default {
                 });
             } else if (id == 2) {
                 this.$nextTick(function () {
-                    if (this.$refs.spectraEditorREF) {
-                        this.$refs.spectraEditorREF.registerEvents();
-                    }
+                    // if (this.$refs.spectraEditorREF) {
+                    //     this.$refs.spectraEditorREF.registerEvents();
+                    // }
+                    this.fetchValidations();
                 });
             }
         },
+        fetchValidations() {
+            axios
+                .get("/projects/" + this.project.id + "/validation")
+                .then((response) => {
+                    this.validation = response.data.report;
+                    // console.log(this.validation)
+                });
+        },
         hidePrimer() {
             axios.post("/primer/skip").then(() => {
-                Inertia.reload({
+                router.reload({
                     only: ["user", "user.permissions", "user.roles"],
                 });
             });
@@ -2817,7 +2777,6 @@ export default {
         saveStudyDetails() {
             this.loadingStep = true;
             this.studyForm.tags_array = this.studyForm.tags.map((a) => a.text);
-
             axios
                 .put(
                     "/dashboard/studies/" + this.selectedStudy.id + "/update",
@@ -2836,10 +2795,10 @@ export default {
                 .then((response) => {
                     if (response) {
                         this.loadingStep = false;
-                        this.selectStudy(
-                            response.data,
-                            this.selectedStudyIndex
-                        );
+                        // this.selectStudy(
+                        //     response.data,
+                        //     this.selectedStudyIndex
+                        // );
                         this.studyForm.hasErrors = false;
                     }
                 });
@@ -2849,80 +2808,139 @@ export default {
                 "This dataset contains NMR spectra obtained for the sample -" +
                 this.selectedStudy.name +
                 "</br>";
-            let sampleNames = [];
-            let sampleTags = [];
-            this.selectedStudy.datasets.forEach((ds) => {
-                if (ds.nmrium_info) {
-                    let nmriuminfo = JSON.parse(ds.nmrium_info);
-                    if (nmriuminfo) {
-                        let spectra = nmriuminfo.spectra;
-                        spectra.forEach((sp) => {
-                            desc =
-                                desc +
-                                "Experiment: " +
-                                sp.info.experiment +
-                                "</br>";
-                            desc =
-                                desc + "Nucleus: " + sp.info.nucleus + "</br>";
-                            desc = desc + "Type: " + sp.info.type + "</br>";
-                            desc =
-                                desc +
-                                "Temperature: " +
-                                sp.info.temperature +
-                                "</br>";
-                            desc =
-                                desc + "Solvent: " + sp.info.solvent + "</br>";
-                            desc =
-                                desc +
-                                "Origin Frequency: " +
-                                sp.info.originFrequency +
-                                "</br>";
-                            desc =
-                                desc +
-                                "Probe Name: " +
-                                sp.info.probeName +
-                                "</br>";
-                            sampleTags.push(
-                                this.isString(sp.info.nucleus)
-                                    ? sp.info.nucleus
-                                    : sp.info.nucleus.join(" - ")
-                            );
-                            if (sp.info.sampleName) {
-                                sampleNames.push(sp.info.sampleName);
+            axios
+                .get(
+                    "/dashboard/studies/" +
+                        this.selectedStudy.id +
+                        "/nmriumInfo"
+                )
+                .then((response) => {
+                    let nmrium_info = response.data;
+                    if (nmrium_info) {
+                        nmrium_info.data.spectra.forEach((spectra) => {
+                            Object.keys(spectra.info).forEach((key) => {
                                 desc =
                                     desc +
-                                    "Sample Name: " +
-                                    sp.info.sampleName +
+                                    key +
+                                    ": " +
+                                    spectra.info[key] +
                                     "</br>";
-                            }
+                            });
                         });
-                        desc = desc + "</br></br>";
+                        this.studyForm.description = desc;
                     }
+                });
+        },
+        autoImport() {
+            this.spectraLoadingStatus = true;
+            this.studiesToImport = [];
+            this.studies.forEach((study) => {
+                if (!study.has_nmrium) {
+                    this.studiesToImport.push({
+                        projectSlug: this.project.slug,
+                        studySlug: study.slug,
+                        studyID: study.id,
+                        studyDownloadUrl: study.download_url,
+                        status: false,
+                    });
                 }
             });
-            this.studyForm.description = desc;
-            if (sampleNames.length > 0) {
-                sampleNames = [...new Set(sampleNames)];
-                let sampleName = sampleNames.join(", ");
-                if (sampleName != "") {
-                    this.studyForm.name = sampleNames.join(", ");
-                }
+            if (this.studiesToImport.length > 0) {
+                this.fetchNMRium();
+            } else {
+                console.log(
+                    "Nothing to import: NMRium spectra JSON already exists"
+                );
+                this.spectraLoadingStatus = false;
             }
-            if (sampleTags.length > 0) {
-                sampleTags = [...new Set(sampleTags)];
-                let tags = [];
-                sampleTags.forEach((t) => {
-                    tags.push({
-                        text: t,
+        },
+        fetchNMRium() {
+            let studyDetails = this.studiesToImport.filter(
+                (f) => f.status == false
+            )[0];
+            if (studyDetails) {
+                this.spectraLoadingStatus = true;
+                let url = null;
+                if (studyDetails.studyDownloadUrl) {
+                    url = studyDetails.studyDownloadUrl;
+                } else {
+                    // let ownerUserName =
+                    // this.$page.props.team && this.$page.props.team.owner
+                    //     ? this.$page.props.team.owner.username
+                    //     : this.project.owner.username;
+
+                    let username = this.$page.props.team.owner
+                        ? this.$page.props.team.owner.username
+                        : this.project.owner.username;
+
+                    url =
+                        this.url +
+                        "/" +
+                        username +
+                        "/datasets/" +
+                        this.project.slug +
+                        "/" +
+                        studyDetails.studySlug;
+                }
+                this.spectraLoadingMessage =
+                    "Parsing: " + studyDetails.studySlug + "<br/>" + url;
+                axios
+                    .post("https://nodejsdev.nmrxiv.org/spectra-parser", {
+                        urls: [url],
+                        snapshot: false,
+                    })
+                    .then((response) => {
+                        let parsedSpectra = response.data.data;
+                        parsedSpectra.spectra.forEach((spec) => {
+                            delete spec["data"];
+                            delete spec["meta"];
+                            delete spec["originalData"];
+                            delete spec["originalInfo"];
+                        });
+                        let version = parsedSpectra.version;
+                        delete parsedSpectra["version"];
+                        axios
+                            .post(
+                                "/dashboard/studies/" +
+                                    studyDetails.studyID +
+                                    "/nmriumInfo",
+                                {
+                                    data: parsedSpectra,
+                                    version: version,
+                                }
+                            )
+                            .then((res) => {
+                                this.loadingStep = false;
+                                this.studiesToImport.filter(
+                                    (f) => f.studyID == studyDetails.studyID
+                                )[0].status = true;
+                                this.fetchNMRium();
+                            })
+                            .catch((err) => {
+                                this.loadingStep = false;
+                                this.studiesToImport.filter(
+                                    (f) => f.studyID == studyDetails.studyID
+                                )[0].status = true;
+                                this.fetchNMRium();
+                            });
+                    })
+                    .catch((error) => {
+                        this.loadingStep = false;
+                        this.studiesToImport.filter(
+                            (f) => f.studyID == studyDetails.studyID
+                        )[0].status = true;
+                        this.fetchNMRium();
                     });
-                });
-                this.studyForm.tags = tags;
+            } else {
+                this.fetchProjectData();
             }
         },
     },
     computed: {
         url() {
-            return String(this.$page.props.url);
+            return String(this.$page.props.url)
+                ? String(this.$page.props.url)
+                : "https://dev.nmrxiv.org";
         },
         getMax() {
             if (this.selectedStudy) {
@@ -2943,6 +2961,26 @@ export default {
         },
         currentTab() {
             return this.tabs.find((t) => t.current);
+        },
+        mailFromAddress() {
+            return String(this.$page.props.mailFromAddress);
+        },
+        mailTo() {
+            return "mailto:" + String(this.$page.props.mailFromAddress);
+        },
+        spectraCount() {
+            let i = 0;
+            this.studies.forEach((s) => {
+                i = i + s.datasets.length;
+            });
+            return i;
+        },
+        moleculesCount() {
+            let i = 0;
+            this.studies.forEach((s) => {
+                i = i + s.sample.molecules.length;
+            });
+            return i;
         },
     },
 };

@@ -1,7 +1,8 @@
 <template>
     <div>
-        <h1 class="text-xl font-extrabold text-gray-400">
-            Here’s how your project compares to
+        <h1 class="text-md font-extrabold text-gray-400">
+            Here’s how your <span v-if="mode != 'study'">project</span
+            ><span v-else>samples meta-data</span> compares to
             <a
                 target="_blank"
                 class="text-blue-800"
@@ -67,7 +68,7 @@
                 role="list"
                 class="divide-y border-t divide-gray-200"
             >
-                <li>
+                <li v-if="mode != 'study'">
                     <a target="_blank" class="block">
                         <div class="px-4 py-4 sm:px-6">
                             <div class="flex items-center border-b">
@@ -325,7 +326,7 @@
                                                     >
                                                         Study title
                                                     </p>
-                                                    <span
+                                                    <!-- <span
                                                         v-if="
                                                             !getStatus(
                                                                 study.title
@@ -334,7 +335,7 @@
                                                         class="cursor-pointer bg-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
                                                     >
                                                         Edit
-                                                    </span>
+                                                    </span> -->
                                                 </div>
                                                 <div
                                                     class="flex items-center hover:bg-gray-100 rounded-md px-2"
@@ -347,9 +348,9 @@
                                                     <p
                                                         class="truncate text-md text-dark-600"
                                                     >
-                                                        Study description
+                                                        Sample description
                                                     </p>
-                                                    <span
+                                                    <!-- <span
                                                         v-if="
                                                             !getStatus(
                                                                 study.description
@@ -358,7 +359,7 @@
                                                         class="cursor-pointer bg-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
                                                     >
                                                         Edit
-                                                    </span>
+                                                    </span> -->
                                                 </div>
                                                 <div
                                                     class="flex items-center hover:bg-gray-100 rounded-md px-2"
@@ -369,7 +370,7 @@
                                                     <p
                                                         class="truncate text-md text-dark-600"
                                                     >
-                                                        Study keywords
+                                                        Sample keywords
                                                     </p>
                                                     <a
                                                         v-if="
@@ -378,10 +379,10 @@
                                                             )
                                                         "
                                                         class="cursor-pointer bg-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
-                                                        :href="
-                                                            route(
-                                                                'dashboard.studies',
-                                                                study.id
+                                                        @click="
+                                                            update(
+                                                                study,
+                                                                'keywords'
                                                             )
                                                         "
                                                     >
@@ -397,7 +398,7 @@
                                                     <p
                                                         class="truncate text-md text-dark-600"
                                                     >
-                                                        Study sample details
+                                                        Sample meta data
                                                     </p>
                                                     <span
                                                         v-if="
@@ -415,24 +416,24 @@
                                                 >
                                                     <ValidationStatus
                                                         :status="
-                                                            study.composition
+                                                            study.molecules
                                                         "
                                                     ></ValidationStatus>
                                                     <p
                                                         class="truncate text-md text-dark-600"
                                                     >
-                                                        Sample Composition
+                                                        Compound Information
                                                     </p>
                                                     <a
                                                         v-if="
                                                             !getStatus(
-                                                                study.composition
+                                                                study.molecules
                                                             )
                                                         "
-                                                        :href="
-                                                            route(
-                                                                'dashboard.studies',
-                                                                study.id
+                                                        @click="
+                                                            update(
+                                                                study,
+                                                                'structure'
                                                             )
                                                         "
                                                         class="cursor-pointer bg-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
@@ -446,7 +447,7 @@
                                                     <p
                                                         class="truncate text-md text-dark-600 mb-3"
                                                     >
-                                                        Datasets
+                                                        Spectral Datasets
                                                     </p>
                                                 </div>
                                                 <div
@@ -683,6 +684,7 @@ export default {
     props: {
         project: Object,
         validation: Object,
+        mode: String,
     },
     methods: {
         getStatus(value) {
@@ -690,6 +692,19 @@ export default {
                 return value;
             }
             return value.split("|")[0] == "true";
+        },
+        update(model, property) {
+            if (this.mode == "study") {
+                this.$emit("update", {
+                    property: property,
+                    model: model,
+                });
+            } else {
+                // route(
+                //     'dashboard.studies',
+                //     study.id
+                // )
+            }
         },
     },
 };

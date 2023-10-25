@@ -100,6 +100,9 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::get('projects/status/{project}/queue', [ProjectController::class, 'status'])
         ->name('project.status');
 
+    Route::get('projects/{project}/validation', [ProjectController::class, 'validationReport'])
+        ->name('project.validation');
+
     Route::post('users/notification/{user}/markAsRead', [UsersController::class, 'markNotificationAsRead'])
         ->name('users.markNotificationAsRead');
 
@@ -199,6 +202,8 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
             ->name('dashboard.studies.nmrium');
         Route::post('studies/{study}/nmriumInfo', [StudyController::class, 'nmriumInfo'])
             ->name('dashboard.studies.nmriumInfo');
+        Route::post('studies/{study}/preview', [StudyController::class, 'preview'])
+            ->name('dashboard.study.preview');
 
         Route::post('studies/{study}/molecule', [StudyController::class, 'moleculeStore'])
             ->name('study-molecule.store');

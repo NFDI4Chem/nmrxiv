@@ -30,7 +30,7 @@
                             </a></i
                         >
                     </div>
-                    <button class="float-right" @click="toggleFullScreen">
+                    <!-- <button class="float-right" @click="toggleFullScreen">
                         <span v-if="fullScreen">
                             <svg
                                 width="24"
@@ -85,7 +85,7 @@
                                 />
                             </svg>
                         </span>
-                    </button>
+                    </button> -->
                 </div>
             </div>
             <div
@@ -137,8 +137,9 @@
                                     v-if="status"
                                     class="mt-2 block text-sm font-medium text-gray-900"
                                 >
-                                    {{ status }} -
+                                    {{ status }}
                                     <div v-if="uploadBatchErrors.length > 0">
+                                        -
                                         <a
                                             @click="
                                                 showErrorBatchLogs =
@@ -167,7 +168,33 @@
                     </div>
                 </form>
             </div>
+            <div v-if="loading">
+                <div class="h-[calc(100vh-260px)] text-center py-12">
+                    <svg
+                        class="animate-spin -ml-1 mr-3 h-5 w-5 text-dark flex-inline inline"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                    >
+                        <circle
+                            class="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            stroke-width="4"
+                        ></circle>
+                        <path
+                            class="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                    </svg>
+                    Loading Files...
+                </div>
+            </div>
             <div
+                v-else
                 :class="[
                     fullScreen
                         ? 'overflow-scroll h-full relative px-6 py-4'
@@ -407,6 +434,64 @@
             </div>
         </div>
     </div>
+    <div
+        v-if="
+            (status != 'PROCESSING UPLOADED FILES' &&
+                status != '' &&
+                status != null) ||
+            precentageUpload > 0
+        "
+        class="w-full h-screen mx-84 px-10 fixed block top-0 left-0 bg-white opacity-90 z-50"
+    >
+        <div
+            role="status"
+            class="absolute -translate-x-1/2 -translate-y-1/2 top-2/4 left-1/2"
+        >
+            <svg
+                aria-hidden="true"
+                class="w-8 h-8 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+                viewBox="0 0 100 101"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+            >
+                <path
+                    d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                    fill="currentColor"
+                />
+                <path
+                    d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                    fill="currentFill"
+                />
+            </svg>
+            <div class="mt-4 w-64 h-84">
+                <div class="h-2 mb-2 text-xs flex rounded-md bg-gray-200">
+                    <div
+                        :style="'width: ' + precentageUpload + '%'"
+                        class="shadow-none flex rounded-md flex-col text-center whitespace-nowrap text-white justify-center bg-green-500"
+                    ></div>
+                </div>
+                {{ status }}&emsp;({{ uploadedFilesCount }}/{{
+                    totalFilesCount
+                }})
+            </div>
+            <div class="w-64 text-gray-700 truncate">
+                <small
+                    ><i>{{ currentLog }}</i></small
+                >
+            </div>
+            <button
+                v-if="Object.keys(logs).length > 0"
+                class="mt-4 text-sm cursor-pointer bg-white-900"
+                @click="showLogsDialog = true"
+            >
+                <InformationCircleIcon
+                    class="h-5 w-5 inline flex-shrink-0 mx-auto"
+                    aria-hidden="true"
+                />
+                View logs
+            </button>
+        </div>
+    </div>
 </template>
 <script>
 import JetDialogModal from "@/Jetstream/DialogModal.vue";
@@ -458,6 +543,7 @@ export default {
             fullScreen: false,
             precentageUpload: 0,
             busy: false,
+            loading: false,
             file: null,
             url: null,
             logs: {},
@@ -466,6 +552,7 @@ export default {
             uploadBatchErrors: [],
             showErrorBatchLogs: false,
             showLogsDialog: false,
+            currentLog: null,
         };
     },
     computed: {
@@ -523,14 +610,18 @@ export default {
                 this.$page.props.selectedFileSystemObject = this.file;
                 this.$page.props.selectedFolder = "/";
                 this.updateBusyStatus(true);
+                this.loading = false;
             });
         },
         annotate() {
             this.updateBusyStatus(true);
+            this.loading = true;
+            this.status = "PROCESSING UPLOADED FILES";
             axios
                 .get("/dashboard/drafts/" + this.draft.id + "/annotate")
                 .then(() => {
                     this.updateBusyStatus(false);
+                    this.status = null;
                     this.loadFiles();
                 });
         },
@@ -538,13 +629,17 @@ export default {
             vm.batchesCount += 1;
             const url = "/dashboard/storage/signed-draft-storage-url";
             const client = axios.create({ baseURL: window.location.origin });
+            vm.currentLog = "Fetching temporary storage url";
             axiosRetry(client, {
                 retries: 3,
                 retryCondition: (error) => {
                     // console.log(
                     //     "retring failed upload requests - Signed storage URL"
                     // );
-                    return error.response.status === 500;
+                    return (
+                        error.response.status === 500 ||
+                        error.response.status === 502
+                    );
                 },
             });
             client
@@ -597,6 +692,8 @@ export default {
                 })
                 .then((response) => {
                     if (response) {
+                        vm.currentLog =
+                            "Uploading files to temporary storage url";
                         let data = response.data;
                         this.processedBatches += 1;
                         data.forEach((u) => {
@@ -670,7 +767,7 @@ export default {
                     disablePreviews: true,
                     parallelUploads: 100,
                     autoQueue: false,
-                    maxFiles: 10000,
+                    maxFiles: 20000,
                     dictDefaultMessage: document.querySelector(
                         "#fs-dropzone-message"
                     ).innerHTML,
@@ -695,6 +792,7 @@ export default {
                     vm.uploadedFilesCount += 1;
                     vm.precentageUpload =
                         (vm.uploadedFilesCount / vm.totalFilesCount) * 100;
+                    vm.currentLog = file.fullPath;
                 });
                 vm.dropzone.on("error", (file) => {
                     let message = "Upload failed";
@@ -719,6 +817,9 @@ export default {
                             messages: [],
                         };
                     }
+                });
+                vm.dropzone.on("click", function (e) {
+                    alert();
                 });
                 vm.dropzone.on("addedfiles", (files) => {
                     this.updateBusyStatus(true);
@@ -747,12 +848,13 @@ export default {
                     });
                 });
                 vm.dropzone.on("queuecomplete", () => {
+                    vm.status = "UPLOAD COMPLETE";
                     vm.annotate();
+                    vm.currentLog = null;
                     vm.dropzone.removeAllFiles();
                     vm.precentageUpload = 0;
                     vm.totalFilesCount = 0;
                     vm.uploadedFilesCount = 0;
-                    vm.status = "UPLOAD COMPLETE";
                     this.updateBusyStatus(false);
                     setTimeout(() => {
                         vm.status = null;

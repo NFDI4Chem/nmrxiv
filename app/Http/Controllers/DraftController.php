@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\ArchiveStudy;
 use App\Jobs\ProcessDraft;
 use App\Models\Dataset;
 use App\Models\Draft;
@@ -57,7 +58,7 @@ class DraftController extends Controller
             );
 
             $defaultDraft = Draft::create([
-                'name' => "Untitled Project",
+                'name' => 'Untitled Project',
                 'slug' => Str::slug('"Untitled Project"'),
                 'description' => '',
                 'relative_url' => rtrim(
@@ -90,6 +91,7 @@ class DraftController extends Controller
                             ['status', '<>', 'missing'],
                             ['draft_id', $draft->id],
                         ])
+                        ->orderBy('created_at', 'DESC')
                         ->orderBy('type')
                         ->get(),
                 ],
@@ -100,6 +102,7 @@ class DraftController extends Controller
     {
         $draft->name = $request->get('name');
         $draft->save();
+
         return $draft;
     }
 
@@ -147,6 +150,7 @@ class DraftController extends Controller
     {
         $input = $request->all();
         $project = Project::where('draft_id', $draft->id)->first();
+
         // if ($project) {
         //     $rule = Rule::unique('projects')->where('owner_id', $input['owner_id'])->ignore($project->id);
         // } else {
@@ -165,9 +169,10 @@ class DraftController extends Controller
                 ['draft_id', $draft->id],
             ])
             ->orderBy('type')
+            ->orderBy('created_at', 'DESC')
             ->get();
-
-        $draft->name = $request->get('name');
+        $draftName = $request->get('name');
+        $draft->name = $draftName ? $draftName : 'Untitled Project (draft)';
         $draft->description = $request->get('description');
         $draft->syncTagsWithType($request->get('tags_array'), 'Draft');
         $draft->save();
@@ -407,6 +412,8 @@ class DraftController extends Controller
                 return redirect()->back()->withErrors(['studies' => 'nmrXiv requires raw or processed raw instrument output files. If you data is from a single sample organise all the files in one folder and click proceed. If you have multiple samples, group your data in subfolders with each subfolder corresponding to a sample. Thank you.']);
             }
 
+            ArchiveStudy::dispatch($project);
+
             return response()->json([
                 'project' => $project->load(['owner', 'citations', 'authors']),
                 'studies' => $studies,
@@ -418,7 +425,7 @@ class DraftController extends Controller
     {
         $project = Project::where('draft_id', $draft->id)->first();
 
-        $studies = json_decode($project->studies->load(['datasets', 'sample.molecules', 'tags']));
+        $studies = json_decode($project->studies->orderBy('created_at', 'DESC')->load(['datasets', 'sample.molecules', 'tags']));
 
         return response()->json([
             'project' => $project->load(['owner']),
@@ -542,7 +549,7 @@ class DraftController extends Controller
 
     public function isNMReData($folder)
     {
-        $fileTypes = ['nmredata'];
+        $fileTypes = ['sdf'];
         $names = [$folder->name];
         $extensions = array_map(fn ($s) => substr("$s", (strrpos($s, '.') + 1)), $names);
         $isNMReData = false;

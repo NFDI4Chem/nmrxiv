@@ -26,7 +26,9 @@
                 >#{{ study.identifier }}</small
             >
             <Link :href="route('dashboard.studies', [study.id])">
-                <div class="flex items-center font-bold text-lg text-gray-600">
+                <div
+                    class="flex items-center font-bold text-lg text-gray-600 truncate ellipsis"
+                >
                     {{ study.name }}
                 </div>
             </Link>
@@ -40,7 +42,7 @@
             <span v-for="(ds, $dsIndex) in study.datasets" :key="$dsIndex">
                 <div
                     :class="[
-                        ds.has_nmrium
+                        study.has_nmrium || ds.has_nmrium
                             ? 'bg-green-100 text-gray-800'
                             : 'bg-gray-100 text-gray-800',
                         'mb-0.5 inline-flex truncate break-words items-center px-3 py-0.5 rounded-full text-xs font-medium mr-1 hover:bg-teal-700',
@@ -94,12 +96,14 @@
 </template>
 
 <script>
-import { LockClosedIcon } from "@heroicons/vue/24/solid";
-import { LockOpenIcon } from "@heroicons/vue/24/solid";
-import { PencilIcon } from "@heroicons/vue/24/solid";
-import { EnvelopeIcon } from "@heroicons/vue/24/solid";
-import { Link } from "@inertiajs/inertia-vue3";
-import { StarIcon } from "@heroicons/vue/24/solid";
+import {
+    LockClosedIcon,
+    StarIcon,
+    LockOpenIcon,
+    PencilIcon,
+    EnvelopeIcon,
+} from "@heroicons/vue/24/solid";
+import { Link } from "@inertiajs/vue3";
 
 export default {
     components: {
@@ -119,14 +123,15 @@ export default {
     },
     methods: {
         getSVGString(molecule) {
-            if (molecule.MOL) {
+            if (molecule && molecule.MOL) {
                 let mol = OCL.Molecule.fromMolfile(
                     "\n  " + molecule.MOL.replaceAll('"', "")
                 );
                 return mol.toSVG(200, 200);
-            } else {
-                console.log(molecule);
             }
+            //  else {
+            //     console.log(molecule);
+            // }
         },
     },
 };

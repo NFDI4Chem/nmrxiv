@@ -22,6 +22,7 @@ return [
             'description' => '',
             'nmrium_info' => 'required',
             'keywords' => 'array|min:1',
+            'molecules' => 'required|array|min:1',
             'composition' => 'array|min:1',
             'sample' => 'required',
         ],

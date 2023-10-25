@@ -1,7 +1,7 @@
 <template>
     <div>
         <div>
-            <!-- <div class="mb-2 float-right">
+            <div class="mb-2 float-right">
                 <small>
                     <a
                         class="text-xs cursor-pointer hover:text-blue-700 mr-2"
@@ -10,15 +10,15 @@
                         >Learn more
                     </a>
                     <a
-                        @click="loadFromURLs(null)"
+                        @click="resetStudy"
                         class="cursor-pointer mr-3 border px-2 py-1 rounded-md"
                         >Reset</a
                     >
-                    <a
+                    <!-- <a
                         @click="showVersions"
                         class="cursor-pointer mr-3 border px-2 py-1 rounded-md"
                         >Edit History</a
-                    >
+                    > -->
 
                     <a
                         @click="exportPreview()"
@@ -28,7 +28,7 @@
                         Preview</a
                     >
                 </small>
-            </div> -->
+            </div>
             <small class="text-gray-400">
                 <span v-if="info">{{ info }}</span>
             </small>
@@ -368,6 +368,7 @@ export default {
             autoSaving: false,
             currentMolecules: [],
             reset: false,
+            resetInProgress: false,
             info: null,
             version: null,
         };
@@ -392,7 +393,20 @@ export default {
         registerEvents() {
             const saveNMRiumUpdates = (e) => {
                 const { data, type } = e.data;
+                if (type == "nmr-wrapper:action-response") {
+                    if (
+                        e.origin != "https://nmriumdev.nmrxiv.org" &&
+                        e.origin != "https://nmrium.nmrxiv.org"
+                    ) {
+                        return;
+                    }
+                    let actionType = data.type;
+                    if (actionType == "exportSpectraViewerAsBlob") {
+                        this.saveStudyPreview(data.data);
+                    }
+                }
                 if (data && data.source == "data") {
+                    // console.log(type)
                     if (
                         e.origin != "https://nmriumdev.nmrxiv.org" &&
                         e.origin != "https://nmrium.nmrxiv.org"
@@ -402,77 +416,66 @@ export default {
                     if (type == "nmr-wrapper:error") {
                         this.spectraError = e.data;
                         this.updateLoadingStatus(false);
-
                         return;
                     }
-                    if (type == "nmr-wrapper:action-response") {
-                        let state = data.state;
-                        this.version = state.version;
-                        let actionType = state.data.actionType;
-                        if (actionType == "exportSpectraViewerAsBlob") {
-                            this.saveStudyPreview(data);
-                        }
-                    }
-                    if (type == "nmr-wrapper:data-change") {
-                        let state = data.state;
-                        this.version = state.version;
-                        let actionType = state.data.actionType;
-                        // console.log(this.study.has_nmrium,actionType)
-                        if (state.data.spectra.length > 0) {
-                            if (
-                                actionType == "INITIATE" &&
-                                !this.study.has_nmrium
-                            ) {
-                                this.infoLog(
-                                    "Spectra loaded successfully...",
-                                    true
-                                );
-                                this.selectedSpectraData = state.data;
+                    let state = data.state;
+                    this.version = state.version;
+                    let actionType = state.data.actionType;
 
-                                if (!this.study.has_nmrium) {
+                    if (type == "nmr-wrapper:data-change") {
+                        if (state.data.spectra.length > 0) {
+                            this.selectedSpectraData = state.data;
+                            if (actionType == "INITIATE") {
+                                if (
+                                    !this.study.has_nmrium ||
+                                    this.resetInProgress
+                                ) {
                                     delete this.selectedSpectraData[
                                         "actionType"
                                     ];
                                     this.selectedSpectraData.spectra.forEach(
                                         (spec) => {
                                             delete spec["data"];
-                                            delete spec["info"];
                                             delete spec["meta"];
                                             delete spec["originalData"];
                                             delete spec["originalInfo"];
                                         }
                                     );
+                                    if (this.study.study_photo_url == "") {
+                                        setTimeout(
+                                            function () {
+                                                this.exportPreview();
+                                            }.bind(this),
+                                            500
+                                        );
+                                    }
+                                    this.resetInProgress = false;
                                     this.updateStudyNMRiumInfo();
+                                    return;
+                                } else {
+                                    this.infoLog(
+                                        "Spectra loaded successfully...",
+                                        true
+                                    );
                                     this.updateLoadingStatus(false);
+                                    return;
                                 }
-                                return;
-                            } else if (
-                                this.study.has_nmrium &&
-                                actionType != "INITIATE"
-                            ) {
-                                this.selectedSpectraData = state.data;
+                            } else {
+                                this.updateLoadingStatus(
+                                    true,
+                                    "Saving updates: " + this.study.name
+                                );
                                 delete this.selectedSpectraData["actionType"];
                                 this.selectedSpectraData.spectra.forEach(
                                     (spec) => {
                                         delete spec["data"];
-                                        delete spec["info"];
                                         delete spec["meta"];
                                         delete spec["originalData"];
                                         delete spec["originalInfo"];
                                     }
                                 );
                                 this.updateStudyNMRiumInfo();
-                                this.updateLoadingStatus(false);
-                            } else if (
-                                this.study.has_nmrium &&
-                                actionType == "INITIATE"
-                            ) {
-                                this.selectedSpectraData = state.data;
-                                this.infoLog(
-                                    "Spectra loaded successfully...",
-                                    true
-                                );
-                                this.updateLoadingStatus(false);
+                                return;
                             }
                         }
                     }
@@ -491,11 +494,14 @@ export default {
             const iframe = window.frames.submissionNMRiumIframe;
             this.spectraError = null;
             this.currentMolecules = [];
-            this.updateLoadingStatus(true);
             let username = this.$page.props.team.owner
                 ? this.$page.props.team.owner.username
                 : this.project.owner.username;
             if (iframe) {
+                this.updateLoadingStatus(
+                    true,
+                    "Loading spectra: " + this.study.name
+                );
                 if (this.study && this.study.has_nmrium) {
                     this.infoLog("Loading Spectra from NMRium JSON..");
                     axios
@@ -505,7 +511,6 @@ export default {
                                 "/nmriumInfo"
                         )
                         .then((response) => {
-                            this.updateLoadingStatus(false);
                             let nmrium_info = response.data;
                             if (nmrium_info) {
                                 let data = {
@@ -523,15 +528,19 @@ export default {
                 } else {
                     if (this.study.datasets.length > 0) {
                         let urls = [];
-
-                        let url =
-                            this.url +
-                            "/" +
-                            username +
-                            "/datasets/" +
-                            this.project.slug +
-                            "/" +
-                            this.study.slug;
+                        let url = null;
+                        if (this.study.download_url) {
+                            url = this.study.download_url;
+                        } else {
+                            url =
+                                this.url +
+                                "/" +
+                                username +
+                                "/datasets/" +
+                                this.project.slug +
+                                "/" +
+                                this.study.slug;
+                        }
                         urls.push(url);
                         this.loadFromURLs(urls);
                     }
@@ -543,18 +552,25 @@ export default {
             const iframe = window.frames.submissionNMRiumIframe;
             if (!urls) {
                 urls = [];
-                let username = this.$page.props.team.owner
-                    ? this.$page.props.team.owner.username
-                    : this.project.owner.username;
-                let url =
-                    this.url +
-                    "/" +
-                    username +
-                    "/datasets/" +
-                    this.project.slug +
-                    "/" +
-                    this.study.slug;
+                let url = null;
+                if (this.study.download_url) {
+                    url = this.study.download_url;
+                } else {
+                    let username = this.$page.props.team.owner
+                        ? this.$page.props.team.owner.username
+                        : this.project.owner.username;
+                    url =
+                        this.url +
+                        "/" +
+                        username +
+                        "/datasets/" +
+                        this.project.slug +
+                        "/" +
+                        this.study.slug;
+                    urls.push(url);
+                }
                 urls.push(url);
+                this.loadFromURLs(urls);
             }
 
             let data = {
@@ -566,7 +582,6 @@ export default {
         },
         updateStudyNMRiumInfo() {
             if (this.study != null && this.selectedSpectraData) {
-                this.updateLoadingStatus(true);
                 axios
                     .post(
                         "/dashboard/studies/" + this.study.id + "/nmriumInfo",
@@ -585,7 +600,9 @@ export default {
                         this.updateLoadingStatus(false);
                         this.infoLog("Error saving spectra info");
                         console.error(
-                            "Error saving the nmrium info. Please contact us at {{mailFromAddress}} if the error persist."
+                            "Error saving the nmrium info. Please contact us at " +
+                                this.mailFromAddress +
+                                " if the error persist."
                         );
                         this.autoSaving = false;
                     });
@@ -593,7 +610,6 @@ export default {
         },
         updateDataSet() {
             if (this.dataset != null && this.selectedSpectraData.length > 0) {
-                this.updateLoadingStatus(true);
                 axios
                     .post(
                         "/dashboard/datasets/" +
@@ -607,12 +623,12 @@ export default {
                     )
                     .then((response) => {
                         this.infoLog("Spectra saved successfully", true);
-                        this.updateLoadingStatus(false);
+                        // this.updateLoadingStatus(false);
                         this.autoSaving = false;
                         this.dataset.has_nmrium = response.data.has_nmrium;
                     })
                     .catch((err) => {
-                        this.updateLoadingStatus(false);
+                        // this.updateLoadingStatus(false);
                         this.infoLog("Error saving spectra info");
                         console.error(
                             "Error saving the nmrium info. Please contact us at {{mailFromAddress}} if the error persist."
@@ -646,23 +662,19 @@ export default {
             }
         },
         saveStudyPreview(data) {
-            if (this.dataset) {
-                this.updateLoadingStatus(true);
+            if (this.study) {
                 const reader = new FileReader();
                 reader.addEventListener("loadend", () => {
                     let svg = reader.result;
                     axios
                         .post(
-                            "/dashboard/datasets/" +
-                                this.dataset.id +
-                                "/preview",
+                            "/dashboard/studies/" + this.study.id + "/preview",
                             {
                                 img: svg,
                             }
                         )
                         .then((response) => {
                             this.infoLog("Saved preview successfully", true);
-                            this.updateLoadingStatus(false);
                         });
                 });
                 reader.readAsText(data.blob);
@@ -676,8 +688,11 @@ export default {
                 return mol.toSVG(200, 200);
             }
         },
-        updateLoadingStatus(status) {
-            this.$emit("loading", status);
+        updateLoadingStatus(status, message) {
+            this.$emit("loading", {
+                status: status,
+                message: message,
+            });
         },
         infoLog(message, reset) {
             this.info = message;
@@ -686,6 +701,10 @@ export default {
                     this.info = "";
                 }, 5000);
             }
+        },
+        resetStudy() {
+            this.resetInProgress = true;
+            this.loadFromURLs(null);
         },
         showVersions() {
             this.versionsElement.toggleVersions();
