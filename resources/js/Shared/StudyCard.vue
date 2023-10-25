@@ -3,79 +3,43 @@
         v-if="study"
         class="flex flex-col border rounded-lg shadow-lg transition ease-in-out delay-150 duration-300 overflow-hidden"
     >
-        <div class="pt-5 px-5 bg-gray-200">
+        <div class="relative overflow-hidden h-48 bg-white-200">
             <span
                 v-if="
-                    study.study_preview_urls &&
-                    study.study_preview_urls.length > 0
+                    study.photo_url ||
+                    (study.study_preview_urls &&
+                        study.study_preview_urls.length > 0) ||
+                    (study.sample &&
+                        study.sample.molecules &&
+                        study.sample.molecules.length > 0)
                 "
             >
-                <span v-if="study.study_preview_urls.length == 1">
-                    <img
-                        class="h-36 w-full rounded-t-md shadow-lg"
-                        :src="study.study_preview_urls[0]"
-                        alt=""
-                    />
-                </span>
-                <span v-else>
-                    <div class="relative">
-                        <span
-                            v-for="(url, index) in study.study_preview_urls"
-                            :key="url"
-                        >
-                            <span v-if="index == selectedPreviewIndex">
-                                <img
-                                    class="h-36 w-full rounded-t-md shadow-lg"
-                                    :src="url"
-                                    alt=""
-                                />
-                            </span>
-                        </span>
-
+                <ul v-if="study.molecules.length > 0" role="list">
+                    <li
+                        class="col-span-1 divide-y divide-gray-200 cursor-pointer"
+                    >
                         <div
-                            class="absolute w-full py-2.5 bottom-0 inset-x-0 pl-4 text-white text-xs text-center leading-4"
+                            class="bg-white absolute top-0 left-0 bg-white opacity-80 item-center w-full rounded-t-md flex justify-center items-center"
                         >
-                            <div>
-                                <ol
-                                    role="list"
-                                    class="flex items-center space-x-2"
-                                >
-                                    <li
-                                        v-for="(
-                                            url, index
-                                        ) in study.study_preview_urls"
-                                        :key="index"
-                                    >
-                                        <a
-                                            v-if="
-                                                index === selectedPreviewIndex
-                                            "
-                                            class="block w-2.5 h-2.5 bg-teal-200 rounded-full hover:bg-teal-400"
-                                            @click.prevent="
-                                                selectedPreviewIndex = index
-                                            "
-                                        >
-                                        </a>
-                                        <a
-                                            v-else
-                                            class="cursor-pointer block w-2.5 h-2.5 bg-gray-200 rounded-full hover:bg-gray-400"
-                                            @click.prevent="
-                                                selectedPreviewIndex = index
-                                            "
-                                        >
-                                        </a>
-                                    </li>
-                                </ol>
-                            </div>
+                            <span
+                                ><div
+                                    v-html="getSVGString(study.molecules[0])"
+                                ></div
+                            ></span>
                         </div>
-                    </div>
-                    <span class="bg-gradient-to-r from-cyan-500 to-blue-500">
-                    </span>
-                </span>
+                    </li>
+                </ul>
+
+                <img
+                    class="h-48 w-full rounded-t-md shadow-lg"
+                    v-if="study.photo_url"
+                    :src="study.photo_url"
+                    alt="study.name"
+                />
             </span>
             <span v-else>
                 <img
-                    class="h-36 w-full rounded-t-md shadow-lg"
+                    class="12rem w-full rounded-t-md shadow-lg"
                     src="https://via.placeholder.com/340x180/FFF/f1f1f4?text=No preview"
                     alt=""
                 />
@@ -86,7 +50,9 @@
                 >#{{ study.identifier }}</small
             >
             <Link :href="route('dashboard.studies', [study.id])">
-                <div class="flex items-center font-bold text-lg text-gray-600">
+                <div
+                    class="flex items-center font-bold truncate text-lg text-gray-600"
+                >
                     <span class="">
                         <!-- Commented now to avoid to lighten the query, will be added later with cache. -->
                         <!--  <StarIcon
@@ -169,6 +135,18 @@ export default {
             selectedPreviewIndex: 0,
         };
     },
-    methods: {},
+    methods: {
+        getSVGString(molecule) {
+            if (molecule && molecule.MOL) {
+                let mol = OCL.Molecule.fromMolfile(
+                    "\n  " + molecule.MOL.replaceAll('"', "")
+                );
+                return mol.toSVG(300, 200);
+            }
+            //  else {
+            //     console.log(molecule);
+            // }
+        },
+    },
 };
 </script>

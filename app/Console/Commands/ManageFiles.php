@@ -46,7 +46,6 @@ class ManageFiles extends Command
         $listing = Storage::disk(env('FILESYSTEM_DRIVER'))->listContents($path, true);
         foreach ($listing as $item) {
             $path = $item->path();
-
             if ($item instanceof \League\Flysystem\FileAttributes) {
                 $fsObject = FileSystemObject::where([
                     ['path', '/'.$path],
@@ -59,7 +58,7 @@ class ManageFiles extends Command
                     $fsObject->save();
                 }
             } elseif ($item instanceof \League\Flysystem\DirectoryAttributes) {
-                // echo($item);
+                echo $item->study_id;
             }
         }
     }

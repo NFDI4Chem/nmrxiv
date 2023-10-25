@@ -31,47 +31,6 @@
                                         <span
                                             class="px-3 -ml-4 rounded text-sm bg-gray-100 font-medium text-gray-500"
                                         >
-                                            Description
-                                        </span>
-                                        <button
-                                            v-if="canUpdateStudy"
-                                            type="button"
-                                            class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                                            @click="openStudyDetailsPane"
-                                        >
-                                            <PencilIcon
-                                                class="w-4 h-4 mr-1 text-gray-600"
-                                            />
-                                            <span>Edit</span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <dd
-                                    class="mt-1 text-md text-gray-900 space-y-5"
-                                >
-                                    <p
-                                        style="max-width: 100ch !important"
-                                        class="prose mt-1 text-sm text-blue-gray-500"
-                                        v-html="md(study.description)"
-                                    ></p>
-                                </dd>
-                            </div>
-                            <div class="mb-4">
-                                <div class="relative">
-                                    <div
-                                        class="absolute inset-0 flex items-center"
-                                        aria-hidden="true"
-                                    >
-                                        <div
-                                            class="w-full border-t border-gray-300"
-                                        ></div>
-                                    </div>
-                                    <div
-                                        class="relative flex items-center justify-between"
-                                    >
-                                        <span
-                                            class="px-3 -ml-4 rounded text-sm bg-gray-100 font-medium text-gray-500"
-                                        >
                                             Keywords
                                         </span>
                                         <button
@@ -587,6 +546,47 @@
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+                            <div class="mb-4">
+                                <div class="relative">
+                                    <div
+                                        class="absolute inset-0 flex items-center"
+                                        aria-hidden="true"
+                                    >
+                                        <div
+                                            class="w-full border-t border-gray-300"
+                                        ></div>
+                                    </div>
+                                    <div
+                                        class="relative flex items-center justify-between"
+                                    >
+                                        <span
+                                            class="px-3 -ml-4 rounded text-sm bg-gray-100 font-medium text-gray-500"
+                                        >
+                                            Description
+                                        </span>
+                                        <button
+                                            v-if="canUpdateStudy"
+                                            type="button"
+                                            class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                            @click="openStudyDetailsPane"
+                                        >
+                                            <PencilIcon
+                                                class="w-4 h-4 mr-1 text-gray-600"
+                                            />
+                                            <span>Edit</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <dd
+                                    class="mt-1 text-md text-gray-900 space-y-5"
+                                >
+                                    <p
+                                        style="max-width: 100ch !important"
+                                        class="prose mt-1 text-sm text-blue-gray-500"
+                                        v-html="md(study.description)"
+                                    ></p>
+                                </dd>
                             </div>
                         </div>
                     </div>

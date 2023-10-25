@@ -396,4 +396,15 @@ class StudyController extends Controller
     {
         return Bookmark::toggle($study, $request->user());
     }
+
+    public function preview(Request $request, Study $study)
+    {
+        $content = $request->get('img');
+        if ($content) {
+            $path = '/projects/'.$study->project->uuid.'/'.$study->slug.'.svg';
+            Storage::disk(env('FILESYSTEM_DRIVER_PUBLIC'))->put($path, $content, 'public');
+            $study->study_photo_path = $path;
+            $study->save();
+        }
+    }
 }

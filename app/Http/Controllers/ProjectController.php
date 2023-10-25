@@ -251,28 +251,58 @@ class ProjectController extends Controller
         ]);
     }
 
+    public function validationReport(Request $request, Project $project)
+    {
+        $validation = $project->validation;
+
+        if (! $validation) {
+            $validation = new Validation();
+            $validation->save();
+            $project->validation()->associate($validation);
+            $project->save();
+
+            foreach ($project->studies as $study) {
+                $study->validation()->associate($validation);
+                $study->save();
+                foreach ($study->datasets as $dataset) {
+                    $dataset->validation()->associate($validation);
+                    $dataset->save();
+                }
+            }
+        }
+
+        $validation->process();
+
+        return $validation->fresh();
+    }
+
     public function publish(Request $request, Project $project)
     {
         if ($project) {
-            $project->release_date = $request->get('releaseDate');
-            $project->status = 'queued';
-            $project->save();
+            $enableProjectMode = $request->get('enableProjectMode');
+            if ($enableProjectMode) {
+                $project->release_date = $request->get('releaseDate');
+                $project->status = 'queued';
+                $project->save();
 
-            $validation = $project->validation;
-            $validation->process();
-            $validation = $validation->fresh();
+                $validation = $project->validation;
+                $validation->process();
+                $validation = $validation->fresh();
 
-            if ($validation['report']['project']['status']) {
-                ProcessProject::dispatch($project);
+                if ($validation['report']['project']['status']) {
+                    ProcessProject::dispatch($project);
 
-                return response()->json([
-                    'project' => $project,
-                    'validation' => $validation,
-                ]);
+                    return response()->json([
+                        'project' => $project,
+                        'validation' => $validation,
+                    ]);
+                } else {
+                    return response()->json([
+                        'errors' => 'Validation failing. Please provide all the required data and try again. If the problem persists, please contact us.',
+                    ], 422);
+                }
             } else {
-                return response()->json([
-                    'errors' => 'Validation failing. Please provide all the required data and try again. If the problem persists, please contact us.',
-                ], 422);
+                return 'je;;p';
             }
         }
     }
