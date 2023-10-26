@@ -47,6 +47,7 @@ class Study extends Model implements Auditable
         'fs_id',
         'study_photo_path',
         'license_id',
+        'species',
     ];
 
     protected static $marks = [

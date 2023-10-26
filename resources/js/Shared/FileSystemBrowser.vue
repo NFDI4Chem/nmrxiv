@@ -536,6 +536,9 @@ export default {
         ToolTip,
     },
     props: ["draft", "readonly", "height"],
+
+    emits: ["loading"],
+
     data() {
         return {
             status: "",
@@ -599,8 +602,6 @@ export default {
         },
         updateBusyStatus(status) {
             this.busy = status;
-            // console.log("raising")
-            // this.$emit("loading", this.busy);
         },
         loadFiles() {
             this.updateBusyStatus(true);
@@ -610,11 +611,13 @@ export default {
                 this.$page.props.selectedFileSystemObject = this.file;
                 this.$page.props.selectedFolder = "/";
                 this.updateBusyStatus(true);
+                this.$emit("loading", false);
                 this.loading = false;
             });
         },
         annotate() {
             this.updateBusyStatus(true);
+            this.$emit("loading", true);
             this.loading = true;
             this.status = "PROCESSING UPLOADED FILES";
             axios

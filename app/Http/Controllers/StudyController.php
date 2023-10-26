@@ -128,7 +128,7 @@ class StudyController extends Controller
                 'FORMULA' => $request->get('formula') ? $request->get('formula') : '',
                 'INCHI_KEY' => $request->get('InChIKey') ? $request->get('InChIKey') : '',
                 'MOL' => $request->get('mol') ? $request->get('mol') : '',
-                'CANONICAL_SMILES' => $request->get('cannonical_smiles') ? $request->get('cannonical_smiles') : '',
+                'CANONICAL_SMILES' => $request->get('canonical_smiles') ? $request->get('canonical_smiles') : '',
             ]);
             $sample->molecules()->syncWithPivotValues([$molecule->id], ['percentage_composition' => $request->get('percentage')], false);
         }
@@ -260,7 +260,7 @@ class StudyController extends Controller
             ->first();
 
         return $studyFSObject->children->filter(function ($child) {
-            return $child->instrument_type == 'nmredata';
+            return $child->instrument_type == 'nmredata' || $child->instrument_type == 'mol' || $child->instrument_type == 'sdf';
         })->values();
     }
 

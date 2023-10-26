@@ -356,6 +356,7 @@
                                                 :readonly="false"
                                                 :draft="currentDraft"
                                                 :height="'h-[calc(100vh-385px)]'"
+                                                @loading="filesLoading"
                                             ></file-system-browser>
                                         </div>
                                         <jet-input-error
@@ -396,6 +397,10 @@
                                                         }}
                                                         ({{ studies.length }})
                                                         <div
+                                                            v-if="
+                                                                importPendingSamples.length >
+                                                                0
+                                                            "
                                                             class="float-right cursor-pointer tooltip"
                                                             @click="
                                                                 autoImport()
@@ -434,22 +439,20 @@
                                                             ]"
                                                         >
                                                             <div
-                                                                class="px-4 text-sm w-full"
+                                                                class="cursor-pointer px-4 text-sm w-full"
+                                                                @click="
+                                                                    selectStudy(
+                                                                        study,
+                                                                        $index
+                                                                    )
+                                                                "
                                                             >
                                                                 <p
                                                                     class="font-medium text-blue-gray-900"
                                                                 >
-                                                                    <a
-                                                                        @click="
-                                                                            selectStudy(
-                                                                                study,
-                                                                                $index
-                                                                            )
-                                                                        "
-                                                                        >{{
-                                                                            study.name
-                                                                        }}</a
-                                                                    >
+                                                                    <a>{{
+                                                                        study.name
+                                                                    }}</a>
                                                                     <span
                                                                         v-if="
                                                                             study
@@ -481,10 +484,10 @@
                                                                                 study.has_nmrium
                                                                                     ? 'bg-green-100 text-gray-800'
                                                                                     : 'bg-gray-100 text-gray-800',
-                                                                                'mb-0.5 inline-flex truncate break-words items-center px-3 py-0.5 rounded-full text-xs font-medium mr-1 hover:bg-teal-700',
+                                                                                'mb-0.5 inline-flex truncate break-words items-center px-3 py-0.5 rounded-full text-xs font-medium mr-1',
                                                                             ]"
                                                                         >
-                                                                            <a
+                                                                            <span
                                                                                 >{{
                                                                                     ds.name
                                                                                 }}
@@ -495,7 +498,7 @@
                                                                                     >({{
                                                                                         ds.type
                                                                                     }})</span
-                                                                                ></a
+                                                                                ></span
                                                                             >
                                                                         </div>
                                                                     </span>
@@ -573,6 +576,7 @@
                                                                     <dt
                                                                         class="text-sm font-medium leading-6 text-gray-500"
                                                                     >
+                                                                        Samples
                                                                         Validation
                                                                     </dt>
                                                                     <!-- <dd class="text-xs font-medium text-rose-600">x%</dd> -->
@@ -581,7 +585,7 @@
                                                                     >
                                                                         <span
                                                                             v-if="
-                                                                                project.validation_status
+                                                                                validationStatus
                                                                             "
                                                                         >
                                                                             Success
@@ -599,6 +603,80 @@
                                                             class="overflow-y-scroll h-[calc(100vh-153px)] mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8"
                                                         >
                                                             <div
+                                                                v-if="
+                                                                    importPendingSamples.length >
+                                                                    0
+                                                                "
+                                                                class="mb-4"
+                                                            >
+                                                                <div
+                                                                    class="bg-white border shadow sm:rounded-lg"
+                                                                >
+                                                                    <div
+                                                                        class="px-4 py-5 sm:p-6"
+                                                                    >
+                                                                        <h3
+                                                                            class="text-base font-semibold leading-6 text-gray-900"
+                                                                        >
+                                                                            Spectra
+                                                                            Metadata
+                                                                            Not
+                                                                            Found
+                                                                        </h3>
+                                                                        <div
+                                                                            class="mt-2 max-w-xl text-sm text-gray-500"
+                                                                        >
+                                                                            <p>
+                                                                                Looks
+                                                                                like
+                                                                                we're
+                                                                                missing
+                                                                                some
+                                                                                important
+                                                                                Spectra
+                                                                                metadata.
+                                                                                No
+                                                                                worries,
+                                                                                though
+                                                                                –
+                                                                                we've
+                                                                                got
+                                                                                your
+                                                                                back!
+                                                                                Would
+                                                                                you
+                                                                                like
+                                                                                us
+                                                                                to
+                                                                                automatically
+                                                                                import
+                                                                                the
+                                                                                missing
+                                                                                Spectra
+                                                                                information
+                                                                                and
+                                                                                kickstart
+                                                                                the
+                                                                                processing?
+                                                                            </p>
+                                                                        </div>
+                                                                        <div
+                                                                            class="mt-5"
+                                                                        >
+                                                                            <button
+                                                                                @click="
+                                                                                    autoImport
+                                                                                "
+                                                                                type="button"
+                                                                                class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                                                                            >
+                                                                                Process
+                                                                            </button>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div
                                                                 class="mx-auto grid max-w-2xl grid-cols-1 grid-rows-1 items-start gap-x-8 gap-y-8 lg:mx-0 lg:max-w-none lg:grid-cols-3"
                                                             >
                                                                 <div
@@ -609,14 +687,29 @@
                                                                             validation
                                                                         "
                                                                     >
-                                                                        <a
+                                                                        <button
                                                                             @click="
                                                                                 fetchValidations
                                                                             "
-                                                                            class="float-right cursor-pointer"
+                                                                            class="px-3 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:ring focus:ring-blue-200 active:text-gray-800 active:bg-gray-50 disabled:opacity-25 transition ml-2 float-right hover:bg-gray-200 hover:text-gray-900"
                                                                         >
+                                                                            <svg
+                                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                                fill="none"
+                                                                                viewBox="0 0 24 24"
+                                                                                stroke-width="1.5"
+                                                                                stroke="currentColor"
+                                                                                class="w-4 h-4 mr-2 inline"
+                                                                            >
+                                                                                <path
+                                                                                    stroke-linecap="round"
+                                                                                    stroke-linejoin="round"
+                                                                                    d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"
+                                                                                />
+                                                                            </svg>
+
                                                                             Refresh
-                                                                        </a>
+                                                                        </button>
                                                                         <Validation
                                                                             :project="
                                                                                 project
@@ -824,6 +917,105 @@
                                                                                                 "
                                                                                                 class="mt-2"
                                                                                             />
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div
+                                                                                    class="mb-3"
+                                                                                >
+                                                                                    <label
+                                                                                        for="description"
+                                                                                        class="block text-sm font-medium text-gray-700"
+                                                                                    >
+                                                                                        Organism
+                                                                                        (Optional)
+                                                                                    </label>
+
+                                                                                    <div
+                                                                                        class="mt-2 sm:flex sm:items-start sm:justify-between"
+                                                                                    >
+                                                                                        <div
+                                                                                            class="text-sm text-gray-500 w-full"
+                                                                                        >
+                                                                                            <ontology-autocomplete
+                                                                                                class="rounded-md"
+                                                                                                format="text"
+                                                                                                :value="
+                                                                                                    studySpecies
+                                                                                                "
+                                                                                                @change="
+                                                                                                    studySpecies =
+                                                                                                        $event
+                                                                                                            .detail[0]
+                                                                                                "
+                                                                                                placeholder="Search species"
+                                                                                            ></ontology-autocomplete>
+                                                                                        </div>
+                                                                                        <div
+                                                                                            class="mt-5 sm:ml-6 sm:mt-0 sm:flex sm:flex-shrink-0 sm:items-center"
+                                                                                        >
+                                                                                            <button
+                                                                                                @click="
+                                                                                                    updateSpecies(
+                                                                                                        studySpecies
+                                                                                                    )
+                                                                                                "
+                                                                                                type="button"
+                                                                                                class="inline-flex items-center gap-x-1.5 py-3 bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                                                                                            >
+                                                                                                <svg
+                                                                                                    class="-ml-0.5 h-5 w-5 text-gray-400"
+                                                                                                    viewBox="0 0 20 20"
+                                                                                                    fill="currentColor"
+                                                                                                    aria-hidden="true"
+                                                                                                >
+                                                                                                    <path
+                                                                                                        d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z"
+                                                                                                    ></path>
+                                                                                                </svg>
+                                                                                                Add
+                                                                                            </button>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div
+                                                                                        class="mt-2"
+                                                                                    >
+                                                                                        <div
+                                                                                            v-for="(
+                                                                                                species,
+                                                                                                $index
+                                                                                            ) in studyForm.species"
+                                                                                            :key="
+                                                                                                $index
+                                                                                            "
+                                                                                            class="bg-gray-100 text-gray-800 mb-0.5 inline-flex truncate break-words items-center px-3 py-2 rounded-full text-sm font-medium mr-1"
+                                                                                        >
+                                                                                            <ontology-term-annotation
+                                                                                                :annotation="
+                                                                                                    species
+                                                                                                "
+                                                                                            ></ontology-term-annotation>
+                                                                                            <span
+                                                                                                class="cursor-pointer"
+                                                                                                @click="
+                                                                                                    removeSpecies(
+                                                                                                        $index
+                                                                                                    )
+                                                                                                "
+                                                                                            >
+                                                                                                <svg
+                                                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                                                    viewBox="0 0 24 24"
+                                                                                                    fill="currentColor"
+                                                                                                    class="w-5 h-5 ml-2"
+                                                                                                >
+                                                                                                    <path
+                                                                                                        fill-rule="evenodd"
+                                                                                                        d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm-1.72 6.97a.75.75 0 10-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 101.06 1.06L12 13.06l1.72 1.72a.75.75 0 101.06-1.06L13.06 12l1.72-1.72a.75.75 0 10-1.06-1.06L12 10.94l-1.72-1.72z"
+                                                                                                        clip-rule="evenodd"
+                                                                                                    />
+                                                                                                </svg>
+                                                                                            </span>
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>
@@ -1085,15 +1277,24 @@
                                                                                                                     class="mt-2 text-sm text-gray-700"
                                                                                                                 >
                                                                                                                     <div
-                                                                                                                        class="rounded-md border my-3 flex justify-center items-center"
+                                                                                                                        class="rounded-md border mb-3"
                                                                                                                     >
-                                                                                                                        <span
-                                                                                                                            v-html="
-                                                                                                                                getSVGString(
-                                                                                                                                    molecule
-                                                                                                                                )
+                                                                                                                        <div
+                                                                                                                            v-if="
+                                                                                                                                molecule.CANONICAL_SMILES
                                                                                                                             "
-                                                                                                                        ></span>
+                                                                                                                        >
+                                                                                                                            <Depictor
+                                                                                                                                class="py-4 -px-4"
+                                                                                                                                :modelValue="
+                                                                                                                                    molecule.CANONICAL_SMILES
+                                                                                                                                "
+                                                                                                                                :showDownload="
+                                                                                                                                    false
+                                                                                                                                "
+                                                                                                                            ></Depictor>
+                                                                                                                        </div>
+                                                                                                                        <!-- <img> -->
                                                                                                                     </div>
                                                                                                                     <button
                                                                                                                         class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
@@ -1402,7 +1603,11 @@
                                                         fill="currentFill"
                                                     />
                                                 </svg>
-                                                {{ spectraLoadingMessage }}
+                                                <div
+                                                    v-html="
+                                                        spectraLoadingMessage
+                                                    "
+                                                ></div>
                                             </div>
                                         </div>
                                     </div>
@@ -2063,6 +2268,7 @@ import ToolTip from "@/Shared/ToolTip.vue";
 import ManageCitation from "@/Shared/ManageCitation.vue";
 import Citation from "@/Shared/Citation.vue";
 import AuthorCard from "@/Shared/AuthorCard.vue";
+import Depictor from "@/Shared/Depictor.vue";
 import {
     XCircleIcon,
     ClipboardDocumentIcon,
@@ -2080,6 +2286,7 @@ import {
 import SpectraEditor from "@/Shared/SpectraEditor.vue";
 import ToggleButton from "@/Shared/ToggleButton.vue";
 import Primer from "@/Shared/Primer.vue";
+import "ontology-elements/dist/index.js";
 
 export default {
     components: {
@@ -2117,6 +2324,7 @@ export default {
         StarIcon,
         CalendarIcon,
         Primer,
+        Depictor,
     },
     props: ["draft_id"],
     setup() {},
@@ -2128,7 +2336,12 @@ export default {
             loadingStep: false,
             selectedStudy: null,
 
+            project: null,
+            studies: null,
+
             displaySamplesSummaryInfo: true,
+
+            studySpecies: null,
 
             drafts: [],
 
@@ -2166,6 +2379,7 @@ export default {
                 description: "",
                 error_message: null,
                 tags: [],
+                species: [],
                 tag: "",
                 tags_array: [],
             }),
@@ -2223,6 +2437,7 @@ export default {
             }),
 
             errors: null,
+            studiesToImport: [],
         };
     },
 
@@ -2264,6 +2479,33 @@ export default {
     },
 
     methods: {
+        updateSpecies(species) {
+            if (species && species != "") {
+                this.studyForm.species.push(species);
+                this.saveStudyDetails();
+                this.studySpecies = "";
+            }
+        },
+        removeSpecies(index) {
+            if (index > -1) {
+                this.studyForm.species.splice(index, 1);
+                this.saveStudyDetails();
+            }
+        },
+        loadSmiles() {
+            this.errorMessage = "";
+            if (this.smiles && this.smiles != "") {
+                try {
+                    let mol = OCL.Molecule.fromSmiles(this.smiles);
+                    this.editor.setSmiles(this.smiles);
+                } catch (e) {
+                    this.errorMessage = "The entered SMILES is not valid.";
+                }
+            }
+        },
+        filesLoading(e) {
+            this.loadingStep = e;
+        },
         editData(e) {
             let i = 0;
             this.studies.forEach((s) => {
@@ -2271,12 +2513,6 @@ export default {
                     this.selectStudy(s, i);
                 }
                 i = i + 1;
-            });
-        },
-        fetchProjectData() {
-            this.spectraLoadingStatus = false;
-            router.reload({
-                only: ["project", "studies"],
             });
         },
         spectraLoading(e) {
@@ -2324,7 +2560,52 @@ export default {
             });
 
             this.hasStudies(this.$refs.fsbRef.file);
-
+            this.fetchProjectDetails().then(
+                (response) => {
+                    this.loadingStep = false;
+                    this.project = response.data.project;
+                    this.studies = response.data.studies;
+                    if (
+                        this.project &&
+                        this.studies &&
+                        this.studies.length > 0
+                    ) {
+                        this.loadingStep = false;
+                        this.selectStep(2);
+                    } else {
+                        if (this.studies.length == 0) {
+                            this.loadingStep = false;
+                        }
+                    }
+                },
+                (error) => {
+                    this.loadingStep = false;
+                    Object.keys(error.response.data.errors).forEach((key) => {
+                        error.response.data.errors[key] =
+                            error.response.data.errors[key].join(", ");
+                    });
+                    this.draftForm.errors = error.response.data.errors;
+                    this.draftForm.error_message = error.response.data.message;
+                    this.draftForm.hasErrors = true;
+                    Object.keys(this.draftForm.errors).forEach((key) => {
+                        if (!this.errorMessage) {
+                            this.errorMessage =
+                                "<b class='capitalize'>" +
+                                key +
+                                "</b>: " +
+                                this.draftForm.errors[key] +
+                                "</br>";
+                        } else {
+                            this.errorMessage +=
+                                "<b class='capitalize'>" +
+                                key +
+                                "</b>: " +
+                                this.draftForm.errors[key] +
+                                "</br>";
+                        }
+                    });
+                }
+            );
             if (
                 this.$refs.fsbRef.file &&
                 this.$refs.fsbRef.file.children.length > 0 &&
@@ -2336,70 +2617,6 @@ export default {
                 this.draftForm.tags_array = this.draftForm.tags.map(
                     (a) => a.text
                 );
-                axios
-                    .post(
-                        "/dashboard/drafts/" +
-                            this.currentDraft.id +
-                            "/process",
-                        this.draftForm
-                    )
-                    .then(
-                        (response) => {
-                            this.loadingStep = false;
-                            this.project = response.data.project;
-                            this.studies = response.data.studies;
-                            if (
-                                this.project &&
-                                this.studies &&
-                                this.studies.length > 0
-                            ) {
-                                // this.selectStudy(this.studies[0], 0);
-                                // this.selectedDataset =
-                                //     this.selectedStudy.datasets[0];
-                                this.loadingStep = false;
-                                this.selectStep(2);
-                            } else {
-                                if (this.studies.length == 0) {
-                                    this.loadingStep = false;
-                                }
-                            }
-                        },
-                        (error) => {
-                            this.loadingStep = false;
-
-                            Object.keys(error.response.data.errors).forEach(
-                                (key) => {
-                                    error.response.data.errors[key] =
-                                        error.response.data.errors[key].join(
-                                            ", "
-                                        );
-                                }
-                            );
-                            this.draftForm.errors = error.response.data.errors;
-                            this.draftForm.error_message =
-                                error.response.data.message;
-                            this.draftForm.hasErrors = true;
-                            Object.keys(this.draftForm.errors).forEach(
-                                (key) => {
-                                    if (!this.errorMessage) {
-                                        this.errorMessage =
-                                            "<b class='capitalize'>" +
-                                            key +
-                                            "</b>: " +
-                                            this.draftForm.errors[key] +
-                                            "</br>";
-                                    } else {
-                                        this.errorMessage +=
-                                            "<b class='capitalize'>" +
-                                            key +
-                                            "</b>: " +
-                                            this.draftForm.errors[key] +
-                                            "</br>";
-                                    }
-                                }
-                            );
-                        }
-                    );
             } else {
                 if (
                     this.$refs.fsbRef.file.children.length > 0 &&
@@ -2419,6 +2636,12 @@ export default {
                 }
             }
         },
+        fetchProjectDetails() {
+            return axios.post(
+                "/dashboard/drafts/" + this.currentDraft.id + "/process",
+                this.draftForm
+            );
+        },
         loadLicenses() {
             if (this.$page.props.licenses) {
                 this.licenses = this.$page.props.licenses;
@@ -2429,61 +2652,53 @@ export default {
                 });
             }
         },
-        saveMolecule(mol) {
+        saveMolecule(mol, study) {
+            if (!study) {
+                study = this.selectedStudy;
+            }
             if (!mol) {
                 let mol = this.editor.getMolFile();
                 axios
                     .post(
-                        "https://www.cheminfo.org/webservices/inchi",
-                        "molfile=" + mol
-                    )
-                    .then((response) => {
-                        let InChI = response.data.output.InChI;
-                        let InChIKey = response.data.output.InChIKey;
-                        let MF = this.editor
-                            .getMolecule()
-                            .getMolecularFormula().formula;
-                        axios
-                            .post(
-                                "/dashboard/studies/" +
-                                    this.selectedStudy.id +
-                                    "/molecule",
-                                {
-                                    InChI: InChI,
-                                    InChIKey: InChIKey,
-                                    percentage: this.percentage,
-                                    formula: MF,
-                                    mol: mol,
-                                }
-                            )
-                            .then((res) => {
-                                this.selectedStudy.sample.molecules = res.data;
-                                this.smiles = "";
-                                this.percentage = 0;
-                                // this.editor.setSmiles("");
-                            });
-                    });
-            } else {
-                axios
-                    .post(
-                        "/dashboard/studies/" +
-                            this.selectedStudy.id +
-                            "/molecule",
-                        {
-                            InChI: mol.inchi,
-                            InChIKey: mol.inchikey,
-                            percentage: 0,
-                            mol: mol.standardized_mol,
-                            canonical_smiles: mol.canonical_smiles,
-                        }
+                        "https://dev.api.naturalproducts.net/latest/chem/standardize",
+                        mol
                     )
                     .then((res) => {
-                        this.selectedStudy.sample.molecules = res.data;
-                        this.smiles = "";
-                        this.percentage = 0;
-                        // this.editor.setSmiles("");
+                        this.associateMoleculeToStudy(res.data, study);
                     });
+            } else {
+                this.associateMoleculeToStudy(mol, study);
             }
+        },
+        editMolecule(mol) {
+            this.editor.setMolFile(mol.MOL);
+            this.percentage = parseInt(mol.pivot.percentage_composition);
+            axios
+                .delete(
+                    "/dashboard/studies/" +
+                        this.selectedStudy.id +
+                        "/molecule/" +
+                        mol.id
+                )
+                .then((res) => {
+                    this.selectedStudy.sample.molecules = res.data;
+                });
+        },
+        associateMoleculeToStudy(mol, study) {
+            axios
+                .post("/dashboard/studies/" + study.id + "/molecule", {
+                    InChI: mol.inchi,
+                    InChIKey: mol.inchikey,
+                    percentage: 0,
+                    mol: mol.standardized_mol,
+                    canonical_smiles: mol.canonical_smiles,
+                })
+                .then((res) => {
+                    study.sample.molecules = res.data;
+                    this.smiles = "";
+                    this.percentage = 0;
+                    // this.editor.setSmiles("");
+                });
         },
         deleteMolecule(mol) {
             axios
@@ -2500,16 +2715,6 @@ export default {
                     this.editor.setSmiles("");
                 });
         },
-        getSVGString(molecule) {
-            if (molecule.MOL) {
-                let mol = OCL.Molecule.fromMolfile(
-                    "\n  " + molecule.MOL.replaceAll('"', "")
-                );
-                return mol.toSVG(200, 200);
-            } else {
-                console.log(molecule);
-            }
-        },
         showSamplesSummary() {
             this.displaySamplesSummaryInfo = true;
             this.selectedStudy = null;
@@ -2519,6 +2724,7 @@ export default {
             this.selectedStudy = study;
             this.studyForm.name = this.selectedStudy.name;
             this.studyForm.description = this.selectedStudy.description;
+            this.studyForm.species = JSON.parse(this.selectedStudy.species);
             let tags = [];
             this.selectedStudy.tags.forEach((t) => {
                 tags.push({
@@ -2543,10 +2749,26 @@ export default {
                     1
                 );
             });
+            if (this.studyForm.description == "") {
+                if (study.has_nmrium) {
+                    this.autoGenerateDescription();
+                }
+            }
+            if (
+                this.selectedStudy &&
+                this.selectedStudy.sample.molecules.length == 0
+            ) {
+                this.autoImportMolecularData(this.selectedStudy);
+            }
+            if (!datasetIndex) {
+                this.selectedDSIndex = 0;
+            } else {
+                this.selectedDSIndex = datasetIndex;
+            }
+        },
+        autoImportMolecularData(study) {
             axios
-                .get(
-                    "/dashboard/studies/" + this.selectedStudy.id + "/nmredata"
-                )
+                .get("/dashboard/studies/" + study.id + "/annotations")
                 .then((response) => {
                     let nmredataFiles = response.data;
                     nmredataFiles.forEach((file) => {
@@ -2561,7 +2783,7 @@ export default {
                             username +
                             "/studies" +
                             "/" +
-                            this.selectedStudy.id +
+                            study.id +
                             "/file/" +
                             file.slug;
                         axios.get(url).then((response) => {
@@ -2574,31 +2796,20 @@ export default {
                                 .then((res) => {
                                     let STANDARD_INCHI = res.data.inchi;
                                     let molExists = false;
-                                    this.selectedStudy.sample.molecules.forEach(
-                                        (mol) => {
-                                            if (
-                                                mol.STANDARD_INCHI ==
-                                                STANDARD_INCHI
-                                            ) {
-                                                molExists = true;
-                                            }
+                                    study.sample.molecules.forEach((mol) => {
+                                        if (
+                                            mol.STANDARD_INCHI == STANDARD_INCHI
+                                        ) {
+                                            molExists = true;
                                         }
-                                    );
+                                    });
                                     if (!molExists) {
-                                        this.saveMolecule(res.data);
+                                        this.saveMolecule(res.data, study);
                                     }
                                 });
                         });
-
-                        // save molecule if doesnt exist
                     });
                 });
-
-            if (!datasetIndex) {
-                this.selectedDSIndex = 0;
-            } else {
-                this.selectedDSIndex = datasetIndex;
-            }
         },
         toggleManageAuthor() {
             this.manageAuthorElement.toggleDialog();
@@ -2607,38 +2818,48 @@ export default {
             this.manageCitationElement.toggleDialog();
         },
         closeDraft() {
-            this.loadingStep = true;
-            axios
-                .post(
-                    "/dashboard/drafts/" + this.currentDraft.id + "/complete",
-                    {}
-                )
-                .catch(() => {
-                    this.loadingStep = false;
-                })
-                .then((response) => {
-                    this.project = response.data.project;
-                    this.validation = this.parseJSON(
-                        response.data.validation.report
-                    );
-                    this.validationStatus = true;
-                    this.validation.project.studies.forEach((study) => {
-                        if (study.status == false) {
-                            this.validationStatus = false;
+            if (this.validationStatus) {
+                this.loadingStep = true;
+                axios
+                    .post(
+                        "/dashboard/drafts/" +
+                            this.currentDraft.id +
+                            "/complete",
+                        {}
+                    )
+                    .catch(() => {
+                        this.loadingStep = false;
+                    })
+                    .then((response) => {
+                        this.project = response.data.project;
+                        this.validation = this.parseJSON(
+                            response.data.validation.report
+                        );
+                        this.validationStatus = true;
+                        this.validation.project.studies.forEach((study) => {
+                            console.log(study);
+                            if (study.status == false) {
+                                this.validationStatus = false;
+                            }
+                        });
+                        if (this.project) {
+                            // this.loadingStep = false;
+                            // this.loadLicenses();
+                            // this.selectStep(3);
+                            // this.publishForm.project.name = this.draftForm.name;
+                            // this.publishForm.project.description =
+                            //     this.draftForm.description;
+                            // this.publishForm.project.tags = this.draftForm.tags;
+                            // this.trackProject();
+                            window.location =
+                                "/publish/" + this.currentDraft.id;
                         }
                     });
-                    if (this.project) {
-                        // this.loadingStep = false;
-                        // this.loadLicenses();
-                        // this.selectStep(3);
-                        // this.publishForm.project.name = this.draftForm.name;
-                        // this.publishForm.project.description =
-                        //     this.draftForm.description;
-                        // this.publishForm.project.tags = this.draftForm.tags;
-                        // this.trackProject();
-                        window.location = "/publish/" + this.currentDraft.id;
-                    }
-                });
+            } else {
+                alert(
+                    "Samples validation failed: Please provide all meta data to proceed"
+                );
+            }
         },
         publish() {
             if (this.publishForm.conditions && this.publishForm.terms) {
@@ -2752,6 +2973,7 @@ export default {
                     //     this.$refs.spectraEditorREF.registerEvents();
                     // }
                     this.fetchValidations();
+                    this.updateAutoImportList();
                 });
             }
         },
@@ -2760,7 +2982,12 @@ export default {
                 .get("/projects/" + this.project.id + "/validation")
                 .then((response) => {
                     this.validation = response.data.report;
-                    // console.log(this.validation)
+                    this.validationStatus = true;
+                    this.validation.project.studies.forEach((study) => {
+                        if (study.status == false) {
+                            this.validationStatus = false;
+                        }
+                    });
                 });
         },
         hidePrimer() {
@@ -2828,23 +3055,25 @@ export default {
                             });
                         });
                         this.studyForm.description = desc;
+                        this.saveStudyDetails();
                     }
                 });
         },
-        autoImport() {
-            this.spectraLoadingStatus = true;
+        updateAutoImportList() {
             this.studiesToImport = [];
             this.studies.forEach((study) => {
                 if (!study.has_nmrium) {
                     this.studiesToImport.push({
                         projectSlug: this.project.slug,
-                        studySlug: study.slug,
-                        studyID: study.id,
-                        studyDownloadUrl: study.download_url,
+                        study: study,
                         status: false,
                     });
                 }
             });
+        },
+        autoImport() {
+            this.spectraLoadingStatus = true;
+            this.updateAutoImportList();
             if (this.studiesToImport.length > 0) {
                 this.fetchNMRium();
             } else {
@@ -2855,14 +3084,15 @@ export default {
             }
         },
         fetchNMRium() {
-            let studyDetails = this.studiesToImport.filter(
-                (f) => f.status == false
-            )[0];
+            let studyDetails =
+                this.importPendingSamples.length > 0
+                    ? this.importPendingSamples[0]
+                    : null;
             if (studyDetails) {
                 this.spectraLoadingStatus = true;
                 let url = null;
-                if (studyDetails.studyDownloadUrl) {
-                    url = studyDetails.studyDownloadUrl;
+                if (studyDetails.study.download_url) {
+                    url = studyDetails.study.download_url;
                 } else {
                     // let ownerUserName =
                     // this.$page.props.team && this.$page.props.team.owner
@@ -2880,10 +3110,17 @@ export default {
                         "/datasets/" +
                         this.project.slug +
                         "/" +
-                        studyDetails.studySlug;
+                        studyDetails.study.slug;
                 }
                 this.spectraLoadingMessage =
-                    "Parsing: " + studyDetails.studySlug + "<br/>" + url;
+                    "<br/> <small><i>Pending: " +
+                    this.importPendingSamples.length +
+                    "/" +
+                    this.studies.length +
+                    "</i></small> <br/> Processing: " +
+                    studyDetails.study.slug +
+                    "<br/> Spectra URL: " +
+                    url;
                 axios
                     .post("https://nodejsdev.nmrxiv.org/spectra-parser", {
                         urls: [url],
@@ -2902,7 +3139,7 @@ export default {
                         axios
                             .post(
                                 "/dashboard/studies/" +
-                                    studyDetails.studyID +
+                                    studyDetails.study.id +
                                     "/nmriumInfo",
                                 {
                                     data: parsedSpectra,
@@ -2912,31 +3149,43 @@ export default {
                             .then((res) => {
                                 this.loadingStep = false;
                                 this.studiesToImport.filter(
-                                    (f) => f.studyID == studyDetails.studyID
+                                    (f) => f.study.id == studyDetails.study.id
                                 )[0].status = true;
+                                this.autoImportMolecularData(
+                                    studyDetails.study
+                                );
                                 this.fetchNMRium();
                             })
                             .catch((err) => {
                                 this.loadingStep = false;
                                 this.studiesToImport.filter(
-                                    (f) => f.studyID == studyDetails.studyID
+                                    (f) => f.studyID == studyDetails.study.id
                                 )[0].status = true;
                                 this.fetchNMRium();
                             });
                     })
-                    .catch((error) => {
+                    .catch(() => {
                         this.loadingStep = false;
                         this.studiesToImport.filter(
-                            (f) => f.studyID == studyDetails.studyID
+                            (f) => f.studyID == studyDetails.study.id
                         )[0].status = true;
                         this.fetchNMRium();
                     });
             } else {
-                this.fetchProjectData();
+                this.fetchProjectDetails().then((response) => {
+                    this.loadingStep = false;
+                    this.project = response.data.project;
+                    this.studies = response.data.studies;
+                    this.fetchValidations();
+                    this.spectraLoadingStatus = false;
+                });
             }
         },
     },
     computed: {
+        importPendingSamples() {
+            return this.studiesToImport.filter((f) => f.status == false);
+        },
         url() {
             return String(this.$page.props.url)
                 ? String(this.$page.props.url)

@@ -302,7 +302,7 @@ class DraftController extends Controller
                 $sChildren = $folder->children;
 
                 foreach ($sChildren as $sChild) {
-                    if ($sChild->instrument_type != null && $sChild->instrument_type != 'nmredata') {
+                    if ($sChild->instrument_type != null && $sChild->instrument_type != 'nmredata' && $sChild->instrument_type != 'mol') {
                         // associate all children with the study_id, project_id, dataset_id
                         // create samples
                         // create assays
@@ -469,6 +469,8 @@ class DraftController extends Controller
                 } elseif ($this->isNMReData($folder)) {
                     $this->saveInstrumentType($folder, 'nmredata');
                     $this->saveAnnotationsDetected($folder->parent);
+                } elseif ($this->isMolData($folder)) {
+                    $this->saveInstrumentType($folder, 'mol');
                 }
             }
         }
@@ -558,6 +560,23 @@ class DraftController extends Controller
         }
 
         if ($isNMReData) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function isMolData($folder)
+    {
+        $fileTypes = ['mol'];
+        $names = [$folder->name];
+        $extensions = array_map(fn ($s) => substr("$s", (strrpos($s, '.') + 1)), $names);
+        $isMolData = false;
+        if (array_intersect($fileTypes, $extensions) == $fileTypes) {
+            $isMolData = true;
+        }
+
+        if ($isMolData) {
             return true;
         }
 

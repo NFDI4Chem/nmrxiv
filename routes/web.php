@@ -174,8 +174,8 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
             ->name('dashboard.studies');
         Route::get('studies/{study}/files', [StudyController::class, 'files'])
             ->name('dashboard.study.files');
-        Route::get('studies/{study}/nmredata', [StudyController::class, 'annotations'])
-            ->name('dashboard.study.nmredata');
+        Route::get('studies/{study}/annotations', [StudyController::class, 'annotations'])
+            ->name('dashboard.study.annotations');
         Route::get('studies/{study}/datasets', [StudyController::class, 'datasets'])
             ->name('dashboard.study.datasets');
         Route::get('studies/{study}/settings', [StudyController::class, 'settings'])

@@ -3,17 +3,21 @@
         v-if="study"
         class="flex flex-col border rounded-lg shadow-lg transition ease-in-out delay-150 duration-300 overflow-hidden"
     >
-        <div class="pt-5 px-5 bg-gray-200">
+        <div class="pt-2 px-2 bg-gray-200">
             <ul role="list">
                 <li class="col-span-1 divide-y divide-gray-200 cursor-pointer">
                     <div
                         class="bg-white rounded-t-md flex justify-center items-center"
                     >
-                        <span
-                            ><div
-                                v-html="getSVGString(study.sample.molecules[0])"
-                            ></div
-                        ></span>
+                        <span>
+                            <Depictor
+                                class="p-4"
+                                :modelValue="
+                                    study.sample.molecules[0].CANONICAL_SMILES
+                                "
+                                :showDownload="false"
+                            ></Depictor>
+                        </span>
                     </div>
                 </li>
             </ul>
@@ -33,7 +37,7 @@
                 </div>
             </Link>
         </div>
-        <div class="px-3 pb-3 pt-0">
+        <div class="px-3 pb-3 pt-0 h-28 overflow-scroll">
             <!-- <label
                 class="block mb-2 text-xs text-gray-700, block text-sm font-medium text-gray-700"
             >
@@ -45,7 +49,7 @@
                         study.has_nmrium || ds.has_nmrium
                             ? 'bg-green-100 text-gray-800'
                             : 'bg-gray-100 text-gray-800',
-                        'mb-0.5 inline-flex truncate break-words items-center px-3 py-0.5 rounded-full text-xs font-medium mr-1 hover:bg-teal-700',
+                        'mb-0.5 inline-flex truncate break-words items-center px-3 py-0.5 rounded-full text-xs font-medium mr-1',
                     ]"
                 >
                     <a
@@ -104,6 +108,7 @@ import {
     EnvelopeIcon,
 } from "@heroicons/vue/24/solid";
 import { Link } from "@inertiajs/vue3";
+import Depictor from "@/Shared/Depictor.vue";
 
 export default {
     components: {
@@ -113,6 +118,7 @@ export default {
         PencilIcon,
         StarIcon,
         Link,
+        Depictor,
     },
     props: ["study"],
     setup() {},
