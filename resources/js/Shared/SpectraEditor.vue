@@ -355,6 +355,7 @@ export default {
             },
         },
     },
+    emits: ["loading"],
     setup() {
         const versionsElement = ref(null);
         return {

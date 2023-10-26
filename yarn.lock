@@ -2198,6 +2198,13 @@ once@^1.3.0:
   dependencies:
     wrappy "1"
 
+ontology-elements@^0.2.3:
+  version "0.2.3"
+  resolved "https://registry.npmjs.org/ontology-elements/-/ontology-elements-0.2.3.tgz"
+  integrity sha512-7+VBiAveZ8ek3jeGIGOyZPd4y8D7cDWzDwO57+rBnuZXLDaaKIelZ1z/MV0BF/4ghzVl6IGhtkXiRL3LnSeEWA==
+  dependencies:
+    vue "^3.2.47"
+
 openchemlib@^7.4.3:
   version "7.5.0"
   resolved "https://registry.npmjs.org/openchemlib/-/openchemlib-7.5.0.tgz"
@@ -2965,7 +2972,7 @@ vue-types@^4.1.0:
   dependencies:
     is-plain-object "5.0.0"
 
-"vue@^2.0.0 || ^3.0.0", "vue@^2.6.0 || ^3.2.0", "vue@^2.6.0 || >=3.0.0-rc.0", vue@^3.0.0, "vue@^3.0.0-0 || ^2.6.0", vue@^3.0.0-beta.1, vue@^3.0.1, vue@^3.0.5, vue@^3.2.0, vue@^3.2.25, vue@^3.2.31, vue@^3.2.6, vue@^3.3.4, "vue@>= 3", vue@>=3.2.0, vue@3.3.4:
+"vue@^2.0.0 || ^3.0.0", "vue@^2.6.0 || ^3.2.0", "vue@^2.6.0 || >=3.0.0-rc.0", vue@^3.0.0, "vue@^3.0.0-0 || ^2.6.0", vue@^3.0.0-beta.1, vue@^3.0.1, vue@^3.0.5, vue@^3.2.0, vue@^3.2.25, vue@^3.2.31, vue@^3.2.47, vue@^3.2.6, vue@^3.3.4, "vue@>= 3", vue@>=3.2.0, vue@3.3.4:
   version "3.3.4"
   resolved "https://registry.npmjs.org/vue/-/vue-3.3.4.tgz"
   integrity sha512-VTyEYn3yvIeY1Py0WaYGZsXnz3y5UnGi62GjVEqvEGPl6nxbOrCXbVOTQWBEJUqAyTUk2uJ5JLVnYJ6ZzGbrSw==

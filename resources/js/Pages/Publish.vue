@@ -147,6 +147,95 @@
                                             class="mt-2"
                                         />
                                     </div>
+                                    <div>
+                                        <div class="mb-3">
+                                            <label
+                                                for="description"
+                                                class="block text-sm font-medium text-gray-700"
+                                            >
+                                                Organism (Optional)
+                                            </label>
+
+                                            <div
+                                                class="mt-2 sm:flex sm:items-start sm:justify-between"
+                                            >
+                                                <div
+                                                    class="text-sm text-gray-500 w-full"
+                                                >
+                                                    <ontology-autocomplete
+                                                        class="rounded-md"
+                                                        format="text"
+                                                        :value="projectSpecies"
+                                                        @change="
+                                                            projectSpecies =
+                                                                $event.detail[0]
+                                                        "
+                                                        placeholder="Search species"
+                                                    ></ontology-autocomplete>
+                                                </div>
+                                                <div
+                                                    class="mt-5 sm:ml-6 sm:mt-0 sm:flex sm:flex-shrink-0 sm:items-center"
+                                                >
+                                                    <button
+                                                        @click="
+                                                            updateSpecies(
+                                                                projectSpecies
+                                                            )
+                                                        "
+                                                        type="button"
+                                                        class="inline-flex items-center gap-x-1.5 py-3 bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                                                    >
+                                                        <svg
+                                                            class="-ml-0.5 h-5 w-5 text-gray-400"
+                                                            viewBox="0 0 20 20"
+                                                            fill="currentColor"
+                                                            aria-hidden="true"
+                                                        >
+                                                            <path
+                                                                d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z"
+                                                            ></path>
+                                                        </svg>
+                                                        Add
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="mt-2">
+                                                <div
+                                                    v-for="(
+                                                        species, $index
+                                                    ) in publishForm.project
+                                                        .species"
+                                                    :key="$index"
+                                                    class="bg-gray-100 border text-gray-800 mb-0.5 inline-flex truncate break-words items-center px-3 py-2 rounded-full text-sm font-medium mr-1"
+                                                >
+                                                    <ontology-term-annotation
+                                                        :annotation="species"
+                                                    ></ontology-term-annotation>
+                                                    <span
+                                                        class="cursor-pointer"
+                                                        @click="
+                                                            removeSpecies(
+                                                                $index
+                                                            )
+                                                        "
+                                                    >
+                                                        <svg
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            viewBox="0 0 24 24"
+                                                            fill="currentColor"
+                                                            class="w-5 h-5 ml-2"
+                                                        >
+                                                            <path
+                                                                fill-rule="evenodd"
+                                                                d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm-1.72 6.97a.75.75 0 10-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 101.06 1.06L12 13.06l1.72 1.72a.75.75 0 101.06-1.06L13.06 12l1.72-1.72a.75.75 0 10-1.06-1.06L12 10.94l-1.72-1.72z"
+                                                                clip-rule="evenodd"
+                                                            />
+                                                        </svg>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div class="mb-2">
                                         <div class="relative pl-2">
                                             <div
@@ -318,7 +407,7 @@
                                 </label>
                                 <div>
                                     <div
-                                        class="mt-4 mb-8 mx-auto max-w-md grid gap-8 sm:max-w-lg lg:grid-cols-3 lg:max-w-7xl"
+                                        class="mt-4 mb-8 mx-auto max-w-md grid gap-8 sm:max-w-lg lg:grid-cols-4 lg:max-w-7xl"
                                     >
                                         <div
                                             v-for="study in project.studies"
@@ -580,6 +669,7 @@ import {
 } from "@heroicons/vue/24/solid";
 import SpectraEditor from "@/Shared/SpectraEditor.vue";
 import ToggleButton from "@/Shared/ToggleButton.vue";
+import "ontology-elements/dist/index.js";
 
 export default {
     components: {
@@ -633,6 +723,7 @@ export default {
                     tag: "",
                     tags_array: [],
                     owner_id: null,
+                    species: [],
                 },
                 conditions: false,
                 terms: false,
@@ -644,6 +735,7 @@ export default {
             returnUrl: "/dashboard",
             validationStatus: true,
             errors: null,
+            projectSpecies: "",
         };
     },
 
@@ -672,6 +764,17 @@ export default {
     },
 
     methods: {
+        updateSpecies(species) {
+            if (species && species != "") {
+                this.publishForm.project.species.push(species);
+                this.projectSpecies = "";
+            }
+        },
+        removeSpecies(index) {
+            if (index > -1) {
+                this.publishForm.project.species.splice(index, 1);
+            }
+        },
         getTarget(id) {
             var target = null;
             if (id) {
