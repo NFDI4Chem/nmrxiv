@@ -42,15 +42,15 @@ trait HasDOI
                 } elseif ($this instanceof Study) {
                     $users = $this->allUsers();
                     $citations = [];
-                    if($this->project){
+                    if ($this->project) {
                         $authors = $this->project->authors ? $this->project->authors : [];
                         $projectIdentifier = $this->getIdentifier($this->project, 'identifier');
                         $suffix = 'P'.$projectIdentifier.'.'.'S'.$identifier;
                         $citations = $this->project->citation ? $this->project->citation : [];
-                    }else{
+                    } else {
                         $suffix = 'S'.$identifier;
                     }
-                    
+
                     $url = $url.'S'.$identifier;
                     $resourceType = 'Study';
 
@@ -66,12 +66,12 @@ trait HasDOI
                     $users = $this->study->allUsers();
                     $studyIdentifier = $this->getIdentifier($this->study, 'identifier');
                     $citations = [];
-                    if($this->project){
+                    if ($this->project) {
                         $authors = $this->project->authors ? $this->project->authors : [];
                         $projectIdentifier = $this->getIdentifier($this->project, 'identifier');
                         $suffix = 'P'.$projectIdentifier.'.'.'S'.$studyIdentifier.'.'.'D'.$identifier;
                         $citations = $this->project->citation ? $this->project->citation : [];
-                    }else{
+                    } else {
                         $suffix = 'S'.$studyIdentifier.'.'.'D'.$identifier;
                     }
                     $url = $url.'D'.$identifier;
