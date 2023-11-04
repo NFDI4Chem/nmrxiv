@@ -3,8 +3,30 @@
         v-if="study"
         class="flex flex-col border rounded-lg shadow-lg transition ease-in-out delay-150 duration-300 overflow-hidden"
     >
-        <div class="relative overflow-hidden h-48 bg-white-200">
-            <span
+        <div class="relative overflow-hidden bg-white-200">
+            <div class="pt-2 px-2">
+                <ul role="list">
+                    <li
+                        class="col-span-1 divide-y divide-gray-200 cursor-pointer"
+                    >
+                        <div
+                            class="bg-white rounded-t-md flex justify-center items-center"
+                        >
+                            <span>
+                                <Depictor
+                                    class="py-2"
+                                    :modelValue="
+                                        study.molecules[0].CANONICAL_SMILES
+                                    "
+                                    :showDownload="false"
+                                ></Depictor>
+                            </span>
+                        </div>
+                    </li>
+                </ul>
+                <div class="bg-white"></div>
+            </div>
+            <!-- <span
                 v-if="
                     study.photo_url ||
                     (study.study_preview_urls &&
@@ -43,7 +65,7 @@
                     src="https://via.placeholder.com/340x180/FFF/f1f1f4?text=No preview"
                     alt=""
                 />
-            </span>
+            </span> -->
         </div>
         <div class="flex-1 border-t bg-white p-3 flex flex-col justify-between">
             <small v-if="study.identifier" class="text-gray-500"
@@ -112,13 +134,12 @@
 </template>
 
 <script>
-import { LockClosedIcon } from "@heroicons/vue/24/solid";
-import { LockOpenIcon } from "@heroicons/vue/24/solid";
+import { LockClosedIcon, LockOpenIcon } from "@heroicons/vue/24/solid";
 import { PencilIcon } from "@heroicons/vue/24/solid";
 import { EnvelopeIcon } from "@heroicons/vue/24/solid";
 import { Link } from "@inertiajs/vue3";
 import { StarIcon } from "@heroicons/vue/24/solid";
-
+import Depictor from "@/Shared/Depictor.vue";
 export default {
     components: {
         LockClosedIcon,
@@ -127,6 +148,7 @@ export default {
         PencilIcon,
         StarIcon,
         Link,
+        Depictor,
     },
     props: ["study"],
     setup() {},
@@ -135,18 +157,6 @@ export default {
             selectedPreviewIndex: 0,
         };
     },
-    methods: {
-        getSVGString(molecule) {
-            if (molecule && molecule.MOL) {
-                let mol = OCL.Molecule.fromMolfile(
-                    "\n  " + molecule.MOL.replaceAll('"', "")
-                );
-                return mol.toSVG(300, 200);
-            }
-            //  else {
-            //     console.log(molecule);
-            // }
-        },
-    },
+    methods: {},
 };
 </script>

@@ -3,7 +3,7 @@
         v-if="study"
         class="flex flex-col border rounded-lg shadow-lg transition ease-in-out delay-150 duration-300 overflow-hidden"
     >
-        <div class="pt-2 px-2 bg-gray-200">
+        <div class="pt-2 px-2">
             <ul role="list">
                 <li class="col-span-1 divide-y divide-gray-200 cursor-pointer">
                     <div
@@ -11,7 +11,7 @@
                     >
                         <span>
                             <Depictor
-                                class="p-4"
+                                class="py-2"
                                 :modelValue="
                                     study.sample.molecules[0].CANONICAL_SMILES
                                 "

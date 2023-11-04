@@ -12,6 +12,8 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Storage;
 use ZipStream;
+use Illuminate\Support\Facades\Http;
+ 
 
 class ArchiveStudy implements ShouldBeUnique, ShouldQueue
 {
@@ -42,6 +44,8 @@ class ArchiveStudy implements ShouldBeUnique, ShouldQueue
         $project = $this->project;
         if ($project) {
             foreach ($project->studies as $study) {
+                $study->internal_status = "processing";
+                $study->save();
                 $archiveDownloadURL = $study->download_url;
                 if (! $archiveDownloadURL) {
                     $fsObject = $study->fsObject;
@@ -103,13 +107,96 @@ class ArchiveStudy implements ShouldBeUnique, ShouldQueue
                         Storage::setVisibility($zipFilePath, 'public');
                         $url = Storage::url($zipFilePath);
                         $study->download_url = $url;
+
+                        // $nmrium = $study->nmrium;
+                        // if (!$nmrium) {
+                        //     dd($url);
+                        //     $nmrium_ = $this->processSpectra($url);
+                        //     dd($nmrium_);
+                        //     $parsedSpectra = $nmrium_['data']['data'];
+                        //     foreach ($parsedSpectra['spectra'] as $spectra) {
+                        //         unset($spectra["data"]);
+                        //         unset($spectra["meta"]);
+                        //         unset($spectra["originalData"]);
+                        //         unset($spectra["originalInfo"]);
+                        //     }
+                                
+                        //     $version = $parsedSpectra['version'];
+                        //     unset($parsedSpectra["version"]);
+    
+                        //     // associate
+                        //     $nmriumJSON = array(
+                        //         "data" => $parsedSpectra,
+                        //         "version" => $version,
+                        //     );
+
+                        //     $nmrium = NMRium::create([
+                        //         'nmrium_info' => json_encode($nmriumJSON),
+                        //     ]);
+                        //     $study->nmrium()->save($nmrium);
+                        //     $study->has_nmrium = true;
+                        // }
+
+                        // $sample = $study->sample;
+                        // if (! $sample) {
+                        //     $sample = Sample::create([
+                        //         'name' => $study->name.'_sample',
+                        //         'slug' => Str::slug($study->name.'_sample', '-'),
+                        //         'study_id' => $study->id,
+                        //         'project_id' => $study->project->id,
+                        //     ]);
+                        //     $study->sample()->save($sample);
+                        // }
+
+                        // $molecules = $parsedSpectra['molecules'];
+                        // if (count($molecules) > 0) {
+                        //     foreach ($molecules as $mol) {
+                        //         $standardizedMolecule = $this->standardizeMolecule($mol['molfile']);
+                        //         // associate
+                        //         $inchi = $standardizedMolecule['InChI'];
+                        //         $molecule = $sample->molecules->where('STANDARD_INCHI', $inchi)->first();
+                        //         if (is_null($molecule)) {
+                        //             $molecule = Molecule::firstOrCreate([
+                        //                 'STANDARD_INCHI' => $inchi,
+                        //             ], [
+                        //                 'FORMULA' => $standardizedMolecule['formula'] ? $standardizedMolecule['formula']  : '',
+                        //                 'INCHI_KEY' => $standardizedMolecule['InChIKey']  ? $standardizedMolecule['InChIKey']  : '',
+                        //                 'MOL' => $standardizedMolecule['mol']  ? $standardizedMolecule['mol']  : '',
+                        //                 'CANONICAL_SMILES' => $standardizedMolecule['canonical_smiles']  ? $standardizedMolecule['canonical_smiles']  : '',
+                        //             ]);
+                        //             $sample->molecules()->syncWithPivotValues([$molecule->id], ['percentage_composition' => 0], false);
+                        //         }
+                        //     }
+                        // }
+                        // // add molecules
+                        $study->internal_status = "complete";
                         $study->save();
                     }
+                }else{
+                    $study->internal_status = "complete";
+                    $study->save();
                 }
             }
         }
-
     }
+
+    // protected function standardizeMolecule($mol)
+    // {
+    //     $response = Http::post('https://dev.api.naturalproducts.net/latest/chem/standardize', $mol);
+    //     return $response->json();
+    // }
+
+    // protected function processSpectra($url)
+    // {
+    //     $response = Http::post('https://nodejsdev.nmrxiv.org/spectra-parser', '{
+    //         "urls": [
+    //           '. $url .'
+    //         ],
+    //         "snapshot": false
+    //       }');
+
+    //     return $response->json();
+    // }
 
     /**
      * Get the S3 storage client instance.

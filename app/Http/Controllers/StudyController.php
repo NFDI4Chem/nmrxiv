@@ -175,14 +175,12 @@ class StudyController extends Controller
         if ($study) {
             $user = Auth::user();
             $data = $request->all();
-            $version = $request->get('version');
+            // $version = $request->get('version');
             // $spectra = $request->get('spectra');
-            // $molecules = $request->get('molecules');
-
             $nmriumInfo = $data;
+            // $molecules = $nmriumInfo['data']['molecules'];
             // $molecularInfo = $molecules;
             $nmrium = $study->nmrium;
-
             if ($nmrium) {
                 $nmrium->nmrium_info = $nmriumInfo;
                 $study->has_nmrium = true;

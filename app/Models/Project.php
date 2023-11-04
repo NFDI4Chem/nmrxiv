@@ -52,6 +52,7 @@ class Project extends Model implements Auditable
         'license_id',
         'release_date',
         'deleted_on',
+        'species',
     ];
 
     protected static $marks = [

@@ -247,11 +247,6 @@
   resolved "https://registry.npmjs.org/@humanwhocodes/object-schema/-/object-schema-1.2.1.tgz"
   integrity sha512-ZnQMnLV4e7hDlUvw8H+U8ASL02SS2Gn6+9Ac3wGGLIe7+je2AeAOxPY+izIPJDfFDb7eDjev0Us8MO1iFRN8hA==
 
-"@imengyu/vue3-context-menu@^1.0.9":
-  version "1.1.2"
-  resolved "https://registry.npmjs.org/@imengyu/vue3-context-menu/-/vue3-context-menu-1.1.2.tgz"
-  integrity sha512-uh1tT14F5ImkyPyqYbblJORAfkEbM/qlEgqqzVZ4Thf+NDb1ElgeiGtusyjsxN2zSLVcbED9KogbbSnueV8ZrQ==
-
 "@inertiajs/core@1.0.12":
   version "1.0.12"
   resolved "https://registry.npmjs.org/@inertiajs/core/-/core-1.0.12.tgz"
@@ -1030,9 +1025,9 @@ camelcase-css@^2.0.1:
   integrity sha512-QOSvevhslijgYwRx6Rv7zKdMF8lbRmx+uQGx2+vDc+KI/eBnsy9kit5aj23AgGu3pa4t9AgwbnXWqS+iOY+2aA==
 
 caniuse-lite@^1.0.30001400, caniuse-lite@^1.0.30001426:
-  version "1.0.30001431"
-  resolved "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001431.tgz"
-  integrity sha512-zBUoFU0ZcxpvSt9IU66dXVT/3ctO1cy4y9cscs1szkPlcWb6pasYM144GqrUygUbT+k7cmUCW61cvskjcv0enQ==
+  version "1.0.30001558"
+  resolved "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001558.tgz"
+  integrity sha512-/Et7DwLqpjS47JPEcz6VnxU9PwcIdVi0ciLXRWBQdj1XFye68pSQYpV0QtPTfUKWuOaEig+/Vez2l74eDc1tPQ==
 
 chalk@^2.4.1:
   version "2.4.2"

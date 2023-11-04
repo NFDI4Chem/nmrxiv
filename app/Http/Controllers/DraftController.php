@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\ArchiveStudy;
-use App\Jobs\ProcessDraft;
 use App\Models\Dataset;
 use App\Models\Draft;
 use App\Models\FileSystemObject;
@@ -100,9 +99,15 @@ class DraftController extends Controller
 
     public function update(Request $request, Draft $draft)
     {
-        $draft->name = $request->get('name');
+        $project_enabled = $request->has('project_enabled') ? $request->get('project_enabled') : $draft->project_enabled;
+        if($project_enabled == 1){
+            $project_enabled = TRUE;
+        }else{
+            $project_enabled = FALSE;
+        }
+        $draft->name = $request->get('name') ? $request->get('name') : $draft->name;
+        $draft->project_enabled = $project_enabled;
         $draft->save();
-
         return $draft;
     }
 
@@ -137,8 +142,6 @@ class DraftController extends Controller
 
         $validation = $project->validation;
         $validation->process();
-
-        // ProcessDraft::dispatch($draft);
 
         return response()->json([
             'project' => Project::with(['studies.datasets', 'owner', 'citations', 'authors'])->where('draft_id', $draft->id)->first(),

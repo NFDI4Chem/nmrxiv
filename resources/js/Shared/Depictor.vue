@@ -44,16 +44,17 @@
                 :molecule="modelValue"
                 :showDownload="showDownload"
                 :identifier="identifier"
+                :height="height"
+                :width="width"
             ></Depictor2D>
         </div>
-        <div
-            v-if="selectedTab == '3D'"
-            class="flex justify-center align-middle pt-5"
-        >
+        <div v-if="selectedTab == '3D'">
             <Depictor3D
                 :molecule="modelValue"
                 :showDownload="showDownload"
                 :identifier="identifier"
+                :height="height"
+                :width="width"
             ></Depictor3D>
         </div>
     </div>

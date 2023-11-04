@@ -345,7 +345,7 @@
                                         $page.props.selectedFileSystemObject.id
                                     "
                                     class="ml-4 cursor-pointer relative inline-flex items-center px-4 py-1 rounded-full border border-gray-300 bg-white text-sm font-black text-dark hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 float-right"
-                                    @click="deleteFSO"
+                                    @click="confirmFSODeletion"
                                 >
                                     <TrashIcon
                                         class="cursor-pointer h-4 w-4 text-gray-900 mr-2"
@@ -366,34 +366,37 @@
                                 class="relative shadow rounded-lg"
                             >
                                 <div
-                                    class="group block w-full aspect-w-10 aspect-h-7 py-4 bg-gray-100 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 focus-within:ring-indigo-500 overflow-hidden"
+                                    style="user-select: none"
+                                    class="hover:cursor-pointer"
+                                    @dblclick.stop="displaySelected(file)"
                                 >
-                                    <span v-if="file.type == 'directory'">
-                                        <FolderIcon
-                                            class="cursor-pointer h-28 w-28 text-gray-400 flex-shrink-0 mx-auto"
-                                            aria-hidden="true"
-                                            @dblclick.stop="
-                                                displaySelected(file)
-                                            "
-                                        />
-                                    </span>
-                                    <span v-else>
-                                        <DocumentTextIcon
-                                            class="h-28 w-28 text-gray-400 flex-shrink-0 mx-auto"
-                                            aria-hidden="true"
-                                        />
-                                    </span>
+                                    <div
+                                        class="group block w-full aspect-w-10 aspect-h-7 py-4 bg-gray-100 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 focus-within:ring-indigo-500 overflow-hidden"
+                                    >
+                                        <span v-if="file.type == 'directory'">
+                                            <FolderIcon
+                                                class="cursor-pointer h-28 w-28 text-gray-400 flex-shrink-0 mx-auto"
+                                                aria-hidden="true"
+                                            />
+                                        </span>
+                                        <span v-else>
+                                            <DocumentTextIcon
+                                                class="h-28 w-28 text-gray-400 flex-shrink-0 mx-auto"
+                                                aria-hidden="true"
+                                            />
+                                        </span>
+                                    </div>
+                                    <p
+                                        class="mt-2 px-2 py-1 block text-sm font-medium truncate text-gray-900 pointer-events-none"
+                                    >
+                                        {{ file.name }}
+                                    </p>
+                                    <p
+                                        class="block text-sm font-medium text-gray-500 pointer-events-none"
+                                    >
+                                        {{ file.size }}
+                                    </p>
                                 </div>
-                                <p
-                                    class="mt-2 px-2 py-1 block text-sm font-medium truncate text-gray-900 pointer-events-none"
-                                >
-                                    {{ file.name }}
-                                </p>
-                                <p
-                                    class="block text-sm font-medium text-gray-500 pointer-events-none"
-                                >
-                                    {{ file.size }}
-                                </p>
                             </li>
                         </ul>
                     </div>
@@ -406,7 +409,7 @@
                                 {{ $page.props.selectedFileSystemObject.name }}
                                 <a
                                     class="ml-4 cursor-pointer relative inline-flex items-center px-4 py-1 rounded-full border border-gray-300 bg-white text-sm font-black text-dark hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 float-right"
-                                    @click="deleteFSO"
+                                    @click="confirmFSODeletion"
                                 >
                                     <TrashIcon
                                         class="cursor-pointer h-4 w-4 text-gray-900 mr-2"
@@ -492,6 +495,27 @@
             </button>
         </div>
     </div>
+    <jet-confirmation-modal
+        :show="fsoBeingDeleted"
+        @close="fsoBeingDeleted = null"
+    >
+        <template #title> Delete </template>
+
+        <template #content>
+            Are you sure you would like to delete
+            {{ this.$page.props.selectedFileSystemObject.name }}?
+        </template>
+
+        <template #footer>
+            <jet-secondary-button @click="fsoBeingDeleted = null">
+                Cancel
+            </jet-secondary-button>
+
+            <jet-danger-button class="ml-2" @click="deleteFSO">
+                Delete
+            </jet-danger-button>
+        </template>
+    </jet-confirmation-modal>
 </template>
 <script>
 import JetDialogModal from "@/Jetstream/DialogModal.vue";
@@ -501,7 +525,8 @@ import axiosRetry from "axios-retry";
 import FileDetails from "@/Shared/FileDetails.vue";
 import SelectInput from "@/Shared/SelectInput.vue";
 import ToolTip from "@/Shared/ToolTip.vue";
-
+import JetConfirmationModal from "@/Jetstream/ConfirmationModal.vue";
+import JetDangerButton from "@/Jetstream/DangerButton.vue";
 import {
     FolderIcon,
     DocumentTextIcon,
@@ -534,6 +559,8 @@ export default {
         SelectInput,
         TrashIcon,
         ToolTip,
+        JetConfirmationModal,
+        JetDangerButton,
     },
     props: ["draft", "readonly", "height"],
 
@@ -556,6 +583,7 @@ export default {
             showErrorBatchLogs: false,
             showLogsDialog: false,
             currentLog: null,
+            fsoBeingDeleted: null,
         };
     },
     computed: {
@@ -579,9 +607,14 @@ export default {
         }
     },
     methods: {
+        confirmFSODeletion() {
+            this.fsoBeingDeleted = this.$page.props.selectedFileSystemObject.id;
+        },
         deleteFSO() {
             if (this.$page.props.selectedFileSystemObject.id) {
+                this.fsoBeingDeleted = null;
                 this.updateBusyStatus(true);
+                this.$emit("loading", true);
                 axios
                     .delete(
                         "/dashboard/drafts/" +
@@ -591,6 +624,7 @@ export default {
                     )
                     .then((response) => {
                         this.annotate();
+                        this.$emit("loading", true);
                     });
             }
         },
@@ -864,6 +898,45 @@ export default {
                     }, 5000);
                 });
             });
+        },
+        displaySelected(file) {
+            this.$page.props.selectedFileSystemObject = file;
+            let sFolder = "/";
+            if (this.$page.props.selectedFileSystemObject.name == "/") {
+                sFolder = "/";
+            } else {
+                if (this.$page.props.selectedFileSystemObject.type != "file") {
+                    sFolder =
+                        this.$page.props.selectedFileSystemObject.relative_url;
+                } else {
+                    if (
+                        this.$page.props.selectedFileSystemObject.parent_id ==
+                        null
+                    ) {
+                        sFolder = "/";
+                    } else {
+                        sFolder =
+                            this.$page.props.selectedFileSystemObject.relative_url.replace(
+                                "/" +
+                                    this.$page.props.selectedFileSystemObject
+                                        .name,
+                                ""
+                            );
+                    }
+                }
+            }
+
+            this.$page.props.selectedFolder = sFolder;
+
+            if (file.has_children && file.level > 0 && !file.children) {
+                file.loading = true;
+                axios
+                    .get("/api/v1/files/children/" + file.id)
+                    .then((response) => {
+                        file.children = response.data.files[0].children;
+                        file.loading = false;
+                    });
+            }
         },
     },
 };

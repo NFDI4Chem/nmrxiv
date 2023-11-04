@@ -8,6 +8,7 @@
                 class="space-y-1"
             >
                 <div
+                    style="user-select: none"
                     :class="[
                         $page.props.selectedFileSystemObject &&
                         $page.props.selectedFileSystemObject.relative_url ==
@@ -59,9 +60,7 @@
                             </svg>
                         </span>
                     </DisclosureButton>
-                    <span
-                        @contextmenu.prevent.stop="handleClick1($event, item)"
-                    >
+                    <span>
                         <span
                             v-if="file.type == 'directory'"
                             v-html="composeIcon(file)"
@@ -139,7 +138,7 @@
                                                                 open
                                                                     ? 'text-gray-700 rotate-90'
                                                                     : 'text-gray-300',
-                                                                'mr-2 inline flex-shrink-0 h-5 w-5 transform group-hover:text-gray-700 transition-colors ease-in-out duration-150',
+                                                                'mr-2 -mt-2 inline flex-shrink-0 h-5 w-5 transform group-hover:text-gray-700 transition-colors ease-in-out duration-150',
                                                             ]"
                                                             viewBox="0 0 20 20"
                                                             aria-hidden="true"
@@ -150,37 +149,34 @@
                                                             />
                                                         </svg>
                                                     </span>
-                                                </DisclosureButton>
-                                                <span
-                                                    @contextmenu.prevent.stop="
-                                                        handleClick1(
-                                                            $event,
-                                                            item
-                                                        )
-                                                    "
-                                                >
                                                     <span>
                                                         <span
-                                                            v-if="
-                                                                sfile.type ==
-                                                                'directory'
-                                                            "
-                                                            v-html="
-                                                                composeIcon(
-                                                                    sfile
-                                                                )
+                                                            style="
+                                                                user-select: none;
                                                             "
                                                         >
+                                                            <span
+                                                                v-if="
+                                                                    sfile.type ==
+                                                                    'directory'
+                                                                "
+                                                                v-html="
+                                                                    composeIcon(
+                                                                        sfile
+                                                                    )
+                                                                "
+                                                            >
+                                                            </span>
+                                                            <span v-else>
+                                                                <DocumentTextIcon
+                                                                    class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700"
+                                                                    aria-hidden="true"
+                                                                />
+                                                            </span>
+                                                            {{ sfile.name }}
                                                         </span>
-                                                        <span v-else>
-                                                            <DocumentTextIcon
-                                                                class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700"
-                                                                aria-hidden="true"
-                                                            />
-                                                        </span>
-                                                        {{ sfile.name }}
                                                     </span>
-                                                </span>
+                                                </DisclosureButton>
                                             </div>
                                             <DisclosurePanel class="space-y-0">
                                                 <div
@@ -255,13 +251,6 @@
                 </DisclosurePanel>
             </Disclosure>
         </nav>
-        <vue-simple-context-menu
-            ref="vueSimpleContextMenu1"
-            element-id="myFirstMenu"
-            :options="optionsArray1"
-            @option-clicked="optionClicked1"
-        >
-        </vue-simple-context-menu>
     </span>
 </template>
 
@@ -284,25 +273,7 @@ export default {
         return {};
     },
     data() {
-        return {
-            optionsArray1: [
-                {
-                    name: "Duplicate",
-                    slug: "duplicate",
-                },
-                {
-                    type: "divider",
-                },
-                {
-                    name: "Edit",
-                    slug: "edit",
-                },
-                {
-                    name: "<em>Delete</em>",
-                    slug: "delete",
-                },
-            ],
-        };
+        return {};
     },
     computed: {},
     mounted() {},
@@ -370,8 +341,6 @@ export default {
                         file.loading = false;
                     });
             }
-
-            this.$emit("reload-nmrium");
         },
     },
 };

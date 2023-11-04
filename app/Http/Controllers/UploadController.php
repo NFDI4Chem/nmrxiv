@@ -32,7 +32,7 @@ class UploadController extends Controller
 
         return Inertia::render('Publish', [
             'draft' => $draft,
-            'project' => Project::with(['studies.datasets', 'studies.sample.molecules', 'owner', 'citations', 'authors'])->where('draft_id', $draft->id)->first(),
+            'project' => Project::with(['studies.datasets', 'studies.sample.molecules', 'owner', 'citations', 'authors', 'tags', 'license'])->where('draft_id', $draft->id)->first(),
             'validation' => $validation,
         ]);
     }

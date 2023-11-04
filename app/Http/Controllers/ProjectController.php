@@ -10,7 +10,7 @@ use App\Actions\Project\RestoreProject;
 use App\Actions\Project\UpdateProject;
 use App\Http\Resources\ProjectResource;
 use App\Http\Resources\StudyResource;
-use App\Jobs\ProcessProject;
+use App\Jobs\ProcessSubmission;
 use App\Models\Project;
 use App\Models\Study;
 use App\Models\User;
@@ -288,10 +288,8 @@ class ProjectController extends Controller
                 $validation = $project->validation;
                 $validation->process();
                 $validation = $validation->fresh();
-
                 if ($validation['report']['project']['status']) {
-                    ProcessProject::dispatch($project);
-
+                    ProcessSubmission::dispatch($project);
                     return response()->json([
                         'project' => $project,
                         'validation' => $validation,
@@ -302,7 +300,37 @@ class ProjectController extends Controller
                     ], 422);
                 }
             } else {
-                return 'je;;p';
+                $draft = $project->draft;
+                $draft->project_enabled = false;
+                $draft->save();
+
+                $project->release_date = $request->get('releaseDate');
+                $project->status = 'queued';
+                $project->save();
+
+                $validation = $project->validation;
+                $validation->process();
+                $validation = $validation->fresh();
+
+                $status = true;
+
+                foreach ($validation['report']['project']['studies'] as $study) {
+                    if(!$study['status']){
+                        $status = false;
+                    }
+                }
+                // add license check
+                if ($status) {
+                    ProcessSubmission::dispatch($project);
+                    return response()->json([
+                        'project' => $project,
+                        'validation' => $validation,
+                    ]);
+                } else {
+                    return response()->json([
+                        'errors' => 'Validation failing. Please provide all the required data and try again. If the problem persists, please contact us.',
+                    ], 422);
+                }
             }
         }
     }

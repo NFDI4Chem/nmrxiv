@@ -24,7 +24,7 @@ class UpdateProject
         ];
         Validator::make($input, [
             'name' => ['required', 'string', 'max:255',  Rule::unique('projects')
-                ->where('owner_id', $input['owner_id'])->ignore($project->id), ],
+                ->where('owner_id', $project->owner_id)->ignore($project->id), ],
             'description' => ['required', 'string', 'min:20'],
             'license' => ['required_if:is_public,"true"'],
         ], $errorMessages)->validate();
@@ -69,9 +69,11 @@ class UpdateProject
                     'access_type' => array_key_exists('access_type', $input)
                         ? $input['access_type']
                         : 'viewer',
-                    'team_id' => $input['team_id'],
-                    'owner_id' => $input['owner_id'],
+                    'team_id' => array_key_exists('team_id', $input) ? $input['team_id'] : $project->team_id,
+                    'owner_id' => array_key_exists('owner_id', $input) ? $input['owner_id'] : $project->owner_id,
                     'license_id' => $license_id,
+                    'species' => array_key_exists('species', $input) ? $input['species'] : $project->species,
+                    'release_date' => $release_date,
                     'project_photo_path' => $s3filePath ? $s3filePath : $project->project_photo_path,
                 ])
                 ->save();
@@ -87,7 +89,7 @@ class UpdateProject
                         $study->license_id = $license_id;
                     }
                 }
-
+                $study->release_date = $release_date;
                 $study->save();
 
                 $datasets = $study->datasets;
@@ -97,7 +99,7 @@ class UpdateProject
                             $dataset->license_id = $license_id;
                         }
                     }
-
+                    $dataset->release_date = $release_date;
                     $dataset->save();
                 }
             }
