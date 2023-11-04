@@ -1,8 +1,8 @@
 <template>
-    <div>
+    <div class="mx-auto w-100">
         <iframe
-            :width="width"
-            :height="height"
+            :width="width - 60"
+            :height="height - 65"
             :src="this.$page.props.CM_API + 'depict/3D?smiles=' + encodedSmiles"
             frameborder="0"
         ></iframe>

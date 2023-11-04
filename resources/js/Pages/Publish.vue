@@ -29,7 +29,7 @@
                 </div>
             </div>
         </template>
-        <div>
+        <div class="mb-10">
             <div>
                 <div v-if="!validationStatus" class="p-4">
                     <Validation
@@ -50,6 +50,7 @@
                                     v-model:enabled="
                                         publishForm.enableProjectMode
                                     "
+                                    @blur="updateDraft"
                                 />
                             </div>
                             <div v-if="publishForm.enableProjectMode">
@@ -71,6 +72,7 @@
                                                 "
                                                 type="text"
                                                 name="project-name"
+                                                @blur="updateProject"
                                                 class="block w-full shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm border-gray-300 rounded-md"
                                             />
                                         </div>
@@ -106,6 +108,7 @@
                                                 name="description"
                                                 placeholder="Describe this project"
                                                 rows="3"
+                                                @blur="updateProject"
                                                 class="block w-full shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm border border-gray-300 rounded-md"
                                             ></textarea>
                                         </div>
@@ -135,6 +138,7 @@
                                                 :separators="[';', ',']"
                                                 max-width="100%"
                                                 :tags="publishForm.project.tags"
+                                                @blur="updateProject"
                                                 @tags-changed="
                                                     (newTags) =>
                                                         (publishForm.project.tags =
@@ -426,6 +430,7 @@
                                 </label>
                                 <Datepicker
                                     v-model="publishForm.releaseDate"
+                                    @update:modelValue="updateProject"
                                 ></Datepicker>
                                 <p class="mt-1 text-sm text-gray-500">
                                     Publish your data now or choose a release
@@ -452,6 +457,9 @@
                                                 </span>
                                                 <select-rich
                                                     v-model:selected="license"
+                                                    @update:selected="
+                                                        updateProject
+                                                    "
                                                     label="License"
                                                     :items="licenses"
                                                 />
@@ -756,18 +764,55 @@ export default {
             }
         });
         if (this.draft) {
-            this.publishForm.project.name = this.draft.name;
-            this.publishForm.project.description = this.draft.description;
-            this.publishForm.project.tags = this.draft.tags;
+            this.publishForm.project.name = this.project.name
+                ? this.project.name
+                : this.draft.name;
+            this.publishForm.enableProjectMode = this.draft.project_enabled;
+            this.publishForm.project.description = this.project.description;
+            let tags = [];
+            this.project.tags.forEach((t) => {
+                tags.push({
+                    text: t.name["en"],
+                });
+            });
+            this.publishForm.project.tags = tags;
+            this.license = this.project.license;
+
+            this.publishForm.project.species = JSON.parse(this.project.species)
+                ? JSON.parse(this.project.species)
+                : [];
         }
         this.loadLicenses();
     },
-
     methods: {
+        updateDraft() {
+            axios.put("/dashboard/drafts/" + this.draft.id, {
+                project_enabled: this.publishForm.enableProjectMode ? 1 : 0,
+            });
+        },
+        updateProject() {
+            this.loadingStep = true;
+            axios
+                .put(route("dashboard.project.update", this.project.id), {
+                    name: this.publishForm.project.name,
+                    description: this.publishForm.project.description,
+                    tags: this.publishForm.project.tags,
+                    tags_array: this.publishForm.project.tags
+                        ? this.publishForm.project.tags.map((a) => a.text)
+                        : [],
+                    license_id: this.license ? this.license.id : null,
+                    species: this.publishForm.project.species,
+                    release_date: this.publishForm.releaseDate,
+                })
+                .then((res) => {
+                    console.log("success");
+                });
+        },
         updateSpecies(species) {
             if (species && species != "") {
                 this.publishForm.project.species.push(species);
                 this.projectSpecies = "";
+                this.updateProject();
             }
         },
         removeSpecies(index) {

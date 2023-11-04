@@ -522,6 +522,9 @@ export default {
                                     { type: `nmr-wrapper:load`, data },
                                     "*"
                                 );
+                                this.updateMolecularData(
+                                    nmrium_info.data.molecules
+                                );
                             } else {
                                 this.loadFromURLs(null);
                             }
@@ -583,11 +586,12 @@ export default {
         },
         updateStudyNMRiumInfo() {
             if (this.study != null && this.selectedSpectraData) {
+                let _version = this.version ? this.version : 4;
                 axios
                     .post(
                         "/dashboard/studies/" + this.study.id + "/nmriumInfo",
                         {
-                            version: 4,
+                            version: _version,
                             data: this.selectedSpectraData,
                         }
                     )
@@ -596,6 +600,9 @@ export default {
                         this.updateLoadingStatus(false);
                         this.autoSaving = false;
                         this.study.has_nmrium = response.data.has_nmrium;
+                        this.updateMolecularData(
+                            this.selectedSpectraData.molecules
+                        );
                     })
                     .catch(() => {
                         this.updateLoadingStatus(false);
@@ -607,6 +614,36 @@ export default {
                         );
                         this.autoSaving = false;
                     });
+            }
+        },
+        updateMolecularData(molecules) {
+            if (molecules.length > 0) {
+                molecules.forEach((mol) => {
+                    axios
+                        .post(
+                            "https://api.naturalproducts.net/latest/chem/standardize",
+                            mol.molfile
+                        )
+                        .then((res) => {
+                            let _mol = res.data;
+                            axios
+                                .post(
+                                    "/dashboard/studies/" +
+                                        this.study.id +
+                                        "/molecule",
+                                    {
+                                        InChI: _mol.inchi,
+                                        InChIKey: _mol.inchikey,
+                                        percentage: 0,
+                                        mol: _mol.standardized_mol,
+                                        canonical_smiles: _mol.canonical_smiles,
+                                    }
+                                )
+                                .then((res) => {
+                                    this.study.sample.molecules = res.data;
+                                });
+                        });
+                });
             }
         },
         updateDataSet() {

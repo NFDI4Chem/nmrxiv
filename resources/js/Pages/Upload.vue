@@ -450,9 +450,35 @@
                                                                 <p
                                                                     class="font-medium text-blue-gray-900"
                                                                 >
-                                                                    <a>{{
-                                                                        study.name
-                                                                    }}</a>
+                                                                    <a>
+                                                                        <svg
+                                                                            v-if="
+                                                                                study.internal_status !=
+                                                                                'complete'
+                                                                            "
+                                                                            class="animate-spin h-4 w-4 inline text-gray-400"
+                                                                            xmlns="http://www.w3.org/2000/svg"
+                                                                            fill="none"
+                                                                            viewBox="0 0 24 24"
+                                                                        >
+                                                                            <circle
+                                                                                class="opacity-25"
+                                                                                cx="12"
+                                                                                cy="12"
+                                                                                r="10"
+                                                                                stroke="currentColor"
+                                                                                stroke-width="4"
+                                                                            ></circle>
+                                                                            <path
+                                                                                class="opacity-75"
+                                                                                fill="currentColor"
+                                                                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                                                            ></path>
+                                                                        </svg>
+                                                                        {{
+                                                                            study.name
+                                                                        }}</a
+                                                                    >
                                                                     <span
                                                                         v-if="
                                                                             study
@@ -604,78 +630,153 @@
                                                         >
                                                             <div
                                                                 v-if="
-                                                                    importPendingSamples.length >
+                                                                    inprogressStudies.length >
                                                                     0
                                                                 "
-                                                                class="mb-4"
                                                             >
                                                                 <div
-                                                                    class="bg-white border shadow sm:rounded-lg"
+                                                                    class="rounded-md bg-red-50 p-4 mb-12"
                                                                 >
                                                                     <div
-                                                                        class="px-4 py-5 sm:p-6"
+                                                                        class="flex"
                                                                     >
-                                                                        <h3
-                                                                            class="text-base font-semibold leading-6 text-gray-900"
-                                                                        >
-                                                                            Spectra
-                                                                            Metadata
-                                                                            Not
-                                                                            Found
-                                                                        </h3>
                                                                         <div
-                                                                            class="mt-2 max-w-xl text-sm text-gray-500"
+                                                                            class="flex-shrink-0"
                                                                         >
-                                                                            <p>
-                                                                                Looks
-                                                                                like
-                                                                                we're
-                                                                                missing
-                                                                                some
-                                                                                important
-                                                                                Spectra
-                                                                                metadata.
-                                                                                No
-                                                                                worries,
-                                                                                though
-                                                                                –
-                                                                                we've
-                                                                                got
-                                                                                your
-                                                                                back!
-                                                                                Would
-                                                                                you
-                                                                                like
-                                                                                us
-                                                                                to
-                                                                                automatically
-                                                                                import
-                                                                                the
-                                                                                missing
-                                                                                Spectra
-                                                                                information
-                                                                                and
-                                                                                kickstart
-                                                                                the
-                                                                                processing?
-                                                                            </p>
+                                                                            <svg
+                                                                                class="h-5 w-5 text-red-400"
+                                                                                viewBox="0 0 20 20"
+                                                                                fill="currentColor"
+                                                                                aria-hidden="true"
+                                                                            >
+                                                                                <path
+                                                                                    fill-rule="evenodd"
+                                                                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
+                                                                                    clip-rule="evenodd"
+                                                                                />
+                                                                            </svg>
                                                                         </div>
                                                                         <div
-                                                                            class="mt-5"
+                                                                            class="ml-3"
                                                                         >
-                                                                            <button
-                                                                                @click="
-                                                                                    autoImport
-                                                                                "
-                                                                                type="button"
-                                                                                class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                                                                            <h3
+                                                                                class="text-sm font-medium text-red-800"
                                                                             >
-                                                                                Process
-                                                                            </button>
+                                                                                Processing
+                                                                                uploaded
+                                                                                data:
+                                                                                Please
+                                                                                wait
+                                                                                for
+                                                                                your
+                                                                                samples
+                                                                                to
+                                                                                be
+                                                                                processed.
+                                                                            </h3>
+                                                                            <div
+                                                                                class="mt-2 text-sm text-red-700"
+                                                                            >
+                                                                                <ul
+                                                                                    role="list"
+                                                                                    class="list-disc space-y-1 pl-5"
+                                                                                >
+                                                                                    <li>
+                                                                                        Pending:
+                                                                                        {{
+                                                                                            inprogressStudies.length
+                                                                                        }}
+                                                                                        out
+                                                                                        of
+                                                                                        {{
+                                                                                            studies.length
+                                                                                        }}
+                                                                                        samples
+                                                                                    </li>
+                                                                                </ul>
+                                                                            </div>
                                                                         </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
+                                                            <div v-else>
+                                                                <div
+                                                                    v-if="
+                                                                        importPendingSamples.length >
+                                                                        0
+                                                                    "
+                                                                    class="mb-4"
+                                                                >
+                                                                    <div
+                                                                        class="bg-white border shadow sm:rounded-lg"
+                                                                    >
+                                                                        <div
+                                                                            class="px-4 py-5 sm:p-6"
+                                                                        >
+                                                                            <h3
+                                                                                class="text-base font-semibold leading-6 text-gray-900"
+                                                                            >
+                                                                                Spectra
+                                                                                Metadata
+                                                                                Not
+                                                                                Found
+                                                                            </h3>
+                                                                            <div
+                                                                                class="mt-2 max-w-xl text-sm text-gray-500"
+                                                                            >
+                                                                                <p>
+                                                                                    Looks
+                                                                                    like
+                                                                                    we're
+                                                                                    missing
+                                                                                    some
+                                                                                    important
+                                                                                    Spectra
+                                                                                    metadata.
+                                                                                    No
+                                                                                    worries,
+                                                                                    though
+                                                                                    –
+                                                                                    we've
+                                                                                    got
+                                                                                    your
+                                                                                    back!
+                                                                                    Would
+                                                                                    you
+                                                                                    like
+                                                                                    us
+                                                                                    to
+                                                                                    automatically
+                                                                                    import
+                                                                                    the
+                                                                                    missing
+                                                                                    Spectra
+                                                                                    information
+                                                                                    and
+                                                                                    kickstart
+                                                                                    the
+                                                                                    processing?
+                                                                                </p>
+                                                                            </div>
+                                                                            <div
+                                                                                class="mt-5"
+                                                                            >
+                                                                                <button
+                                                                                    @click="
+                                                                                        autoImport
+                                                                                    "
+                                                                                    type="button"
+                                                                                    class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                                                                                >
+                                                                                    Import
+                                                                                    now
+                                                                                </button>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
                                                             <div
                                                                 class="mx-auto grid max-w-2xl grid-cols-1 grid-rows-1 items-start gap-x-8 gap-y-8 lg:mx-0 lg:max-w-none lg:grid-cols-3"
                                                             >
@@ -2344,6 +2445,7 @@ export default {
             studySpecies: null,
 
             drafts: [],
+            inprogressStudies: [],
 
             draftForm: this.$inertia.form({
                 _method: "POST",
@@ -2572,6 +2674,12 @@ export default {
                     ) {
                         this.loadingStep = false;
                         this.selectStep(2);
+                        this.inprogressStudies = this.studies.filter(
+                            (study) => study.internal_status != "complete"
+                        );
+                        if (this.inprogressStudies.length > 0) {
+                            this.checkStudyStatus();
+                        }
                     } else {
                         if (this.studies.length == 0) {
                             this.loadingStep = false;
@@ -2658,17 +2766,18 @@ export default {
             }
             if (!mol) {
                 let mol = this.editor.getMolFile();
-                axios
-                    .post(
-                        "https://dev.api.naturalproducts.net/latest/chem/standardize",
-                        mol
-                    )
-                    .then((res) => {
-                        this.associateMoleculeToStudy(res.data, study);
-                    });
+                this.standardizeMolecules(mol).then((res) => {
+                    this.associateMoleculeToStudy(res.data, study);
+                });
             } else {
                 this.associateMoleculeToStudy(mol, study);
             }
+        },
+        standardizeMolecules(mol) {
+            return axios.post(
+                "https://dev.api.naturalproducts.net/latest/chem/standardize",
+                mol
+            );
         },
         editMolecule(mol) {
             this.editor.setMolFile(mol.MOL);
@@ -2720,50 +2829,54 @@ export default {
             this.selectedStudy = null;
         },
         selectStudy(study, index, datasetIndex = null) {
-            this.selectedStudyIndex = index;
-            this.selectedStudy = study;
-            this.studyForm.name = this.selectedStudy.name;
-            this.studyForm.description = this.selectedStudy.description;
-            this.studyForm.species = JSON.parse(this.selectedStudy.species);
-            let tags = [];
-            this.selectedStudy.tags.forEach((t) => {
-                tags.push({
-                    text: t.name["en"],
+            if (study.internal_status == "complete") {
+                this.selectedStudyIndex = index;
+                this.selectedStudy = study;
+                this.studyForm.name = this.selectedStudy.name;
+                this.studyForm.description = this.selectedStudy.description;
+                this.studyForm.species = JSON.parse(this.selectedStudy.species)
+                    ? JSON.parse(this.selectedStudy.species)
+                    : [];
+                let tags = [];
+                this.selectedStudy.tags.forEach((t) => {
+                    tags.push({
+                        text: t.name["en"],
+                    });
                 });
-            });
-            this.studyForm.tags = tags;
-            let editorState = JSON.parse(
-                JSON.stringify(this.displaySamplesSummaryInfo)
-            );
-            if (this.displaySamplesSummaryInfo) {
-                this.displaySamplesSummaryInfo = false;
-            }
-            this.$nextTick(() => {
-                if (editorState) {
-                    if (this.$refs.spectraEditorREF) {
-                        this.$refs.spectraEditorREF.registerEvents();
+                this.studyForm.tags = tags;
+                let editorState = JSON.parse(
+                    JSON.stringify(this.displaySamplesSummaryInfo)
+                );
+                if (this.displaySamplesSummaryInfo) {
+                    this.displaySamplesSummaryInfo = false;
+                }
+                this.$nextTick(() => {
+                    if (editorState) {
+                        if (this.$refs.spectraEditorREF) {
+                            this.$refs.spectraEditorREF.registerEvents();
+                        }
+                    }
+                    this.editor = OCL.StructureEditor.createSVGEditor(
+                        "structureSearchEditor",
+                        1
+                    );
+                });
+                if (this.studyForm.description == "") {
+                    if (study.has_nmrium) {
+                        this.autoGenerateDescription();
                     }
                 }
-                this.editor = OCL.StructureEditor.createSVGEditor(
-                    "structureSearchEditor",
-                    1
-                );
-            });
-            if (this.studyForm.description == "") {
-                if (study.has_nmrium) {
-                    this.autoGenerateDescription();
+                if (
+                    this.selectedStudy &&
+                    this.selectedStudy.sample.molecules.length == 0
+                ) {
+                    this.autoImportMolecularData(this.selectedStudy);
                 }
-            }
-            if (
-                this.selectedStudy &&
-                this.selectedStudy.sample.molecules.length == 0
-            ) {
-                this.autoImportMolecularData(this.selectedStudy);
-            }
-            if (!datasetIndex) {
-                this.selectedDSIndex = 0;
-            } else {
-                this.selectedDSIndex = datasetIndex;
+                if (!datasetIndex) {
+                    this.selectedDSIndex = 0;
+                } else {
+                    this.selectedDSIndex = datasetIndex;
+                }
             }
         },
         autoImportMolecularData(study) {
@@ -2977,6 +3090,23 @@ export default {
                 });
             }
         },
+        checkStudyStatus() {
+            setTimeout(() => {
+                this.fetchProjectDetails().then((response) => {
+                    this.loadingStep = false;
+                    this.project = response.data.project;
+                    this.studies = response.data.studies;
+                    this.fetchValidations();
+                    this.spectraLoadingStatus = false;
+                    this.inprogressStudies = this.studies.filter(
+                        (study) => study.internal_status != "complete"
+                    );
+                    if (this.inprogressStudies.length > 0) {
+                        this.checkStudyStatus();
+                    }
+                });
+            }, 30000);
+        },
         fetchValidations() {
             axios
                 .get("/projects/" + this.project.id + "/validation")
@@ -3117,9 +3247,9 @@ export default {
                     this.importPendingSamples.length +
                     "/" +
                     this.studies.length +
-                    "</i></small> <br/> Processing: " +
+                    "</i></small> <br/> Processing Spectra from Sample: " +
                     studyDetails.study.slug +
-                    "<br/> Spectra URL: " +
+                    " <br/> Spectra URL: " +
                     url;
                 axios
                     .post("https://nodejsdev.nmrxiv.org/spectra-parser", {
@@ -3136,6 +3266,19 @@ export default {
                         });
                         let version = parsedSpectra.version;
                         delete parsedSpectra["version"];
+                        let molecules = parsedSpectra.molecules;
+                        if (molecules.length > 0) {
+                            molecules.forEach((mol) => {
+                                this.standardizeMolecules(mol.molfile).then(
+                                    (res) => {
+                                        this.associateMoleculeToStudy(
+                                            res.data,
+                                            studyDetails.study
+                                        );
+                                    }
+                                );
+                            });
+                        }
                         axios
                             .post(
                                 "/dashboard/studies/" +

@@ -170,7 +170,7 @@
             </div>
             <div v-else>
                 <div
-                    class="mt-8 mx-auto max-w-md grid gap-8 sm:max-w-lg lg:grid-cols-3 lg:max-w-7xl"
+                    class="mt-8 mx-auto max-w-md grid gap-8 sm:max-w-lg lg:grid-cols-4 lg:max-w-7xl"
                 >
                     <div v-for="study in studies.data" :key="study.uuid">
                         <study-card :study="study" />
