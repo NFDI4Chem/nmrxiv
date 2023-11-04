@@ -290,6 +290,7 @@ class ProjectController extends Controller
                 $validation = $validation->fresh();
                 if ($validation['report']['project']['status']) {
                     ProcessSubmission::dispatch($project);
+
                     return response()->json([
                         'project' => $project,
                         'validation' => $validation,
@@ -315,13 +316,14 @@ class ProjectController extends Controller
                 $status = true;
 
                 foreach ($validation['report']['project']['studies'] as $study) {
-                    if(!$study['status']){
+                    if (! $study['status']) {
                         $status = false;
                     }
                 }
                 // add license check
                 if ($status) {
                     ProcessSubmission::dispatch($project);
+
                     return response()->json([
                         'project' => $project,
                         'validation' => $validation,

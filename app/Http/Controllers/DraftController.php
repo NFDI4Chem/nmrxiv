@@ -100,14 +100,15 @@ class DraftController extends Controller
     public function update(Request $request, Draft $draft)
     {
         $project_enabled = $request->has('project_enabled') ? $request->get('project_enabled') : $draft->project_enabled;
-        if($project_enabled == 1){
-            $project_enabled = TRUE;
-        }else{
-            $project_enabled = FALSE;
+        if ($project_enabled == 1) {
+            $project_enabled = true;
+        } else {
+            $project_enabled = false;
         }
         $draft->name = $request->get('name') ? $request->get('name') : $draft->name;
         $draft->project_enabled = $project_enabled;
         $draft->save();
+
         return $draft;
     }
 

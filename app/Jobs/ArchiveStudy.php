@@ -10,10 +10,9 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use ZipStream;
-use Illuminate\Support\Facades\Http;
- 
 
 class ArchiveStudy implements ShouldBeUnique, ShouldQueue
 {
@@ -44,7 +43,7 @@ class ArchiveStudy implements ShouldBeUnique, ShouldQueue
         $project = $this->project;
         if ($project) {
             foreach ($project->studies as $study) {
-                $study->internal_status = "processing";
+                $study->internal_status = 'processing';
                 $study->save();
                 $archiveDownloadURL = $study->download_url;
                 if (! $archiveDownloadURL) {
@@ -120,10 +119,10 @@ class ArchiveStudy implements ShouldBeUnique, ShouldQueue
                         //         unset($spectra["originalData"]);
                         //         unset($spectra["originalInfo"]);
                         //     }
-                                
+
                         //     $version = $parsedSpectra['version'];
                         //     unset($parsedSpectra["version"]);
-    
+
                         //     // associate
                         //     $nmriumJSON = array(
                         //         "data" => $parsedSpectra,
@@ -169,11 +168,11 @@ class ArchiveStudy implements ShouldBeUnique, ShouldQueue
                         //     }
                         // }
                         // // add molecules
-                        $study->internal_status = "complete";
+                        $study->internal_status = 'complete';
                         $study->save();
                     }
-                }else{
-                    $study->internal_status = "complete";
+                } else {
+                    $study->internal_status = 'complete';
                     $study->save();
                 }
             }
