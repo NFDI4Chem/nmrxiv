@@ -768,6 +768,13 @@ const navigation = [
         icon: Squares2X2Icon,
         bg: "bg-white",
     },
+    // {
+    //     auth: false,
+    //     name: "Spectra",
+    //     href: "/spectra",
+    //     icon: Squares2X2Icon,
+    //     bg: "bg-white",
+    // },
     {
         auth: true,
         name: "Dashboard",

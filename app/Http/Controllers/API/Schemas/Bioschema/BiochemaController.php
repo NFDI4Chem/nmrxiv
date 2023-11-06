@@ -12,6 +12,7 @@ use App\Models\Study;
 use App\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Spatie\SchemaOrg\Schema;
 
 /**
@@ -231,26 +232,25 @@ class BiochemaController extends Controller
         foreach ($sample->molecules as &$molecule) {
             $inchiKey = $molecule->INCHI_KEY;
             $pubchemLink = 'https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/inchikey/'.$inchiKey.'/property/IUPACName/JSON';
-            $json = file_get_contents($pubchemLink);
-            $jsonDecode = json_decode($json, true);
-            $cid = $jsonDecode['PropertyTable']['Properties'][0]['CID'];
-            $iupacName = $jsonDecode['PropertyTable']['Properties'][0]['IUPACName'];
+            $json = json_decode(Http::get($pubchemLink)->body(), true);
+            // $cid = $json['PropertyTable']['Properties'][0]['CID'];
+            // $iupacName = $json['PropertyTable']['Properties'][0]['IUPACName'];
 
-            $moleculeSchema = Schema::MolecularEntity();
-            $moleculeSchema['@id'] = $inchiKey;
-            $moleculeSchema['dct:conformsTo'] = $this->conformsTo(['https://bioschemas.org/profiles/MolecularEntity/0.5-RELEASE']);
-            $moleculeSchema['identifier'] = $inchiKey;
-            $moleculeSchema->name($molecule->CAS_NUMBER);
-            $moleculeSchema->url('https://pubchem.ncbi.nlm.nih.gov/compound/'.$cid);
-            $moleculeSchema->inChI('InChI='.$molecule->STANDARD_INCHI);
-            $moleculeSchema->inChIKey($inchiKey);
-            $moleculeSchema->iupacName($iupacName);
-            $moleculeSchema->molecularFormula($molecule->FORMULA);
-            $moleculeSchema->molecularWeight($molecule->MOLECULAR_WEIGHT);
-            $moleculeSchema->smiles([$molecule->SMILES, $molecule->SMILES_CHIRAL, $molecule->CANONICAL_SMILES]);
-            $moleculeSchema->hasRepresentation($molecule->MOL);
-            $moleculeSchema->description('Percentage composition: '.$molecule->pivot->percentage_composition.'%');
-            array_push($molecules, $moleculeSchema);
+            // $moleculeSchema = Schema::MolecularEntity();
+            // $moleculeSchema['@id'] = $inchiKey;
+            // $moleculeSchema['dct:conformsTo'] = $this->conformsTo(['https://bioschemas.org/profiles/MolecularEntity/0.5-RELEASE']);
+            // $moleculeSchema['identifier'] = $inchiKey;
+            // $moleculeSchema->name($molecule->CAS_NUMBER);
+            // $moleculeSchema->url('https://pubchem.ncbi.nlm.nih.gov/compound/'.$cid);
+            // $moleculeSchema->inChI('InChI='.$molecule->STANDARD_INCHI);
+            // $moleculeSchema->inChIKey($inchiKey);
+            // $moleculeSchema->iupacName($iupacName);
+            // $moleculeSchema->molecularFormula($molecule->FORMULA);
+            // $moleculeSchema->molecularWeight($molecule->MOLECULAR_WEIGHT);
+            // $moleculeSchema->smiles([$molecule->SMILES, $molecule->SMILES_CHIRAL, $molecule->CANONICAL_SMILES]);
+            // $moleculeSchema->hasRepresentation($molecule->MOL);
+            // $moleculeSchema->description('Percentage composition: '.$molecule->pivot->percentage_composition.'%');
+            // array_push($molecules, $moleculeSchema);
         }
 
         return $molecules;
@@ -290,9 +290,18 @@ class BiochemaController extends Controller
      */
     public function getNMRiumInfo($dataset)
     {
-        $nmrium = NMRium::where([['dataset_id', $dataset->id]])->firstOrFail();
-        $info = json_decode($nmrium->nmrium_info)->spectra[0]->info;
-
+        $nmrium = $dataset->nmrium;
+        if (! $nmrium) {
+            $study = $dataset->study;
+            $studyNMRiumInfo = json_decode($study->nmrium->nmrium_info);
+            foreach ($studyNMRiumInfo->data->spectra as $spectra) {
+                $fileSource = $spectra->sourceSelector->files[0];
+                $fileName = pathinfo($fileSource);
+                if ($fileName['basename'] == $dataset->fsObject->name) {
+                    $info = $spectra->info;
+                }
+            }
+        }
         $solvent = $info->solvent;
         $nucleus = $info->nucleus;
         if (is_string($nucleus)) {

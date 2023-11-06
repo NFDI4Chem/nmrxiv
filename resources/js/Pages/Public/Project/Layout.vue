@@ -193,7 +193,7 @@ export default {
                     icon: "",
                 },
                 {
-                    name: "studies",
+                    name: "samples",
                     description: "",
                     icon: "",
                 },

@@ -251,13 +251,12 @@
                                                             <div
                                                                 class="rounded-md border my-3 flex justify-center items-center"
                                                             >
-                                                                <span
-                                                                    v-html="
-                                                                        getSVGString(
-                                                                            molecule
-                                                                        )
+                                                                <Depictor2D
+                                                                    class="py-4 -px-4"
+                                                                    :molecule="
+                                                                        molecule.CANONICAL_SMILES
                                                                     "
-                                                                ></span>
+                                                                ></Depictor2D>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -465,7 +464,7 @@ import ProjectLayout from "@/Pages/Public/Project/Layout.vue";
 import { ShareIcon, ClipboardDocumentIcon } from "@heroicons/vue/24/solid";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import SpectraViewer from "@/Shared/SpectraViewer.vue";
-
+import Depictor2D from "@/Shared/Depictor2D.vue";
 export default {
     components: {
         ProjectLayout,
@@ -476,6 +475,7 @@ export default {
         MenuItem,
         MenuItems,
         SpectraViewer,
+        Depictor2D,
     },
     props: ["project", "tab", "study"],
     data() {

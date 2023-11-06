@@ -12,6 +12,7 @@
             <div :class="[fullScreen ? 'px-6 py-4' : '', 'flex']">
                 <div class="w-full px-5">
                     <div
+                        v-if="!readonly"
                         class="float-left text-sm cursor-pointer hover:text-blue-700 mt-2 mr-10"
                     >
                         <i
@@ -210,7 +211,7 @@
                 >
                     <children :file="file"></children>
                     <div
-                        v-if="Object.keys(logs).length > 0"
+                        v-if="Object.keys(logs).length > 0 && !readonly"
                         class="mt-4 text-sm cursor-pointer text-gray-400"
                         @click="showLogsDialog = true"
                     >
@@ -342,7 +343,8 @@
                                 {{ $page.props.selectedFileSystemObject.name }}
                                 <a
                                     v-if="
-                                        $page.props.selectedFileSystemObject.id
+                                        $page.props.selectedFileSystemObject
+                                            .id && !readonly
                                     "
                                     class="ml-4 cursor-pointer relative inline-flex items-center px-4 py-1 rounded-full border border-gray-300 bg-white text-sm font-black text-dark hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 float-right"
                                     @click="confirmFSODeletion"
@@ -409,6 +411,7 @@
                                 {{ $page.props.selectedFileSystemObject.name }}
                                 <a
                                     class="ml-4 cursor-pointer relative inline-flex items-center px-4 py-1 rounded-full border border-gray-300 bg-white text-sm font-black text-dark hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 float-right"
+                                    v-if="!readonly"
                                     @click="confirmFSODeletion"
                                 >
                                     <TrashIcon
@@ -639,15 +642,19 @@ export default {
         },
         loadFiles() {
             this.updateBusyStatus(true);
-            axios.get(this.url).then((response) => {
-                this.file = response.data.file;
-                this.file.has_children = true;
-                this.$page.props.selectedFileSystemObject = this.file;
-                this.$page.props.selectedFolder = "/";
-                this.updateBusyStatus(true);
-                this.$emit("loading", false);
-                this.loading = false;
-            });
+            if (this.draft) {
+                axios.get(this.url).then((response) => {
+                    this.file = response.data.file;
+                    this.file.has_children = true;
+                    this.$page.props.selectedFileSystemObject = this.file;
+                    this.$page.props.selectedFolder = "/";
+                    this.updateBusyStatus(true);
+                    this.$emit("loading", false);
+                    this.loading = false;
+                });
+            } else {
+                this.file = this.$page.props.selectedFileSystemObject;
+            }
         },
         annotate() {
             this.updateBusyStatus(true);

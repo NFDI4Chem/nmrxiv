@@ -59,118 +59,12 @@
                             </li>
                         </ol>
                     </nav>
-                    <div
-                        class="min-w-0 flex-1 min-h-screen border-gray-200 lg:flex"
-                    >
-                        <aside
-                            class="hidden py-3 px-2 lg:block lg:flex-shrink-0 lg:order-first"
-                        >
-                            <div
-                                v-if="project.data.files != null"
-                                class="h-full relative flex flex-col w-64 border-r border-gray-200 overflow-y-auto"
-                            >
-                                <children
-                                    :file="project.data.files"
-                                    :project="project"
-                                ></children>
-                            </div>
-                        </aside>
-                        <section
-                            class="min-w-0 p-6 flex-1 h-full flex flex-col overflow-y-auto lg:order-last"
-                        >
-                            <div
-                                v-if="
-                                    $page.props.selectedFileSystemObject &&
-                                    $page.props.selectedFileSystemObject
-                                        .has_children
-                                "
-                                class="mb-3"
-                            >
-                                <div
-                                    v-if="
-                                        $page.props.selectedFileSystemObject
-                                            .uuid
-                                    "
-                                    class="py-2 mb-2 block"
-                                >
-                                    <p class="font-bold text-xl">
-                                        {{
-                                            $page.props.selectedFileSystemObject
-                                                .name
-                                        }}
-                                        <a
-                                            :href="downloadURL"
-                                            class="ml-4 cursor-pointer relative inline-flex items-center px-4 py-1 rounded-full border border-gray-300 bg-white text-sm font-black text-dark hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 float-right"
-                                        >
-                                            Download
-                                        </a>
-                                    </p>
-                                </div>
-                                <ul
-                                    role="list"
-                                    class="mb-3 grid grid-cols-1 gap-5 sm:gap-6 sm:grid-cols-2 lg:grid-cols-4"
-                                >
-                                    <li
-                                        v-for="file in $page.props
-                                            .selectedFileSystemObject.children"
-                                        :key="file.key"
-                                        class="relative shadow rounded-lg"
-                                    >
-                                        <div
-                                            class="group block w-full aspect-w-10 aspect-h-7 py-4 bg-gray-100 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 focus-within:ring-indigo-500 overflow-hidden"
-                                        >
-                                            <span
-                                                v-if="file.type == 'directory'"
-                                            >
-                                                <FolderIcon
-                                                    class="cursor-pointer h-28 w-28 text-gray-400 flex-shrink-0 mx-auto"
-                                                    aria-hidden="true"
-                                                    @dblclick.stop="
-                                                        displaySelected(file)
-                                                    "
-                                                />
-                                            </span>
-                                            <span v-else>
-                                                <DocumentTextIcon
-                                                    class="h-28 w-28 text-gray-400 flex-shrink-0 mx-auto"
-                                                    aria-hidden="true"
-                                                />
-                                            </span>
-                                        </div>
-                                        <p
-                                            class="mt-2 px-2 py-1 block truncate text-sm font-medium text-gray-900 pointer-events-none"
-                                        >
-                                            {{ file.name }}
-                                        </p>
-                                        <p
-                                            class="block text-sm font-medium text-gray-500 pointer-events-none"
-                                        >
-                                            {{ file.size }}
-                                        </p>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div v-else>
-                                <div class="">
-                                    <span
-                                        v-if="
-                                            $page.props
-                                                .selectedFileSystemObject &&
-                                            $page.props.selectedFileSystemObject
-                                                .type == 'file'
-                                        "
-                                    >
-                                        <File-details
-                                            :project="project.data"
-                                            :file="
-                                                $page.props
-                                                    .selectedFileSystemObject
-                                            "
-                                        ></File-details>
-                                    </span>
-                                </div>
-                            </div>
-                        </section>
+                    <div>
+                        <file-system-browser
+                            ref="fsbRef"
+                            :readonly="true"
+                            :height="'h-[calc(100vh-385px)]'"
+                        ></file-system-browser>
                     </div>
                 </div>
             </div>
@@ -180,7 +74,7 @@
 
 <script>
 import ProjectLayout from "@/Pages/Public/Project/Layout.vue";
-import FileDetails from "@/Shared/FileDetails.vue";
+import FileSystemBrowser from "./../../../Shared/FileSystemBrowser.vue";
 import {
     FolderIcon,
     DocumentTextIcon,
@@ -191,11 +85,11 @@ import {
 export default {
     components: {
         ProjectLayout,
-        FileDetails,
         FolderIcon,
         DocumentTextIcon,
         ChevronRightIcon,
         HomeIcon,
+        FileSystemBrowser,
     },
     props: ["project", "tab"],
     data() {
@@ -224,6 +118,11 @@ export default {
     mounted() {
         this.$page.props.selectedFileSystemObject = this.project.data.files;
         this.$page.props.selectedFolder = "/";
+        this.$nextTick(function () {
+            if (this.$refs.fsbRef) {
+                this.$refs.fsbRef.loadFiles();
+            }
+        });
     },
     methods: {},
 };

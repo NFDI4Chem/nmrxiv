@@ -500,7 +500,6 @@ export default {
                         file.loading = false;
                     });
             }
-            this.$emit("reloadnmrium");
         },
         loadMol() {
             this.svgString = null;

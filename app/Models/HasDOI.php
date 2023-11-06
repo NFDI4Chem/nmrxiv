@@ -142,7 +142,7 @@ trait HasDOI
                 ];
 
                 $attributes = [
-                    'creators' => $creators,
+                    'creators' => count($creators) > 0 ? $creators : $contributors,
                     'titles' => [
                         [
                             'title' => $this->name,
@@ -162,6 +162,8 @@ trait HasDOI
                     'state' => 'findable',
                     'schemaVersion' => 'http://datacite.org/schema/kernel-4',
                 ];
+
+                // dd($attributes);
 
                 $doiResponse = $doiService->createDOI($suffix, $attributes);
                 $this->doi = $doiResponse['data']['id'];

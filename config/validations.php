@@ -15,7 +15,6 @@ return [
             'citations' => 'array|min:1',
             'authors' => 'required|array|min:1',
             'license' => 'required',
-            'image' => 'required',
         ],
         'study' => [
             'title' => 'required',

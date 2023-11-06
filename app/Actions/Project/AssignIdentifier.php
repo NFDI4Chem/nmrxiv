@@ -6,6 +6,7 @@ use App\Models\Project;
 use App\Models\Study;
 use App\Models\Ticker;
 use App\Services\DOI\DOIService;
+use Illuminate\Support\Collection;
 
 class AssignIdentifier
 {
@@ -33,7 +34,7 @@ class AssignIdentifier
         $studies = null;
         if ($model instanceof Project) {
             $project = $model;
-        } elseif (is_array($model)) {
+        } elseif ($model instanceof Collection) {
             $studies = $model;
         }
 
