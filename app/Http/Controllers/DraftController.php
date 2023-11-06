@@ -155,16 +155,16 @@ class DraftController extends Controller
         $input = $request->all();
         $project = Project::where('draft_id', $draft->id)->first();
 
-        // if ($project) {
-        //     $rule = Rule::unique('projects')->where('owner_id', $input['owner_id'])->ignore($project->id);
-        // } else {
-        //     $rule = Rule::unique('projects')->where('owner_id', $input['owner_id']);
-        // }
+        if ($project) {
+            $rule = Rule::unique('projects')->where('owner_id', $input['owner_id'])->ignore($project->id);
+        } else {
+            $rule = Rule::unique('projects')->where('owner_id', $input['owner_id']);
+        }
 
-        // $validation = $request->validate([
-        //     'name' => ['required', 'string', 'max:255',  Rule::unique('drafts')
-        //         ->where('owner_id', $input['owner_id'])->ignore($draft->id), $rule, ],
-        // ]);
+        $validation = $request->validate([
+            'name' => ['required', 'string', 'max:255',  Rule::unique('drafts')
+                ->where('owner_id', $input['owner_id'])->ignore($draft->id), $rule, ],
+        ]);
 
         $draftFolders = FileSystemObject::with('children')
             ->where([

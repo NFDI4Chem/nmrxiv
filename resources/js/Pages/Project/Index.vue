@@ -45,7 +45,7 @@
                     </div>
                     <div class="mt-3 max-w-2xl text-sm text-gray-700">
                         nmrXiv is organized around projects. Projects can
-                        contain as many studies as you wish and each study
+                        contain as many samples as you wish and each sample
                         receives its very own URL. To learn more, check out our
                         documentation.
                     </div>

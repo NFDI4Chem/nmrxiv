@@ -114,11 +114,11 @@ class ProcessSubmission implements ShouldQueue, ShouldBeUnique
 
             if ($project) {
                 $_studies = $project->studies;
-
                 if ($draft) {
                     $environment = env('APP_ENV', 'local');
 
                     foreach ($_studies as $study) {
+                        // $study->users()->sync($project->user()->getDictionary());
                         $studyPath = preg_replace(
                             '~//+~',
                             '/',

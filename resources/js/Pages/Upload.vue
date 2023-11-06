@@ -25,6 +25,10 @@
                                         >
                                             {{ currentDraft.name }}
                                         </p>
+                                        <jet-input-error
+                                            :message="draftForm.errors.name"
+                                            class="mt-2"
+                                        />
                                     </span>
                                     <span v-else> Submit data to nmrXiv </span>
                                 </h3>
@@ -336,10 +340,7 @@
                                 </div>
                             </div>
                             <div v-else>
-                                <div
-                                    class=""
-                                    v-if="currentStep && currentDraft"
-                                >
+                                <div v-if="currentStep && currentDraft">
                                     <div
                                         v-if="currentStep.id == '01'"
                                         id="submission-dropzone"
@@ -447,34 +448,14 @@
                                                                     )
                                                                 "
                                                             >
-                                                                <p
+                                                                <div
+                                                                    v-if="
+                                                                        study.internal_status ==
+                                                                        'complete'
+                                                                    "
                                                                     class="font-medium text-blue-gray-900"
                                                                 >
                                                                     <a>
-                                                                        <svg
-                                                                            v-if="
-                                                                                study.internal_status !=
-                                                                                'complete'
-                                                                            "
-                                                                            class="animate-spin h-4 w-4 inline text-gray-400"
-                                                                            xmlns="http://www.w3.org/2000/svg"
-                                                                            fill="none"
-                                                                            viewBox="0 0 24 24"
-                                                                        >
-                                                                            <circle
-                                                                                class="opacity-25"
-                                                                                cx="12"
-                                                                                cy="12"
-                                                                                r="10"
-                                                                                stroke="currentColor"
-                                                                                stroke-width="4"
-                                                                            ></circle>
-                                                                            <path
-                                                                                class="opacity-75"
-                                                                                fill="currentColor"
-                                                                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                                                            ></path>
-                                                                        </svg>
                                                                         {{
                                                                             study.name
                                                                         }}</a
@@ -495,39 +476,73 @@
                                                                             alt=""
                                                                         />
                                                                     </span>
-                                                                </p>
-                                                                <div
-                                                                    class="mt-1 text-blue-gray-500"
-                                                                >
-                                                                    <span
-                                                                        v-for="ds in study.datasets"
-                                                                        :key="
-                                                                            ds.id
-                                                                        "
+                                                                    <div
+                                                                        class="mt-1 text-blue-gray-500"
+                                                                    >
+                                                                        <span
+                                                                            v-for="ds in study.datasets"
+                                                                            :key="
+                                                                                ds.id
+                                                                            "
+                                                                        >
+                                                                            <div
+                                                                                :class="[
+                                                                                    study.has_nmrium
+                                                                                        ? 'bg-green-100 text-gray-800'
+                                                                                        : 'bg-gray-100 text-gray-800',
+                                                                                    'mb-0.5 inline-flex truncate break-words items-center px-3 py-0.5 rounded-full text-xs font-medium mr-1',
+                                                                                ]"
+                                                                            >
+                                                                                <span
+                                                                                    >{{
+                                                                                        ds.name
+                                                                                    }}
+                                                                                    <span
+                                                                                        v-if="
+                                                                                            ds.type
+                                                                                        "
+                                                                                        >({{
+                                                                                            ds.type
+                                                                                        }})</span
+                                                                                    ></span
+                                                                                >
+                                                                            </div>
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                                <div v-else>
+                                                                    <div
+                                                                        class="p-4 max-w-sm w-full mx-auto"
                                                                     >
                                                                         <div
-                                                                            :class="[
-                                                                                study.has_nmrium
-                                                                                    ? 'bg-green-100 text-gray-800'
-                                                                                    : 'bg-gray-100 text-gray-800',
-                                                                                'mb-0.5 inline-flex truncate break-words items-center px-3 py-0.5 rounded-full text-xs font-medium mr-1',
-                                                                            ]"
+                                                                            class="animate-pulse flex space-x-4"
                                                                         >
-                                                                            <span
-                                                                                >{{
-                                                                                    ds.name
-                                                                                }}
-                                                                                <span
-                                                                                    v-if="
-                                                                                        ds.type
-                                                                                    "
-                                                                                    >({{
-                                                                                        ds.type
-                                                                                    }})</span
-                                                                                ></span
+                                                                            <div
+                                                                                class="flex-1 space-y-6 py-1"
                                                                             >
+                                                                                <div
+                                                                                    class="h-2 bg-slate-200"
+                                                                                ></div>
+                                                                                <div
+                                                                                    class="space-y-3"
+                                                                                >
+                                                                                    <div
+                                                                                        class="grid grid-cols-3 gap-4"
+                                                                                    >
+                                                                                        <div
+                                                                                            class="h-2 bg-slate-200 rounded col-span-2"
+                                                                                        ></div>
+                                                                                        <div
+                                                                                            class="h-2 bg-slate-200 rounded col-span-1"
+                                                                                        ></div>
+                                                                                    </div>
+                                                                                    <div
+                                                                                        class="h-2 bg-slate-200 rounded"
+                                                                                    ></div>
+                                                                                </div>
+                                                                            </div>
                                                                         </div>
-                                                                    </span>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </a>
@@ -644,16 +659,24 @@
                                                                             class="flex-shrink-0"
                                                                         >
                                                                             <svg
-                                                                                class="h-5 w-5 text-red-400"
-                                                                                viewBox="0 0 20 20"
-                                                                                fill="currentColor"
-                                                                                aria-hidden="true"
+                                                                                class="animate-spin -ml-1 h-5 w-5 text-red"
+                                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                                fill="none"
+                                                                                viewBox="0 0 24 24"
                                                                             >
+                                                                                <circle
+                                                                                    class="opacity-25"
+                                                                                    cx="12"
+                                                                                    cy="12"
+                                                                                    r="10"
+                                                                                    stroke="currentColor"
+                                                                                    stroke-width="4"
+                                                                                ></circle>
                                                                                 <path
-                                                                                    fill-rule="evenodd"
-                                                                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
-                                                                                    clip-rule="evenodd"
-                                                                                />
+                                                                                    class="opacity-75"
+                                                                                    fill="currentColor"
+                                                                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                                                                ></path>
                                                                             </svg>
                                                                         </div>
                                                                         <div
@@ -2570,7 +2593,7 @@ export default {
             } else {
                 this.defaultDraft = response.data.default;
                 if (this.drafts.length == 0) {
-                    this.currentDraft = this.defaultDraft;
+                    this.selectDraft(this.defaultDraft);
                     this.loading = false;
                 } else {
                     this.loading = false;
@@ -2623,6 +2646,7 @@ export default {
         },
         updateDraft(e) {
             this.currentDraft.name = e.target.innerText;
+            this.draftForm.errors = [];
             axios
                 .put(
                     "/dashboard/drafts/" + this.currentDraft.id,
@@ -2931,48 +2955,42 @@ export default {
             this.manageCitationElement.toggleDialog();
         },
         closeDraft() {
-            if (this.validationStatus) {
-                this.loadingStep = true;
-                axios
-                    .post(
-                        "/dashboard/drafts/" +
-                            this.currentDraft.id +
-                            "/complete",
-                        {}
-                    )
-                    .catch(() => {
-                        this.loadingStep = false;
-                    })
-                    .then((response) => {
-                        this.project = response.data.project;
-                        this.validation = this.parseJSON(
-                            response.data.validation.report
-                        );
-                        this.validationStatus = true;
-                        this.validation.project.studies.forEach((study) => {
-                            console.log(study);
-                            if (study.status == false) {
-                                this.validationStatus = false;
+            this.fetchValidations().then(() => {
+                if (this.validationStatus) {
+                    this.loadingStep = true;
+                    axios
+                        .post(
+                            "/dashboard/drafts/" +
+                                this.currentDraft.id +
+                                "/complete",
+                            {}
+                        )
+                        .catch(() => {
+                            this.loadingStep = false;
+                        })
+                        .then((response) => {
+                            this.project = response.data.project;
+                            this.validation = this.parseJSON(
+                                response.data.validation.report
+                            );
+                            this.validationStatus = true;
+                            this.validation.project.studies.forEach((study) => {
+                                if (study.status == false) {
+                                    this.validationStatus = false;
+                                }
+                            });
+                            if (this.project) {
+                                window.location =
+                                    "/publish/" + this.currentDraft.id;
                             }
                         });
-                        if (this.project) {
-                            // this.loadingStep = false;
-                            // this.loadLicenses();
-                            // this.selectStep(3);
-                            // this.publishForm.project.name = this.draftForm.name;
-                            // this.publishForm.project.description =
-                            //     this.draftForm.description;
-                            // this.publishForm.project.tags = this.draftForm.tags;
-                            // this.trackProject();
-                            window.location =
-                                "/publish/" + this.currentDraft.id;
-                        }
-                    });
-            } else {
-                alert(
-                    "Samples validation failed: Please provide all meta data to proceed"
-                );
-            }
+                } else {
+                    this.showSamplesSummary();
+                    alert(
+                        "Samples validation failed: Please provide all meta data to proceed"
+                    );
+                }
+            });
         },
         publish() {
             if (this.publishForm.conditions && this.publishForm.terms) {
@@ -3045,6 +3063,7 @@ export default {
             let tags = [];
             this.file = null;
             this.draftForm.tags = [];
+            this.draftForm.owner_id = this.$page.props.user.id;
             if (this.currentDraft.tags) {
                 this.currentDraft.tags.forEach((t) => {
                     tags.push({
@@ -3108,7 +3127,7 @@ export default {
             }, 30000);
         },
         fetchValidations() {
-            axios
+            return axios
                 .get("/projects/" + this.project.id + "/validation")
                 .then((response) => {
                     this.validation = response.data.report;

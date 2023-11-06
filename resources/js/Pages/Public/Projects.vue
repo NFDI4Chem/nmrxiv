@@ -12,7 +12,7 @@
                             </div>
                             <p>
                                 Explore, analyze, and share raw spectral data
-                                and assignements. Learn more about
+                                and assignments. Learn more about
                                 <a
                                     class="text-teal-900"
                                     href="https://docs.nmrxiv.org/docs/introduction/intro"

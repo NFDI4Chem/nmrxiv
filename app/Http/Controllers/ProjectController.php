@@ -43,15 +43,14 @@ class ProjectController extends Controller
         }
 
         $tab = $request->get('tab');
-
         if ($tab == 'info') {
             return Inertia::render('Public/Project/Show', [
                 'project' => (new ProjectResource($project))->lite(false, ['users', 'authors', 'citations']),
                 'tab' => $tab,
             ]);
-        } elseif ($tab == 'studies') {
+        } elseif ($tab == 'samples') {
             return Inertia::render('Public/Project/Studies', [
-                'project' => (new ProjectResource($project))->lite(false, []),
+                'project' => (new ProjectResource($project))->lite(false, ['studies']),
                 'tab' => $tab,
             ]);
         } elseif ($tab == 'files') {
@@ -108,7 +107,9 @@ class ProjectController extends Controller
 
     public function status(Request $request, Project $project)
     {
-        return response()->json(['status' => $project->status, 'logs' => $project->process_logs]);
+        if ($project) {
+            return response()->json(['status' => $project->status, 'logs' => $project->process_logs]);
+        }
     }
 
     public function show(Request $request, Project $project, GetLicense $getLicense)
@@ -281,14 +282,14 @@ class ProjectController extends Controller
         if ($project) {
             $enableProjectMode = $request->get('enableProjectMode');
             if ($enableProjectMode) {
-                $project->release_date = $request->get('releaseDate');
-                $project->status = 'queued';
-                $project->save();
-
                 $validation = $project->validation;
                 $validation->process();
                 $validation = $validation->fresh();
                 if ($validation['report']['project']['status']) {
+                    $project->release_date = $request->get('releaseDate');
+                    $project->status = 'queued';
+                    $project->save();
+
                     ProcessSubmission::dispatch($project);
 
                     return response()->json([
@@ -298,6 +299,7 @@ class ProjectController extends Controller
                 } else {
                     return response()->json([
                         'errors' => 'Validation failing. Please provide all the required data and try again. If the problem persists, please contact us.',
+                        'validation' => $validation,
                     ], 422);
                 }
             } else {

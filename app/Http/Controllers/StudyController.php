@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\License\GetLicense;
 use App\Actions\Study\CreateNewStudy;
 use App\Actions\Study\UpdateStudy;
+use App\Http\Resources\StudyResource;
 use App\Models\FileSystemObject;
 use App\Models\Molecule;
 use App\Models\NMRium;
@@ -26,6 +27,18 @@ use Maize\Markable\Models\Bookmark;
 
 class StudyController extends Controller
 {
+    public function publicStudiesView(Request $request)
+    {
+        // $datasets = Cache::rememberForever('datasets', function () {
+        $studies = StudyResource::collection(Study::with('datasets')->where([['is_public', true], ['is_archived', false]])->filter($request->only('search', 'sort', 'mode'))->paginate(12)->withQueryString());
+        // });
+
+        return Inertia::render('Public/Studies', [
+            'filters' => $request->all('search', 'sort', 'mode'),
+            'studies' => $studies,
+        ]);
+    }
+
     public function store(Request $request, CreateNewStudy $creator)
     {
         $study = $creator->create($request->all());

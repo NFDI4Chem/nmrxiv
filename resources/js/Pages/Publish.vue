@@ -30,7 +30,7 @@
             </div>
         </template>
         <div class="mb-10">
-            <div>
+            <div v-if="status == 'draft'">
                 <div v-if="!validationStatus" class="p-4">
                     <Validation
                         :project="project"
@@ -632,6 +632,52 @@
                     </div>
                 </div>
             </div>
+            <div
+                class="mt-24 mx-auto max-w-3xl transform overflow-hidden rounded-xl bg-white shadow-2xl ring-1 ring-black ring-opacity-5 transition-all"
+                v-else
+            >
+                <div class="py-16">
+                    <div class="text-center">
+                        <div
+                            class="m-3 relative clear-both border-dotted border-2 border-gray-300 rounded-lg"
+                        >
+                            <span
+                                class="inline-flex items-center px-4 py-2 font-semibold leading-6 text-sm rounded-md text-sky-500 bg-white transition ease-in-out duration-150 cursor-not-allowed"
+                                disabled=""
+                                ><h1
+                                    class="capitalize text-4xl font-extrabold text-gray-900 tracking-tight sm:text-5xl"
+                                >
+                                    {{ status }}
+                                </h1></span
+                            >
+                        </div>
+                        <Link
+                            type="button"
+                            :href="route('dashboard')"
+                            class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                        >
+                            Go to Dashboard
+                        </Link>
+                    </div>
+                </div>
+                <div class="w-full">
+                    <div
+                        class="flex flex-wrap items-center bg-gray-50 py-2.5 px-4 text-xs text-gray-700"
+                    >
+                        <b>Whats next?</b>
+                        <div>
+                            <p>
+                                Please allow some time to process your
+                                submission. You will recieve an email once your
+                                submission is processed. Upon processing will
+                                also receive an email with citation details and
+                                other helpful information to share your
+                                datasets.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </app-layout>
 </template>
@@ -744,6 +790,7 @@ export default {
             validationStatus: true,
             errors: null,
             projectSpecies: "",
+            status: "draft",
         };
     },
 
@@ -777,7 +824,10 @@ export default {
             });
             this.publishForm.project.tags = tags;
             this.license = this.project.license;
-
+            this.status =
+                this.project.status && this.project.status != ""
+                    ? this.project.status
+                    : "draft";
             this.publishForm.project.species = JSON.parse(this.project.species)
                 ? JSON.parse(this.project.species)
                 : [];
@@ -791,22 +841,24 @@ export default {
             });
         },
         updateProject() {
-            this.loadingStep = true;
-            axios
-                .put(route("dashboard.project.update", this.project.id), {
-                    name: this.publishForm.project.name,
-                    description: this.publishForm.project.description,
-                    tags: this.publishForm.project.tags,
-                    tags_array: this.publishForm.project.tags
-                        ? this.publishForm.project.tags.map((a) => a.text)
-                        : [],
-                    license_id: this.license ? this.license.id : null,
-                    species: this.publishForm.project.species,
-                    release_date: this.publishForm.releaseDate,
-                })
-                .then((res) => {
-                    console.log("success");
-                });
+            if (this.publishForm.enableProjectMode) {
+                this.loadingStep = true;
+                axios
+                    .put(route("dashboard.project.update", this.project.id), {
+                        name: this.publishForm.project.name,
+                        description: this.publishForm.project.description,
+                        tags: this.publishForm.project.tags,
+                        tags_array: this.publishForm.project.tags
+                            ? this.publishForm.project.tags.map((a) => a.text)
+                            : [],
+                        license_id: this.license ? this.license.id : null,
+                        species: this.publishForm.project.species,
+                        release_date: this.publishForm.releaseDate,
+                    })
+                    .then((res) => {
+                        console.log("success");
+                    });
+            }
         },
         updateSpecies(species) {
             if (species && species != "") {
@@ -879,10 +931,24 @@ export default {
                     })
                     .then((response) => {
                         this.status = response.data.project.status;
-                        this.trackProject();
+                        // this.trackProject();
                     });
             }
         },
+        // trackProject() {
+        //     axios
+        //         .get("/projects/status/" + this.project.id + "/queue")
+        //         .then((response) => {
+        //             this.status = response.data.status;
+        //             if (this.status != "complete") {
+        //                 setTimeout(() => this.trackProject(), 10000);
+        //             } else {
+        //                 return this.$inertia.visit(
+        //                     this.route("dashboard.projects", [this.project.id])
+        //                 );
+        //             }
+        //         });
+        // },
     },
     computed: {
         url() {

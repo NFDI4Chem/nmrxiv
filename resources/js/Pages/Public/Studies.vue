@@ -32,12 +32,12 @@
                         <div
                             class="mx-auto py-3 px-4 sm:flex sm:items-center sm:px-6 lg:px-8"
                         >
-                            <dataset-search
+                            <study-search
                                 v-model="form.search"
                                 class="mr-4 w-full"
                                 @reset="reset"
                             >
-                            </dataset-search>
+                            </study-search>
                         </div>
                     </div>
                 </section>
@@ -138,24 +138,21 @@
                 </div>
             </div>
 
-            <div v-if="datasets.meta.total > 0">
+            <div v-if="studies.meta.total > 0">
                 <div class="border-t mt-3 border-gray-100">
                     <h2 class="text-gray-600 text-md mt-4 font-bold">
-                        Results ({{ datasets.meta.total }})
+                        Results ({{ studies.meta.total }})
                     </h2>
                 </div>
                 <div v-if="filters.mode == 'grid'">
                     <div
                         class="mt-4 mx-auto max-w-md grid gap-8 sm:max-w-lg lg:grid-cols-4 lg:max-w-7xl"
                     >
-                        <span
-                            v-for="dataset in datasets.data"
-                            :key="dataset.id"
-                        >
-                            <dataset-card
+                        <span v-for="study in studies.data" :key="study.id">
+                            <study-card
                                 :mode="filters.mode"
-                                :dataset="dataset"
-                            ></dataset-card>
+                                :study="study"
+                            ></study-card>
                         </span>
                     </div>
                 </div>
@@ -167,23 +164,20 @@
                             role="list"
                             class="divide-y border rounded-md divide-gray-200"
                         >
-                            <span
-                                v-for="dataset in datasets.data"
-                                :key="dataset.id"
-                            >
-                                <dataset-card
+                            <span v-for="study in studies.data" :key="study.id">
+                                <study-card
                                     :mode="filters.mode ? filters.mode : 'grid'"
-                                    :dataset="dataset"
-                                ></dataset-card>
+                                    :study="study"
+                                ></study-card>
                             </span>
                         </ul>
                     </div>
                 </div>
                 <div
-                    v-if="datasets.meta.total > datasets.meta.per_page"
+                    v-if="studies.meta.total > studies.meta.per_page"
                     class="py-10"
                 >
-                    <Pagination :links="datasets.meta.links"></Pagination>
+                    <Pagination :links="studies.meta.links"></Pagination>
                 </div>
             </div>
             <div v-else>
@@ -206,7 +200,7 @@
                         />
                     </svg>
                     <h3 class="mt-2 text-sm font-medium text-gray-900">
-                        No datasets
+                        No studies
                     </h3>
                 </div>
             </div>
@@ -217,8 +211,8 @@
 <script>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import { Link } from "@inertiajs/vue3";
-import DatasetSearch from "@/Shared/DatasetSearch.vue";
-import DatasetCard from "@/Shared/DatasetCard.vue";
+import StudySearch from "@/Shared/StudySearch.vue";
+import StudyCard from "@/Shared/StudyCard.vue";
 import { ref } from "vue";
 import throttle from "lodash/throttle";
 import pickBy from "lodash/pickBy";
@@ -251,7 +245,7 @@ export default {
     components: {
         AppLayout,
         Link,
-        DatasetSearch,
+        StudySearch,
         Pagination,
         Dialog,
         DialogPanel,
@@ -272,10 +266,10 @@ export default {
         ChevronDownIcon,
         QueueListIcon,
         Squares2X2Icon,
-        DatasetCard,
+        StudyCard,
     },
     props: {
-        datasets: {
+        studies: {
             default: [],
             type: Object,
         },
