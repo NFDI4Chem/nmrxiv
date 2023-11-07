@@ -157,19 +157,18 @@
                     </div>
                 </div>
                 <div v-if="filters.mode == 'list'">
-                    <div
-                        class="mt-4 bg-white shadow overflow-hidden sm:rounded-md"
-                    >
-                        <ul
-                            role="list"
-                            class="divide-y border rounded-md divide-gray-200"
-                        >
-                            <span v-for="study in studies.data" :key="study.id">
+                    <div class="mt-4 bg-white overflow-hidden sm:rounded-md">
+                        <ul role="list" class="rounded-md">
+                            <div
+                                class="mb-3"
+                                v-for="study in studies.data"
+                                :key="study.id"
+                            >
                                 <StudyPublicCard
                                     :mode="filters.mode ? filters.mode : 'grid'"
                                     :study="study"
                                 ></StudyPublicCard>
-                            </span>
+                            </div>
                         </ul>
                     </div>
                 </div>

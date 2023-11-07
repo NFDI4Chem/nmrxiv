@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Actions\Project\AssignIdentifier;
+use App\Jobs\ArchiveProject;
 use App\Actions\Project\PublishProject;
 use App\Actions\Study\PublishStudy;
 use App\Models\FileSystemObject;
@@ -106,6 +107,8 @@ class ProcessSubmission implements ShouldQueue, ShouldBeUnique
                 if ($release_date->isToday()) {
                     $projectPublisher->publish($project);
                 }
+                
+                ArchiveProject::dispatch($project);
 
                 Notification::send($project->owner, new DraftProcessedNotification($project));
             }
