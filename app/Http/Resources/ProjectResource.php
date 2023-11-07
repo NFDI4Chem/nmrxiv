@@ -44,6 +44,7 @@ class ProjectResource extends JsonResource
             'tags' => $this->tags,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'download_url' => $this->download_url,
             'stats' => [
                 'likes' => $this->likesCount(),
             ],

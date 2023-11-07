@@ -13,13 +13,13 @@
                             class="bg-white rounded-t-md flex justify-center items-center"
                         >
                             <span>
-                                <Depictor
+                                <Depictor2D
                                     class="py-2"
-                                    :modelValue="
+                                    :molecule="
                                         study.molecules[0].CANONICAL_SMILES
                                     "
                                     :showDownload="false"
-                                ></Depictor>
+                                ></Depictor2D>
                             </span>
                         </div>
                     </li>
@@ -68,9 +68,40 @@
             </span> -->
         </div>
         <div class="flex-1 border-t bg-white p-3 flex flex-col justify-between">
-            <small v-if="study.identifier" class="text-gray-500"
-                >#{{ study.identifier }}</small
-            >
+            <div>
+                <small v-if="study.identifier" class="text-gray-500 float-left"
+                    >#{{ study.identifier }}</small
+                >
+                <div class="float-right">
+                    <div v-if="study.is_public" class="flex items-center mt-1">
+                        <svg
+                            class="h-3 w-3 mr-1 text-green-400 inline"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 64 64"
+                            width="512"
+                            height="512"
+                        >
+                            <g id="globe">
+                                <path
+                                    d="M53.85,47.85A27,27,0,0,1,24,57.8V56l3-3V49l4-4V42l4,4h5l2-2h8Z"
+                                />
+                                <path
+                                    d="M42,20.59v2.56L38.07,27H31l-5.36,5.26L31,37.51v5.06L27.44,39H22.86L16,32.11V24.2L11.8,20h-4A27,27,0,0,1,32,5a26.55,26.55,0,0,1,7.06.94L36,9H30v4l4,4h4.33Z"
+                                />
+                                <path
+                                    d="M32,60A28,28,0,1,1,60,32,28,28,0,0,1,32,60ZM32,6A26,26,0,1,0,58,32,26,26,0,0,0,32,6Z"
+                                />
+                            </g>
+                        </svg>
+
+                        <p class="text-xs text-gray-600">Public</p>
+                    </div>
+                    <div v-else class="flex items-center mt-1">
+                        <LockClosedIcon class="w-3 h-3 mr-1 text-teal-600" />
+                        <p class="text-xs text-gray-600">Private</p>
+                    </div>
+                </div>
+            </div>
             <Link :href="route('dashboard.studies', [study.id])">
                 <div
                     class="flex items-center font-bold truncate text-lg text-gray-600"
@@ -89,41 +120,7 @@
                     {{ study.name }}
                 </div>
                 <div class="pt-1">
-                    <div class="float-left">
-                        <div
-                            v-if="study.is_public"
-                            class="flex items-center mt-1"
-                        >
-                            <svg
-                                class="h-3 w-3 mr-1 text-green-400 inline"
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 64 64"
-                                width="512"
-                                height="512"
-                            >
-                                <g id="globe">
-                                    <path
-                                        d="M53.85,47.85A27,27,0,0,1,24,57.8V56l3-3V49l4-4V42l4,4h5l2-2h8Z"
-                                    />
-                                    <path
-                                        d="M42,20.59v2.56L38.07,27H31l-5.36,5.26L31,37.51v5.06L27.44,39H22.86L16,32.11V24.2L11.8,20h-4A27,27,0,0,1,32,5a26.55,26.55,0,0,1,7.06.94L36,9H30v4l4,4h4.33Z"
-                                    />
-                                    <path
-                                        d="M32,60A28,28,0,1,1,60,32,28,28,0,0,1,32,60ZM32,6A26,26,0,1,0,58,32,26,26,0,0,0,32,6Z"
-                                    />
-                                </g>
-                            </svg>
-
-                            <p class="text-xs text-gray-600">Public</p>
-                        </div>
-                        <div v-else class="flex items-center mt-1">
-                            <LockClosedIcon
-                                class="w-3 h-3 mr-1 text-teal-600"
-                            />
-                            <p class="text-xs text-gray-600">Private</p>
-                        </div>
-                    </div>
-                    <div class="float-right p-1 text-xs text-gray-600">
+                    <div class="text-xs text-gray-600">
                         <span class="text-gray-400">Last updated on</span>
                         {{ formatDate(study.updated_at) }}
                     </div>
@@ -139,7 +136,7 @@ import { PencilIcon } from "@heroicons/vue/24/solid";
 import { EnvelopeIcon } from "@heroicons/vue/24/solid";
 import { Link } from "@inertiajs/vue3";
 import { StarIcon } from "@heroicons/vue/24/solid";
-import Depictor from "@/Shared/Depictor.vue";
+import Depictor2D from "@/Shared/Depictor2D.vue";
 export default {
     components: {
         LockClosedIcon,
@@ -148,7 +145,7 @@ export default {
         PencilIcon,
         StarIcon,
         Link,
-        Depictor,
+        Depictor2D,
     },
     props: ["study"],
     setup() {},
