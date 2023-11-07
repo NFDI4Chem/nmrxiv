@@ -482,11 +482,13 @@ class DraftController extends Controller
 
     public function saveAnnotationsDetected($folder)
     {
-        $study = $folder->study;
+        if ($folder) {
+            $study = $folder->study;
 
-        if ($study) {
-            $study->has_nmredata = true;
-            $study->save();
+            if ($study) {
+                $study->has_nmredata = true;
+                $study->save();
+            }
         }
     }
 

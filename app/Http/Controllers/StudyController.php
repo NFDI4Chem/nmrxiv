@@ -185,14 +185,16 @@ class StudyController extends Controller
 
     public function nmriumInfo(Request $request, Study $study)
     {
+
+        // $version = $request->get('version');
+        // $spectra = $request->get('spectra');
+        // $molecules = $nmriumInfo['data']['molecules'];
+        // $molecularInfo = $molecules;
+
         if ($study) {
             $user = Auth::user();
             $data = $request->all();
-            // $version = $request->get('version');
-            // $spectra = $request->get('spectra');
             $nmriumInfo = $data;
-            // $molecules = $nmriumInfo['data']['molecules'];
-            // $molecularInfo = $molecules;
             $nmrium = $study->nmrium;
             if ($nmrium) {
                 $nmrium->nmrium_info = $nmriumInfo;
@@ -206,6 +208,42 @@ class StudyController extends Controller
                 $study->has_nmrium = true;
             }
             $study->save();
+
+            $_nmriumJSON = $nmriumInfo;
+            foreach ($study->datasets as $dataset) {
+                $fsObject = $dataset->fsObject;
+                $level = -($fsObject->level + 1);
+                echo $fsObject->path;
+                $path = implode('/', array_slice(explode('/', $fsObject->path), $level));
+                foreach ($nmriumInfo['data']['spectra'] as $spectra) {
+                    unset($_nmriumJSON['data']['spectra']);
+                    $files = $spectra['sourceSelector']['files'];
+                    $pathsMatch = true;
+                    if ($files) {
+                        foreach ($files as $file) {
+                            if (! str_contains($file, $path)) {
+                                $pathsMatch = false;
+                            }
+                        }
+                    }
+                    if ($pathsMatch) {
+                        $_nmriumJSON['data']['spectra'] = [$spectra];
+                        $_nmrium = $dataset->nmrium;
+                        if ($_nmrium) {
+                            $_nmrium->nmrium_info = $_nmriumJSON;
+                            $dataset->has_nmrium = true;
+                            $_nmrium->save();
+                        } else {
+                            $_nmrium = NMRium::create([
+                                'nmrium_info' => json_encode($_nmriumJSON),
+                            ]);
+                            $dataset->nmrium()->save($_nmrium);
+                            $dataset->has_nmrium = true;
+                        }
+                        $dataset->save();
+                    }
+                }
+            }
 
             return $study->fresh();
         }

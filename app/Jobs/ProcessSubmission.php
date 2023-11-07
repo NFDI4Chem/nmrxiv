@@ -151,6 +151,13 @@ class ProcessSubmission implements ShouldQueue, ShouldBeUnique
                         $study->process_logs = $process_logs;
                         $study->draft_id = null;
                         $study->project_id = null;
+
+                        foreach ($study->datasets as $dataset) {
+                            $dataset->draft_id = null;
+                            $dataset->project_id = null;
+                            $dataset->save();
+                        }
+
                         $study->status = 'complete';
                         $study->save();
                     }

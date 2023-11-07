@@ -149,10 +149,10 @@
                         class="mt-4 mx-auto max-w-md grid gap-8 sm:max-w-lg lg:grid-cols-4 lg:max-w-7xl"
                     >
                         <span v-for="study in studies.data" :key="study.id">
-                            <study-card
+                            <StudyPublicCard
                                 :mode="filters.mode"
                                 :study="study"
-                            ></study-card>
+                            ></StudyPublicCard>
                         </span>
                     </div>
                 </div>
@@ -165,10 +165,10 @@
                             class="divide-y border rounded-md divide-gray-200"
                         >
                             <span v-for="study in studies.data" :key="study.id">
-                                <study-card
+                                <StudyPublicCard
                                     :mode="filters.mode ? filters.mode : 'grid'"
                                     :study="study"
-                                ></study-card>
+                                ></StudyPublicCard>
                             </span>
                         </ul>
                     </div>
@@ -212,7 +212,7 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import { Link } from "@inertiajs/vue3";
 import StudySearch from "@/Shared/StudySearch.vue";
-import StudyCard from "@/Shared/StudyCard.vue";
+import StudyPublicCard from "@/Shared/StudyCardPublic.vue";
 import { ref } from "vue";
 import throttle from "lodash/throttle";
 import pickBy from "lodash/pickBy";
@@ -266,7 +266,7 @@ export default {
         ChevronDownIcon,
         QueueListIcon,
         Squares2X2Icon,
-        StudyCard,
+        StudyPublicCard,
     },
     props: {
         studies: {
