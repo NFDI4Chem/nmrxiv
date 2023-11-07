@@ -2654,6 +2654,7 @@ export default {
                 )
                 .then((response) => {
                     this.currentDraft = response.data;
+                    this.draftForm.name = this.currentDraft.name;
                 });
         },
         getTarget(id) {

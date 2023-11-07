@@ -669,9 +669,9 @@
                             <p>
                                 Please allow some time to process your
                                 submission. You will recieve an email once your
-                                submission is processed. Upon processing will
-                                also receive an email with citation details and
-                                other helpful information to share your
+                                submission is processed. Upon publishing you
+                                will also receive an email with citation details
+                                and other helpful information to share your
                                 datasets.
                             </p>
                         </div>
