@@ -293,14 +293,18 @@ class BiochemaController extends Controller
         $nmrium = $dataset->nmrium;
         if (! $nmrium) {
             $study = $dataset->study;
-            $studyNMRiumInfo = json_decode($study->nmrium->nmrium_info);
-            foreach ($studyNMRiumInfo->data->spectra as $spectra) {
+            $NMRiumInfo = json_decode($study->nmrium->nmrium_info);
+            foreach ($NMRiumInfo->data->spectra as $spectra) {
                 $fileSource = $spectra->sourceSelector->files[0];
                 $fileName = pathinfo($fileSource);
                 if ($fileName['basename'] == $dataset->fsObject->name) {
                     $info = $spectra->info;
                 }
             }
+        } else {
+            $NMRiumInfo = json_decode($nmrium->nmrium_info);
+            $spectra = $NMRiumInfo->data->spectra[0];
+            $info = $spectra->info;
         }
         $solvent = $info->solvent;
         $nucleus = $info->nucleus;

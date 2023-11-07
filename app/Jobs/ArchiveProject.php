@@ -2,15 +2,14 @@
 
 namespace App\Jobs;
 
-use App\Models\Project;
 use App\Models\FileSystemObject;
+use App\Models\Project;
 use Aws\S3\S3Client;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use ZipStream;
 
@@ -43,24 +42,24 @@ class ArchiveProject implements ShouldQueue
         $project = $this->project;
         if ($project) {
             $archiveDownloadURL = $project->download_url;
-            if($project->internal_status != 'processing' || $project->internal_status != 'completed'){
+            if ($project->internal_status != 'processing' || $project->internal_status != 'completed') {
                 $project->internal_status = 'processing';
                 $project->save();
-    
+
                 if ($archiveDownloadURL == null) {
                     $fsObject = $project->fsObject;
-    
-                    if(!$fsObject){
+
+                    if (! $fsObject) {
                         $fsObject = new FileSystemObject();
                         $fsObject->type = 'directory';
                         $fsObject->name = $project->slug;
                         $environment = env('APP_ENV', 'local');
                         $fsObject->path = $environment.'/'.$project->uuid;
                         $fsObject->key = $project->uuid;
-                        $fsObject->status = "present";
+                        $fsObject->status = 'present';
                         $fsObject->relative_url = '/'.$project->uuid;
                     }
-                    
+
                     if ($fsObject && $fsObject->status != 'missing') {
                         $path = $fsObject->path;
                         $s3Client = $this->storageClient();
@@ -86,19 +85,19 @@ class ArchiveProject implements ShouldQueue
                                 }
                             }
                         }
-    
+
                         $s3Client->registerStreamWrapper();
-    
+
                         $zipFilePath = $environment.'/archive/'.$project->uuid.'/'.$fsObject->name.'.zip';
-    
+
                         $archiveDestination = fopen('s3://'.$bucket.'/'.$zipFilePath, 'w');
-    
+
                         $zip = new ZipStream\ZipStream(
                             outputStream: $archiveDestination,
                             defaultEnableZeroHeader: true,
                             sendHttpHeaders: false,
                         );
-    
+
                         foreach ($s3keys as $key) {
                             $s3path = 's3://'.$bucket.'/'.$key;
                             if ($streamRead = fopen($s3path, 'r')) {
@@ -115,7 +114,7 @@ class ArchiveProject implements ShouldQueue
                         }
                         $zip->finish();
                         fclose($archiveDestination);
-    
+
                         Storage::setVisibility($zipFilePath, 'public');
                         $url = Storage::url($zipFilePath);
                         $project->download_url = $url;
@@ -127,7 +126,7 @@ class ArchiveProject implements ShouldQueue
                     $project->save();
                 }
             }
-      
+
         }
     }
 

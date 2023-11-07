@@ -2,12 +2,10 @@
 
 namespace App\Console\Commands;
 
+use App\Jobs\ArchiveProject;
+use App\Models\Project;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
-use App\Models\Project;
-use App\Models\Study;
-use App\Jobs\ArchiveProject;
-use App\Jobs\ArchiveStudy;
 
 class ArchiveData extends Command
 {
