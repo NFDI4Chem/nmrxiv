@@ -20,8 +20,8 @@
                                     <span v-if="currentStep && currentDraft">
                                         <p
                                             class="inline focus:outline-none focus:ring-0 focus:bg-gray-100 p-2 rounded-md"
-                                            @blur="updateDraft($event)"
                                             contenteditable
+                                            @blur="updateDraft($event)"
                                         >
                                             {{ currentDraft.name }}
                                         </p>
@@ -36,8 +36,8 @@
                                     <div v-if="showPrimer && currentDraft">
                                         <div class="float-left">
                                             <div
-                                                @change="hidePrimer()"
                                                 class="relative mt-2 flex items-start"
+                                                @change="hidePrimer()"
                                             >
                                                 <div
                                                     class="flex h-5 items-center"
@@ -75,7 +75,7 @@
                                         <span v-if="!currentStep">
                                             <Link
                                                 class="inline-flex items-center px-2.5 py-1 border border-gray-300 shadow-sm text-md font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                                                :href="this.returnUrl"
+                                                :href="returnUrl"
                                             >
                                                 Cancel
                                             </Link>
@@ -84,7 +84,7 @@
                                             <span v-if="currentStep.id == '01'">
                                                 <Link
                                                     class="mx-2 inline-flex items-center px-2.5 py-1 border border-gray-300 shadow-sm text-md font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                                                    :href="this.returnUrl"
+                                                    :href="returnUrl"
                                                 >
                                                     Cancel
                                                 </Link>
@@ -211,8 +211,8 @@
                 <div v-if="!loading">
                     <div class="mx-auto">
                         <div
-                            class="px-12"
                             v-if="drafts.length > 0 && !currentDraft"
+                            class="px-12"
                         >
                             <div class="my-8 mx-12 mx-auto max-w-none">
                                 <div
@@ -332,7 +332,7 @@
                             <div></div>
                         </div>
                         <div v-else>
-                            <div class="pt-6" v-if="showPrimer">
+                            <div v-if="showPrimer" class="pt-6">
                                 <div
                                     class="h-[calc(100vh-235px)] overflow-scroll"
                                 >
@@ -375,15 +375,15 @@
                                                     class="flex-shrink-0 w-64 h-[calc(100vh-135px)] overflow-y-hidden bg-white border-r border-gray-200 md:flex md:flex-col"
                                                 >
                                                     <div
-                                                        @click="
-                                                            showSamplesSummary
-                                                        "
                                                         :class="[
                                                             displaySamplesSummaryInfo
                                                                 ? 'bg-gray-900 text-white'
                                                                 : 'text-dark',
                                                             'cursor-pointer border-gray-200 px-4 py-3 border-b bg-gray-50 text-left text-sm font-medium text-gray-500 tracking-wider flex-shrink-0 border-b border-blue-gray-200',
                                                         ]"
+                                                        @click="
+                                                            showSamplesSummary
+                                                        "
                                                     >
                                                         <a> SUMMARY </a>
                                                     </div>
@@ -785,11 +785,11 @@
                                                                                 class="mt-5"
                                                                             >
                                                                                 <button
+                                                                                    type="button"
+                                                                                    class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                                                                                     @click="
                                                                                         autoImport
                                                                                     "
-                                                                                    type="button"
-                                                                                    class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                                                                                 >
                                                                                     Import
                                                                                     now
@@ -812,10 +812,10 @@
                                                                         "
                                                                     >
                                                                         <button
+                                                                            class="px-3 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:ring focus:ring-blue-200 active:text-gray-800 active:bg-gray-50 disabled:opacity-25 transition ml-2 float-right hover:bg-gray-200 hover:text-gray-900"
                                                                             @click="
                                                                                 fetchValidations
                                                                             "
-                                                                            class="px-3 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:ring focus:ring-blue-200 active:text-gray-800 active:bg-gray-50 disabled:opacity-25 transition ml-2 float-right hover:bg-gray-200 hover:text-gray-900"
                                                                         >
                                                                             <svg
                                                                                 xmlns="http://www.w3.org/2000/svg"
@@ -889,13 +889,13 @@
                                                                                     class="my-7"
                                                                                 >
                                                                                     <SpectraEditor
+                                                                                        ref="spectraEditorREF"
                                                                                         :project="
                                                                                             project
                                                                                         "
                                                                                         :study="
                                                                                             selectedStudy
                                                                                         "
-                                                                                        ref="spectraEditorREF"
                                                                                         @loading="
                                                                                             spectraLoading
                                                                                         "
@@ -982,12 +982,12 @@
                                                                                                 v-model="
                                                                                                     studyForm.description
                                                                                                 "
-                                                                                                @blur="
-                                                                                                    saveStudyDetails
-                                                                                                "
                                                                                                 name="study-description"
                                                                                                 rows="3"
                                                                                                 class="block w-full shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm border border-gray-300 rounded-md"
+                                                                                                @blur="
+                                                                                                    saveStudyDetails
+                                                                                                "
                                                                                             ></textarea>
                                                                                             <jet-input-error
                                                                                                 :message="
@@ -1067,25 +1067,25 @@
                                                                                                 :value="
                                                                                                     studySpecies
                                                                                                 "
+                                                                                                placeholder="Search species"
                                                                                                 @change="
                                                                                                     studySpecies =
                                                                                                         $event
                                                                                                             .detail[0]
                                                                                                 "
-                                                                                                placeholder="Search species"
                                                                                             ></ontology-autocomplete>
                                                                                         </div>
                                                                                         <div
                                                                                             class="mt-5 sm:ml-6 sm:mt-0 sm:flex sm:flex-shrink-0 sm:items-center"
                                                                                         >
                                                                                             <button
+                                                                                                type="button"
+                                                                                                class="inline-flex items-center gap-x-1.5 py-3 bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
                                                                                                 @click="
                                                                                                     updateSpecies(
                                                                                                         studySpecies
                                                                                                     )
                                                                                                 "
-                                                                                                type="button"
-                                                                                                class="inline-flex items-center gap-x-1.5 py-3 bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
                                                                                             >
                                                                                                 <svg
                                                                                                     class="-ml-0.5 h-5 w-5 text-gray-400"
@@ -1410,10 +1410,10 @@
                                                                                                                         >
                                                                                                                             <Depictor
                                                                                                                                 class="py-4 -px-4"
-                                                                                                                                :modelValue="
+                                                                                                                                :model-value="
                                                                                                                                     molecule.CANONICAL_SMILES
                                                                                                                                 "
-                                                                                                                                :showDownload="
+                                                                                                                                :show-download="
                                                                                                                                     false
                                                                                                                                 "
                                                                                                                             ></Depictor>
@@ -1550,8 +1550,7 @@
                                                                                             </button>
                                                                                             <jet-input-error
                                                                                                 :message="
-                                                                                                    this
-                                                                                                        .errorMessage
+                                                                                                    errorMessage
                                                                                                 "
                                                                                                 class="mt-2"
                                                                                             />
@@ -2102,12 +2101,12 @@
                                                                     class="flex items-top"
                                                                 >
                                                                     <input
-                                                                        type="checkbox"
-                                                                        class="rounded mt-1 border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                                                                         id="conditions"
                                                                         v-model="
                                                                             publishForm.conditions
                                                                         "
+                                                                        type="checkbox"
+                                                                        class="rounded mt-1 border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                                                                         name="conditions"
                                                                     />
                                                                     <div
@@ -2147,12 +2146,12 @@
                                                                     class="flex items-center"
                                                                 >
                                                                     <input
-                                                                        type="checkbox"
-                                                                        class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                                                                         id="terms"
                                                                         v-model="
                                                                             publishForm.terms
                                                                         "
+                                                                        type="checkbox"
+                                                                        class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                                                                         name="terms"
                                                                     />
                                                                     <div
@@ -2218,11 +2217,11 @@
                                                                     : 'bg-green-600 hover:bg-green-700',
                                                                 'inline-flex w-full justify-center rounded-md border border-transparent px-4 py-2 text-base font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 sm:w-auto sm:text-sm',
                                                             ]"
-                                                            @click="publish"
                                                             :disabled="
                                                                 !publishForm.terms &&
                                                                 !publishForm.conditions
                                                             "
+                                                            @click="publish"
                                                         >
                                                             Publish
                                                         </button>
@@ -2341,7 +2340,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="h-[calc(100vh-260px)] text-center py-12" v-else>
+                <div v-else class="h-[calc(100vh-260px)] text-center py-12">
                     <svg
                         class="animate-spin -ml-1 mr-3 h-5 w-5 text-dark flex-inline inline"
                         xmlns="http://www.w3.org/2000/svg"
@@ -2452,6 +2451,15 @@ export default {
     },
     props: ["draft_id"],
     setup() {},
+
+    setup() {
+        const manageAuthorElement = ref(null);
+        const manageCitationElement = ref(null);
+        return {
+            manageAuthorElement,
+            manageCitationElement,
+        };
+    },
 
     data() {
         return {
@@ -2565,14 +2573,55 @@ export default {
             studiesToImport: [],
         };
     },
-
-    setup() {
-        const manageAuthorElement = ref(null);
-        const manageCitationElement = ref(null);
-        return {
-            manageAuthorElement,
-            manageCitationElement,
-        };
+    computed: {
+        importPendingSamples() {
+            return this.studiesToImport.filter((f) => f.status == false);
+        },
+        url() {
+            return String(this.$page.props.url)
+                ? String(this.$page.props.url)
+                : "https://dev.nmrxiv.org";
+        },
+        getMax() {
+            if (this.selectedStudy) {
+                let totalCount = 0;
+                this.selectedStudy.sample.molecules.forEach((mol) => {
+                    totalCount += parseInt(mol.pivot.percentage_composition);
+                });
+                return 100 - totalCount;
+            } else {
+                return 100;
+            }
+        },
+        primed() {
+            return this.$page.props.user.primed;
+        },
+        currentStep() {
+            return this.steps.filter((s) => s.status == "current")[0];
+        },
+        currentTab() {
+            return this.tabs.find((t) => t.current);
+        },
+        mailFromAddress() {
+            return String(this.$page.props.mailFromAddress);
+        },
+        mailTo() {
+            return "mailto:" + String(this.$page.props.mailFromAddress);
+        },
+        spectraCount() {
+            let i = 0;
+            this.studies.forEach((s) => {
+                i = i + s.datasets.length;
+            });
+            return i;
+        },
+        moleculesCount() {
+            let i = 0;
+            this.studies.forEach((s) => {
+                i = i + s.sample.molecules.length;
+            });
+            return i;
+        },
     },
 
     mounted() {
@@ -3058,6 +3107,7 @@ export default {
             }
         },
         selectDraft(draft) {
+            // if(draft){
             this.currentDraft = draft;
             this.draftForm.name = this.currentDraft.name;
             this.draftForm.description = this.currentDraft.description;
@@ -3074,6 +3124,10 @@ export default {
                 this.draftForm.tags = tags;
             }
             this.selectStep(1);
+            // }else{
+            //     alert("Requested draft dont exist. Redirecting to drafts");
+            //     window.location = "/upload";
+            // }
         },
         updateLoadingStatus(status) {
             console.log(status);
@@ -3343,56 +3397,6 @@ export default {
                     this.spectraLoadingStatus = false;
                 });
             }
-        },
-    },
-    computed: {
-        importPendingSamples() {
-            return this.studiesToImport.filter((f) => f.status == false);
-        },
-        url() {
-            return String(this.$page.props.url)
-                ? String(this.$page.props.url)
-                : "https://dev.nmrxiv.org";
-        },
-        getMax() {
-            if (this.selectedStudy) {
-                let totalCount = 0;
-                this.selectedStudy.sample.molecules.forEach((mol) => {
-                    totalCount += parseInt(mol.pivot.percentage_composition);
-                });
-                return 100 - totalCount;
-            } else {
-                return 100;
-            }
-        },
-        primed() {
-            return this.$page.props.user.primed;
-        },
-        currentStep() {
-            return this.steps.filter((s) => s.status == "current")[0];
-        },
-        currentTab() {
-            return this.tabs.find((t) => t.current);
-        },
-        mailFromAddress() {
-            return String(this.$page.props.mailFromAddress);
-        },
-        mailTo() {
-            return "mailto:" + String(this.$page.props.mailFromAddress);
-        },
-        spectraCount() {
-            let i = 0;
-            this.studies.forEach((s) => {
-                i = i + s.datasets.length;
-            });
-            return i;
-        },
-        moleculesCount() {
-            let i = 0;
-            this.studies.forEach((s) => {
-                i = i + s.sample.molecules.length;
-            });
-            return i;
         },
     },
 };

@@ -72,8 +72,8 @@
                                                 "
                                                 type="text"
                                                 name="project-name"
-                                                @blur="updateProject"
                                                 class="block w-full shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm border-gray-300 rounded-md"
+                                                @blur="updateProject"
                                             />
                                         </div>
                                         <jet-input-error
@@ -108,8 +108,8 @@
                                                 name="description"
                                                 placeholder="Describe this project"
                                                 rows="3"
-                                                @blur="updateProject"
                                                 class="block w-full shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm border border-gray-300 rounded-md"
+                                                @blur="updateProject"
                                             ></textarea>
                                         </div>
                                         <jet-input-error
@@ -170,24 +170,24 @@
                                                         class="rounded-md"
                                                         format="text"
                                                         :value="projectSpecies"
+                                                        placeholder="Search species"
                                                         @change="
                                                             projectSpecies =
                                                                 $event.detail[0]
                                                         "
-                                                        placeholder="Search species"
                                                     ></ontology-autocomplete>
                                                 </div>
                                                 <div
                                                     class="mt-5 sm:ml-6 sm:mt-0 sm:flex sm:flex-shrink-0 sm:items-center"
                                                 >
                                                     <button
+                                                        type="button"
+                                                        class="inline-flex items-center gap-x-1.5 py-3 bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
                                                         @click="
                                                             updateSpecies(
                                                                 projectSpecies
                                                             )
                                                         "
-                                                        type="button"
-                                                        class="inline-flex items-center gap-x-1.5 py-3 bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
                                                     >
                                                         <svg
                                                             class="-ml-0.5 h-5 w-5 text-gray-400"
@@ -457,11 +457,11 @@
                                                 </span>
                                                 <select-rich
                                                     v-model:selected="license"
+                                                    label="License"
+                                                    :items="licenses"
                                                     @update:selected="
                                                         updateProject
                                                     "
-                                                    label="License"
-                                                    :items="licenses"
                                                 />
                                             </div>
                                         </div>
@@ -477,10 +477,10 @@
                                     <div class="ml-2">
                                         <div class="flex items-top">
                                             <input
-                                                type="checkbox"
-                                                class="rounded mt-1 border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                                                 id="conditions"
                                                 v-model="publishForm.conditions"
+                                                type="checkbox"
+                                                class="rounded mt-1 border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                                                 name="conditions"
                                             />
                                             <div class="ml-2 text-sm">
@@ -498,10 +498,10 @@
                                     <div class="ml-2">
                                         <div class="flex items-center">
                                             <input
-                                                type="checkbox"
-                                                class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                                                 id="terms"
                                                 v-model="publishForm.terms"
+                                                type="checkbox"
+                                                class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                                                 name="terms"
                                             />
                                             <div class="ml-2 text-sm">
@@ -541,11 +541,11 @@
                                             : 'bg-green-600 hover:bg-green-700',
                                         'inline-flex w-full justify-center rounded-md border border-transparent px-4 py-2 text-base font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 sm:w-auto sm:text-sm',
                                     ]"
-                                    @click="publish"
                                     :disabled="
                                         !publishForm.terms &&
                                         !publishForm.conditions
                                     "
+                                    @click="publish"
                                 >
                                     Publish
                                 </button>
@@ -633,8 +633,8 @@
                 </div>
             </div>
             <div
-                class="mt-24 mx-auto max-w-3xl transform overflow-hidden rounded-xl bg-white shadow-2xl ring-1 ring-black ring-opacity-5 transition-all"
                 v-else
+                class="mt-24 mx-auto max-w-3xl transform overflow-hidden rounded-xl bg-white shadow-2xl ring-1 ring-black ring-opacity-5 transition-all"
             >
                 <div class="py-16">
                     <div class="text-center">
@@ -765,6 +765,15 @@ export default {
     },
     props: ["user", "team", "project", "validation", "teamRole", "draft"],
 
+    setup() {
+        const manageAuthorElement = ref(null);
+        const manageCitationElement = ref(null);
+        return {
+            manageAuthorElement,
+            manageCitationElement,
+        };
+    },
+
     data() {
         return {
             publishForm: this.$inertia.form({
@@ -793,14 +802,27 @@ export default {
             status: "draft",
         };
     },
-
-    setup() {
-        const manageAuthorElement = ref(null);
-        const manageCitationElement = ref(null);
-        return {
-            manageAuthorElement,
-            manageCitationElement,
-        };
+    computed: {
+        url() {
+            return String(this.$page.props.url);
+        },
+        getMax() {
+            if (this.selectedStudy) {
+                let totalCount = 0;
+                this.selectedStudy.sample.molecules.forEach((mol) => {
+                    totalCount += parseInt(mol.pivot.percentage_composition);
+                });
+                return 100 - totalCount;
+            } else {
+                return 100;
+            }
+        },
+        primed() {
+            return this.$page.props.user.primed;
+        },
+        currentTab() {
+            return this.tabs.find((t) => t.current);
+        },
     },
 
     mounted() {
@@ -949,28 +971,6 @@ export default {
         //             }
         //         });
         // },
-    },
-    computed: {
-        url() {
-            return String(this.$page.props.url);
-        },
-        getMax() {
-            if (this.selectedStudy) {
-                let totalCount = 0;
-                this.selectedStudy.sample.molecules.forEach((mol) => {
-                    totalCount += parseInt(mol.pivot.percentage_composition);
-                });
-                return 100 - totalCount;
-            } else {
-                return 100;
-            }
-        },
-        primed() {
-            return this.$page.props.user.primed;
-        },
-        currentTab() {
-            return this.tabs.find((t) => t.current);
-        },
     },
 };
 </script>

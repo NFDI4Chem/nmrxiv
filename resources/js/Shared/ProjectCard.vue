@@ -76,9 +76,9 @@
                                 </p>
                                 <div class="mt-1 h-14 overflow-hidden">
                                     <span
-                                        class="mt-1 inline-flex items-center rounded-full bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10"
                                         v-for="tag in project.tags"
                                         :key="tag.id"
+                                        class="mt-1 inline-flex items-center rounded-full bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10"
                                     >
                                         {{ tag.name["en"] }}
                                     </span>
@@ -139,6 +139,7 @@
                                     >
                                         <div>
                                             <MenuItem
+                                                v-if="project.download_url"
                                                 v-slot="{ active }"
                                                 class="border-b"
                                             >
@@ -282,6 +283,7 @@
                                     {{ project.license.title }}
                                 </p>
                                 <p
+                                    v-if="project.download_url"
                                     class="flex items-center text-sm text-gray-500 sm:mt-0 sm:ml-2"
                                 >
                                     <a

@@ -142,11 +142,11 @@
                                     <div v-if="uploadBatchErrors.length > 0">
                                         -
                                         <a
+                                            class="text-red-700 cursor-pointer"
                                             @click="
                                                 showErrorBatchLogs =
                                                     !showErrorBatchLogs
                                             "
-                                            class="text-red-700 cursor-pointer"
                                             >View logs</a
                                         >
                                     </div>
@@ -156,11 +156,11 @@
                                     class="mt-2 block text-sm font-medium text-gray-900"
                                 >
                                     <div
-                                        class="rounded-md"
                                         v-for="(
                                             error, $index
                                         ) in uploadBatchErrors"
                                         :key="$index"
+                                        class="rounded-md"
                                         v-html="error"
                                     ></div>
                                 </div>
@@ -340,7 +340,10 @@
                     >
                         <div class="py-2 mb-2 block border-b pb-4">
                             <p class="font-bold text-xl">
-                                {{ $page.props.selectedFileSystemObject.name }}
+                                {{
+                                    $page.props.selectedFileSystemObject
+                                        .relative_url
+                                }}
                                 <a
                                     v-if="
                                         $page.props.selectedFileSystemObject
@@ -387,16 +390,36 @@
                                                 aria-hidden="true"
                                             />
                                         </span>
+                                        <span
+                                            v-if="file.status == 'missing'"
+                                            class="absolute right-0 top-0 pr-4 pt-4 text-sm font-medium text-gray-500 pointer-events-none"
+                                        >
+                                            <div
+                                                class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10"
+                                            >
+                                                <svg
+                                                    class="h-6 w-6 text-red-600"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                    stroke-width="1.5"
+                                                    stroke="currentColor"
+                                                    aria-hidden="true"
+                                                >
+                                                    <path
+                                                        stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                        d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
+                                                    ></path>
+                                                </svg>
+                                            </div>
+                                        </span>
                                     </div>
                                     <p
                                         class="mt-2 px-2 py-1 block text-sm font-medium truncate text-gray-900 pointer-events-none"
                                     >
-                                        {{ file.name }}
-                                    </p>
-                                    <p
-                                        class="block text-sm font-medium text-gray-500 pointer-events-none"
-                                    >
-                                        {{ file.size }}
+                                        <span class="float-left">
+                                            {{ file.name }}
+                                        </span>
                                     </p>
                                 </div>
                             </li>
@@ -408,10 +431,13 @@
                             class="py-2 mb-2 block border-b pb-4"
                         >
                             <p class="font-bold text-xl">
-                                {{ $page.props.selectedFileSystemObject.name }}
+                                {{
+                                    $page.props.selectedFileSystemObject
+                                        .relative_url
+                                }}
                                 <a
-                                    class="ml-4 cursor-pointer relative inline-flex items-center px-4 py-1 rounded-full border border-gray-300 bg-white text-sm font-black text-dark hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 float-right"
                                     v-if="!readonly"
+                                    class="ml-4 cursor-pointer relative inline-flex items-center px-4 py-1 rounded-full border border-gray-300 bg-white text-sm font-black text-dark hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 float-right"
                                     @click="confirmFSODeletion"
                                 >
                                     <TrashIcon
@@ -506,7 +532,7 @@
 
         <template #content>
             Are you sure you would like to delete
-            {{ this.$page.props.selectedFileSystemObject.name }}?
+            {{ $page.props.selectedFileSystemObject.name }}?
         </template>
 
         <template #footer>

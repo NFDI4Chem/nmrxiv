@@ -17,8 +17,8 @@
                         <div class="float-right">
                             <div class="flex-0.5 self-center">
                                 <Menu
-                                    as="div"
                                     v-if="selectedDataset && study.is_public"
+                                    as="div"
                                     class="relative text-left"
                                 >
                                     <div>
@@ -184,17 +184,17 @@
                         <div v-if="selectedDataset" class="mb-7">
                             <SpectraEditor
                                 v-if="canUpdateStudy"
+                                ref="spectraEditorREF"
                                 :dataset="selectedDataset"
                                 :project="project"
                                 :study="study"
-                                ref="spectraEditorREF"
                             ></SpectraEditor>
                             <SpectraViewer
                                 v-else
+                                ref="spectraViewerREF"
                                 :dataset="selectedDataset"
                                 :project="project"
                                 :study="study"
-                                ref="spectraViewerREF"
                             ></SpectraViewer>
                         </div>
                         <div class="pt-3">

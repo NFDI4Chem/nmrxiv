@@ -5,7 +5,6 @@ namespace App\Jobs;
 use App\Models\Project;
 use Aws\S3\S3Client;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
@@ -14,7 +13,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use ZipStream;
 
-class ArchiveStudy implements ShouldBeUnique, ShouldQueue
+class ArchiveStudy implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 

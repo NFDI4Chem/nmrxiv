@@ -93,8 +93,8 @@
                                     Title
                                 </p>
                                 <a
-                                    target="_blank"
                                     v-if="!getStatus(validation.project.title)"
+                                    target="_blank"
                                     :href="
                                         route(
                                             'dashboard.projects',
@@ -118,17 +118,17 @@
                                     Description
                                 </p>
                                 <a
+                                    v-if="
+                                        !getStatus(
+                                            validation.project.description
+                                        )
+                                    "
                                     target="_blank"
                                     :href="
                                         route(
                                             'dashboard.projects',
                                             project.id
                                         ) + '?edit=description'
-                                    "
-                                    v-if="
-                                        !getStatus(
-                                            validation.project.description
-                                        )
                                     "
                                     class="cursor-pointer bg-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
                                 >
@@ -147,15 +147,15 @@
                                     Keywords
                                 </p>
                                 <a
+                                    v-if="
+                                        !getStatus(validation.project.keywords)
+                                    "
                                     target="_blank"
                                     :href="
                                         route(
                                             'dashboard.projects',
                                             project.id
                                         ) + '?edit=keywords'
-                                    "
-                                    v-if="
-                                        !getStatus(validation.project.keywords)
                                     "
                                     class="cursor-pointer bg-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
                                 >
@@ -174,15 +174,15 @@
                                     Citations
                                 </p>
                                 <a
+                                    v-if="
+                                        !getStatus(validation.project.citations)
+                                    "
                                     target="_blank"
                                     :href="
                                         route(
                                             'dashboard.projects',
                                             project.id
                                         ) + '?edit=citation'
-                                    "
-                                    v-if="
-                                        !getStatus(validation.project.citations)
                                     "
                                     class="cursor-pointer bg-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
                                 >
@@ -201,15 +201,15 @@
                                     Authors
                                 </p>
                                 <a
+                                    v-if="
+                                        !getStatus(validation.project.authors)
+                                    "
                                     target="_blank"
                                     :href="
                                         route(
                                             'dashboard.projects',
                                             project.id
                                         ) + '?edit=authors'
-                                    "
-                                    v-if="
-                                        !getStatus(validation.project.authors)
                                     "
                                     class="cursor-pointer bg-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
                                 >
@@ -228,15 +228,15 @@
                                     License
                                 </p>
                                 <a
+                                    v-if="
+                                        !getStatus(validation.project.license)
+                                    "
                                     target="_blank"
                                     :href="
                                         route(
                                             'dashboard.projects',
                                             project.id
                                         ) + '?edit=license'
-                                    "
-                                    v-if="
-                                        !getStatus(validation.project.license)
                                     "
                                     class="cursor-pointer bg-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
                                 >
@@ -255,6 +255,7 @@
                                     Project profile image
                                 </p>
                                 <a
+                                    v-if="!getStatus(validation.project.image)"
                                     target="_blank"
                                     :href="
                                         route(
@@ -262,7 +263,6 @@
                                             project.id
                                         ) + '?edit=profile_image'
                                     "
-                                    v-if="!getStatus(validation.project.image)"
                                     class="cursor-pointer bg-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
                                 >
                                     Edit
@@ -430,13 +430,13 @@
                                                                 study.molecules
                                                             )
                                                         "
+                                                        class="cursor-pointer bg-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
                                                         @click="
                                                             update(
                                                                 study,
                                                                 'structure'
                                                             )
                                                         "
-                                                        class="cursor-pointer bg-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
                                                     >
                                                         Edit
                                                     </a>
@@ -451,9 +451,9 @@
                                                     </p>
                                                 </div>
                                                 <div
-                                                    class="mb-2"
                                                     v-for="dataset in study.datasets"
                                                     :key="dataset.id"
+                                                    class="mb-2"
                                                 >
                                                     <Disclosure
                                                         v-slot="{ open }"
@@ -541,12 +541,12 @@
                                                                     </small>
                                                                 </p>
                                                                 <a
-                                                                    target="_blank"
                                                                     v-if="
                                                                         !getStatus(
                                                                             dataset.nmrium_info
                                                                         )
                                                                     "
+                                                                    target="_blank"
                                                                     :href="
                                                                         route(
                                                                             'dashboard.study.datasets',

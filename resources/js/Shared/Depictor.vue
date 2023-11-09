@@ -5,12 +5,12 @@
                 <label for="tabs" class="sr-only">Select a tab</label>
                 <select
                     id="tabs"
-                    name="tabs"
                     v-model="depictionSelection"
+                    name="tabs"
                     class="block w-full rounded-md border-gray-300 focus:border-secondary-dark focus:ring-secondary-dark"
                     @change="selectedTab = depictionSelection"
                 >
-                    <option :value="tab" v-for="tab in tabs" :key="tab">
+                    <option v-for="tab in tabs" :key="tab" :value="tab">
                         {{ tab }}
                     </option>
                 </select>
@@ -18,20 +18,20 @@
             <div class="hidden sm:block">
                 <nav class="flex space-x-2 pl-3" aria-label="Tabs">
                     <div
-                        @click="selectedTab = tab"
                         v-for="tab in tabs"
                         :key="tab"
                         :class="[
                             selectedTab == tab ? 'bg-gray-500 text-white' : '',
                             'border hover:cursor-pointer text-gray-500 hover:text-gray-700 rounded-md px-3 py-2 text-sm font-medium',
                         ]"
+                        @click="selectedTab = tab"
                     >
                         {{ tab }}
                     </div>
                     <div
-                        @click="loadStructureEditor('structureEditor')"
                         v-if="!readonly"
                         class="hover:cursor-pointer text-gray-500 hover:text-gray-700 rounded-md px-3 py-2 text-sm font-medium"
+                        @click="loadStructureEditor('structureEditor')"
                     >
                         edit
                     </div>
@@ -40,9 +40,9 @@
         </div>
         <div v-if="selectedTab == '2D'">
             <Depictor2D
-                :CIP="CIP"
+                :c-i-p="CIP"
                 :molecule="modelValue"
-                :showDownload="showDownload"
+                :show-download="showDownload"
                 :identifier="identifier"
                 :height="height"
                 :width="width"
@@ -51,14 +51,14 @@
         <div v-if="selectedTab == '3D'">
             <Depictor3D
                 :molecule="modelValue"
-                :showDownload="showDownload"
+                :show-download="showDownload"
                 :identifier="identifier"
                 :height="height"
                 :width="width"
             ></Depictor3D>
         </div>
     </div>
-    <div class="mb-2" v-else>
+    <div v-else class="mb-2">
         <div
             id="structureEditor"
             class="w-full border rounded-md"
@@ -66,8 +66,8 @@
         />
         <br />
         <a
-            @click="save"
             class="border hover:cursor-pointer text-gray-500 hover:text-gray-700 rounded-md px-3 py-2 text-sm font-medium"
+            @click="save"
             >SAVE</a
         >
     </div>

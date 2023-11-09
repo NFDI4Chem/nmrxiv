@@ -57,8 +57,9 @@ class SanitizeProjects extends Command
             ['draft_id', null],
         ])->get();
 
-        return DB::transaction(function () use ($projects) {
-            foreach ($projects as $project) {
+        foreach ($projects as $project) {
+            return DB::transaction(function () use ($project) {
+
                 $user_id = $project->owner->id;
                 $team_id = $project->team_id;
                 $id = Str::uuid();
@@ -107,8 +108,9 @@ class SanitizeProjects extends Command
                         $dataset->save();
                     }
                 }
-            }
-        });
+            });
+
+        }
     }
 
     public function cleanDrafts()
@@ -307,10 +309,20 @@ class SanitizeProjects extends Command
 
     public function updateFilesStatus()
     {
-        return DB::transaction(function () {
-            $fsObjects = FileSystemObject::all();
+        $drafts = Draft::where('is_deleted', true)->get();
+        foreach ($drafts as $draft) {
+            echo $draft->id;
+            echo "\r\n";
+            echo 'Deleting associated files';
+            FileSystemObject::where('draft_id', $draft->id)->delete();
+            echo 'Deleting draft';
+            echo "\r\n";
+            Draft::where('id', $draft->id)->delete();
+        }
 
-            foreach ($fsObjects as $fsObject) {
+        $fsObjects = FileSystemObject::whereNull('status')->get();
+        foreach ($fsObjects as $fsObject) {
+            DB::transaction(function () use ($fsObject) {
                 if ($fsObject->path) {
                     $exists = Storage::disk(env('FILESYSTEM_DRIVER'))->exists($fsObject->path);
                     if (! $exists) {
@@ -320,8 +332,8 @@ class SanitizeProjects extends Command
                     }
                     $fsObject->save();
                 }
-            }
-        });
+            });
+        }
     }
 
     public function updateFilePaths()

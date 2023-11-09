@@ -430,8 +430,7 @@
                                                         </button>
                                                         <jet-input-error
                                                             :message="
-                                                                this
-                                                                    .errorMessage
+                                                                errorMessage
                                                             "
                                                             class="mt-2"
                                                         />

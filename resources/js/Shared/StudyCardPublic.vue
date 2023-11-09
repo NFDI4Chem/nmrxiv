@@ -10,15 +10,20 @@
                         class="col-span-1 divide-y divide-gray-200 cursor-pointer"
                     >
                         <div
-                            class="bg-white rounded-t-md flex justify-center items-center"
+                            class="h-64 bg-white rounded-t-md flex justify-center items-center"
                         >
-                            <span>
+                            <span
+                                v-if="
+                                    study.molecules &&
+                                    study.molecules.length > 0
+                                "
+                            >
                                 <Depictor2D
                                     class="py-2"
                                     :molecule="
                                         study.molecules[0].CANONICAL_SMILES
                                     "
-                                    :showDownload="false"
+                                    :show-download="false"
                                 ></Depictor2D>
                             </span>
                         </div>

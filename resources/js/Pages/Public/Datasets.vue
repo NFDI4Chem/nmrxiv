@@ -81,7 +81,6 @@
                                         v-slot="{ active }"
                                     >
                                         <a
-                                            @click="form.sort = option.value"
                                             :class="[
                                                 option.current
                                                     ? 'font-medium text-gray-900'
@@ -89,6 +88,7 @@
                                                 active ? 'bg-gray-100' : '',
                                                 'block px-4 py-2 text-sm cursor-pointer',
                                             ]"
+                                            @click="form.sort = option.value"
                                         >
                                             {{ option.name }}
                                         </a>
@@ -102,7 +102,6 @@
                             class="relative z-0 inline-flex shadow-sm rounded-md"
                         >
                             <button
-                                @click="form.mode = 'list'"
                                 type="button"
                                 :class="[
                                     filters.mode == 'list'
@@ -110,6 +109,7 @@
                                         : '',
                                     'relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50',
                                 ]"
+                                @click="form.mode = 'list'"
                             >
                                 <span class="sr-only">List</span>
                                 <QueueListIcon
@@ -118,7 +118,6 @@
                                 />
                             </button>
                             <button
-                                @click="form.mode = 'grid'"
                                 type="button"
                                 :class="[
                                     filters.mode == 'grid'
@@ -126,6 +125,7 @@
                                         : '',
                                     '-ml-px relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50',
                                 ]"
+                                @click="form.mode = 'grid'"
                             >
                                 <span class="sr-only">Grid</span>
                                 <Squares2X2Icon
@@ -288,19 +288,6 @@ export default {
             type: Object,
         },
     },
-    mounted() {
-        if (this.filters) {
-            if (this.filters.search == null) {
-                this.filters.search = "";
-            }
-            if (this.filters.mode == null) {
-                this.filters.mode = "grid";
-            }
-            if (this.filters.sort == null) {
-                this.filters.sort = "newest";
-            }
-        }
-    },
     data() {
         return {
             sortOptions: [
@@ -314,6 +301,19 @@ export default {
                 mode: "grid",
             },
         };
+    },
+    mounted() {
+        if (this.filters) {
+            if (this.filters.search == null) {
+                this.filters.search = "";
+            }
+            if (this.filters.mode == null) {
+                this.filters.mode = "grid";
+            }
+            if (this.filters.sort == null) {
+                this.filters.sort = "newest";
+            }
+        }
     },
     watch: {
         form: {

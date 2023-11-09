@@ -290,15 +290,18 @@ class BiochemaController extends Controller
      */
     public function getNMRiumInfo($dataset)
     {
+        $info = null;
         $nmrium = $dataset->nmrium;
         if (! $nmrium) {
             $study = $dataset->study;
-            $NMRiumInfo = json_decode($study->nmrium->nmrium_info);
-            foreach ($NMRiumInfo->data->spectra as $spectra) {
-                $fileSource = $spectra->sourceSelector->files[0];
-                $fileName = pathinfo($fileSource);
-                if ($fileName['basename'] == $dataset->fsObject->name) {
-                    $info = $spectra->info;
+            if ($study->nmrium) {
+                $NMRiumInfo = json_decode($study->nmrium->nmrium_info);
+                foreach ($NMRiumInfo->data->spectra as $spectra) {
+                    $fileSource = $spectra->sourceSelector->files[0];
+                    $fileName = pathinfo($fileSource);
+                    if ($fileName['basename'] == $dataset->fsObject->name) {
+                        $info = $spectra->info;
+                    }
                 }
             }
         } else {
@@ -306,45 +309,47 @@ class BiochemaController extends Controller
             $spectra = $NMRiumInfo->data->spectra[0];
             $info = $spectra->info;
         }
-        $solvent = $info->solvent;
-        $nucleus = $info->nucleus;
-        if (is_string($nucleus)) {
-            $nucleus = [$nucleus];
+        if ($info) {
+            $solvent = $info->solvent;
+            $nucleus = $info->nucleus;
+            if (is_string($nucleus)) {
+                $nucleus = [$nucleus];
+            }
+            $dimension = $info->dimension;
+            $probeName = $info->probeName;
+            $experiment = $info->experiment;
+            $temperature = $info->temperature;
+            $baseFrequency = $info->baseFrequency;
+            $fieldStrength = $info->fieldStrength;
+            $numberOfScans = $info->numberOfScans;
+            $pulseSequence = $info->pulseSequence;
+            $spectralWidth = $info->spectralWidth;
+            $numberOfPoints = $info->numberOfPoints;
+            $relaxationTime = $info->relaxationTime;
+
+            $solventProperty = $this->getPropertyValue('NMR solvent', 'NMR:1000330', $solvent, null);
+            $nucleusProperty = $this->getPropertyValue('acquisition nucleus', 'NMR:1400083', $nucleus, null);
+            $dimensionProperty = $this->getPropertyValue('NMR spectrum by dimensionality', 'NMR:1000117', $dimension, null);
+            $probeNameProperty = $this->getPropertyValue('NMR probe', 'OBI:0000516', $probeName, null);
+            $experimentProperty = $this->getPropertyValue('pulsed nuclear magnetic resonance spectroscopy', 'CHMO:0000613', $experiment, null);
+            $temperatureProperty = $this->getPropertyValue('Temperature', 'NCIT:C25206', $temperature, 'https://ontobee.org/ontology/UO?iri=http://purl.obolibrary.org/obo/UO_0000012');
+            $baseFrequencyProperty = $this->getPropertyValue('irradiation frequency', 'NMR:1400026', $baseFrequency, 'http://purl.obolibrary.org/obo/UO_0000325');
+            $fieldStrengthProperty = $this->getPropertyValue('magnetic field strength', 'MR:1400253', $fieldStrength, 'http://purl.obolibrary.org/obo/UO_0000228');
+            $numberOfScansProperty = $this->getPropertyValue('number of scans', 'NMR:1400087', $numberOfScans, 'scans');
+            $pulseSequenceProperty = $this->getPropertyValue('nuclear magnetic resonance pulse sequence', 'CHMO:0001841', $pulseSequence, null);
+            $spectralWidthProperty = $this->getPropertyValue('Spectral Width', 'NCIT:C156496', $spectralWidth, null); //todo: add unit
+            $numberOfPointsProperty = $this->getPropertyValue('number of data points', 'NMR:1000176', $numberOfPoints, 'points');
+            $relaxationTimeProperty = $this->getPropertyValue('relaxation time measurement', 'FIX:0000202', $relaxationTime, 'http://purl.obolibrary.org/obo/UO_0000010');
+
+            $keywords = [$solvent, $dimension.'D', $experiment];
+            foreach ($nucleus as $e) {
+                array_push($keywords, $e);
+            }
+            $variables = [$solventProperty, $nucleusProperty,  $dimensionProperty, $probeNameProperty,
+                $experimentProperty, $temperatureProperty, $baseFrequencyProperty, $fieldStrengthProperty, $numberOfScansProperty, $pulseSequenceProperty, $spectralWidthProperty, $numberOfPointsProperty, $relaxationTimeProperty, ];
+
+            return [$keywords, $variables, $experiment];
         }
-        $dimension = $info->dimension;
-        $probeName = $info->probeName;
-        $experiment = $info->experiment;
-        $temperature = $info->temperature;
-        $baseFrequency = $info->baseFrequency;
-        $fieldStrength = $info->fieldStrength;
-        $numberOfScans = $info->numberOfScans;
-        $pulseSequence = $info->pulseSequence;
-        $spectralWidth = $info->spectralWidth;
-        $numberOfPoints = $info->numberOfPoints;
-        $relaxationTime = $info->relaxationTime;
-
-        $solventProperty = $this->getPropertyValue('NMR solvent', 'NMR:1000330', $solvent, null);
-        $nucleusProperty = $this->getPropertyValue('acquisition nucleus', 'NMR:1400083', $nucleus, null);
-        $dimensionProperty = $this->getPropertyValue('NMR spectrum by dimensionality', 'NMR:1000117', $dimension, null);
-        $probeNameProperty = $this->getPropertyValue('NMR probe', 'OBI:0000516', $probeName, null);
-        $experimentProperty = $this->getPropertyValue('pulsed nuclear magnetic resonance spectroscopy', 'CHMO:0000613', $experiment, null);
-        $temperatureProperty = $this->getPropertyValue('Temperature', 'NCIT:C25206', $temperature, 'https://ontobee.org/ontology/UO?iri=http://purl.obolibrary.org/obo/UO_0000012');
-        $baseFrequencyProperty = $this->getPropertyValue('irradiation frequency', 'NMR:1400026', $baseFrequency, 'http://purl.obolibrary.org/obo/UO_0000325');
-        $fieldStrengthProperty = $this->getPropertyValue('magnetic field strength', 'MR:1400253', $fieldStrength, 'http://purl.obolibrary.org/obo/UO_0000228');
-        $numberOfScansProperty = $this->getPropertyValue('number of scans', 'NMR:1400087', $numberOfScans, 'scans');
-        $pulseSequenceProperty = $this->getPropertyValue('nuclear magnetic resonance pulse sequence', 'CHMO:0001841', $pulseSequence, null);
-        $spectralWidthProperty = $this->getPropertyValue('Spectral Width', 'NCIT:C156496', $spectralWidth, null); //todo: add unit
-        $numberOfPointsProperty = $this->getPropertyValue('number of data points', 'NMR:1000176', $numberOfPoints, 'points');
-        $relaxationTimeProperty = $this->getPropertyValue('relaxation time measurement', 'FIX:0000202', $relaxationTime, 'http://purl.obolibrary.org/obo/UO_0000010');
-
-        $keywords = [$solvent, $dimension.'D', $experiment];
-        foreach ($nucleus as $e) {
-            array_push($keywords, $e);
-        }
-        $variables = [$solventProperty, $nucleusProperty,  $dimensionProperty, $probeNameProperty,
-            $experimentProperty, $temperatureProperty, $baseFrequencyProperty, $fieldStrengthProperty, $numberOfScansProperty, $pulseSequenceProperty, $spectralWidthProperty, $numberOfPointsProperty, $relaxationTimeProperty, ];
-
-        return [$keywords, $variables, $experiment];
     }
 
     /**
@@ -441,25 +446,28 @@ class BiochemaController extends Controller
      */
     public function datasetLite($dataset)
     {
-        $prefix = $dataset->study->project->name.':'.$dataset->study->name.'.';
-        $datasetSchema = Schema::Dataset();
-        $datasetSchema['@id'] = $dataset->doi;
-        $datasetSchema['dct:conformsTo'] = $this->conformsTo(['https://bioschemas.org/profiles/Dataset/1.0-RELEASE', 'https://isa-specs.readthedocs.io/en/latest/isamodel.html#assay']);
-        $datasetSchema->name($prefix.$this->getNMRiumInfo($dataset)[2]);
-        $datasetSchema->description($dataset->description);
-        $datasetSchema->keywords($this->getNMRiumInfo($dataset)[0]);
-        $datasetSchema->license($dataset->study->license->url);
-        $datasetSchema->url(env('APP_URL').'/'.explode(':', $dataset->identifier ? $dataset->identifier : ':')[1]);
-        $datasetSchema->dateCreated($dataset->created_at);
-        $datasetSchema->dateModified($dataset->updated_at);
-        $datasetSchema->datePublished($dataset->release_date);
-        $datasetSchema->distribution($this->getDistribution($dataset));
-        $datasetSchema->includedInDataCatalog($this->DataCatalogLite());
-        $datasetSchema->measurementTechnique(env('MEASUREMENT_TECHNIQUE'));
-        $datasetSchema->variableMeasured($this->getNMRiumInfo($dataset)[1]);
-        $datasetSchema->isAccessibleForFree(true);
+        $nmriumInfo = $this->getNMRiumInfo($dataset);
+        if ($nmriumInfo) {
+            $prefix = $dataset->study->project->name.':'.$dataset->study->name.'.';
+            $datasetSchema = Schema::Dataset();
+            $datasetSchema['@id'] = $dataset->doi;
+            $datasetSchema['dct:conformsTo'] = $this->conformsTo(['https://bioschemas.org/profiles/Dataset/1.0-RELEASE', 'https://isa-specs.readthedocs.io/en/latest/isamodel.html#assay']);
+            $datasetSchema->name($prefix.$nmriumInfo[2]);
+            $datasetSchema->description($dataset->description);
+            $datasetSchema->keywords($nmriumInfo[0]);
+            $datasetSchema->license($dataset->study->license->url);
+            $datasetSchema->url(env('APP_URL').'/'.explode(':', $dataset->identifier ? $dataset->identifier : ':')[1]);
+            $datasetSchema->dateCreated($dataset->created_at);
+            $datasetSchema->dateModified($dataset->updated_at);
+            $datasetSchema->datePublished($dataset->release_date);
+            $datasetSchema->distribution($this->getDistribution($dataset));
+            $datasetSchema->includedInDataCatalog($this->DataCatalogLite());
+            $datasetSchema->measurementTechnique(env('MEASUREMENT_TECHNIQUE'));
+            $datasetSchema->variableMeasured($nmriumInfo[1]);
+            $datasetSchema->isAccessibleForFree(true);
 
-        return $datasetSchema;
+            return $datasetSchema;
+        }
     }
 
     public function dataset($dataset)
