@@ -60,7 +60,11 @@
                             </svg>
                         </span>
                     </DisclosureButton>
-                    <span>
+                    <span
+                        :class="[
+                            file.status == 'missing' ? 'text-red-800' : '',
+                        ]"
+                    >
                         <span
                             v-if="file.type == 'directory'"
                             v-html="composeIcon(file)"
@@ -151,6 +155,12 @@
                                                     </span>
                                                     <span>
                                                         <span
+                                                            :class="[
+                                                                sfile.status ==
+                                                                'missing'
+                                                                    ? 'text-red-800'
+                                                                    : '',
+                                                            ]"
                                                             style="
                                                                 user-select: none;
                                                             "
@@ -217,11 +227,20 @@
                                                             'p-1 rounded-md truncate ...',
                                                         ]"
                                                     >
-                                                        <DocumentTextIcon
-                                                            class="mr-1 inline h-5 w-5 text-gray-700"
-                                                            aria-hidden="true"
-                                                        />
-                                                        {{ subItem.name }}
+                                                        <span
+                                                            :class="[
+                                                                subItem.status ==
+                                                                'missing'
+                                                                    ? 'text-red-800'
+                                                                    : '',
+                                                            ]"
+                                                        >
+                                                            <DocumentTextIcon
+                                                                class="mr-1 inline h-5 w-5 text-gray-700"
+                                                                aria-hidden="true"
+                                                            />
+                                                            {{ subItem.name }}
+                                                        </span>
                                                     </span>
                                                 </div>
                                             </DisclosurePanel>
@@ -239,11 +258,19 @@
                                         'p-1 ml-5 rounded-md truncate ...',
                                     ]"
                                 >
-                                    <DocumentTextIcon
-                                        class="inline mr-1 h-5 w-5 text-gray-700"
-                                        aria-hidden="true"
-                                    />
-                                    {{ sfile.name }}
+                                    <span
+                                        :class="[
+                                            sfile.status == 'missing'
+                                                ? 'text-red-800'
+                                                : '',
+                                        ]"
+                                    >
+                                        <DocumentTextIcon
+                                            class="inline mr-1 h-5 w-5 text-gray-700"
+                                            aria-hidden="true"
+                                        />
+                                        {{ sfile.name }}
+                                    </span>
                                 </span>
                             </div>
                         </div>

@@ -12,10 +12,10 @@
                         <span>
                             <Depictor
                                 class="py-2"
-                                :modelValue="
+                                :model-value="
                                     study.sample.molecules[0].CANONICAL_SMILES
                                 "
-                                :showDownload="false"
+                                :show-download="false"
                             ></Depictor>
                         </span>
                     </div>

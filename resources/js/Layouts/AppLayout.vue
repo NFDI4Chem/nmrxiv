@@ -198,14 +198,14 @@
                             :class="[item.auth ? 'border-t' : '']"
                         >
                             <div
-                                class="p-2 bg-gray-100 text-gray-500 text-sm border-b"
                                 v-if="item.prefix"
+                                class="p-2 bg-gray-100 text-gray-500 text-sm border-b"
                             >
                                 {{ item.prefix }}
                             </div>
                             <Link
-                                :href="item.href"
                                 :id="item.id"
+                                :href="item.href"
                                 :class="[
                                     $page.url === item.href
                                         ? ' border-r-4 bg-gray-200 border-r-black'
@@ -223,8 +223,8 @@
                             </Link>
                             <Link
                                 v-for="child in item.children"
-                                :key="child.name"
                                 :id="child.id"
+                                :key="child.name"
                                 :href="child.href"
                                 :class="[
                                     $page.url === child.href
@@ -378,11 +378,11 @@
                             class="ml-3 relative"
                         >
                             <div
-                                id="tour-step-account-management"
                                 v-if="
                                     $page.props.user.current_team &&
                                     $page.props.user.current_team.personal_team
                                 "
+                                id="tour-step-account-management"
                             >
                                 <MenuButton
                                     v-if="

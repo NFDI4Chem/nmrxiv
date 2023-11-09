@@ -25,10 +25,13 @@
                             </span>
                         </p>
                         <div class="flex mt-2 md:inline">
-                            <div class="float-left md:float-right">
+                            <div
+                                v-if="project.data.download_url"
+                                class="float-left md:float-right"
+                            >
                                 <a
                                     class="md:ml-4 cursor-pointer relative inline-flex items-center px-4 py-1 rounded-full border border-gray-300 bg-white text-sm font-black text-dark hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
-                                    :href="downloadURL"
+                                    :href="project.data.download_url"
                                 >
                                     Download
                                 </a>
@@ -114,9 +117,9 @@
                                     </p>
                                     <div class="sm:col-span-12 pt-4">
                                         <span
-                                            class="mt-1 inline-flex items-center rounded-full bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10"
                                             v-for="tag in project.data.tags"
                                             :key="tag.id"
+                                            class="mt-1 inline-flex items-center rounded-full bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10"
                                             target="_blank"
                                             :href="
                                                 '/projects?tag=' + tag.name.en
@@ -143,13 +146,13 @@
                                 aria-label="Tabs"
                             >
                                 <Link
+                                    v-for="tab in tabs"
+                                    :key="tab.name"
                                     :href="
                                         project.data.public_url +
                                         '?tab=' +
                                         tab.name
                                     "
-                                    v-for="tab in tabs"
-                                    :key="tab.name"
                                     :class="[
                                         selectedTab == tab.name
                                             ? 'border-pink-500 text-gray-900'
@@ -174,8 +177,7 @@
 
 <script>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import { Link } from "@inertiajs/vue3";
-import { router } from "@inertiajs/vue3";
+import { Link, router } from "@inertiajs/vue3";
 import { ArrowDownTrayIcon } from "@heroicons/vue/24/solid";
 export default {
     components: {
@@ -211,15 +213,6 @@ export default {
         };
     },
     computed: {
-        downloadURL() {
-            return (
-                this.url +
-                "/" +
-                this.project.data.owner.username +
-                "/datasets/" +
-                this.project.data.slug
-            );
-        },
         url() {
             return String(this.$page.props.url);
         },
@@ -245,7 +238,7 @@ export default {
                             );
                         }
                     })
-                    .then(function (response) {
+                    .then(function () {
                         router.reload({ only: ["project"] });
                     });
             } else {

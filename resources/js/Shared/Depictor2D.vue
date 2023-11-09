@@ -5,11 +5,11 @@
             class="flex justify-center align-middle pt-5"
             v-html="getSVGString(molecule)"
         ></div>
-        <div class="flex" v-else>
+        <div v-else class="flex">
             <img
                 class="mx-auto w-100"
                 :src="
-                    this.$page.props.CM_API +
+                    $page.props.CM_API +
                     'depict/2D?smiles=' +
                     encodedSmiles +
                     '&height=' +
@@ -25,16 +25,16 @@
         </div>
         <div
             v-if="showDownload"
+            class="cursor-pointer mt-1 text-sm text-gray-900 float-right"
             @click="
                 (e) =>
                     downloadMolFile2D(
                         e,
                         molecule,
                         identifier,
-                        this.$page.props.CM_API
+                        $page.props.CM_API
                     )
             "
-            class="cursor-pointer mt-1 text-sm text-gray-900 float-right"
         >
             <a style="box-shadow: none" class="hover:text-gray-600"
                 >Download Molfile(2D)</a
@@ -71,15 +71,15 @@ export default {
         },
         identifier: String,
     },
-    computed: {
-        encodedSmiles() {
-            return encodeURIComponent(this.molecule);
-        },
-    },
     data() {
         return {
             results: [],
         };
+    },
+    computed: {
+        encodedSmiles() {
+            return encodeURIComponent(this.molecule);
+        },
     },
     mounted() {},
     methods: {

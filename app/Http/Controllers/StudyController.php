@@ -185,12 +185,10 @@ class StudyController extends Controller
 
     public function nmriumInfo(Request $request, Study $study)
     {
-
         // $version = $request->get('version');
         // $spectra = $request->get('spectra');
         // $molecules = $nmriumInfo['data']['molecules'];
         // $molecularInfo = $molecules;
-
         if ($study) {
             $user = Auth::user();
             $data = $request->all();
@@ -208,12 +206,11 @@ class StudyController extends Controller
                 $study->has_nmrium = true;
             }
             $study->save();
-
             $_nmriumJSON = $nmriumInfo;
             foreach ($study->datasets as $dataset) {
                 $fsObject = $dataset->fsObject;
                 $level = -($fsObject->level + 1);
-                echo $fsObject->path;
+                // echo $fsObject->path;
                 $path = implode('/', array_slice(explode('/', $fsObject->path), $level));
                 foreach ($nmriumInfo['data']['spectra'] as $spectra) {
                     unset($_nmriumJSON['data']['spectra']);
@@ -239,6 +236,15 @@ class StudyController extends Controller
                             ]);
                             $dataset->nmrium()->save($_nmrium);
                             $dataset->has_nmrium = true;
+                        }
+                        $experimentDetailsExists = array_key_exists('experiment', $spectra['info']);
+                        if ($experimentDetailsExists) {
+                            $experiment = $spectra['info']['experiment'];
+                            $nucleus = $spectra['info']['nucleus'];
+                            if (is_array($nucleus)) {
+                                $nucleus = implode('-', $nucleus);
+                            }
+                            $dataset->type = $experiment.','.$nucleus;
                         }
                         $dataset->save();
                     }

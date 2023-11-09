@@ -25,15 +25,15 @@
                     </div>
                     <button
                         class="ml-2 inline-flex items-center rounded-full px-6 py-3 shadow rounded-full text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                        @click.prevent="update()"
                         style="overflow-anchor: none"
+                        @click.prevent="update()"
                     >
                         GO
                     </button>
                     <button
-                        @click.prevent="reset()"
                         class="ml-3 text-sm text-gray-500 hover:text-gray-700 focus:text-indigo-500"
                         style="overflow-anchor: none"
+                        @click.prevent="reset()"
                     >
                         Reset
                     </button>
@@ -142,8 +142,8 @@
                         </div>
                         <button
                             type="button"
-                            @click.prevent="reset()"
                             class="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 mt-6 focus:ring-offset-2 focus:ring-teal-500"
+                            @click.prevent="reset()"
                         >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -188,14 +188,14 @@
                             <div
                                 v-for="link in studies.meta.links"
                                 :key="link.url"
-                                @click="update(link)"
-                                v-html="link.label"
                                 :class="[
                                     link.active
                                         ? 'text-teal-600 border-teal-500'
                                         : '',
                                     'cursor-pointer border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 border-t-2 pt-4 px-4 inline-flex items-center text-sm font-medium',
                                 ]"
+                                @click="update(link)"
+                                v-html="link.label"
                             ></div>
                         </div>
                         <div class="-mt-px w-0 flex-1 flex justify-end">
@@ -205,7 +205,7 @@
                 </div>
             </div>
         </div>
-        <div class="text-gray-400" v-else>
+        <div v-else class="text-gray-400">
             <svg
                 class="animate-spin inline -ml-1 mr-2 h-5 w-5 text-dark"
                 xmlns="http://www.w3.org/2000/svg"

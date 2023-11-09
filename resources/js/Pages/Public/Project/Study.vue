@@ -1,5 +1,5 @@
 <template>
-    <project-layout :project="project" :selectedTab="tab">
+    <project-layout :project="project" :selected-tab="tab">
         <template #project-content>
             <div
                 class="pb-10 mb-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6"
@@ -16,8 +16,8 @@
                     <div class="float-right">
                         <span class="flex-0.5 self-center">
                             <Menu
-                                as="div"
                                 v-if="selectedDataset && study.data.is_public"
+                                as="div"
                                 class="relative text-left"
                             >
                                 <div>
@@ -344,10 +344,10 @@
                     </div> -->
                     <div class="mt-3">
                         <SpectraViewer
+                            ref="spectraViewerREF"
                             :dataset="selectedDataset"
                             :project="project.data"
                             :study="study.data"
-                            ref="spectraViewerREF"
                         ></SpectraViewer>
                     </div>
 

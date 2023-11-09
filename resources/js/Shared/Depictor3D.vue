@@ -3,21 +3,21 @@
         <iframe
             :width="width - 60"
             :height="height - 65"
-            :src="this.$page.props.CM_API + 'depict/3D?smiles=' + encodedSmiles"
+            :src="$page.props.CM_API + 'depict/3D?smiles=' + encodedSmiles"
             frameborder="0"
         ></iframe>
         <div
             v-if="showDownload"
+            class="cursor-pointer mt-1 text-sm text-gray-900 float-right"
             @click="
                 (e) =>
                     downloadMolFile3D(
                         e,
                         molecule,
                         identifier,
-                        this.$page.props.CM_API
+                        $page.props.CM_API
                     )
             "
-            class="cursor-pointer mt-1 text-sm text-gray-900 float-right"
         >
             <a style="box-shadow: none" class="hover:text-gray-600"
                 >Download Molfile(3D)</a
@@ -44,15 +44,15 @@ export default {
         },
         identifier: String,
     },
-    computed: {
-        encodedSmiles() {
-            return encodeURIComponent(this.molecule);
-        },
-    },
     data() {
         return {
             results: [],
         };
+    },
+    computed: {
+        encodedSmiles() {
+            return encodeURIComponent(this.molecule);
+        },
     },
     mounted() {},
     methods: {},

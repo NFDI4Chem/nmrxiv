@@ -200,12 +200,12 @@
                             </thead>
                             <tbody class="bg-white">
                                 <tr
-                                    :key="$index"
                                     v-for="(
                                         peak, $index
                                     ) in selectedSpectraData[0]['peaks'][
                                         'values'
                                     ]"
+                                    :key="$index"
                                 >
                                     <td
                                         class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6"
@@ -262,12 +262,12 @@
                             </thead>
                             <tbody class="bg-white">
                                 <tr
-                                    :key="$index"
                                     v-for="(
                                         range, $index
                                     ) in selectedSpectraData[0]['ranges'][
                                         'values'
                                     ]"
+                                    :key="$index"
                                 >
                                     <td
                                         class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6"
@@ -296,14 +296,6 @@ export default {
         project: Object,
         study: Object,
     },
-    watch: {
-        // dataset: {
-        //     immediate: true,
-        //     handler() {
-        //        this.loadSpectra();
-        //     },
-        // },
-    },
     data() {
         return {
             spectraError: null,
@@ -323,6 +315,14 @@ export default {
                       Math.random();
         },
     },
+    watch: {
+        // dataset: {
+        //     immediate: true,
+        //     handler() {
+        //        this.loadSpectra();
+        //     },
+        // },
+    },
     methods: {
         loadSpectra() {
             if (this.study) {
@@ -331,7 +331,6 @@ export default {
                 this.currentMolecules = [];
                 this.updateLoadingStatus(true);
                 if (iframe) {
-                    console.log(this.study.has_nmrium);
                     if (this.study.has_nmrium) {
                         this.infoLog("Loading Spectra from NMRium JSON..");
                         axios

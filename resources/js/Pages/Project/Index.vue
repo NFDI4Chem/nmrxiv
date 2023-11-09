@@ -166,8 +166,8 @@
                         class="flex justify-between items-center bg-white shadow-md border rounded-lg px-6 py-6"
                     >
                         <div
-                            @click="getLink(project)"
                             class="flex-grow cursor-pointer"
+                            @click="getLink(project)"
                         >
                             <div class="flex justify-between items-baseline">
                                 <div class="font-bold text-xl text-gray-600">
@@ -263,9 +263,9 @@
                                     >
                                         <p>
                                             <span
-                                                class="mt-1 inline-flex items-center rounded-full bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10"
                                                 v-for="tag in project.tags"
                                                 :key="tag.id"
+                                                class="mt-1 inline-flex items-center rounded-full bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10"
                                             >
                                                 {{ tag.name["en"] }}
                                             </span>

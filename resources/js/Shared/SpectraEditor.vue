@@ -10,8 +10,8 @@
                         >Learn more
                     </a>
                     <a
-                        @click="resetStudy"
                         class="cursor-pointer mr-3 border px-2 py-1 rounded-md"
+                        @click="resetStudy"
                         >Reset</a
                     >
                     <!-- <a
@@ -21,8 +21,8 @@
                     > -->
 
                     <a
-                        @click="exportPreview()"
                         class="cursor-pointer border px-2 py-1 rounded-md"
+                        @click="exportPreview()"
                     >
                         <ArrowPathIcon class="w-4 h-4 inline" />
                         Preview</a
@@ -341,20 +341,6 @@ export default {
         project: Object,
         study: Object,
     },
-    watch: {
-        dataset: {
-            immediate: true,
-            handler() {
-                this.loadSpectra();
-            },
-        },
-        study: {
-            immediate: true,
-            handler() {
-                this.loadSpectra();
-            },
-        },
-    },
     emits: ["loading"],
     setup() {
         const versionsElement = ref(null);
@@ -388,6 +374,20 @@ export default {
         },
         mailFromAddress() {
             return String(this.$page.props.mailFromAddress);
+        },
+    },
+    watch: {
+        dataset: {
+            immediate: true,
+            handler() {
+                this.loadSpectra();
+            },
+        },
+        study: {
+            immediate: true,
+            handler() {
+                this.loadSpectra();
+            },
         },
     },
     methods: {

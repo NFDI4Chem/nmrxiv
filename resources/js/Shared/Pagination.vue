@@ -45,11 +45,11 @@
 <script>
 import { Link } from "@inertiajs/vue3";
 export default {
-    props: {
-        links: Array,
-    },
     components: {
         Link,
+    },
+    props: {
+        links: Array,
     },
 };
 </script>

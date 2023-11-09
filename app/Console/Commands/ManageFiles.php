@@ -58,7 +58,7 @@ class ManageFiles extends Command
                     $fsObject->save();
                 }
             } elseif ($item instanceof \League\Flysystem\DirectoryAttributes) {
-                echo $item->study_id;
+                // echo $item->study_id;
             }
         }
     }

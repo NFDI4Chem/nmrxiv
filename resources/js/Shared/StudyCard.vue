@@ -18,7 +18,7 @@
                                     :molecule="
                                         study.molecules[0].CANONICAL_SMILES
                                     "
-                                    :showDownload="false"
+                                    :show-download="false"
                                 ></Depictor2D>
                             </span>
                         </div>
