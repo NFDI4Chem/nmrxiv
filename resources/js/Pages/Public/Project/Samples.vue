@@ -1,5 +1,5 @@
 <template>
-    <project-layout :project="project" :selectedTab="tab">
+    <project-layout :project="project" :selected-tab="tab">
         <template #project-content>
             <div class="p-8">
                 <div class="flex items-baseline justify-between">
@@ -29,9 +29,9 @@
                                 GO
                             </button>
                             <button
-                                @click="reset()"
                                 class="ml-3 text-sm text-gray-500 hover:text-gray-700 focus:text-indigo-500"
                                 type="button"
+                                @click="reset()"
                             >
                                 Reset
                             </button>
@@ -94,14 +94,14 @@
                                     <div
                                         v-for="link in studies.meta.links"
                                         :key="link.url"
-                                        @click="update(link)"
-                                        v-html="link.label"
                                         :class="[
                                             link.active
                                                 ? 'text-teal-600 border-teal-500'
                                                 : '',
                                             'cursor-pointer border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 border-t-2 pt-4 px-4 inline-flex items-center text-sm font-medium',
                                         ]"
+                                        @click="update(link)"
+                                        v-html="link.label"
                                     ></div>
                                 </div>
                                 <div class="-mt-px w-0 flex-1 flex justify-end">
@@ -111,7 +111,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="text-gray-400 mt-10" v-else>
+                <div v-else class="text-gray-400 mt-10">
                     <svg
                         class="animate-spin inline -ml-1 mr-2 h-5 w-5 text-dark"
                         xmlns="http://www.w3.org/2000/svg"

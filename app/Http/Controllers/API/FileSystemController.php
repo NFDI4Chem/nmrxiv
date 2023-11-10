@@ -13,7 +13,7 @@ class FileSystemController extends Controller
         return [
             'files' => FileSystemObject::with('children')->where([
                 ['id', $fileId],
-            ])->orderBy('type')->get(),
+            ])->orderBy('type')->orderBy('created_at', 'DESC')->get(),
         ];
     }
 }

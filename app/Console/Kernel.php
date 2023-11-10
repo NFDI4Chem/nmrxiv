@@ -27,7 +27,9 @@ class Kernel extends ConsoleKernel
         $schedule->command('nmrxiv:delete-projects')->daily();
         $schedule->command('nmrxiv:delete-citations')->weekly();
         $schedule->command('nmrxiv:delete-authors')->weekly();
-        $schedule->command('nmrxiv:backup-postgres-dump')->daily();
+        if (App::environment('production')) {
+            $schedule->command('nmrxiv:backup-postgres-dump')->daily();
+        }
     }
 
     /**

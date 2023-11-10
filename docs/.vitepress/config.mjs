@@ -5,8 +5,13 @@ export default defineConfig({
   title: "nmrXiv",
   description: "FAIR, consensus-driven NMR data repository and computational platform",
   ignoreDeadLinks: true,
+ //base: '/nmrxiv/',
 
   themeConfig: {
+    search: {
+      provider: 'local'
+    },
+
     logo:  { 
       light: "/logo.svg",
       dark: "/logo-dark.svg",

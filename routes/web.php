@@ -20,6 +20,7 @@ use App\Http\Controllers\StudyController;
 use App\Http\Controllers\StudyInvitationController;
 use App\Http\Controllers\StudyMemberController;
 use App\Http\Controllers\TeamController;
+use App\Http\Controllers\UploadController;
 use App\Models\Dataset;
 use App\Models\Molecule;
 use App\Models\Project;
@@ -99,6 +100,9 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::get('projects/status/{project}/queue', [ProjectController::class, 'status'])
         ->name('project.status');
 
+    Route::get('projects/{project}/validation', [ProjectController::class, 'validationReport'])
+        ->name('project.validation');
+
     Route::post('users/notification/{user}/markAsRead', [UsersController::class, 'markNotificationAsRead'])
         ->name('users.markNotificationAsRead');
 
@@ -106,6 +110,9 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
         ->name('users.markAllNotificationAsRead');
 
     Route::get('dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
+
+    Route::get('upload', [UploadController::class, 'upload'])->name('upload');
+    Route::get('publish/{draft}', [UploadController::class, 'publish'])->name('publish');
 
     Route::group([
         'prefix' => 'dashboard',
@@ -167,6 +174,8 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
             ->name('dashboard.studies');
         Route::get('studies/{study}/files', [StudyController::class, 'files'])
             ->name('dashboard.study.files');
+        Route::get('studies/{study}/annotations', [StudyController::class, 'annotations'])
+            ->name('dashboard.study.annotations');
         Route::get('studies/{study}/datasets', [StudyController::class, 'datasets'])
             ->name('dashboard.study.datasets');
         Route::get('studies/{study}/settings', [StudyController::class, 'settings'])
@@ -186,6 +195,15 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
             ->name('study-members.update');
         Route::delete('/studies/{study}/members/{user}', [StudyMemberController::class, 'removeMember'])
             ->name('study-members.destroy');
+
+        Route::get('studies/{study}/nmriumVersions', [StudyController::class, 'nmriumVersions'])
+            ->name('dashboard.studies.nmriumVersions');
+        Route::get('studies/{study}/nmriumInfo', [StudyController::class, 'fetchNMRium'])
+            ->name('dashboard.studies.nmrium');
+        Route::post('studies/{study}/nmriumInfo', [StudyController::class, 'nmriumInfo'])
+            ->name('dashboard.studies.nmriumInfo');
+        Route::post('studies/{study}/preview', [StudyController::class, 'preview'])
+            ->name('dashboard.study.preview');
 
         Route::post('studies/{study}/molecule', [StudyController::class, 'moleculeStore'])
             ->name('study-molecule.store');
@@ -211,6 +229,8 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
             ->name('dashboard.draft.info');
         Route::get('drafts/{draft}/files', [DraftController::class, 'files'])
             ->name('dashboard.draft.files');
+        Route::put('drafts/{draft}', [DraftController::class, 'update'])
+            ->name('dashboard.draft.update');
         Route::delete('drafts/{draft}/files/{filesystemobject}', [DraftController::class, 'deleteFSO'])
             ->name('dashboard.draft.files.delete');
         Route::get('drafts/{draft}/annotate', [DraftController::class, 'annotate'])
@@ -303,6 +323,9 @@ Route::get('projects/{project}/toggleStarred', [ProjectController::class, 'toggl
 Route::get('studies/{study}/toggleStarred', [StudyController::class, 'toggleStarred'])
     ->name('study.toggle-starred');
 
+Route::get('studies/{study}/nmriumInfo', [StudyController::class, 'fetchNMRium'])
+    ->name('dashboard.studies.nmrium');
+
 Route::get('projects/{project}/studies', [ProjectController::class, 'publicStudies'])
     ->name('project.studies');
 
@@ -318,5 +341,5 @@ Route::get('datasets/{dataset}/nmriumInfo', [DatasetController::class, 'fetchNMR
 Route::get('datasets/{owner}/{slug}', [DatasetController::class, 'publicDatasetView'])
     ->name('public.dataset');
 
-Route::get('spectra', [DatasetController::class, 'publicDatasetsView'])
-    ->name('public.datasets');
+Route::get('spectra', [StudyController::class, 'publicStudiesView'])
+    ->name('public.spectra');
