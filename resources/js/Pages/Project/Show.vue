@@ -28,8 +28,8 @@
                     read-only.
                 </div>
                 <div
-                    class="text-center px-3 py-2 bg-green-50 text-green-700 border-b"
                     v-else
+                    class="text-center px-3 py-2 bg-green-50 text-green-700 border-b"
                 >
                     <b>Info: </b> This project is published. You cannot edit a
                     published project, please create a new version to updated
@@ -77,16 +77,6 @@
                                     <span>Edit</span>
                                 </button>
                             </div>
-
-                            <span
-                                v-if="project.identifier"
-                                class="text-gray-400 pt-2"
-                            >
-                                <img
-                                    :src="'/badge/doi/' + project.identifier"
-                                />
-                            </span>
-
                             <div class="inline-flex items-center mt-3">
                                 <access-dialogue
                                     :available-roles="availableRoles"
@@ -201,7 +191,7 @@
                                 <project-details
                                     ref="projectDetailsElement"
                                     :role="role"
-                                    :projectPermissions="projectPermissions"
+                                    :project-permissions="projectPermissions"
                                     :project="project"
                                 />
                                 <manage-author
@@ -313,6 +303,12 @@
                     </div>
                     <div class="flex flex-nowrap justify-between pb-3">
                         <div
+                            v-if="project.identifier"
+                            class="text-gray-400 mt-2"
+                        >
+                            <img :src="'/badge/doi/' + project.identifier" />
+                        </div>
+                        <div
                             class="mt-2 flex items-center text-xs text-gray-400"
                         >
                             <CalendarIcon
@@ -413,20 +409,9 @@
                             <span
                                 v-for="tag in project.tags"
                                 :key="tag.id"
-                                class="mr-2"
+                                class="mt-1 inline-flex items-center rounded-full bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10"
                             >
-                                <span
-                                    class="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-indigo-100 text-indigo-800"
-                                >
-                                    <svg
-                                        class="-ml-0.5 mr-1.5 h-2 w-2 text-indigo-400"
-                                        fill="currentColor"
-                                        viewBox="0 0 8 8"
-                                    >
-                                        <circle cx="4" cy="4" r="3" />
-                                    </svg>
-                                    {{ tag.name["en"] }}
-                                </span>
+                                {{ tag.name["en"] }}
                             </span>
                         </p>
                     </dd>
@@ -507,9 +492,7 @@
                         class="mt-2 text-md text-gray-900 space-y-5 focus:pointer-events-auto"
                     >
                         <div class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                            <citation-card
-                                :citations="this.project.citations"
-                            />
+                            <citation-card :citations="project.citations" />
                         </div>
                     </dd>
                 </div>
@@ -544,7 +527,7 @@
                     </div>
                     <dd class="mt-2 text-md text-gray-900 space-y-5">
                         <div class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-3">
-                            <author-card :authors="this.project.authors" />
+                            <author-card :authors="project.authors" />
                         </div>
                     </dd>
                 </div>
@@ -561,7 +544,7 @@
                     :editable="editable"
                     :project="project"
                     :role="role"
-                    :teamRole="teamRole"
+                    :team-role="teamRole"
                 />
             </div>
         </div>
@@ -623,6 +606,21 @@ export default {
             manageCitationElement,
         };
     },
+    data() {
+        return {};
+    },
+    computed: {
+        canDeleteProject() {
+            return this.projectPermissions
+                ? this.projectPermissions.canDeleteProject
+                : false;
+        },
+        canUpdateProject() {
+            return this.projectPermissions
+                ? this.projectPermissions.canUpdateProject
+                : false;
+        },
+    },
     mounted() {
         const urlSearchParams = new URLSearchParams(window.location.search);
         const params = Object.fromEntries(urlSearchParams.entries());
@@ -642,21 +640,6 @@ export default {
                 this.toggleManageAuthor();
             }
         }
-    },
-    data() {
-        return {};
-    },
-    computed: {
-        canDeleteProject() {
-            return this.projectPermissions
-                ? this.projectPermissions.canDeleteProject
-                : false;
-        },
-        canUpdateProject() {
-            return this.projectPermissions
-                ? this.projectPermissions.canUpdateProject
-                : false;
-        },
     },
     methods: {
         toogleStarred() {

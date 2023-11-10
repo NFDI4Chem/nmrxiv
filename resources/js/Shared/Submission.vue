@@ -192,7 +192,7 @@
                     </div>
                 </div>
                 <div v-else>
-                    <div class="-mx-6 -my-4" v-if="showPrimer">
+                    <div v-if="showPrimer" class="-mx-6 -my-4">
                         <div>
                             <section
                                 class="h-1/2 overflow-hidden bg-white overflow-hidden py-12"
@@ -508,13 +508,13 @@
                                                             class="font-medium text-blue-gray-900 pr-4"
                                                         >
                                                             <a
+                                                                class="hover:font-bold"
                                                                 @click="
                                                                     selectStudy(
                                                                         study,
                                                                         $index
                                                                     )
                                                                 "
-                                                                class="hover:font-bold"
                                                                 >{{
                                                                     study.name
                                                                 }}</a
@@ -545,6 +545,13 @@
                                                                 :key="ds.id"
                                                             >
                                                                 <div
+                                                                    :class="[
+                                                                        study.has_nmrium ||
+                                                                        ds.has_nmrium
+                                                                            ? 'bg-green-100 text-gray-800'
+                                                                            : 'bg-gray-100 text-gray-800',
+                                                                        'w-64 inline-flex truncate break-words items-center px-3 py-0.5 rounded-full text-xs font-medium mr-1 hover:bg-teal-700',
+                                                                    ]"
                                                                     @click="
                                                                         selectStudy(
                                                                             study,
@@ -552,12 +559,6 @@
                                                                             $dsIndex
                                                                         )
                                                                     "
-                                                                    :class="[
-                                                                        ds.has_nmrium
-                                                                            ? 'bg-green-100 text-gray-800'
-                                                                            : 'bg-gray-100 text-gray-800',
-                                                                        'w-64 inline-flex truncate break-words items-center px-3 py-0.5 rounded-full text-xs font-medium mr-1 hover:bg-teal-700',
-                                                                    ]"
                                                                 >
                                                                     <a
                                                                         >{{
@@ -584,18 +585,18 @@
                                                 height: 80vh;
                                                 overflow: scroll !important;
                                             "
-                                            class="flex-1 xl:overflow-y-auto p-2"
+                                            class="flex-1 xl:overflow-y-auto"
                                         >
                                             <div
-                                                class="mx-auto flex flex-col md:px-4 xl:px-0"
+                                                class="mx-auto flex flex-col md:px-0 xl:px-0"
                                             >
                                                 <main class="flex-1">
                                                     <div
-                                                        class="relative mx-auto md:px-4 xl:px-0"
+                                                        class="relative mx-auto md:px-0 xl:px-0"
                                                     >
                                                         <div class="pt-5 pb-16">
                                                             <div
-                                                                class="px-4 sm:px-6"
+                                                                class="px-3 sm:px-3"
                                                             >
                                                                 <h1
                                                                     class="text-3xl font-extrabold text-gray-900"
@@ -635,7 +636,7 @@
                                                                 </select>
                                                             </div>
                                                             <div
-                                                                class="hidden lg:block px-4 sm:px-6"
+                                                                class="hidden lg:block px-3 sm:px-3"
                                                             >
                                                                 <div
                                                                     class="border-b border-gray-200"
@@ -807,17 +808,17 @@
                                                                 </div>
                                                             </div>
                                                             <div
-                                                                id="tour-step-nmrium"
                                                                 v-if="
                                                                     currentTab.name ==
                                                                     'Experiments (Spectra)'
                                                                 "
+                                                                id="tour-step-nmrium"
                                                                 class="px-4 sm:px-6 md:px-0"
                                                             >
                                                                 <div
-                                                                    class="p-6"
+                                                                    class="p-3"
                                                                 >
-                                                                    <div>
+                                                                    <!-- <div>
                                                                         <label
                                                                             for="location"
                                                                             class="block text-sm font-medium text-gray-700"
@@ -864,11 +865,12 @@
                                                                                 </span>
                                                                             </option>
                                                                         </select>
-                                                                    </div>
+                                                                    </div> -->
                                                                     <div
-                                                                        class="my-7"
+                                                                        class="my-3"
                                                                     >
                                                                         <SpectraEditor
+                                                                            ref="spectraEditorREF"
                                                                             :dataset="
                                                                                 selectedDataset
                                                                             "
@@ -878,7 +880,6 @@
                                                                             :study="
                                                                                 selectedStudy
                                                                             "
-                                                                            ref="spectraEditorREF"
                                                                             @loading="
                                                                                 updateLoadingStatus
                                                                             "
@@ -1343,8 +1344,7 @@
                                                                             </button>
                                                                             <jet-input-error
                                                                                 :message="
-                                                                                    this
-                                                                                        .errorMessage
+                                                                                    errorMessage
                                                                                 "
                                                                                 class="mt-2"
                                                                             />
@@ -1552,11 +1552,11 @@
         </template>
         <template #footer>
             <div class="flex">
-                <div class="w-full" v-if="showPrimer && currentDraft">
+                <div v-if="showPrimer && currentDraft" class="w-full">
                     <div class="float-left">
                         <div
-                            @change="hidePrimer()"
                             class="relative mt-2 flex items-start"
+                            @change="hidePrimer()"
                         >
                             <div class="flex h-5 items-center">
                                 <input
@@ -1586,11 +1586,11 @@
                         Proceed
                     </jet-button>
                 </div>
-                <div class="w-full" v-else>
+                <div v-else class="w-full">
                     <span v-if="!currentStep">
                         <Link
                             class="inline-flex items-center px-2.5 py-1 border border-gray-300 shadow-sm text-md font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                            :href="this.returnUrl"
+                            :href="returnUrl"
                         >
                             Cancel
                         </Link>
@@ -1610,7 +1610,7 @@
                             </jet-secondary-button>
                             <Link
                                 class="inline-flex items-center px-2.5 py-1 border border-gray-300 shadow-sm text-md font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                                :href="this.returnUrl"
+                                :href="returnUrl"
                             >
                                 Cancel
                             </Link>
@@ -1664,7 +1664,7 @@
                                 Back
                             </jet-button>
                             <Link
-                                :href="this.returnUrl"
+                                :href="returnUrl"
                                 class="inline-flex items-center px-2.5 py-1 border border-gray-300 shadow-sm text-md font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                             >
                                 Cancel
@@ -2491,7 +2491,7 @@ export default {
             } else if (id == 2) {
                 this.$nextTick(function () {
                     if (this.$refs.spectraEditorREF) {
-                        this.$refs.spectraEditorREF.registerEvents();
+                        // this.$refs.spectraEditorREF.registerEvents();
                     }
                 });
             }

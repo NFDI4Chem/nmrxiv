@@ -44,6 +44,8 @@ class ProjectResource extends JsonResource
             'tags' => $this->tags,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'download_url' => $this->download_url,
+            'species' => json_decode($this->species),
             'stats' => [
                 'likes' => $this->likesCount(),
             ],
@@ -82,7 +84,7 @@ class ProjectResource extends JsonResource
                                     'children' => FileSystemObject::with(
                                         'children'
                                     )
-                                        ->where([['project_id', $this->id]])
+                                        ->where([['project_id', $this->id], ['level', 0]])
                                         ->orderBy('type')
                                         ->get(),
                                 ],

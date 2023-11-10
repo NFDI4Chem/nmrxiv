@@ -75,8 +75,8 @@ class DatasetController extends Controller
                 } else {
                     $nmrium = NMRium::create([
                         'nmrium_info' => json_encode($nmriumData),
-                        'dataset_id' => $dataset->id,
                     ]);
+                    $dataset->nmrium()->save($nmrium);
                     $dataset->has_nmrium = true;
                 }
 
@@ -123,7 +123,7 @@ class DatasetController extends Controller
     public function publicDatasetsView(Request $request)
     {
         // $datasets = Cache::rememberForever('datasets', function () {
-        $datasets = DatasetResource::collection(Dataset::with('project')->where([['is_public', true], ['is_archived', false]])->filter($request->only('search', 'sort', 'mode'))->paginate(12)->withQueryString());
+        $datasets = DatasetResource::collection(Dataset::with('study')->where([['is_public', true], ['is_archived', false]])->filter($request->only('search', 'sort', 'mode'))->paginate(12)->withQueryString());
         // });
 
         return Inertia::render('Public/Datasets', [

@@ -338,12 +338,12 @@
                                                     </legend>
                                                     <div class="mt-2 space-y-5">
                                                         <div
+                                                            class="relative flex items-start"
                                                             @click="
                                                                 updateAccess(
                                                                     false
                                                                 )
                                                             "
-                                                            class="relative flex items-start"
                                                         >
                                                             <div
                                                                 class="absolute flex items-center h-5"
@@ -435,8 +435,8 @@
                                                     </div>
                                                 </div>
                                                 <div
-                                                    class="mt-2"
                                                     v-if="form.doi"
+                                                    class="mt-2"
                                                 >
                                                     <label
                                                         for="email"
@@ -758,7 +758,7 @@
                                 </div>
                                 <!--Footer-->
                                 <div
-                                    v-if="!this.form.is_public"
+                                    v-if="!form.is_public"
                                     class="flex-shrink-0 px-4 py-4 flex justify-end"
                                 >
                                     <jet-action-message
@@ -785,15 +785,13 @@
                                 </div>
                                 <!--Footer with confirmation-->
                                 <div
-                                    v-if="
-                                        this.form.is_public && canUpdateProject
-                                    "
+                                    v-if="form.is_public && canUpdateProject"
                                     class="flex-shrink-0 px-4 py-4 flex justify-end"
                                 >
                                     <div class="flex items-center h-5">
                                         <input
-                                            v-model="this.confirmPublicAccess"
                                             id="confirm"
+                                            v-model="confirmPublicAccess"
                                             aria-describedby="confirm-description"
                                             name="confirm"
                                             type="checkbox"

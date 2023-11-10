@@ -52,8 +52,8 @@ class ApplicationController extends Controller
                         'tab' => $tab,
                     ]);
                     break;
-                case 'studies':
-                    return Inertia::render('Public/Project/Studies', [
+                case 'samples':
+                    return Inertia::render('Public/Project/Samples', [
                         'project' => (new ProjectResource($project))->lite(false, []),
                         'tab' => $tab,
                     ]);

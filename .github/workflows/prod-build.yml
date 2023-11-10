@@ -18,6 +18,9 @@ env:
   
 
 jobs:
+  # php-unit-test:
+  #   uses: NFDI4Chem/nmrxiv/.github/workflows/test.yml@development
+
   php-unit-test:
     name: Run test
     runs-on: ubuntu-latest
@@ -132,6 +135,7 @@ jobs:
         username: ${{ env.DOCKER_HUB_USERNAME  }}
         password: ${{ env.DOCKER_HUB_PASSWORD  }}
 
+    # Deploy the latest Docker image to the GKE cluster
     - name: Deploy
       run: |-
         kubectl rollout restart deployment/$DEPLOYMENT_NAME

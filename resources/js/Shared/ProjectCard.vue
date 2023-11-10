@@ -62,7 +62,6 @@
                                 class="text-gray-500"
                                 >#{{ project.identifier }}</small
                             >
-                            {{}}
                             <Link
                                 :href="project.public_url"
                                 class="block cursor-pointer"
@@ -77,9 +76,9 @@
                                 </p>
                                 <div class="mt-1 h-14 overflow-hidden">
                                     <span
-                                        class="mt-1 inline-flex items-center rounded-full bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10"
                                         v-for="tag in project.tags"
                                         :key="tag.id"
+                                        class="mt-1 inline-flex items-center rounded-full bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10"
                                     >
                                         {{ tag.name["en"] }}
                                     </span>
@@ -140,11 +139,12 @@
                                     >
                                         <div>
                                             <MenuItem
+                                                v-if="project.download_url"
                                                 v-slot="{ active }"
                                                 class="border-b"
                                             >
                                                 <a
-                                                    :href="downloadURL"
+                                                    :href="project.download_url"
                                                     :class="[
                                                         active
                                                             ? 'bg-gray-100 text-gray-600'
@@ -167,7 +167,7 @@
                                                             >License</small
                                                         ><br />
                                                         <span
-                                                            class="mt-2 float rounded-full border text-xs whitespace-nowrap border-gray-200 items-center py-1.5 pl-3 pr-3 bg-white text-gray-900"
+                                                            class="mt-2 float text-xs whitespace-nowrap border-gray-200 items-center py-1.5 bg-white text-gray-900 ellipsis ..."
                                                             >{{
                                                                 project.license
                                                                     .title
@@ -185,7 +185,6 @@
                 </div>
             </div>
             <div v-if="mode == 'list'">
-                <!-- This example requires Tailwind CSS v2.0+ -->
                 <li class="flex border-b bprder-gray-100">
                     <div class="flex-shrink-0">
                         <img
@@ -284,10 +283,11 @@
                                     {{ project.license.title }}
                                 </p>
                                 <p
+                                    v-if="project.download_url"
                                     class="flex items-center text-sm text-gray-500 sm:mt-0 sm:ml-2"
                                 >
                                     <a
-                                        :href="downloadURL"
+                                        :href="project.download_url"
                                         class="block px-4 text-sm cursor-pointer hover:text-gray-900', ]"
                                     >
                                         <ArrowDownTrayIcon
@@ -299,7 +299,6 @@
                             <div
                                 class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0"
                             >
-                                <!-- Heroicon name: solid/calendar -->
                                 <svg
                                     class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
                                     xmlns="http://www.w3.org/2000/svg"
@@ -328,50 +327,27 @@
 </template>
 
 <script>
-import { LockClosedIcon } from "@heroicons/vue/24/solid";
-import { LockOpenIcon, ArrowDownTrayIcon } from "@heroicons/vue/24/solid";
-import { PencilIcon } from "@heroicons/vue/24/solid";
-import { EnvelopeIcon } from "@heroicons/vue/24/solid";
+import {
+    EllipsisVerticalIcon,
+    ScaleIcon,
+    ArrowDownTrayIcon,
+} from "@heroicons/vue/24/solid";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
-import { EllipsisVerticalIcon, ScaleIcon } from "@heroicons/vue/24/solid";
 import { router } from "@inertiajs/vue3";
-import { Head, Link } from "@inertiajs/vue3";
+import { Link } from "@inertiajs/vue3";
 
 export default {
     components: {
-        Head,
         Link,
-        LockClosedIcon,
-        LockOpenIcon,
-        ArrowDownTrayIcon,
-        EnvelopeIcon,
-        PencilIcon,
-        ScaleIcon,
+        EllipsisVerticalIcon,
         Menu,
         MenuButton,
         MenuItem,
         MenuItems,
-        EllipsisVerticalIcon,
+        ArrowDownTrayIcon,
+        ScaleIcon,
     },
     props: ["project", "mode"],
-    setup() {},
-    data() {
-        return {};
-    },
-    computed: {
-        downloadURL() {
-            return (
-                this.url +
-                "/" +
-                this.project.owner.username +
-                "/datasets/" +
-                this.project.slug
-            );
-        },
-        url() {
-            return String(this.$page.props.url);
-        },
-    },
     methods: {
         toggleUpVote() {
             if (
@@ -391,7 +367,7 @@ export default {
                             );
                         }
                     })
-                    .then(function (response) {
+                    .then(function () {
                         router.reload({ only: ["projects"] });
                     });
             } else {
