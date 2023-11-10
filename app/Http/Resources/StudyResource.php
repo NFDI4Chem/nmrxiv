@@ -31,8 +31,9 @@ class StudyResource extends JsonResource
             'name' => $this->name,
             'slug' => $this->slug,
             'description' => $this->description,
+            'molecules' => $this->sample->molecules,
             'team' => $this->when(! ($this->team && $this->team->personal_team), $this->team),
-            'photo_url' => $this->study_photo_path,
+            'photo_url' => $this->study_photo_url,
             'tags' => $this->tags,
             'identifier' => $this->identifier,
             'doi' => $this->doi,
@@ -41,6 +42,8 @@ class StudyResource extends JsonResource
             'public_url' => $this->public_url ? $this->public_url : null,
             'updated_at' => $this->updated_at,
             'study_preview_urls' => $this->study_preview_urls,
+            'download_url' => $this->download_url,
+            'has_nmrium' => $this->has_nmrium,
             $this->mergeWhen(! $this->lite, function () {
                 return [
                     $this->mergeWhen(

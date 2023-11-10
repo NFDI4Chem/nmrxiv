@@ -19,8 +19,8 @@
                     read-only.
                 </div>
                 <div
-                    class="text-center px-3 py-2 bg-green-50 text-green-700 border-b"
                     v-if="study.is_public && !study.is_archived"
+                    class="text-center px-3 py-2 bg-green-50 text-green-700 border-b"
                 >
                     <b>Info: </b> This project is published. You cannot edit a
                     published project, please create a new version to updated
@@ -324,7 +324,7 @@
                                         ref="studyDetailsElement"
                                         :study="study"
                                         :role="studyRole"
-                                        :studyPermissions="studyPermissions"
+                                        :study-permissions="studyPermissions"
                                     />
                                 </div>
                                 <div
@@ -443,16 +443,16 @@ export default {
         };
     },
 
+    data() {
+        return {};
+    },
+
     computed: {
         canUpdateStudy() {
             return this.studyPermissions
                 ? this.studyPermissions.canUpdateStudy
                 : false;
         },
-    },
-
-    data() {
-        return {};
     },
     methods: {
         toggleDetails() {
