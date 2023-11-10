@@ -199,14 +199,14 @@
                 :class="[
                     fullScreen
                         ? 'overflow-scroll h-full relative px-6 py-4'
-                        : 'px-5',
+                        : 'px-1',
                     'min-w-0 flex-1 bg-white border-t border-gray-200 lg:flex',
                 ]"
             >
                 <aside
                     :class="[
                         height ? height : '',
-                        'py-5 pr-4 lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col overflow-y-scroll border-r',
+                        'py-2 lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col overflow-y-scroll overflow-x-scroll border-r',
                     ]"
                 >
                     <children :file="file"></children>
