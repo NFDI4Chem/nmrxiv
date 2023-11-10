@@ -1,7 +1,7 @@
 <template>
     <project-layout :project="project" :selected-tab="tab">
         <template #project-content>
-            <div class="pb-10 mb-10 max-w-7xl mx-auto p-4">
+            <div class="pb-10 mb-10 max-w-7xl mx-auto py-4">
                 <div v-if="project.data.files">
                     <nav
                         v-if="$page.props.selectedFolder"

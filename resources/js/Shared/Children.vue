@@ -107,7 +107,7 @@
                                                         sfile.relative_url
                                                         ? 'cursor-pointer bg-gray-100 text-gray-900'
                                                         : 'cursor-pointer text-gray-600',
-                                                    'group w-full flex items-center pr-2 py-1 text-left font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500',
+                                                    'group w-full flex pr-1 py-1 text-left font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500',
                                                 ]"
                                                 @click.stop="
                                                     displaySelected(sfile)
@@ -159,7 +159,7 @@
                                                                 sfile.status ==
                                                                 'missing'
                                                                     ? 'text-red-800'
-                                                                    : '',
+                                                                    : 'ellipsis',
                                                             ]"
                                                             style="
                                                                 user-select: none;
@@ -193,7 +193,7 @@
                                                     v-for="subItem in sfile.children"
                                                     :key="subItem.name"
                                                     as="div"
-                                                    class="cursor-pointer group w-full flex items-center pl-7 pr-2 py-0 font-medium text-gray-600 rounded-md"
+                                                    class="cursor-pointer group w-full flex pl-4 pr-2 py-0 font-medium text-gray-600 rounded-md"
                                                     @click.stop="
                                                         displaySelected(subItem)
                                                     "

@@ -20,10 +20,10 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // Schema::table('datasets', function (Blueprint $table) {
-        //     $table->dropColumn('nmrium_info');
-        //     $table->boolean('has_nmrium')->nullable()->default(0);
-        // });
+        Schema::table('datasets', function (Blueprint $table) {
+            $table->dropColumn('nmrium_info');
+            $table->boolean('has_nmrium')->nullable()->default(0);
+        });
     }
 
     /**
