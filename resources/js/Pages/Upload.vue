@@ -350,6 +350,10 @@
                                                 >Draft ID:
                                                 {{ currentDraft.key }}</small
                                             >
+                                            <div
+                                                class="text-red-600"
+                                                v-html="filesErrorMessage"
+                                            ></div>
                                         </div>
                                         <div id="tour-step-upload-spectra">
                                             <file-system-browser
@@ -377,9 +381,9 @@
                                                     <div
                                                         :class="[
                                                             displaySamplesSummaryInfo
-                                                                ? 'bg-gray-900 text-white'
+                                                                ? 'bg-gray-800 text-white'
                                                                 : 'text-dark',
-                                                            'cursor-pointer border-gray-200 px-4 py-3 border-b bg-gray-50 text-left text-sm font-medium text-gray-500 tracking-wider flex-shrink-0 border-b border-blue-gray-200',
+                                                            'cursor-pointer border-gray-200 px-4 py-3 border-b text-left text-sm font-medium text-gray-500 tracking-wider flex-shrink-0 border-b border-blue-gray-200 hover:bg-gray-800 hover:text-white',
                                                         ]"
                                                         @click="
                                                             showSamplesSummary
@@ -612,6 +616,10 @@
                                                                     </dd>
                                                                 </div>
                                                                 <div
+                                                                    v-if="
+                                                                        inprogressStudies.length ==
+                                                                        0
+                                                                    "
                                                                     class="flex items-baseline flex-wrap justify-between gap-y-2 gap-x-4 border-t border-gray-900/5 px-4 py-10 sm:px-6 lg:border-t-0 xl:px-8 sm:border-l"
                                                                 >
                                                                     <dt
@@ -622,19 +630,41 @@
                                                                     </dt>
                                                                     <!-- <dd class="text-xs font-medium text-rose-600">x%</dd> -->
                                                                     <dd
-                                                                        class="w-full flex-none text-3xl font-medium leading-10 tracking-tight text-gray-900"
+                                                                        class="w-full flex-none"
                                                                     >
                                                                         <span
                                                                             v-if="
                                                                                 validationStatus
                                                                             "
                                                                         >
-                                                                            Success
+                                                                            <span
+                                                                                class="text-green-600 text-3xl font-medium leading-10 tracking-tight text-gray-900"
+                                                                            >
+                                                                                Success
+                                                                            </span>
                                                                         </span>
                                                                         <span
                                                                             v-else
                                                                         >
-                                                                            Failed
+                                                                            <span
+                                                                                class="text-yellow-600 text-3xl font-medium leading-10 tracking-tight text-gray-900"
+                                                                            >
+                                                                                Incomplete
+                                                                            </span>
+                                                                            <span
+                                                                                class="text-sm text-red-500 tracking-tight"
+                                                                            >
+                                                                                Meta
+                                                                                data
+                                                                                is
+                                                                                missing.
+                                                                                Please
+                                                                                check
+                                                                                the
+                                                                                validation
+                                                                                report
+                                                                                below.
+                                                                            </span>
                                                                         </span>
                                                                     </dd>
                                                                 </div>
@@ -760,10 +790,11 @@
                                                                                     worries,
                                                                                     though
                                                                                     –
-                                                                                    we've
+                                                                                    We
                                                                                     got
                                                                                     your
-                                                                                    back!
+                                                                                    back
+                                                                                    covered!
                                                                                     Would
                                                                                     you
                                                                                     like
@@ -786,7 +817,7 @@
                                                                             >
                                                                                 <button
                                                                                     type="button"
-                                                                                    class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                                                                                    class="inline-flex items-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-500"
                                                                                     @click="
                                                                                         autoImport
                                                                                     "
@@ -801,14 +832,16 @@
                                                             </div>
 
                                                             <div
-                                                                class="mx-auto grid max-w-2xl grid-cols-1 grid-rows-1 items-start gap-x-8 gap-y-8 lg:mx-0 lg:max-w-none lg:grid-cols-3"
+                                                                class="mx-auto grid mt-10 max-w-2xl grid-cols-1 grid-rows-1 items-start gap-x-8 gap-y-8 lg:mx-0 lg:max-w-none lg:grid-cols-3"
                                                             >
                                                                 <div
                                                                     class="lg:col-span-3"
                                                                 >
                                                                     <div
                                                                         v-if="
-                                                                            validation
+                                                                            validation &&
+                                                                            inprogressStudies.length ==
+                                                                                0
                                                                         "
                                                                     >
                                                                         <button
@@ -1073,6 +1106,11 @@
                                                                                                         $event
                                                                                                             .detail[0]
                                                                                                 "
+                                                                                                @blur="
+                                                                                                    updateSpecies(
+                                                                                                        studySpecies
+                                                                                                    )
+                                                                                                "
                                                                                             ></ontology-autocomplete>
                                                                                         </div>
                                                                                         <div
@@ -1156,155 +1194,6 @@
                                                                                             composition
                                                                                             (optional)
                                                                                         </h3>
-                                                                                    </div>
-                                                                                    <div
-                                                                                        class="rounded-md my-2 bg-yellow-50 p-4"
-                                                                                    >
-                                                                                        <div
-                                                                                            class="flex"
-                                                                                        >
-                                                                                            <div
-                                                                                                class="flex-shrink-0"
-                                                                                            >
-                                                                                                <svg
-                                                                                                    class="h-5 w-5 text-yellow-400"
-                                                                                                    viewBox="0 0 20 20"
-                                                                                                    fill="currentColor"
-                                                                                                    aria-hidden="true"
-                                                                                                >
-                                                                                                    <path
-                                                                                                        fill-rule="evenodd"
-                                                                                                        d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z"
-                                                                                                        clip-rule="evenodd"
-                                                                                                    />
-                                                                                                </svg>
-                                                                                            </div>
-                                                                                            <div
-                                                                                                class="ml-3"
-                                                                                            >
-                                                                                                <h3
-                                                                                                    class="text-sm font-medium text-yellow-800"
-                                                                                                >
-                                                                                                    Residual
-                                                                                                    Complexity
-                                                                                                    (RC)
-                                                                                                </h3>
-                                                                                                <div
-                                                                                                    class="mt-2 text-sm text-yellow-700"
-                                                                                                >
-                                                                                                    <p>
-                                                                                                        Residual
-                                                                                                        Complexity
-                                                                                                        (RC)
-                                                                                                        refers
-                                                                                                        to
-                                                                                                        the
-                                                                                                        subtle
-                                                                                                        but
-                                                                                                        significant
-                                                                                                        convolution
-                                                                                                        of
-                                                                                                        major
-                                                                                                        and
-                                                                                                        minor
-                                                                                                        ("hidden")
-                                                                                                        chemical
-                                                                                                        species
-                                                                                                        in
-                                                                                                        materials
-                                                                                                        that
-                                                                                                        originate
-                                                                                                        from
-                                                                                                        biochemical
-                                                                                                        or
-                                                                                                        synthetic
-                                                                                                        reaction
-                                                                                                        mixtures.
-                                                                                                        Certain
-                                                                                                        levels
-                                                                                                        of
-                                                                                                        these
-                                                                                                        chemical
-                                                                                                        species
-                                                                                                        (molecules)
-                                                                                                        usually
-                                                                                                        remain
-                                                                                                        present
-                                                                                                        even
-                                                                                                        after
-                                                                                                        a
-                                                                                                        number
-                                                                                                        of
-                                                                                                        purification
-                                                                                                        steps,
-                                                                                                        and
-                                                                                                        this
-                                                                                                        RC
-                                                                                                        is
-                                                                                                        to
-                                                                                                        some
-                                                                                                        degree
-                                                                                                        conserved
-                                                                                                        even
-                                                                                                        in
-                                                                                                        highly
-                                                                                                        purified
-                                                                                                        materials.
-                                                                                                        In
-                                                                                                        principle,
-                                                                                                        RC
-                                                                                                        affects
-                                                                                                        all
-                                                                                                        "pure"
-                                                                                                        materials,
-                                                                                                        including
-                                                                                                        synthetic
-                                                                                                        compound,
-                                                                                                        whenever
-                                                                                                        chromatographic
-                                                                                                        or
-                                                                                                        other
-                                                                                                        purification
-                                                                                                        steps
-                                                                                                        are
-                                                                                                        required
-                                                                                                        prior
-                                                                                                        to
-                                                                                                        their
-                                                                                                        biological
-                                                                                                        evaluation.
-                                                                                                        Please
-                                                                                                        report
-                                                                                                        the
-                                                                                                        chemical
-                                                                                                        composition
-                                                                                                        (if
-                                                                                                        known)
-                                                                                                        of
-                                                                                                        your
-                                                                                                        sample.
-                                                                                                        If
-                                                                                                        unknown
-                                                                                                        please
-                                                                                                        report
-                                                                                                        the
-                                                                                                        molecules
-                                                                                                        that
-                                                                                                        you
-                                                                                                        expect
-                                                                                                        to
-                                                                                                        be
-                                                                                                        present
-                                                                                                        in
-                                                                                                        your
-                                                                                                        sample
-                                                                                                        with-out
-                                                                                                        the
-                                                                                                        composition.
-                                                                                                    </p>
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        </div>
                                                                                     </div>
                                                                                 </div>
 
@@ -1421,7 +1310,7 @@
                                                                                                                         <!-- <img> -->
                                                                                                                     </div>
                                                                                                                     <button
-                                                                                                                        class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                                                                                                        class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
                                                                                                                         @click="
                                                                                                                             deleteMolecule(
                                                                                                                                 molecule
@@ -1634,6 +1523,155 @@
                                                                                         >
                                                                                             ADD
                                                                                         </button>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div
+                                                                                    class="rounded-md my-6 bg-blue-50 p-4"
+                                                                                >
+                                                                                    <div
+                                                                                        class="flex"
+                                                                                    >
+                                                                                        <div
+                                                                                            class="flex-shrink-0"
+                                                                                        >
+                                                                                            <svg
+                                                                                                class="h-5 w-5 text-blue-400"
+                                                                                                viewBox="0 0 20 20"
+                                                                                                fill="currentColor"
+                                                                                                aria-hidden="true"
+                                                                                            >
+                                                                                                <path
+                                                                                                    fill-rule="evenodd"
+                                                                                                    d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z"
+                                                                                                    clip-rule="evenodd"
+                                                                                                />
+                                                                                            </svg>
+                                                                                        </div>
+                                                                                        <div
+                                                                                            class="ml-3"
+                                                                                        >
+                                                                                            <h3
+                                                                                                class="text-sm font-medium text-gray-800"
+                                                                                            >
+                                                                                                Residual
+                                                                                                Complexity
+                                                                                                (RC)
+                                                                                            </h3>
+                                                                                            <div
+                                                                                                class="mt-2 text-sm text-gray-700"
+                                                                                            >
+                                                                                                <p>
+                                                                                                    Residual
+                                                                                                    Complexity
+                                                                                                    (RC)
+                                                                                                    refers
+                                                                                                    to
+                                                                                                    the
+                                                                                                    subtle
+                                                                                                    but
+                                                                                                    significant
+                                                                                                    convolution
+                                                                                                    of
+                                                                                                    major
+                                                                                                    and
+                                                                                                    minor
+                                                                                                    ("hidden")
+                                                                                                    chemical
+                                                                                                    species
+                                                                                                    in
+                                                                                                    materials
+                                                                                                    that
+                                                                                                    originate
+                                                                                                    from
+                                                                                                    biochemical
+                                                                                                    or
+                                                                                                    synthetic
+                                                                                                    reaction
+                                                                                                    mixtures.
+                                                                                                    Certain
+                                                                                                    levels
+                                                                                                    of
+                                                                                                    these
+                                                                                                    chemical
+                                                                                                    species
+                                                                                                    (molecules)
+                                                                                                    usually
+                                                                                                    remain
+                                                                                                    present
+                                                                                                    even
+                                                                                                    after
+                                                                                                    a
+                                                                                                    number
+                                                                                                    of
+                                                                                                    purification
+                                                                                                    steps,
+                                                                                                    and
+                                                                                                    this
+                                                                                                    RC
+                                                                                                    is
+                                                                                                    to
+                                                                                                    some
+                                                                                                    degree
+                                                                                                    conserved
+                                                                                                    even
+                                                                                                    in
+                                                                                                    highly
+                                                                                                    purified
+                                                                                                    materials.
+                                                                                                    In
+                                                                                                    principle,
+                                                                                                    RC
+                                                                                                    affects
+                                                                                                    all
+                                                                                                    "pure"
+                                                                                                    materials,
+                                                                                                    including
+                                                                                                    synthetic
+                                                                                                    compound,
+                                                                                                    whenever
+                                                                                                    chromatographic
+                                                                                                    or
+                                                                                                    other
+                                                                                                    purification
+                                                                                                    steps
+                                                                                                    are
+                                                                                                    required
+                                                                                                    prior
+                                                                                                    to
+                                                                                                    their
+                                                                                                    biological
+                                                                                                    evaluation.
+                                                                                                    Please
+                                                                                                    report
+                                                                                                    the
+                                                                                                    chemical
+                                                                                                    composition
+                                                                                                    (if
+                                                                                                    known)
+                                                                                                    of
+                                                                                                    your
+                                                                                                    sample.
+                                                                                                    If
+                                                                                                    unknown
+                                                                                                    please
+                                                                                                    report
+                                                                                                    the
+                                                                                                    molecules
+                                                                                                    that
+                                                                                                    you
+                                                                                                    expect
+                                                                                                    to
+                                                                                                    be
+                                                                                                    present
+                                                                                                    in
+                                                                                                    your
+                                                                                                    sample
+                                                                                                    with-out
+                                                                                                    the
+                                                                                                    composition.
+                                                                                                </p>
+                                                                                            </div>
+                                                                                        </div>
                                                                                     </div>
                                                                                 </div>
                                                                             </div>
@@ -2571,6 +2609,8 @@ export default {
 
             errors: null,
             studiesToImport: [],
+            errorMessage: null,
+            filesErrorMessage: null,
         };
     },
     computed: {
@@ -2734,60 +2774,65 @@ export default {
                     foldersExist = true;
                 }
             });
-
-            this.hasStudies(this.$refs.fsbRef.file);
-            this.fetchProjectDetails().then(
-                (response) => {
-                    this.loadingStep = false;
-                    this.project = response.data.project;
-                    this.studies = response.data.studies;
-                    if (
-                        this.project &&
-                        this.studies &&
-                        this.studies.length > 0
-                    ) {
+            if (foldersExist) {
+                this.hasStudies(this.$refs.fsbRef.file);
+                this.fetchProjectDetails().then(
+                    (response) => {
+                        console.log(response);
                         this.loadingStep = false;
-                        this.selectStep(2);
-                        this.inprogressStudies = this.studies.filter(
-                            (study) => study.internal_status != "complete"
-                        );
-                        if (this.inprogressStudies.length > 0) {
-                            this.checkStudyStatus();
-                        }
-                    } else {
-                        if (this.studies.length == 0) {
+                        this.project = response.data.project;
+                        this.studies = response.data.studies;
+                        if (
+                            this.project &&
+                            this.studies &&
+                            this.studies.length > 0
+                        ) {
                             this.loadingStep = false;
-                        }
-                    }
-                },
-                (error) => {
-                    this.loadingStep = false;
-                    Object.keys(error.response.data.errors).forEach((key) => {
-                        error.response.data.errors[key] =
-                            error.response.data.errors[key].join(", ");
-                    });
-                    this.draftForm.errors = error.response.data.errors;
-                    this.draftForm.error_message = error.response.data.message;
-                    this.draftForm.hasErrors = true;
-                    Object.keys(this.draftForm.errors).forEach((key) => {
-                        if (!this.errorMessage) {
-                            this.errorMessage =
-                                "<b class='capitalize'>" +
-                                key +
-                                "</b>: " +
-                                this.draftForm.errors[key] +
-                                "</br>";
+                            this.selectStep(2);
+                            this.inprogressStudies = this.studies.filter(
+                                (study) => study.internal_status != "complete"
+                            );
+                            if (this.inprogressStudies.length > 0) {
+                                this.checkStudyStatus();
+                            }
                         } else {
-                            this.errorMessage +=
-                                "<b class='capitalize'>" +
-                                key +
-                                "</b>: " +
-                                this.draftForm.errors[key] +
-                                "</br>";
+                            if (this.studies.length == 0) {
+                                this.loadingStep = false;
+                            }
                         }
-                    });
-                }
-            );
+                    },
+                    (error) => {
+                        this.loadingStep = false;
+                        Object.keys(error.response.data.errors).forEach(
+                            (key) => {
+                                error.response.data.errors[key] =
+                                    error.response.data.errors[key].join(", ");
+                            }
+                        );
+                        this.draftForm.errors = error.response.data.errors;
+                        this.draftForm.error_message =
+                            error.response.data.message;
+                        this.draftForm.hasErrors = true;
+                        Object.keys(this.draftForm.errors).forEach((key) => {
+                            if (!this.errorMessage) {
+                                this.errorMessage =
+                                    "<b class='capitalize'>" +
+                                    key +
+                                    "</b>: " +
+                                    this.draftForm.errors[key] +
+                                    "</br>";
+                            } else {
+                                this.errorMessage +=
+                                    "<b class='capitalize'>" +
+                                    key +
+                                    "</b>: " +
+                                    this.draftForm.errors[key] +
+                                    "</br>";
+                            }
+                        });
+                    }
+                );
+            }
             if (
                 this.$refs.fsbRef.file &&
                 this.$refs.fsbRef.file.children.length > 0 &&
@@ -2804,16 +2849,16 @@ export default {
                     this.$refs.fsbRef.file.children.length > 0 &&
                     !foldersExist
                 ) {
-                    this.errorMessage =
+                    this.filesErrorMessage =
                         "Spectra files needs to be organised into folders. Please create a folder corresponding to each sample and add all your NMR spectroscopic experiment output files are added to the corresponding folders";
                 } else if (this.$refs.fsbRef.file.children.length <= 0) {
-                    this.errorMessage =
+                    this.filesErrorMessage =
                         "Please upload spectral data to proceed.";
                 } else if (!this.studiesExist) {
-                    this.errorMessage =
+                    this.filesErrorMessage =
                         "Please upload spectral data to proceed.";
                 } else {
-                    this.errorMessage =
+                    this.filesErrorMessage =
                         "Please make sure you fill in all the required data before you proceed";
                 }
             }

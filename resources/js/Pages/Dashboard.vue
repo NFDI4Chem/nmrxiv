@@ -70,14 +70,14 @@
                             d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"
                         />
                     </svg>
-                    <h3 class="mt-2 text-sm font-medium text-gray-900">
-                        No Projects or Samples
+                    <h3 class="mt-2 text-md font-medium text-gray-900">
+                        You have no <b>projects</b> or <b>samples</b> yet
                     </h3>
                     <div v-if="editableTeamRole" class="mt-2">
                         <p class="mb-1 text-sm text-gray-500">
                             Get started by uploading your data.
                         </p>
-                        <create mode="button"></create>
+                        <create class="mt-5" mode="button"></create>
                         <span
                             class="float-center text-xs cursor-pointer hover:text-blue-700 mt-2"
                         >
