@@ -7,19 +7,19 @@
         <template #title>
             {{ project.name }} - Manage Authors
             <button
-                type="button"
                 v-if="!displayAddAuthorForms"
-                @click="displayAddAuthorForms = true"
+                type="button"
                 class="inline-flex float-right items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                @click="displayAddAuthorForms = true"
             >
                 <PlusIcon class="w-5 h-5 mr-1 text-white" />
                 Add Author
             </button>
             <button
-                type="button"
                 v-else
-                @click="onBack"
+                type="button"
                 class="inline-flex float-right items-center rounded-md border border-transparent bg-gray-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                @click="onBack"
             >
                 <ArrowSmallRightIcon class="w-5 h-5 mr-1 text-white" />
                 Back
@@ -183,7 +183,7 @@
                                                 form.contributor_type
                                             "
                                             label="Role"
-                                            :items="this.contributorType"
+                                            :items="contributorType"
                                         />
                                     </div>
                                     <div class="sm:col-span-6">
@@ -223,9 +223,9 @@
                                             class="float-right"
                                             :disabled="
                                                 !(
-                                                    this.form &&
-                                                    this.form.given_name &&
-                                                    this.form.family_name
+                                                    form &&
+                                                    form.given_name &&
+                                                    form.family_name
                                                 )
                                             "
                                             @click="save('addManually')"
@@ -236,14 +236,14 @@
                                             class="float-right mr-2"
                                             :disabled="
                                                 !(
-                                                    this.form &&
-                                                    this.form.given_name &&
-                                                    this.form.family_name
+                                                    form &&
+                                                    form.given_name &&
+                                                    form.family_name
                                                 )
                                             "
                                             @click="
-                                                this.form.reset(),
-                                                    this.authorsForm.reset()
+                                                form.reset(),
+                                                    authorsForm.reset()
                                             "
                                         >
                                             Clear
@@ -257,9 +257,9 @@
                                             class="float-right"
                                             :disabled="
                                                 !(
-                                                    this.form &&
-                                                    this.form.given_name &&
-                                                    this.form.family_name
+                                                    form &&
+                                                    form.given_name &&
+                                                    form.family_name
                                                 )
                                             "
                                             @click="save('addManually')"
@@ -270,9 +270,9 @@
                                             class="float-right mr-2"
                                             :disabled="
                                                 !(
-                                                    this.form &&
-                                                    this.form.given_name &&
-                                                    this.form.family_name
+                                                    form &&
+                                                    form.given_name &&
+                                                    form.family_name
                                                 )
                                             "
                                             @click="onCancelEdit()"
@@ -330,18 +330,16 @@
                                         class="ml-2"
                                         :disabled="!(fetchedAuthors.length > 0)"
                                         @click="
-                                            (this.fetchedAuthors = []),
-                                                (this.query = null)
+                                            (fetchedAuthors = []),
+                                                (query = null)
                                         "
                                     >
                                         Reset
                                     </jet-secondary-button>
                                     <jet-secondary-button
                                         class="ml-2 float-right"
-                                        :disabled="
-                                            !this.$page.props.user.orcid_id
-                                        "
-                                        @click="this.addCurrentUser"
+                                        :disabled="!$page.props.user.orcid_id"
+                                        @click="addCurrentUser"
                                     >
                                         Add me
                                     </jet-secondary-button>
@@ -367,17 +365,17 @@
                                             class="relative flex items-start mt-2"
                                         >
                                             <div
-                                                @click="
-                                                    addAuthorToSelectedList(
-                                                        author
-                                                    )
-                                                "
                                                 :class="[
                                                     author.selected
                                                         ? 'bg-gray-200 text-white'
                                                         : '',
                                                     'cursor-pointer min-w-0 flex-1 text-sm font-medium border rounded-md p-4',
                                                 ]"
+                                                @click="
+                                                    addAuthorToSelectedList(
+                                                        author
+                                                    )
+                                                "
                                             >
                                                 <label
                                                     for="items"
@@ -425,7 +423,7 @@
                                         <jet-secondary-button
                                             :disabled="
                                                 !(
-                                                    this.selectedFetchedAuthorsList(
+                                                    selectedFetchedAuthorsList(
                                                         false
                                                     ).length > 0
                                                 )
@@ -460,12 +458,12 @@
                         *Click and drag authors to sort order.
                     </p>
                     <draggable
-                        v-model="this.authors"
+                        v-model="authors"
+                        item-key="author.id"
+                        group="author"
                         @start="drag = true"
                         @end="drag = false"
                         @change="onSort()"
-                        item-key="author.id"
-                        group="author"
                     >
                         <template #item="{ element }">
                             <div class="overflow-auto">
@@ -491,7 +489,7 @@
                                                     class="ml-2 flex flex-shrink-0"
                                                     @click="
                                                         (showManageRoleDialog = true),
-                                                            (this.updateRoleForm.author_id =
+                                                            (updateRoleForm.author_id =
                                                                 element.id)
                                                     "
                                                 >
@@ -587,8 +585,8 @@
                 </div>
             </div>
             <div
-                class="py-5"
                 v-if="authors.length == 0 && !displayAddAuthorForms"
+                class="py-5"
             >
                 <div class="text-center">
                     <FolderPlusIcon class="mx-auto h-12 w-12 text-gray-400" />
@@ -601,8 +599,8 @@
                     <div class="mt-6">
                         <button
                             type="button"
-                            @click="displayAddAuthorForms = true"
                             class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                            @click="displayAddAuthorForms = true"
                         >
                             <!-- Heroicon name: mini/plus -->
                             <PlusIcon class="w-5 h-5 mr-1 text-white" />
@@ -625,9 +623,7 @@
 
                 <template #footer>
                     <jet-secondary-button
-                        @click="
-                            confirmDelete = false && this.authorsForm.reset()
-                        "
+                        @click="confirmDelete = false && authorsForm.reset()"
                     >
                         Cancel
                     </jet-secondary-button>
@@ -666,8 +662,8 @@
                     class="relative flex items-start mt-2"
                 >
                     <div
-                        @click="updateRole(item)"
                         class="cursor-pointer flex-1 border rounded-md p-2 bg-white-200 hover:bg-gray-200"
+                        @click="updateRole(item)"
                     >
                         <div class="text-gray-900">
                             <b>{{ item.title }}</b> <br />

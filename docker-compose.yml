@@ -3,7 +3,7 @@ version: "3"
 services:
     laravel.test:
         build:
-            context: ./docker/8.1
+            context: ./docker/8.2
             dockerfile: Dockerfile
             args:
                 WWWGROUP: "${WWWGROUP}"
@@ -26,11 +26,12 @@ services:
             - selenium
         #   - minio
     pgsql:
-        image: "postgres:13"
+        image: "informaticsmatters/rdkit-cartridge-debian:latest"
+        pull_policy: always
         ports:
             - "${FORWARD_DB_PORT:-5432}:5432"
         environment:
-            PGPASSWORD: "${DB_PASSWORD:-secret}"
+            PG_VERSION: "${DB_VERSION}"
             POSTGRES_DB: "${DB_DATABASE}"
             POSTGRES_USER: "${DB_USERNAME}"
             POSTGRES_PASSWORD: "${DB_PASSWORD:-secret}"
@@ -89,6 +90,8 @@ services:
             - "sailmeilisearch:/data.ms"
         networks:
             - sail
+        environment:
+            MEILI_MASTER_KEY: "${MEILISEARCH_PRIVATEKEY}"
         healthcheck:
             test:
                 [

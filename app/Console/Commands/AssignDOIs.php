@@ -2,8 +2,9 @@
 
 namespace App\Console\Commands;
 
+use App\Actions\Project\AssignIdentifier;
 use App\Models\Project;
-use App\Services\DOI\DOIService;
+use App\Models\Study;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -28,9 +29,9 @@ class AssignDOIs extends Command
      *
      * @return int
      */
-    public function handle(DOIService $doiService)
+    public function handle(AssignIdentifier $assigner)
     {
-        return DB::transaction(function () use ($doiService) {
+        return DB::transaction(function () use ($assigner) {
             $projects = Project::where([
                 ['is_public', true],
                 ['doi', null],
@@ -38,7 +39,17 @@ class AssignDOIs extends Command
 
             foreach ($projects as $project) {
                 $projectDOI = $project->doi ? $project->doi : null;
-                $project->generateDOI($doiService);
+                $assigner->assign($project);
+            }
+
+            $studies = Study::where([
+                ['is_public', true],
+                ['doi', null],
+            ])->get();
+
+            foreach ($studies as $study) {
+                $studyDOI = $study->doi ? $study->doi : null;
+                $assigner->assign(collect([$study]));
             }
         });
     }

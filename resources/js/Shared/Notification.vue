@@ -121,12 +121,12 @@
                                                 >
                                                     <button
                                                         type="button"
+                                                        class="rounded-md text-sm font-medium text-teal-600 hover:text-teal-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                                                         @click="
                                                             markNotificationAsRead(
                                                                 notification
                                                             )
                                                         "
-                                                        class="rounded-md text-sm font-medium text-teal-600 hover:text-teal-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                                                     >
                                                         Mark As Read
                                                     </button>
@@ -157,7 +157,7 @@
                                             type="button"
                                             class="ml-4"
                                             :disabled="
-                                                this.notifications.length == 0
+                                                notifications.length == 0
                                             "
                                             @click="markAllNotificationAsRead()"
                                         >

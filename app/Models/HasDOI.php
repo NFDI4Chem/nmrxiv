@@ -41,12 +41,18 @@ trait HasDOI
                     }
                 } elseif ($this instanceof Study) {
                     $users = $this->allUsers();
-                    $authors = $this->project->authors ? $this->project->authors : [];
-                    $projectIdentifier = $this->getIdentifier($this->project, 'identifier');
-                    $suffix = 'P'.$projectIdentifier.'.'.'S'.$identifier;
+                    $citations = [];
+                    if ($this->project) {
+                        $authors = $this->project->authors ? $this->project->authors : [];
+                        $projectIdentifier = $this->getIdentifier($this->project, 'identifier');
+                        $suffix = 'P'.$projectIdentifier.'.'.'S'.$identifier;
+                        $citations = $this->project->citation ? $this->project->citation : [];
+                    } else {
+                        $suffix = 'S'.$identifier;
+                    }
+
                     $url = $url.'S'.$identifier;
                     $resourceType = 'Study';
-                    $citations = $this->project->citation ? $this->project->citation : [];
 
                     if (! $citations == []) {
                         foreach ($citations as $citation) {
@@ -58,13 +64,18 @@ trait HasDOI
                     }
                 } elseif ($this instanceof Dataset) {
                     $users = $this->study->allUsers();
-                    $authors = $this->project->authors ? $this->project->authors : [];
-                    $projectIdentifier = $this->getIdentifier($this->project, 'identifier');
                     $studyIdentifier = $this->getIdentifier($this->study, 'identifier');
-                    $suffix = 'P'.$projectIdentifier.'.'.'S'.$studyIdentifier.'.'.'D'.$identifier;
+                    $citations = [];
+                    if ($this->project) {
+                        $authors = $this->project->authors ? $this->project->authors : [];
+                        $projectIdentifier = $this->getIdentifier($this->project, 'identifier');
+                        $suffix = 'P'.$projectIdentifier.'.'.'S'.$studyIdentifier.'.'.'D'.$identifier;
+                        $citations = $this->project->citation ? $this->project->citation : [];
+                    } else {
+                        $suffix = 'S'.$studyIdentifier.'.'.'D'.$identifier;
+                    }
                     $url = $url.'D'.$identifier;
                     $resourceType = 'Dataset';
-                    $citations = $this->project->citation ? $this->project->citation : [];
 
                     if (! $citations == []) {
                         foreach ($citations as $citation) {
@@ -131,7 +142,7 @@ trait HasDOI
                 ];
 
                 $attributes = [
-                    'creators' => $creators,
+                    'creators' => count($creators) > 0 ? $creators : $contributors,
                     'titles' => [
                         [
                             'title' => $this->name,
@@ -151,6 +162,8 @@ trait HasDOI
                     'state' => 'findable',
                     'schemaVersion' => 'http://datacite.org/schema/kernel-4',
                 ];
+
+                // dd($attributes);
 
                 $doiResponse = $doiService->createDOI($suffix, $attributes);
                 $this->doi = $doiResponse['data']['id'];

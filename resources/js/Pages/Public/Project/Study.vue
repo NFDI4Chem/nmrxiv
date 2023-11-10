@@ -1,5 +1,5 @@
 <template>
-    <project-layout :project="project" :selectedTab="tab">
+    <project-layout :project="project" :selected-tab="tab">
         <template #project-content>
             <div
                 class="pb-10 mb-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6"
@@ -16,8 +16,8 @@
                     <div class="float-right">
                         <span class="flex-0.5 self-center">
                             <Menu
-                                as="div"
                                 v-if="selectedDataset && study.data.is_public"
+                                as="div"
                                 class="relative text-left"
                             >
                                 <div>
@@ -98,7 +98,13 @@
                     </div>
                 </h1>
                 <br />
-                <div class="mt-4">
+                <div
+                    v-if="
+                        study.data.description &&
+                        study.data.description.length > 0
+                    "
+                    class="mt-4"
+                >
                     <div class="relative">
                         <div
                             class="absolute inset-0 flex items-center"
@@ -245,13 +251,12 @@
                                                             <div
                                                                 class="rounded-md border my-3 flex justify-center items-center"
                                                             >
-                                                                <span
-                                                                    v-html="
-                                                                        getSVGString(
-                                                                            molecule
-                                                                        )
+                                                                <Depictor2D
+                                                                    class="py-4 -px-4"
+                                                                    :molecule="
+                                                                        molecule.CANONICAL_SMILES
                                                                     "
-                                                                ></span>
+                                                                ></Depictor2D>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -325,8 +330,8 @@
                                     }})</span
                                 >
                             </option>
-                        </select>
-                        <div v-if="selectedDataset" class="text-sm my-2">
+                        </select> -->
+                    <!-- <div v-if="selectedDataset" class="text-sm my-2">
                             <span class="text-gray-400 pt-2">
                                 <img
                                     :src="
@@ -339,10 +344,10 @@
                     </div> -->
                     <div class="mt-3">
                         <SpectraViewer
+                            ref="spectraViewerREF"
                             :dataset="selectedDataset"
                             :project="project.data"
                             :study="study.data"
-                            ref="spectraViewerREF"
                         ></SpectraViewer>
                     </div>
 
@@ -459,7 +464,7 @@ import ProjectLayout from "@/Pages/Public/Project/Layout.vue";
 import { ShareIcon, ClipboardDocumentIcon } from "@heroicons/vue/24/solid";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import SpectraViewer from "@/Shared/SpectraViewer.vue";
-
+import Depictor2D from "@/Shared/Depictor2D.vue";
 export default {
     components: {
         ProjectLayout,
@@ -470,6 +475,7 @@ export default {
         MenuItem,
         MenuItems,
         SpectraViewer,
+        Depictor2D,
     },
     props: ["project", "tab", "study"],
     data() {

@@ -160,7 +160,7 @@
                             >
                         </div>
                     </div>
-                    <jet-input-error :message="this.error.orcid" class="mt-2" />
+                    <jet-input-error :message="error.orcid" class="mt-2" />
                 </div>
 
                 <!-- Affiliation -->
@@ -196,8 +196,8 @@
         <!-- Find ORCID iD Modal -->
         <select-orcid-id
             ref="selectOrcidIdElement"
-            v-model:orcidId="this.form.orcid_id"
-            v-model:affiliation="this.form.affiliation"
+            v-model:orcidId="form.orcid_id"
+            v-model:affiliation="form.affiliation"
         />
     </div>
 </template>
@@ -226,6 +226,12 @@ export default {
     },
 
     props: ["user"],
+    setup() {
+        const selectOrcidIdElement = ref(null);
+        return {
+            selectOrcidIdElement,
+        };
+    },
 
     data() {
         return {
@@ -241,12 +247,6 @@ export default {
             }),
             error: {},
             photoPreview: null,
-        };
-    },
-    setup() {
-        const selectOrcidIdElement = ref(null);
-        return {
-            selectOrcidIdElement,
         };
     },
 
