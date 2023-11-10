@@ -10,8 +10,9 @@
     >
         <div>
             <div :class="[fullScreen ? 'px-6 py-4' : '', 'flex']">
-                <div class="w-full">
+                <div class="w-full px-5">
                     <div
+                        v-if="!readonly"
                         class="float-left text-sm cursor-pointer hover:text-blue-700 mt-2 mr-10"
                     >
                         <i
@@ -30,7 +31,7 @@
                             </a></i
                         >
                     </div>
-                    <button class="float-right" @click="toggleFullScreen">
+                    <!-- <button class="float-right" @click="toggleFullScreen">
                         <span v-if="fullScreen">
                             <svg
                                 width="24"
@@ -85,10 +86,13 @@
                                 />
                             </svg>
                         </span>
-                    </button>
+                    </button> -->
                 </div>
             </div>
-            <div v-if="!readonly" :class="[fullScreen ? 'px-6 py-4' : '', '']">
+            <div
+                v-if="!readonly"
+                :class="[fullScreen ? 'px-6 py-4' : 'px-5', '']"
+            >
                 <form class="py-2 mb-3">
                     <div id="fs-dropzone-message" class="text-center">
                         <div
@@ -134,14 +138,15 @@
                                     v-if="status"
                                     class="mt-2 block text-sm font-medium text-gray-900"
                                 >
-                                    {{ status }} -
+                                    {{ status }}
                                     <div v-if="uploadBatchErrors.length > 0">
+                                        -
                                         <a
+                                            class="text-red-700 cursor-pointer"
                                             @click="
                                                 showErrorBatchLogs =
                                                     !showErrorBatchLogs
                                             "
-                                            class="text-red-700 cursor-pointer"
                                             >View logs</a
                                         >
                                     </div>
@@ -151,11 +156,11 @@
                                     class="mt-2 block text-sm font-medium text-gray-900"
                                 >
                                     <div
-                                        class="rounded-md"
                                         v-for="(
                                             error, $index
                                         ) in uploadBatchErrors"
                                         :key="$index"
+                                        class="rounded-md"
                                         v-html="error"
                                     ></div>
                                 </div>
@@ -164,20 +169,49 @@
                     </div>
                 </form>
             </div>
+            <div v-if="loading">
+                <div class="h-[calc(100vh-260px)] text-center py-12">
+                    <svg
+                        class="animate-spin -ml-1 mr-3 h-5 w-5 text-dark flex-inline inline"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                    >
+                        <circle
+                            class="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            stroke-width="4"
+                        ></circle>
+                        <path
+                            class="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                    </svg>
+                    Loading Files...
+                </div>
+            </div>
             <div
+                v-else
                 :class="[
                     fullScreen
                         ? 'overflow-scroll h-full relative px-6 py-4'
-                        : '',
+                        : 'px-1',
                     'min-w-0 flex-1 bg-white border-t border-gray-200 lg:flex',
                 ]"
             >
                 <aside
-                    class="py-3 px-2 lg:block lg:flex-shrink-0 lg:order-first overflow-scroll"
+                    :class="[
+                        height ? height : '',
+                        'py-2 lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col overflow-y-scroll overflow-x-scroll border-r',
+                    ]"
                 >
                     <children :file="file"></children>
                     <div
-                        v-if="Object.keys(logs).length > 0"
+                        v-if="Object.keys(logs).length > 0 && !readonly"
                         class="mt-4 text-sm cursor-pointer text-gray-400"
                         @click="showLogsDialog = true"
                     >
@@ -291,7 +325,12 @@
                         </template>
                     </jet-dialog-modal>
                 </aside>
-                <section class="p-6 flex-1 flex flex-col lg:order-last">
+                <section
+                    :class="[
+                        height ? height : '',
+                        'p-6 flex-1 flex flex-col lg:order-last overflow-y-scroll',
+                    ]"
+                >
                     <div
                         v-if="
                             $page.props.selectedFileSystemObject &&
@@ -301,13 +340,17 @@
                     >
                         <div class="py-2 mb-2 block border-b pb-4">
                             <p class="font-bold text-xl">
-                                {{ $page.props.selectedFileSystemObject.name }}
+                                {{
+                                    $page.props.selectedFileSystemObject
+                                        .relative_url
+                                }}
                                 <a
                                     v-if="
-                                        $page.props.selectedFileSystemObject.id
+                                        $page.props.selectedFileSystemObject
+                                            .id && !readonly
                                     "
                                     class="ml-4 cursor-pointer relative inline-flex items-center px-4 py-1 rounded-full border border-gray-300 bg-white text-sm font-black text-dark hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 float-right"
-                                    @click="deleteFSO"
+                                    @click="confirmFSODeletion"
                                 >
                                     <TrashIcon
                                         class="cursor-pointer h-4 w-4 text-gray-900 mr-2"
@@ -328,34 +371,57 @@
                                 class="relative shadow rounded-lg"
                             >
                                 <div
-                                    class="group block w-full aspect-w-10 aspect-h-7 py-4 bg-gray-100 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 focus-within:ring-indigo-500 overflow-hidden"
+                                    style="user-select: none"
+                                    class="hover:cursor-pointer"
+                                    @dblclick.stop="displaySelected(file)"
                                 >
-                                    <span v-if="file.type == 'directory'">
-                                        <FolderIcon
-                                            class="cursor-pointer h-28 w-28 text-gray-400 flex-shrink-0 mx-auto"
-                                            aria-hidden="true"
-                                            @dblclick.stop="
-                                                displaySelected(file)
-                                            "
-                                        />
-                                    </span>
-                                    <span v-else>
-                                        <DocumentTextIcon
-                                            class="h-28 w-28 text-gray-400 flex-shrink-0 mx-auto"
-                                            aria-hidden="true"
-                                        />
-                                    </span>
+                                    <div
+                                        class="group block w-full aspect-w-10 aspect-h-7 py-4 bg-gray-100 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 focus-within:ring-indigo-500 overflow-hidden"
+                                    >
+                                        <span v-if="file.type == 'directory'">
+                                            <FolderIcon
+                                                class="cursor-pointer h-28 w-28 text-gray-400 flex-shrink-0 mx-auto"
+                                                aria-hidden="true"
+                                            />
+                                        </span>
+                                        <span v-else>
+                                            <DocumentTextIcon
+                                                class="h-28 w-28 text-gray-400 flex-shrink-0 mx-auto"
+                                                aria-hidden="true"
+                                            />
+                                        </span>
+                                        <span
+                                            v-if="file.status == 'missing'"
+                                            class="absolute right-0 top-0 pr-4 pt-4 text-sm font-medium text-gray-500 pointer-events-none"
+                                        >
+                                            <div
+                                                class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10"
+                                            >
+                                                <svg
+                                                    class="h-6 w-6 text-red-600"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                    stroke-width="1.5"
+                                                    stroke="currentColor"
+                                                    aria-hidden="true"
+                                                >
+                                                    <path
+                                                        stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                        d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
+                                                    ></path>
+                                                </svg>
+                                            </div>
+                                        </span>
+                                    </div>
+                                    <p
+                                        class="mt-2 px-2 py-1 block text-sm font-medium truncate text-gray-900 pointer-events-none"
+                                    >
+                                        <span class="float-left">
+                                            {{ file.name }}
+                                        </span>
+                                    </p>
                                 </div>
-                                <p
-                                    class="mt-2 px-2 py-1 block text-sm font-medium truncate text-gray-900 pointer-events-none"
-                                >
-                                    {{ file.name }}
-                                </p>
-                                <p
-                                    class="block text-sm font-medium text-gray-500 pointer-events-none"
-                                >
-                                    {{ file.size }}
-                                </p>
                             </li>
                         </ul>
                     </div>
@@ -365,10 +431,14 @@
                             class="py-2 mb-2 block border-b pb-4"
                         >
                             <p class="font-bold text-xl">
-                                {{ $page.props.selectedFileSystemObject.name }}
+                                {{
+                                    $page.props.selectedFileSystemObject
+                                        .relative_url
+                                }}
                                 <a
+                                    v-if="!readonly"
                                     class="ml-4 cursor-pointer relative inline-flex items-center px-4 py-1 rounded-full border border-gray-300 bg-white text-sm font-black text-dark hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 float-right"
-                                    @click="deleteFSO"
+                                    @click="confirmFSODeletion"
                                 >
                                     <TrashIcon
                                         class="cursor-pointer h-4 w-4 text-gray-900 mr-2"
@@ -396,6 +466,85 @@
             </div>
         </div>
     </div>
+    <div
+        v-if="
+            (status != 'PROCESSING UPLOADED FILES' &&
+                status != '' &&
+                status != null) ||
+            precentageUpload > 0
+        "
+        class="w-full h-screen mx-84 px-10 fixed block top-0 left-0 bg-white opacity-90 z-50"
+    >
+        <div
+            role="status"
+            class="absolute -translate-x-1/2 -translate-y-1/2 top-2/4 left-1/2"
+        >
+            <svg
+                aria-hidden="true"
+                class="w-8 h-8 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+                viewBox="0 0 100 101"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+            >
+                <path
+                    d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                    fill="currentColor"
+                />
+                <path
+                    d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                    fill="currentFill"
+                />
+            </svg>
+            <div class="mt-4 w-64 h-84">
+                <div class="h-2 mb-2 text-xs flex rounded-md bg-gray-200">
+                    <div
+                        :style="'width: ' + precentageUpload + '%'"
+                        class="shadow-none flex rounded-md flex-col text-center whitespace-nowrap text-white justify-center bg-green-500"
+                    ></div>
+                </div>
+                {{ status }}&emsp;({{ uploadedFilesCount }}/{{
+                    totalFilesCount
+                }})
+            </div>
+            <div class="w-64 text-gray-700 truncate">
+                <small
+                    ><i>{{ currentLog }}</i></small
+                >
+            </div>
+            <button
+                v-if="Object.keys(logs).length > 0"
+                class="mt-4 text-sm cursor-pointer bg-white-900"
+                @click="showLogsDialog = true"
+            >
+                <InformationCircleIcon
+                    class="h-5 w-5 inline flex-shrink-0 mx-auto"
+                    aria-hidden="true"
+                />
+                View logs
+            </button>
+        </div>
+    </div>
+    <jet-confirmation-modal
+        :show="fsoBeingDeleted"
+        @close="fsoBeingDeleted = null"
+    >
+        <template #title> Delete </template>
+
+        <template #content>
+            Are you sure you would like to delete
+            {{ $page.props.selectedFileSystemObject.name }}?
+        </template>
+
+        <template #footer>
+            <jet-secondary-button @click="fsoBeingDeleted = null">
+                Cancel
+            </jet-secondary-button>
+
+            <jet-danger-button class="ml-2" @click="deleteFSO">
+                Delete
+            </jet-danger-button>
+        </template>
+    </jet-confirmation-modal>
 </template>
 <script>
 import JetDialogModal from "@/Jetstream/DialogModal.vue";
@@ -405,7 +554,8 @@ import axiosRetry from "axios-retry";
 import FileDetails from "@/Shared/FileDetails.vue";
 import SelectInput from "@/Shared/SelectInput.vue";
 import ToolTip from "@/Shared/ToolTip.vue";
-
+import JetConfirmationModal from "@/Jetstream/ConfirmationModal.vue";
+import JetDangerButton from "@/Jetstream/DangerButton.vue";
 import {
     FolderIcon,
     DocumentTextIcon,
@@ -438,8 +588,13 @@ export default {
         SelectInput,
         TrashIcon,
         ToolTip,
+        JetConfirmationModal,
+        JetDangerButton,
     },
-    props: ["draft", "readonly"],
+    props: ["draft", "readonly", "height"],
+
+    emits: ["loading"],
+
     data() {
         return {
             status: "",
@@ -447,6 +602,7 @@ export default {
             fullScreen: false,
             precentageUpload: 0,
             busy: false,
+            loading: false,
             file: null,
             url: null,
             logs: {},
@@ -455,6 +611,8 @@ export default {
             uploadBatchErrors: [],
             showErrorBatchLogs: false,
             showLogsDialog: false,
+            currentLog: null,
+            fsoBeingDeleted: null,
         };
     },
     computed: {
@@ -478,9 +636,14 @@ export default {
         }
     },
     methods: {
+        confirmFSODeletion() {
+            this.fsoBeingDeleted = this.$page.props.selectedFileSystemObject.id;
+        },
         deleteFSO() {
             if (this.$page.props.selectedFileSystemObject.id) {
+                this.fsoBeingDeleted = null;
                 this.updateBusyStatus(true);
+                this.$emit("loading", true);
                 axios
                     .delete(
                         "/dashboard/drafts/" +
@@ -490,6 +653,7 @@ export default {
                     )
                     .then((response) => {
                         this.annotate();
+                        this.$emit("loading", true);
                     });
             }
         },
@@ -501,24 +665,33 @@ export default {
         },
         updateBusyStatus(status) {
             this.busy = status;
-            this.$emit("loading", this.busy);
         },
         loadFiles() {
             this.updateBusyStatus(true);
-            axios.get(this.url).then((response) => {
-                this.updateBusyStatus(false);
-                this.file = response.data.file;
-                this.file.has_children = true;
-                this.$page.props.selectedFileSystemObject = this.file;
-                this.$page.props.selectedFolder = "/";
-            });
+            if (this.draft) {
+                axios.get(this.url).then((response) => {
+                    this.file = response.data.file;
+                    this.file.has_children = true;
+                    this.$page.props.selectedFileSystemObject = this.file;
+                    this.$page.props.selectedFolder = "/";
+                    this.updateBusyStatus(true);
+                    this.$emit("loading", false);
+                    this.loading = false;
+                });
+            } else {
+                this.file = this.$page.props.selectedFileSystemObject;
+            }
         },
         annotate() {
             this.updateBusyStatus(true);
+            this.$emit("loading", true);
+            this.loading = true;
+            this.status = "PROCESSING UPLOADED FILES";
             axios
                 .get("/dashboard/drafts/" + this.draft.id + "/annotate")
                 .then(() => {
                     this.updateBusyStatus(false);
+                    this.status = null;
                     this.loadFiles();
                 });
         },
@@ -526,13 +699,17 @@ export default {
             vm.batchesCount += 1;
             const url = "/dashboard/storage/signed-draft-storage-url";
             const client = axios.create({ baseURL: window.location.origin });
+            vm.currentLog = "Fetching temporary storage url";
             axiosRetry(client, {
                 retries: 3,
                 retryCondition: (error) => {
                     // console.log(
                     //     "retring failed upload requests - Signed storage URL"
                     // );
-                    return error.response.status === 500;
+                    return (
+                        error.response.status === 500 ||
+                        error.response.status === 502
+                    );
                 },
             });
             client
@@ -585,6 +762,8 @@ export default {
                 })
                 .then((response) => {
                     if (response) {
+                        vm.currentLog =
+                            "Uploading files to temporary storage url";
                         let data = response.data;
                         this.processedBatches += 1;
                         data.forEach((u) => {
@@ -658,7 +837,7 @@ export default {
                     disablePreviews: true,
                     parallelUploads: 100,
                     autoQueue: false,
-                    maxFiles: 10000,
+                    maxFiles: 20000,
                     dictDefaultMessage: document.querySelector(
                         "#fs-dropzone-message"
                     ).innerHTML,
@@ -683,6 +862,7 @@ export default {
                     vm.uploadedFilesCount += 1;
                     vm.precentageUpload =
                         (vm.uploadedFilesCount / vm.totalFilesCount) * 100;
+                    vm.currentLog = file.fullPath;
                 });
                 vm.dropzone.on("error", (file) => {
                     let message = "Upload failed";
@@ -707,6 +887,9 @@ export default {
                             messages: [],
                         };
                     }
+                });
+                vm.dropzone.on("click", function (e) {
+                    alert();
                 });
                 vm.dropzone.on("addedfiles", (files) => {
                     this.updateBusyStatus(true);
@@ -735,18 +918,58 @@ export default {
                     });
                 });
                 vm.dropzone.on("queuecomplete", () => {
+                    vm.status = "UPLOAD COMPLETE";
                     vm.annotate();
+                    vm.currentLog = null;
                     vm.dropzone.removeAllFiles();
                     vm.precentageUpload = 0;
                     vm.totalFilesCount = 0;
                     vm.uploadedFilesCount = 0;
-                    vm.status = "UPLOAD COMPLETE";
                     this.updateBusyStatus(false);
                     setTimeout(() => {
                         vm.status = null;
                     }, 5000);
                 });
             });
+        },
+        displaySelected(file) {
+            this.$page.props.selectedFileSystemObject = file;
+            let sFolder = "/";
+            if (this.$page.props.selectedFileSystemObject.name == "/") {
+                sFolder = "/";
+            } else {
+                if (this.$page.props.selectedFileSystemObject.type != "file") {
+                    sFolder =
+                        this.$page.props.selectedFileSystemObject.relative_url;
+                } else {
+                    if (
+                        this.$page.props.selectedFileSystemObject.parent_id ==
+                        null
+                    ) {
+                        sFolder = "/";
+                    } else {
+                        sFolder =
+                            this.$page.props.selectedFileSystemObject.relative_url.replace(
+                                "/" +
+                                    this.$page.props.selectedFileSystemObject
+                                        .name,
+                                ""
+                            );
+                    }
+                }
+            }
+
+            this.$page.props.selectedFolder = sFolder;
+
+            if (file.has_children && file.level > 0 && !file.children) {
+                file.loading = true;
+                axios
+                    .get("/api/v1/files/children/" + file.id)
+                    .then((response) => {
+                        file.children = response.data.files[0].children;
+                        file.loading = false;
+                    });
+            }
         },
     },
 };

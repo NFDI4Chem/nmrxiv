@@ -10,7 +10,7 @@ use App\Actions\Project\RestoreProject;
 use App\Actions\Project\UpdateProject;
 use App\Http\Resources\ProjectResource;
 use App\Http\Resources\StudyResource;
-use App\Jobs\ProcessProject;
+use App\Jobs\ProcessSubmission;
 use App\Models\Project;
 use App\Models\Study;
 use App\Models\User;
@@ -43,15 +43,14 @@ class ProjectController extends Controller
         }
 
         $tab = $request->get('tab');
-
         if ($tab == 'info') {
             return Inertia::render('Public/Project/Show', [
                 'project' => (new ProjectResource($project))->lite(false, ['users', 'authors', 'citations']),
                 'tab' => $tab,
             ]);
-        } elseif ($tab == 'studies') {
+        } elseif ($tab == 'samples') {
             return Inertia::render('Public/Project/Studies', [
-                'project' => (new ProjectResource($project))->lite(false, []),
+                'project' => (new ProjectResource($project))->lite(false, ['studies']),
                 'tab' => $tab,
             ]);
         } elseif ($tab == 'files') {
@@ -108,7 +107,9 @@ class ProjectController extends Controller
 
     public function status(Request $request, Project $project)
     {
-        return response()->json(['status' => $project->status, 'logs' => $project->process_logs]);
+        if ($project) {
+            return response()->json(['status' => $project->status, 'logs' => $project->process_logs]);
+        }
     }
 
     public function show(Request $request, Project $project, GetLicense $getLicense)
@@ -251,28 +252,89 @@ class ProjectController extends Controller
         ]);
     }
 
+    public function validationReport(Request $request, Project $project)
+    {
+        $validation = $project->validation;
+
+        if (! $validation) {
+            $validation = new Validation();
+            $validation->save();
+            $project->validation()->associate($validation);
+            $project->save();
+
+            foreach ($project->studies as $study) {
+                $study->validation()->associate($validation);
+                $study->save();
+                foreach ($study->datasets as $dataset) {
+                    $dataset->validation()->associate($validation);
+                    $dataset->save();
+                }
+            }
+        }
+
+        $validation->process();
+
+        return $validation->fresh();
+    }
+
     public function publish(Request $request, Project $project)
     {
         if ($project) {
-            $project->release_date = $request->get('releaseDate');
-            $project->status = 'queued';
-            $project->save();
+            $enableProjectMode = $request->get('enableProjectMode');
+            if ($enableProjectMode) {
+                $validation = $project->validation;
+                $validation->process();
+                $validation = $validation->fresh();
+                if ($validation['report']['project']['status']) {
+                    $project->release_date = $request->get('releaseDate');
+                    $project->status = 'queued';
+                    $project->save();
 
-            $validation = $project->validation;
-            $validation->process();
-            $validation = $validation->fresh();
+                    ProcessSubmission::dispatch($project);
 
-            if ($validation['report']['project']['status']) {
-                ProcessProject::dispatch($project);
-
-                return response()->json([
-                    'project' => $project,
-                    'validation' => $validation,
-                ]);
+                    return response()->json([
+                        'project' => $project,
+                        'validation' => $validation,
+                    ]);
+                } else {
+                    return response()->json([
+                        'errors' => 'Validation failing. Please provide all the required data and try again. If the problem persists, please contact us.',
+                        'validation' => $validation,
+                    ], 422);
+                }
             } else {
-                return response()->json([
-                    'errors' => 'Validation failing. Please provide all the required data and try again. If the problem persists, please contact us.',
-                ], 422);
+                $draft = $project->draft;
+                $draft->project_enabled = false;
+                $draft->save();
+
+                $project->release_date = $request->get('releaseDate');
+                $project->status = 'queued';
+                $project->save();
+
+                $validation = $project->validation;
+                $validation->process();
+                $validation = $validation->fresh();
+
+                $status = true;
+
+                foreach ($validation['report']['project']['studies'] as $study) {
+                    if (! $study['status']) {
+                        $status = false;
+                    }
+                }
+                // add license check
+                if ($status) {
+                    ProcessSubmission::dispatch($project);
+
+                    return response()->json([
+                        'project' => $project,
+                        'validation' => $validation,
+                    ]);
+                } else {
+                    return response()->json([
+                        'errors' => 'Validation failing. Please provide all the required data and try again. If the problem persists, please contact us.',
+                    ], 422);
+                }
             }
         }
     }

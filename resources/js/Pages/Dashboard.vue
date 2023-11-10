@@ -71,11 +71,11 @@
                         />
                     </svg>
                     <h3 class="mt-2 text-sm font-medium text-gray-900">
-                        No datasets
+                        No Projects or Samples
                     </h3>
                     <div v-if="editableTeamRole" class="mt-2">
                         <p class="mb-1 text-sm text-gray-500">
-                            Get started by uploading a dataset.
+                            Get started by uploading your data.
                         </p>
                         <create mode="button"></create>
                         <span

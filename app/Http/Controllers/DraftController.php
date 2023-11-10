@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\ProcessDraft;
+use App\Jobs\ArchiveStudy;
 use App\Models\Dataset;
 use App\Models\Draft;
 use App\Models\FileSystemObject;
@@ -90,6 +90,7 @@ class DraftController extends Controller
                             ['status', '<>', 'missing'],
                             ['draft_id', $draft->id],
                         ])
+                        ->orderBy('created_at', 'DESC')
                         ->orderBy('type')
                         ->get(),
                 ],
@@ -98,7 +99,14 @@ class DraftController extends Controller
 
     public function update(Request $request, Draft $draft)
     {
-        $draft->name = $request->get('name');
+        $project_enabled = $request->has('project_enabled') ? $request->get('project_enabled') : $draft->project_enabled;
+        if ($project_enabled == 1) {
+            $project_enabled = true;
+        } else {
+            $project_enabled = false;
+        }
+        $draft->name = $request->get('name') ? $request->get('name') : $draft->name;
+        $draft->project_enabled = $project_enabled;
         $draft->save();
 
         return $draft;
@@ -136,8 +144,6 @@ class DraftController extends Controller
         $validation = $project->validation;
         $validation->process();
 
-        // ProcessDraft::dispatch($draft);
-
         return response()->json([
             'project' => Project::with(['studies.datasets', 'owner', 'citations', 'authors'])->where('draft_id', $draft->id)->first(),
             'validation' => $validation,
@@ -148,6 +154,7 @@ class DraftController extends Controller
     {
         $input = $request->all();
         $project = Project::where('draft_id', $draft->id)->first();
+
         if ($project) {
             $rule = Rule::unique('projects')->where('owner_id', $input['owner_id'])->ignore($project->id);
         } else {
@@ -166,9 +173,10 @@ class DraftController extends Controller
                 ['draft_id', $draft->id],
             ])
             ->orderBy('type')
+            ->orderBy('created_at', 'DESC')
             ->get();
-
-        $draft->name = $request->get('name');
+        $draftName = $request->get('name');
+        $draft->name = $draftName ? $draftName : 'Untitled Project (draft)';
         $draft->description = $request->get('description');
         $draft->syncTagsWithType($request->get('tags_array'), 'Draft');
         $draft->save();
@@ -298,7 +306,7 @@ class DraftController extends Controller
                 $sChildren = $folder->children;
 
                 foreach ($sChildren as $sChild) {
-                    if ($sChild->instrument_type != null && $sChild->instrument_type != 'nmredata') {
+                    if ($sChild->instrument_type != null && $sChild->instrument_type != 'nmredata' && $sChild->instrument_type != 'mol') {
                         // associate all children with the study_id, project_id, dataset_id
                         // create samples
                         // create assays
@@ -408,6 +416,8 @@ class DraftController extends Controller
                 return redirect()->back()->withErrors(['studies' => 'nmrXiv requires raw or processed raw instrument output files. If you data is from a single sample organise all the files in one folder and click proceed. If you have multiple samples, group your data in subfolders with each subfolder corresponding to a sample. Thank you.']);
             }
 
+            ArchiveStudy::dispatch($project);
+
             return response()->json([
                 'project' => $project->load(['owner', 'citations', 'authors']),
                 'studies' => $studies,
@@ -419,7 +429,7 @@ class DraftController extends Controller
     {
         $project = Project::where('draft_id', $draft->id)->first();
 
-        $studies = json_decode($project->studies->load(['datasets', 'sample.molecules', 'tags']));
+        $studies = json_decode($project->studies->orderBy('created_at', 'DESC')->load(['datasets', 'sample.molecules', 'tags']));
 
         return response()->json([
             'project' => $project->load(['owner']),
@@ -463,6 +473,8 @@ class DraftController extends Controller
                 } elseif ($this->isNMReData($folder)) {
                     $this->saveInstrumentType($folder, 'nmredata');
                     $this->saveAnnotationsDetected($folder->parent);
+                } elseif ($this->isMolData($folder)) {
+                    $this->saveInstrumentType($folder, 'mol');
                 }
             }
         }
@@ -470,11 +482,13 @@ class DraftController extends Controller
 
     public function saveAnnotationsDetected($folder)
     {
-        $study = $folder->study;
+        if ($folder) {
+            $study = $folder->study;
 
-        if ($study) {
-            $study->has_nmredata = true;
-            $study->save();
+            if ($study) {
+                $study->has_nmredata = true;
+                $study->save();
+            }
         }
     }
 
@@ -543,7 +557,7 @@ class DraftController extends Controller
 
     public function isNMReData($folder)
     {
-        $fileTypes = ['nmredata'];
+        $fileTypes = ['sdf'];
         $names = [$folder->name];
         $extensions = array_map(fn ($s) => substr("$s", (strrpos($s, '.') + 1)), $names);
         $isNMReData = false;
@@ -552,6 +566,23 @@ class DraftController extends Controller
         }
 
         if ($isNMReData) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function isMolData($folder)
+    {
+        $fileTypes = ['mol'];
+        $names = [$folder->name];
+        $extensions = array_map(fn ($s) => substr("$s", (strrpos($s, '.') + 1)), $names);
+        $isMolData = false;
+        if (array_intersect($fileTypes, $extensions) == $fileTypes) {
+            $isMolData = true;
+        }
+
+        if ($isMolData) {
             return true;
         }
 

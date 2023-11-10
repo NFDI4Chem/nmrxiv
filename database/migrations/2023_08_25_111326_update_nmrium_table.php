@@ -27,6 +27,14 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::table('nmrium', function (Blueprint $table) {
+            $table->renameColumn('nmriumable_id', 'dataset_id');
+            $table->dropColumn('nmriumable_type');
+        });
+
+        Schema::table('studies', function (Blueprint $table) {
+            $table->dropColumn('has_nmrium');
+            $table->dropColumn('has_nmredata');
+        });
     }
 };

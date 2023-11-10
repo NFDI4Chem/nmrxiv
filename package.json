@@ -35,7 +35,6 @@
   "dependencies": {
     "@headlessui/vue": "^1.6.2",
     "@heroicons/vue": "^2.0.11",
-    "@imengyu/vue3-context-menu": "^1.0.9",
     "@inertiajs/vue3": "^1.0.12",
     "@meilisearch/instant-meilisearch": "^0.7.1",
     "@sipec/vue3-tags-input": "^3.0.4",
@@ -49,6 +48,7 @@
     "marked": "^4.0.4",
     "medium-zoom": "^1.0.8",
     "mitt": "^3.0.0",
+    "ontology-elements": "^0.2.3",
     "openchemlib": "^7.4.3",
     "pluralize": "^8.0.0",
     "popper.js": "^1.16.1",
