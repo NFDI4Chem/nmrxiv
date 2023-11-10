@@ -35,6 +35,7 @@ class UpdateStudy
                 'location' => array_key_exists('location', $input) ? $input['location'] : $study->location,
                 'url' => array_key_exists('url', $input) ? $input['url'] : $study->url,
                 'type' => array_key_exists('type', $input) ? $input['type'] : $study->type,
+                'species' => array_key_exists('species', $input) ? $input['species'] : $study->species,
                 'access' => array_key_exists('access', $input) ? $input['access'] : 'restricted',
                 'access_type' => array_key_exists('access_type', $input) ? $input['access_type'] : 'viewer',
                 'is_public' => array_key_exists('is_public', $input) ? $input['is_public'] : $study->is_public,

@@ -1,11 +1,11 @@
 <template>
     <div v-if="project.validation_status">
-        <button
-            @click="open = true"
+        <a
+            :href="'/publish/' + project.id"
             class="ml-4 inline-flex items-center justify-center whitespace-nowrap rounded-md border border-transparent bg-indigo-700 px-4 py-2 text-base font-medium text-white shadow-sm"
         >
             Publish
-        </button>
+        </a>
     </div>
     <div v-else>
         <Link
@@ -21,7 +21,7 @@
             Publish
         </button>
     </div>
-    <div>
+    <!-- <div>
         <TransitionRoot
             :show="open"
             as="template"
@@ -313,7 +313,6 @@
                                         >
                                             <div class="flex">
                                                 <div class="flex-shrink-0">
-                                                    <!-- Heroicon name: mini/x-circle -->
                                                     <svg
                                                         class="h-5 w-5 text-red-400"
                                                         xmlns="http://www.w3.org/2000/svg"
@@ -381,12 +380,12 @@
                 </div>
             </Dialog>
         </TransitionRoot>
-    </div>
+    </div> -->
 </template>
 
 <script>
 import { Link } from "@inertiajs/vue3";
-import { computed, ref } from "vue";
+import { ref } from "vue";
 import { MagnifyingGlassIcon } from "@heroicons/vue/20/solid";
 import { ChevronRightIcon, UsersIcon } from "@heroicons/vue/24/outline";
 import {

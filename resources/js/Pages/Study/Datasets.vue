@@ -17,8 +17,8 @@
                         <div class="float-right">
                             <div class="flex-0.5 self-center">
                                 <Menu
-                                    as="div"
                                     v-if="selectedDataset && study.is_public"
+                                    as="div"
                                     class="relative text-left"
                                 >
                                     <div>
@@ -93,7 +93,7 @@
                         </div>
                     </div>
                     <div class="p-6">
-                        <div
+                        <!-- <div
                             class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6"
                         >
                             <div
@@ -179,22 +179,22 @@
                                     </a>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
 
-                        <div v-if="selectedDataset" class="my-7">
+                        <div v-if="selectedDataset" class="mb-7">
                             <SpectraEditor
                                 v-if="canUpdateStudy"
+                                ref="spectraEditorREF"
                                 :dataset="selectedDataset"
                                 :project="project"
                                 :study="study"
-                                ref="spectraEditorREF"
                             ></SpectraEditor>
                             <SpectraViewer
                                 v-else
+                                ref="spectraViewerREF"
                                 :dataset="selectedDataset"
                                 :project="project"
                                 :study="study"
-                                ref="spectraViewerREF"
                             ></SpectraViewer>
                         </div>
                         <div class="pt-3">

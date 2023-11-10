@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Laravel\Scout\Searchable;
 use Maize\Markable\Markable;
 use Maize\Markable\Models\Bookmark;
@@ -46,6 +47,7 @@ class Study extends Model implements Auditable
         'fs_id',
         'study_photo_path',
         'license_id',
+        'species',
     ];
 
     protected static $marks = [
@@ -75,7 +77,7 @@ class Study extends Model implements Auditable
             if ($this->release_date) {
                 return ! Carbon::now()->startOfDay()->gte($this->release_date);
             } else {
-                return $this->project->is_published;
+                return $this->project ? $this->project->is_published : false;
             }
         }
 
@@ -163,6 +165,11 @@ class Study extends Model implements Auditable
         return $this->hasMany(StudyInvitation::class);
     }
 
+    public function nmrium(): MorphOne
+    {
+        return $this->morphOne(NMRium::class, 'nmriumable');
+    }
+
     /**
      * Get the user study role
      *
@@ -221,7 +228,7 @@ class Study extends Model implements Auditable
      */
     public function allUsers()
     {
-        return $this->project->users->merge($this->users);
+        return $this->project ? $this->project->users->merge($this->users) : $this->users->merge([$this->owner]);
     }
 
     /**

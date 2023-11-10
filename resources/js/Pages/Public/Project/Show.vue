@@ -1,30 +1,47 @@
 <template>
-    <project-layout :project="project" :selectedTab="tab">
+    <project-layout :project="project" :selected-tab="tab">
         <template #project-content>
             <div
                 class="pb-10 mb-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6"
             >
-                <h3 class="text-xl font-extrabold text-blue-gray-900">
-                    About project
-                </h3>
-                <!-- <span class="text-gray-400 pt-2">
-                    <img :src="'badge/doi/' + project.data.identifier" />
-                </span> -->
-                <div class="mt-2 space-y-8 divide-y divide-y-blue-gray-200">
-                    <div
-                        class="grid grid-cols-1 gap-y-6 sm:grid-cols-6 sm:gap-x-6"
-                    >
-                        <div class="col-span-6">
-                            <p
-                                style="max-width: 100ch !important"
-                                class="prose mt-1 text-sm text-blue-gray-500"
-                                v-html="md(project.data.description)"
-                            ></p>
+                <div class="mt-2 space-y-4 divide-y divide-y-blue-gray-200">
+                    <div>
+                        <h3 class="text-xl font-extrabold text-blue-gray-900">
+                            About project
+                        </h3>
+                        <div
+                            class="grid grid-cols-1 gap-y-6 sm:grid-cols-6 sm:gap-x-6"
+                        >
+                            <div class="col-span-6">
+                                <p
+                                    style="max-width: 100ch !important"
+                                    class="prose mt-1 text-sm text-blue-gray-500"
+                                    v-html="md(project.data.description)"
+                                ></p>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="pt-8 gap-y-6 sm:grid-cols-6 sm:gap-x-6">
-                        <div class="sm:col-span-6">
+                    <div class="pt-2">
+                        <h3 class="text-xl font-extrabold text-blue-gray-900">
+                            Organism
+                        </h3>
+                        <div class="pt-3">
+                            <div
+                                v-for="(species, $index) in project.data
+                                    .species"
+                                :key="$index"
+                                class="bg-gray-100 text-gray-800 mb-0.5 inline-flex truncate break-words items-center px-3 py-2 rounded-full text-sm font-medium mr-1"
+                            >
+                                <ontology-term-annotation
+                                    :annotation="species"
+                                ></ontology-term-annotation>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="gap-y-6 sm:grid-cols-6 sm:gap-x-6">
+                        <div class="pt-2 sm:col-span-6">
                             <h2
                                 class="text-xl font-extrabold mb-3 text-blue-gray-900"
                             >
@@ -81,17 +98,11 @@
                                 >
                                     Author(s)
                                 </h2>
-                                <!-- <p class="mt-1 text-sm text-blue-gray-500">
-                      This information will be displayed publicly so be careful what you
-                      share.
-                    </p> -->
                             </div>
                             <div
                                 class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-2"
                             >
-                                <author-card
-                                    :authors="this.project.data.authors"
-                                />
+                                <author-card :authors="project.data.authors" />
                             </div>
                             <div
                                 v-if="
@@ -106,10 +117,6 @@
                                     >
                                         Citation(s)
                                     </h2>
-                                    <!-- <p class="mt-1 text-sm text-blue-gray-500">
-                      This information will be displayed publicly so be careful what you
-                      share.
-                    </p> -->
                                 </div>
                                 <dd
                                     class="mt-2 text-md text-gray-900 space-y-5 focus:pointer-events-auto"
@@ -118,9 +125,7 @@
                                         class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-2"
                                     >
                                         <citation-card
-                                            :citations="
-                                                this.project.data.citations
-                                            "
+                                            :citations="project.data.citations"
                                         />
                                     </div>
                                 </dd>
@@ -140,6 +145,7 @@
 import ProjectLayout from "@/Pages/Public/Project/Layout.vue";
 import AuthorCard from "@/Shared/AuthorCard.vue";
 import CitationCard from "@/Shared/CitationCard.vue";
+import "ontology-elements/dist/index.js";
 
 export default {
     components: {

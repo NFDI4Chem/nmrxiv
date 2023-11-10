@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Mpociot\Versionable\VersionableTrait;
 
 class NMRium extends Model
@@ -20,9 +21,12 @@ class NMRium extends Model
         'dataset_id',
     ];
 
-    public function dataset()
+    /**
+     * Get the parent nmriumable model (Dataset or Study).
+     */
+    public function nmriumable(): MorphTo
     {
-        return $this->belongsTo(Dataset::class, 'dataset_id');
+        return $this->morphTo();
     }
 
     public function user()

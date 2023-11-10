@@ -20,6 +20,10 @@ class DownloadController extends Controller
         if (str_contains($dataset, '.zip')) {
             $dataset = str_replace('.zip', '', $dataset);
         }
+        if (str_contains($study, '.zip')) {
+            $study = str_replace('.zip', '', $study);
+        }
+
         $user = User::where('username', $username)->firstOrFail();
         if ($project) {
             $project = Project::where([['slug', $project], ['owner_id', $user->id]])->firstOrFail();
@@ -40,10 +44,23 @@ class DownloadController extends Controller
 
             if ($study) {
                 $study = Study::where([['project_id', $project->id], ['slug', $study],  ['owner_id', $user->id]])->firstOrFail();
-                $fsObject = FileSystemObject::where([['id', $study->fs_id], ['type', 'directory']])->first();
-                $request->merge(['uuid' => $fsObject->uuid]);
 
-                return $this->downloadFromProject($request, $username, $project, $fsObject->key);
+                if ($study->download_url) {
+                    $fsObject = FileSystemObject::where([['id', $study->fs_id], ['type', 'directory']])->first();
+
+                    return response()->stream(function () use ($study) {
+                        readfile($study->download_url);
+                    }, 200, [
+                        'Access-Control-Allow-Origin' => '*',
+                        'Content-Disposition' => 'attachment;filename="'.$fsObject->name.'.zip"',
+                        'Content-Type' => 'application/octet-stream',
+                    ]);
+                } else {
+                    $fsObject = FileSystemObject::where([['id', $study->fs_id], ['type', 'directory']])->first();
+                    $request->merge(['uuid' => $fsObject->uuid]);
+
+                    return $this->downloadFromProject($request, $username, $project, $fsObject->key);
+                }
             }
 
             $fsObj = new FileSystemObject();
@@ -104,11 +121,13 @@ class DownloadController extends Controller
 
             return response()->stream(
                 function () use ($s3keys, $bucket, $fsObj) {
-                    $options = new \ZipStream\Option\Archive();
-                    $options->setContentType('application/octet-stream');
-                    $options->setZeroHeader(true);
-                    $options->setComment($fsObj->name);
-                    $zip = new ZipStream\ZipStream($fsObj->name, $options);
+                    $zip = new ZipStream\ZipStream(
+                        outputName : $fsObj->name.'.zip',
+                        contentType: 'application/octet-stream',
+                        defaultEnableZeroHeader: true,
+                        comment: $fsObj->name
+                    );
+
                     foreach ($s3keys as $key) {
                         $s3path = 's3://'.$bucket.'/'.$key;
                         if ($streamRead = fopen($s3path, 'r')) {

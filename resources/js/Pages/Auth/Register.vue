@@ -89,8 +89,8 @@
                         />
                     </div>
                     <div
-                        @click="findOrcidID()"
                         class="tooltip -ml-px relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500 cursor-pointer"
+                        @click="findOrcidID()"
                     >
                         <img
                             alt="ORCID logo"
@@ -103,7 +103,7 @@
                         >
                     </div>
                 </div>
-                <jet-input-error :message="this.error.orcid" class="mt-2" />
+                <jet-input-error :message="error.orcid" class="mt-2" />
             </div>
             <!-- Password -->
             <div class="mt-4">
@@ -188,8 +188,8 @@
     <!-- Find ORCID iD Modal -->
     <select-orcid-id
         ref="selectOrcidIdElement"
-        v-model:orcidId="this.form.orcid_id"
-        v-model:affiliation="this.form.affiliation"
+        v-model:orcidId="form.orcid_id"
+        v-model:affiliation="form.affiliation"
     />
 </template>
 
@@ -229,6 +229,12 @@ export default {
         SelectOrcidId,
         ref,
     },
+    setup() {
+        const selectOrcidIdElement = ref(null);
+        return {
+            selectOrcidIdElement,
+        };
+    },
 
     data() {
         return {
@@ -247,12 +253,6 @@ export default {
             showOrcidIdDialog: false,
             loading: false,
             error: {},
-        };
-    },
-    setup() {
-        const selectOrcidIdElement = ref(null);
-        return {
-            selectOrcidIdElement,
         };
     },
 

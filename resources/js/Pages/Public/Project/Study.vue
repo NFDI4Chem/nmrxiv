@@ -1,5 +1,5 @@
 <template>
-    <project-layout :project="project" :selectedTab="tab">
+    <project-layout :project="project" :selected-tab="tab">
         <template #project-content>
             <div
                 class="pb-10 mb-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6"
@@ -16,8 +16,8 @@
                     <div class="float-right">
                         <span class="flex-0.5 self-center">
                             <Menu
-                                as="div"
                                 v-if="selectedDataset && study.data.is_public"
+                                as="div"
                                 class="relative text-left"
                             >
                                 <div>
@@ -98,7 +98,13 @@
                     </div>
                 </h1>
                 <br />
-                <div class="mt-4">
+                <div
+                    v-if="
+                        study.data.description &&
+                        study.data.description.length > 0
+                    "
+                    class="mt-4"
+                >
                     <div class="relative">
                         <div
                             class="absolute inset-0 flex items-center"
@@ -245,13 +251,12 @@
                                                             <div
                                                                 class="rounded-md border my-3 flex justify-center items-center"
                                                             >
-                                                                <span
-                                                                    v-html="
-                                                                        getSVGString(
-                                                                            molecule
-                                                                        )
+                                                                <Depictor2D
+                                                                    class="py-4 -px-4"
+                                                                    :molecule="
+                                                                        molecule.CANONICAL_SMILES
                                                                     "
-                                                                ></span>
+                                                                ></Depictor2D>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -299,7 +304,7 @@
                             </span>
                         </div>
                     </div>
-                    <div class="mt-3">
+                    <!-- <div class="mt-3">
                         <label
                             for="location"
                             class="block text-sm font-medium text-gray-700"
@@ -325,8 +330,8 @@
                                     }})</span
                                 >
                             </option>
-                        </select>
-                        <div v-if="selectedDataset" class="text-sm my-2">
+                        </select> -->
+                    <!-- <div v-if="selectedDataset" class="text-sm my-2">
                             <span class="text-gray-400 pt-2">
                                 <img
                                     :src="
@@ -336,15 +341,115 @@
                                 />
                             </span>
                         </div>
-                    </div>
+                    </div> -->
                     <div class="mt-3">
                         <SpectraViewer
+                            ref="spectraViewerREF"
                             :dataset="selectedDataset"
                             :project="project.data"
                             :study="study.data"
-                            ref="spectraViewerREF"
                         ></SpectraViewer>
                     </div>
+
+                    <div class="my-2">
+                        <div>
+                            <h2 class="text-sm font-medium text-gray-500">
+                                Spectra Datasets
+                            </h2>
+                            <ul
+                                role="list"
+                                class="mt-3 grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3"
+                            >
+                                <li
+                                    v-for="dataset in study.data.datasets.sort(
+                                        (a, b) => (a.name > b.name ? 1 : -1)
+                                    )"
+                                    :key="dataset.slug"
+                                    class="col-span-1 flex rounded-md shadow-sm"
+                                >
+                                    <a
+                                        class="cursor-pointer"
+                                        :href="
+                                            '/' +
+                                            dataset.identifier.replace(
+                                                'NMRXIV:',
+                                                ''
+                                            )
+                                        "
+                                        target="_blank"
+                                    >
+                                        <!-- <div
+                                        class="flex w-16 flex-shrink-0 items-center justify-center bg-pink-600 rounded-l-md text-sm font-medium text-white"
+                                    >
+                                    
+                                    </div> -->
+                                        <div
+                                            class="flex flex-1 border-l rounded-md items-center justify-between truncate rounded-r-md border-b border-r border-t border-gray-200 bg-white"
+                                        >
+                                            <div
+                                                class="flex-1 truncate px-4 py-2 text-sm"
+                                            >
+                                                <a
+                                                    class="font-medium text-lg text-gray-900 hover:text-gray-600"
+                                                >
+                                                    {{ dataset.name }}
+                                                    <span v-if="dataset.type"
+                                                        >({{
+                                                            dataset.type.replace(
+                                                                /,\s*$/,
+                                                                ""
+                                                            )
+                                                        }})</span
+                                                    ></a
+                                                >
+                                                <p class="text-gray-500">
+                                                    <img
+                                                        :src="
+                                                            'badge/doi/' +
+                                                            dataset.identifier
+                                                        "
+                                                    />
+                                                </p>
+                                            </div>
+                                            <div class="flex-shrink-0 pr-2">
+                                                <!-- {{ dataset.identifier }} -->
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                    stroke-width="1.5"
+                                                    stroke="currentColor"
+                                                    class="h-5 w-5 text-gray-600 ml-4"
+                                                >
+                                                    <path
+                                                        stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                        d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
+                                                    ></path>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <!-- 
+                        <span
+                               
+                                :value="dataset"
+                            >
+                            <span class="text-gray-400 float-left mr-1 pt-2">
+                                
+                                <img
+                                    :src="
+                                        'badge/doi/' +
+                                        dataset.identifier
+                                    "
+                                />
+                            </span>
+                        </span> -->
+                    </div>
+                    <div>&emsp;</div>
                 </div>
             </div>
         </template>
@@ -359,7 +464,7 @@ import ProjectLayout from "@/Pages/Public/Project/Layout.vue";
 import { ShareIcon, ClipboardDocumentIcon } from "@heroicons/vue/24/solid";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import SpectraViewer from "@/Shared/SpectraViewer.vue";
-
+import Depictor2D from "@/Shared/Depictor2D.vue";
 export default {
     components: {
         ProjectLayout,
@@ -370,6 +475,7 @@ export default {
         MenuItem,
         MenuItems,
         SpectraViewer,
+        Depictor2D,
     },
     props: ["project", "tab", "study"],
     data() {

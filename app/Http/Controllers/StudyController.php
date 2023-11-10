@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Actions\License\GetLicense;
 use App\Actions\Study\CreateNewStudy;
 use App\Actions\Study\UpdateStudy;
+use App\Http\Resources\StudyResource;
 use App\Models\FileSystemObject;
 use App\Models\Molecule;
+use App\Models\NMRium;
 use App\Models\Sample;
 use App\Models\Study;
 use Auth;
@@ -25,6 +27,18 @@ use Maize\Markable\Models\Bookmark;
 
 class StudyController extends Controller
 {
+    public function publicStudiesView(Request $request)
+    {
+        // $datasets = Cache::rememberForever('datasets', function () {
+        $studies = StudyResource::collection(Study::with('datasets')->where([['is_public', true], ['is_archived', false]])->filter($request->only('search', 'sort', 'mode'))->paginate(12)->withQueryString());
+        // });
+
+        return Inertia::render('Public/Studies', [
+            'filters' => $request->all('search', 'sort', 'mode'),
+            'studies' => $studies,
+        ]);
+    }
+
     public function store(Request $request, CreateNewStudy $creator)
     {
         $study = $creator->create($request->all());
@@ -127,12 +141,118 @@ class StudyController extends Controller
                 'FORMULA' => $request->get('formula') ? $request->get('formula') : '',
                 'INCHI_KEY' => $request->get('InChIKey') ? $request->get('InChIKey') : '',
                 'MOL' => $request->get('mol') ? $request->get('mol') : '',
+                'CANONICAL_SMILES' => $request->get('canonical_smiles') ? $request->get('canonical_smiles') : '',
             ]);
             $sample->molecules()->syncWithPivotValues([$molecule->id], ['percentage_composition' => $request->get('percentage')], false);
         }
         $sample = $sample->fresh();
 
         return $sample->molecules;
+    }
+
+    public function fetchNMRium(Request $request, Study $study)
+    {
+        if ($study) {
+            $nmrium = $study->nmrium;
+            if ($nmrium) {
+                return json_decode($nmrium->nmrium_info);
+            } else {
+                return null;
+            }
+        }
+    }
+
+    public function nmriumVersions(Request $request, Study $study)
+    {
+        if ($study) {
+            $nmrium = $study->nmrium;
+
+            if ($nmrium) {
+                return $nmrium->versions()->orderBy('created_at', 'DESC')->get()->map(function ($version) {
+                    $user = User::find($version->user_id);
+
+                    return [
+                        'updated_at' => $version->updated_at,
+                        'user' => [
+                            'name' => $user->first_name.' '.$user->last_name,
+                            'profile_photo_url' => $user->profile_photo_url,
+                        ],
+                    ];
+                });
+            }
+        }
+    }
+
+    public function nmriumInfo(Request $request, Study $study)
+    {
+        // $version = $request->get('version');
+        // $spectra = $request->get('spectra');
+        // $molecules = $nmriumInfo['data']['molecules'];
+        // $molecularInfo = $molecules;
+        if ($study) {
+            $user = Auth::user();
+            $data = $request->all();
+            $nmriumInfo = $data;
+            $nmrium = $study->nmrium;
+            if ($nmrium) {
+                $nmrium->nmrium_info = $nmriumInfo;
+                $study->has_nmrium = true;
+                $nmrium->save();
+            } else {
+                $nmrium = NMRium::create([
+                    'nmrium_info' => json_encode($nmriumInfo),
+                ]);
+                $study->nmrium()->save($nmrium);
+                $study->has_nmrium = true;
+            }
+            $study->save();
+            $_nmriumJSON = $nmriumInfo;
+            foreach ($study->datasets as $dataset) {
+                $fsObject = $dataset->fsObject;
+                $level = -($fsObject->level + 1);
+                // echo $fsObject->path;
+                $path = implode('/', array_slice(explode('/', $fsObject->path), $level));
+                foreach ($nmriumInfo['data']['spectra'] as $spectra) {
+                    unset($_nmriumJSON['data']['spectra']);
+                    $files = $spectra['sourceSelector']['files'];
+                    $pathsMatch = true;
+                    if ($files) {
+                        foreach ($files as $file) {
+                            if (! str_contains($file, $path)) {
+                                $pathsMatch = false;
+                            }
+                        }
+                    }
+                    if ($pathsMatch) {
+                        $_nmriumJSON['data']['spectra'] = [$spectra];
+                        $_nmrium = $dataset->nmrium;
+                        if ($_nmrium) {
+                            $_nmrium->nmrium_info = $_nmriumJSON;
+                            $dataset->has_nmrium = true;
+                            $_nmrium->save();
+                        } else {
+                            $_nmrium = NMRium::create([
+                                'nmrium_info' => json_encode($_nmriumJSON),
+                            ]);
+                            $dataset->nmrium()->save($_nmrium);
+                            $dataset->has_nmrium = true;
+                        }
+                        $experimentDetailsExists = array_key_exists('experiment', $spectra['info']);
+                        if ($experimentDetailsExists) {
+                            $experiment = $spectra['info']['experiment'];
+                            $nucleus = $spectra['info']['nucleus'];
+                            if (is_array($nucleus)) {
+                                $nucleus = implode('-', $nucleus);
+                            }
+                            $dataset->type = $experiment.','.$nucleus;
+                        }
+                        $dataset->save();
+                    }
+                }
+            }
+
+            return $study->fresh();
+        }
     }
 
     public function moleculeDetach(Request $request, Study $study, Molecule $molecule)
@@ -180,39 +300,81 @@ class StudyController extends Controller
         ]);
     }
 
+    public function annotations(Request $request, Study $study)
+    {
+        if (! Gate::forUser($request->user())->check('viewStudy', $study)) {
+            throw new AuthorizationException;
+        }
+
+        $studyFSObject = FileSystemObject::with('children')
+            ->where([
+                ['study_id', $study->id],
+                ['level', $study->fsObject->level],
+            ])
+            ->orderBy('type')
+            ->first();
+
+        return $studyFSObject->children->filter(function ($child) {
+            return $child->instrument_type == 'nmredata' || $child->instrument_type == 'mol' || $child->instrument_type == 'sdf';
+        })->values();
+    }
+
     public function file(Request $request, $code, Study $study, $filename)
     {
         $file = FileSystemObject::with('project', 'study')
             ->where([['name', $filename], ['study_id', $study->id]])
             ->first();
+        if (! $file) {
+            $file = FileSystemObject::with('project', 'study')
+                ->where([['slug', $filename], ['draft_id', $study->draft->id]])
+                ->first();
 
-        $environment = env('APP_ENV', 'local');
+            $file->project = $study->project;
+            $file->study = $study;
 
-        $path = preg_replace(
-            '~//+~',
-            '/',
-            '/'.
-                $environment.
-                '/'.
-                $file->project->uuid.
-                '/'.
-                $file->study->uuid.
-                '/'.
-                $file->relative_url
-        );
+            if (Storage::has($file->path)) {
+                $data = Storage::get($file->path);
+                $newFileName = $file->name;
+                $headers = [
+                    'Access-Control-Allow-Origin' => '*',
+                    'Content-Disposition' => sprintf(
+                        'attachment; filename="%s"',
+                        $newFileName
+                    ),
+                ];
 
-        if (Storage::has($path)) {
-            $data = Storage::get($path);
-            $newFileName = $file->name;
-            $headers = [
-                'Access-Control-Allow-Origin' => '*',
-                'Content-Disposition' => sprintf(
-                    'attachment; filename="%s"',
-                    $newFileName
-                ),
-            ];
+                return Response::make($data, 200, $headers);
+            }
 
-            return Response::make($data, 200, $headers);
+        } else {
+            if ($file) {
+                $environment = env('APP_ENV', 'local');
+                $path = preg_replace(
+                    '~//+~',
+                    '/',
+                    '/'.
+                        $environment.
+                        '/'.
+                        $file->project->uuid.
+                        '/'.
+                        $file->study->uuid.
+                        '/'.
+                        $file->relative_url
+                );
+                if (Storage::has($path)) {
+                    $data = Storage::get($path);
+                    $newFileName = $file->name;
+                    $headers = [
+                        'Access-Control-Allow-Origin' => '*',
+                        'Content-Disposition' => sprintf(
+                            'attachment; filename="%s"',
+                            $newFileName
+                        ),
+                    ];
+
+                    return Response::make($data, 200, $headers);
+                }
+            }
         }
 
         return Response::make(null, 404);
@@ -288,5 +450,16 @@ class StudyController extends Controller
     public function toggleStarred(Request $request, Study $study)
     {
         return Bookmark::toggle($study, $request->user());
+    }
+
+    public function preview(Request $request, Study $study)
+    {
+        $content = $request->get('img');
+        if ($content) {
+            $path = '/projects/'.$study->project->uuid.'/'.$study->slug.'.svg';
+            Storage::disk(env('FILESYSTEM_DRIVER_PUBLIC'))->put($path, $content, 'public');
+            $study->study_photo_path = $path;
+            $study->save();
+        }
     }
 }
