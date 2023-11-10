@@ -309,16 +309,16 @@ class SanitizeProjects extends Command
 
     public function updateFilesStatus()
     {
-        $drafts = Draft::where('is_deleted', true)->get();
-        foreach ($drafts as $draft) {
-            echo $draft->id;
-            echo "\r\n";
-            echo 'Deleting associated files';
-            FileSystemObject::where('draft_id', $draft->id)->delete();
-            echo 'Deleting draft';
-            echo "\r\n";
-            Draft::where('id', $draft->id)->delete();
-        }
+        // $drafts = Draft::where('is_deleted', true)->get();
+        // foreach ($drafts as $draft) {
+        //     echo $draft->id;
+        //     echo "\r\n";
+        //     echo 'Deleting associated files';
+        //     FileSystemObject::where('draft_id', $draft->id)->delete();
+        //     echo 'Deleting draft';
+        //     echo "\r\n";
+        //     Draft::where('id', $draft->id)->delete();
+        // }
 
         $fsObjects = FileSystemObject::whereNull('status')->get();
         foreach ($fsObjects as $fsObject) {

@@ -88,7 +88,7 @@ class ExtractSpectra extends Command
                 } catch (Exception $e) {
                     echo 'Caught exception: ',  $e->getMessage(), "\n";
                 }
-
+                $study = $study->fresh();
                 foreach ($study->datasets as $dataset) {
                     echo $dataset->identifier;
                     echo "\r\n";
@@ -110,8 +110,8 @@ class ExtractSpectra extends Command
                         $pathsMatch = true;
                         if ($files) {
                             foreach ($files as $file) {
-                                echo $file;
-                                echo "\r\n";
+                                // echo $file;
+                                // echo "\r\n";
                                 if (! str_contains($file, $path)) {
                                     $pathsMatch = false;
                                 }

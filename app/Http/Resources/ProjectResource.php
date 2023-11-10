@@ -84,7 +84,7 @@ class ProjectResource extends JsonResource
                                     'children' => FileSystemObject::with(
                                         'children'
                                     )
-                                        ->where([['project_id', $this->id]])
+                                        ->where([['project_id', $this->id], ['level', 0]])
                                         ->orderBy('type')
                                         ->get(),
                                 ],

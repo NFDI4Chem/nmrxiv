@@ -115,13 +115,17 @@
                                 />
                             </svg>
                             <span
-                                class="mt-2 block text-sm font-medium text-gray-900"
+                                class="mt-2 block text-lg font-bold text-blue-600"
                             >
-                                Drop Files or Folders to upload to
-                                <span v-if="$page.props.selectedFolder"
-                                    >"{{ $page.props.selectedFolder }}"</span
+                                Drop Files or Folders to upload
+                                <span
+                                    v-if="
+                                        $page.props.selectedFolder &&
+                                        $page.props.selectedFolder != '/'
+                                    "
                                 >
-                                folder
+                                    to "{{ $page.props.selectedFolder }}" folder
+                                </span>
                             </span>
                             <div v-if="dropzone" class="relative mt-5">
                                 <div

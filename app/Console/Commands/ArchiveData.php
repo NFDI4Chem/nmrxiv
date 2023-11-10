@@ -36,7 +36,8 @@ class ArchiveData extends Command
             ])->get();
 
             foreach ($projects as $project) {
-                // echo($project->identifier);
+                echo($project->identifier);
+                echo("\r\n");
                 ArchiveProject::dispatch($project);
                 ArchiveStudy::dispatch($project);
             }
