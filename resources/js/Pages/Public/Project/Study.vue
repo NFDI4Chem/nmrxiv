@@ -336,7 +336,6 @@
                     <div class="mt-3">
                         <SpectraViewer
                             ref="spectraViewerREF"
-                            :dataset="selectedDataset"
                             :project="project.data"
                             :study="study.data"
                         ></SpectraViewer>

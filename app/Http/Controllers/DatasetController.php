@@ -31,7 +31,7 @@ class DatasetController extends Controller
         if ($dataset) {
             $nmrium = $dataset->nmrium;
             if ($nmrium) {
-                return $nmrium;
+                return json_decode($nmrium->nmrium_info);
             } else {
                 return null;
             }
