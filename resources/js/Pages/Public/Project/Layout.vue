@@ -108,18 +108,15 @@
                                         >
                                     </h1>
                                     <p class="text-gray-700 pl-1 pt-2">
-                                        <img
-                                            :src="
-                                                'badge/doi/' +
-                                                project.data.identifier
-                                            "
-                                        />
+                                        <DOIBadge
+                                            :doi="project.data.doi"
+                                        ></DOIBadge>
                                     </p>
                                     <div class="sm:col-span-12 pt-4">
                                         <span
                                             v-for="tag in project.data.tags"
                                             :key="tag.id"
-                                            class="mt-1 inline-flex items-center rounded-full bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10"
+                                            class="mt-1 mr-1 inline-flex items-center rounded-full bg-gray-50 px-2 py-1 text-sm font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10"
                                             target="_blank"
                                             :href="
                                                 '/projects?tag=' + tag.name.en
@@ -179,11 +176,13 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import { Link, router } from "@inertiajs/vue3";
 import { ArrowDownTrayIcon } from "@heroicons/vue/24/solid";
+import DOIBadge from "@/Shared/DOIBadge.vue";
 export default {
     components: {
         AppLayout,
         Link,
         ArrowDownTrayIcon,
+        DOIBadge,
     },
     props: ["project", "selectedTab"],
     data() {

@@ -306,7 +306,7 @@
                             v-if="project.identifier"
                             class="text-gray-400 mt-2"
                         >
-                            <img :src="'/badge/doi/' + project.identifier" />
+                            <DOIBadge :doi="project.doi"></DOIBadge>
                         </div>
                         <div
                             class="mt-2 flex items-center text-xs text-gray-400"
@@ -567,6 +567,7 @@ import Citation from "@/Shared/Citation.vue";
 import Publish from "@/Shared/Publish.vue";
 import AuthorCard from "@/Shared/AuthorCard.vue";
 import CitationCard from "@/Shared/CitationCard.vue";
+import DOIBadge from "@/Shared/DOIBadge.vue";
 
 export default {
     components: {
@@ -585,6 +586,7 @@ export default {
         Publish,
         AuthorCard,
         CitationCard,
+        DOIBadge,
     },
     props: [
         "project",
