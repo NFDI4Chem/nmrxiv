@@ -2,8 +2,17 @@
     <project-layout :project="project" :selected-tab="tab">
         <template #project-content>
             <div
-                class="pb-10 mb-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6"
+                class="pb-10 mb-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-6"
             >
+                <div
+                    class="-mx-4"
+                    v-if="project.data.is_public && project.data.doi != null"
+                >
+                    <Citation
+                        :model="'project'"
+                        :doi="project.data.doi"
+                    ></Citation>
+                </div>
                 <div class="mt-2 space-y-4 divide-y divide-y-blue-gray-200">
                     <div>
                         <h3 class="text-xl font-extrabold text-blue-gray-900">
@@ -22,7 +31,7 @@
                         </div>
                     </div>
 
-                    <div class="pt-2">
+                    <div v-if="project.data.species" class="pt-2">
                         <h3 class="text-xl font-extrabold text-blue-gray-900">
                             Organism
                         </h3>
@@ -146,12 +155,14 @@ import ProjectLayout from "@/Pages/Public/Project/Layout.vue";
 import AuthorCard from "@/Shared/AuthorCard.vue";
 import CitationCard from "@/Shared/CitationCard.vue";
 import "ontology-elements/dist/index.js";
+import Citation from "@/Shared/Citation.vue";
 
 export default {
     components: {
         ProjectLayout,
         AuthorCard,
         CitationCard,
+        Citation,
     },
     props: ["project", "tab"],
     data() {

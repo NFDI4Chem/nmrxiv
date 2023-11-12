@@ -74,13 +74,15 @@ export default {
 
             return str;
         },
-        copyToClipboard(text, id) {
-            document.getElementById(id).select();
-            copyText(text, undefined, (error, event) => {
+        copyToClipboard(text, element) {
+            if (typeof element == "string") {
+                document.getElementById(id).select();
+            } else {
+                element.select();
+            }
+            copyText(text, undefined, (error) => {
                 if (error) {
                     console.log(error);
-                } else {
-                    // console.log(event)
                 }
             });
         },
