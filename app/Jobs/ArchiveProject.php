@@ -72,17 +72,21 @@ class ArchiveProject implements ShouldQueue, ShouldBeUnique
                                 array_push($s3keys, substr($fsObject->path, 1));
                             }
                         } else {
-                            $command = $s3Client->getCommand('ListObjects');
-                            $command['Bucket'] = $bucket;
+                            $command = [
+                                'Bucket' => $bucket,
+                            ];
                             if ($path[0] == '/') {
                                 $command['Prefix'] = ltrim($path, $path[0]).'/';
                             } else {
                                 $command['Prefix'] = $path.'/';
                             }
-                            $result = $s3Client->execute($command);
-                            if ($result['Contents']) {
-                                foreach ($result['Contents'] as $file) {
-                                    array_push($s3keys, $file['Key']);
+                            $results = $s3Client->getPaginator('ListObjects', $command);
+                            foreach ($results as $result) {
+                                $contents = $result->get('Contents');
+                                if ($contents) {
+                                    foreach ($contents as $file) {
+                                        array_push($s3keys, $file['Key']);
+                                    }
                                 }
                             }
                         }
