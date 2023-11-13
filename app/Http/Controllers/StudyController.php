@@ -209,45 +209,50 @@ class StudyController extends Controller
             $_nmriumJSON = $nmriumInfo;
             foreach ($study->datasets as $dataset) {
                 $fsObject = $dataset->fsObject;
-                $level = -($fsObject->level + 1);
-                // echo $fsObject->path;
-                $path = implode('/', array_slice(explode('/', $fsObject->path), $level));
+
+                $studyFSObject = $study->fsObject;
+                $datasetFSObject = $dataset->fsObject;
+                $path = '/'.$studyFSObject->name.'/'.$datasetFSObject->name;
+                    
+                $pathsMatch = false;
                 foreach ($nmriumInfo['data']['spectra'] as $spectra) {
                     unset($_nmriumJSON['data']['spectra']);
                     $files = $spectra['sourceSelector']['files'];
-                    $pathsMatch = true;
                     if ($files) {
                         foreach ($files as $file) {
-                            if (! str_contains($file, $path)) {
-                                $pathsMatch = false;
+                            if (str_contains($file, $path)) {
+                                $pathsMatch = true;
                             }
                         }
                     }
                     if ($pathsMatch) {
-                        $_nmriumJSON['data']['spectra'] = [$spectra];
-                        $_nmrium = $dataset->nmrium;
-                        if ($_nmrium) {
-                            $_nmrium->nmrium_info = $_nmriumJSON;
-                            $dataset->has_nmrium = true;
-                            $_nmrium->save();
-                        } else {
-                            $_nmrium = NMRium::create([
-                                'nmrium_info' => json_encode($_nmriumJSON),
-                            ]);
-                            $dataset->nmrium()->save($_nmrium);
-                            $dataset->has_nmrium = true;
-                        }
-                        $experimentDetailsExists = array_key_exists('experiment', $spectra['info']);
-                        if ($experimentDetailsExists) {
-                            $experiment = $spectra['info']['experiment'];
-                            $nucleus = $spectra['info']['nucleus'];
-                            if (is_array($nucleus)) {
-                                $nucleus = implode('-', $nucleus);
-                            }
-                            $dataset->type = $experiment.','.$nucleus;
-                        }
-                        $dataset->save();
+                        break;
                     }
+                }
+                if ($pathsMatch){
+                    $_nmriumJSON['data']['spectra'] = [$spectra];
+                    $_nmrium = $dataset->nmrium;
+                    if ($_nmrium) {
+                        $_nmrium->nmrium_info = json_encode($_nmriumJSON, JSON_UNESCAPED_UNICODE);
+                        $dataset->has_nmrium = true;
+                        $_nmrium->save();
+                    } else {
+                        $_nmrium = NMRium::create([
+                            'nmrium_info' => json_encode($_nmriumJSON, JSON_UNESCAPED_UNICODE),
+                        ]);
+                        $dataset->nmrium()->save($_nmrium);
+                        $dataset->has_nmrium = true;
+                    }
+                    $experimentDetailsExists = array_key_exists('experiment', $spectra['info']);
+                    if ($experimentDetailsExists) {
+                        $experiment = $spectra['info']['experiment'];
+                        $nucleus = $spectra['info']['nucleus'];
+                        if (is_array($nucleus)) {
+                            $nucleus = implode('-', $nucleus);
+                        }
+                        $dataset->type = $experiment.','.$nucleus;
+                    }
+                    $dataset->save();
                 }
             }
 
