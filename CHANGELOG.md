@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.0.1-rc.8](https://github.com/NFDI4Chem/nmrxiv/compare/v1.0.0-rc.8...v1.0.1-rc.8) (2023-11-13)
+
+
+### Bug Fixes
+
+* resolved [#888](https://github.com/NFDI4Chem/nmrxiv/issues/888) ([bb6da86](https://github.com/NFDI4Chem/nmrxiv/commit/bb6da86da78d2e7f451abb56c2187e18043e6847))
+* updated dataset spectra loading logic and other minor updates ([e854cbb](https://github.com/NFDI4Chem/nmrxiv/commit/e854cbbd1c4c1681c79f128d8bd4f43b1f2524a1))
+* updated DOIBadge component and various other fixes/updates ([ca36ea6](https://github.com/NFDI4Chem/nmrxiv/commit/ca36ea63dd99cd53b875ef2d43ffd2e528438670))
+* updated nmrium info save routine ([5f22551](https://github.com/NFDI4Chem/nmrxiv/commit/5f225518eb7df42aaec30ff67b7f72df298c2742))
+
 ## 1.0.0 (2023-11-10)
 
 

@@ -72,7 +72,7 @@ export default {
         dataciteURL() {
             return this.$page.props.dataciteURL
                 ? String(this.$page.props.dataciteURL) + "/dois/"
-                : "https://api.test.datacite.org/dois/";
+                : "https://api.datacite.org/dois/";
         },
     },
     watch: {
