@@ -1,7 +1,9 @@
 <template>
     <project-layout :project="project" :selected-tab="tab">
         <template #project-content>
-            <div class="p-8">
+            <div
+                class="pb-10 mb-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-6"
+            >
                 <div class="flex items-baseline justify-between">
                     <div>
                         <h2 class="text-lg mb-3 font-bold">Studies</h2>
@@ -70,7 +72,7 @@
                     </div>
                     <div v-else>
                         <div
-                            class="mt-8 mx-auto max-w-md grid gap-8 sm:max-w-lg lg:grid-cols-3 lg:max-w-7xl"
+                            class="mt-8 mx-auto max-w-md grid gap-8 sm:max-w-lg lg:grid-cols-4 lg:max-w-7xl"
                         >
                             <div
                                 v-for="study in studies.data"

@@ -331,10 +331,10 @@ export default {
                 this.currentMolecules = [];
                 this.updateLoadingStatus(true);
                 if (iframe) {
-                    if (this.study.has_nmrium) {
+                    if (this.dataset && this.dataset.has_nmrium) {
                         this.infoLog("Loading Spectra from NMRium JSON..");
                         axios
-                            .get("/studies/" + this.study.id + "/nmriumInfo")
+                            .get("/datasets/" + this.dataset.id + "/nmriumInfo")
                             .then((response) => {
                                 let nmrium_info = response.data;
                                 if (nmrium_info) {
@@ -353,10 +353,35 @@ export default {
                                 }
                             });
                     } else {
-                        if (this.study.download_url) {
-                            let urls = [];
-                            urls.push(this.study.download_url);
-                            this.loadFromURL(urls);
+                        if (this.study.has_nmrium) {
+                            this.infoLog("Loading Spectra from NMRium JSON..");
+                            axios
+                                .get(
+                                    "/studies/" + this.study.id + "/nmriumInfo"
+                                )
+                                .then((response) => {
+                                    let nmrium_info = response.data;
+                                    if (nmrium_info) {
+                                        let data = {
+                                            data: nmrium_info,
+                                            type: "nmrium",
+                                        };
+                                        iframe.postMessage(
+                                            { type: `nmr-wrapper:load`, data },
+                                            "*"
+                                        );
+                                    } else {
+                                        let urls = [];
+                                        urls.push(this.study.download_url);
+                                        this.loadFromURL(urls);
+                                    }
+                                });
+                        } else {
+                            if (this.study.download_url) {
+                                let urls = [];
+                                urls.push(this.study.download_url);
+                                this.loadFromURL(urls);
+                            }
                         }
                     }
                 }
