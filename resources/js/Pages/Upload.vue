@@ -737,6 +737,7 @@
                                                                                     <li>
                                                                                         Pending:
                                                                                         {{
+                                                                                            studies.length -
                                                                                             inprogressStudies.length
                                                                                         }}
                                                                                         out
@@ -778,23 +779,12 @@
                                                                                 class="mt-2 max-w-xl text-sm text-gray-500"
                                                                             >
                                                                                 <p>
-                                                                                    Looks
-                                                                                    like
-                                                                                    we're
-                                                                                    missing
-                                                                                    some
+                                                                                    Some
                                                                                     important
                                                                                     Spectra
-                                                                                    metadata.
-                                                                                    No
-                                                                                    worries,
-                                                                                    though
-                                                                                    –
-                                                                                    We
-                                                                                    got
-                                                                                    your
-                                                                                    back
-                                                                                    covered!
+                                                                                    metadata
+                                                                                    are
+                                                                                    needed.
                                                                                     Would
                                                                                     you
                                                                                     like
@@ -3362,7 +3352,7 @@ export default {
                 }
                 this.spectraLoadingMessage =
                     "<br/> <small><i>Pending: " +
-                    this.importPendingSamples.length +
+                    (this.studies.length - this.importPendingSamples.length) +
                     "/" +
                     this.studies.length +
                     "</i></small> <br/> Processing Spectra from Sample: " +
