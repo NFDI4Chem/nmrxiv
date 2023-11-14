@@ -19,7 +19,7 @@
                     ]"
                     @click.stop="displaySelected(file)"
                 >
-                    <DisclosureButton>
+                    <DisclosureButton class="w-full text-left truncate ...">
                         <span v-if="file.loading">
                             <svg
                                 class="animate-spin mr-3 ml-1 h-5 w-5 text-dark inline"
