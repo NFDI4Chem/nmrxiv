@@ -1,4 +1,5 @@
 <template>
+    <Head :title="project.data.name" />
     <project-layout :project="project" :selected-tab="tab">
         <template #project-content>
             <div
@@ -156,6 +157,7 @@ import AuthorCard from "@/Shared/AuthorCard.vue";
 import CitationCard from "@/Shared/CitationCard.vue";
 import "ontology-elements/dist/index.js";
 import Citation from "@/Shared/Citation.vue";
+import { Head } from "@inertiajs/vue3";
 
 export default {
     components: {
@@ -163,6 +165,7 @@ export default {
         AuthorCard,
         CitationCard,
         Citation,
+        Head,
     },
     props: ["project", "tab"],
     data() {

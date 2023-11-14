@@ -1,4 +1,5 @@
 <template>
+    <Head :title="dataset.data.name + ' - ' + study.data.name" />
     <project-layout :project="project" :selected-tab="tab">
         <template #project-content>
             <div
@@ -247,13 +248,12 @@
                                                             <div
                                                                 class="rounded-md border my-3 flex justify-center items-center"
                                                             >
-                                                                <span
-                                                                    v-html="
-                                                                        getSVGString(
-                                                                            molecule
-                                                                        )
+                                                                <Depictor2D
+                                                                    class="py-4 -px-4"
+                                                                    :molecule="
+                                                                        molecule.CANONICAL_SMILES
                                                                     "
-                                                                ></span>
+                                                                ></Depictor2D>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -341,6 +341,8 @@ import { ShareIcon, ClipboardDocumentIcon } from "@heroicons/vue/24/solid";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import SpectraViewer from "@/Shared/SpectraViewer.vue";
 import DOIBadge from "@/Shared/DOIBadge.vue";
+import Depictor2D from "@/Shared/Depictor2D.vue";
+import { Head } from "@inertiajs/vue3";
 
 export default {
     components: {
@@ -353,6 +355,8 @@ export default {
         MenuItems,
         SpectraViewer,
         DOIBadge,
+        Depictor2D,
+        Head,
     },
     props: ["project", "tab", "study", "dataset"],
     data() {
@@ -375,16 +379,6 @@ export default {
             .then((response) => {
                 this.schema = response.data;
             });
-    },
-    methods: {
-        getSVGString(molecule) {
-            if (molecule.MOL) {
-                let mol = OCL.Molecule.fromMolfile(
-                    "\n  " + molecule.MOL.replaceAll('"', "")
-                );
-                return mol.toSVG(200, 200);
-            }
-        },
     },
 };
 </script>

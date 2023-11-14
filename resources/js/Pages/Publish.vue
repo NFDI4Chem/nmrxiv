@@ -689,7 +689,6 @@ import Create from "@/Shared/CreateButton.vue";
 import Onboarding from "@/App/Onboarding.vue";
 import { Link } from "@inertiajs/vue3";
 import { computed } from "vue";
-import FileSystemBrowser from "./../Shared/FileSystemBrowser.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import axios from "axios";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
@@ -741,7 +740,6 @@ export default {
         TeamProjects,
         Create,
         Onboarding,
-        FileSystemBrowser,
         Link,
         JetInputError,
         JetSecondaryButton,
