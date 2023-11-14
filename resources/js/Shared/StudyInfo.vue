@@ -135,9 +135,6 @@ export default {
                 );
                 return mol.toSVG(200, 200);
             }
-            //  else {
-            //     console.log(molecule);
-            // }
         },
     },
 };

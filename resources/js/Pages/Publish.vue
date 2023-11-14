@@ -865,21 +865,20 @@ export default {
         updateProject() {
             if (this.publishForm.enableProjectMode) {
                 this.loadingStep = true;
-                axios
-                    .put(route("dashboard.project.update", this.project.id), {
-                        name: this.publishForm.project.name,
-                        description: this.publishForm.project.description,
-                        tags: this.publishForm.project.tags,
-                        tags_array: this.publishForm.project.tags
-                            ? this.publishForm.project.tags.map((a) => a.text)
-                            : [],
-                        license_id: this.license ? this.license.id : null,
-                        species: this.publishForm.project.species,
-                        release_date: this.publishForm.releaseDate,
-                    })
-                    .then((res) => {
-                        console.log("success");
-                    });
+                axios.put(route("dashboard.project.update", this.project.id), {
+                    name: this.publishForm.project.name,
+                    description: this.publishForm.project.description,
+                    tags: this.publishForm.project.tags,
+                    tags_array: this.publishForm.project.tags
+                        ? this.publishForm.project.tags.map((a) => a.text)
+                        : [],
+                    license_id: this.license ? this.license.id : null,
+                    species: this.publishForm.project.species,
+                    release_date: this.publishForm.releaseDate,
+                });
+                // .then((res) => {
+                //     console.log("success");
+                // });
             }
         },
         updateSpecies(species) {
@@ -930,8 +929,6 @@ export default {
                     "\n  " + molecule.MOL.replaceAll('"', "")
                 );
                 return mol.toSVG(200, 200);
-            } else {
-                console.log(molecule);
             }
         },
         toggleManageAuthor() {

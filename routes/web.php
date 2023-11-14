@@ -39,9 +39,9 @@ Route::group([
 });
 
 Route::get('/', function () {
-    if (Auth::check()) {
-        return redirect()->route('dashboard');
-    } else {
+    // if (Auth::check()) {
+    //     return redirect()->route('dashboard');
+    // } else {
         return Inertia::render('Welcome', [
             'spectra' => Cache::rememberForever('stats.spectra', function () {
                 return Dataset::where('is_public', true)->get()->count();
@@ -56,7 +56,7 @@ Route::get('/', function () {
                 return Dataset::where('is_public', true)->get()->unique('type')->count();
             }),
         ]);
-    }
+    // }
 })->name('welcome');
 
 Route::supportBubble();

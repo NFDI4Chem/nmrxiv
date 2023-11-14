@@ -2541,7 +2541,7 @@ export default {
             }),
 
             smiles: "",
-            percentage: 1,
+            percentage: 100,
             editor: null,
 
             studyForm: this.$inertia.form({
@@ -2778,7 +2778,6 @@ export default {
                 this.hasStudies(this.$refs.fsbRef.file);
                 this.fetchProjectDetails().then(
                     (response) => {
-                        console.log(response);
                         this.loadingStep = false;
                         this.project = response.data.project;
                         this.studies = response.data.studies;
@@ -3175,7 +3174,7 @@ export default {
             // }
         },
         updateLoadingStatus(status) {
-            console.log(status);
+            // console.log(status);
             this.loading = status;
         },
         fetchDrafts() {
