@@ -213,7 +213,7 @@ class StudyController extends Controller
                 $studyFSObject = $study->fsObject;
                 $datasetFSObject = $dataset->fsObject;
                 $path = '/'.$studyFSObject->name.'/'.$datasetFSObject->name;
-                    
+
                 $pathsMatch = false;
                 foreach ($nmriumInfo['data']['spectra'] as $spectra) {
                     unset($_nmriumJSON['data']['spectra']);
@@ -229,7 +229,7 @@ class StudyController extends Controller
                         break;
                     }
                 }
-                if ($pathsMatch){
+                if ($pathsMatch) {
                     $_nmriumJSON['data']['spectra'] = [$spectra];
                     $_nmrium = $dataset->nmrium;
                     if ($_nmrium) {

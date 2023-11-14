@@ -32,7 +32,7 @@
                 <div class="bg-white"></div>
             </div>
             <div
-                class="flex-1 border-t bg-white p-3 flex flex-col justify-between"
+                class="flex-1 bg-white p-3 border-t mt-1 flex flex-col justify-between"
             >
                 <div>
                     <small
