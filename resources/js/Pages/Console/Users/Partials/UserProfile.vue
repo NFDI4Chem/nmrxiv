@@ -153,7 +153,7 @@
                         >
                     </div>
                 </div>
-                <jet-input-error :message="this.error.orcid" class="mt-2" />
+                <jet-input-error :message="error.orcid" class="mt-2" />
             </div>
 
             <div v-if="!user" class="col-span-6 sm:col-span-4">

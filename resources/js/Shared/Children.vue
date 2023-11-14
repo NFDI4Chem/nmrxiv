@@ -8,6 +8,7 @@
                 class="space-y-1"
             >
                 <div
+                    style="user-select: none"
                     :class="[
                         $page.props.selectedFileSystemObject &&
                         $page.props.selectedFileSystemObject.relative_url ==
@@ -18,10 +19,10 @@
                     ]"
                     @click.stop="displaySelected(file)"
                 >
-                    <DisclosureButton>
+                    <DisclosureButton class="w-full text-left truncate ...">
                         <span v-if="file.loading">
                             <svg
-                                class="animate-spin mr-3 ml-1 h-5 w-5 text-dark"
+                                class="animate-spin mr-3 ml-1 h-5 w-5 text-dark inline"
                                 xmlns="http://www.w3.org/2000/svg"
                                 fill="none"
                                 viewBox="0 0 24 24"
@@ -58,22 +59,24 @@
                                 />
                             </svg>
                         </span>
-                    </DisclosureButton>
-                    <span
-                        @contextmenu.prevent.stop="handleClick1($event, item)"
-                    >
                         <span
-                            v-if="file.type == 'directory'"
-                            v-html="composeIcon(file)"
-                        ></span>
-                        <span v-else>
-                            <FolderIcon
-                                class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700"
-                                aria-hidden="true"
-                            />
+                            :class="[
+                                file.status == 'missing' ? 'text-red-800' : '',
+                            ]"
+                        >
+                            <span
+                                v-if="file.type == 'directory'"
+                                v-html="composeIcon(file)"
+                            ></span>
+                            <span v-else>
+                                <FolderIcon
+                                    class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700"
+                                    aria-hidden="true"
+                                />
+                            </span>
+                            {{ file.name }}
                         </span>
-                        {{ file.name }}
-                    </span>
+                    </DisclosureButton>
                 </div>
                 <DisclosurePanel class="space-y-1">
                     <span v-for="sfile in file.children" :key="sfile.name">
@@ -104,16 +107,18 @@
                                                         sfile.relative_url
                                                         ? 'cursor-pointer bg-gray-100 text-gray-900'
                                                         : 'cursor-pointer text-gray-600',
-                                                    'group w-full flex items-center pr-2 py-1 text-left font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500',
+                                                    'group w-full flex pr-1 py-1 text-left font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500',
                                                 ]"
                                                 @click.stop="
                                                     displaySelected(sfile)
                                                 "
                                             >
-                                                <DisclosureButton>
+                                                <DisclosureButton
+                                                    class="w-full text-left truncate ..."
+                                                >
                                                     <span v-if="sfile.loading">
                                                         <svg
-                                                            class="animate-spin ml-1 mr-3 h-5 w-5 text-dark"
+                                                            class="animate-spin ml-1 mr-3 h-5 w-5 text-dark inline"
                                                             xmlns="http://www.w3.org/2000/svg"
                                                             fill="none"
                                                             viewBox="0 0 24 24"
@@ -139,7 +144,7 @@
                                                                 open
                                                                     ? 'text-gray-700 rotate-90'
                                                                     : 'text-gray-300',
-                                                                'mr-2 inline flex-shrink-0 h-5 w-5 transform group-hover:text-gray-700 transition-colors ease-in-out duration-150',
+                                                                'mr-2 flex-shrink-0 inline h-5 w-5 transform group-hover:text-gray-700 transition-colors ease-in-out duration-150',
                                                             ]"
                                                             viewBox="0 0 20 20"
                                                             aria-hidden="true"
@@ -150,44 +155,48 @@
                                                             />
                                                         </svg>
                                                     </span>
-                                                </DisclosureButton>
-                                                <span
-                                                    @contextmenu.prevent.stop="
-                                                        handleClick1(
-                                                            $event,
-                                                            item
-                                                        )
-                                                    "
-                                                >
                                                     <span>
                                                         <span
-                                                            v-if="
-                                                                sfile.type ==
-                                                                'directory'
-                                                            "
-                                                            v-html="
-                                                                composeIcon(
-                                                                    sfile
-                                                                )
+                                                            :class="[
+                                                                sfile.status ==
+                                                                'missing'
+                                                                    ? 'text-red-800'
+                                                                    : '',
+                                                                '',
+                                                            ]"
+                                                            style="
+                                                                user-select: none;
                                                             "
                                                         >
+                                                            <span
+                                                                v-if="
+                                                                    sfile.type ==
+                                                                    'directory'
+                                                                "
+                                                                v-html="
+                                                                    composeIcon(
+                                                                        sfile
+                                                                    )
+                                                                "
+                                                            >
+                                                            </span>
+                                                            <span v-else>
+                                                                <DocumentTextIcon
+                                                                    class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700"
+                                                                    aria-hidden="true"
+                                                                />
+                                                            </span>
+                                                            {{ sfile.name }}
                                                         </span>
-                                                        <span v-else>
-                                                            <DocumentTextIcon
-                                                                class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700"
-                                                                aria-hidden="true"
-                                                            />
-                                                        </span>
-                                                        {{ sfile.name }}
                                                     </span>
-                                                </span>
+                                                </DisclosureButton>
                                             </div>
                                             <DisclosurePanel class="space-y-0">
                                                 <div
                                                     v-for="subItem in sfile.children"
                                                     :key="subItem.name"
                                                     as="div"
-                                                    class="cursor-pointer group w-full flex items-center pl-7 pr-2 py-0 font-medium text-gray-600 rounded-md"
+                                                    class="cursor-pointer group w-full flex pl-4 pr-2 py-0 font-medium text-gray-600 rounded-md"
                                                     @click.stop="
                                                         displaySelected(subItem)
                                                     "
@@ -221,11 +230,20 @@
                                                             'p-1 rounded-md truncate ...',
                                                         ]"
                                                     >
-                                                        <DocumentTextIcon
-                                                            class="mr-1 inline h-5 w-5 text-gray-700"
-                                                            aria-hidden="true"
-                                                        />
-                                                        {{ subItem.name }}
+                                                        <span
+                                                            :class="[
+                                                                subItem.status ==
+                                                                'missing'
+                                                                    ? 'text-red-800'
+                                                                    : '',
+                                                            ]"
+                                                        >
+                                                            <DocumentTextIcon
+                                                                class="mr-1 inline h-5 w-5 text-gray-700"
+                                                                aria-hidden="true"
+                                                            />
+                                                            {{ subItem.name }}
+                                                        </span>
                                                     </span>
                                                 </div>
                                             </DisclosurePanel>
@@ -243,11 +261,19 @@
                                         'p-1 ml-5 rounded-md truncate ...',
                                     ]"
                                 >
-                                    <DocumentTextIcon
-                                        class="inline mr-1 h-5 w-5 text-gray-700"
-                                        aria-hidden="true"
-                                    />
-                                    {{ sfile.name }}
+                                    <span
+                                        :class="[
+                                            sfile.status == 'missing'
+                                                ? 'text-red-800'
+                                                : '',
+                                        ]"
+                                    >
+                                        <DocumentTextIcon
+                                            class="inline mr-1 h-5 w-5 text-gray-700"
+                                            aria-hidden="true"
+                                        />
+                                        {{ sfile.name }}
+                                    </span>
                                 </span>
                             </div>
                         </div>
@@ -255,13 +281,6 @@
                 </DisclosurePanel>
             </Disclosure>
         </nav>
-        <vue-simple-context-menu
-            ref="vueSimpleContextMenu1"
-            element-id="myFirstMenu"
-            :options="optionsArray1"
-            @option-clicked="optionClicked1"
-        >
-        </vue-simple-context-menu>
     </span>
 </template>
 
@@ -284,25 +303,7 @@ export default {
         return {};
     },
     data() {
-        return {
-            optionsArray1: [
-                {
-                    name: "Duplicate",
-                    slug: "duplicate",
-                },
-                {
-                    type: "divider",
-                },
-                {
-                    name: "Edit",
-                    slug: "edit",
-                },
-                {
-                    name: "<em>Delete</em>",
-                    slug: "delete",
-                },
-            ],
-        };
+        return {};
     },
     computed: {},
     mounted() {},
@@ -370,8 +371,6 @@ export default {
                         file.loading = false;
                     });
             }
-
-            this.$emit("reload-nmrium");
         },
     },
 };

@@ -47,6 +47,7 @@ class Study extends Model implements Auditable
         'fs_id',
         'study_photo_path',
         'license_id',
+        'species',
     ];
 
     protected static $marks = [
@@ -76,7 +77,7 @@ class Study extends Model implements Auditable
             if ($this->release_date) {
                 return ! Carbon::now()->startOfDay()->gte($this->release_date);
             } else {
-                return $this->project->is_published;
+                return $this->project ? $this->project->is_published : false;
             }
         }
 
@@ -227,7 +228,7 @@ class Study extends Model implements Auditable
      */
     public function allUsers()
     {
-        return $this->project->users->merge($this->users);
+        return $this->project ? $this->project->users->merge($this->users) : $this->users->merge([$this->owner]);
     }
 
     /**

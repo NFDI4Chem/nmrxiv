@@ -23,8 +23,8 @@
                     class="relative flex items-start mt-2"
                 >
                     <div
-                        @click="selectOrcidId(item)"
                         class="cursor-pointer flex-1 border rounded-md p-2 bg-white-200 hover:bg-gray-200"
+                        @click="selectOrcidId(item)"
                     >
                         <div class="text-gray-900">
                             <p class="text-sm font-medium text-teal-900">

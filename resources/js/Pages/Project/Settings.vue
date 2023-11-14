@@ -64,8 +64,8 @@
                                     {{ project.schema_version }}
                                 </span>
                                 <span
-                                    class="ml-4"
                                     v-if="project.schema_version == schema"
+                                    class="ml-4"
                                 >
                                     Migrate now?
                                 </span>
