@@ -12,7 +12,12 @@
                         <div
                             class="bg-white rounded-t-md flex justify-center items-center"
                         >
-                            <span>
+                            <span
+                                v-if="
+                                    study.molecules[0] &&
+                                    study.molecules[0].CANONICAL_SMILES
+                                "
+                            >
                                 <Depictor2D
                                     class="py-2"
                                     :molecule="
@@ -20,6 +25,20 @@
                                     "
                                     :show-download="false"
                                 ></Depictor2D>
+                            </span>
+                            <span v-else>
+                                <div class="h-64">
+                                    <div
+                                        class="absolute inset-0 flex items-center justify-center"
+                                    >
+                                        <h2 class="text-gray-200 font-bold">
+                                            <i
+                                                >-- molecule(s) information
+                                                missing --</i
+                                            >
+                                        </h2>
+                                    </div>
+                                </div>
                             </span>
                         </div>
                     </li>
