@@ -464,8 +464,8 @@
                                                         </button>
                                                     </div>
                                                     <div
-                                                        class="mt-2"
                                                         v-if="form.doi"
+                                                        class="mt-2"
                                                     >
                                                         <label
                                                             for="doi"
@@ -924,19 +924,19 @@ export default {
             linkAccess: this.study.access == "link",
         };
     },
-    mounted() {
-        const initialise = () => {
-            this.loadLicenses();
-            this.open = true;
-        };
-        this.emitter.all.set("openStudyDetails", [initialise]);
-    },
     computed: {
         canUpdateStudy() {
             return this.studyPermissions
                 ? this.studyPermissions.canUpdateStudy
                 : false;
         },
+    },
+    mounted() {
+        const initialise = () => {
+            this.loadLicenses();
+            this.open = true;
+        };
+        this.emitter.all.set("openStudyDetails", [initialise]);
     },
     methods: {
         toggleDetails() {

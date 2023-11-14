@@ -34,6 +34,7 @@ class Validation extends Model
                     "description": false,
                     "keywords": false,
                     "sample": false,
+                    "molecules": false,
                     "composition": false,
                     "datasets": [
                     {
@@ -142,7 +143,9 @@ class Validation extends Model
                     'description' => $study->description,
                     'keywords' => $study->tags->pluck('id')->toArray(),
                     'composition' => $study->sample->molecules->pluck('id')->toArray(),
+                    'nmrium_info' => $study->has_nmrium ? $study->has_nmrium : null,
                     'sample' => $study->sample,
+                    'molecules' => $study->sample->molecules->pluck('id')->toArray(),
                 ];
 
                 $study_rules = $rules['study'];
@@ -180,9 +183,9 @@ class Validation extends Model
 
                     $values = [
                         'files' => $dataset->fsObject ? $dataset->fsObject->instrument_type : null,
-                        'nmrium_info' => ($study->has_nmrium || $dataset->has_nmrium) ? $dataset->has_nmrium : null,
+                        'nmrium_info' => ($dataset->has_nmrium) ? $dataset->has_nmrium : null,
                         'assay' => $dataset->assay,
-                        'assignments' => ($study->has_nmrium || $dataset->has_nmrium) ? $dataset->has_nmrium : null,
+                        'assignments' => ($dataset->has_nmrium) ? $dataset->has_nmrium : null,
                     ];
 
                     $dataset_rules = $rules['dataset'];

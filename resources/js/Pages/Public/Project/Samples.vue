@@ -1,7 +1,9 @@
 <template>
-    <project-layout :project="project" :selectedTab="tab">
+    <project-layout :project="project" :selected-tab="tab">
         <template #project-content>
-            <div class="p-8">
+            <div
+                class="pb-10 mb-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-6"
+            >
                 <div class="flex items-baseline justify-between">
                     <div>
                         <h2 class="text-lg mb-3 font-bold">Studies</h2>
@@ -29,9 +31,9 @@
                                 GO
                             </button>
                             <button
-                                @click="reset()"
                                 class="ml-3 text-sm text-gray-500 hover:text-gray-700 focus:text-indigo-500"
                                 type="button"
+                                @click="reset()"
                             >
                                 Reset
                             </button>
@@ -70,7 +72,7 @@
                     </div>
                     <div v-else>
                         <div
-                            class="mt-8 mx-auto max-w-md grid gap-8 sm:max-w-lg lg:grid-cols-3 lg:max-w-7xl"
+                            class="mt-8 mx-auto max-w-md grid gap-8 sm:max-w-lg lg:grid-cols-4 lg:max-w-7xl"
                         >
                             <div
                                 v-for="study in studies.data"
@@ -94,14 +96,14 @@
                                     <div
                                         v-for="link in studies.meta.links"
                                         :key="link.url"
-                                        @click="update(link)"
-                                        v-html="link.label"
                                         :class="[
                                             link.active
                                                 ? 'text-teal-600 border-teal-500'
                                                 : '',
                                             'cursor-pointer border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 border-t-2 pt-4 px-4 inline-flex items-center text-sm font-medium',
                                         ]"
+                                        @click="update(link)"
+                                        v-html="link.label"
                                     ></div>
                                 </div>
                                 <div class="-mt-px w-0 flex-1 flex justify-end">
@@ -111,7 +113,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="text-gray-400 mt-10" v-else>
+                <div v-else class="text-gray-400 mt-10">
                     <svg
                         class="animate-spin inline -ml-1 mr-2 h-5 w-5 text-dark"
                         xmlns="http://www.w3.org/2000/svg"

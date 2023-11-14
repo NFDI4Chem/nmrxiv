@@ -1,5 +1,5 @@
 <template>
-    <project-layout :project="project" :selectedTab="tab">
+    <project-layout :project="project" :selected-tab="tab">
         <template #project-content>
             <div
                 class="pb-10 mb-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6"
@@ -10,14 +10,17 @@
                     </span>
                     <div class="text-sm">
                         <span class="text-gray-400 pt-2">
-                            <img :src="'badge/doi/' + study.data.identifier" />
+                            <DOIBadge
+                                :doi="study.data.doi"
+                                color="bg-yellow-300"
+                            ></DOIBadge>
                         </span>
                     </div>
                     <div class="float-right">
                         <span class="flex-0.5 self-center">
                             <Menu
-                                as="div"
                                 v-if="dataset && study.data.is_public"
+                                as="div"
                                 class="relative text-left"
                             >
                                 <div>
@@ -97,7 +100,7 @@
                         </div>
                     </div>
                 </h1>
-                <div class="mt-4">
+                <!-- <div class="mt-4">
                     <div class="relative">
                         <div
                             class="absolute inset-0 flex items-center"
@@ -118,7 +121,7 @@
                         class="prose mt-1 text-sm text-blue-gray-500"
                         v-html="md(study.data.description)"
                     ></p>
-                </div>
+                </div> -->
                 <div v-if="study.data.tags.length > 0" class="mt-4">
                     <div class="relative">
                         <div
@@ -309,11 +312,10 @@
                         ><br />
                         <div class="text-sm">
                             <span class="text-gray-400 pt-2">
-                                <img
-                                    :src="
-                                        'badge/doi/' + dataset.data.identifier
-                                    "
-                                />
+                                <DOIBadge
+                                    :doi="dataset.data.doi"
+                                    color="bg-green-100"
+                                ></DOIBadge>
                             </span>
                         </div>
                     </h1>
@@ -338,6 +340,7 @@ import ProjectLayout from "@/Pages/Public/Project/Layout.vue";
 import { ShareIcon, ClipboardDocumentIcon } from "@heroicons/vue/24/solid";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import SpectraViewer from "@/Shared/SpectraViewer.vue";
+import DOIBadge from "@/Shared/DOIBadge.vue";
 
 export default {
     components: {
@@ -349,6 +352,7 @@ export default {
         MenuItem,
         MenuItems,
         SpectraViewer,
+        DOIBadge,
     },
     props: ["project", "tab", "study", "dataset"],
     data() {

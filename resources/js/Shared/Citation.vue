@@ -21,9 +21,9 @@
                     <p class="text-md text-blue-700">
                         Cite this {{ model }}
                         <select
-                            @change="queryDataCite"
                             v-model="selectedFormat"
                             class="-mt-2 -mr-2 block rounded-md border-gray-300 py-1 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm float-right"
+                            @change="queryDataCite"
                         >
                             <option name="citation" value="APA">APA</option>
                             <option name="citation" value="Harvard">
@@ -54,11 +54,6 @@ import axios from "axios";
 export default {
     components: {},
     props: ["doi", "model"],
-    mounted() {
-        if (this.doi) {
-            this.queryDataCite();
-        }
-    },
     data() {
         return {
             formats: {
@@ -77,7 +72,7 @@ export default {
         dataciteURL() {
             return this.$page.props.dataciteURL
                 ? String(this.$page.props.dataciteURL) + "/dois/"
-                : "https://api.test.datacite.org/dois/";
+                : "https://api.datacite.org/dois/";
         },
     },
     watch: {
@@ -86,6 +81,11 @@ export default {
                 this.queryDataCite();
             }
         },
+    },
+    mounted() {
+        if (this.doi) {
+            this.queryDataCite();
+        }
     },
     methods: {
         queryDataCite() {

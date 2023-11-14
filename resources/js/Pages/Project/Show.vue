@@ -28,8 +28,8 @@
                     read-only.
                 </div>
                 <div
-                    class="text-center px-3 py-2 bg-green-50 text-green-700 border-b"
                     v-else
+                    class="text-center px-3 py-2 bg-green-50 text-green-700 border-b"
                 >
                     <b>Info: </b> This project is published. You cannot edit a
                     published project, please create a new version to updated
@@ -191,7 +191,7 @@
                                 <project-details
                                     ref="projectDetailsElement"
                                     :role="role"
-                                    :projectPermissions="projectPermissions"
+                                    :project-permissions="projectPermissions"
                                     :project="project"
                                 />
                                 <manage-author
@@ -306,7 +306,7 @@
                             v-if="project.identifier"
                             class="text-gray-400 mt-2"
                         >
-                            <img :src="'/badge/doi/' + project.identifier" />
+                            <DOIBadge :doi="project.doi"></DOIBadge>
                         </div>
                         <div
                             class="mt-2 flex items-center text-xs text-gray-400"
@@ -407,9 +407,9 @@
                     <dd class="mt-1 text-md text-gray-900 space-y-5">
                         <p>
                             <span
-                                class="mt-1 inline-flex items-center rounded-full bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10"
                                 v-for="tag in project.tags"
                                 :key="tag.id"
+                                class="mt-1 inline-flex items-center rounded-full bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10"
                             >
                                 {{ tag.name["en"] }}
                             </span>
@@ -492,9 +492,7 @@
                         class="mt-2 text-md text-gray-900 space-y-5 focus:pointer-events-auto"
                     >
                         <div class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                            <citation-card
-                                :citations="this.project.citations"
-                            />
+                            <citation-card :citations="project.citations" />
                         </div>
                     </dd>
                 </div>
@@ -529,7 +527,7 @@
                     </div>
                     <dd class="mt-2 text-md text-gray-900 space-y-5">
                         <div class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-3">
-                            <author-card :authors="this.project.authors" />
+                            <author-card :authors="project.authors" />
                         </div>
                     </dd>
                 </div>
@@ -546,7 +544,7 @@
                     :editable="editable"
                     :project="project"
                     :role="role"
-                    :teamRole="teamRole"
+                    :team-role="teamRole"
                 />
             </div>
         </div>
@@ -569,6 +567,7 @@ import Citation from "@/Shared/Citation.vue";
 import Publish from "@/Shared/Publish.vue";
 import AuthorCard from "@/Shared/AuthorCard.vue";
 import CitationCard from "@/Shared/CitationCard.vue";
+import DOIBadge from "@/Shared/DOIBadge.vue";
 
 export default {
     components: {
@@ -587,6 +586,7 @@ export default {
         Publish,
         AuthorCard,
         CitationCard,
+        DOIBadge,
     },
     props: [
         "project",
@@ -608,6 +608,21 @@ export default {
             manageCitationElement,
         };
     },
+    data() {
+        return {};
+    },
+    computed: {
+        canDeleteProject() {
+            return this.projectPermissions
+                ? this.projectPermissions.canDeleteProject
+                : false;
+        },
+        canUpdateProject() {
+            return this.projectPermissions
+                ? this.projectPermissions.canUpdateProject
+                : false;
+        },
+    },
     mounted() {
         const urlSearchParams = new URLSearchParams(window.location.search);
         const params = Object.fromEntries(urlSearchParams.entries());
@@ -627,21 +642,6 @@ export default {
                 this.toggleManageAuthor();
             }
         }
-    },
-    data() {
-        return {};
-    },
-    computed: {
-        canDeleteProject() {
-            return this.projectPermissions
-                ? this.projectPermissions.canDeleteProject
-                : false;
-        },
-        canUpdateProject() {
-            return this.projectPermissions
-                ? this.projectPermissions.canUpdateProject
-                : false;
-        },
     },
     methods: {
         toogleStarred() {

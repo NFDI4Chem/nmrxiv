@@ -7,19 +7,19 @@
         <template #title>
             {{ project.name }} - Manage Citations
             <button
-                type="button"
                 v-if="!displayAddCitationForms"
-                @click="displayAddCitationForms = true"
+                type="button"
                 class="inline-flex float-right items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                @click="displayAddCitationForms = true"
             >
                 <PlusIcon class="w-5 h-5 mr-1 text-white" />
                 Add Citation
             </button>
             <button
-                type="button"
                 v-else
-                @click="onBack"
+                type="button"
                 class="inline-flex float-right items-center rounded-md border border-transparent bg-gray-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                @click="onBack"
             >
                 <ArrowSmallRightIcon class="w-5 h-5 mr-1 text-white" />
                 Back
@@ -184,21 +184,17 @@
                                     >
                                         <jet-secondary-button
                                             class="float-right"
-                                            :disabled="
-                                                !(this.form && this.form.title)
-                                            "
+                                            :disabled="!(form && form.title)"
                                             @click="save('addManually')"
                                         >
                                             Add
                                         </jet-secondary-button>
                                         <jet-secondary-button
                                             class="float-right mr-2"
-                                            :disabled="
-                                                !(this.form && this.form.title)
-                                            "
+                                            :disabled="!(form && form.title)"
                                             @click="
-                                                this.form.reset(),
-                                                    this.citationsForm.reset()
+                                                form.reset(),
+                                                    citationsForm.reset()
                                             "
                                         >
                                             Clear
@@ -210,18 +206,14 @@
                                     >
                                         <jet-secondary-button
                                             class="float-right"
-                                            :disabled="
-                                                !(this.form && this.form.title)
-                                            "
+                                            :disabled="!(form && form.title)"
                                             @click="save('addManually')"
                                         >
                                             Update
                                         </jet-secondary-button>
                                         <jet-secondary-button
                                             class="float-right mr-2"
-                                            :disabled="
-                                                !(this.form && this.form.title)
-                                            "
+                                            :disabled="!(form && form.title)"
                                             @click="onCancelEdit()"
                                         >
                                             Cancel
@@ -275,12 +267,10 @@
                                     </jet-secondary-button>
                                     <jet-secondary-button
                                         class="ml-2"
-                                        :disabled="
-                                            isEmpty(this.fetchedCitations)
-                                        "
+                                        :disabled="isEmpty(fetchedCitations)"
                                         @click="
-                                            (this.fetchedCitations = {}),
-                                                (this.query = null)
+                                            (fetchedCitations = {}),
+                                                (query = null)
                                         "
                                     >
                                         Reset
@@ -300,8 +290,8 @@
                                 <div
                                     v-if="
                                         !(
-                                            isEmpty(this.fetchedCitations) ||
-                                            this.fetchCitations == null
+                                            isEmpty(fetchedCitations) ||
+                                            fetchCitations == null
                                         ) && !loading
                                     "
                                     class="mt-4"
@@ -395,11 +385,11 @@
                     class="sm:rounded-md overflow-y-scroll"
                 >
                     <draggable
-                        v-model="this.citations"
-                        @start="drag = true"
-                        @end="drag = false"
+                        v-model="citations"
                         item-key="citation.id"
                         group="author"
+                        @start="drag = true"
+                        @end="drag = false"
                     >
                         <template #item="{ element }">
                             <div class="overflow-auto">
@@ -489,8 +479,8 @@
             </div>
             <!-- Option to add citations when list is empty -->
             <div
-                class="py-5"
                 v-if="citations.length == 0 && !displayAddCitationForms"
+                class="py-5"
             >
                 <div class="text-center">
                     <FolderPlusIcon class="mx-auto h-12 w-12 text-gray-400" />
@@ -503,8 +493,8 @@
                     <div class="mt-6">
                         <button
                             type="button"
-                            @click="displayAddCitationForms = true"
                             class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                            @click="displayAddCitationForms = true"
                         >
                             <!-- Heroicon name: mini/plus -->
                             <PlusIcon class="w-5 h-5 mr-1 text-white" />
@@ -527,9 +517,7 @@
 
                 <template #footer>
                     <jet-secondary-button
-                        @click="
-                            confirmDelete = false && this.citationsForm.reset()
-                        "
+                        @click="confirmDelete = false && citationsForm.reset()"
                     >
                         Cancel
                     </jet-secondary-button>
