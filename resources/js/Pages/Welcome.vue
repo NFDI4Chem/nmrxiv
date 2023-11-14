@@ -301,7 +301,7 @@
                 </div>
             </div>
 
-            <div class="relative pt-16 pb-32">
+            <div class="relative pt-16">
                 <div>
                     <div
                         class="lg:mx-auto lg:max-w-7xl lg:px-8 lg:grid lg:grid-cols-2 lg:grid-flow-col-dense lg:gap-24 overflow-x-hidden py-10 border-r"
@@ -546,6 +546,11 @@
                 </div>
             </div>
 
+            <div>
+                <FAQs></FAQs>
+            </div>
+
+            <!-- Gradient Feature Section -->
             <div class="bg-gradient-to-r from-indigo-800 to-teal-700">
                 <div
                     class="max-w-4xl mx-auto px-4 py-16 sm:px-6 sm:pt-20 sm:pb-24 lg:max-w-7xl lg:pt-24 lg:px-8"
@@ -683,21 +688,25 @@
                                     Quick links
                                 </h3>
                                 <ul role="list" class="mt-4 space-y-4">
-                                    <li>
-                                        <Link
-                                            href="/projects"
+                                    <li
+                                        v-for="item in footerNavigation.quicklinks"
+                                        :key="item.name"
+                                    >
+                                    <Link
+                                            :href="item.href"
                                             class="text-base text-gray-500 hover:text-gray-900"
                                         >
-                                            Projects
+                                            {{ item.name }}
                                         </Link>
                                     </li>
                                     <li>
-                                        <Link
-                                            href="/spectra"
+                                        <a
+                                            target="_blank"
+                                            href=https://docs.nmrxiv.org/FAQs.html
                                             class="text-base text-gray-500 hover:text-gray-900"
                                         >
-                                            Spectra
-                                        </Link>
+                                            FAQs
+                                        </a>
                                     </li>
                                 </ul>
                             </div>
@@ -829,6 +838,7 @@ import {
 } from "@heroicons/vue/24/outline";
 import { ChevronDownIcon } from "@heroicons/vue/24/solid";
 import ToolTip from "@/Shared/ToolTip.vue";
+import FAQs from "@/App/FAQs.vue";
 
 const Search = [
     {
@@ -889,6 +899,14 @@ const features = [
     },
 ];
 const footerNavigation = {
+    // Search: [
+    //   { name: "Browse", href: "/projects" },
+    //   { name: "Advanced Search", href: "/projects" },
+    // ],
+    quicklinks: [
+        { name: "Projects", href: "/projects"},
+        { name: "Spectra", href: "/spectra"}
+    ],
     support: [
         { name: "Documentation", href: "https://docs.nmrxiv.org" },
         {
@@ -956,6 +974,7 @@ export default {
         CircleStackIcon,
         ToolTip,
         Projects,
+        FAQs,
     },
 
     props: {
