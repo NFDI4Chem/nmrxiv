@@ -42,20 +42,20 @@ Route::get('/', function () {
     // if (Auth::check()) {
     //     return redirect()->route('dashboard');
     // } else {
-        return Inertia::render('Welcome', [
-            'spectra' => Cache::rememberForever('stats.spectra', function () {
-                return Dataset::where('is_public', true)->get()->count();
-            }),
-            'projects' => Cache::rememberForever('stats.projects', function () {
-                return Project::where('is_public', true)->get()->count();
-            }),
-            'compounds' => Cache::rememberForever('stats.compounds', function () {
-                return Molecule::whereNotNull('identifier')->get()->count();
-            }),
-            'techniques' => Cache::rememberForever('stats.techniques', function () {
-                return Dataset::where('is_public', true)->get()->unique('type')->count();
-            }),
-        ]);
+    return Inertia::render('Welcome', [
+        'spectra' => Cache::rememberForever('stats.spectra', function () {
+            return Dataset::where('is_public', true)->get()->count();
+        }),
+        'projects' => Cache::rememberForever('stats.projects', function () {
+            return Project::where('is_public', true)->get()->count();
+        }),
+        'compounds' => Cache::rememberForever('stats.compounds', function () {
+            return Molecule::whereNotNull('identifier')->get()->count();
+        }),
+        'techniques' => Cache::rememberForever('stats.techniques', function () {
+            return Dataset::where('is_public', true)->get()->unique('type')->count();
+        }),
+    ]);
     // }
 })->name('welcome');
 
