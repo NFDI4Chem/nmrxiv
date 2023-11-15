@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.0.1-rc.9](https://github.com/NFDI4Chem/nmrxiv/compare/v1.0.0-rc.9...v1.0.1-rc.9) (2023-11-15)
+
+
+### Bug Fixes
+
+* added titles to public pages and various other minor updates ([cca8fce](https://github.com/NFDI4Chem/nmrxiv/commit/cca8fcedf053d0b341b3bf26846b590289bcaac3))
+* dataset spectra parsing updates / issues fixes ([4c71480](https://github.com/NFDI4Chem/nmrxiv/commit/4c714807d92939b241c7d6b302fd2b34e92fd3bc))
+* FSBrowser folder truncate enabled ([ca44ca9](https://github.com/NFDI4Chem/nmrxiv/commit/ca44ca98932512decaa46331a90618d2f8cb71cb))
+* resolved [#645](https://github.com/NFDI4Chem/nmrxiv/issues/645) ([da98574](https://github.com/NFDI4Chem/nmrxiv/commit/da9857406fa305f9c658d13d47f50ea8ff28f871))
+* resolves [#804](https://github.com/NFDI4Chem/nmrxiv/issues/804) download issue ([13da87a](https://github.com/NFDI4Chem/nmrxiv/commit/13da87a23c23ced2539cd446e1d239bc54264a94))
+* update postgres version to 15.4 ([87099f3](https://github.com/NFDI4Chem/nmrxiv/commit/87099f376aa0833c792bae48c2a2255043501ebf))
+* updated messages in the upload screen and also formatting changes ([40d147b](https://github.com/NFDI4Chem/nmrxiv/commit/40d147bd6ed0b9edafbf61a91a552d34ad2e9d0c))
+* various bug fixes and updates ([f7ca828](https://github.com/NFDI4Chem/nmrxiv/commit/f7ca828d6a04b8fc485645f54103fe4dac624477))
+
 ## [1.0.1-rc.8](https://github.com/NFDI4Chem/nmrxiv/compare/v1.0.0-rc.8...v1.0.1-rc.8) (2023-11-13)
 
 
