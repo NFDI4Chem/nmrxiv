@@ -177,6 +177,7 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import { Link, router } from "@inertiajs/vue3";
 import { ArrowDownTrayIcon } from "@heroicons/vue/24/solid";
 import DOIBadge from "@/Shared/DOIBadge.vue";
+
 export default {
     components: {
         AppLayout,

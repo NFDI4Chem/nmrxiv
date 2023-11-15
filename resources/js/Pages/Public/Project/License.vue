@@ -1,4 +1,5 @@
 <template>
+    <Head :title="'License - ' + project.data.name" />
     <project-layout :project="project" :selected-tab="tab">
         <template #project-content>
             <div
@@ -28,10 +29,12 @@
 
 <script>
 import ProjectLayout from "@/Pages/Public/Project/Layout.vue";
+import { Head } from "@inertiajs/vue3";
 
 export default {
     components: {
         ProjectLayout,
+        Head,
     },
     props: ["project", "tab"],
     data() {

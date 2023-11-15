@@ -59,7 +59,7 @@
                             </div>
                         </TransitionChild>
                         <div class="flex-shrink-0 flex items-center px-4">
-                            <Link :href="route('dashboard')">
+                            <Link :href="route('welcome')">
                                 <jet-application-logo
                                     class="block h-8 w-auto"
                                 />

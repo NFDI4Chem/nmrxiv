@@ -1,4 +1,5 @@
 <template>
+    <Head :title="study.data.name" />
     <project-layout :project="project" :selected-tab="tab">
         <template #project-content>
             <div
@@ -438,6 +439,7 @@ import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import SpectraViewer from "@/Shared/SpectraViewer.vue";
 import Depictor2D from "@/Shared/Depictor2D.vue";
 import DOIBadge from "@/Shared/DOIBadge.vue";
+import { Head } from "@inertiajs/vue3";
 
 export default {
     components: {
@@ -451,6 +453,7 @@ export default {
         SpectraViewer,
         Depictor2D,
         DOIBadge,
+        Head,
     },
     props: ["project", "tab", "study"],
     data() {
