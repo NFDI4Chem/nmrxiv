@@ -213,8 +213,10 @@ class StudyController extends Controller
                 $studyFSObject = $study->fsObject;
                 $datasetFSObject = $dataset->fsObject;
                 $path = '/'.$studyFSObject->name.'/'.$datasetFSObject->name;
-                    
+
                 $pathsMatch = false;
+                $spectrum = [];
+                $type = [];
                 foreach ($nmriumInfo['data']['spectra'] as $spectra) {
                     unset($_nmriumJSON['data']['spectra']);
                     $files = $spectra['sourceSelector']['files'];
@@ -226,11 +228,21 @@ class StudyController extends Controller
                         }
                     }
                     if ($pathsMatch) {
-                        break;
+                        array_push($spectrum, $spectra);
+                        $experimentDetailsExists = array_key_exists('experiment', $spectra['info']);
+                        if ($experimentDetailsExists) {
+                            $experiment = $spectra['info']['experiment'];
+                            $nucleus = $spectra['info']['nucleus'];
+                            if (is_array($nucleus)) {
+                                $nucleus = implode('-', $nucleus);
+                            }
+                            array_push($type, $experiment.' - '.$nucleus);
+                        }
+                        $pathsMatch = false;
                     }
                 }
-                if ($pathsMatch){
-                    $_nmriumJSON['data']['spectra'] = [$spectra];
+                if (count($spectrum) > 0) {
+                    $_nmriumJSON['data']['spectra'] = $spectrum;
                     $_nmrium = $dataset->nmrium;
                     if ($_nmrium) {
                         $_nmrium->nmrium_info = json_encode($_nmriumJSON, JSON_UNESCAPED_UNICODE);
@@ -243,17 +255,13 @@ class StudyController extends Controller
                         $dataset->nmrium()->save($_nmrium);
                         $dataset->has_nmrium = true;
                     }
-                    $experimentDetailsExists = array_key_exists('experiment', $spectra['info']);
-                    if ($experimentDetailsExists) {
-                        $experiment = $spectra['info']['experiment'];
-                        $nucleus = $spectra['info']['nucleus'];
-                        if (is_array($nucleus)) {
-                            $nucleus = implode('-', $nucleus);
-                        }
-                        $dataset->type = $experiment.','.$nucleus;
-                    }
-                    $dataset->save();
                 }
+                $uType = array_unique($type);
+                if (count($uType) == 1) {
+                    $dataset->type = $uType[0];
+                }
+                $dataset->save();
+
             }
 
             return $study->fresh();

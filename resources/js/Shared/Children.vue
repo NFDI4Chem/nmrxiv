@@ -19,10 +19,10 @@
                     ]"
                     @click.stop="displaySelected(file)"
                 >
-                    <DisclosureButton>
+                    <DisclosureButton class="w-full text-left truncate ...">
                         <span v-if="file.loading">
                             <svg
-                                class="animate-spin mr-3 ml-1 h-5 w-5 text-dark"
+                                class="animate-spin mr-3 ml-1 h-5 w-5 text-dark inline"
                                 xmlns="http://www.w3.org/2000/svg"
                                 fill="none"
                                 viewBox="0 0 24 24"
@@ -59,24 +59,24 @@
                                 />
                             </svg>
                         </span>
-                    </DisclosureButton>
-                    <span
-                        :class="[
-                            file.status == 'missing' ? 'text-red-800' : '',
-                        ]"
-                    >
                         <span
-                            v-if="file.type == 'directory'"
-                            v-html="composeIcon(file)"
-                        ></span>
-                        <span v-else>
-                            <FolderIcon
-                                class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700"
-                                aria-hidden="true"
-                            />
+                            :class="[
+                                file.status == 'missing' ? 'text-red-800' : '',
+                            ]"
+                        >
+                            <span
+                                v-if="file.type == 'directory'"
+                                v-html="composeIcon(file)"
+                            ></span>
+                            <span v-else>
+                                <FolderIcon
+                                    class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700"
+                                    aria-hidden="true"
+                                />
+                            </span>
+                            {{ file.name }}
                         </span>
-                        {{ file.name }}
-                    </span>
+                    </DisclosureButton>
                 </div>
                 <DisclosurePanel class="space-y-1">
                     <span v-for="sfile in file.children" :key="sfile.name">
@@ -113,10 +113,12 @@
                                                     displaySelected(sfile)
                                                 "
                                             >
-                                                <DisclosureButton>
+                                                <DisclosureButton
+                                                    class="w-full text-left truncate ..."
+                                                >
                                                     <span v-if="sfile.loading">
                                                         <svg
-                                                            class="animate-spin ml-1 mr-3 h-5 w-5 text-dark"
+                                                            class="animate-spin ml-1 mr-3 h-5 w-5 text-dark inline"
                                                             xmlns="http://www.w3.org/2000/svg"
                                                             fill="none"
                                                             viewBox="0 0 24 24"
@@ -142,7 +144,7 @@
                                                                 open
                                                                     ? 'text-gray-700 rotate-90'
                                                                     : 'text-gray-300',
-                                                                'mr-2 -mt-2 inline flex-shrink-0 h-5 w-5 transform group-hover:text-gray-700 transition-colors ease-in-out duration-150',
+                                                                'mr-2 flex-shrink-0 inline h-5 w-5 transform group-hover:text-gray-700 transition-colors ease-in-out duration-150',
                                                             ]"
                                                             viewBox="0 0 20 20"
                                                             aria-hidden="true"
@@ -159,7 +161,8 @@
                                                                 sfile.status ==
                                                                 'missing'
                                                                     ? 'text-red-800'
-                                                                    : 'ellipsis',
+                                                                    : '',
+                                                                '',
                                                             ]"
                                                             style="
                                                                 user-select: none;

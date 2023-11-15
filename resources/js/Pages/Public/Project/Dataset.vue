@@ -1,18 +1,27 @@
 <template>
+    <Head :title="dataset.data.name + ' - ' + study.data.name" />
     <project-layout :project="project" :selected-tab="tab">
         <template #project-content>
             <div
                 class="pb-10 mb-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6"
             >
                 <h1 class="mt-2 text-2xl font-bold break-words text-gray-900">
-                    <span class="text-blue-500">
-                        {{ study.data.name }}
+                    <span>
+                        {{ study.data.name }} >
+                        <span class="text-blue-500"
+                            >{{ dataset.data.name }}
+                            <span v-if="dataset.data.type"
+                                >- ({{
+                                    dataset.data.type.replace(/,\s*$/, "")
+                                }})</span
+                            ></span
+                        >
                     </span>
                     <div class="text-sm">
                         <span class="text-gray-400 pt-2">
                             <DOIBadge
-                                :doi="study.data.doi"
-                                color="bg-yellow-300"
+                                :doi="dataset.data.doi"
+                                color="bg-green-100"
                             ></DOIBadge>
                         </span>
                     </div>
@@ -91,14 +100,6 @@
                             </Menu>
                         </span>
                     </div>
-
-                    <div class="text-sm float-right mr-4">
-                        <div
-                            class="inline hover:text-blue-600 hover:cursor-pointer text-gray-200"
-                        >
-                            #{{ study.data.identifier }}
-                        </div>
-                    </div>
                 </h1>
                 <!-- <div class="mt-4">
                     <div class="relative">
@@ -122,6 +123,33 @@
                         v-html="md(study.data.description)"
                     ></p>
                 </div> -->
+                <div class="mt-4">
+                    <div class="relative">
+                        <div
+                            class="absolute inset-0 flex items-center"
+                            aria-hidden="true"
+                        >
+                            <div class="w-full border-t border-gray-100"></div>
+                        </div>
+                        <div class="relative flex items-center justify-between">
+                            <span
+                                class="pr-3 text-md bg-white font-medium text-gray-400"
+                            >
+                                Spectra
+                            </span>
+                        </div>
+                    </div>
+                    <h1
+                        class="mt-2 text-2xl font-bold break-words text-gray-900"
+                    ></h1>
+                    <div class="my-7">
+                        <SpectraViewer
+                            :dataset="dataset.data"
+                            :project="project.data"
+                            :study="study.data"
+                        ></SpectraViewer>
+                    </div>
+                </div>
                 <div v-if="study.data.tags.length > 0" class="mt-4">
                     <div class="relative">
                         <div
@@ -247,13 +275,12 @@
                                                             <div
                                                                 class="rounded-md border my-3 flex justify-center items-center"
                                                             >
-                                                                <span
-                                                                    v-html="
-                                                                        getSVGString(
-                                                                            molecule
-                                                                        )
+                                                                <Depictor2D
+                                                                    class="py-4 -px-4"
+                                                                    :molecule="
+                                                                        molecule.CANONICAL_SMILES
                                                                     "
-                                                                ></span>
+                                                                ></Depictor2D>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -285,48 +312,6 @@
                         </div>
                     </div>
                 </div>
-                <div class="mt-4">
-                    <div class="relative">
-                        <div
-                            class="absolute inset-0 flex items-center"
-                            aria-hidden="true"
-                        >
-                            <div class="w-full border-t border-gray-100"></div>
-                        </div>
-                        <div class="relative flex items-center justify-between">
-                            <span
-                                class="pr-3 text-md bg-white font-medium text-gray-400"
-                            >
-                                Spectra
-                            </span>
-                        </div>
-                    </div>
-                    <h1
-                        class="mt-2 text-2xl font-bold break-words text-gray-900"
-                    >
-                        {{ dataset.data.name }}
-                        <span v-if="dataset.data.type"
-                            >- ({{
-                                dataset.data.type.replace(/,\s*$/, "")
-                            }})</span
-                        ><br />
-                        <div class="text-sm">
-                            <span class="text-gray-400 pt-2">
-                                <DOIBadge
-                                    :doi="dataset.data.doi"
-                                    color="bg-green-100"
-                                ></DOIBadge>
-                            </span>
-                        </div>
-                    </h1>
-                    <div class="my-7">
-                        <SpectraViewer
-                            :dataset="dataset.data"
-                            :project="project.data"
-                            :study="study.data"
-                        ></SpectraViewer>
-                    </div>
-                </div>
             </div>
         </template>
     </project-layout>
@@ -341,6 +326,8 @@ import { ShareIcon, ClipboardDocumentIcon } from "@heroicons/vue/24/solid";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import SpectraViewer from "@/Shared/SpectraViewer.vue";
 import DOIBadge from "@/Shared/DOIBadge.vue";
+import Depictor2D from "@/Shared/Depictor2D.vue";
+import { Head } from "@inertiajs/vue3";
 
 export default {
     components: {
@@ -353,6 +340,8 @@ export default {
         MenuItems,
         SpectraViewer,
         DOIBadge,
+        Depictor2D,
+        Head,
     },
     props: ["project", "tab", "study", "dataset"],
     data() {
@@ -375,16 +364,6 @@ export default {
             .then((response) => {
                 this.schema = response.data;
             });
-    },
-    methods: {
-        getSVGString(molecule) {
-            if (molecule.MOL) {
-                let mol = OCL.Molecule.fromMolfile(
-                    "\n  " + molecule.MOL.replaceAll('"', "")
-                );
-                return mol.toSVG(200, 200);
-            }
-        },
     },
 };
 </script>
