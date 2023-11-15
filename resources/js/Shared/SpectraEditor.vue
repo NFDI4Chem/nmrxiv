@@ -407,7 +407,6 @@ export default {
                     }
                 }
                 if (data && data.source == "data") {
-                    // console.log(type)
                     if (
                         e.origin != "https://nmriumdev.nmrxiv.org" &&
                         e.origin != "https://nmrium.nmrxiv.org"

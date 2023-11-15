@@ -548,7 +548,13 @@ class DraftController extends Controller
             $isDX = true;
         }
 
-        if ($isJDX || $isDX) {
+        $fileTypes = ['jcamp'];
+        $isJCAMP = false;
+        if (array_intersect($fileTypes, $extensions) == $fileTypes) {
+            $isJCAMP = true;
+        }
+
+        if ($isJDX || $isDX || $isJCAMP) {
             return true;
         }
 

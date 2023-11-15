@@ -10,13 +10,13 @@
                         class="bg-white rounded-t-md flex justify-center items-center"
                     >
                         <span>
-                            <Depictor
+                            <Depictor2D
                                 class="py-2"
-                                :model-value="
+                                :molecule="
                                     study.sample.molecules[0].CANONICAL_SMILES
                                 "
                                 :show-download="false"
-                            ></Depictor>
+                            ></Depictor2D>
                         </span>
                     </div>
                 </li>
@@ -108,7 +108,7 @@ import {
     EnvelopeIcon,
 } from "@heroicons/vue/24/solid";
 import { Link } from "@inertiajs/vue3";
-import Depictor from "@/Shared/Depictor.vue";
+import Depictor2D from "@/Shared/Depictor2D.vue";
 
 export default {
     components: {
@@ -118,7 +118,7 @@ export default {
         PencilIcon,
         StarIcon,
         Link,
-        Depictor,
+        Depictor2D,
     },
     props: ["study"],
     setup() {},
@@ -135,9 +135,6 @@ export default {
                 );
                 return mol.toSVG(200, 200);
             }
-            //  else {
-            //     console.log(molecule);
-            // }
         },
     },
 };
