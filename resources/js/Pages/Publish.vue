@@ -689,7 +689,6 @@ import Create from "@/Shared/CreateButton.vue";
 import Onboarding from "@/App/Onboarding.vue";
 import { Link } from "@inertiajs/vue3";
 import { computed } from "vue";
-import FileSystemBrowser from "./../Shared/FileSystemBrowser.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import axios from "axios";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
@@ -741,7 +740,6 @@ export default {
         TeamProjects,
         Create,
         Onboarding,
-        FileSystemBrowser,
         Link,
         JetInputError,
         JetSecondaryButton,
@@ -865,21 +863,20 @@ export default {
         updateProject() {
             if (this.publishForm.enableProjectMode) {
                 this.loadingStep = true;
-                axios
-                    .put(route("dashboard.project.update", this.project.id), {
-                        name: this.publishForm.project.name,
-                        description: this.publishForm.project.description,
-                        tags: this.publishForm.project.tags,
-                        tags_array: this.publishForm.project.tags
-                            ? this.publishForm.project.tags.map((a) => a.text)
-                            : [],
-                        license_id: this.license ? this.license.id : null,
-                        species: this.publishForm.project.species,
-                        release_date: this.publishForm.releaseDate,
-                    })
-                    .then((res) => {
-                        console.log("success");
-                    });
+                axios.put(route("dashboard.project.update", this.project.id), {
+                    name: this.publishForm.project.name,
+                    description: this.publishForm.project.description,
+                    tags: this.publishForm.project.tags,
+                    tags_array: this.publishForm.project.tags
+                        ? this.publishForm.project.tags.map((a) => a.text)
+                        : [],
+                    license_id: this.license ? this.license.id : null,
+                    species: this.publishForm.project.species,
+                    release_date: this.publishForm.releaseDate,
+                });
+                // .then((res) => {
+                //     console.log("success");
+                // });
             }
         },
         updateSpecies(species) {
@@ -930,8 +927,6 @@ export default {
                     "\n  " + molecule.MOL.replaceAll('"', "")
                 );
                 return mol.toSVG(200, 200);
-            } else {
-                console.log(molecule);
             }
         },
         toggleManageAuthor() {

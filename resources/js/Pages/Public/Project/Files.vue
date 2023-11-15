@@ -1,4 +1,5 @@
 <template>
+    <Head :title="'Files - ' + project.data.name" />
     <project-layout :project="project" :selected-tab="tab">
         <template #project-content>
             <div
@@ -83,6 +84,7 @@ import {
     ChevronRightIcon,
     HomeIcon,
 } from "@heroicons/vue/24/solid";
+import { Head } from "@inertiajs/vue3";
 
 export default {
     components: {
@@ -92,6 +94,7 @@ export default {
         ChevronRightIcon,
         HomeIcon,
         FileSystemBrowser,
+        Head,
     },
     props: ["project", "tab"],
     data() {
