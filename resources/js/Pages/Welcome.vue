@@ -1,5 +1,6 @@
 <template>
     <div class="bg-white">
+        <Head title="Welcome"></Head>
         <main>
             <div class="relative index_beams">
                 <header>
