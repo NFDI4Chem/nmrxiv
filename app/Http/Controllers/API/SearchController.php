@@ -156,7 +156,7 @@ class SearchController extends Controller
                     $offset;
             } elseif ($queryType == 'inchi') {
                 $statement =
-                    "select id, COUNT(*) OVER () from molecules where standard_inchi LIKE '%".
+                    "select id, COUNT(*) OVER () from molecules WHERE identifier NOTNULL AND standard_inchi LIKE '%".
                     $query.
                     "%' limit ".
                     $limit.
@@ -164,7 +164,7 @@ class SearchController extends Controller
                     $offset;
             } elseif ($queryType == 'inchikey') {
                 $statement =
-                    "select id, COUNT(*) OVER () from molecules where standard_inchi_key LIKE '%".
+                    "select id, COUNT(*) OVER () from molecules WHERE identifier NOTNULL AND standard_inchi_key LIKE '%".
                     $query.
                     "%' limit ".
                     $limit.
@@ -257,7 +257,7 @@ class SearchController extends Controller
                 if ($query) {
                     $query = str_replace("'", "''", $query);
                     $statement =
-                        "select id, COUNT(*) OVER () from molecules WHERE (\"name\"::TEXT ILIKE '%".
+                        "select id, COUNT(*) OVER () from molecules WHERE identifier NOTNULL AND (\"name\"::TEXT ILIKE '%".
                         $query.
                         "%') OR (\"synonyms\"::TEXT ILIKE '%".
                         $query.
@@ -294,7 +294,7 @@ class SearchController extends Controller
 
                 if ($ids != '') {
                     $statement =
-                        'SELECT * FROM molecules WHERE ID IN ('.
+                        'SELECT * FROM molecules WHERE identifier NOTNULL AND ID IN ('.
                         implode(
                             ',',
                             collect($hits)

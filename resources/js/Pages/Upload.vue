@@ -2883,12 +2883,12 @@ export default {
         },
         standardizeMolecules(mol) {
             return axios.post(
-                "https://dev.api.naturalproducts.net/latest/chem/standardize",
+                "https://api.naturalproducts.net/latest/chem/standardize",
                 mol
             );
         },
         editMolecule(mol) {
-            this.editor.setMolFile(mol.MOL);
+            this.editor.setSmiles(mol.canonical_smiles);
             this.percentage = parseInt(mol.pivot.percentage_composition);
             axios
                 .delete(
