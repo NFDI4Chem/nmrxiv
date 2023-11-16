@@ -13,7 +13,7 @@
                             <Depictor2D
                                 class="py-2"
                                 :molecule="
-                                    study.sample.molecules[0].CANONICAL_SMILES
+                                    study.sample.molecules[0].canonical_smiles
                                 "
                                 :show-download="false"
                             ></Depictor2D>

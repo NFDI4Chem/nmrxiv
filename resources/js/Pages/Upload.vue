@@ -1212,7 +1212,7 @@
                                                                                                         .sample
                                                                                                         .molecules"
                                                                                                     :key="
-                                                                                                        molecule.STANDARD_INCHI
+                                                                                                        molecule.standard_inchi
                                                                                                     "
                                                                                                 >
                                                                                                     <div
@@ -1271,7 +1271,7 @@
                                                                                                                             href="#"
                                                                                                                             class="font-medium text-gray-900"
                                                                                                                             >{{
-                                                                                                                                molecule.STANDARD_INCHI
+                                                                                                                                molecule.standard_inchi
                                                                                                                             }}</a
                                                                                                                         >
                                                                                                                     </div>
@@ -1284,13 +1284,13 @@
                                                                                                                     >
                                                                                                                         <div
                                                                                                                             v-if="
-                                                                                                                                molecule.CANONICAL_SMILES
+                                                                                                                                molecule.canonical_smiles
                                                                                                                             "
                                                                                                                         >
                                                                                                                             <Depictor
                                                                                                                                 class="py-4 -px-4"
                                                                                                                                 :model-value="
-                                                                                                                                    molecule.CANONICAL_SMILES
+                                                                                                                                    molecule.canonical_smiles
                                                                                                                                 "
                                                                                                                                 :show-download="
                                                                                                                                     false
@@ -2883,12 +2883,12 @@ export default {
         },
         standardizeMolecules(mol) {
             return axios.post(
-                "https://dev.api.naturalproducts.net/latest/chem/standardize",
+                "https://api.naturalproducts.net/latest/chem/standardize",
                 mol
             );
         },
         editMolecule(mol) {
-            this.editor.setMolFile(mol.MOL);
+            this.editor.setSmiles(mol.canonical_smiles);
             this.percentage = parseInt(mol.pivot.percentage_composition);
             axios
                 .delete(
@@ -3015,11 +3015,11 @@ export default {
                                     response.data
                                 )
                                 .then((res) => {
-                                    let STANDARD_INCHI = res.data.inchi;
+                                    let standard_inchi = res.data.inchi;
                                     let molExists = false;
                                     study.sample.molecules.forEach((mol) => {
                                         if (
-                                            mol.STANDARD_INCHI == STANDARD_INCHI
+                                            mol.standard_inchi == standard_inchi
                                         ) {
                                             molExists = true;
                                         }

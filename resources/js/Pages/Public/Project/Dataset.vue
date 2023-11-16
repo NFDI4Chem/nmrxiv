@@ -230,7 +230,7 @@
                                         <li
                                             v-for="molecule in study.data.sample
                                                 .molecules"
-                                            :key="molecule.STANDARD_INCHI"
+                                            :key="molecule.standard_inchi"
                                         >
                                             <div class="relative pb-8">
                                                 <span
@@ -264,7 +264,7 @@
                                                                 <a
                                                                     class="font-medium text-gray-900"
                                                                     >{{
-                                                                        molecule.STANDARD_INCHI
+                                                                        molecule.standard_inchi
                                                                     }}</a
                                                                 >
                                                             </div>
@@ -278,7 +278,7 @@
                                                                 <Depictor2D
                                                                     class="py-4 -px-4"
                                                                     :molecule="
-                                                                        molecule.CANONICAL_SMILES
+                                                                        molecule.canonical_smiles
                                                                     "
                                                                 ></Depictor2D>
                                                             </div>
