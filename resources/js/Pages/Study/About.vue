@@ -284,13 +284,11 @@
                                                                             <div
                                                                                 class="rounded-md border my-3 flex justify-center items-center"
                                                                             >
-                                                                                <span
-                                                                                    v-html="
-                                                                                        getSVGString(
-                                                                                            molecule
-                                                                                        )
+                                                                                <Depictor2D
+                                                                                    :molecule="
+                                                                                        molecule.canonical_smiles
                                                                                     "
-                                                                                ></span>
+                                                                                ></Depictor2D>
                                                                             </div>
                                                                         </div>
                                                                         <button
@@ -492,7 +490,7 @@
                                                 <button
                                                     type="button"
                                                     class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                                                    @click="saveMolecule"
+                                                    @click="saveMolecule(null)"
                                                 >
                                                     ADD
                                                 </button>
@@ -607,6 +605,7 @@ import slider from "vue3-slider";
 import OCL from "openchemlib/full";
 import ToolTip from "@/Shared/ToolTip.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
+import Depictor2D from "@/Shared/Depictor2D.vue";
 export default {
     components: {
         StudyContent,
@@ -617,6 +616,7 @@ export default {
         PencilIcon,
         InformationCircleIcon,
         JetInputError,
+        Depictor2D,
     },
     props: [
         "study",
@@ -702,7 +702,7 @@ export default {
                 });
         },
         editMolecule(mol) {
-            this.editor.setMolFile("\n  " + mol.MOL.replaceAll('"', ""));
+            this.editor.setSmiles(mol.canonical_smiles);
             this.percentage = parseInt(mol.pivot.percentage_composition);
             axios
                 .delete(
@@ -715,36 +715,39 @@ export default {
                     this.study.sample.molecules = res.data;
                 });
         },
-        saveMolecule() {
-            let mol = this.editor.getMolFile();
+        saveMolecule(mol, study) {
+            if (!study) {
+                study = this.study;
+            }
+            if (!mol) {
+                let mol = this.editor.getMolFile();
+                this.standardizeMolecules(mol).then((res) => {
+                    this.associateMoleculeToStudy(res.data, study);
+                });
+            } else {
+                this.associateMoleculeToStudy(mol, study);
+            }
+        },
+        standardizeMolecules(mol) {
+            return axios.post(
+                "https://api.naturalproducts.net/latest/chem/standardize",
+                mol
+            );
+        },
+        associateMoleculeToStudy(mol, study) {
             axios
-                .post(
-                    "https://www.cheminfo.org/webservices/inchi",
-                    "molfile=" + mol
-                )
-                .then((response) => {
-                    let InChI = response.data.output.InChI;
-                    let InChIKey = response.data.output.InChIKey;
-                    let MF = this.editor
-                        .getMolecule()
-                        .getMolecularFormula().formula;
-                    axios
-                        .post(
-                            "/dashboard/studies/" + this.study.id + "/molecule",
-                            {
-                                InChI: InChI,
-                                InChIKey: InChIKey,
-                                percentage: this.percentage,
-                                formula: MF,
-                                mol: mol,
-                            }
-                        )
-                        .then((res) => {
-                            this.study.sample.molecules = res.data;
-                            this.smiles = "";
-                            this.percentage = 0;
-                            this.editor.setSmiles("");
-                        });
+                .post("/dashboard/studies/" + study.id + "/molecule", {
+                    InChI: mol.inchi,
+                    InChIKey: mol.inchikey,
+                    percentage: 0,
+                    mol: mol.standardized_mol,
+                    canonical_smiles: mol.canonical_smiles,
+                })
+                .then((res) => {
+                    study.sample.molecules = res.data;
+                    this.smiles = "";
+                    this.percentage = 0;
+                    // this.editor.setSmiles("");
                 });
         },
     },
