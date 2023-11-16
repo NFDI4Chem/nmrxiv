@@ -12,6 +12,22 @@ use Inertia\Inertia;
 class ApplicationController extends Controller
 {
     /**
+     * Resolve the incoming compounds search request and renders compounds
+     * inertia view
+     *
+     * @return Inertia\Inertia
+     */
+    public function compounds(Request $request)
+    {
+        $query = $request->get('query');
+        $limit = $request->get('limit') ? $limit : 24;
+        $page = $request->query('page');
+        $tagType = $request->query('tagType') ? $request->query('tagType') : null;
+
+        return Inertia::render('Public/Compounds', compact(['query', 'limit', 'page', 'tagType']));
+    }
+
+    /**
      * Resolve the incoming request into right models and render the
      * inertia view
      *

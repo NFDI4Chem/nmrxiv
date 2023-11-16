@@ -158,15 +158,15 @@ class ArchiveStudy implements ShouldQueue, ShouldBeUnique
                         //         $standardizedMolecule = $this->standardizeMolecule($mol['molfile']);
                         //         // associate
                         //         $inchi = $standardizedMolecule['InChI'];
-                        //         $molecule = $sample->molecules->where('STANDARD_INCHI', $inchi)->first();
+                        //         $molecule = $sample->molecules->where('standard_inchi', $inchi)->first();
                         //         if (is_null($molecule)) {
                         //             $molecule = Molecule::firstOrCreate([
-                        //                 'STANDARD_INCHI' => $inchi,
+                        //                 'standard_inchi' => $inchi,
                         //             ], [
-                        //                 'FORMULA' => $standardizedMolecule['formula'] ? $standardizedMolecule['formula']  : '',
-                        //                 'INCHI_KEY' => $standardizedMolecule['InChIKey']  ? $standardizedMolecule['InChIKey']  : '',
-                        //                 'MOL' => $standardizedMolecule['mol']  ? $standardizedMolecule['mol']  : '',
-                        //                 'CANONICAL_SMILES' => $standardizedMolecule['canonical_smiles']  ? $standardizedMolecule['canonical_smiles']  : '',
+                        //                 'molecular_formula' => $standardizedMolecule['formula'] ? $standardizedMolecule['formula']  : '',
+                        //                 'inchi_key' => $standardizedMolecule['InChIKey']  ? $standardizedMolecule['InChIKey']  : '',
+                        //                 'sdf' => $standardizedMolecule['mol']  ? $standardizedMolecule['mol']  : '',
+                        //                 'canonical_smiles' => $standardizedMolecule['canonical_smiles']  ? $standardizedMolecule['canonical_smiles']  : '',
                         //             ]);
                         //             $sample->molecules()->syncWithPivotValues([$molecule->id], ['percentage_composition' => 0], false);
                         //         }
