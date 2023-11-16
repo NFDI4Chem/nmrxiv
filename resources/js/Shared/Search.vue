@@ -17,7 +17,7 @@
         >
             <path d="m19 19-3.5-3.5"></path>
             <circle cx="11" cy="11" r="6"></circle></svg
-        ><span class="flex-auto">Search...</span>
+        ><span class="flex-auto">Search</span>
         <kbd class="font-sans text-gray-300 font-semibold dark:text-slate-500"
             ><abbr
                 title="Command"
@@ -83,7 +83,7 @@
                                             <ComboboxInput
                                                 id="searchAC"
                                                 class="h-12 w-full border-0 bg-transparent pl-11 pr-4 text-gray-900 placeholder-gray-500 focus:ring-0 sm:text-sm"
-                                                placeholder="Search..."
+                                                placeholder="Search"
                                                 @input="
                                                     refine(
                                                         $event.currentTarget

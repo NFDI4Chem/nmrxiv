@@ -299,6 +299,9 @@ Route::group([
 Route::get('{id}', [ApplicationController::class, 'resolve'])->where('id', '(P|S|D|M|p|s|d|m)[0-9]+')
     ->name('public');
 
+// Search / browse page
+Route::get('/compounds', [ApplicationController::class, 'compounds'])->name('compounds');
+
 Route::get('/badge/doi/{id}', [ApplicationController::class, 'resolveBadge'])
     ->name('badge.doi');
 

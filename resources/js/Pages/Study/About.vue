@@ -233,7 +233,7 @@
                                                                 .sample
                                                                 .molecules"
                                                             :key="
-                                                                molecule.STANDARD_INCHI
+                                                                molecule.standard_inchi
                                                             "
                                                         >
                                                             <div
@@ -273,7 +273,7 @@
                                                                                 <a
                                                                                     class="break-all font-medium text-gray-900"
                                                                                     >{{
-                                                                                        molecule.STANDARD_INCHI
+                                                                                        molecule.standard_inchi
                                                                                     }}</a
                                                                                 >
                                                                             </div>
