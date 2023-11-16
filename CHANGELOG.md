@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.0.1-rc.10](https://github.com/NFDI4Chem/nmrxiv/compare/v1.0.0-rc.10...v1.0.1-rc.10) (2023-11-16)
+
+
+### Bug Fixes
+
+* added molecular search ([8dfcc4a](https://github.com/NFDI4Chem/nmrxiv/commit/8dfcc4a0a2b218ee68e7d39d8916ac44e93af508))
+* enable listing of files with missing flag at root and title udpates ([05adf74](https://github.com/NFDI4Chem/nmrxiv/commit/05adf74dbf0161c38475821f7c5528597d717a4a))
+* molecules filtering and other bug fixes ([bb3d701](https://github.com/NFDI4Chem/nmrxiv/commit/bb3d7012123df556c63188443b9741e7a8ea2ab9))
+* updated molecular card link and studies filtering ([cf6763e](https://github.com/NFDI4Chem/nmrxiv/commit/cf6763e6f595285682cc870f5dd5c44bf6d0a3ef))
+
 ## [1.0.1-rc.9](https://github.com/NFDI4Chem/nmrxiv/compare/v1.0.0-rc.9...v1.0.1-rc.9) (2023-11-15)
 
 
