@@ -86,7 +86,10 @@
                             </div>
                         </div>
                         <div
-                            v-if="studies.meta.total > studies.meta.per_page"
+                            v-if="
+                                studies.meta &&
+                                studies.meta.total > studies.meta.per_page
+                            "
                             class="block w-100 mt-10"
                         >
                             <nav

@@ -51,7 +51,9 @@
                         </div>
                     </div>
                     <div class="font-bold text-md mb-2">
-                        <a class="font-semibold text-gray-600 hover:underline"
+                        <a
+                            :href="'/spectra?compound=' + molecule.identifier"
+                            class="font-semibold text-gray-600 hover:underline"
                             >#NMRXIV:{{ molecule.identifier }}</a
                         >
                     </div>
@@ -103,7 +105,9 @@
                         </div>
                     </div>
                     <div class="font-bold text-md mb-2">
-                        <a class="font-semibold text-gray-600 hover:underline"
+                        <a
+                            :href="'/spectra?compound=' + molecule.identifier"
+                            class="font-semibold text-gray-600 hover:underline"
                             >#NMRXIV:{{ molecule.identifier }}</a
                         >
                     </div>

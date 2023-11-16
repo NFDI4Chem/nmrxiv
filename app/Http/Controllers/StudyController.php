@@ -29,13 +29,23 @@ class StudyController extends Controller
 {
     public function publicStudiesView(Request $request)
     {
-        // $datasets = Cache::rememberForever('datasets', function () {
-        $studies = StudyResource::collection(Study::with('datasets')->where([['is_public', true], ['is_archived', false]])->filter($request->only('search', 'sort', 'mode'))->paginate(12)->withQueryString());
-        // });
+        $moleculeId = $request->get('compound');
+        if ($moleculeId) {
+            $molecule = Molecule::where('identifier', $moleculeId)->first();
+            if ($molecule) {
+                $studies = $molecule->studies()->where([['is_public', true], ['is_archived', false]])->filter($request->only('search', 'sort', 'mode'))->paginate(12)->withQueryString();
+            } else {
+                $studies = [];
+            }
+        } else {
+            $studies = Study::with('datasets')->where([['is_public', true], ['is_archived', false]])->filter($request->only('search', 'sort', 'mode'))->paginate(12)->withQueryString();
+        }
+
+        $studiesResource = StudyResource::collection($studies);
 
         return Inertia::render('Public/Studies', [
             'filters' => $request->all('search', 'sort', 'mode'),
-            'studies' => $studies,
+            'studies' => $studiesResource,
         ]);
     }
 
