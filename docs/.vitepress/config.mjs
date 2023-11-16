@@ -49,7 +49,7 @@ export default defineConfig({
           { text: 'Data Models',
             items: [
               { text: 'Project', link: '/submission-guides/data-model/project.md'},
-              { text: 'Sample/Study', link: '/submission-guides/data-model/study.md'},
+              { text: 'Sample', link: '/submission-guides/data-model/sample.md'},
               { text: 'Spectra Dataset', link: '/submission-guides/data-model/dataset.md'},
               { text: 'Team', link: '/submission-guides/data-model/team.md'},
               { text: 'Sharing', link: '/submission-guides/data-model/sharing.md'}
