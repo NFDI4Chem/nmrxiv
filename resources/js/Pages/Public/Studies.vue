@@ -193,7 +193,7 @@
                 </div>
             </div>
 
-            <div v-if="studies.meta.total > 0">
+            <div v-if="studies.meta && studies.meta.total > 0">
                 <div class="border-t mt-3 border-gray-100">
                     <h2 class="text-gray-600 text-md mt-4 font-bold">
                         Results ({{ studies.meta.total }})
