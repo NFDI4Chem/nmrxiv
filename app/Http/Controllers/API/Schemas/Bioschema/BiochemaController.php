@@ -230,7 +230,7 @@ class BiochemaController extends Controller
     {
         $molecules = [];
         foreach ($sample->molecules as &$molecule) {
-            $inchiKey = $molecule->INCHI_KEY;
+            $inchiKey = $molecule->inchi_key;
             $pubchemLink = 'https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/inchikey/'.$inchiKey.'/property/IUPACName/JSON';
             $json = json_decode(Http::get($pubchemLink)->body(), true);
             // $cid = $json['PropertyTable']['Properties'][0]['CID'];
@@ -240,14 +240,14 @@ class BiochemaController extends Controller
             // $moleculeSchema['@id'] = $inchiKey;
             // $moleculeSchema['dct:conformsTo'] = $this->conformsTo(['https://bioschemas.org/profiles/MolecularEntity/0.5-RELEASE']);
             // $moleculeSchema['identifier'] = $inchiKey;
-            // $moleculeSchema->name($molecule->CAS_NUMBER);
+            // $moleculeSchema->name($molecule->cas);
             // $moleculeSchema->url('https://pubchem.ncbi.nlm.nih.gov/compound/'.$cid);
-            // $moleculeSchema->inChI('InChI='.$molecule->STANDARD_INCHI);
+            // $moleculeSchema->inChI('InChI='.$molecule->standard_inchi);
             // $moleculeSchema->inChIKey($inchiKey);
             // $moleculeSchema->iupacName($iupacName);
-            // $moleculeSchema->molecularFormula($molecule->FORMULA);
-            // $moleculeSchema->molecularWeight($molecule->MOLECULAR_WEIGHT);
-            // $moleculeSchema->smiles([$molecule->SMILES, $molecule->SMILES_CHIRAL, $molecule->CANONICAL_SMILES]);
+            // $moleculeSchema->molecularFormula($molecule->molecular_formula);
+            // $moleculeSchema->molecularWeight($molecule->molecular_weight);
+            // $moleculeSchema->smiles([$molecule->SMILES, $molecule->absolute_smiles, $molecule->canonical_smiles]);
             // $moleculeSchema->hasRepresentation($molecule->MOL);
             // $moleculeSchema->description('Percentage composition: '.$molecule->pivot->percentage_composition.'%');
             // array_push($molecules, $moleculeSchema);

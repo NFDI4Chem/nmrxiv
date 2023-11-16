@@ -32,6 +32,6 @@ class Sample extends Model
      */
     public function study()
     {
-        return $this->belongsTo(Sample::class);
+        return $this->belongsTo(Study::class, 'study_id');
     }
 }

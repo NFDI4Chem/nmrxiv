@@ -742,6 +742,7 @@ import {
     StarIcon,
     FolderIcon,
     Squares2X2Icon,
+    SwatchIcon,
     TrashIcon,
 } from "@heroicons/vue/24/outline";
 import { MagnifyingGlassIcon, PlusIcon } from "@heroicons/vue/24/solid";
@@ -766,6 +767,13 @@ const navigation = [
         name: "Spectra",
         href: "/spectra",
         icon: Squares2X2Icon,
+        bg: "bg-white",
+    },
+    {
+        auth: false,
+        name: "Compounds",
+        href: "/compounds",
+        icon: SwatchIcon,
         bg: "bg-white",
     },
     // {
@@ -858,6 +866,7 @@ export default {
         StudyCreate,
         Submission,
         Notification,
+        SwatchIcon,
     },
     props: {
         title: String,

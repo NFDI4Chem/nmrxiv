@@ -27,17 +27,17 @@ class SanitizeMolecules extends Command
      */
     public function handle()
     {
-        $molecules = Molecule::whereNull('CANONICAL_SMILES')->get();
+        $molecules = Molecule::whereNull('canonical_smiles')->get();
 
         foreach ($molecules as $molecule) {
             echo $molecule->id;
             echo "\r\n";
             $molecule->MOL = '
             '.$molecule->MOL;
-            $standardisedMOL = $this->standardizeMolecule($molecule->MOL);
-            $molecule->CANONICAL_SMILES = $standardisedMOL['canonical_smiles'];
-            $molecule->STANDARD_INCHI = $standardisedMOL['inchi'];
-            $molecule->INCHI_KEY = $standardisedMOL['inchikey'];
+            $standardisedMOL = $this->standardizeMolecule($molecule->sdf);
+            $molecule->canonical_smiles = $standardisedMOL['canonical_smiles'];
+            $molecule->standard_inchi = $standardisedMOL['inchi'];
+            $molecule->inchi_key = $standardisedMOL['inchikey'];
             $molecule->save();
         }
     }
