@@ -30,9 +30,9 @@ class MoleculeFactory extends Factory
 
         $output = [];
         $labels = [
-            'InChI' => 'STANDARD_INCHI',
-            'InChIKey' => 'INCHI_KEY',
-            'Molecular Formula' => 'FORMULA',
+            'InChI' => 'standard_inchi',
+            'InChIKey' => 'inchi_key',
+            'Molecular Formula' => 'molecular_formula',
         ];
 
         foreach ($data as $key => $value) {
@@ -48,16 +48,16 @@ class MoleculeFactory extends Factory
 
         return
         [
-            'CAS_NUMBER' => null,
-            'FORMULA' => $output['FORMULA'],
-            'MOLECULAR_WEIGHT' => null,
-            'SMILES' => null,
-            'SMILES_CHIRAL' => null,
-            'CANONICAL_SMILES' => null,
-            'INCHI' => null,
-            'STANDARD_INCHI' => $output['STANDARD_INCHI'],
-            'INCHI_KEY' => $output['INCHI_KEY'],
-            'STANDARD_INCHI_KEY' => null,
+            'cas' => null,
+            'molecular_formula' => $output['molecular_formula'],
+            'molecular_weight' => null,
+            'smiles' => null,
+            'absolute_smiles' => null,
+            'canonical_smiles' => null,
+            'inchi' => null,
+            'standard_inchi' => $output['standard_inchi'],
+            'inchi_key' => $output['inchi_key'],
+            'standard_inchi_key' => null,
             'fp0' => null,
             'fp1' => null,
             'fp2' => null,
@@ -78,7 +78,7 @@ class MoleculeFactory extends Factory
             'SSSR' => null,
             'SAR' => null,
             'COMMENT' => null,
-            'MOL' => null, //todo: add mol file
+            'sdf' => null,
             'MULTIPLICITY_0' => null,
             'MULTIPLICITY_1' => null,
             'MULTIPLICITY_2' => null,

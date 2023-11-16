@@ -29,13 +29,23 @@ class StudyController extends Controller
 {
     public function publicStudiesView(Request $request)
     {
-        // $datasets = Cache::rememberForever('datasets', function () {
-        $studies = StudyResource::collection(Study::with('datasets')->where([['is_public', true], ['is_archived', false]])->filter($request->only('search', 'sort', 'mode'))->paginate(12)->withQueryString());
-        // });
+        $moleculeId = $request->get('compound');
+        if ($moleculeId) {
+            $molecule = Molecule::where('identifier', $moleculeId)->first();
+            if ($molecule) {
+                $studies = $molecule->studies()->where([['is_public', true], ['is_archived', false]])->filter($request->only('search', 'sort', 'mode'))->paginate(12)->withQueryString();
+            } else {
+                $studies = [];
+            }
+        } else {
+            $studies = Study::with('datasets')->where([['is_public', true], ['is_archived', false]])->filter($request->only('search', 'sort', 'mode'))->paginate(12)->withQueryString();
+        }
+
+        $studiesResource = StudyResource::collection($studies);
 
         return Inertia::render('Public/Studies', [
             'filters' => $request->all('search', 'sort', 'mode'),
-            'studies' => $studies,
+            'studies' => $studiesResource,
         ]);
     }
 
@@ -133,15 +143,15 @@ class StudyController extends Controller
             $study->sample()->save($sample);
         }
         $inchi = $request->get('InChI');
-        $molecule = $sample->molecules->where('STANDARD_INCHI', $inchi)->first();
+        $molecule = $sample->molecules->where('standard_inchi', $inchi)->first();
         if (is_null($molecule)) {
             $molecule = Molecule::firstOrCreate([
-                'STANDARD_INCHI' => $inchi,
+                'standard_inchi' => $inchi,
             ], [
-                'FORMULA' => $request->get('formula') ? $request->get('formula') : '',
-                'INCHI_KEY' => $request->get('InChIKey') ? $request->get('InChIKey') : '',
-                'MOL' => $request->get('mol') ? $request->get('mol') : '',
-                'CANONICAL_SMILES' => $request->get('canonical_smiles') ? $request->get('canonical_smiles') : '',
+                'molecular_formula' => $request->get('formula') ? $request->get('formula') : '',
+                'inchi_key' => $request->get('InChIKey') ? $request->get('InChIKey') : '',
+                'sdf' => $request->get('mol') ? $request->get('mol') : '',
+                'canonical_smiles' => $request->get('canonical_smiles') ? $request->get('canonical_smiles') : '',
             ]);
             $sample->molecules()->syncWithPivotValues([$molecule->id], ['percentage_composition' => $request->get('percentage')], false);
         }
