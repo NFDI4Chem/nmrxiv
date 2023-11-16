@@ -8,6 +8,7 @@ use App\Http\Controllers\API\ProjectController;
 use App\Http\Controllers\API\Schemas\Bioschema\BiochemaController;
 use App\Http\Controllers\API\Schemas\Bioschema\DataCatalogController;
 use App\Http\Controllers\API\Schemas\Datacite\DataCiteController;
+use App\Http\Controllers\API\SearchController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -27,6 +28,9 @@ Route::prefix('v1')->group(function () {
             Route::get('/user/info', [UserController::class, 'info']);
         });
     });
+
+    // Search
+    Route::post('/search/{smiles?}', [SearchController::class, 'search']);
 
     Route::prefix('files')->group(function () {
         Route::get('/children/{file}', [FileSystemController::class, 'children']);

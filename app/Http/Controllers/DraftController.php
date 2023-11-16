@@ -87,7 +87,6 @@ class DraftController extends Controller
                     'children' => FileSystemObject::with('children')
                         ->where([
                             ['level', 0],
-                            ['status', '<>', 'missing'],
                             ['draft_id', $draft->id],
                         ])
                         ->orderBy('created_at', 'DESC')

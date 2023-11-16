@@ -1,5 +1,6 @@
 <template>
     <div class="bg-white">
+        <Head title="Welcome"></Head>
         <main>
             <div class="relative index_beams">
                 <header>
@@ -692,7 +693,7 @@
                                         v-for="item in footerNavigation.quicklinks"
                                         :key="item.name"
                                     >
-                                    <Link
+                                        <Link
                                             :href="item.href"
                                             class="text-base text-gray-500 hover:text-gray-900"
                                         >
@@ -702,7 +703,7 @@
                                     <li>
                                         <a
                                             target="_blank"
-                                            href=https://docs.nmrxiv.org/FAQs.html
+                                            href="https://docs.nmrxiv.org/FAQs.html"
                                             class="text-base text-gray-500 hover:text-gray-900"
                                         >
                                             FAQs
@@ -904,8 +905,8 @@ const footerNavigation = {
     //   { name: "Advanced Search", href: "/projects" },
     // ],
     quicklinks: [
-        { name: "Projects", href: "/projects"},
-        { name: "Spectra", href: "/spectra"}
+        { name: "Projects", href: "/projects" },
+        { name: "Spectra", href: "/spectra" },
     ],
     support: [
         { name: "Documentation", href: "https://docs.nmrxiv.org" },
