@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.1-rc.11](https://github.com/NFDI4Chem/nmrxiv/compare/v1.0.0-rc.11...v1.0.1-rc.11) (2023-11-17)
+
+
+### Bug Fixes
+
+* updated study public card and other bug fixes ([7c654f8](https://github.com/NFDI4Chem/nmrxiv/commit/7c654f80c4f83936a9c70c4d20288f9786effdeb))
+* validation page rendering issue fix ([7e1362d](https://github.com/NFDI4Chem/nmrxiv/commit/7e1362debc3c6e89b7f0eed873977ceb19d0ab99))
+
 ## [1.0.1-rc.10](https://github.com/NFDI4Chem/nmrxiv/compare/v1.0.0-rc.10...v1.0.1-rc.10) (2023-11-16)
 
 
