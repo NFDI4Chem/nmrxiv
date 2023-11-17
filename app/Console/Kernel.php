@@ -26,6 +26,7 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('nmrxiv:publish')->daily();
         $schedule->command('nmrxiv:delete-projects')->daily();
+        $schedule->command('nmrxiv:index-molecules')->daily();
         $schedule->command('nmrxiv:delete-citations')->weekly();
         $schedule->command('nmrxiv:delete-authors')->weekly();
         if (App::environment('production')) {
