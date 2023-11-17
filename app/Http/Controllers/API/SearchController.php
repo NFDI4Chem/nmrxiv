@@ -269,7 +269,7 @@ class SearchController extends Controller
                         $offset;
                 } else {
                     $statement =
-                        'select id, COUNT(*) OVER () from mols limit '.
+                        'select id, COUNT(*) OVER () from molecules WHERE identifier NOTNULL limit '.
                         $limit.
                         ' offset '.
                         $offset;

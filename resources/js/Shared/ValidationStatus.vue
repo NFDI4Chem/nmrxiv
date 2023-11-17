@@ -74,7 +74,7 @@ export default {
             if (typeof this.status == "boolean") {
                 return this.status;
             }
-            return this.status.split("|")[0] == "true";
+            return this.status ? this.status.split("|")[0] == "true" : "false";
         },
     },
 };
