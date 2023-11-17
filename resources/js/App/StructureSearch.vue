@@ -146,7 +146,7 @@
                                         Cancel
                                     </button>
                                     <button
-                                        class="ml-3 inline-flex justify-center rounded-md border border-transparent bg-secondary-dark py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-secondary-light focus:outline-none focus:ring-2 focus:ring-secondary-dark focus:ring-offset-2"
+                                        class="ml-3 inline-flex justify-center rounded-md bg-gray-700 text-white py-2 px-4 text-sm font-medium shadow-sm hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-secondary-dark focus:ring-offset-2"
                                         @click="search"
                                     >
                                         Search
