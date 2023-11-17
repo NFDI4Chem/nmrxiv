@@ -691,7 +691,7 @@ export default {
             if (typeof value == "boolean") {
                 return value;
             }
-            return value.split("|")[0] == "true";
+            return value ? value.split("|")[0] == "true" : "false";
         },
         update(model, property) {
             if (this.mode == "study") {
