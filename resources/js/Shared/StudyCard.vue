@@ -45,46 +45,6 @@
                 </ul>
                 <div class="bg-white"></div>
             </div>
-            <!-- <span
-                v-if="
-                    study.photo_url ||
-                    (study.study_preview_urls &&
-                        study.study_preview_urls.length > 0) ||
-                    (study.sample &&
-                        study.sample.molecules &&
-                        study.sample.molecules.length > 0)
-                "
-            >
-                <ul v-if="study.molecules.length > 0" role="list">
-                    <li
-                        class="col-span-1 divide-y divide-gray-200 cursor-pointer"
-                    >
-                        <div
-                            class="bg-white absolute top-0 left-0 bg-white opacity-80 item-center w-full rounded-t-md flex justify-center items-center"
-                        >
-                            <span
-                                ><div
-                                    v-html="getSVGString(study.molecules[0])"
-                                ></div
-                            ></span>
-                        </div>
-                    </li>
-                </ul>
-
-                <img
-                    class="h-48 w-full rounded-t-md shadow-lg"
-                    v-if="study.photo_url"
-                    :src="study.photo_url"
-                    alt="study.name"
-                />
-            </span>
-            <span v-else>
-                <img
-                    class="12rem w-full rounded-t-md shadow-lg"
-                    src="https://via.placeholder.com/340x180/FFF/f1f1f4?text=No preview"
-                    alt=""
-                />
-            </span> -->
         </div>
         <div class="flex-1 border-t bg-white p-3 flex flex-col justify-between">
             <div>

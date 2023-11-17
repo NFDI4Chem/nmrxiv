@@ -42,6 +42,7 @@ class StudyResource extends JsonResource
             'public_url' => $this->public_url ? $this->public_url : null,
             'updated_at' => $this->updated_at,
             'study_preview_urls' => $this->study_preview_urls,
+            'experiment_types' => $this->study_experiment_types,
             'download_url' => $this->download_url,
             'has_nmrium' => $this->has_nmrium,
             $this->mergeWhen(! $this->lite, function () {
