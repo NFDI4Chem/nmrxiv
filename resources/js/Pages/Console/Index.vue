@@ -82,6 +82,12 @@
                             </svg>
                         </span>
                     </div>
+                    <blocks
+                        heading="Curation"
+                        description="Manage spectra meta-data."
+                        name="curation"
+                        path="console.spectra"
+                    />
                 </div>
             </div>
         </div>
@@ -92,7 +98,10 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import { Link } from "@inertiajs/vue3";
 import Blocks from "@/Shared/Blocks.vue";
-import { EllipsisVerticalIcon } from "@heroicons/vue/24/solid";
+import {
+    EllipsisVerticalIcon,
+    RectangleStackIcon,
+} from "@heroicons/vue/24/solid";
 
 export default {
     components: {
@@ -100,6 +109,7 @@ export default {
         AppLayout,
         Blocks,
         EllipsisVerticalIcon,
+        RectangleStackIcon,
     },
 };
 </script>
