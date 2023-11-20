@@ -3,7 +3,7 @@
         <template #header>
             <div class="relative border-b border-zinc-900/5">
                 <div
-                    class="relative pt-10 dark:border-white/5 mx-8 max-w-7xl py-12 sm:py-12"
+                    class="relative pt-10 dark:border-white/5 mx-8 py-12 sm:py-12"
                 >
                     <div
                         class="absolute inset-0 bg-gradient-to-r from-[#36b49f] to-[#DBFF75] opacity-40 [mask-image:radial-gradient(farthest-side_at_top,white,transparent)] dark:from-[#36b49f]/30 dark:to-[#DBFF75]/30 dark:opacity-100"
@@ -198,9 +198,7 @@
                     </h2>
                 </div>
                 <div v-if="filters.mode == 'grid'">
-                    <div
-                        class="mt-4 mx-auto max-w-md grid gap-8 sm:max-w-lg lg:grid-cols-4 lg:max-w-7xl"
-                    >
+                    <div class="mt-4 mx-auto grid gap-8 lg:grid-cols-4 w-full">
                         <span
                             v-for="project in projects.data.filter(
                                 (p) => p.owner
