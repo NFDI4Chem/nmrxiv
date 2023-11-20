@@ -9,6 +9,7 @@
                 <!-- Icon component getting conditionally rendered on the basis of icon name passed -->
                 <icon v-if="name === 'users'" name="users" />
                 <icon v-if="name === 'announcements'" name="announcements" />
+                <icon v-if="name === 'curation'" name="spectra" />
             </span>
         </div>
         <!-- Heading and Description section -->

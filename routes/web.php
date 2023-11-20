@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AnnouncementController;
 use App\Http\Controllers\Admin\ConsoleController;
+use App\Http\Controllers\Admin\CurationController;
 use App\Http\Controllers\Admin\LicenseController;
 use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\ApplicationController;
@@ -292,6 +293,15 @@ Route::group([
 
             Route::delete('announcements/{announcement}', [AnnouncementController::class, 'destroy'])
                 ->name('console.announcements.destroy');
+        });
+
+        // Adding routes for submissions curation
+        Route::group(['middleware' => ['auth', 'permission:manage roles|manage platform']], function () {
+            // Spectra
+            Route::get('spectra', [CurationController::class, 'spectra'])
+                ->name('console.spectra');
+            Route::get('snapshots', [CurationController::class, 'snapshots'])
+                ->name('console.spectra.snapshots');
         });
     });
 });

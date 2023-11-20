@@ -101,7 +101,7 @@
                                             project.id
                                         ) + '?edit=title'
                                     "
-                                    class="cursor-pointer bg-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
+                                    class="cursor-pointer bg-red-800 text-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
                                 >
                                     Edit
                                 </a>
@@ -130,7 +130,7 @@
                                             project.id
                                         ) + '?edit=description'
                                     "
-                                    class="cursor-pointer bg-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
+                                    class="cursor-pointer bg-red-800 text-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
                                 >
                                     Edit
                                 </a>
@@ -157,7 +157,7 @@
                                             project.id
                                         ) + '?edit=keywords'
                                     "
-                                    class="cursor-pointer bg-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
+                                    class="cursor-pointer bg-red-800 text-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
                                 >
                                     Edit
                                 </a>
@@ -184,7 +184,7 @@
                                             project.id
                                         ) + '?edit=citation'
                                     "
-                                    class="cursor-pointer bg-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
+                                    class="cursor-pointer bg-red-800 text-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
                                 >
                                     Edit
                                 </a>
@@ -211,7 +211,7 @@
                                             project.id
                                         ) + '?edit=authors'
                                     "
-                                    class="cursor-pointer bg-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
+                                    class="cursor-pointer bg-red-800 text-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
                                 >
                                     Edit
                                 </a>
@@ -238,7 +238,7 @@
                                             project.id
                                         ) + '?edit=license'
                                     "
-                                    class="cursor-pointer bg-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
+                                    class="cursor-pointer bg-red-800 text-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
                                 >
                                     Edit
                                 </a>
@@ -263,7 +263,7 @@
                                             project.id
                                         ) + '?edit=profile_image'
                                     "
-                                    class="cursor-pointer bg-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
+                                    class="cursor-pointer bg-red-800 text-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
                                 >
                                     Edit
                                 </a>
@@ -332,7 +332,7 @@
                                                                 study.title
                                                             )
                                                         "
-                                                        class="cursor-pointer bg-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
+                                                        class="cursor-pointer bg-red-800 text-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
                                                     >
                                                         Edit
                                                     </span> -->
@@ -356,7 +356,7 @@
                                                                 study.description
                                                             )
                                                         "
-                                                        class="cursor-pointer bg-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
+                                                        class="cursor-pointer bg-red-800 text-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
                                                     >
                                                         Edit
                                                     </span> -->
@@ -378,7 +378,7 @@
                                                                 study.keywords
                                                             )
                                                         "
-                                                        class="cursor-pointer bg-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
+                                                        class="cursor-pointer bg-red-800 text-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
                                                         @click="
                                                             update(
                                                                 study,
@@ -406,10 +406,53 @@
                                                                 study.sample
                                                             )
                                                         "
-                                                        class="cursor-pointer bg-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
+                                                        class="cursor-pointer bg-red-800 text-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
                                                     >
                                                         Edit
                                                     </span>
+                                                </div>
+                                                <div
+                                                    class="flex items-center hover:bg-gray-100 rounded-md px-2"
+                                                >
+                                                    <ValidationStatus
+                                                        :status="
+                                                            study.nmrium_info
+                                                        "
+                                                    ></ValidationStatus>
+                                                    <p
+                                                        class="truncate text-md text-dark-600"
+                                                    >
+                                                        Spectra
+                                                        <small
+                                                            v-if="
+                                                                study.nmrium_info.split(
+                                                                    '|'
+                                                                )[0] !== 'true'
+                                                            "
+                                                        >
+                                                            <br />
+                                                            Please load and
+                                                            confirm the spectra
+                                                            uploaded.
+                                                        </small>
+                                                    </p>
+                                                    <a
+                                                        v-if="
+                                                            !getStatus(
+                                                                study.nmrium_info
+                                                            )
+                                                        "
+                                                        target="_blank"
+                                                        :href="
+                                                            route(
+                                                                'dashboard.study.datasets',
+                                                                study.id
+                                                            )
+                                                        "
+                                                        class="cursor-pointer bg-red-800 text-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
+                                                    >
+                                                        Edit
+                                                    </a>
                                                 </div>
                                                 <div
                                                     class="flex items-center hover:bg-gray-100 rounded-md px-2"
@@ -430,7 +473,7 @@
                                                                 study.molecules
                                                             )
                                                         "
-                                                        class="cursor-pointer bg-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
+                                                        class="cursor-pointer bg-red-800 text-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
                                                         @click="
                                                             update(
                                                                 study,
@@ -506,7 +549,7 @@
                                                                             dataset.files
                                                                         )
                                                                     "
-                                                                    class="cursor-pointer bg-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
+                                                                    class="cursor-pointer bg-red-800 text-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
                                                                 >
                                                                     Edit
                                                                 </span>
@@ -555,7 +598,7 @@
                                                                         '?dsid=' +
                                                                         dataset.id
                                                                     "
-                                                                    class="cursor-pointer bg-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
+                                                                    class="cursor-pointer bg-red-800 text-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
                                                                 >
                                                                     Edit
                                                                 </a>
@@ -580,7 +623,7 @@
                                                                             dataset.assay
                                                                         )
                                                                     "
-                                                                    class="cursor-pointer bg-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
+                                                                    class="cursor-pointer bg-red-800 text-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
                                                                 >
                                                                     Edit
                                                                 </span>
@@ -604,7 +647,7 @@
                                                                             dataset.assignments
                                                                         )
                                                                     "
-                                                                    class="cursor-pointer bg-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
+                                                                    class="cursor-pointer bg-red-800 text-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
                                                                     :href="
                                                                         route(
                                                                             'dashboard.study.datasets',
