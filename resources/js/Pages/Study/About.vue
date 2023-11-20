@@ -456,7 +456,7 @@
                                                 <span
                                                     class="float-right text-xs cursor-pointer hover:text-blue-700"
                                                     ><a
-                                                        href="https://docs.nmrxiv.org/docs/submission-guides/submission/editor"
+                                                        href="https://docs.nmrxiv.org/submission-guides/editor.html"
                                                         target="_blank"
                                                         >Need help?</a
                                                     ></span

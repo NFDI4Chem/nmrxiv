@@ -686,7 +686,7 @@
                                                             >
                                                                 <a
                                                                     target="_blank"
-                                                                    href="https://docs.nmrxiv.org/docs/submission-guides/licenses"
+                                                                    href="https://docs.nmrxiv.org/submission-guides/licenses.html"
                                                                     >How to
                                                                     choose the
                                                                     right
@@ -717,7 +717,7 @@
                                                 <div class="mt-6 flex text-sm">
                                                     <a
                                                         target="_blank"
-                                                        href="https://docs.nmrxiv.org/docs/submission-guides/data-model/sharing"
+                                                        href="https://docs.nmrxiv.org/submission-guides/sharing.html"
                                                         class="group inline-flex items-center text-gray-500 hover:text-gray-900"
                                                     >
                                                         <QuestionMarkCircleIcon
