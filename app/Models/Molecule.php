@@ -48,7 +48,9 @@ class Molecule extends Model
         $samples = $this->samples->load('study');
         $studies = [];
         foreach ($samples as $sample) {
-            array_push($studies, $sample->study->id);
+            if ($sample->study) {
+                array_push($studies, $sample->study->id);
+            }
         }
 
         return Study::whereIn('id', $studies);
