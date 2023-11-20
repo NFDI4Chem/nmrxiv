@@ -297,31 +297,34 @@
                         -->
                     </div>
                     <flash-messages />
-                    <notification
-                        ref="notificationElement"
-                        :notification="$page.props.user.notifications"
-                    />
                     <div class="ml-4 flex items-center md:ml-6">
-                        <div class="ml-5 tooltip">
-                            <a
-                                class="cursor-pointer"
-                                @click="openShowNotificationDialog"
-                            >
-                                <BellIcon
-                                    class="w-6 h-6 fill-current text-gray-600"
-                                />
-                            </a>
+                        <span v-if="$page.props.user.first_name != null">
+                            <div class="ml-5 mt-2 tooltip">
+                                <a
+                                    class="cursor-pointer"
+                                    @click="openShowNotificationDialog"
+                                >
+                                    <BellIcon
+                                        class="w-6 h-6 fill-current text-gray-600"
+                                    />
+                                </a>
+                                <span
+                                    class="bg-gray-900 text-center text-white px-2 py-1 shadow-lg rounded-md tooltiptextbottom"
+                                    >View Notifications</span
+                                >
+                            </div>
                             <span
-                                class="bg-gray-900 text-center text-white px-2 py-1 shadow-lg rounded-md tooltiptextbottom"
-                                >View Notifications</span
+                                v-if="hasUnreadNotification()"
+                                class="inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full"
                             >
-                        </div>
-                        <span
-                            v-if="hasUnreadNotification()"
-                            class="inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full"
-                        >
-                            {{ countNotification() }}</span
-                        >
+                                {{ countNotification() }}</span
+                            >
+                            <notification
+                                ref="notificationElement"
+                                :notification="$page.props.user.notifications"
+                            />
+                        </span>
+
                         <div class="ml-5 tooltip">
                             <a
                                 id="tour-step-documentation"
