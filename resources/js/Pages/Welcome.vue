@@ -56,7 +56,25 @@
                                     Docs
                                 </a>
                             </PopoverGroup>
+                            <!-- <div
+                            
+                            class="ml-5 tooltip"
+                        >
+                            
+                        </div> -->
                             <div
+                                v-if="$page.props.user.first_name != null"
+                                class="hidden md:flex items-center justify-end md:flex-1 lg:w-0"
+                            >
+                                <Link
+                                    href="/dashboard"
+                                    class="ml-8 whitespace-nowrap inline-flex items-center justify-center bg-gradient-to-r from-indigo-600 to-teal-600 bg-origin-border px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white hover:from-indigo-700 hover:to-teal-700"
+                                >
+                                    Dashboard
+                                </Link>
+                            </div>
+                            <div
+                                v-else
                                 class="hidden md:flex items-center justify-end md:flex-1 lg:w-0"
                             >
                                 <Link
@@ -155,6 +173,12 @@
                                                 >
                                                     Datasets
                                                 </Link>
+                                                <Link
+                                                    href="/compounds"
+                                                    class="text-base font-medium text-gray-900 hover:text-gray-700"
+                                                >
+                                                    Compounds
+                                                </Link>
                                                 <a
                                                     target="_blank"
                                                     href="https://docs.nmrxiv.org"
@@ -239,39 +263,26 @@
                 </div>
             </div>
 
-            <div class="relative bg-gray-800">
-                <div
-                    class="h-80 absolute inset-x-0 bottom-0 xl:top-0 xl:h-full"
-                >
-                    <div class="h-full w-full xl:grid xl:grid-cols-2">
-                        <div class="h-full xl:relative xl:col-start-2">
-                            <img
-                                class="h-full w-full object-cover opacity-25 xl:absolute xl:inset-0"
-                                src="https://images.unsplash.com/photo-1656331797721-b593b8f00297?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2830&q=80&sat=-100"
-                                alt="People working on laptops"
-                            />
-                            <div
-                                aria-hidden="true"
-                                class="absolute inset-x-0 top-0 h-32 bg-gradient-to-r from-gray-800 xl:inset-y-0 xl:left-0 xl:h-full xl:w-32 xl:bg-gradient-to-r"
-                            />
-                        </div>
-                    </div>
+            <div class="relative bg-transparent">
+                <div class="absolute inset-x-0 top-0 overflow-hidden pl-[50%]">
+                    <img
+                        src="/img/beams-basic.png"
+                        alt=""
+                        class="-ml-[39rem] w-[113.125rem] max-w-none"
+                    />
                 </div>
-                <div
-                    class="max-w-4xl mx-auto px-4 sm:px-6 lg:max-w-7xl lg:px-8 xl:grid xl:grid-cols-2 xl:grid-flow-col-dense xl:gap-x-8"
-                >
+                <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div
-                        class="relative pt-12 pb-64 sm:pt-24 sm:pb-64 xl:col-start-1 xl:pb-24"
+                        class="relative pt-12 sm:p-24 xl:col-start-1 border-b border-slate-100"
                     >
                         <h2
                             class="text-sm font-semibold tracking-wide uppercase"
                         >
-                            <span
-                                class="bg-gradient-to-r from-indigo-300 to-teal-300 bg-clip-text text-transparent"
+                            <span class="bg-clip-text text-gray-600"
                                 >Metrics</span
                             >
                         </h2>
-                        <p class="mt-3 text-xl font-bold text-gray-400">
+                        <p class="mt-3 text-xl font-bold">
                             Validate your spectral findings and develop
                             new/accurate tools using state of the art AI/ML
                             models.
@@ -280,26 +291,22 @@
                             class="mt-4 grid grid-cols-1 gap-y-12 gap-x-6 sm:grid-cols-2"
                         >
                             <p>
-                                <span
-                                    class="block text-2xl font-bold text-white"
+                                <span class="block text-2xl font-bold"
                                     >{{ projects }} Projects</span
                                 >
                             </p>
                             <p>
-                                <span
-                                    class="block text-2xl font-bold text-white"
+                                <span class="block text-2xl font-bold"
                                     >{{ compounds }} Compounds</span
                                 >
                             </p>
                             <p>
-                                <span
-                                    class="block text-2xl font-bold text-white"
+                                <span class="block text-2xl font-bold"
                                     >{{ spectra }} Spectra</span
                                 >
                             </p>
                             <p>
-                                <span
-                                    class="block text-2xl font-bold text-white"
+                                <span class="block text-2xl font-bold"
                                     >{{ techniques }} Techniques</span
                                 >
                             </p>
