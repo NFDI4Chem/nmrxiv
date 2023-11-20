@@ -7,7 +7,7 @@
                     class="float-center text-xs cursor-pointer hover:text-blue-700 mb-2"
                 >
                     <a
-                        href="https://docs.nmrxiv.org/docs/submission-guides/data-model/study"
+                        href="https://docs.nmrxiv.org/submission-guides/data-model/sample.html"
                         target="_blank"
                         >Learn more about samples
                     </a>
