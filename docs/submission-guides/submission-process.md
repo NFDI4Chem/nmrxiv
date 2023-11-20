@@ -13,6 +13,7 @@ Before you start submitting your data, you need to:
 - A project can have multiple samples -  A sample study corresponds to a group of NMR experiments of one sample, e.g. 1H, 13C, APT, COSY HSQC, HMBC, NOESY in Bruker Format or (another study) in another format such as JCAMP-DX / Variant.
 - Each NMR measurement in a sample study is referred to as a dataset, e.g. 1H NMR or COSY (are each a dataset).
 - nmrXiv allows you to upload NMR raw data from any NMR instrument. We can currently auto-detect Bruker/Varian/JOEL formats & JCAMP files and will support more raw & processed file formats soon. Once you upload your raw or processed NMR data, nmrXiv will auto-generate the samples and datasets for you based on the uploaded folder structure.
+- Once your project is made public you will not be able to edit the information.
 
 <p align="center">
 <img src="/img/primer.png" width="1000"/>
@@ -115,6 +116,8 @@ If you choose to publish as a `Project`, you need to provide the necessary minim
   - `License` - license is mandatory for making your data public. If you are not sure which license to use, please check the link [How to choose the right license?](/submission-guides/licenses.html).
   - `Terms & Conditions` - please check the boxes if you agree to the [Terms of Service](https://nmrxiv.org/terms-of-service) and [Privacy Policy](https://nmrxiv.org/privacy-policy) of the [nmrXiv](https://nmrxiv.org) and also please note once you publish your data, you are aware that your data including the underlying spectras and files will be made public.
 
+  ::: danger Please be aware that once the project is made public, it cannot be edited any further and cannot be reverted to a private status.
+  ::: 
 <p align="center">
 <img src="/img/upload/final-details-1.png" width="1000"/>
 </p>
