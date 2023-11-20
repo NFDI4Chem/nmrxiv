@@ -1,118 +1,139 @@
 # Data Submission
 
+[nmrXiv](nmrxiv.org) support scientists in their efforts to collect, store, process, analyse, disclose and re-use Nuclear Magnetic Resonance Spectroscopy research data.
+
 ## Before You start
 
 Before you start submitting your data, you need to:
 
 - First, [register](/submission-guides/registration.md) to create an account in **[nmrXiv](https://www.nmrxiv.org)**, or login to **[nmrXiv](https://www.nmrxiv.org)** via single sign-on with your GitHub or Twitter ID. Please be aware that the single sign-on will result in registering you on **[nmrXiv](https://www.nmrxiv.org)**.
-- Make sure to structure your folder in the way described [here](/submission-guides/submission/folder-structure).
+- Make sure to structure your folder in the way described [here](/submission-guides/folder-structure.html).
 - Make sure to include at least one [file format supported by NMRium](https://docs.nmrium.org/#2-open-spectra) in your folder to generate spectra.
+- In nmrXiv, data is organised as projects. Consider a project is equivalent to your publication with the corresponding NMR data to be uploaded to nmrXiv.
+- A project can have multiple samples -  A sample study corresponds to a group of NMR experiments of one sample, e.g. 1H, 13C, APT, COSY HSQC, HMBC, NOESY in Bruker Format or (another study) in another format such as JCAMP-DX / Variant.
+- Each NMR measurement in a sample study is referred to as a dataset, e.g. 1H NMR or COSY (are each a dataset).
+- nmrXiv allows you to upload NMR raw data from any NMR instrument. We can currently auto-detect Bruker/Varian/JOEL formats & JCAMP files and will support more raw & processed file formats soon. Once you upload your raw or processed NMR data, nmrXiv will auto-generate the samples and datasets for you based on the uploaded folder structure.
+
+<p align="center">
+<img src="/img/primer.png" width="1000"/>
+</p>
 
 ### What You Need to Know
 
-- Keep in mind that your submission will be structured as a **Project**.
-- If you submit more than one folder at once, they will still be one **Project**, and the underlying folders with datasets will be studies.
+- After submitting the data, it will be visible only to you and will remain private until you decide to make it public and generate a DOI.
+- You can delete your project at any time before making it public. However, once the project is public, it cannot be deleted but can only be archived. This is because once a project is public, it may be referenced elsewhere, necessitating the repository to maintain an active link to the project. To learn more about deleting and archiving policy click [here](/submission-guides/data-model/project.html#delete-and-archive).
+- When the project is made public, it becomes visible and open to everyone for accessing and downloading files, even if one is not registered on nmrxiv.
+- All the data uploaded to nmrXiv are stored in the S3 bucket provisioned by the University Computing Center of [Friedrich-Schiller-Universität Jena](https://www.uni-jena.de/) and are backed up daily to the [Google Cloud Storage Archive Storage](https://cloud.google.com/storage/docs/storage-classes#archive) with multiple regions located in the European Union.
 
 ## The Submission Pipeline
 
-### Files Upload - Step 1
+### Step 1 - Files Upload:
 
-- Click on the `UPLOAD` button in your Dashboard or the [team Dahsboard](/submission-guides/data-model/team.md) to start the submission pipeline.
-
+- Click on the `UPLOAD` button in your Dashboard or the [team dashboard](/submission-guides/data-model/team.html) to start the submission pipeline.
 <p align="center">
 <img src="/img/upload/upload-btn.png" width="1000"/>
 </p>
-- The window **Files Upload** will open.
-<p align="center">
-<img src="/img/upload/upload.png" width="1000"/>
-</p>
-- Provide details about your **Project**. Every field marked with a red asterisk is **mandatory**.
-  - **Project Name** must be unique within the workspace (personal workspace or team).
-  - **Project Description** must be at least 20 characters.
-  - **Keywords** can be added singly by typing the keyword and pressing "enter", or in bulk by typing a list of keywords separated by commas and pressing enter. Keywords increase the visibility of the **Project**. 
-- Drag and drop your folder to the dedicated field.
-- The loading bar will get green as the upload progresses.
-- Wait until the upload has ended.
-- Your folders are now added to the root folder "\".
-- Clicking on any folder on the left side will show an overview of its content on the right side. You can also navigate the folders with the arrows.
-<p align="center">
-<img src="/img/upload/folders.png" width="1000"/>
-</p>
-- At this step, you can delete any unwanted folders or files by selecting them from the panel on the left side and pressing the `Delete` button on the right side.
 
-![File Upload](/img/upload/fileupload.gif)
-
-### Assignement & Meta data - Step 2
-
-Within this step, you can use [NMRium](https://www.nmrium.org/) to edit your spectra and assign peaks to the corresponding chemical groups. Additionally, you can provide the metadata of the studies and samples within the project.
-
-- **STUDY** can be seen as a title at the top left side of the panel with the total number of studies within the project. In this panel, you can switch between studies and see the names of the underlying datasets. The dataset will have one of three colors:
-  - **Green**: When the dataset is successfully viewed.
-  - **Gray**: If there were no attempts to view the dataset yet, such as when you first open the study before you start viewing the datasets.
-  - **Red**: When the attempt to view the dataset fails.
+- A brief introduction accompanied by a well-described diagram will appear on your screen, providing an overview of how the data will be organized in nmrXiv. Once you have read it, please click on the 'PROCEED' button to move on to the next step.
 
 <p align="center">
-<img src="/img/upload/study-panel.png" width="1000"/>
+<img src="/img/upload/intro.png" width="1000"/>
 </p>
 
-- **Experiments (Spectra)** is the first tab shown by default under the study name on the left side. Here you can navigate between different datasets (experiments) from the dropdown **Select Experiment**, which enables you to visualize and edit the corresponding spectra in the NMRium window in the middle. For more details on how to use NMRium, please check its [documentation](https://docs.nmrium.org/).
+- By default, the project's name will be `UNTITLED PROJECT` which is editable and can be overridden once you click on it and choose a suitable name that corresponds to your type of data. 
+- The upload begins when you drag and drop the folder, and it will take a few minutes to complete. Please wait until the Batch Upload finishes. You can also check the logs by clicking on `View Logs` in case of any failures.
 
 <p align="center">
-<img src="/img/upload/experiments.png" width="1000"/>
-</p> 
+<img src="/img/upload/after-file-upload.png" width="1000"/>
+</p>
 
-Directly above the NMRium window, you can see a gray message on the left that informs the user about the current status of the spectra (being uploaded, saved, etc.). On the right side, there exist three buttons. `Reset` will reset all the edits done on the spectra, getting it back to its original status when uploaded. Resetting is an edit that is saved along with other edits in the history. To view the history, click `Edit History`, which opens a side menu to show the editors, and the dates of edits.
-
-<p align="center">
-<img src="/img/upload/history.png" width="1000"/>
-</p> 
-
-The last button `Preview` helps is to refresh the spectra when you face any issues viewing your edits.
-
-Below, there is [NMRium](https://www.nmrium.org/) window. Clicking on the `User manual` leads to [NMRium Documentation page](https://docs.nmrium.org/). You can control the panels and tools you have by default in [NMRium](https://www.nmrium.org/) from `General settings`. You can also click `Full screen` to enable that mode.
+- After the upload is complete, you can view the files on the left side, allowing easy navigation to check the tree. You also have the option to delete specific files or folders by selecting them and clicking the 'Delete' button. If you wish to upload additional files to a specific path, select the desired path and drag and drop the files.
 
 <p align="center">
-<img src="/img/upload/manual.png" width="1000"/>
-</p> 
+<img src="/img/upload/step-1.gif" width="1000"/>
+</p>
 
-Below the [NMRium](https://www.nmrium.org/) window there are two tables:
+A small clip showcasing the Step-1 of file upload process.
 
-- **Info** includes all the information extracted by [NMRium](https://www.nmrium.org/) about the NMR experiment.
 
-- **Meta** is the second table coming after **Info**. It includes the metadata from the instrument file.
+### Step 2 - Assignment & Meta data
 
-![Assignement & Meta data](/img/upload/assignment-metadata.gif)
+- In this step, your data is organized into samples, and you have the opportunity to input missing metadata for these samples. On the left side, you can observe that 7 samples have been created, collectively comprising 8 spectra. Please wait for a moment until all the metadata for the spectra has been processed.
+- The `Samples Validation` section remains Incomplete, as your upload lacks certain metadata required to meet community standards. Currently, we are verifying the mandatory metadata specified by [DataCite](https://datacite.org/) necessary to obtain a [DOI](https://www.doi.org/) in addition to requesting an image for the project. Click on the `Import now` button to automatically import the missing Spectra information.
 
-- **Sample Info** tab shows details about the chemical composition of the sample (available molecules and their percentages). You can load structures by adding **SMILES** to the corresponding field and pressing `Load Structure`. It will view the structure in the [structure editor](/submission-guides/submission/editor.md), where you can apply any needed changes. Alternatively, you can draw the structure in the [editor](/submission-guides/submission/editor.md) from scratch. When you feel satisfied with the structure, set its percentage using the bar and press `ADD`. The molecule with its percentage and INChI will appear in the molecules list on the left side. Added structures can be `Edit`ed and `Delete`d using the corresponding buttons. For more details about the structure editor, please [visit its documentation](/submission-guides/submission/editor.md).
+<p align="center">
+<img src="/img/upload/enter-metadata.png" width="1000"/>
+</p>
 
-:::caution
-The purpose of the **Sample chemical composition** section is to enable the user to add the molecules they are aware of their existence in the sample **before the NMR spectroscopy** along with their percentages. Molecules identified through the NMR analysis are located at the dataset level.
+- To identify the missing information, click on each individual sample. This action will provide a comprehensive checklist of the required information that is currently incomplete. Here you can find either red <span style="color:red;">(x)</span> or green <span style="color:green;">(✓)</span> to indicate the existence or absence of the metadata respectively. Whenever the red <span style="color:red;">(x)</span> exists, it is accompanied by an `Edit` button to facilitate providing the missing data. Additionally, there are optional fields available for you to fill in, allowing you to provide additional information if desired.
+
+<p align="center">
+<img src="/img/upload/checklist.png" width="1000"/>
+</p>
+
+- You can navigate through each sample by clicking on it to review the metadata. Additionally, you have the option to visualize and edit your spectra using [NMRium](https://www.nmrium.org/) and assign peaks to the corresponding chemical groups. For more details on how to use NMRium, please check its [documentation](https://docs.nmrium.org/).
+
+<p align="center">
+<img src="/img/upload/metadata.png" width="1000"/>
+</p>
+
+- On the same screen below you can find the Sample details which consist of:     
+  - `Sample description` - Automatically imported information provides a brief summary of the experiment and details on how it was conducted.
+  - `Keywords` - Tags used to search for the project and increase its findability. 
+  - `Organism` - This is ontology driven organism information about your sample.
+  - `Chemical composition` - Molecule structure information existing in the sample  along with their percentage. You can leave the percentage composition to zero if unknown. 
+  Click [here](/submission-guides/editor.html) for more information about how to use the `Structure Editor`.
+
+<p align="center">
+<img src="/img/upload/metadata-2.png" width="1000"/>
+</p>
+
+- After providing all the necessary metadata information, the `Validation` status will change to <span style="color:green; font:bold;">Success</span> and all the checklist items will be marked in green <span style="color:green;">(✓)</span>. Click on the `Refresh` button if the validation status doesnot update. Click on the `Proceed` button to move to the final step of submission.
+ 
+<p align="center">
+<img src="/img/upload/validation-success.png" width="1000"/>
+</p>
+
+
+<p align="center">
+<img src="/img/upload/step-2.gif" width="1000"/>
+</p>
+
+A small clip showcasing the Step-2 of file upload process.
+
+### Step 3 - Publish  
+
+- You've reached the final stage of the submission process and you are almost there. At the top, you have the option to either publish the project as a `Project` or simply publish the `Samples`, which you can find listed on this screen.
+If you choose to publish as a `Project`, you need to provide the necessary minimum requirements, such as:
+  - `Project Name` - must be unique within the workspace (personal workspace or team).
+  - `Project Desription` - must be at least 20 characters.
+  - `Keywords(Optional)` - this field is optional but can be added individually by typing the keyword and pressing "Enter," or in bulk by typing a list of keywords separated by commas and pressing "Enter." Keywords enhance the visibility of the `Project`.
+  - `Organism(Optional)` - this field is optional and is ontology driven organism information about your project.
+  - `Citation` - this field contains the article to which the submitted data is attached. You can either enter the citation details manually or import it directly from the DOI.
+  - `Author` - enter the details of the authors who are linked with the creation of the data. Again, these details can be entered manually or imported via ORCID IDs
+  - `Release Date` - if you want to publish your data right away, you can leave this value as the default. Otherwise, you can choose any future date, and your data will be automatically published on that particular date.
+  - `License` - license is mandatory for making your data public. If you are not sure which license to use, please check the link [How to choose the right license?](/submission-guides/licenses.html).
+  - `Terms & Conditions` - please check the boxes if you agree to the [Terms of Service](https://nmrxiv.org/terms-of-service) and [Privacy Policy](https://nmrxiv.org/privacy-policy) of the [nmrXiv](https://nmrxiv.org) and also please note once you publish your data, you are aware that your data including the underlying spectras and files will be made public.
+
+<p align="center">
+<img src="/img/upload/final-details-1.png" width="1000"/>
+</p>
+
+<p align="center">
+<img src="/img/upload/final-details-2.png" width="1000"/>
+</p>
+
+Once you have provided all the necessary information, you can click on the 'Publish' button. However, if you are unsure and wish to publish it later, please click on the 'Not right yet' button. This will take you to the dashboard, and your project will remain private. You can choose to make it public whenever you want in the future.
+
+<p align="center">
+<img src="/img/upload/step-3.gif" width="1000"/>
+</p>
+
+A small clip showcasing the last step of file upload process.
+
+After completing the final step of the submission process, you will be directed to the [dashboard](/submission-guides/dashboard.html) about which you can find more details in the next section.
+
+::: warning 
+Please note that all the clips and screenshots are taken from the [development](https://dev.nmrxiv.org) environment of nmrXiv. 
+Kindly note that this serves as a demo/test server for nmrXiv, and we urge you not to upload or save any sensitive data. For real-time data uploads, please visit https://nmrxiv.org.
 :::
-
-:::caution Please note
-If you don't know the percentage of a molecule in your sample, you have to set it to **zero**.
-:::
-
-<p align="center">
-<img src="/img/upload/sample.png" width="1000"/>
-</p> 
-
-- **Meta Data** tab shows an overview of the selected study's metadata. You can edit this metadata at this level or after submission as long your study is private. You can press on **Auto generate** to auto-generate the study description. Please don't forget to press `SAVE` before you proceed.
-
-After providing all the details in this tab, you can go back to step 1 with the button `BACK`, you can `CANCEL` the submission, or you can `PROCEED` to step 3.
-
-<p align="center">
-<img src="/img/upload/meta.png" width="1000"/>
-</p> 
-
-### Complete - Step 3
-
-In step 3, you can find how your project compares to [recommended community standards](https://nfdi4chem.github.io/workshops/). Whenever a piece of information is missing, you will have it marked in red with an `Edit` button for a quick update. You can press `FINISH` to end the submission process even while having red marks, but your project will remain private, and complying with the standards is a prerequisite for publishing. Here are more details about the validation of [projects](/submission-guides/data-model/project#validation), [studies](/submission-guides/data-model/study#validation), and [datasets](/submission-guides/data-model/dataset#validation)
-
-<p align="center">
-<img src="/img/upload/check.png" width="1000"/>
-</p> 
-
-## After Submission
-
-After completing your submission, you can still manage to add and delete folders and files to and from your project. This option is available in the [project view](/submission-guides/data-model/project#project-view) as the [`Manage Studies` button](/submission-guides/data-model/project#manage-studies) and in the [dataset view](/submission-guides/data-model/dataset#dataset-view) as the [`Manage Datasets` button](/submission-guides/data-model/dataset#manage-datasets).
