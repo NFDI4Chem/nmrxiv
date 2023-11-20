@@ -137,10 +137,10 @@
                 </span>
             </div>
         </div>
-        <div
-            class="flex-1 bg-white p-3 border-t mt-1 flex flex-col justify-between"
-        >
-            <Link :href="study.public_url">
+        <Link :href="study.public_url">
+            <div
+                class="flex-1 bg-white p-3 border-t mt-1 flex flex-col justify-between"
+            >
                 <div>
                     <small
                         v-if="study.identifier"
@@ -160,31 +160,32 @@
                         </div>
                     </div>
                 </div>
-            </Link>
 
-            <div class="flex-1">
-                <p
-                    class="text-lg mt-2 font-semibold text-gray-900 line-clamp-1"
-                >
-                    {{ study.name }}
-                </p>
-                <div class="mt-1 h-14 overflow-hidden">
-                    <span
-                        v-for="type in study.experiment_types"
-                        :key="type"
-                        class="mt-1 inline-flex items-center rounded-full bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10"
+                <div class="flex-1">
+                    <p
+                        class="text-lg mt-2 font-semibold text-gray-900 line-clamp-1"
                     >
-                        {{ type }}
-                    </span>
+                        {{ study.name }}
+                    </p>
+                    <div class="mt-1 h-14 overflow-hidden">
+                        <span
+                            v-for="type in study.experiment_types"
+                            :key="type"
+                            class="mt-1 inline-flex items-center rounded-full bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10"
+                        >
+                            {{ type }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="pt-1">
+                    <div class="text-xs text-gray-600">
+                        <span class="text-gray-400">Last updated on</span>
+                        {{ formatDate(study.updated_at) }}
+                    </div>
                 </div>
             </div>
-            <div class="pt-1">
-                <div class="text-xs text-gray-600">
-                    <span class="text-gray-400">Last updated on</span>
-                    {{ formatDate(study.updated_at) }}
-                </div>
-            </div>
-        </div>
+        </Link>
     </div>
 </template>
 
