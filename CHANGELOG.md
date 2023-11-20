@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.1.0-rc.12](https://github.com/NFDI4Chem/nmrxiv/compare/v1.0.0-rc.12...v1.1.0-rc.12) (2023-11-20)
+
+
+### Features
+
+* added backend curation functionality to console (spectra snapshots) ([6b5f6ff](https://github.com/NFDI4Chem/nmrxiv/commit/6b5f6ffb39abe6d3bdb7f749dae1bd03946a3e83))
+
+
+### Bug Fixes
+
+* added molecules index to scheduled daily tasks and other minor ui improvements ([2abb207](https://github.com/NFDI4Chem/nmrxiv/commit/2abb207c950cb4abfeccfe54c026da84e95b5779))
+* added spectra field to study validations and also changed edit button css ([f304b37](https://github.com/NFDI4Chem/nmrxiv/commit/f304b37d933b827845ba0b545980c0aa34864bbc))
+* updated card - compound and study ([23863ab](https://github.com/NFDI4Chem/nmrxiv/commit/23863abdbe11bc794475ce1b1b3c0443b543b201))
+
 ## [1.0.1-rc.11](https://github.com/NFDI4Chem/nmrxiv/compare/v1.0.0-rc.11...v1.0.1-rc.11) (2023-11-17)
 
 
