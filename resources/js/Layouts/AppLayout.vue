@@ -276,25 +276,6 @@
                             :host="MEILISEARCH_HOST"
                             :akey="MEILISEARCH_PUBLICKEY"
                         ></search>
-                        <!-- 
-                            <form class="w-full flex md:ml-0" action="#" method="GET">
-                                <label for="search-field" class="sr-only">Search</label>
-                                <div class="relative w-full text-gray-400 focus-within:text-gray-600">
-                                    <div
-                                    class="absolute inset-y-0 left-0 flex items-center pointer-events-none"
-                                    >
-                                    <MagnifyingGlassIcon class="h-5 w-5" aria-hidden="true" />
-                                    </div>
-                                    <input
-                                    id="search-field"
-                                    class="block w-full h-full pl-8 pr-3 py-2 border-transparent text-gray-900 placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-0 focus:border-transparent sm:text-sm"
-                                    placeholder="Search"
-                                    type="search"
-                                    name="search"
-                                    />
-                                </div>
-                            </form> 
-                        -->
                     </div>
                     <flash-messages />
                     <div class="ml-4 flex items-center md:ml-6">
@@ -349,7 +330,7 @@
                                 >Submission guides</span
                             >
                         </div>
-                        <div
+                        <!-- <div
                             v-if="$page.props.user.first_name != null"
                             class="ml-5 tooltip"
                         >
@@ -374,7 +355,7 @@
                                 class="bg-gray-900 text-center text-white px-2 py-1 shadow-lg rounded-md tooltiptextbottom"
                                 >Start&nbsp;tour</span
                             >
-                        </div>
+                        </div> -->
                         <Menu
                             v-if="$page.props.user"
                             as="div"
@@ -779,13 +760,6 @@ const navigation = [
         icon: SwatchIcon,
         bg: "bg-white",
     },
-    // {
-    //     auth: false,
-    //     name: "Spectra",
-    //     href: "/spectra",
-    //     icon: Squares2X2Icon,
-    //     bg: "bg-white",
-    // },
     {
         auth: true,
         name: "Dashboard",
