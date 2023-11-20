@@ -53,7 +53,7 @@
                     class="text-center text-xs cursor-pointer hover:text-blue-700 mt-2"
                 >
                     <a
-                        href="https://docs.nmrxiv.org/docs/submission-guides/submission/upload/#manage-studies-and-datasets"
+                        href="https://docs.nmrxiv.org/submission-guides/data-model/project.html#manage-samples"
                         target="_blank"
                         >Need help?
                     </a>
