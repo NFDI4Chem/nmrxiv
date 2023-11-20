@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1-rc.13](https://github.com/NFDI4Chem/nmrxiv/compare/v1.0.0-rc.13...v1.0.1-rc.13) (2023-11-20)
+
+
+### Bug Fixes
+
+* layout bug fixes ([289620e](https://github.com/NFDI4Chem/nmrxiv/commit/289620ee0b8cb13131b13cdfa2a6c0dbf9a8feab))
+
 ## [1.1.0-rc.12](https://github.com/NFDI4Chem/nmrxiv/compare/v1.0.0-rc.12...v1.1.0-rc.12) (2023-11-20)
 
 
