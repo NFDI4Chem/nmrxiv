@@ -1,7 +1,64 @@
 <template>
     <app-layout title="Submit Data">
         <template #header>
-            <div class="bg-white border-b">
+            <div
+                class="absolute inset-0 bg-gradient-to-r from-[#36b49f] to-[#DBFF75] opacity-40 [mask-image:radial-gradient(farthest-side_at_top,white,transparent)] dark:from-[#36b49f]/30 dark:to-[#DBFF75]/30 dark:opacity-100"
+            >
+                <svg
+                    aria-hidden="true"
+                    class="absolute inset-x-0 inset-y-[-50%] h-[200%] w-full skew-y-[-18deg] fill-black/40 stroke-black/50 mix-blend-overlay dark:fill-white/2.5 dark:stroke-white/5"
+                >
+                    <defs>
+                        <pattern
+                            id=":r99:"
+                            width="72"
+                            height="56"
+                            patternUnits="userSpaceOnUse"
+                            x="-12"
+                            y="4"
+                        >
+                            <path d="M.5 56V.5H72" fill="none"></path>
+                        </pattern>
+                    </defs>
+                    <rect
+                        width="100%"
+                        height="100%"
+                        stroke-width="0"
+                        fill="url(#:r99:)"
+                    ></rect>
+                    <svg x="-12" y="4" class="overflow-visible">
+                        <rect
+                            stroke-width="0"
+                            width="73"
+                            height="57"
+                            x="288"
+                            y="168"
+                        ></rect>
+                        <rect
+                            stroke-width="0"
+                            width="73"
+                            height="57"
+                            x="144"
+                            y="56"
+                        ></rect>
+                        <rect
+                            stroke-width="0"
+                            width="73"
+                            height="57"
+                            x="504"
+                            y="168"
+                        ></rect>
+                        <rect
+                            stroke-width="0"
+                            width="73"
+                            height="57"
+                            x="720"
+                            y="336"
+                        ></rect>
+                    </svg>
+                </svg>
+            </div>
+            <div class="border-b bg-white relative">
                 <div class="px-6">
                     <div class="py-4">
                         <div>
@@ -206,7 +263,7 @@
                 </div>
             </div>
         </template>
-        <div>
+        <div class="relative">
             <div>
                 <div v-if="!loading">
                     <div class="mx-auto">
@@ -344,6 +401,7 @@
                                     <div
                                         v-if="currentStep.id == '01'"
                                         id="submission-dropzone"
+                                        class="border-gray-100"
                                     >
                                         <div class="mx-5 pt-4">
                                             <small class="cursor-pointer"
@@ -355,14 +413,18 @@
                                                 v-html="filesErrorMessage"
                                             ></div>
                                         </div>
-                                        <div id="tour-step-upload-spectra">
-                                            <file-system-browser
-                                                ref="fsbRef"
-                                                :readonly="false"
-                                                :draft="currentDraft"
-                                                :height="'h-[calc(100vh-385px)]'"
-                                                @loading="filesLoading"
-                                            ></file-system-browser>
+                                        <div
+                                            class="relative border bg-white mt-3"
+                                        >
+                                            <div id="tour-step-upload-spectra">
+                                                <file-system-browser
+                                                    ref="fsbRef"
+                                                    :readonly="false"
+                                                    :draft="currentDraft"
+                                                    :height="'h-[calc(100vh-385px)]'"
+                                                    @loading="filesLoading"
+                                                ></file-system-browser>
+                                            </div>
                                         </div>
                                         <jet-input-error
                                             :message="draftForm.errors.studies"
@@ -552,7 +614,9 @@
                                                         </a>
                                                     </div>
                                                 </nav>
-                                                <div class="flex-1 px-2">
+                                                <div
+                                                    class="flex-1 px-2 bg-white"
+                                                >
                                                     <div
                                                         v-if="
                                                             displaySamplesSummaryInfo
