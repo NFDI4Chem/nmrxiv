@@ -124,7 +124,6 @@ class Study extends Model implements Auditable
         return $urls;
     }
 
-
     /**
      * Get the experiment types performed on this sample.
      *
@@ -133,6 +132,7 @@ class Study extends Model implements Auditable
     public function getStudyExperimentTypesAttribute()
     {
         $experiment_types = $this->datasets->pluck('type');
+
         return $experiment_types;
     }
 
