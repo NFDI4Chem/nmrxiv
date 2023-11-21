@@ -265,7 +265,7 @@
                                 </div>
                                 <div
                                     v-if="results.data.length > 0"
-                                    class="mx-auto grid mt-6 gap-5 lg:max-w-none md:grid-cols-3 lg:grid-cols-4"
+                                    class="mx-auto grid mt-6 gap-5 lg:max-w-none md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6"
                                 >
                                     <span
                                         class="rounded-lg hover:shadow-lg shadow border"
@@ -534,7 +534,7 @@
                             </div>
                             <div
                                 v-if="results.data.length > 0"
-                                class="flex items-center justify-between bg-white px-4 py-3 sm:px-6 rounded-md"
+                                class="flex items-center justify-between bg-white px-12 py-3 rounded-md"
                             >
                                 <div
                                     class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between"
