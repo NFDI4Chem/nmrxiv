@@ -3,8 +3,8 @@
 ### How can I submit my data to **[nmrXiv](https://nmrxiv.org/)**?
 
 - [Register to nmrXiv](/submission-guides/registration.md).
-- Structure your data in folders similar to **[nmrXiv](https://nmrxiv.org/)** structuring of projects, studies, and datasets. This step might not be intuitive so we recommend [checking its docummentation](/submission-guides/submission/folder-structure.md).
-- Upload your data, edit it, and provide its metadata via the [submission pipeline](/submission-guides/submission/upload.md).
+- Structure your data in folders similar to **[nmrXiv](https://nmrxiv.org/)** structuring of projects, studies, and datasets. This step might not be intuitive so we recommend [checking its docummentation](/submission-guides/folder-structure.html).
+- Upload your data, edit it, and provide its metadata via the [submission pipeline](/submission-guides/submission-process.html).
 
 ### Do I need to register before submitting data to nmrXiv?
 
@@ -12,13 +12,16 @@ Yes. Registration is a prerequisite to submitting the data. Although you can sub
 
 ### How should I structure my data in folders before submitting it to **[nmrXiv](https://nmrxiv.org/)**?
 
-**[nmrXiv](https://nmrxiv.org/)** can structure the submitted data into datasets/studies/projects, but there is still no way to guarantee that the automatically generated structure is what the user was hoping to get. Therefore, it is recommended to have a look at the [folder structuring page](/submission-guides/submission/folder-structure.md).
+**[nmrXiv](https://nmrxiv.org/)** can structure the submitted data into datasets/studies/projects, but there is still no way to guarantee that the automatically generated structure is what the user was hoping to get. Therefore, it is recommended to have a look at the [folder structuring page](/submission-guides/folder-structure.html).
 
 ### What are supported files format in **[nmrXiv](https://nmrxiv.org/)**?
 
-**[nmrXiv](https://nmrxiv.org/)** accepts all NMR formats uploaded. However, not all of them are readable at the moment. So far, only NMRium-supported formats can be translated into spectra in **[nmrXiv](https://nmrxiv.org/)**. Those formats are jcamp-dx, jeol, Bruker folders, NMReData, and nmrium. For validation purposes, the uploaded data should have at least one readable format.
+**[nmrXiv](https://nmrxiv.org/)** accepts all NMR formats uploaded. However, not all of them are readable at the moment. So far, only NMRium-supported formats can be translated into spectra in **[nmrXiv](https://nmrxiv.org/)**. Those formats are **jcamp-dx, jeol, Bruker folders, NMReData, and nmrium**. For validation purposes, the uploaded data should have at least one readable format.
 
 ### What happens to my data once submitted?
+After you submit your data, it will remain private and will only be visible to you, unless you decide to make it public.
+
+All the data uploaded to nmrXiv are stored in the S3 bucket provisioned by the University Computing Center of [Friedrich-Schiller-Universität Jena](https://www.uni-jena.de/) and are backed up daily to the [Google Cloud Storage Archive Storage](https://cloud.google.com/storage/docs/storage-classes#archive) with multiple regions located in the European Union.
 
 ### What are public and private objects in **[nmrXiv](https://nmrxiv.org/)**?
 
@@ -40,7 +43,7 @@ You cannot edit a resource (project, study, dataset) once it's made public, but 
 
 ### How can I delete my projects, studies or dataset?
 
-You can only delete private ones. For more details, check deletion of [projects](/submission-guides/data-model/project#delete), [studies](/submission-guides/data-model/study#delete), and [datasets](/submission-guides/data-model/dataset#delete).
+You can only delete private ones. For more details, check deletion of [projects](/submission-guides/data-model/project#delete), [samples](/submission-guides/data-model/sample#delete), and [spectra](/submission-guides/data-model/spectra#delete).
 
 ### How can I share my resources?
 
