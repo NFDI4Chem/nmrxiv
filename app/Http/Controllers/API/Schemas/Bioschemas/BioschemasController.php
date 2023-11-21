@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\API\Schemas\Bioschema;
+namespace App\Http\Controllers\API\Schemas\Bioschemas;
 
 use App\Http\Controllers\Controller;
-use App\Models\Bioschema\BioSchema;
+use App\Models\Bioschemas\BioSchemas;
 use App\Models\Dataset;
 use App\Models\NMRium;
 use App\Models\Project;
@@ -20,7 +20,7 @@ use Spatie\SchemaOrg\Schema;
  * to enable exporting their metadata with a json endpoint, including the
  * samples and molecules.
  */
-class BiochemaController extends Controller
+class BioschemasController extends Controller
 {
     /**
      * Implement Bioschemas upon request by model's name to generate a project, study, or dataset schema.
@@ -112,6 +112,46 @@ class BiochemaController extends Controller
         } else {
             throw new AuthorizationException;
         }
+    }
+
+    /**
+     * Get Defined Term for ontology term.
+     *
+     *
+     * @param  string  $name
+     * @param  array  $alternameName
+     * @param  string  $identifier
+     * @param  string  $url
+     * @param  object  $inDefinedTermSet
+     * @return object $definedTerm
+     */
+    public function getDefinedTerm($name, $alternateName, $identifier, $url, $inDefinedTermSet)
+    {
+        $definedTerm = Schema::DefinedTerm();
+        $definedTerm->name($name);
+        $definedTerm->alternateName($alternateName);
+        $definedTerm->identifier($identifier);
+        $definedTerm->url($url);
+        $definedTerm->inDefinedTermSet($inDefinedTermSet);
+
+        return $definedTerm;
+    }
+
+    /**
+     * Get Defined Term set for ontology service.
+     *
+     *
+     * @param  string  $name
+     * @param  string  $url
+     * @return object $definedTermSet
+     */
+    public function getDefinedTermSet($name, $url)
+    {
+        $definedTermSet = Schema::DefinedTermSet();
+        $definedTermSet->name($name);
+        $definedTermSet->url($url);
+
+        return $definedTermSet;
     }
 
     /**
@@ -233,24 +273,24 @@ class BiochemaController extends Controller
             $inchiKey = $molecule->inchi_key;
             $pubchemLink = 'https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/inchikey/'.$inchiKey.'/property/IUPACName/JSON';
             $json = json_decode(Http::get($pubchemLink)->body(), true);
-            // $cid = $json['PropertyTable']['Properties'][0]['CID'];
-            // $iupacName = $json['PropertyTable']['Properties'][0]['IUPACName'];
+            $cid = $json['PropertyTable']['Properties'][0]['CID'];
+            $iupacName = $json['PropertyTable']['Properties'][0]['IUPACName'];
 
-            // $moleculeSchema = Schema::MolecularEntity();
-            // $moleculeSchema['@id'] = $inchiKey;
-            // $moleculeSchema['dct:conformsTo'] = $this->conformsTo(['https://bioschemas.org/profiles/MolecularEntity/0.5-RELEASE']);
-            // $moleculeSchema['identifier'] = $inchiKey;
-            // $moleculeSchema->name($molecule->cas);
-            // $moleculeSchema->url('https://pubchem.ncbi.nlm.nih.gov/compound/'.$cid);
-            // $moleculeSchema->inChI('InChI='.$molecule->standard_inchi);
-            // $moleculeSchema->inChIKey($inchiKey);
-            // $moleculeSchema->iupacName($iupacName);
-            // $moleculeSchema->molecularFormula($molecule->molecular_formula);
-            // $moleculeSchema->molecularWeight($molecule->molecular_weight);
-            // $moleculeSchema->smiles([$molecule->SMILES, $molecule->absolute_smiles, $molecule->canonical_smiles]);
-            // $moleculeSchema->hasRepresentation($molecule->MOL);
-            // $moleculeSchema->description('Percentage composition: '.$molecule->pivot->percentage_composition.'%');
-            // array_push($molecules, $moleculeSchema);
+            $moleculeSchema = Schema::MolecularEntity();
+            $moleculeSchema['@id'] = $inchiKey;
+            $moleculeSchema['dct:conformsTo'] = $this->conformsTo(['https://bioschemas.org/profiles/MolecularEntity/0.5-RELEASE']);
+            $moleculeSchema['identifier'] = $inchiKey;
+            $moleculeSchema->name($molecule->cas);
+            $moleculeSchema->url('https://pubchem.ncbi.nlm.nih.gov/compound/'.$cid);
+            $moleculeSchema->inChI($molecule->standard_inchi);
+            $moleculeSchema->inChIKey($inchiKey);
+            $moleculeSchema->iupacName($iupacName);
+            $moleculeSchema->molecularFormula($molecule->molecular_formula);
+            $moleculeSchema->molecularWeight($molecule->molecular_weight);
+            $moleculeSchema->smiles([$molecule->SMILES, $molecule->absolute_smiles, $molecule->canonical_smiles]);
+            $moleculeSchema->hasRepresentation($molecule->MOL);
+            $moleculeSchema->description('Percentage composition: '.$molecule->pivot->percentage_composition.'%');
+            array_push($molecules, $moleculeSchema);
         }
 
         return $molecules;
@@ -268,16 +308,55 @@ class BiochemaController extends Controller
     public function getSample($study)
     {
         $sample = $study->sample;
-        $sampleSchema = BioSchema::ChemicalSubstance();
+        $molecules = $this->getMolecules($sample);
+        //$solvents = $this->getSolvents($study);
+
+        $sampleSchema = BioSchemas::ChemicalSubstance();
         $sampleSchema['@id'] = $study->doi;
         $sampleSchema['dct:conformsTo'] = $this->conformsTo(['https://bioschemas.org/profiles/ChemicalSubstance/0.4-RELEASE']);
         $sampleSchema->name($study->project->name.'.'.$sample->name);
         $sampleSchema->description($sample->description);
         $sampleSchema->url(env('APP_URL').'/'.explode(':', $study->identifier ? $study->identifier : ':')[1]);
-        $sampleSchema->hasBioChemEntityPart($this->getMolecules($sample));
+        //$parts = array_merge($molecules, $solvents);
+        //$sampleSchema->hasBioChemEntityPart($parts);
+        $sampleSchema->hasBioChemEntityPart($molecules);
 
         return $sampleSchema;
     }
+    // /**
+    //  * Implement Bioschemas' ChemicalSubstance on sample's solvent found in study's datasets.
+    //  *
+    //  * @link https://bioschemas.org/profiles/ChemicalSubstance/0.4-RELEASE
+    //  * @link https://bioschemas.org/profiles/Study/0.3-DRAFT
+    //  * @link https://bioschemas.org/profiles/Dataset/1.0-RELEASE
+    //  *
+    //  * @param  App\Models\Study  $study
+    //  * @return object $sampleSchema
+    //  */
+    // public function getSolvents($study)
+    // {
+    //     $chebi = $this->getDefinedTermSet('Chemical Entities of Biological Interest', 'https://www.ebi.ac.uk/chebi/init.do');
+    //     $nmrSolvent = $this->getDefinedTerm('NMR solvent', null, 'CHEBI:197449', 'https://www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI:197449', $chebi);
+
+    //     $solvents = [];
+    //     foreach ($study->datasets as $dataset) {
+    //         $solvent = $this->getNMRiumInfo($dataset)[0][0];
+    //         array_push($solvents, $solvent);
+    //     }
+    //     $solvents = array_unique($solvents); 
+
+    //     $solventSchemas = [];
+    //     foreach ($solvents as $solvent) {
+    //         $solventSchema = BioSchemas::ChemicalSubstance();
+    //         $solventSchema['dct:conformsTo'] = $this->conformsTo(['https://bioschemas.org/profiles/ChemicalSubstance/0.4-RELEASE']);
+    //         $solventSchema->name($solvent);
+    //         $solventSchema->chemicalRole($nmrSolvent);
+    //         array_push($solventSchemas, $solventSchema);
+    //     };
+
+    //     return $solventSchemas;
+    // }
+
 
     /**
      * Get NMRium info from a dataset.
@@ -493,7 +572,7 @@ class BiochemaController extends Controller
     public function studyLite($study)
     {
         $prefix = $study->project->name.':';
-        $studySchema = BioSchema::Study();
+        $studySchema = BioSchemas::Study();
         $studySchema['@id'] = $study->doi;
         $studySchema['dct:conformsTo'] = $this->conformsTo(['https://bioschemas.org/profiles/Study/0.3-DRAFT', 'https://isa-specs.readthedocs.io/en/latest/isamodel.html#study']);
         $studySchema->name($prefix.$study->name);
@@ -534,7 +613,7 @@ class BiochemaController extends Controller
      */
     public function projectLite($project)
     {
-        $projectSchema = BioSchema::Study();
+        $projectSchema = BioSchemas::Study();
         $projectSchema['@id'] = $project->doi;
         $projectSchema['dct:conformsTo'] = $this->conformsTo(['https://bioschemas.org/profiles/Study/0.3-DRAFT', 'https://isa-specs.readthedocs.io/en/latest/isamodel.html#investigation']);
         $projectSchema->name($project->name);
@@ -560,3 +639,5 @@ class BiochemaController extends Controller
         return $projectSchema;
     }
 }
+
+

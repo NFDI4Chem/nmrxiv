@@ -1013,7 +1013,7 @@ export default {
     },
 
     mounted() {
-        axios.get(route("bioschema.datacatalog")).then((response) => {
+        axios.get(route("bioschemas.datacatalog")).then((response) => {
             this.schema = response.data;
         });
     },

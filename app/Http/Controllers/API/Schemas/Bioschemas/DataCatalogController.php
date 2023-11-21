@@ -1,19 +1,19 @@
 <?php
 
-namespace App\Http\Controllers\API\Schemas\Bioschema;
+namespace App\Http\Controllers\API\Schemas\Bioschemas;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Spatie\SchemaOrg\Schema;
 
 /**
- * Implement Bioschema Data Catalog type on nmrXiv as a repository to enable exporting
+ * Implement Bioschemas Data Catalog type on nmrXiv as a repository to enable exporting
  * its metadata with a json endpoint.
  */
 class DataCatalogController extends Controller
 {
     /**
-     * Implement Bioschema Data Catalog type on nmrXiv as a repository.
+     * Implement Bioschemas Data Catalog type on nmrXiv as a repository.
      *
      * @link https://bioschemas.org/profiles/DataCatalog/0.3-RELEASE-2019_07_01
      *
