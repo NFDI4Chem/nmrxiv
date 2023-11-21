@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\Bioschema;
+namespace App\Models\Bioschemas;
 
 use Spatie\SchemaOrg\BaseType;
 

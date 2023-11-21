@@ -360,7 +360,7 @@ export default {
     },
     mounted() {
         axios
-            .get(route("bioschema.id", this.dataset.data.identifier))
+            .get(route("bioschemas.id", this.dataset.data.identifier))
             .then((response) => {
                 this.schema = response.data;
             });

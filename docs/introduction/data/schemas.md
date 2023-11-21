@@ -24,7 +24,7 @@ nmrXiv uses Bioschemas profiles to describe both data structuring components (su
 #### [DataCatalog](https://bioschemas.org/profiles/DataCatalog/0.3-RELEASE-2019_07_01)
 DataCatalog profile can be used as a guide to describe repositories, and thus, it is used to describe nmrXiv repository.[DataCatalog API endpoint link](https://www.postman.com/nmrxiv-jena/workspace/nmrxiv/request/17195598-31c24120-14f0-41c4-b511-292fd310db79)
 
-#### [Project](https://github.com/NFDI4Chem/nmrxiv/blob/main/app/Models/Bioschema/Project.php) 
+#### [Project](https://github.com/NFDI4Chem/nmrxiv/blob/main/app/Models/Bioschemas/Project.php) 
 [Project type](https://schema.org/Project) already exists in [Schema.org](https://schema.org/), but it refers to enterprises rather than a scientific investigation. However, as the project metadata is somehow similar to the study metadata (id, name, URL, etc.), nmrXiv initially defines a new project type similarly to the [study](https://bioschemas.org/types/Study/0.3-DRAFT) provided by [Bioschemas](https://bioschemas.org/). Further enhancements will be applied upon discussion with field experts, and possible submission to [Bioschemas](https://bioschemas.org/) will take place. Project properties allow linking with the included studies and their inner data. [Project API endpoint link](https://www.postman.com/nmrxiv-jena/workspace/nmrxiv/request/17195598-d7481762-e431-4975-b786-9cfd7f007d56).
 
 #### [Study](https://bioschemas.org/profiles/Study/0.2-DRAFT)
