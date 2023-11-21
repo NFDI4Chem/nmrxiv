@@ -17,7 +17,7 @@
                     >
                         <i
                             ><a
-                                href="https://docs.nmrxiv.org/docs/submission-guides/submission/folder-structure"
+                                href="https://docs.nmrxiv.org/submission-guides/folder-structure.html"
                                 target="_blank"
                                 class="mb-4"
                             >

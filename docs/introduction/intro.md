@@ -7,7 +7,7 @@ The immediate goal of **[nmrXiv](https://nmrxiv.org)** is to integrate and execu
 ### Software Development
 To develop nmrXiv based on a voluntarily FAIR, cloud-based infrastructure that uses freely shared source code and deployment methods. Apply industry-grade development practices to ensure platform reliability, safety, and efficacy. Use Continuous Improvement principles will ensure an always-on user experience and high reliability. Release the codebase and infrastructure details (including the development, documentation, and usage practices) through [MIT Open Source License](/license.md) for openness.
 
-*More details about the platform architecture and related topics* - [here](/category/developer-guides)
+*More details about the platform architecture and related topics* - [here](/developer-guides/architecture.html)
 
 ### Submission, Curation, and Analysis
 

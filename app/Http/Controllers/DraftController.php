@@ -56,9 +56,11 @@ class DraftController extends Controller
                 $environment.'/'.$user_id.'/drafts/'.$id
             );
 
+            $name = 'Untitled Project (Draft: '.explode('-', $id)[0].')';
+
             $defaultDraft = Draft::create([
-                'name' => 'Untitled Project',
-                'slug' => Str::slug('"Untitled Project"'),
+                'name' => $name,
+                'slug' => Str::slug($name),
                 'description' => '',
                 'relative_url' => rtrim(
                     preg_replace('~//+~', '/', '/'.$id),
