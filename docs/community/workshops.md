@@ -15,9 +15,10 @@ Discussion on available data formats in analytical chemistry, can we make any av
 
 - Participants (Alphabetically): Mr. Adam Basha, Mr. Bhavin Katabathuni, [Prof. Christoph Steinbeck](https://orcid.org/0000-0001-6966-0814), Ms. Claire Lin, [Dr. David Rauh](https://orcid.org/0000-0001-7499-1693), [Dr.-Ing Felix Bach](https://orcid.org/0000-0002-5035-7978), [Dr. Giacomo Lanza](https://orcid.org/0000-0002-2239-3955), Dr. Holger Israel, Dr. Joachim Richert, [Dr. Johannes Liermann](https://orcid.org/0000-0003-2060-842X), [Ms. Leah McEwen](https://orcid.org/0000-0003-2968-1674), [Michael Klix](https://orcid.org/0000-0002-0591-6582), Ms. Nikki Parks, Ms. Nisha Sharma, Ms. Noura Rayya, Ms. Pei-Chi Huang, [Philip Strömert](https://orcid.org/0000-0002-1595-3213), [Dr. René Meier](https://orcid.org/0000-0002-1501-1349), [Dr. Rukeia El-Athman](https://orcid.org/0000-0003-0749-160X), [Dr. Steffen Neumann](https://orcid.org/0000-0002-7899-7192), Dr. Timothy holbrook, [Dr. Tobias Schulze](https://orcid.org/0000-0002-9744-8914)
 
+## NMR Task Force Meeting
 
-## Coming Soon
-### Minimum Information Standards in Analytical Chemistry
-Work in Progress.
+NMR Task Force Meeting was held for more detailed discussions on NMR across the several task areas within NFDI4Chem, and it resulted in drafting our [Recommendation Standard for Reporting Liquid-State NMR Experiments of Small Molecules](https://nfdi4chem.github.io/workshops/docs/category/recommendation-standard-for-reporting-liquid-state-nmr-experiments-of-small-molecules). For more details about the workshop, please visit [this link](https://nfdi4chem.github.io/workshops/docs/workshops/nmr-michi/overview)
 
+- Date and Location: Jena: 19.07.2023
 
+- Participants (Alphabetically): [Prof. Christoph Steinbeck](https://orcid.org/0000-0001-6966-0814), Dr. Eva Ziegler, [Dr. Johannes Liermann](https://orcid.org/0000-0003-2060-842X), [prof Luc Patiny](https://orcid.org/0000-0002-4943-2643), [Dr. Nils Schlörer](https://orcid.org/0000-0002-0990-9582) ,   Ms. Nisha Sharma, Ms. Noura Rayya, Dr. Pavel Kessler, [Dr. Stefan Kuhn](https://orcid.org/0000-0002-5990-4157), [Dr. Steffen Neumann](https://orcid.org/0000-0002-7899-7192), [Dr. Tillmann Fischer](https://orcid.org/0000-0003-4480-8661), [Mr. Venkata Chandra Sekhar Nainala](https://orcid.org/0000-0002-2564-3243).
