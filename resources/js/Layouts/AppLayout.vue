@@ -678,7 +678,7 @@
                 </div>
             </div>
             <main
-                class="flex-1 relative overflow-y-auto bg-white focus:outline-none"
+                class="flex-1 relative overflow-y-hidden bg-white focus:outline-none"
             >
                 <slot name="header"></slot>
                 <slot></slot>
