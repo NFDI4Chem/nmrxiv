@@ -185,7 +185,7 @@ In order to actively watch and compile changes
 $ npm run watch
 ```
 
-:::caution Recommendation
+:::warning Recommendation
 Follow our [code contribution guidelines](/developer-guides/code-contribution-guidelines) to make a pull request.
 :::
 
