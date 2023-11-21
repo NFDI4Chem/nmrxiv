@@ -44,7 +44,10 @@
                                 <label
                                     class="block tracking-wider text-sm font-medium text-gray-700, block text-sm font-medium text-gray-700"
                                 >
-                                    <small>PUBLISH AS PROJECT</small>
+                                    <small v-if="publishForm.enableProjectMode"
+                                        >PUBLISH AS PROJECT</small
+                                    >
+                                    <small v-else>PUBLISH SAMPLES</small>
                                 </label>
                                 <toggle-button
                                     v-model:enabled="
@@ -484,12 +487,28 @@
                                                 name="conditions"
                                             />
                                             <div class="ml-2 text-sm">
-                                                I understand once the project is
-                                                published, all the underlying
-                                                studies and spectra will also be
-                                                made public and agree to make
-                                                this data persistently available
-                                                in this location.
+                                                <span
+                                                    v-if="
+                                                        publishForm.enableProjectMode
+                                                    "
+                                                >
+                                                    I understand once the
+                                                    project is published, all
+                                                    the underlying samples and
+                                                    spectra will also be made
+                                                    public and agree to make
+                                                    this data persistently
+                                                    available in this location.
+                                                </span>
+                                                <span v-else>
+                                                    I understand once the
+                                                    samples are published, all
+                                                    the underlying spectra will
+                                                    also be made public and
+                                                    agree to make this data
+                                                    persistently available in
+                                                    this location.
+                                                </span>
                                             </div>
                                         </div>
                                     </div>
