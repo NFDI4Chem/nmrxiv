@@ -122,6 +122,7 @@ export default defineConfig({
       {
         text: 'Community',
         items: [
+          { text: 'Recommendation', link: '/community/recommendation.md' },
           { text: 'Training', link: '/community/training.md' },
           { text: 'NMR MIChI Workshops in NFDI4Chem', link: '/community/workshops.md' },
           { text: 'Media Kit', link: '/community/media-kit.md' }
@@ -135,13 +136,7 @@ export default defineConfig({
           { text: 'Contributors and Steering Committee', link: '/contribution//contributors.md' }
         ],
       },
-      {
-        text: 'Miscellaneous',
-        items: [
-          { text: 'Tour', link: '/miscellaneous/tour.md' },
-          { text: 'Shortcuts', link: '/miscellaneous/shortcuts.md' },
-        ],
-      },
+
       {
         text: 'License' , link: 'license.md',
       },
