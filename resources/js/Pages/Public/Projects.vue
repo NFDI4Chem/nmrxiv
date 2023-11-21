@@ -198,7 +198,9 @@
                     </h2>
                 </div>
                 <div v-if="filters.mode == 'grid'">
-                    <div class="mt-4 mx-auto grid gap-8 lg:grid-cols-4 w-full">
+                    <div
+                        class="mt-4 mx-auto grid gap-8 lg:grid-cols-4 2xl:grid-cols-6 w-full"
+                    >
                         <span
                             v-for="project in projects.data.filter(
                                 (p) => p.owner

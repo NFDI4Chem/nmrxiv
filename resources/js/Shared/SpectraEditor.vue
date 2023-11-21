@@ -5,7 +5,7 @@
                 <small>
                     <a
                         class="text-xs cursor-pointer hover:text-blue-700 mr-2"
-                        href="https://docs.nmrxiv.org/docs/submission-guides/data-model/sharing"
+                        href="https://docs.nmrxiv.org/advanced-guides/nmrium/nmrium.html"
                         target="_blank"
                         >Learn more
                     </a>

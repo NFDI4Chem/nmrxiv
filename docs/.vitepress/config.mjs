@@ -46,23 +46,21 @@ export default defineConfig({
         items: [
           { text: 'Data - Life cycle', link: '/submission-guides/data-lifecycle.md' },
           { text: 'Registration', link: '/submission-guides/registration.md' },
+          { text: 'Folder Structure', link: '/submission-guides/folder-structure.md'},
+          { text: 'Submission Process', link: '/submission-guides/submission-process.md'},
+          { text: 'Dashboard', link: '/submission-guides/dashboard.md'},
           { text: 'Data Models',
             items: [
               { text: 'Project', link: '/submission-guides/data-model/project.md'},
-              { text: 'Sample/Study', link: '/submission-guides/data-model/study.md'},
-              { text: 'Spectra Dataset', link: '/submission-guides/data-model/dataset.md'},
-              { text: 'Team', link: '/submission-guides/data-model/team.md'},
-              { text: 'Sharing', link: '/submission-guides/data-model/sharing.md'}
+              { text: 'Sample', link: '/submission-guides/data-model/sample.md'},
+              { text: 'Spectra', link: '/submission-guides/data-model/spectra.md'},
             ]
           },
-          { text: 'Submission Process',
-            items: [
-              { text: 'OAuth', link: '/developer-guides/configurations/oauth.md'},
-              { text: 'Storage', link: '/developer-guides/configurations/storage.md'}
-            ]
-          },
-          { text: 'Spectra', link: '/developer-guides/architecture.md' },
-          { text: 'Licenses', link: '/submission-guides/licenses.md' }
+          { text: 'Editor', link: '/submission-guides/editor.md'},
+          //{ text: 'Spectra', link: '/submission-guides/spectra.md' },
+          { text: 'Licenses', link: '/submission-guides/licenses.md' },
+          { text: 'Team', link: '/submission-guides/team.md'},
+          { text: 'Sharing', link: '/submission-guides/sharing.md'}
         ],
       },
       {

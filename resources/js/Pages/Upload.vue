@@ -889,7 +889,7 @@
                                                                 class="mx-auto grid mt-10 max-w-2xl grid-cols-1 grid-rows-1 items-start gap-x-8 gap-y-8 lg:mx-0 lg:max-w-none lg:grid-cols-3"
                                                             >
                                                                 <div
-                                                                    class="lg:col-span-3"
+                                                                    class="lg:col-span-3 mb-24 pb-24"
                                                                 >
                                                                     <div
                                                                         v-if="
@@ -933,14 +933,9 @@
                                                                                 editData
                                                                             "
                                                                         ></Validation>
+                                                                        &emsp;
                                                                     </div>
                                                                 </div>
-
-                                                                <!-- <div
-                                                                    class="shadow-sm p-2 ring-1 ring-gray-900/5 sm:rounded-lg lg:col-span-1 lg:row-span-2 lg:row-end-2"
-                                                                >
-                                                                Lorem ipsum dolor, sit amet consectetur adipisicing elit. Obcaecati, libero totam tempora enim illo atque dolorum rerum praesentium voluptatum, a eos velit eum officiis inventore in vel nesciunt ab excepturi?
-                                                                </div> -->
                                                             </div>
                                                         </div>
                                                     </div>
@@ -3192,14 +3187,18 @@ export default {
         newDraft() {
             if (this.defaultDraft) {
                 this.defaultDraft.name =
-                    "Untitled Project - " + new Date().toLocaleString();
+                    "Untitled Project (Draft: " +
+                    this.defaultDraft.key.split("-")[0] +
+                    ")";
                 this.selectDraft(this.defaultDraft);
             } else {
                 this.fetchDrafts().then((response) => {
                     this.defaultDraft = response.data.default;
                     this.loading = false;
                     this.defaultDraft.name =
-                        "Untitled Project - " + new Date().toLocaleString();
+                        "Untitled Project (Draft: " +
+                        this.defaultDraft.key.split("-")[0] +
+                        ")";
                     this.selectDraft(this.defaultDraft);
                 });
             }
@@ -3275,6 +3274,8 @@ export default {
                     );
                     if (this.inprogressStudies.length > 0) {
                         this.checkStudyStatus();
+                    } else {
+                        this.autoImport();
                     }
                 });
             }, 30000);
