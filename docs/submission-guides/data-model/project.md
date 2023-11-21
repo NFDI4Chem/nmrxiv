@@ -1,6 +1,6 @@
 # Project
 
-The concept of project in **[nmrXiv](https://nmrxiv.org/)** is similar to the [Investigation](https://isa-specs.readthedocs.io/en/latest/isamodel.html#investigation) one in [ISA model](https://isa-tools.org/format/specification.html). Therefore, the project helps to group related samples and describe their collective metadata. How those samples are related is up to the user. They can be a collection of samples used for teaching or in a thesis. They can also be a part of one [Investigation](https://isa-specs.readthedocs.io/en/latest/isamodel.html#investigation)  (several samples from one source). In other words, the relation can be based on the domain of the samples, their usage, or any other basis, as long the user is aware that all the data submitted to **[nmrXiv](https://nmrxiv.org/)** in [one process](/submission-guides/submission/upload.md) are grouped as one project.
+The concept of project in **[nmrXiv](https://nmrxiv.org/)** is similar to the [Investigation](https://isa-specs.readthedocs.io/en/latest/isamodel.html#investigation) one in [ISA model](https://isa-tools.org/format/specification.html). Therefore, the project helps to group related samples and describe their collective metadata. How those samples are related is up to the user. They can be a collection of samples used for teaching or in a thesis. They can also be a part of one [Investigation](https://isa-specs.readthedocs.io/en/latest/isamodel.html#investigation)  (several samples from one source). In other words, the relation can be based on the domain of the samples, their usage, or any other basis, as long the user is aware that all the data submitted to **[nmrXiv](https://nmrxiv.org/)** in [one process](/submission-guides/submission-process.html) are grouped as one project.
 
 ## Project View
 
@@ -49,7 +49,7 @@ Moving down, a blue bar contains the citation details which can be adjusted acco
 
 ## Create
 
-The only way to create projects is through the [Data Submission](/submission-guides/submission/upload.md).
+The only way to create projects is through the [Data Submission](/submission-guides/submission-process.html).
 
 ## Access
 
@@ -104,17 +104,19 @@ For the `Description`, `Keywords`, and `License` fields, the `Edit` button will 
 <figcaption>Project Manage Author window</figcaption>
 </p>
 
-### Manage samples
+## Manage samples
 
-Files and folders stored under the project can be managed (by adding more or deleting some out of them) with the button `Manage samples`, which leads you back to the [upload](/submission-guides/submission/upload#files-upload---step-1) window, where you can add more files by dragging and dropping to the project folder, or delete existing ones by selecting them in the **left panel** and clicking `Delete` button. Once the editing is done, you can click `Proceed` to continue normally with the submission pipeline.
+Files and folders stored under the project can be managed (by adding more or deleting some out of them) with the button `Manage samples`, which leads you back to the first step of [upload](/submission-guides/submission-process.html#step-1-files-upload) window, where you can add more files by dragging and dropping to the project folder, or delete existing ones by selecting them in the **left panel** and clicking `Delete` button. Once the editing is done, you can click `Proceed` to continue normally until the end of the submission pipeline.
 
 :::warning Folder Structure
-Please pay attention to preserving your project folder structure when adding more samples. This means that the new study should be added to the same level as the rest of the existing ones. The recommended structuring is to group all the samples in one folder and then upload this folder. Thus, when adding a new study, it should be added to the same folder and not the root. In the following image, the study should be added to the **data** folder. Please find more in [Folder Structure documentation](/submission-guides/submission/folder-structure.md)
+Please pay attention to preserving your project folder structure when adding more samples. This means that the new sample should be added to the same level as the rest of the existing ones. The recommended structuring is to group all the samples in one folder and then upload this folder. Thus, when adding a new study, it should be added to the same folder and not the root. In the following image, the study should be added to the **data** folder. Please find more in [Folder Structure documentation](/submission-guides/submission/folder-structure.md)
 :::
 
 <p align="center">
-<img src="/img/project/structure.png" width="1000"/>
+<img src="/img/project/manage-samples.gif" width="1000"/>
 </p>
+
+A small clip showcasing on how to manage samples.
 
 ## Validation
 
