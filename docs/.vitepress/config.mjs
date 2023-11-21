@@ -117,7 +117,6 @@ export default defineConfig({
             ]
           },
           { text: 'Spectral Viewing and Processing', link: '/submission-guides/spectra.md' },
-          { text: 'Licenses', link: '/submission-guides/licenses.md' }
         ],
       },
       {
