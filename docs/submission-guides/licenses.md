@@ -1,8 +1,8 @@
 # License
 
-Users have the option to provide a license for their privately submitted data. However, the license is mandatory for making the data public. In [step-3 of the submission](/submission-guides/submission/upload#complete---step-3), the user can see that the license field in the project is marked with red as it is required for publishing. By clicking `Edit`, they can provide one. Alternatively, after submission, the user can provide a license to the project from [View details](/submission-guides/data-model/project#view-details) or [Edit button](/submission-guides/data-model/project#edit-button) found next to the license field.
+Users have the option to provide a license for their privately submitted data. However, the license is mandatory for making the data public. In [step-3 of the submission](/submission-guides/submission-process.html#step-3-publish), the user can see that the license field in the project is marked with red as it is required for publishing. By clicking `Edit`, they can provide one. Alternatively, after submission, the user can provide a license to the project from [View details](/submission-guides/data-model/project#view-details) or [Edit button](/submission-guides/data-model/project#edit-button) found next to the license field.
 
-Licensing propagates from parent objects to their children, meaning that licensing a project will reflect in its studies and datasets. However, the user can selectively give the studies different licenses, which propagate again to the datasets. At the dataset level, the user cannot provide licenses, which means that the dataset will always inherit its parent study license. Licensing a study can be done from the [View details](/submission-guides/data-model/study#view-details) or [Edit button](/submission-guides/data-model/study#edit-button) found next to the license field in the `About` tab of the [study view](/submission-guides/data-model/study#study-view). The user can edit the licenses as long as the project is private.
+Licensing propagates from parent objects to their children, meaning that licensing a project will reflect in its studies and datasets. However, the user can selectively give the studies different licenses, which propagate again to the datasets. At the dataset level, the user cannot provide licenses, which means that the dataset will always inherit its parent study license. Licensing a study can be done from the [View details](/submission-guides/data-model/study#view-details) or [Edit button](/submission-guides/data-model/study#edit-button) found next to the license field in the `About` tab of the [sample view](/submission-guides/data-model/sample#sample-view). The user can edit the licenses as long as the project is private.
 
 <p align="center">
 <img src="/img/license-edit.png" width="1000"/>
@@ -13,7 +13,7 @@ Licensing propagates from parent objects to their children, meaning that licensi
 
 Data producers might have different wishes on how their shared data can be used in the sense of modifications, resharing, citing, etc. Thus, **[nmrXiv](https://nmrxiv.org/)** aims at using as many relevant licenses as possible, and providing the user with the required knowledge to pick the right license. Here we provide a list of all licenses available in **[nmrXiv](https://nmrxiv.org/)**. Please reach out to us if you believe any relevant license is missing.
 
-:::caution Our recommendations
+:::warning Our recommendations
 As we promote open data, we encourage you to use [Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/), which allows the users to modify and share your material while crediting you for it.
 :::
 
