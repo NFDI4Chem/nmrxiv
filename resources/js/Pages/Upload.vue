@@ -889,7 +889,7 @@
                                                                 class="mx-auto grid mt-10 max-w-2xl grid-cols-1 grid-rows-1 items-start gap-x-8 gap-y-8 lg:mx-0 lg:max-w-none lg:grid-cols-3"
                                                             >
                                                                 <div
-                                                                    class="lg:col-span-3 mb-24"
+                                                                    class="lg:col-span-3 mb-24 pb-24"
                                                                 >
                                                                     <div
                                                                         v-if="
@@ -3274,6 +3274,8 @@ export default {
                     );
                     if (this.inprogressStudies.length > 0) {
                         this.checkStudyStatus();
+                    } else {
+                        this.autoImport();
                     }
                 });
             }, 30000);
