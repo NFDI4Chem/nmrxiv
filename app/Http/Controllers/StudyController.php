@@ -30,6 +30,7 @@ class StudyController extends Controller
     public function publicStudiesView(Request $request)
     {
         $moleculeId = $request->get('compound');
+        $molecule = null;
         if ($moleculeId) {
             $molecule = Molecule::where('identifier', $moleculeId)->first();
             if ($molecule) {
@@ -46,6 +47,7 @@ class StudyController extends Controller
         return Inertia::render('Public/Studies', [
             'filters' => $request->all('search', 'sort', 'mode'),
             'studies' => $studiesResource,
+            'molecule' => $molecule,
         ]);
     }
 
