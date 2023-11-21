@@ -82,7 +82,7 @@
                             class="float-center text-xs cursor-pointer hover:text-blue-700 mt-2"
                         >
                             <a
-                                href="https://docs.nmrxiv.org/docs/submission-guides/submission/upload"
+                                href="https://docs.nmrxiv.org/submission-guides/submission-process.html"
                                 target="_blank"
                                 >Need Help?
                             </a>
@@ -124,7 +124,7 @@
                             <div class="text-sm font-medium text-gray-900">
                                 <a
                                     id="tour-step-submission-guide"
-                                    href="https://docs.nmrxiv.org/docs/introduction/intro"
+                                    href="https://docs.nmrxiv.org/introduction/intro"
                                     target="_blank"
                                 >
                                     <span
@@ -186,7 +186,7 @@
                             <div class="text-sm font-medium text-gray-900">
                                 <a
                                     id="tour-step-api"
-                                    href="https://docs.nmrxiv.org/docs/developer-guides/API"
+                                    href="https://docs.nmrxiv.org/developer-guides/api.html"
                                     target="_blank"
                                 >
                                     <span

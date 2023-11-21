@@ -304,7 +304,7 @@
                                                             ><a
                                                                 class="text-xs"
                                                                 target="_blank"
-                                                                href="https://docs.nmrxiv.org/docs/submission-guides/submission/folder-structure"
+                                                                href="https://docs.nmrxiv.org/submission-guides/submission/folder-structure"
                                                                 >More info
                                                                 here</a
                                                             ></i
