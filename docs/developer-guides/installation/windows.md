@@ -31,7 +31,7 @@ To upgrade your existing Linux distro to v2, run:
 wsl.exe --set-version (distro name) 2
 ```
 
-:::important
+:::tip
 
 After installing and enabling WSL2, you should ensure that Docker Desktop is [configured to use the WSL2 backend.](https://docs.docker.com/desktop/windows/wsl/)
 
@@ -132,7 +132,7 @@ Once the application's Docker containers have been started, you can access the a
 Run `code .` to open the code base to your VSCode editor.
 Thanks to [Vite](https://vitejs.dev/guide/) that any changes you make to the javascript file would be reflected in your browser immediately without requiring any refresh.
 
-:::caution Recommendation
+:::warning Recommendation
 Follow our [code contribution guidelines](/developer-guides/code-contribution-guidelines) to make a pull request.
 :::
 :::info Info

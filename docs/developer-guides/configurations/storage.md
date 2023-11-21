@@ -1,6 +1,4 @@
-______________________________________________________________________
-
-## sidebar_position: 3 id: storage title: Storage
+# Storage
 
 Files in [nmrxiv](https://nmrxiv.org) are stored as [objects](https://en.wikipedia.org/wiki/Object_storage) and are [S3](https://en.wikipedia.org/wiki/Amazon_S3) compatible which provides below three big benefits.
 

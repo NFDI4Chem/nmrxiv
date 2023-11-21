@@ -6,7 +6,7 @@ The workflow focuses on automating the software delivery process so that the tea
 We have used [Github Actions](https://docs.github.com/en/actions) for building the [CI/CD](https://en.wikipedia.org/wiki/CI/CD) pipeline and below is the diagram to briefly describe how the current setup works. The workflow gets triggered the moment the code is pushed to the respective branches ([dev-helm-deploy](https://github.com/NFDI4Chem/nmrxiv/tree/dev-helm-deploy) to deploy code to [development](https://dev.nmrxiv.org) and [prod-helm-deploy](https://github.com/NFDI4Chem/nmrxiv/tree/prod-helm-deploy) to deploy code to [production](https://www.nmrxiv.org/)). Once the workflow is triggered (which you can find in the Actions tab) it will perform the below actions.
 
 - **Test** - Execute automated tests(WIP).
-- **Build and Push** -  Build the Docker images and push to [Google Artifact Registry](https://cloud.google.com/artifact-registry/docs).
+- **Build and Push** -  Build the Docker images and push to [Docker Hub](https://hub.docker.com/r/nfdi4chem/nmrxiv).
 - **Deploy** - Pull the latest image, deploy and restart the deployment in the [Google Kubernetes Engine](https://cloud.google.com/kubernetes-engine/docs) cluster.
 
 All the jobs defined above are synchronous and failure at any step will abort the consecutive jobs. After the successful completion of the workflow, the code changes will be reflected on the server with minimum or zero downtime.
