@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.0.1-rc.13](https://github.com/NFDI4Chem/nmrxiv/compare/v1.0.0-rc.13...v1.0.1-rc.13) (2023-11-21)
+
+
+### Bug Fixes
+
+* enabled spectra auto import after processing ([219b6a4](https://github.com/NFDI4Chem/nmrxiv/commit/219b6a403df0413e8e1954e13f3c0e8dd13f3da4))
+* layout bug fixes ([289620e](https://github.com/NFDI4Chem/nmrxiv/commit/289620ee0b8cb13131b13cdfa2a6c0dbf9a8feab))
+* more ux/ui developments ([fa5fd88](https://github.com/NFDI4Chem/nmrxiv/commit/fa5fd8879bc3f274810017ff4ccdb7e5da862c27))
+* study null error fix ([001f73d](https://github.com/NFDI4Chem/nmrxiv/commit/001f73ddb5090959a9cea3b99187db3db22d1b5d))
+* update links ([500f302](https://github.com/NFDI4Chem/nmrxiv/commit/500f30224e7ec741e4392dbb1d8f1b17a8674c83))
+* various bug fixes and draft issues ([59a5bf3](https://github.com/NFDI4Chem/nmrxiv/commit/59a5bf313062f956ec7b7d399ac7a6becb399d1d))
+
 ## [1.1.0-rc.12](https://github.com/NFDI4Chem/nmrxiv/compare/v1.0.0-rc.12...v1.1.0-rc.12) (2023-11-20)
 
 

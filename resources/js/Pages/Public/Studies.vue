@@ -200,7 +200,9 @@
                     </h2>
                 </div>
                 <div v-if="filters.mode == 'grid'">
-                    <div class="mt-4 mx-auto grid gap-8 lg:grid-cols-4">
+                    <div
+                        class="mt-4 mx-auto grid gap-8 lg:grid-cols-4 2xl:grid-cols-6"
+                    >
                         <span v-for="study in studies.data" :key="study.id">
                             <StudyPublicCard
                                 :mode="filters.mode"
