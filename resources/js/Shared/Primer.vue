@@ -47,7 +47,9 @@
                                     class="text-md text-teal-700"
                                     target="_blank"
                                     href="https://docs.nmrxiv.org/submission-guides/submission-process.html"
-                                    >Please read our documentation for more detailed documentation about submission process.</a
+                                    >Please read our documentation for more
+                                    detailed documentation about submission
+                                    process.</a
                                 ></i
                             >
                         </p>
