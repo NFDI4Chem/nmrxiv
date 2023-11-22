@@ -10,7 +10,7 @@ The ontology component will be provided as an open-source, platform-agnostic too
 nmrXiv will make use of the available [APIs](https://terminology.nfdi4chem.de/ts/api) in the [Terminology Service](https://terminology.nfdi4chem.de/ts/index), which, along with more general possibilities such as retrieving an entire ontology, enable retrieving a specific term and restricting the search to a list of ontologies. Additionally, they support the suggestion of new terms. For a detailed description of the available endpoints and parameters, please check the [API Documentation](https://terminology.nfdi4chem.de/ts/api).
 
 ### Schemas Export with Ontologies 
-Metadata describing the submitted projects/studies/datasets can be exported in nmrXiv as files complying with a schema chosen by the user from the [schemas supported in nmrXiv](/introduction/data/data-schema). Many of those schemas support ontologies usage such as [ISA](https://isa-tools.org/) and [Bioschema](https://bioschemas.org/), which will efficiently reflect the use of ontology terms in the exported files by providing links and identifiers to the intended terms.
+Metadata describing the submitted projects/studies/datasets can be exported in nmrXiv as files complying with a schema chosen by the user from the [schemas supported in nmrXiv](/introduction/data/schemas.html). Many of those schemas support ontologies usage such as [ISA](https://isa-tools.org/) and [Bioschema](https://bioschemas.org/), which will efficiently reflect the use of ontology terms in the exported files by providing links and identifiers to the intended terms.
 
 ### Ontologies of Interest in nmrXiv
 Several factors have been considered to pick the ontologies to use in nmrXiv,:
