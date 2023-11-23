@@ -878,7 +878,6 @@ export default {
                     }
                 });
                 vm.dropzone.on("addedfile", (file) => {
-                    console.log(file);
                     vm.selectedFSO.push(file);
                     if (file.fullPath) {
                         vm.logs[file.fullPath] = {
@@ -893,7 +892,6 @@ export default {
                     }
                 });
                 vm.dropzone.on("addedfiles", (files) => {
-                    console.log(files.length);
                     if (files.length > 0) {
                         this.updateBusyStatus(true);
                         setTimeout(() => {
@@ -917,7 +915,7 @@ export default {
                                         vm.processFilesDZL(vm, filesBatch);
                                     }
                                 } else {
-                                    // vm.totalFilesCount = vm.selectedFSO.length;
+                                    vm.totalFilesCount = vm.selectedFSO.length;
                                     vm.status = "PROCESSING FILES";
                                 }
                             }, 500);

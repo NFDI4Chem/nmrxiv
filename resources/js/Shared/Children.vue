@@ -319,7 +319,7 @@ export default {
                 if (file.instrument_type == "bruker") {
                     return '<img class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700 border rounded-md" src="/img/bruker.jpg" alt=""/>';
                 } else if (file.instrument_type == "varian") {
-                    return '<img class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700 border rounded-md" src="/img/vaian.JPG" alt=""/>';
+                    return '<img class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700 border rounded-md" src="/img/varian.jpeg" alt=""/>';
                 } else if (file.instrument_type == "joel") {
                     return '<img class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700 border rounded-md" src="/img/joel.jpg" alt=""/>';
                 } else if (file.instrument_type == "jcamp") {
