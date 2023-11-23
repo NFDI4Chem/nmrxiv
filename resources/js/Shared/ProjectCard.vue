@@ -3,52 +3,59 @@
         <div v-if="project" class="hover:shadow-lg">
             <div v-if="mode == 'mini' || mode == 'grid'">
                 <div class="flex flex-col rounded-lg shadow-lg">
-                    <div class="relative rounded-t-lg lg:h-36 xl:h-36">
-                        <img
-                            v-if="project.photo_url && project.photo_url != ''"
-                            :src="project.photo_url"
-                            alt=""
-                            class="w-full h-full object-center rounded-t-lg object-cover"
-                        />
-                        <div
-                            v-else
-                            class="flex-shrink-0 lg:h-36 xl:h-36 pattern-diagonal-lines pattern-gray-400 pattern-bg-white pattern-size-2 pattern-opacity-20 border-b border-gray-400"
-                        ></div>
-                        <div class="absolute top-0 right-0">
-                            <div class="p-2 flex items-center">
-                                <div class="flex-shrink-0">
-                                    <span
-                                        v-if="project.stats"
-                                        class="relative z-0 inline-flex shadow-sm rounded-md"
-                                    >
-                                        <button
-                                            type="button"
-                                            class="relative inline-flex items-center px-1 py-1 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-900 hover:bg-gray-50"
-                                            @click="toggleUpVote()"
+                    <Link
+                        :href="project.public_url"
+                        class="block cursor-pointer"
+                    >
+                        <div class="relative rounded-t-lg lg:h-36 xl:h-36">
+                            <img
+                                v-if="
+                                    project.photo_url && project.photo_url != ''
+                                "
+                                :src="project.photo_url"
+                                alt=""
+                                class="w-full h-full object-center rounded-t-lg object-cover"
+                            />
+                            <div
+                                v-else
+                                class="flex-shrink-0 lg:h-36 xl:h-36 pattern-diagonal-lines pattern-gray-400 pattern-bg-white pattern-size-2 pattern-opacity-20 border-b border-gray-400"
+                            ></div>
+                            <div class="absolute top-0 right-0">
+                                <div class="p-2 flex items-center">
+                                    <div class="flex-shrink-0">
+                                        <span
+                                            v-if="project.stats"
+                                            class="relative z-0 inline-flex shadow-sm rounded-md"
                                         >
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                class="h-5 w-5"
-                                                viewBox="0 0 20 20"
-                                                fill="currentColor"
+                                            <button
+                                                type="button"
+                                                class="relative inline-flex items-center px-1 py-1 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-900 hover:bg-gray-50"
+                                                @click="toggleUpVote()"
                                             >
-                                                <path
-                                                    fill-rule="evenodd"
-                                                    d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z"
-                                                    clip-rule="evenodd"
-                                                />
-                                            </svg>
-                                        </button>
-                                        <a
-                                            class="-ml-px relative inline-flex items-center px-2 py-1 rounded-r-md border border-gray-300 bg-white text-sm font-black text-dark hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
-                                        >
-                                            {{ project.stats.likes }}
-                                        </a>
-                                    </span>
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    class="h-5 w-5"
+                                                    viewBox="0 0 20 20"
+                                                    fill="currentColor"
+                                                >
+                                                    <path
+                                                        fill-rule="evenodd"
+                                                        d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z"
+                                                        clip-rule="evenodd"
+                                                    />
+                                                </svg>
+                                            </button>
+                                            <a
+                                                class="-ml-px relative inline-flex items-center px-2 py-1 rounded-r-md border border-gray-300 bg-white text-sm font-black text-dark hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                                            >
+                                                {{ project.stats.likes }}
+                                            </a>
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </Link>
 
                     <div
                         :class="[
