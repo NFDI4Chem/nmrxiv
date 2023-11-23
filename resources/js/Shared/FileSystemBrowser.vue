@@ -814,7 +814,6 @@ export default {
         loadDropZone() {
             this.$nextTick(() => {
                 const vm = this;
-
                 vm.totalFilesCount = 0;
                 vm.uploadedFilesCount = 0;
                 vm.batchCount = 100;
@@ -879,6 +878,7 @@ export default {
                     }
                 });
                 vm.dropzone.on("addedfile", (file) => {
+                    console.log(file);
                     vm.selectedFSO.push(file);
                     if (file.fullPath) {
                         vm.logs[file.fullPath] = {
@@ -892,34 +892,37 @@ export default {
                         };
                     }
                 });
-                vm.dropzone.on("click", function (e) {
-                    alert();
-                });
                 vm.dropzone.on("addedfiles", (files) => {
-                    this.updateBusyStatus(true);
-                    setTimeout(() => {
-                        var timer = setInterval(function () {
-                            if (vm.totalFilesCount === vm.selectedFSO.length) {
-                                clearInterval(timer);
-                                vm.status = "BATCH UPLOAD STARTED";
-                                for (
-                                    let i = 0;
-                                    i < vm.totalFilesCount;
-                                    i += vm.batchCount
+                    console.log(files.length);
+                    if (files.length > 0) {
+                        this.updateBusyStatus(true);
+                        setTimeout(() => {
+                            var timer = setInterval(function () {
+                                if (
+                                    vm.totalFilesCount === vm.selectedFSO.length
                                 ) {
-                                    let filesBatch = vm.dropzone.files.slice(
-                                        i,
-                                        i + vm.batchCount
-                                    );
-                                    vm.batches += 1;
-                                    vm.processFilesDZL(vm, filesBatch);
+                                    clearInterval(timer);
+                                    vm.status = "BATCH UPLOAD STARTED";
+                                    for (
+                                        let i = 0;
+                                        i < vm.totalFilesCount;
+                                        i += vm.batchCount
+                                    ) {
+                                        let filesBatch =
+                                            vm.dropzone.files.slice(
+                                                i,
+                                                i + vm.batchCount
+                                            );
+                                        vm.batches += 1;
+                                        vm.processFilesDZL(vm, filesBatch);
+                                    }
+                                } else {
+                                    // vm.totalFilesCount = vm.selectedFSO.length;
+                                    vm.status = "PROCESSING FILES";
                                 }
-                            } else {
-                                vm.totalFilesCount = vm.selectedFSO.length;
-                                vm.status = "PROCESSING FILES";
-                            }
-                        }, 500);
-                    });
+                            }, 500);
+                        });
+                    }
                 });
                 vm.dropzone.on("queuecomplete", () => {
                     vm.status = "UPLOAD COMPLETE";

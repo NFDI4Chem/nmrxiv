@@ -114,7 +114,7 @@
                                 </div>
                             </h1>
                         </div>
-                        <div class="flex items-center gap-x-4 sm:gap-x-6">
+                        <!-- <div class="flex items-center gap-x-4 sm:gap-x-6">
                             <a
                                 :href="
                                     '/upload?compound=' + molecule.identifier
@@ -123,7 +123,7 @@
                             >
                                 Upload Spectra
                             </a>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
             </div>
