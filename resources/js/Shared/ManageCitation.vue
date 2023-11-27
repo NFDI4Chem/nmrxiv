@@ -621,7 +621,6 @@ export default {
         },
         /*Fetch citation from DOI*/
         fetchCitations() {
-            console.log("Fetching data...");
             this.loading = true;
             this.error = "";
             this.query = this.extractDoi(this.query);
@@ -639,7 +638,6 @@ export default {
                     },
                 })
                 .then((res) => {
-                    console.log(res);
                     if (
                         res &&
                         res.data &&
@@ -653,10 +651,8 @@ export default {
                         this.fetchDataFromCrossref(this.query);
                     }
                 })
-                .catch(() => {
-                    this.error =
-                        "Something went wrong. Please check the input and try again.";
-                    this.loading = false;
+                .catch((err) => {
+                    console.log(err);
                 })
                 .finally(() => {
                     this.loading = false;
@@ -664,29 +660,29 @@ export default {
         },
         /*Make REST Call to Crossref API */
         fetchDataFromCrossref(query) {
-            this.fetchedCitations = null;
+            this.fetchedCitations = [];
             axios
                 .get(this.$page.props.CROSSREF_API + this.query)
                 .then((res) => {
-                    this.fetchedCitations = this.formatCitationResponse(
-                        res.data.message,
-                        "crossref"
-                    );
-                })
-                .catch((err) => {
-                    if (
-                        err.response.status !== 200 ||
-                        err.response.status !== 201
-                    ) {
-                        throw new Error(
-                            `API call failed with status code: ${err.response.status}`
+                    if (res.data && res.data.message) {
+                        this.fetchedCitations = this.formatCitationResponse(
+                            res.data.message,
+                            "crossref"
                         );
                     }
                 })
-                .then(function (response) {
+                .catch((err) => {
+                    console.log(err);
+                })
+                .finally(() => {
+                    if (
+                        this.fetchedCitations &&
+                        this.fetchedCitations.length == 0
+                    ) {
+                        this.error =
+                            "No data found. Please enter the details manually.";
+                    }
                     this.loading = false;
-                    this.error =
-                        "Something went wrong. Please check the input and try again.";
                 });
         },
 
@@ -843,11 +839,7 @@ export default {
                         break;
                     case "crossref":
                         journalTitle = obj.title[0];
-                        yearofPublication = "";
-                        // yearofPublication =
-                        //     obj.published-online
-                        //         ? obj.published-online.date-parts[0]
-                        //         : "";
+                        yearofPublication = obj["published-online"]["date-parts"] ? obj["published-online"]["date-parts"][0][0] : "";
                         volume = obj.volume ? obj.volume : "";
                         issue = obj.issue ? obj.issue : "";
                         pageInfo = obj.page ? obj.page : "";
