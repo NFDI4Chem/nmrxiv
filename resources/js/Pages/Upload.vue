@@ -3484,8 +3484,8 @@ export default {
                         this.loadingStep = false;
                         let study = this.studiesToImport.filter(
                             (f) => f.study.id == studyDetails.study.id
-                        )[0]
-                        if(study){
+                        )[0];
+                        if (study) {
                             study.status = true;
                             this.fetchNMRium();
                         }
