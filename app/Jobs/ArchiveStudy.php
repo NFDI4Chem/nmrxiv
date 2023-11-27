@@ -36,6 +36,14 @@ class ArchiveStudy implements ShouldQueue, ShouldBeUnique
     }
 
     /**
+     * Get the unique ID for the job.
+     */
+    public function uniqueId(): string
+    {
+        return $this->project->id;
+    }
+
+    /**
      * Execute the job.
      */
     public function handle(): void
