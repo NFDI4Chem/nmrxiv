@@ -1089,6 +1089,7 @@
                                                                                             class="block text-sm font-medium text-gray-700"
                                                                                         >
                                                                                             Keywords
+                                                                                            (Optional)
                                                                                         </label>
                                                                                         <div>
                                                                                             <vue-tags-input
@@ -1241,7 +1242,6 @@
                                                                                         >
                                                                                             Chemical
                                                                                             composition
-                                                                                            (optional)
                                                                                         </h3>
                                                                                     </div>
                                                                                 </div>
