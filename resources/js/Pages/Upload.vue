@@ -3475,17 +3475,20 @@ export default {
                             .catch((err) => {
                                 this.loadingStep = false;
                                 this.studiesToImport.filter(
-                                    (f) => f.studyID == studyDetails.study.id
+                                    (f) => f.study.id == studyDetails.study.id
                                 )[0].status = true;
                                 this.fetchNMRium();
                             });
                     })
                     .catch(() => {
                         this.loadingStep = false;
-                        this.studiesToImport.filter(
-                            (f) => f.studyID == studyDetails.study.id
-                        )[0].status = true;
-                        this.fetchNMRium();
+                        let study = this.studiesToImport.filter(
+                            (f) => f.study.id == studyDetails.study.id
+                        )[0]
+                        if(study){
+                            study.status = true;
+                            this.fetchNMRium();
+                        }
                     });
             } else {
                 this.fetchProjectDetails().then((response) => {
