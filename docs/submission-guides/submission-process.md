@@ -1,6 +1,6 @@
 # Data Submission
 
-[nmrXiv](nmrxiv.org) support scientists in their efforts to collect, store, process, analyse, disclose and re-use Nuclear Magnetic Resonance Spectroscopy research data.
+[nmrXiv](nmrxiv.org) assists scientists in collecting, storing, processing, analyzing, disclosing, and reusing data from Nuclear Magnetic Resonance Spectroscopy research. We offer a seamless and straightforward submission process, allowing you to submit NMR data easily in just three steps. This documentation guides you through each step of the submission process. If you encounter any issues or have valuable feedback, please do not hesitate to contact us at info.nmrxiv@uni-jena.de.
 
 ## Before You start
 
