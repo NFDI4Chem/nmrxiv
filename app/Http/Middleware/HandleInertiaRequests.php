@@ -79,6 +79,7 @@ class HandleInertiaRequests extends Middleware
             'orcidPersonApi' => env('ORCID_ID_PERSON_API'),
             'orcidEmploymentApi' => env('ORCID_ID_EMPLOYMENT_API'),
             'CM_API' => env('CM_API'),
+            'CROSSREF_API' => env('CROSSREF_API'),
         ]);
     }
 }
