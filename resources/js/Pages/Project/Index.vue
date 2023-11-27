@@ -7,17 +7,6 @@
                 <!-- <div class="max-w-2xl">You may house a variety of projects.</div> -->
                 <!-- </div> -->
             </div>
-            <div class="flex-shrink-0 ml-4">
-                <!-- <button
-                    v-if="mode == 'create' && editableTeamRole"
-                    id="v-step-1"
-                    type="button"
-                    class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                    @click="openProjectCreateDialog"
-                >
-                    New Project
-                </button> -->
-            </div>
         </div>
         <span v-if="projects.length <= 0">
             <div v-if="mode == 'create' && editableTeamRole" class="mt-4">
@@ -163,7 +152,7 @@
                 </div>
                 <a>
                     <div
-                        class="flex justify-between items-center bg-white shadow-md border rounded-lg px-6 py-6"
+                        class="flex justify-between items-center bg-white shadow-md border rounded-lg px-6 py-8"
                     >
                         <div
                             class="flex-grow cursor-pointer"
@@ -308,9 +297,7 @@
                         <div class="border-l cursor-pointer">
                             <a
                                 target="_blank"
-                                :href="
-                                    route('dashboard.projects', [project.id])
-                                "
+                                :href="'upload?draft_id=' + project.draft_id"
                                 class="text-gray-500 hover:text-gray-900"
                             >
                                 <svg
@@ -345,7 +332,7 @@
     </div>
 </template>
 <script>
-import { Link } from "@inertiajs/vue3";
+import { Link, router } from "@inertiajs/vue3";
 import { StarIcon } from "@heroicons/vue/24/solid";
 export default {
     components: {
@@ -366,9 +353,7 @@ export default {
         },
         getLink(project) {
             if (project) {
-                return this.$inertia.visit(
-                    this.route("dashboard.projects", [project.id])
-                );
+                return router.visit("upload?draft_id=" + project.draft_id);
             }
         },
     },

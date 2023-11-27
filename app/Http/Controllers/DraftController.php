@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\ArchiveStudy;
+use App\Jobs\ProcessFiles;
 use App\Models\Dataset;
 use App\Models\Draft;
 use App\Models\FileSystemObject;
@@ -95,6 +96,12 @@ class DraftController extends Controller
                         ->orderBy('type')
                         ->get(),
                 ],
+                'missing_files' => FileSystemObject::with('children')
+                    ->where([
+                        ['draft_id', $draft->id],
+                        ['status', 'missing'],
+                    ])
+                    ->count(),
             ]);
     }
 
@@ -261,7 +268,6 @@ class DraftController extends Controller
             $folders = FileSystemObject::with('children')
                 ->where([
                     ['draft_id', $draft->id],
-                    ['status', '<>', 'missing'],
                     ['model_type', 'study'],
                 ])
                 ->orderBy('type')
@@ -443,11 +449,11 @@ class DraftController extends Controller
         $draftFolders = FileSystemObject::with('children')
             ->where([
                 ['level', 0],
-                ['status', '<>', 'missing'],
                 ['draft_id', $draft->id],
             ])
             ->orderBy('type')
             ->get();
+        ProcessFiles::dispatch($draft);
         $this->processFolder($draftFolders);
     }
 
