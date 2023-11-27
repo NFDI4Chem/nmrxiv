@@ -62,6 +62,8 @@ Route::get('/', function () {
 
 Route::supportBubble();
 
+Route::impersonate();
+
 Route::group(['middleware' => 'verified'], function () {
     if (Jetstream::hasTeamFeatures()) {
         Route::delete('/teams/{team}', [TeamController::class, 'destroy'])->name('app.teams.destroy');
@@ -263,6 +265,9 @@ Route::group([
 
             Route::get('users/edit/{user}', [UsersController::class, 'edit'])
                 ->name('console.users.edit');
+
+            Route::get('users/impersonate/{user}', [UsersController::class, 'impersonate'])
+                ->name('console.users.impersonate');
 
             Route::put('users/edit/{user}', [UsersController::class, 'update'])
                 ->name('console.users.update');
