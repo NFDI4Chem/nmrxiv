@@ -110,7 +110,7 @@ AWS_BUCKET_PUBLIC=nmrxiv-public
 
 Once the application's Docker containers have been started, you can access the application in your web browser at [http://localhost](http://localhost). But first, you will be prompted to <b>Generate app key</b>. After pressing the generation button, the following message is shown on the screen: "The solution was executed successfully. Refresh now." After refreshing, you access the application.
 
-:::caution Recommendation
+:::warning Recommendation
 Follow our [code contribution guidelines](/developer-guides/code-contribution-guidelines) to make a pull request.
 :::
 

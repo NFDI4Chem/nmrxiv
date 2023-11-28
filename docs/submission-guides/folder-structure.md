@@ -56,4 +56,4 @@ All the data submitted to **[nmrXiv](https://nmrxiv.org/)** in one process is gr
 
 ## Final Step
 
-Make sure to give your folders and datasets proper names. in **[nmrXiv](https://nmrxiv.org/)** you can rename projects and studies, but you can't rename the folders they came from or the datasets. After this step you are ready for [Data Submission](/submission-guides/submission/upload.md)
+Make sure to give your folders and datasets proper names. in **[nmrXiv](https://nmrxiv.org/)** you can rename projects and studies, but you can't rename the folders they came from or the datasets. After this step you are ready for [Data Submission](/submission-guides/submission-process.html)

@@ -90,69 +90,73 @@ class ExtractSpectra extends Command
                             foreach ($study->datasets as $dataset) {
                                 echo $dataset->identifier;
                                 echo "\r\n";
-                                // if(!$dataset->has_nmrium){
-                                $nmriumInfo = json_decode($study->nmrium['nmrium_info'], true);
-                                $_nmriumJSON = $nmriumInfo;
-                                $fsObject = $dataset->fsObject;
-
-                                $studyFSObject = $study->fsObject;
-                                $datasetFSObject = $dataset->fsObject;
-                                $path = '/'.$studyFSObject->name.'/'.$datasetFSObject->name;
-                                // echo($path);
+                                // echo $dataset->type;
                                 // echo "\r\n";
-                                $fsObject = $dataset->fsObject;
-                                $studyFSObject = $study->fsObject;
-                                $datasetFSObject = $dataset->fsObject;
-                                $path = '/'.$studyFSObject->name.'/'.$datasetFSObject->name;
+                                if (! $dataset->has_nmrium) {
+                                    $nmriumInfo = json_decode($study->nmrium['nmrium_info'], true);
+                                    $_nmriumJSON = $nmriumInfo;
+                                    $fsObject = $dataset->fsObject;
 
-                                $pathsMatch = false;
-                                $spectrum = [];
-                                $type = [];
-                                foreach ($nmriumInfo['data']['spectra'] as $spectra) {
-                                    unset($_nmriumJSON['data']['spectra']);
-                                    $files = $spectra['sourceSelector']['files'];
-                                    if ($files) {
-                                        foreach ($files as $file) {
-                                            if (str_contains($file, $path)) {
-                                                $pathsMatch = true;
+                                    $studyFSObject = $study->fsObject;
+                                    $datasetFSObject = $dataset->fsObject;
+                                    $path = '/'.$studyFSObject->name.'/'.$datasetFSObject->name;
+                                    $fType = $studyFSObject->type;
+
+                                    // echo($path);
+                                    // echo "\r\n";
+                                    $fsObject = $dataset->fsObject;
+                                    $studyFSObject = $study->fsObject;
+                                    $datasetFSObject = $dataset->fsObject;
+                                    $path = '/'.$studyFSObject->name.'/'.$datasetFSObject->name;
+
+                                    $pathsMatch = false;
+                                    $spectrum = [];
+                                    $type = [];
+                                    foreach ($nmriumInfo['data']['spectra'] as $spectra) {
+                                        unset($_nmriumJSON['data']['spectra']);
+                                        $files = $spectra['sourceSelector']['files'];
+                                        if ($files) {
+                                            foreach ($files as $file) {
+                                                if (str_contains($file, $fType == 'file' ? $path : $path.'/')) {
+                                                    $pathsMatch = true;
+                                                }
                                             }
                                         }
-                                    }
-                                    if ($pathsMatch) {
-                                        array_push($spectrum, $spectra);
-                                        $experimentDetailsExists = array_key_exists('experiment', $spectra['info']);
-                                        if ($experimentDetailsExists) {
-                                            $experiment = $spectra['info']['experiment'];
-                                            $nucleus = $spectra['info']['nucleus'];
-                                            if (is_array($nucleus)) {
-                                                $nucleus = implode('-', $nucleus);
+                                        if ($pathsMatch) {
+                                            array_push($spectrum, $spectra);
+                                            $experimentDetailsExists = array_key_exists('experiment', $spectra['info']);
+                                            if ($experimentDetailsExists) {
+                                                $experiment = $spectra['info']['experiment'];
+                                                $nucleus = $spectra['info']['nucleus'];
+                                                if (is_array($nucleus)) {
+                                                    $nucleus = implode('-', $nucleus);
+                                                }
+                                                array_push($type, $experiment.' - '.$nucleus);
                                             }
-                                            array_push($type, $experiment.' - '.$nucleus);
+                                            $pathsMatch = false;
                                         }
-                                        $pathsMatch = false;
                                     }
-                                }
-                                if (count($spectrum) > 0) {
-                                    $_nmriumJSON['data']['spectra'] = $spectrum;
-                                    $_nmrium = $dataset->nmrium;
-                                    if ($_nmrium) {
-                                        $_nmrium->nmrium_info = json_encode($_nmriumJSON, JSON_UNESCAPED_UNICODE);
-                                        $dataset->has_nmrium = true;
-                                        $_nmrium->save();
-                                    } else {
-                                        $_nmrium = NMRium::create([
-                                            'nmrium_info' => json_encode($_nmriumJSON, JSON_UNESCAPED_UNICODE),
-                                        ]);
-                                        $dataset->nmrium()->save($_nmrium);
-                                        $dataset->has_nmrium = true;
+                                    if (count($spectrum) > 0) {
+                                        $_nmriumJSON['data']['spectra'] = $spectrum;
+                                        $_nmrium = $dataset->nmrium;
+                                        if ($_nmrium) {
+                                            $_nmrium->nmrium_info = json_encode($_nmriumJSON, JSON_UNESCAPED_UNICODE);
+                                            $dataset->has_nmrium = true;
+                                            $_nmrium->save();
+                                        } else {
+                                            $_nmrium = NMRium::create([
+                                                'nmrium_info' => json_encode($_nmriumJSON, JSON_UNESCAPED_UNICODE),
+                                            ]);
+                                            $dataset->nmrium()->save($_nmrium);
+                                            $dataset->has_nmrium = true;
+                                        }
                                     }
+                                    $uType = array_unique($type);
+                                    if (count($uType) == 1) {
+                                        $dataset->type = $uType[0];
+                                    }
+                                    $dataset->save();
                                 }
-                                $uType = array_unique($type);
-                                if (count($uType) == 1) {
-                                    $dataset->type = $uType[0];
-                                }
-                                $dataset->save();
-                                // }
                             }
                         }
                     }

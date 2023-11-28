@@ -92,12 +92,11 @@ You can continue to commit and push changes in response to the reviews. Your pul
 
 Your pull request can be merged once it is approved by the reviewer. The primary merge should always be made to the `development` branch, from where your code will be deployed to the [dev environment](https://dev.nmrxiv.org) via our [CI/CD pipeline](https://docs.nmrxiv.org/developer-guides/ci-cd). The [dev environment](https://dev.nmrxiv.org) provides the room to test your feature or code changes. Once it has passed all the test cases, your code changes will now be included as part of a release and be deployed finally to the [production environment](https://nmrxiv.org). These actions are restrictive and should only be performed by our repo admins and owners.
 
-#### Delete your branch
+::: danger Please note
+Your branch will be deleted as soon as it is merged to `development` or `main` branch. However you always have an option to restore it within a limited time frame.
+:::
 
-After your branch is merged and the pull request is closed please don't forget to delete your stale branch. This indicates that the work on the branch is complete and prevents you or others from accidentally using old branches. For more information, see [Deleting and restoring branches in a pull request](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-branches-in-your-repository/deleting-and-restoring-branches-in-a-pull-request).
-<img src="/img/delete_branch.png"/>
-
-:::info Info
+:::danger Warning
 
 - Never leak your secrets or commit local config files(.env) into source control.
 - Follow the link to learn more about [Laravel](https://laravel.com/9.x/readme) and [Inertia.js](https://inertiajs.com/) best practices.

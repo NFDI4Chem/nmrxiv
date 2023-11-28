@@ -1,6 +1,4 @@
-______________________________________________________________________
-
-## sidebar_position: 2 id: oauth title: OAuth
+# OAuth
 
 In addition to basic username/password authentication, nmrXiv also supports authentication via [OAuth 2.0](https://www.digitalocean.com/community/tutorials/an-introduction-to-oauth-2), which is an authorization framework that enables third party clients to obtain limited access to user accounts on an HTTP service.
 Currently nmrXiv supports login via below three clients:

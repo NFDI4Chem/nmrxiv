@@ -44,7 +44,10 @@
                                 <label
                                     class="block tracking-wider text-sm font-medium text-gray-700, block text-sm font-medium text-gray-700"
                                 >
-                                    <small>PUBLISH AS PROJECT</small>
+                                    <small v-if="publishForm.enableProjectMode"
+                                        >PUBLISH AS PROJECT</small
+                                    >
+                                    <small v-else>PUBLISH SAMPLES</small>
                                 </label>
                                 <toggle-button
                                     v-model:enabled="
@@ -87,7 +90,7 @@
                                     >
                                         <label
                                             for="description"
-                                            class="block text-sm font-medium text-gray-700"
+                                            class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
                                         >
                                             <span
                                                 @click="
@@ -95,8 +98,7 @@
                                                         'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore'
                                                 "
                                                 >Project Description
-                                                (Optional)</span
-                                            >
+                                            </span>
                                         </label>
                                         <div class="mt-1">
                                             <textarea
@@ -254,7 +256,7 @@
                                                 class="relative flex items-center justify-between"
                                             >
                                                 <span
-                                                    class="px-3 -ml-4 rounded text-sm bg-gray-100 font-medium text-gray-500"
+                                                    class="px-3 -ml-4 rounded text-sm bg-gray-100 font-medium text-gray-500 after:content-['*'] after:ml-0.5 after:text-red-500"
                                                 >
                                                     Citation
                                                 </span>
@@ -279,76 +281,13 @@
                                                 class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-2"
                                             >
                                                 <div
-                                                    v-for="citation in project.citations"
-                                                    :key="citation.id"
-                                                    class="relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm flex items-top space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-teal-500"
+                                                    class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-2"
                                                 >
-                                                    <div class="flex-1 min-w-0">
-                                                        <a
-                                                            class="focus:outline-none cursor-pointer"
-                                                            :href="
-                                                                getCitationLink(
-                                                                    citation.doi
-                                                                )
-                                                            "
-                                                            :target="
-                                                                getTarget(
-                                                                    citation.doi
-                                                                )
-                                                            "
-                                                        >
-                                                            <span
-                                                                class="absolute inset-0"
-                                                                aria-hidden="true"
-                                                            ></span>
-                                                            <p
-                                                                class="text-sm font-medium text-gray-900"
-                                                            >
-                                                                {{
-                                                                    citation.title
-                                                                }}
-                                                            </p>
-                                                            <p
-                                                                class="text-sm text-teal-500"
-                                                            >
-                                                                {{
-                                                                    citation.authors
-                                                                }}
-                                                            </p>
-                                                            <p
-                                                                class="text-sm text-gray-500"
-                                                            >
-                                                                {{
-                                                                    citation.citation_text
-                                                                }}
-                                                            </p>
-                                                            <p
-                                                                v-if="
-                                                                    citation.doi
-                                                                "
-                                                                class="text-sm font-sm text-gray-500"
-                                                            >
-                                                                DOI -
-                                                                <a
-                                                                    :href="
-                                                                        citation.doi
-                                                                    "
-                                                                    class="text-teal-900"
-                                                                    >{{
-                                                                        citation.doi
-                                                                    }}</a
-                                                                >
-                                                            </p>
-                                                            <p
-                                                                class="text-sm text-gray-500 truncate ..."
-                                                            >
-                                                                {{
-                                                                    citation.abstract
-                                                                }}
-                                                                ...
-                                                            </p>
-                                                        </a>
-                                                    </div>
+                                                    <citation-card
+                                                        :citations="
+                                                            project.citations
+                                                        "
+                                                    />
                                                 </div>
                                             </div>
                                         </dd>
@@ -367,7 +306,7 @@
                                                 class="relative flex items-center justify-between"
                                             >
                                                 <span
-                                                    class="px-3 -ml-4 rounded text-sm bg-gray-100 font-medium text-gray-500"
+                                                    class="px-3 -ml-4 rounded text-sm bg-gray-100 font-medium text-gray-500 after:content-['*'] after:ml-0.5 after:text-red-500"
                                                 >
                                                     Author
                                                 </span>
@@ -450,7 +389,7 @@
                                                 >
                                                     <a
                                                         target="_blank"
-                                                        href="https://docs.nmrxiv.org/docs/submission-guides/licenses"
+                                                        href="https://docs.nmrxiv.org/submission-guides/licenses"
                                                         >How to choose the right
                                                         license?</a
                                                     >
@@ -484,12 +423,29 @@
                                                 name="conditions"
                                             />
                                             <div class="ml-2 text-sm">
-                                                I understand once the project is
-                                                published, all the underlying
-                                                studies and spectra will also be
-                                                made public and agree to make
-                                                this data persistently available
-                                                in this location.
+                                                <span
+                                                    v-if="
+                                                        publishForm.enableProjectMode
+                                                    "
+                                                >
+                                                    I understand once the
+                                                    project is published, all
+                                                    the underlying samples and
+                                                    spectra will also be made
+                                                    public and agree to make
+                                                    this data persistently
+                                                    available in the nmrXiv
+                                                    platform.
+                                                </span>
+                                                <span v-else>
+                                                    I understand once the
+                                                    samples are published, all
+                                                    the underlying spectra will
+                                                    also be made public and
+                                                    agree to make this data
+                                                    persistently available in
+                                                    the nmrXiv platform.
+                                                </span>
                                             </div>
                                         </div>
                                     </div>
@@ -549,13 +505,13 @@
                                 >
                                     Publish
                                 </button>
-                                <button
+                                <Link
                                     type="button"
                                     class="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                                    @click="open = false"
+                                    :href="route('dashboard')"
                                 >
                                     Not right yet
-                                </button>
+                                </Link>
                             </div>
                             <div v-if="errors">
                                 <div class="rounded-md bg-red-50 p-4 mx-4 mb-4">
@@ -706,6 +662,7 @@ import Citation from "@/Shared/Citation.vue";
 import AuthorCard from "@/Shared/AuthorCard.vue";
 import StudyInfo from "@/Shared/StudyInfo.vue";
 import SelectRich from "@/Shared/SelectRich.vue";
+import CitationCard from "@/Shared/CitationCard.vue";
 import {
     XCircleIcon,
     ClipboardDocumentIcon,
@@ -760,6 +717,7 @@ export default {
         StarIcon,
         CalendarIcon,
         StudyInfo,
+        CitationCard,
     },
     props: ["user", "team", "project", "validation", "teamRole", "draft"],
 

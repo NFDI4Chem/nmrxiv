@@ -37,7 +37,7 @@
                 </div>
             </Link>
         </div>
-        <div class="px-3 pb-3 pt-0 h-28 overflow-scroll">
+        <div class="px-3 pb-3 pt-0 h-28 overflow-auto">
             <!-- <label
                 class="block mb-2 text-xs text-gray-700, block text-sm font-medium text-gray-700"
             >

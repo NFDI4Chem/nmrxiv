@@ -6,6 +6,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Lab404\Impersonate\Models\Impersonate;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Jetstream\HasTeams;
@@ -23,6 +24,7 @@ class User extends Authenticatable implements MustVerifyEmail
     use HasTeams;
     use Notifiable;
     use TwoFactorAuthenticatable;
+    use Impersonate;
 
     /**
      * The attributes that are mass assignable.
@@ -121,5 +123,24 @@ class User extends Authenticatable implements MustVerifyEmail
     public function markNotificationAsRead($id)
     {
         $this->notifications->where('id', $id)->markAsRead();
+    }
+
+    /**
+     * By default, all users can impersonate anyone
+     * this example limits it so only admins can
+     * impersonate other users
+     */
+    public function canImpersonate(): bool
+    {
+        return $this->hasAnyRole(['super-admin', 'developer']);
+    }
+
+    /**
+     * By default, all users can be impersonated,
+     * this limits it to only certain users.
+     */
+    public function canBeImpersonated(): bool
+    {
+        return ! $this->hasAnyRole(['super-admin', 'developer']);
     }
 }
