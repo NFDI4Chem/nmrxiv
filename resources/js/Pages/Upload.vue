@@ -992,7 +992,7 @@
                                                                                         class="sm:flex sm:items-center sm:justify-between"
                                                                                     >
                                                                                         <h3
-                                                                                            class="text-xl font-bold text-gray-900"
+                                                                                            class="text-xl font-bold text-gray-900 after:content-['*'] after:ml-0.5 after:text-red-500"
                                                                                         >
                                                                                             Chemical
                                                                                             composition
@@ -1254,7 +1254,7 @@
                                                                                             class="float-right text-xs cursor-pointer hover:text-blue-700"
                                                                                         >
                                                                                             <a
-                                                                                                href="https://docs.nmrxiv.org/docs/submission-guides/submission/editor"
+                                                                                                href="https://docs.nmrxiv.org/submission-guides/editor.html"
                                                                                                 target="_blank"
                                                                                                 >Need
                                                                                                 help?
@@ -1331,7 +1331,7 @@
                                                                                     >
                                                                                         <label
                                                                                             for="description"
-                                                                                            class="block text-sm font-medium text-gray-700"
+                                                                                            class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
                                                                                         >
                                                                                             Sample
                                                                                             Description
@@ -2740,7 +2740,7 @@ export default {
                 this.selectedStudyIndex = index;
                 this.selectedStudy = study;
                 this.studyForm.name = this.selectedStudy.name;
-                this.studyForm.description = this.selectedStudy.description;
+                this.studyForm.description = this.selectedStudy.description.replace(/<\/br>/g, ' ');
                 this.studyForm.species = JSON.parse(this.selectedStudy.species)
                     ? JSON.parse(this.selectedStudy.species)
                     : [];
@@ -3097,7 +3097,7 @@ export default {
                                     "</br>";
                             });
                         });
-                        this.studyForm.description = desc;
+                        this.studyForm.description = desc.replace(/<\/br>/g, ' ');
                         this.saveStudyDetails();
                     }
                 });
