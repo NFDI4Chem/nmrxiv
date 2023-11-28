@@ -7,17 +7,6 @@
                 <!-- <div class="max-w-2xl">You may house a variety of projects.</div> -->
                 <!-- </div> -->
             </div>
-            <div class="flex-shrink-0 ml-4">
-                <!-- <button
-                    v-if="mode == 'create' && editableTeamRole"
-                    id="v-step-1"
-                    type="button"
-                    class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                    @click="openProjectCreateDialog"
-                >
-                    New Project
-                </button> -->
-            </div>
         </div>
         <span v-if="projects.length <= 0">
             <div v-if="mode == 'create' && editableTeamRole" class="mt-4">
@@ -163,7 +152,7 @@
                 </div>
                 <a>
                     <div
-                        class="flex justify-between items-center bg-white shadow-md border rounded-lg px-6 py-6"
+                        class="flex justify-between items-center bg-white shadow-md border rounded-lg px-6 py-8"
                     >
                         <div
                             class="flex-grow cursor-pointer"
@@ -306,28 +295,80 @@
                             </div>
                         </div>
                         <div class="border-l cursor-pointer">
-                            <a
-                                target="_blank"
-                                :href="
-                                    route('dashboard.projects', [project.id])
-                                "
-                                class="text-gray-500 hover:text-gray-900"
-                            >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke-width="1.5"
-                                    stroke="currentColor"
-                                    class="h-5 w-5 text-gray-600 ml-4"
+                            <div class="tooltip">
+                                <a
+                                    target="_blank"
+                                    :href="getProjectSummaryLink(project)"
+                                    class="text-gray-500 hover:text-gray-900"
                                 >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
-                                    />
-                                </svg>
-                            </a>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke-width="1.5"
+                                        stroke="currentColor"
+                                        class="h-5 w-5 text-gray-600 ml-4"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
+                                        />
+                                    </svg>
+                                </a>
+                                <span
+                                    class="bg-gray-900 text-center text-white px-2 py-1 shadow-lg rounded-md tooltiptextbottom"
+                                    >Open draft in the summary view</span
+                                >
+                            </div>
+                            <div v-if="!project.is_public" class="tooltip">
+                                <a
+                                    target="_blank"
+                                    :href="getProjectSettingsLink(project)"
+                                    class="text-gray-500 hover:text-gray-900"
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke-width="1.5"
+                                        stroke="currentColor"
+                                        class="h-5 w-5 text-gray-600 ml-4"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 011.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.56.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.893.149c-.425.07-.765.383-.93.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 01-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.397.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 01-.12-1.45l.527-.737c.25-.35.273-.806.108-1.204-.165-.397-.505-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.107-1.204l-.527-.738a1.125 1.125 0 01.12-1.45l.773-.773a1.125 1.125 0 011.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894z"
+                                        />
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                                        />
+                                    </svg>
+                                </a>
+                                <span
+                                    class="bg-gray-900 text-center text-white px-2 py-1 shadow-lg rounded-md tooltiptextbottom"
+                                    >Open draft/project settings view</span
+                                >
+                            </div>
+                            <!-- <div class="tooltip">
+                                <a
+                                    target="_blank"
+                                    :href="getProjectSettingsLink(project)"
+                                    class="text-gray-500 hover:text-gray-900"
+                                >
+                                    
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5 text-gray-600 ml-4">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M3 3v1.5M3 21v-6m0 0l2.77-.693a9 9 0 016.208.682l.108.054a9 9 0 006.086.71l3.114-.732a48.524 48.524 0 01-.005-10.499l-3.11.732a9 9 0 01-6.085-.711l-.108-.054a9 9 0 00-6.208-.682L3 4.5M3 15V4.5" />
+</svg>
+
+                                </a>
+                                <span
+                                    class="bg-gray-900 text-center text-white px-2 py-1 shadow-lg rounded-md tooltiptextbottom"
+                                    >Open validations report</span
+                                >
+                            </div> -->
                             <!-- <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
@@ -345,7 +386,7 @@
     </div>
 </template>
 <script>
-import { Link } from "@inertiajs/vue3";
+import { Link, router } from "@inertiajs/vue3";
 import { StarIcon } from "@heroicons/vue/24/solid";
 export default {
     components: {
@@ -365,11 +406,25 @@ export default {
             this.emitter.emit("openProjectCreateDialog", data);
         },
         getLink(project) {
-            if (project) {
-                return this.$inertia.visit(
+            if (!project.is_public) {
+                if (project.draft_id) {
+                    return router.visit("upload?draft_id=" + project.draft_id);
+                } else {
+                    alert(
+                        "Draft missing. Please contact us at info.nmrxiv@uni-jena.de."
+                    );
+                }
+            } else {
+                return router.visit(
                     this.route("dashboard.projects", [project.id])
                 );
             }
+        },
+        getProjectSummaryLink(project) {
+            return route("dashboard.projects", [project.id]);
+        },
+        getProjectSettingsLink(project) {
+            return route("dashboard.project.settings", [project.id]);
         },
     },
 };
