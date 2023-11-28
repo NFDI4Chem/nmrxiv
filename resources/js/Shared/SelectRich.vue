@@ -2,7 +2,7 @@
     <Listbox v-model="proxySelected" as="div">
         <ListboxLabel
             v-if="label"
-            class="block text-sm font-medium text-gray-700"
+            class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
             >{{ label }}</ListboxLabel
         >
         <div class="mt-1 relative">
