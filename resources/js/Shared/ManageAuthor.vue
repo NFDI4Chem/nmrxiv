@@ -384,34 +384,20 @@
                                                     {{ author.lastName }}
                                                 </label>
                                                 <p
-                                                    v-if="
-                                                        author.authorAffiliationDetailsList &&
-                                                        author
-                                                            .authorAffiliationDetailsList
-                                                            .authorAffiliation[0]
-                                                    "
+                                                    v-if="author.affiliation"
                                                     id="items-description"
                                                     class="text-xs font-medium text-gray-900"
                                                 >
-                                                    {{
-                                                        author
-                                                            .authorAffiliationDetailsList
-                                                            .authorAffiliation[0]
-                                                            .affiliation
-                                                    }}
+                                                    {{ author.affiliation }}
                                                 </p>
                                                 <div
-                                                    v-if="
-                                                        author.authorId &&
-                                                        author.authorId.type ==
-                                                            'ORCID'
-                                                    "
+                                                    v-if="author.orcidId"
                                                     class="text-xs leading-6 font-medium text-teal-900"
                                                 >
                                                     <b class="text-gray-500"
                                                         >ORCID iD:</b
                                                     >
-                                                    {{ author.authorId.value }}
+                                                    {{ author.orcidId }}
                                                 </div>
                                             </div>
                                         </div>
@@ -925,6 +911,7 @@ export default {
             this.loading = true;
             this.error = "";
             this.query = this.extractDoi(this.query);
+            this.fetchedAuthors = [];
             let isDOI = new RegExp(/\b(10[.][0-9]{4,}(?:[.][0-9]+)*)\b/g).test(
                 this.query
             );
@@ -939,26 +926,102 @@ export default {
                     },
                 })
                 .then((res) => {
-                    this.fetchedAuthors = isDOI
-                        ? res.data.resultList.result[0].authorList.author
-                        : res.data.resultList.result[0].authorList.author.filter(
-                              (a) =>
-                                  a.authorId &&
-                                  a.authorId.type == "ORCID" &&
-                                  a.authorId.value == this.query
-                          );
+                    if (
+                        res &&
+                        res.data &&
+                        res.data.resultList.result.length > 0
+                    ) {
+                        var authors = isDOI
+                            ? res.data.resultList.result[0].authorList.author
+                            : res.data.resultList.result[0].authorList.author.filter(
+                                  (a) =>
+                                      a.authorId &&
+                                      a.authorId.type == "ORCID" &&
+                                      a.authorId.value == this.query
+                              );
+                        this.fetchedAuthors = this.formatAuthorResponse(
+                            authors,
+                            "europemc"
+                        );
+                    } else {
+                        this.fetchDataFromCrossref(this.query);
+                    }
                 })
-                .catch(() => {
-                    this.error =
-                        "Something went wrong. Please check the input and try again.";
+                .catch((err) => {
+                    console.log(err);
                 })
                 .finally(() => {
-                    if (this.fetchedAuthors.length == 0) {
+                    this.loading = false;
+                });
+        },
+        /*Make REST Call to Crossref API */
+        fetchDataFromCrossref(query) {
+            this.fetchedAuthors = [];
+            axios
+                .get(this.$page.props.CROSSREF_API + this.query)
+                .then((res) => {
+                    if (res.data && res.data.message) {
+                        this.fetchedAuthors = this.formatAuthorResponse(
+                            res.data.message.author,
+                            "crossref"
+                        );
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
+                })
+                .finally(() => {
+                    if (
+                        this.fetchedAuthors &&
+                        this.fetchedAuthors.length == 0
+                    ) {
                         this.error =
                             "No data found. Please enter the details manually.";
                     }
                     this.loading = false;
                 });
+        },
+        /*Format authors response*/
+        formatAuthorResponse(authors, apiType) {
+            var formattedAuthors = [];
+            if (authors && authors.length > 0) {
+                switch (apiType) {
+                    case "europemc":
+                        authors.forEach((author) => {
+                            var a = {};
+                            a.firstName = author.firstName;
+                            a.lastName = author.lastName;
+                            a.fullName = author.fullName;
+                            a.orcidId =
+                                author.authorId &&
+                                author.authorId.type == "ORCID"
+                                    ? author.authorId.value
+                                    : "";
+                            a.affiliation =
+                                author.authorAffiliationDetailsList &&
+                                author.authorAffiliationDetailsList
+                                    .authorAffiliation[0]
+                                    ? author.authorAffiliationDetailsList
+                                          .authorAffiliation[0].affiliation
+                                    : "";
+                            formattedAuthors.push(a);
+                        });
+                        break;
+                    case "crossref":
+                        authors.forEach((author) => {
+                            var a = {};
+                            a.firstName = author.given;
+                            a.lastName = author.family;
+                            a.orcidId = ""; //as we are not recieving ORCID ID from Cross ref response;
+                            a.affiliation = author.affiliation[0]
+                                ? author.affiliation[0].name
+                                : "";
+                            formattedAuthors.push(a);
+                        });
+                        break;
+                }
+            }
+            return formattedAuthors;
         },
         /*Format the response*/
         formatAuthors(authors) {
@@ -967,16 +1030,8 @@ export default {
                 authorsList.push({
                     given_name: author.firstName,
                     family_name: author.lastName,
-                    orcid_id:
-                        author.authorId && author.authorId.type == "ORCID"
-                            ? author.authorId.value
-                            : "",
-                    affiliation:
-                        author.authorAffiliationDetailsList &&
-                        author.authorAffiliationDetailsList.authorAffiliation[0]
-                            ? author.authorAffiliationDetailsList
-                                  .authorAffiliation[0].affiliation
-                            : "",
+                    orcid_id: author.orcidId,
+                    affiliation: author.affiliation,
                 });
             });
             return authorsList;
