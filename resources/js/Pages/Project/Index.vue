@@ -352,8 +352,12 @@ export default {
             this.emitter.emit("openProjectCreateDialog", data);
         },
         getLink(project) {
-            if (project) {
+            if (!project.is_public) {
                 return router.visit("upload?draft_id=" + project.draft_id);
+            } else {
+                return router.visit(
+                    this.route("dashboard.projects", [project.id])
+                );
             }
         },
     },

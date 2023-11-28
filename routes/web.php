@@ -232,6 +232,8 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
             ->name('dashboard.draft.info');
         Route::get('drafts/{draft}/files', [DraftController::class, 'files'])
             ->name('dashboard.draft.files');
+        Route::get('drafts/{draft}/missing-files', [DraftController::class, 'missingFiles'])
+            ->name('dashboard.draft.missing-files');
         Route::put('drafts/{draft}', [DraftController::class, 'update'])
             ->name('dashboard.draft.update');
         Route::delete('drafts/{draft}/files/{filesystemobject}', [DraftController::class, 'deleteFSO'])

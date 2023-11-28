@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\Draft;
 use App\Models\FileSystemObject;
+use App\Models\Project;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -58,16 +59,33 @@ class ProcessFiles implements ShouldQueue, ShouldBeUnique
                 ->orWhere('status', 'missing')
                 ->get();
 
+            $missingFileAdded = false;
             foreach ($draftFSObjects as $fsObject) {
                 if ($fsObject->path) {
+                    $missingFile = false;
+                    if ($fsObject->status == 'missing') {
+                        $missingFile = true;
+                    }
                     $exists = Storage::disk(env('FILESYSTEM_DRIVER'))->exists($fsObject->path);
                     if (! $exists) {
                         $fsObject->status = 'missing';
                     } else {
                         $fsObject->status = 'present';
+                        if ($missingFile) {
+                            $missingFileAdded = true;
+                        }
                     }
                     $fsObject->save();
                 }
+            }
+
+            if ($missingFileAdded) {
+                $project = Project::where('draft_id', $draft->id)->first();
+                foreach ($project->studies as $study) {
+                    $study->download_url = null;
+                    $study->save();
+                }
+                ArchiveStudy::dispatch($project);
             }
 
             // $this->processFiles($draft->path);

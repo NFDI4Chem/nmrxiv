@@ -96,12 +96,24 @@ class DraftController extends Controller
                         ->orderBy('type')
                         ->get(),
                 ],
-                'missing_files' => FileSystemObject::with('children')
+                'missing_files' => FileSystemObject::where([
+                    ['draft_id', $draft->id],
+                    ['status', 'missing'],
+                ])
+                    ->count(),
+            ]);
+    }
+
+    public function missingFiles(Request $request, Draft $draft)
+    {
+        return response()->json(
+            [
+                'missing_files' => FileSystemObject::select('relative_url')
                     ->where([
                         ['draft_id', $draft->id],
                         ['status', 'missing'],
                     ])
-                    ->count(),
+                    ->get(),
             ]);
     }
 
