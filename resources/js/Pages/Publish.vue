@@ -281,76 +281,13 @@
                                                 class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-2"
                                             >
                                                 <div
-                                                    v-for="citation in project.citations"
-                                                    :key="citation.id"
-                                                    class="relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm flex items-top space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-teal-500"
+                                                    class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-2"
                                                 >
-                                                    <div class="flex-1 min-w-0">
-                                                        <a
-                                                            class="focus:outline-none cursor-pointer"
-                                                            :href="
-                                                                getCitationLink(
-                                                                    citation.doi
-                                                                )
-                                                            "
-                                                            :target="
-                                                                getTarget(
-                                                                    citation.doi
-                                                                )
-                                                            "
-                                                        >
-                                                            <span
-                                                                class="absolute inset-0"
-                                                                aria-hidden="true"
-                                                            ></span>
-                                                            <p
-                                                                class="text-sm font-medium text-gray-900"
-                                                            >
-                                                                {{
-                                                                    citation.title
-                                                                }}
-                                                            </p>
-                                                            <p
-                                                                class="text-sm text-teal-500"
-                                                            >
-                                                                {{
-                                                                    citation.authors
-                                                                }}
-                                                            </p>
-                                                            <p
-                                                                class="text-sm text-gray-500"
-                                                            >
-                                                                {{
-                                                                    citation.citation_text
-                                                                }}
-                                                            </p>
-                                                            <p
-                                                                v-if="
-                                                                    citation.doi
-                                                                "
-                                                                class="text-sm font-sm text-gray-500"
-                                                            >
-                                                                DOI -
-                                                                <a
-                                                                    :href="
-                                                                        citation.doi
-                                                                    "
-                                                                    class="text-teal-900"
-                                                                    >{{
-                                                                        citation.doi
-                                                                    }}</a
-                                                                >
-                                                            </p>
-                                                            <p
-                                                                class="text-sm text-gray-500 truncate ..."
-                                                            >
-                                                                {{
-                                                                    citation.abstract
-                                                                }}
-                                                                ...
-                                                            </p>
-                                                        </a>
-                                                    </div>
+                                                    <citation-card
+                                                        :citations="
+                                                            project.citations
+                                                        "
+                                                    />
                                                 </div>
                                             </div>
                                         </dd>
@@ -497,7 +434,7 @@
                                                     spectra will also be made
                                                     public and agree to make
                                                     this data persistently
-                                                    available in nmrXiv
+                                                    available in the nmrXiv
                                                     platform.
                                                 </span>
                                                 <span v-else>
@@ -507,7 +444,7 @@
                                                     also be made public and
                                                     agree to make this data
                                                     persistently available in
-                                                    nmrXiv platform.
+                                                    the nmrXiv platform.
                                                 </span>
                                             </div>
                                         </div>
@@ -725,6 +662,7 @@ import Citation from "@/Shared/Citation.vue";
 import AuthorCard from "@/Shared/AuthorCard.vue";
 import StudyInfo from "@/Shared/StudyInfo.vue";
 import SelectRich from "@/Shared/SelectRich.vue";
+import CitationCard from "@/Shared/CitationCard.vue";
 import {
     XCircleIcon,
     ClipboardDocumentIcon,
@@ -779,6 +717,7 @@ export default {
         StarIcon,
         CalendarIcon,
         StudyInfo,
+        CitationCard,
     },
     props: ["user", "team", "project", "validation", "teamRole", "draft"],
 
