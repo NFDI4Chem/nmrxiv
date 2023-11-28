@@ -92,7 +92,7 @@ class ProjectController extends Controller
 
     public function publicStudies(Request $request, Project $project)
     {
-        return StudyResource::collection(Study::where([['project_id', $project->id], ['is_public', true]])->filter($request->only('search', 'sort', 'mode'))->paginate(9)->withQueryString());
+        return StudyResource::collection(Study::where([['project_id', $project->id], ['is_public', true]])->filter($request->only('search', 'sort', 'mode'))->paginate(12)->withQueryString());
     }
 
     public function toggleUpVote(Request $request, Project $project)

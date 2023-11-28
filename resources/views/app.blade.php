@@ -40,7 +40,7 @@
             class="z-20 fixed bottom-0 bg-yellow-300 border-b w-screen border-black-800"
         >
             <div class="max-w-7xl mx-auto py-1 px-6 text-center">
-              <small><b>DEMO SITE WARNING</b>: Please be aware that this is a demo/test server for nmrXiv and don't upload or save any sensitive data.</small>
+              <small><b>DEMO SITE WARNING</b>: Please be aware that this is a demo/test server for nmrXiv and don't upload or save any sensitive data. For real data please visit <a href="https://nmrxiv.org" target="_blank" style=color:blue>nmrxiv.org.</a></small>
             </div>
         </div>
         @endenv

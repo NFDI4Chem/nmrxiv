@@ -1,5 +1,33 @@
 # Changelog
 
+## [1.1.0-rc.14](https://github.com/NFDI4Chem/nmrxiv/compare/v1.0.0-rc.14...v1.1.0-rc.14) (2023-11-28)
+
+
+### Features
+
+* added missing files check to the submission process ([3d947d5](https://github.com/NFDI4Chem/nmrxiv/commit/3d947d50393d69d618eb9e2fc5f409a32117c02b))
+* Implemented curation tools - users ([66b26c7](https://github.com/NFDI4Chem/nmrxiv/commit/66b26c71dfc8e6c9442256c88661f5026fa6f28b))
+* ux/ui improvements - missing files display and archiving logic updates ([7bb224f](https://github.com/NFDI4Chem/nmrxiv/commit/7bb224fd6b5e921bb1e06a77d819bd4b9491425c))
+
+
+### Bug Fixes
+
+* added quick links ([47c2020](https://github.com/NFDI4Chem/nmrxiv/commit/47c2020cd2a9b0cb0a5db77c0786719b31aae45e))
+* card click updates and added logs for file upload ([d07e5ec](https://github.com/NFDI4Chem/nmrxiv/commit/d07e5ec46d87eb199e5acc04cf838d4d329cea1e))
+* formatting updates ([f90891e](https://github.com/NFDI4Chem/nmrxiv/commit/f90891eff5ac06d24198bb1165fa6fe4541d6372))
+* import citation data from crossref. ([247aaf6](https://github.com/NFDI4Chem/nmrxiv/commit/247aaf69d0cd427f8ae3fc6d5c115e35cd1feeb8))
+* import citations and authors from crossref if ([2e02979](https://github.com/NFDI4Chem/nmrxiv/commit/2e02979ba30a94f29f4d9ce9d40de5d29cd8ab95)), closes [#764](https://github.com/NFDI4Chem/nmrxiv/issues/764)
+* NULL draft id error handling added and also updated the quick link to summary page ([29d1308](https://github.com/NFDI4Chem/nmrxiv/commit/29d130825352a3d0631faa0b96fabe6ef8c30e95))
+* remove extra scroll ([dc18dbd](https://github.com/NFDI4Chem/nmrxiv/commit/dc18dbd66bb88934587e0f927c20169a727c458d))
+* remove html tag from sample description ([a4021ee](https://github.com/NFDI4Chem/nmrxiv/commit/a4021ee3c1646eecb87b81362c136b321c32f874))
+* spectra parser error handling updated ([2b55eda](https://github.com/NFDI4Chem/nmrxiv/commit/2b55edaa265e53e74bb25999b59ddee15c91f55e))
+* spectral path matching issue fix (file names are matched strictly based on file type) ([2635582](https://github.com/NFDI4Chem/nmrxiv/commit/2635582e3c6f1213f29414f2e73078f77b81300a))
+* update .env.example ([b75a7e2](https://github.com/NFDI4Chem/nmrxiv/commit/b75a7e2b96e40b67f2a322d526d1f55bfce20a84))
+* update .env.example ([1435354](https://github.com/NFDI4Chem/nmrxiv/commit/14353544e9b993957ff8857adee022a2e0dc72ed))
+* updated components sequence and also fixes molecule save percentage bug ([d53fe07](https://github.com/NFDI4Chem/nmrxiv/commit/d53fe07749fe55f3cc757292b29558450e0fa06a))
+* updates ux/ui and publish page ([19899ed](https://github.com/NFDI4Chem/nmrxiv/commit/19899ed6bd64726090350ad2b83d75bd2ccabb50))
+* upload issue temp fix revert and varian image issue fix ([cd33f30](https://github.com/NFDI4Chem/nmrxiv/commit/cd33f30f1cb618e8638cff8045aa574b385b12ae))
+
 ## [1.0.1-rc.13](https://github.com/NFDI4Chem/nmrxiv/compare/v1.0.0-rc.13...v1.0.1-rc.13) (2023-11-21)
 
 
