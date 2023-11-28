@@ -324,7 +324,7 @@
                                                     <p
                                                         class="truncate text-md text-dark-600"
                                                     >
-                                                        Study title
+                                                        Sample title
                                                     </p>
                                                     <!-- <span
                                                         v-if="

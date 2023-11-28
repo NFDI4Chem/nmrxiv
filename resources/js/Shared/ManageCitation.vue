@@ -839,7 +839,11 @@ export default {
                         break;
                     case "crossref":
                         journalTitle = obj.title[0];
-                        yearofPublication = obj["published-online"]["date-parts"] ? obj["published-online"]["date-parts"][0][0] : "";
+                        yearofPublication = obj["published-online"][
+                            "date-parts"
+                        ]
+                            ? obj["published-online"]["date-parts"][0][0]
+                            : "";
                         volume = obj.volume ? obj.volume : "";
                         issue = obj.issue ? obj.issue : "";
                         pageInfo = obj.page ? obj.page : "";

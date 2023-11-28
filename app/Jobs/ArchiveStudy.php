@@ -36,6 +36,14 @@ class ArchiveStudy implements ShouldQueue, ShouldBeUnique
     }
 
     /**
+     * Get the unique ID for the job.
+     */
+    public function uniqueId(): string
+    {
+        return $this->project->id;
+    }
+
+    /**
      * Execute the job.
      */
     public function handle(): void
@@ -48,7 +56,7 @@ class ArchiveStudy implements ShouldQueue, ShouldBeUnique
                 $archiveDownloadURL = $study->download_url;
                 if (! $archiveDownloadURL) {
                     $fsObject = $study->fsObject;
-                    if ($fsObject && $fsObject->status != 'missing') {
+                    if ($fsObject) {
                         $path = $fsObject->path;
                         $s3Client = $this->storageClient();
                         $bucket = config('filesystems.disks.'.env('FILESYSTEM_DRIVER').'.bucket');

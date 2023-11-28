@@ -48,3 +48,5 @@ SELECT setval('tickers_id_seq', max(id)) FROM tickers;
 SELECT setval('users_id_seq', max(id)) FROM users;
 SELECT setval('validations_id_seq', max(id)) FROM validations;
 SELECT setval('versions_version_id_seq', max(version_id)) FROM versions;
+
+-- Make sure you have all the constraints in place
