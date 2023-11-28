@@ -19,7 +19,7 @@ You can find the needed hierarchy for submission there :
 It is common in Bruker datasets to find, for instance, the 2D datasets provided in a parent folder with the experiment name (e.g., HSQC), and within this folder you find the traditional Bruker named folders such as 1,2,3, etc. Such hierarchy will result in considering the HSQC dataset as a separate sample by nmrXiv, thus you need to be careful and avoid such inconveniences
 :::
 
-In the following photo, because there is an "HSQC" folder above the actual spectrum folder "58", nmrXiv recognizes 3 studies (Eserine, Cucurbitacin E, and HSQC)
+In the following photo, because there is an "HSQC" folder above the actual spectrum folder "58", nmrXiv recognizes 3 samples (Eserine, Cucurbitacin E, and HSQC)
 
 <p align="center">
 <img src="/img/examples/Bruker-wrong.png" width="350"/>
@@ -28,7 +28,7 @@ In the following photo, because there is an "HSQC" folder above the actual spect
 
 <p align="center">
 <img src="/img/examples/Bruker-studies.png" width="700"/>
-<figcaption>The studies in nmrXiv resulting from submitting the project in the above image.</figcaption>
+<figcaption>The samples in nmrXiv resulting from submitting the project in the above image.</figcaption>
 </p>
 
 ## JCAMP Datasets
@@ -50,7 +50,7 @@ You can find the needed hierarchy for submission there :
 It is common in JCAMP datasets to find, for instance, the 2D datasets provided in a parent folder with the experiment name (e.g., HSQC), and within this folder, you find the jcamp file such as hsqc.dx. Such hierarchy will result in considering the HSQC dataset as a separate sample by nmrXiv, thus you need to be careful and avoid such inconveniences
 :::
 
-In the following photo, because there is an "HSQC" folder above the actual spectrum file "hsqc.dx", nmrXiv recognizes 3 studies (196793-29-0, 1155308-25-0, and HSQC)
+In the following photo, because there is an "HSQC" folder above the actual spectrum file "hsqc.dx", nmrXiv recognizes 3 samples (196793-29-0, 1155308-25-0, and HSQC)
 
 <p align="center">
 <img src="/img/examples/JCAMP-wrong.png" width="350"/>
@@ -59,5 +59,5 @@ In the following photo, because there is an "HSQC" folder above the actual spect
 
 <p align="center">
 <img src="/img/examples/JCAMP-studies.png" width="700"/>
-<figcaption>The studies in nmrXiv resulting from submitting the project in the above image.</figcaption>
+<figcaption>The samples in nmrXiv resulting from submitting the project in the above image.</figcaption>
 </p>

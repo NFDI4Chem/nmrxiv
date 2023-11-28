@@ -78,6 +78,54 @@
                         >.
                     </p>
                 </div>
+                <div
+                    v-if="molecule"
+                    class="border-t mx-auto px-4 sm:px-6 lg:px-8"
+                >
+                    <div
+                        class="mx-auto flex max-w-2xl items-center justify-between gap-x-8 lg:mx-0 lg:max-w-none"
+                    >
+                        <div class="flex items-center gap-x-6">
+                            <img
+                                :src="
+                                    $page.props.CM_API +
+                                    'depict/2D?smiles=' +
+                                    molecule.canonical_smiles
+                                "
+                                alt=""
+                                class="h-32 w-32 rounded rounded-full flex-none"
+                            />
+                            <h1>
+                                <div class="text-sm leading-6 text-gray-500">
+                                    <span class="text-gray-700">{{
+                                        molecule.identifier
+                                    }}</span>
+                                </div>
+                                <div
+                                    class="mt-1 text-base font-semibold leading-6 text-gray-900"
+                                >
+                                    <span v-if="molecule.iupac_name">{{
+                                        molecule.iupac_name
+                                    }}</span
+                                    ><br />
+                                    <span v-if="molecule.canonical_smiles">{{
+                                        molecule.canonical_smiles
+                                    }}</span>
+                                </div>
+                            </h1>
+                        </div>
+                        <!-- <div class="flex items-center gap-x-4 sm:gap-x-6">
+                            <a
+                                :href="
+                                    '/upload?compound=' + molecule.identifier
+                                "
+                                class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                            >
+                                Upload Spectra
+                            </a>
+                        </div> -->
+                    </div>
+                </div>
             </div>
         </template>
         <div>
@@ -333,6 +381,10 @@ export default {
                 sort: "newest",
                 mode: "grid",
             },
+            type: Object,
+        },
+        molecule: {
+            default: [],
             type: Object,
         },
     },

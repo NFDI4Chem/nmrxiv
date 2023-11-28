@@ -638,18 +638,46 @@ export default {
                     },
                 })
                 .then((res) => {
-                    this.fetchedCitations = this.formatCitationResponse(
-                        res.data.resultList.result[0]
-                    );
+                    if (
+                        res &&
+                        res.data &&
+                        res.data.resultList.result.length > 0
+                    ) {
+                        this.fetchedCitations = this.formatCitationResponse(
+                            res.data.resultList.result[0],
+                            "europemc"
+                        );
+                    } else {
+                        this.fetchDataFromCrossref(this.query);
+                    }
                 })
-                .catch(() => {
-                    this.error =
-                        "Something went wrong. Please check the input and try again.";
+                .catch((err) => {
+                    console.log(err);
+                })
+                .finally(() => {
+                    this.loading = false;
+                });
+        },
+        /*Make REST Call to Crossref API */
+        fetchDataFromCrossref(query) {
+            this.fetchedCitations = [];
+            axios
+                .get(this.$page.props.CROSSREF_API + this.query)
+                .then((res) => {
+                    if (res.data && res.data.message) {
+                        this.fetchedCitations = this.formatCitationResponse(
+                            res.data.message,
+                            "crossref"
+                        );
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
                 })
                 .finally(() => {
                     if (
-                        this.fetchedCitations == null ||
-                        Object.keys(this.fetchedCitations).length == 0
+                        this.fetchedCitations &&
+                        this.fetchedCitations.length == 0
                     ) {
                         this.error =
                             "No data found. Please enter the details manually.";
@@ -657,6 +685,7 @@ export default {
                     this.loading = false;
                 });
         },
+
         /*Edit Citation */
         edit(citation) {
             this.selectedCitation = citation;
@@ -759,45 +788,91 @@ export default {
                 this.form.hasErrors = true;
             }
         },
-        formatCitationResponse(obj) {
+        /*Format response recived from Europemc API*/
+        formatCitationResponse(obj, apiType) {
             var journalTitle = "";
             var yearofPublication = "";
             var volume = "";
             var issue = "";
             var pageInfo = "";
             this.formattedCitationRes = {};
+
             if (obj) {
-                if (obj.journalInfo) {
-                    journalTitle = obj.journalInfo.journal.title
-                        ? obj.journalInfo.journal.title
-                        : "";
-                    yearofPublication = obj.journalInfo.yearOfPublication
-                        ? obj.journalInfo.yearOfPublication
-                        : "";
-                    volume = obj.journalInfo.volume
-                        ? obj.journalInfo.volume
-                        : "";
-                    issue = obj.journalInfo.issue ? obj.journalInfo.issue : "";
+                switch (apiType) {
+                    case "europemc":
+                        if (obj.journalInfo) {
+                            journalTitle = obj.journalInfo.journal.title
+                                ? obj.journalInfo.journal.title
+                                : "";
+                            yearofPublication = obj.journalInfo
+                                .yearOfPublication
+                                ? obj.journalInfo.yearOfPublication
+                                : "";
+                            volume = obj.journalInfo.volume
+                                ? obj.journalInfo.volume
+                                : "";
+                            issue = obj.journalInfo.issue
+                                ? obj.journalInfo.issue
+                                : "";
+                        }
+                        pageInfo = obj.pageInfo ? obj.pageInfo : "";
+                        this.formattedCitationRes.title = obj.title
+                            ? obj.title
+                            : "";
+                        this.formattedCitationRes.authors = obj.authorString
+                            ? obj.authorString
+                            : "";
+                        this.formattedCitationRes.citation_text =
+                            journalTitle +
+                            " " +
+                            yearofPublication +
+                            " " +
+                            volume +
+                            " ( " +
+                            issue +
+                            " ) " +
+                            pageInfo;
+                        this.formattedCitationRes.doi = obj.doi ? obj.doi : "";
+                        this.formattedCitationRes.abstract = obj.abstractText
+                            ? obj.abstractText
+                            : "";
+                        break;
+                    case "crossref":
+                        journalTitle = obj.title[0];
+                        yearofPublication = obj["published-online"][
+                            "date-parts"
+                        ]
+                            ? obj["published-online"]["date-parts"][0][0]
+                            : "";
+                        volume = obj.volume ? obj.volume : "";
+                        issue = obj.issue ? obj.issue : "";
+                        pageInfo = obj.page ? obj.page : "";
+
+                        this.formattedCitationRes.title = journalTitle;
+                        if (obj.author) {
+                            this.formattedCitationRes.authors = obj.author
+                                .map(
+                                    (author) =>
+                                        author.given + " " + author.family
+                                )
+                                .join(", ");
+                        }
+                        this.formattedCitationRes.citation_text =
+                            journalTitle +
+                            " " +
+                            yearofPublication +
+                            " " +
+                            volume +
+                            " ( " +
+                            issue +
+                            " ) " +
+                            pageInfo;
+                        this.formattedCitationRes.doi = obj.DOI ? obj.DOI : "";
+                        this.formattedCitationRes.abstract = obj.abstract
+                            ? obj.abstract
+                            : "";
+                        break;
                 }
-                pageInfo = obj.pageInfo ? obj.pageInfo : "";
-                this.formattedCitationRes.title = obj.title ? obj.title : "";
-                this.formattedCitationRes.authors = obj.authorString
-                    ? obj.authorString
-                    : "";
-                this.formattedCitationRes.citation_text =
-                    journalTitle +
-                    " " +
-                    yearofPublication +
-                    " " +
-                    volume +
-                    " ( " +
-                    issue +
-                    " ) " +
-                    pageInfo;
-                this.formattedCitationRes.doi = obj.doi ? obj.doi : "";
-                this.formattedCitationRes.abstract = obj.abstractText
-                    ? obj.abstractText
-                    : "";
             }
             return this.formattedCitationRes;
         },
