@@ -2458,16 +2458,23 @@ export default {
             this.drafts = response.data.drafts;
             this.sharedDrafts = response.data.sharedDrafts;
             if (this.draft_id) {
-                let selectedDraft = this.drafts.find(
-                    (d) => d.id == this.draft_id
-                );
-                if (!selectedDraft) {
-                    selectedDraft = this.sharedDrafts.find(
+                if (this.draft_id != "null") {
+                    let selectedDraft = this.drafts.find(
                         (d) => d.id == this.draft_id
                     );
+                    if (!selectedDraft) {
+                        selectedDraft = this.sharedDrafts.find(
+                            (d) => d.id == this.draft_id
+                        );
+                    }
+                    this.selectDraft(selectedDraft);
+                    this.loading = false;
+                } else {
+                    alert(
+                        "Could not find the draft. Redirecting to the upload page."
+                    );
+                    return router.visit("upload");
                 }
-                this.selectDraft(selectedDraft);
-                this.loading = false;
             } else {
                 this.defaultDraft = response.data.default;
                 if (this.drafts.length == 0) {
@@ -2740,7 +2747,8 @@ export default {
                 this.selectedStudyIndex = index;
                 this.selectedStudy = study;
                 this.studyForm.name = this.selectedStudy.name;
-                this.studyForm.description = this.selectedStudy.description.replace(/<\/br>/g, ' ');
+                this.studyForm.description =
+                    this.selectedStudy.description.replace(/<\/br>/g, " ");
                 this.studyForm.species = JSON.parse(this.selectedStudy.species)
                     ? JSON.parse(this.selectedStudy.species)
                     : [];
@@ -3097,7 +3105,10 @@ export default {
                                     "</br>";
                             });
                         });
-                        this.studyForm.description = desc.replace(/<\/br>/g, ' ');
+                        this.studyForm.description = desc.replace(
+                            /<\/br>/g,
+                            " "
+                        );
                         this.saveStudyDetails();
                     }
                 });

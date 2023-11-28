@@ -295,26 +295,32 @@
                             </div>
                         </div>
                         <div class="border-l cursor-pointer">
-                            <a
-                                target="_blank"
-                                :href="'upload?draft_id=' + project.draft_id"
-                                class="text-gray-500 hover:text-gray-900"
-                            >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke-width="1.5"
-                                    stroke="currentColor"
-                                    class="h-5 w-5 text-gray-600 ml-4"
+                            <div class="tooltip">
+                                <a
+                                    target="_blank"
+                                    :href="getProjectSummaryLink(project)"
+                                    class="text-gray-500 hover:text-gray-900"
                                 >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
-                                    />
-                                </svg>
-                            </a>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke-width="1.5"
+                                        stroke="currentColor"
+                                        class="h-5 w-5 text-gray-600 ml-4"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
+                                        />
+                                    </svg>
+                                </a>
+                                <span
+                                    class="bg-gray-900 text-center text-white px-2 py-1 shadow-lg rounded-md tooltiptextbottom"
+                                    >Open draft in the summary view</span
+                                >
+                            </div>
                             <!-- <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
@@ -353,12 +359,21 @@ export default {
         },
         getLink(project) {
             if (!project.is_public) {
-                return router.visit("upload?draft_id=" + project.draft_id);
+                if (project.draft_id) {
+                    return router.visit("upload?draft_id=" + project.draft_id);
+                } else {
+                    alert(
+                        "Draft missing. Please contact us at info.nmrxiv@uni-jena.de."
+                    );
+                }
             } else {
                 return router.visit(
                     this.route("dashboard.projects", [project.id])
                 );
             }
+        },
+        getProjectSummaryLink(project) {
+            return route("dashboard.projects", [project.id]);
         },
     },
 };
