@@ -18,11 +18,11 @@
                         class="border border-teal-500 rounded px-4 py-3 mt-3 max-w-2xl text-sm text-gray-700 font-bold"
                     >
                         <p>
-                            <span style="color:red">Warning:</span> This site is for demonstration purpose
-                            only. You can test most of the nmrXiv features but
-                            DO NOT use the current site for your work. All the
-                            data stored here can be reset anytime. For real data
-                            please visit
+                            <span style="color: red">Warning:</span> This site
+                            is for demonstration purpose only. You can test most
+                            of the nmrXiv features but DO NOT use the current
+                            site for your work. All the data stored here can be
+                            reset anytime. For real data please visit
                             <a
                                 href="https://nmrxiv.org"
                                 target="_blank"
