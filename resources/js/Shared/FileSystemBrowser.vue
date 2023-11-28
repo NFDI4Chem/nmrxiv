@@ -30,7 +30,8 @@
                                 </span>
                             </a>
                         </i>
-                        <span
+                        <a
+                            @click="showMissingFilesDetailsModal()"
                             v-if="missing_files > 0"
                             class="text-red-900 text-strong float-right"
                         >
@@ -47,7 +48,7 @@
                                 ></path>
                             </svg>
                             {{ missing_files }} files missing
-                        </span>
+                        </a>
                     </div>
                     <!-- <button class="float-right" @click="toggleFullScreen">
                         <span v-if="fullScreen">
@@ -567,6 +568,26 @@
             </jet-danger-button>
         </template>
     </jet-confirmation-modal>
+
+    <jet-confirmation-modal
+        :show="missing_files > 0 && showMissingFilesDetails"
+        @close="showMissingFilesDetails = null"
+    >
+        <template #title> Missing Files </template>
+
+        <template #content>
+            Following files are mising <br />
+            <span v-for="file in missing_files_list">
+                {{ file.relative_url }} <br />
+            </span>
+        </template>
+
+        <template #footer>
+            <jet-secondary-button @click="showMissingFilesDetails = null">
+                Cancel
+            </jet-secondary-button>
+        </template>
+    </jet-confirmation-modal>
 </template>
 <script>
 import JetDialogModal from "@/Jetstream/DialogModal.vue";
@@ -635,7 +656,9 @@ export default {
             showLogsDialog: false,
             currentLog: null,
             fsoBeingDeleted: null,
+            showMissingFilesDetails: null,
             missing_files: 0,
+            missing_files_list: [],
         };
     },
     computed: {
@@ -679,6 +702,18 @@ export default {
                         this.$emit("loading", true);
                     });
             }
+        },
+        showMissingFilesDetailsModal() {
+            this.fetchMissingFiles();
+            this.showMissingFilesDetails = true;
+        },
+        fetchMissingFiles() {
+            axios
+                .get("/dashboard/drafts/" + this.draft.id + "/missing-files")
+                .then((response) => {
+                    console.log(response);
+                    this.missing_files_list = response.data.missing_files;
+                });
         },
         toggleFullScreen() {
             this.fullScreen = !this.fullScreen;
