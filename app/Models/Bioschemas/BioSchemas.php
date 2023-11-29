@@ -13,14 +13,4 @@ class BioSchemas extends Schema
     {
         return new Study();
     }
-
-    public static function sample(): Sample
-    {
-        return new Sample();
-    }
-
-    public static function bioSample(): BioSample
-    {
-        return new BioSample();
-    }
 }
