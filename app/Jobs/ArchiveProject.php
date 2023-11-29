@@ -14,7 +14,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Storage;
 use ZipStream;
 
-class ArchiveProject implements ShouldQueue, ShouldBeUnique
+class ArchiveProject implements ShouldBeUnique, ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -33,6 +33,14 @@ class ArchiveProject implements ShouldQueue, ShouldBeUnique
     public function __construct(Project $project)
     {
         $this->project = $project;
+    }
+
+    /**
+     * Get the unique ID for the job.
+     */
+    public function uniqueId(): string
+    {
+        return $this->project->id;
     }
 
     /**
