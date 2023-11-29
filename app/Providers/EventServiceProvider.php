@@ -16,6 +16,8 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
+use Lab404\Impersonate\Events\LeaveImpersonation;
+use Lab404\Impersonate\Events\TakeImpersonation;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -57,6 +59,18 @@ class EventServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        Event::listen(function (TakeImpersonation $event) {
+            session()->put([
+                'password_hash_sanctum' => $event->impersonated->getAuthPassword(),
+            ]);
+        });
+
+        Event::listen(function (LeaveImpersonation $event) {
+            session()->remove('password_hash_web');
+            session()->put([
+                'password_hash_sanctum' => $event->impersonator->getAuthPassword(),
+            ]);
+            Auth::setUser($event->impersonator);
+        });
     }
 }

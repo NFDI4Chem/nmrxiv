@@ -13,11 +13,11 @@
                 <div class="w-full px-5">
                     <div
                         v-if="!readonly"
-                        class="float-left text-sm cursor-pointer hover:text-blue-700 mt-2 mr-10"
+                        class="text-sm cursor-pointer hover:text-blue-700 mt-2 mr-10"
                     >
                         <i
                             ><a
-                                href="https://docs.nmrxiv.org/docs/submission-guides/submission/folder-structure"
+                                href="https://docs.nmrxiv.org/submission-guides/folder-structure.html"
                                 target="_blank"
                                 class="mb-4"
                             >
@@ -28,8 +28,27 @@
                                 <span class="ml-4">
                                     Learn more about folder structuring
                                 </span>
-                            </a></i
+                            </a>
+                        </i>
+                        <a
+                            @click="showMissingFilesDetailsModal()"
+                            v-if="missing_files > 0"
+                            class="text-red-900 text-strong float-right"
                         >
+                            <svg
+                                class="h-5 w-5 text-red-400 inline"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    fill-rule="evenodd"
+                                    d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z"
+                                    clip-rule="evenodd"
+                                ></path>
+                            </svg>
+                            {{ missing_files }} files missing
+                        </a>
                     </div>
                     <!-- <button class="float-right" @click="toggleFullScreen">
                         <span v-if="fullScreen">
@@ -549,6 +568,26 @@
             </jet-danger-button>
         </template>
     </jet-confirmation-modal>
+
+    <jet-confirmation-modal
+        :show="missing_files > 0 && showMissingFilesDetails"
+        @close="showMissingFilesDetails = null"
+    >
+        <template #title> Missing Files </template>
+
+        <template #content>
+            Following files are mising <br />
+            <span v-for="file in missing_files_list">
+                {{ file.relative_url }} <br />
+            </span>
+        </template>
+
+        <template #footer>
+            <jet-secondary-button @click="showMissingFilesDetails = null">
+                Cancel
+            </jet-secondary-button>
+        </template>
+    </jet-confirmation-modal>
 </template>
 <script>
 import JetDialogModal from "@/Jetstream/DialogModal.vue";
@@ -617,6 +656,9 @@ export default {
             showLogsDialog: false,
             currentLog: null,
             fsoBeingDeleted: null,
+            showMissingFilesDetails: null,
+            missing_files: 0,
+            missing_files_list: [],
         };
     },
     computed: {
@@ -661,6 +703,18 @@ export default {
                     });
             }
         },
+        showMissingFilesDetailsModal() {
+            this.fetchMissingFiles();
+            this.showMissingFilesDetails = true;
+        },
+        fetchMissingFiles() {
+            axios
+                .get("/dashboard/drafts/" + this.draft.id + "/missing-files")
+                .then((response) => {
+                    console.log(response);
+                    this.missing_files_list = response.data.missing_files;
+                });
+        },
         toggleFullScreen() {
             this.fullScreen = !this.fullScreen;
         },
@@ -681,6 +735,7 @@ export default {
                     this.updateBusyStatus(true);
                     this.$emit("loading", false);
                     this.loading = false;
+                    this.missing_files = response.data.missing_files;
                 });
             } else {
                 this.file = this.$page.props.selectedFileSystemObject;
@@ -814,7 +869,6 @@ export default {
         loadDropZone() {
             this.$nextTick(() => {
                 const vm = this;
-
                 vm.totalFilesCount = 0;
                 vm.uploadedFilesCount = 0;
                 vm.batchCount = 100;
@@ -892,34 +946,36 @@ export default {
                         };
                     }
                 });
-                vm.dropzone.on("click", function (e) {
-                    alert();
-                });
                 vm.dropzone.on("addedfiles", (files) => {
-                    this.updateBusyStatus(true);
-                    setTimeout(() => {
-                        var timer = setInterval(function () {
-                            if (vm.totalFilesCount === vm.selectedFSO.length) {
-                                clearInterval(timer);
-                                vm.status = "BATCH UPLOAD STARTED";
-                                for (
-                                    let i = 0;
-                                    i < vm.totalFilesCount;
-                                    i += vm.batchCount
+                    if (files.length > 0) {
+                        this.updateBusyStatus(true);
+                        setTimeout(() => {
+                            var timer = setInterval(function () {
+                                if (
+                                    vm.totalFilesCount === vm.selectedFSO.length
                                 ) {
-                                    let filesBatch = vm.dropzone.files.slice(
-                                        i,
-                                        i + vm.batchCount
-                                    );
-                                    vm.batches += 1;
-                                    vm.processFilesDZL(vm, filesBatch);
+                                    clearInterval(timer);
+                                    vm.status = "BATCH UPLOAD STARTED";
+                                    for (
+                                        let i = 0;
+                                        i < vm.totalFilesCount;
+                                        i += vm.batchCount
+                                    ) {
+                                        let filesBatch =
+                                            vm.dropzone.files.slice(
+                                                i,
+                                                i + vm.batchCount
+                                            );
+                                        vm.batches += 1;
+                                        vm.processFilesDZL(vm, filesBatch);
+                                    }
+                                } else {
+                                    vm.totalFilesCount = vm.selectedFSO.length;
+                                    vm.status = "PROCESSING FILES";
                                 }
-                            } else {
-                                vm.totalFilesCount = vm.selectedFSO.length;
-                                vm.status = "PROCESSING FILES";
-                            }
-                        }, 500);
-                    });
+                            }, 500);
+                        });
+                    }
                 });
                 vm.dropzone.on("queuecomplete", () => {
                     vm.status = "UPLOAD COMPLETE";

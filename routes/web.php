@@ -62,6 +62,8 @@ Route::get('/', function () {
 
 Route::supportBubble();
 
+Route::impersonate();
+
 Route::group(['middleware' => 'verified'], function () {
     if (Jetstream::hasTeamFeatures()) {
         Route::delete('/teams/{team}', [TeamController::class, 'destroy'])->name('app.teams.destroy');
@@ -230,6 +232,8 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
             ->name('dashboard.draft.info');
         Route::get('drafts/{draft}/files', [DraftController::class, 'files'])
             ->name('dashboard.draft.files');
+        Route::get('drafts/{draft}/missing-files', [DraftController::class, 'missingFiles'])
+            ->name('dashboard.draft.missing-files');
         Route::put('drafts/{draft}', [DraftController::class, 'update'])
             ->name('dashboard.draft.update');
         Route::delete('drafts/{draft}/files/{filesystemobject}', [DraftController::class, 'deleteFSO'])
@@ -263,6 +267,9 @@ Route::group([
 
             Route::get('users/edit/{user}', [UsersController::class, 'edit'])
                 ->name('console.users.edit');
+
+            Route::get('users/impersonate/{user}', [UsersController::class, 'impersonate'])
+                ->name('console.users.impersonate');
 
             Route::put('users/edit/{user}', [UsersController::class, 'update'])
                 ->name('console.users.update');

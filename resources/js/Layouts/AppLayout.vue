@@ -75,7 +75,7 @@
                                     class="float-center text-xs cursor-pointer hover:text-blue-700 mt-2"
                                 >
                                     <a
-                                        href="https://docs.nmrxiv.org/docs/submission-guides/submission/upload"
+                                        href="https://docs.nmrxiv.org/submission-guides/submission-process.html"
                                         target="_blank"
                                         >Need help?
                                     </a>
@@ -185,7 +185,7 @@
                             class="text-xs cursor-pointer hover:text-blue-700 mt-2"
                         >
                             <a
-                                href="https://docs.nmrxiv.org/docs/submission-guides/submission/upload"
+                                href="https://docs.nmrxiv.org/submission-guides/submission-process.html"
                                 target="_blank"
                                 >Need help?
                             </a>
@@ -309,7 +309,7 @@
                         <div class="ml-5 tooltip">
                             <a
                                 id="tour-step-documentation"
-                                href="https://docs.nmrxiv.org/docs/category/submission-guides"
+                                href="https://docs.nmrxiv.org/submission-guides/submission-process.html"
                                 target="_blank"
                                 ><svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -678,7 +678,7 @@
                 </div>
             </div>
             <main
-                class="flex-1 relative overflow-y-auto bg-white focus:outline-none"
+                class="flex-1 relative overflow-y-hidden bg-white focus:outline-none"
             >
                 <slot name="header"></slot>
                 <slot></slot>

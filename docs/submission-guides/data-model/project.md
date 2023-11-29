@@ -1,6 +1,6 @@
 # Project
 
-The concept of project in **[nmrXiv](https://nmrxiv.org/)** is similar to the [Investigation](https://isa-specs.readthedocs.io/en/latest/isamodel.html#investigation) one in [ISA model](https://isa-tools.org/format/specification.html). Therefore, the project helps to group related studies and describe their collective metadata. How those studies are related is up to the user. They can be a collection of studies used for teaching or in a thesis. They can also be a part of one [Investigation](https://isa-specs.readthedocs.io/en/latest/isamodel.html#investigation)  (several samples from one source). In other words, the relation can be based on the domain of the studies, their usage, or any other basis, as long the user is aware that all the data submitted to **[nmrXiv](https://nmrxiv.org/)** in [one process](/submission-guides/submission/upload.md) are grouped as one project.
+The concept of project in **[nmrXiv](https://nmrxiv.org/)** is similar to the [Investigation](https://isa-specs.readthedocs.io/en/latest/isamodel.html#investigation) one in [ISA model](https://isa-tools.org/format/specification.html). Therefore, the project helps to group related samples and describe their collective metadata. How those samples are related is up to the user. They can be a collection of samples used for teaching or in a thesis. They can also be a part of one [Investigation](https://isa-specs.readthedocs.io/en/latest/isamodel.html#investigation)  (several samples from one source). In other words, the relation can be based on the domain of the samples, their usage, or any other basis, as long the user is aware that all the data submitted to **[nmrXiv](https://nmrxiv.org/)** in [one process](/submission-guides/submission-process.html) are grouped as one project.
 
 ## Project View
 
@@ -11,7 +11,7 @@ The concept of project in **[nmrXiv](https://nmrxiv.org/)** is similar to the [I
 <figcaption>Private project view</figcaption>
 </p>
 
-Starting with **private** projects, from the top, one can see the project **name** (FSU NMR Platform Samples), which must be unique within the workspace. Next to the name is a star to indicate whether the project is starred and to enable starring/de-starring, which helps to bookmark projects. Below, one can see the avatars of the users with whom the project is shared as circles with either the users' images or names' first letters. Clicking on those avatars enables sharing control (more on that in [Share](#share)). One can also click on `View details` to view and edit the project details (more on that in [Edit](#edit)), and to see the project's privacy and the user's ownership. Both those last two are not clickable, but they are editable from `View details` and `Share`. And finally, there are details about when the project was last updated.
+Starting with **private** projects, from the top, one can see the project **name** (PROJECT 1), which must be unique within the workspace. Next to the name is a star to indicate whether the project is starred and to enable starring/de-starring, which helps to bookmark projects. Below, one can see the avatars of the users with whom the project is shared as circles with either the users' images or names' first letters. Clicking on those avatars enables sharing control (more on that in [Share](#share)). One can also click on `View details` to view and edit the project details (more on that in [Edit](#edit)), and to see the project's privacy and the user's ownership. Both those last two are not clickable, but they are editable from `View details` and `Share`. And finally, there are details about when the project was last updated.
 
 <p align="center">
 <img src="/img/project/project-share.png" width="450"/>
@@ -31,10 +31,10 @@ The `Citation` field contains the article to which the submitted data is attache
 <img src="/img/project/fields.png" width="1000"/>
 </p>
 
-At the bottom are the studies included in the project supported by the `Search` bar. At the moment, only the search "by the name" is supported. To search for a study, you need to provide at least a few consecutive letters of its name. The search is case-insensitive. Pressing `GO` takes you to the search results, while `Reset` will takes you back to a view of all the studies. To the right, there is a `Manage Studies` button, which enables adding and deleting studies to and from the project. For more details, please check [Manage Studies](#manage-studies).
+At the bottom are the samples included in the project supported by the `Search` bar. At the moment, only the search "by the name" is supported. To search for a study, you need to provide at least a few consecutive letters of its name. The search is case-insensitive. Pressing `GO` takes you to the search results, while `Reset` will takes you back to a view of all the samples. To the right, there is a `Manage samples` button, which enables adding and deleting samples to and from the project. For more details, please check [Manage samples](#manage-samples).
 
 <p align="center">
-<img src="/img/project/studies.png" width="1000"/>
+<img src="/img/project/samples.png" width="1000"/>
 </p>
 
 ### Public Project View
@@ -49,11 +49,11 @@ Moving down, a blue bar contains the citation details which can be adjusted acco
 
 ## Create
 
-The only way to create projects is through the [Data Submission](/submission-guides/submission/upload.md).
+The only way to create projects is through the [Data Submission](/submission-guides/submission-process.html).
 
 ## Access
 
-You can find your created projects in the `Dashboard` (or in the [team](/submission-guides/data-model/team) dashboard), while you can find the ones shared with you by others in the `Shared with me` folder. All the public projects on **[nmrXiv](https://nmrxiv.org/)** are in the `Projects` folder, and the projects you viewed recently are in the `Recent` folder. Projects that you have starred (along with starred studies) can be found in the `Starred` folder. In the `Trash` you can find the projects you have deleted within the last 30 days. Please note that t the end of the 30 days, the project and all its resources will be deleted and they cannot be recovered. You can restore a deleted project within the 30-day recovery period.
+You can find your created projects in the `Dashboard` (or in the [team](/submission-guides/data-model/team) dashboard), while you can find the ones shared with you by others in the `Shared with me` folder. All the public projects on **[nmrXiv](https://nmrxiv.org/)** are in the `Projects` folder, and the projects you viewed recently are in the `Recent` folder. Projects that you have starred (along with starred samples) can be found in the `Starred` folder. In the `Trash` you can find the projects you have deleted within the last 30 days. Please note that t the end of the 30 days, the project and all its resources will be deleted and they cannot be recovered. You can restore a deleted project within the 30-day recovery period.
 
 <p align="center">
 <img src="/img/project/dashboard.png" width="1000"/>
@@ -66,7 +66,7 @@ In the `Dashboard`, you can see a quick view of the project, including its **nam
 
 To edit a project, you should have **editing** access to it, which is the case when you are its creator or when it is shared with you as an owner or a collaborator. The project should also still be private.
 
-Enter the chosen project by clicking anywhere on its card from the `Dashboard` or [the other folders](#access), which leads to the project view. Within the project view, you can edit the project from `View details` at the top or from any `Edit` button found next to the fields. Additionally, you can edit the files in the project by adding or deleting them with the `Manage Studies` button at the bottom.
+Enter the chosen project by clicking anywhere on its card from the `Dashboard` or [the other folders](#access), which leads to the project view. Within the project view, you can edit the project from `View details` at the top or from any `Edit` button found next to the fields. Additionally, you can edit the files in the project by adding or deleting them with the `Manage samples` button at the bottom.
 
 ### View Details
 
@@ -104,17 +104,19 @@ For the `Description`, `Keywords`, and `License` fields, the `Edit` button will 
 <figcaption>Project Manage Author window</figcaption>
 </p>
 
-### Manage Studies
+## Manage samples
 
-Files and folders stored under the project can be managed (by adding more or deleting some out of them) with the button `Manage Studies`, which leads you back to the [upload](/submission-guides/submission/upload#files-upload---step-1) window, where you can add more files by dragging and dropping to the project folder, or delete existing ones by selecting them in the **left panel** and clicking `Delete` button. Once the editing is done, you can click `Proceed` to continue normally with the submission pipeline.
+Files and folders stored under the project can be managed (by adding more or deleting some out of them) with the button `Manage samples`, which leads you back to the first step of [upload](/submission-guides/submission-process.html#step-1-files-upload) window, where you can add more files by dragging and dropping to the project folder, or delete existing ones by selecting them in the **left panel** and clicking `Delete` button. Once the editing is done, you can click `Proceed` to continue normally until the end of the submission pipeline.
 
-:::caution Folder Structure
-Please pay attention to preserving your project folder structure when adding more studies. This means that the new study should be added to the same level as the rest of the existing ones. The recommended structuring is to group all the studies in one folder and then upload this folder. Thus, when adding a new study, it should be added to the same folder and not the root. In the following image, the study should be added to the **data** folder. Please find more in [Folder Structure documentation](/submission-guides/submission/folder-structure.md)
+:::warning Folder Structure
+Please pay attention to preserving your project folder structure when adding more samples. This means that the new sample should be added to the same level as the rest of the existing ones. The recommended structuring is to group all the samples in one folder and then upload this folder. Thus, when adding a new study, it should be added to the same folder and not the root. In the following image, the study should be added to the **data** folder. Please find more in [Folder Structure documentation](/submission-guides/submission/folder-structure.md)
 :::
 
 <p align="center">
-<img src="/img/project/structure.png" width="1000"/>
+<img src="/img/project/manage-samples.gif" width="1000"/>
 </p>
+
+A small clip showcasing on how to manage samples.
 
 ## Validation
 
@@ -124,7 +126,7 @@ To publish a project, i.e., to make it public, it must comply with community sta
 <img src="/img/project/publish.png" width="1000"/>
 </p>
 
-Clicking on **Why can't I publish?** leads to a new page similar to the [step-3 of the submission pipeline](/submission-guides/submission/upload#complete---step-3). Here you can find either red <span style="color:red;">x</span> or green <span style="color:green;">✓</span> to indicate the existence or absence of the metadata respectively. Whenever the red <span style="color:red;">x</span> exists, it is accompanied by an `Edit` button to facilitate providing the missing data. Missing metadata at the level of the study can be inferred from the red highlighting of its name. More on validating studies in the [study page](/submission-guides/data-model/study#validation)
+Clicking on **Why can't I publish?** leads to a new page similar to the [step-3 of the submission pipeline](/submission-guides/submission/upload#complete---step-3). Here you can find either red <span style="color:red;">x</span> or green <span style="color:green;">✓</span> to indicate the existence or absence of the metadata respectively. Whenever the red <span style="color:red;">x</span> exists, it is accompanied by an `Edit` button to facilitate providing the missing data. Missing metadata at the level of the study can be inferred from the red highlighting of its name. More on validating samples in the [study page](/submission-guides/data-model/study#validation)
 
 <p align="center">
 <img src="/img/project/validation.png" width="1000"/>
@@ -149,9 +151,9 @@ Then the user can click on the button `Share`, which will open another window to
 
 In the opened window, the user needs to fill in the email and select the role of the user to share with, and they can optionally add a message. There are three roles for sharing:
 
-- **Owner**: read/update/delete the project/studies/datasets.
-- **Collaborator**: read/update the project/studies/datasets. A collaborator cannot delete any of the project content.
-- **Viewer**: read the project/studies/datasets. A viewer cannot update or delete any of the project content.
+- **Owner**: read/update/delete the project/samples/datasets.
+- **Collaborator**: read/update the project/samples/datasets. A collaborator cannot delete any of the project content.
+- **Viewer**: read the project/samples/datasets. A viewer cannot update or delete any of the project content.
 
 When the user is satisfied with their entries, they can click `SEND` to send an email to the other user. Then the window gets refreshed to enable entering details of other users to share with them. When all the invitations are sent, the user can click the back arrow to go back to the project sharing-status window, which will be updated to show the status of the new invitations. Sharing can be canceled as long the invitation is still pending (not accepted or rejected by the receivers).
 
@@ -178,8 +180,7 @@ After projects are published, they can be found in the **Projects** folder in th
 
 **[nmrXiv](https://nmrxiv.org/)** users can use the up arrow, which can be found at the top right corner of each project, to give it an "up", increasing the number next to the arrow by one. If the user finds a project interesting, if they have used the provided data there, or if they are aware of similar confirming work, they can press the "up" arrow, and based on the number of users who decided to move a project upward, the project will move up in the view of public projects.
 
-:::caution
-Sorting projects by the number of ups is not provided yet, but it is coming soon.
+:::warning Sorting projects by the number of ups is not provided yet, but it is coming soon.
 :::
 
 ## Delete and Archive
@@ -200,6 +201,6 @@ To avoid accidental deleting/ archiving, the user has to confirm their choice ag
 <figcaption>Project delete confirmation</figcaption>
 </p>
 
-:::caution
+:::warning
 In the case of deletion, this action is reversible for 30 days as the deleted project will be stored in the **Trash** folder, where the user can find the project and restore it from the `Project Settings`. After 30 days, deletion leads to permanently deleting the project and all of its content data. In the case of archiving, the user can unarchive the project anytime from the `Project Settings`. Archived projects are not moved to the trash.
 :::

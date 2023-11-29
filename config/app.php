@@ -183,6 +183,8 @@ return [
         App\Providers\MinioStorageServiceProvider::class,
         App\Providers\CephStorageServiceProvider::class,
         App\Providers\DOIServiceProvider::class,
+
+        Lab404\Impersonate\ImpersonateServiceProvider::class,
     ],
 
     /*
