@@ -220,4 +220,12 @@ class UsersController extends Controller
 
         return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('status', 'all-notification-markedAsRead');
     }
+
+    /**
+     * Impersonate the user
+     */
+    public function impersonate(User $user)
+    {
+        return redirect()->route('impersonate', $user->id);
+    }
 }
