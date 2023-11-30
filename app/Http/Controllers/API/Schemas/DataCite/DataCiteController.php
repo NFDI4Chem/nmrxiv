@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\API\Schemas\Datacite;
+namespace App\Http\Controllers\API\Schemas\DataCite;
 
 use App\Http\Controllers\Controller;
 use App\Models\Dataset;
@@ -9,7 +9,7 @@ use App\Models\Study;
 use App\Models\User;
 use Illuminate\Http\Request;
 
-class DataciteController extends Controller
+class DataCiteController extends Controller
 {
     /**
      * Implement DataCite metadata schema on nmrXiv project, study, and dataset to enable exporting
