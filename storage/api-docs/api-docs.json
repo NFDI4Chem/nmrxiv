@@ -1,0 +1,54 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "nmrXiv",
+        "version": "1.0"
+    },
+    "paths": {
+        "/api/v1/search": {
+            "post": {
+                "tags": [
+                    "search"
+                ],
+                "summary": "Get compound details by Compound name, SMILES, InChi & InChiKey.",
+                "description": "Get compound details by Compound name, SMILES, InChi & InChiKey.",
+                "operationId": "search",
+                "requestBody": {
+                    "description": "Pass search query and type such as InChiKey, InChi, SMILES & text",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "query",
+                                    "type"
+                                ],
+                                "properties": {
+                                    "query": {
+                                        "type": "string",
+                                        "format": "query",
+                                        "example": "AAAAWQOPBUPWEV-UHFFFAOYSA-N"
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "format": "type",
+                                        "example": "InChiKey"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Operation"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        }
+    }
+}
