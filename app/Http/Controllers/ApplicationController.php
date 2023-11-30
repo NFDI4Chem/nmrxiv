@@ -8,6 +8,7 @@ use App\Http\Resources\StudyResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
+use Illuminate\Auth\Access\AuthorizationException;
 
 class ApplicationController extends Controller
 {
