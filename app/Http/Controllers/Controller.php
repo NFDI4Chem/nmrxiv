@@ -13,7 +13,6 @@ use Illuminate\Routing\Controller as BaseController;
  *     title="nmrXiv"
  * )
  */
-
 class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;

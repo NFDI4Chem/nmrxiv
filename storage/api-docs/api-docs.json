@@ -5,6 +5,185 @@
         "version": "1.0"
     },
     "paths": {
+        "/api/v1/auth/login": {
+            "post": {
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Sign in",
+                "description": "Login by email and password",
+                "operationId": "authLogin",
+                "requestBody": {
+                    "description": "Pass user credentials",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "nisha.sharma@email.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "secret1234"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Operation"
+                    },
+                    "401": {
+                        "description": "Wrong Credentials Response"
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/logout": {
+            "get": {
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Sign out",
+                "operationId": "84358406c526dc97519e0eab688b4efe",
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/auth/register": {
+            "post": {
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Register",
+                "description": "Register by providing details.",
+                "operationId": "authRegister",
+                "requestBody": {
+                    "description": "Pass registration details.",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "first_name",
+                                    "last_name",
+                                    "email",
+                                    "password",
+                                    "username"
+                                ],
+                                "properties": {
+                                    "first_name": {
+                                        "type": "string",
+                                        "format": "first_name",
+                                        "example": "Nisha"
+                                    },
+                                    "last_name": {
+                                        "type": "string",
+                                        "format": "last_name",
+                                        "example": "Sharma"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "nisha.sharma@email.com"
+                                    },
+                                    "username": {
+                                        "type": "string",
+                                        "format": "username",
+                                        "example": "nis123"
+                                    },
+                                    "orcid_id": {
+                                        "type": "string",
+                                        "format": "orcid_id",
+                                        "example": "0009-0006-4755-1039"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "secret1234"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful Operation"
+                    },
+                    "422": {
+                        "description": "Unprocessable Content"
+                    }
+                }
+            }
+        },
+        "/api/v1/projects": {
+            "get": {
+                "tags": [
+                    "public"
+                ],
+                "summary": "Fetch all public projects",
+                "description": "Fetch details for all publicly available projects on nmrXiv.",
+                "operationId": "publicProjects",
+                "responses": {
+                    "200": {
+                        "description": "Successful Operation"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/v1/project/?id={id}": {
+            "get": {
+                "tags": [
+                    "public"
+                ],
+                "summary": "Fetch nmrXiv public project based on identifier",
+                "description": "Fetch details of nmrXiv public project based on identifier.",
+                "operationId": "publicProject",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "description": "Public project identifier e.g. P12",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Operation"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/api/v1/search": {
             "post": {
                 "tags": [
