@@ -5,6 +5,12 @@
                 <div class="px-6">
                     <div class="py-4">
                         <div>
+                            <span
+                                class="ml-12 text-sm font-bold text-teal-600 group-hover:text-teal-800"
+                                >Step 3 / 3 -
+
+                                <span> Publish data </span>
+                            </span>
                             <div
                                 class="w-full sm:flex sm:items-center sm:justify-between"
                             >
@@ -12,14 +18,14 @@
                                     class="text-sm text-gray-700 uppercase font-bold tracking-widest"
                                 >
                                     <Link
-                                        class="mx-2 inline-flex items-center px-2.5 py-1 text-md font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                        class="ml-1 mr-2 inline-flex items-center px-2.5 py-1 text-md font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                                         :href="'/upload'"
                                     >
                                         ←
                                     </Link>
                                     <span>
                                         <p class="inline">
-                                            DRAFT: <b>{{ draft.name }}</b>
+                                            <b>{{ draft.name }}</b>
                                         </p>
                                     </span>
                                 </h3>

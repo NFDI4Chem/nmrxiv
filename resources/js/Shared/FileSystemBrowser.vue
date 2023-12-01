@@ -145,6 +145,15 @@
                                 >
                                     to "{{ $page.props.selectedFolder }}" folder
                                 </span>
+                                <div class="text-sm text-gray-400">
+                                    Need help? Check out our
+                                    <a
+                                        class="text-blue-800 hover:underline"
+                                        href="https://docs.nmrxiv.org/submission-guides/submission-process.html#step-1-files-upload"
+                                        target="_blank"
+                                        >submission guides
+                                    </a>
+                                </div>
                             </span>
                             <div v-if="dropzone" class="relative mt-5">
                                 <div
