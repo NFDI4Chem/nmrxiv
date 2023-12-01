@@ -45,21 +45,18 @@ class BioschemasController extends Controller
             if ($project->is_public) {
                 $projectSchema = $this->project($project);
                 if ($studyName) {
-                    // send study back with project info added to it\
                     $study = Study::where([['slug', $studyName], ['owner_id', $user->id], ['project_id', $project->id]])->firstOrFail();
                     if ($study) {
                         if ($study->is_public) {
                             $studySchema = $this->study($study);
                             if ($datasetName) {
                                 $dataset = Dataset::where([['slug', $datasetName], ['owner_id', $user->id], ['project_id', $project->id], ['study_id', $study->id]])->firstOrFail();
-                                // send dataset with project and study details
                                 if ($dataset) {
                                     if ($dataset->is_public) {
                                         $datasetSchema = $this->dataset($dataset);
                                     } else {
                                         throw new AuthorizationException;
                                     }
-
                                     return $datasetSchema;
                                 }
                             }
@@ -157,6 +154,7 @@ class BioschemasController extends Controller
     /**
      * Get Property value from ontologies.
      *
+     * @param  string  $name
      * @param  string  $ontologyID
      * @param  string  $value
      * @param  string  $unitUrl
@@ -197,7 +195,7 @@ class BioschemasController extends Controller
     /**
      * Get the tags (keywords) of a model.
      *
-     * @param  object  $model
+     * @param  object $model
      * @return object $tags
      */
     public function getTags($model)
@@ -263,7 +261,7 @@ class BioschemasController extends Controller
      *
      * @link https://bioschemas.org/profiles/MolecularEntity/0.5-RELEASE
      *
-     * @param  App\Models\BioSample  $sample
+     * @param  App\Models\Sample  $sample
      * @return array $molecules
      */
     public function getMolecules($sample)
@@ -362,7 +360,6 @@ class BioschemasController extends Controller
      * Get NMRium info from a dataset.
      *
      * @link https://bioschemas.org/profiles/Dataset/1.0-RELEASE
-     * @link https://bioschemas.org/profiles/Study/0.3-DRAFT
      *
      * @param  App\Models\Dataset  $dataset
      * @return array $nmriumInfo
@@ -434,12 +431,10 @@ class BioschemasController extends Controller
     /**
      * Get Dataset download details info from a dataset.
      *
-     * @link https://bioschemas.org/profiles/Dataset/1.0-RELEASE
-     * @link https://schema.org/distribution
      * @link https://schema.org/DataDownload
      *
      * @param  App\Models\Dataset  $dataset
-     * return object $distribution
+     * @return object $distribution
      */
     public function getDistribution($dataset)
     {
@@ -452,6 +447,8 @@ class BioschemasController extends Controller
         $distribution->name($dataset->project->name);
         $distribution->encodingFormat('zip');
         $distribution->contentURL($contentURL);
+
+        return $distribution;
     }
 
     /**
@@ -472,13 +469,11 @@ class BioschemasController extends Controller
     }
 
     /**
-     * Implement Bioschemas' study with only few properties, including the sample and molecules,
-     * to be included in the project schema.
      *
      * @link https://bioschemas.org/profiles/Study/0.3-DRAFT
      *
      * @param  App\Models\Project  $project
-     * @return object $projectSchema
+     * @return array $schemas
      */
     public function prepareStudies($project)
     {
@@ -492,6 +487,13 @@ class BioschemasController extends Controller
         return $schemas;
     }
 
+    /**
+     *
+     * @link https://bioschemas.org/profiles/Dataset/1.0-RELEASE
+     *
+     * @param  App\Models\Study  $study
+     * @return array $schemas
+     */
     public function prepareDatasets($study)
     {
         $schemas = [];
@@ -503,6 +505,13 @@ class BioschemasController extends Controller
         return $schemas;
     }
 
+
+    /**
+     *
+     * @link https://schema.org/organization
+     *
+     * @return object $publisher
+     */
     public function preparePublisher()
     {
         $publisher = Schema::Organization();
@@ -513,14 +522,11 @@ class BioschemasController extends Controller
     }
 
     /**
-     * Implement Bioschemas' Dataset, along with the project and study it belongs to.
+     * Implement Bioschemas' Dataset
      *
      * @link https://bioschemas.org/profiles/Dataset/1.0-RELEASE
-     * @link https://bioschemas.org/profiles/Study/0.3-DRAFT
      *
      * @param  App\Models\Dataset  $dataset
-     * @param  App\Models\Study  $study
-     * @param  App\Models\Project  $project
      * @return object $datasetSchema
      */
     public function datasetLite($dataset)
@@ -548,7 +554,15 @@ class BioschemasController extends Controller
             return $datasetSchema;
         }
     }
-
+    /**
+     * Implement Bioschemas' Dataset, along with the project and study it belongs to.
+     *
+     * @link https://bioschemas.org/profiles/Dataset/1.0-RELEASE
+     * @link https://bioschemas.org/profiles/Study/0.3-DRAFT
+     *
+     * @param  App\Models\Dataset  $dataset
+     * @return object $datasetSchema
+     */
     public function dataset($dataset)
     {
         $datasetSchema = $this->datasetLite($dataset);
@@ -589,7 +603,15 @@ class BioschemasController extends Controller
 
         return $studySchema;
     }
-
+    /**
+     * Implement Bioschemas' Study, including the sample and molecules, along
+     * with the project it belongs to and, briefly, the datasets it contains.
+     *
+     * @link https://bioschemas.org/profiles/Study/0.3-DRAFT
+     *
+     * @param  App\Models\Study  $study
+     * @return object $studySchema
+     */
     public function study($study)
     {
         $studySchema = $this->studyLite($study);
@@ -600,13 +622,9 @@ class BioschemasController extends Controller
     }
 
     /**
-     * Implement Bioschemas' project along with brief details about
-     * the studies and datasets it contains.
+     * Implement Bioschemas' study 
      *
      * @link https://bioschemas.org/profiles/Study/0.3-DRAFT
-     * @link https://bioschemas.org/profiles/Dataset/1.0-RELEASE
-     * @link https://bioschemas.org/profiles/Sample/0.2-RELEASE-2018_11_10
-     * @link https://bioschemas.org/types/MolecularEntity/0.3-RELEASE-2019_09_02
      *
      * @param  App\Models\Project  $project
      * @return object $projectSchema
@@ -630,7 +648,15 @@ class BioschemasController extends Controller
 
         return $projectSchema;
     }
-
+/**
+     * Implement Bioschemas' project along with brief details about
+     * the studies and datasets it contains.
+     *
+     * @link https://bioschemas.org/profiles/Study/0.3-DRAFT
+     *
+     * @param  App\Models\Project  $project
+     * @return object $projectSchema
+     */
     public function project($project)
     {
         $projectSchema = $this->projectLite($project);
