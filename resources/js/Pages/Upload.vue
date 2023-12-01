@@ -65,30 +65,59 @@
                             <div
                                 class="w-full sm:flex sm:items-center sm:justify-between"
                             >
-                                <h3
-                                    class="text-sm text-gray-700 uppercase font-bold tracking-widest"
-                                >
-                                    <Link
-                                        class="mx-2 inline-flex items-center px-2.5 py-1 text-md font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                                        :href="'/upload'"
-                                    >
-                                        ←
-                                    </Link>
-                                    <span v-if="currentStep && currentDraft">
-                                        <p
-                                            class="inline focus:outline-none focus:ring-0 focus:bg-gray-100 p-2 rounded-md"
-                                            contenteditable
-                                            @blur="updateDraft($event)"
-                                        >
-                                            {{ currentDraft.name }}
-                                        </p>
-                                        <jet-input-error
-                                            :message="draftForm.errors.name"
-                                            class="mt-2"
-                                        />
+                                <div>
+                                    <span
+                                        v-if="currentStep"
+                                        class="ml-14 text-sm font-bold text-teal-600 group-hover:text-teal-800"
+                                        >Step
+                                        <span v-if="currentStep.id"
+                                            >{{ currentStep.id }}
+                                        </span>
+                                        / 3 -
+                                        <span v-if="currentStep.id == '1'">
+                                            <span
+                                                v-if="
+                                                    showPrimer && currentDraft
+                                                "
+                                            >
+                                                Introduction
+                                            </span>
+                                            <span v-else>File Upload</span>
+                                        </span>
+                                        <span v-else>
+                                            Auto Processing, Assignments and
+                                            Validation
+                                        </span>
                                     </span>
-                                    <span v-else> Submit data to nmrXiv </span>
-                                </h3>
+                                    <h3
+                                        class="text-sm text-gray-700 uppercase font-bold tracking-widest"
+                                    >
+                                        <Link
+                                            class="mr-2 ml-1 inline-flex items-center px-2.5 py-1 text-md font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                            :href="'/upload'"
+                                        >
+                                            ←
+                                        </Link>
+                                        <span
+                                            v-if="currentStep && currentDraft"
+                                        >
+                                            <p
+                                                class="inline focus:outline-none focus:ring-0 focus:bg-gray-100 p-2 rounded-md"
+                                                contenteditable
+                                                @blur="updateDraft($event)"
+                                            >
+                                                {{ currentDraft.name }}
+                                            </p>
+                                            <jet-input-error
+                                                :message="draftForm.errors.name"
+                                                class="mt-2"
+                                            />
+                                        </span>
+                                        <span v-else>
+                                            Submit data to nmrXiv
+                                        </span>
+                                    </h3>
+                                </div>
                                 <div class="mt-3 sm:ml-4 sm:mt-0">
                                     <div v-if="showPrimer && currentDraft">
                                         <div class="float-left">
@@ -138,7 +167,7 @@
                                             </Link>
                                         </span>
                                         <span v-else>
-                                            <span v-if="currentStep.id == '01'">
+                                            <span v-if="currentStep.id == '1'">
                                                 <Link
                                                     class="mx-2 inline-flex items-center px-2.5 py-1 border border-gray-300 shadow-sm text-md font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                                                     :href="returnUrl"
@@ -186,7 +215,7 @@
                                             </span>
                                             <span
                                                 v-else-if="
-                                                    currentStep.id == '02'
+                                                    currentStep.id == '2'
                                                 "
                                             >
                                                 <jet-secondary-button
@@ -243,7 +272,7 @@
                                             </span>
                                             <span
                                                 v-else-if="
-                                                    currentStep.id == '03'
+                                                    currentStep.id == '3'
                                                 "
                                             >
                                                 <Link
@@ -399,7 +428,7 @@
                             <div v-else>
                                 <div v-if="currentStep && currentDraft">
                                     <div
-                                        v-if="currentStep.id == '01'"
+                                        v-if="currentStep.id == '1'"
                                         id="submission-dropzone"
                                         class="border-gray-100"
                                     >
@@ -431,7 +460,7 @@
                                             class="mt-2"
                                         />
                                     </div>
-                                    <div v-if="currentStep.id == '02'">
+                                    <div v-if="currentStep.id == '2'">
                                         <div
                                             class="h-[calc(100vh-135px)] overflow-hidden"
                                         >
@@ -1561,7 +1590,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div v-if="currentStep.id == '03'">
+                                    <div v-if="currentStep.id == '3'">
                                         <div
                                             v-if="!validationStatus"
                                             class="p-4"
@@ -2355,7 +2384,7 @@ export default {
 
             steps: [
                 {
-                    id: "01",
+                    id: "1",
                     step: "tour-step-submission-header",
                     name: "Files Upload",
                     description: "Vitae sed mi luctus laoreet.",
@@ -2363,7 +2392,7 @@ export default {
                     status: "upcoming",
                 },
                 {
-                    id: "02",
+                    id: "2",
                     step: "v-step-20",
                     name: "Assignments & Metadata",
                     description: "Cursus semper viverra.",
@@ -2371,7 +2400,7 @@ export default {
                     status: "upcoming",
                 },
                 {
-                    id: "03",
+                    id: "3",
                     name: "Complete ~ Community Standards",
                     description: "Penatibus eu quis ante.",
                     href: "#",
