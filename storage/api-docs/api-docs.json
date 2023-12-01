@@ -137,6 +137,56 @@
                 }
             }
         },
+        "/api/v1/datasets": {
+            "get": {
+                "tags": [
+                    "public"
+                ],
+                "summary": "Fetch all public datasets",
+                "description": "Fetch details for all publicly available datasets on nmrXiv.",
+                "operationId": "publicDatasets",
+                "responses": {
+                    "200": {
+                        "description": "Successful Operation"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/v1/dataset/?id={id}": {
+            "get": {
+                "tags": [
+                    "public"
+                ],
+                "summary": "Fetch nmrXiv public datasets based on identifier",
+                "description": "Fetch details of nmrXiv public dataset based on identifier.",
+                "operationId": "publicDataset",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "description": "Public dataset identifier e.g. D12",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Operation"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/api/v1/projects": {
             "get": {
                 "tags": [
@@ -177,6 +227,9 @@
                 "responses": {
                     "200": {
                         "description": "Successful Operation"
+                    },
+                    "400": {
+                        "description": "Bad Request"
                     },
                     "500": {
                         "description": "Internal Server Error"
@@ -225,6 +278,56 @@
                     },
                     "404": {
                         "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/api/v1/samples": {
+            "get": {
+                "tags": [
+                    "public"
+                ],
+                "summary": "Fetch all public samples",
+                "description": "Fetch details for all publicly available samples on nmrXiv.",
+                "operationId": "publicSamples",
+                "responses": {
+                    "200": {
+                        "description": "Successful Operation"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/v1/sample/?id={id}": {
+            "get": {
+                "tags": [
+                    "public"
+                ],
+                "summary": "Fetch nmrXiv public samples based on identifier",
+                "description": "Fetch details of nmrXiv public sample based on identifier.",
+                "operationId": "publicSample",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "description": "Public sample identifier e.g. S12",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Operation"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
                     }
                 }
             }
