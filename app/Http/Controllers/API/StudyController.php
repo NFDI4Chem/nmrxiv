@@ -78,7 +78,7 @@ class StudyController extends Controller
         $id = $request->query('id');
 
         if ($id) {
-            return $study = StudyResource::collection(Study::where([['is_public', true], ['identifier', str_replace('S', '', $id)]])->get());
+            return StudyResource::collection(Study::where([['is_public', true], ['identifier', str_replace('S', '', $id)]])->get());
         } else {
             return response()->json([
                 'message' => 'Input missing.',
