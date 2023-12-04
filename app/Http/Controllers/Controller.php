@@ -12,6 +12,13 @@ use Illuminate\Routing\Controller as BaseController;
  *     version="1.0",
  *     title="nmrXiv"
  * )
+ *
+ * @OA\SecurityScheme(
+ *     type="apiKey",
+ *     in="header",
+ *     securityScheme="token",
+ *     name="Authorization"
+ * )
  */
 class Controller extends BaseController
 {
