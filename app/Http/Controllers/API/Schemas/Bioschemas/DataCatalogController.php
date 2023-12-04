@@ -6,28 +6,22 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Spatie\SchemaOrg\Schema;
 use App\Http\Controllers\API\Schemas\Bioschemas\BioschemasHelper;
-
+ 
 /**
- * Implement Bioschemas Data Catalog type on nmrXiv as a repository to enable exporting
- * its metadata with a json endpoint.
+ * Use Schema.org DataCatalog type to represent nmrXiv as a repository. 
  */
 class DataCatalogController extends Controller
 {
     /**
-     * Implement Bioschemas Data Catalog type on nmrXiv as a repository.
+     * Use Schema.org DataCatalog type to represent nmrXiv as a repository.
      *
-     * @link https://bioschemas.org/profiles/DataCatalog/0.3-RELEASE-2019_07_01
+     * @link https://schema.org/DataCatalog
      *
      * @param  Illuminate\Http\Request  $request
      * @return object $dataCatalog
      */
     public function dataCatalogSchema(Request $request)
     {
-        $creativeWork = Schema::CreativeWork();
-        $creativeWork['@id'] = 'https://schema.org/DataCatalog"';
-
-        $confromsTo = $creativeWork;
-
         $keywords = $this->prepareKeywords();
         $contributors = $this->prepareContributors();
 
@@ -37,7 +31,7 @@ class DataCatalogController extends Controller
 
         $dataCatalog = Schema::DataCatalog();
         $dataCatalog['@id'] = url(env('APP_URL'));
-        $dataCatalog['dct:conformsTo'] = $confromsTo;
+        $dataCatalog['dct:conformsTo'] = BioschemasHelper::conformsTo(['https://schema.org/DataCatalog']);
         $dataCatalog->description(env('APP_DESCRIPTION'));
         $dataCatalog->keywords($keywords);
         $dataCatalog->name(env('APP_NAME'));
@@ -91,27 +85,28 @@ class DataCatalogController extends Controller
      */
     public function prepareContributors()
     {
-        $Annett = BioschemasHelper::preparePerson('0000-0002-2542-0867', 'Annett', 'Schröter');
-        $Christian = BioschemasHelper::preparePerson(null, 'Christian', 'Popp');
-        $Christoph = BioschemasHelper::preparePerson('0000-0001-6966-0814', 'Christoph', 'Steinbeck');
-        $Darina = BioschemasHelper::preparePerson(null, 'Darina', 'Storozhuk');
-        $David = BioschemasHelper::preparePerson('0000-0001-7499-1693', 'David', 'Rauh');
-        $Guido = BioschemasHelper::preparePerson('0000-0003-1022-4326', 'Guido', 'Pauli');
-        $Hamed = BioschemasHelper::preparePerson(null, 'Hamed', 'Musallam');
-        $Johannes = BioschemasHelper::preparePerson('0000-0003-2060-842X', 'Johannes', 'Liermann');
-        $Julien = BioschemasHelper::preparePerson('0000-0002-3416-2572', 'Julien', 'Wist');
-        $Kohulan = BioschemasHelper::preparePerson('0000-0003-1066-7792', 'Kohulan', 'Rajan');
-        $Luc = BioschemasHelper::preparePerson('0000-0002-4943-2643', 'Luc', 'Patiny');
-        $Markus = BioschemasHelper::preparePerson(null, 'Markus', 'Lange');
-        $Nazar = BioschemasHelper::preparePerson('0000-0002-5870-8496', 'Nazar', 'Stefaniuk');
-        $Nils = BioschemasHelper::preparePerson('0000-0002-0990-9582', 'Nils', 'Schlörer');
-        $Nisha = BioschemasHelper::preparePerson('0009-0006-4755-1039', 'Nisha', 'Sharma');
-        $Noura = BioschemasHelper::preparePerson('0009-0001-5998-5030', 'Noura', 'Rayya');
-        $Pascal = BioschemasHelper::preparePerson(null, 'Pascal', 'Scherreiks');
-        $Stefan = BioschemasHelper::preparePerson('0000-0002-5990-4157', 'Stefan', 'Kuhn');
-        $Steffen = BioschemasHelper::preparePerson('0000-0002-7899-7192', 'Steffen', 'Neumann');
-        $Tillmann = BioschemasHelper::preparePerson('0000-0003-4480-8661', 'Tillmann', 'Fischer');
-        $Venkata = BioschemasHelper::preparePerson('0000-0002-2564-3243', 'Venkata Chandrasekhar', 'Nainala');
+
+        $Annett = BioschemasHelper::preparePerson('0000-0002-2542-0867', 'Annett', 'Schröter', 'annett.schroeter@uni-jena.de', 'Friedrich-Schiller-Universität Jena');
+        $Christian = BioschemasHelper::preparePerson(null, 'Christian', 'Popp', null, null);
+        $Christoph = BioschemasHelper::preparePerson('0000-0001-6966-0814', 'Christoph', 'Steinbeck', 'christoph.steinbeck@uni-jena.de', 'Friedrich-Schiller-Universität Jena');
+        $Darina = BioschemasHelper::preparePerson(null, 'Darina', 'Storozhuk', 'darina.storozhuk@uni-jena.de', 'Friedrich-Schiller-Universität Jena');
+        $David = BioschemasHelper::preparePerson('0000-0001-7499-1693', 'David', 'Rauh', null, null);
+        $Guido = BioschemasHelper::preparePerson('0000-0003-1022-4326', 'Guido', 'Pauli', null, 'University of Illinois');
+        $Hamed = BioschemasHelper::preparePerson(null, 'Hamed', 'Musallam', 'hamed.musallam@uni-jena.de', 'Friedrich-Schiller-Universität Jena');
+        $Johannes = BioschemasHelper::preparePerson('0000-0003-2060-842X', 'Johannes', 'Liermann', null, null);
+        $Julien = BioschemasHelper::preparePerson('0000-0002-3416-2572', 'Julien', 'Wist', null, null);
+        $Kohulan = BioschemasHelper::preparePerson('0000-0003-1066-7792', 'Kohulan', 'Rajan', null, null);
+        $Luc = BioschemasHelper::preparePerson('0000-0002-4943-2643', 'Luc', 'Patiny', null, null);
+        $Markus = BioschemasHelper::preparePerson(null, 'Markus', 'Lange', null, null);
+        $Nazar = BioschemasHelper::preparePerson('0000-0002-5870-8496', 'Nazar', 'Stefaniuk', null, null);
+        $Nils = BioschemasHelper::preparePerson('0000-0002-0990-9582', 'Nils', 'Schlörer', null, null);
+        $Nisha = BioschemasHelper::preparePerson('0009-0006-4755-1039', 'Nisha', 'Sharma', null, null);
+        $Noura = BioschemasHelper::preparePerson('0009-0001-5998-5030', 'Noura', 'Rayya', null, null);
+        $Pascal = BioschemasHelper::preparePerson(null, 'Pascal', 'Scherreiks', null, null);
+        $Stefan = BioschemasHelper::preparePerson('0000-0002-5990-4157', 'Stefan', 'Kuhn', null, null);
+        $Steffen = BioschemasHelper::preparePerson('0000-0002-7899-7192', 'Steffen', 'Neumann', null, null);
+        $Tillmann = BioschemasHelper::preparePerson('0000-0003-4480-8661', 'Tillmann', 'Fischer', null, null);
+        $Venkata = BioschemasHelper::preparePerson('0000-0002-2564-3243', 'Venkata Chandrasekhar', 'Nainala', null, null);
 
         $contributors = [$Annett, $Christian, $Christoph, $Darina, $Guido, $Hamed, $Johannes, $Julien, $Kohulan, $Luc, $Markus, $Nazar, $Nils, $Nisha, $Noura, $Pascal, $Stefan, $Steffen, $Tillmann, $Venkata];
 
