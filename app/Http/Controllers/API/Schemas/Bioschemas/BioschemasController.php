@@ -57,6 +57,7 @@ class BioschemasController extends Controller
                                     } else {
                                         throw new AuthorizationException;
                                     }
+
                                     return $datasetSchema;
                                 }
                             }
@@ -195,7 +196,7 @@ class BioschemasController extends Controller
     /**
      * Get the tags (keywords) of a model.
      *
-     * @param  object $model
+     * @param  object  $model
      * @return object $tags
      */
     public function getTags($model)
@@ -341,7 +342,7 @@ class BioschemasController extends Controller
     //         $solvent = $this->getNMRiumInfo($dataset)[0][0];
     //         array_push($solvents, $solvent);
     //     }
-    //     $solvents = array_unique($solvents); 
+    //     $solvents = array_unique($solvents);
 
     //     $solventSchemas = [];
     //     foreach ($solvents as $solvent) {
@@ -354,7 +355,6 @@ class BioschemasController extends Controller
 
     //     return $solventSchemas;
     // }
-
 
     /**
      * Get NMRium info from a dataset.
@@ -469,7 +469,6 @@ class BioschemasController extends Controller
     }
 
     /**
-     *
      * @link https://bioschemas.org/profiles/Study/0.3-DRAFT
      *
      * @param  App\Models\Project  $project
@@ -488,7 +487,6 @@ class BioschemasController extends Controller
     }
 
     /**
-     *
      * @link https://bioschemas.org/profiles/Dataset/1.0-RELEASE
      *
      * @param  App\Models\Study  $study
@@ -505,9 +503,7 @@ class BioschemasController extends Controller
         return $schemas;
     }
 
-
     /**
-     *
      * @link https://schema.org/organization
      *
      * @return object $publisher
@@ -554,6 +550,7 @@ class BioschemasController extends Controller
             return $datasetSchema;
         }
     }
+
     /**
      * Implement Bioschemas' Dataset, along with the project and study it belongs to.
      *
@@ -603,6 +600,7 @@ class BioschemasController extends Controller
 
         return $studySchema;
     }
+
     /**
      * Implement Bioschemas' Study, including the sample and molecules, along
      * with the project it belongs to and, briefly, the datasets it contains.
@@ -622,7 +620,7 @@ class BioschemasController extends Controller
     }
 
     /**
-     * Implement Bioschemas' study 
+     * Implement Bioschemas' study
      *
      * @link https://bioschemas.org/profiles/Study/0.3-DRAFT
      *
@@ -648,7 +646,8 @@ class BioschemasController extends Controller
 
         return $projectSchema;
     }
-/**
+
+    /**
      * Implement Bioschemas' project along with brief details about
      * the studies and datasets it contains.
      *
@@ -665,5 +664,3 @@ class BioschemasController extends Controller
         return $projectSchema;
     }
 }
-
-
