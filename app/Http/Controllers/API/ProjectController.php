@@ -78,7 +78,7 @@ class ProjectController extends Controller
         $id = $request->query('id');
 
         if ($id) {
-            return  ProjectResource::collection(Project::where([['is_public', true], ['identifier', str_replace('P', '', $id)]])->get());
+            return ProjectResource::collection(Project::where([['is_public', true], ['identifier', str_replace('P', '', $id)]])->get());
         } else {
             return response()->json([
                 'message' => 'Input missing.',

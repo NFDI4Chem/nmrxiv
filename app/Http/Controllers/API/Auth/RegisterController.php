@@ -4,25 +4,24 @@ namespace App\Http\Controllers\API\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
 class RegisterController extends Controller
 {
     /**
-     * @OA\Post(
-     * path="/api/v1/auth/register",
-     * summary="Register",
-     * description="Register by providing details.",
-     * operationId="authRegister",
-     * tags={"auth"},
+     * Register
      *
-     * @OA\RequestBody(
-     *    required=true,
-     *    description="Pass registration details.",
+     * @OA\Post (
+     *     path="/api/v1/auth/register",
+     *     tags={"auth"},
      *
-     *    @OA\JsonContent(
+     *     @OA\RequestBody(
+     *
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *
+     *             @OA\Schema(
      *       required={"first_name","last_name","email","password","username"},
      *
      *       @OA\Property(property="first_name", type="string", format="first_name", example="Nisha"),
@@ -31,21 +30,31 @@ class RegisterController extends Controller
      *       @OA\Property(property="username", type="string", format="username", example="nis123"),
      *       @OA\Property(property="orcid_id", type="string", format="orcid_id", example="0009-0006-4755-1039"),
      *       @OA\Property(property="password", type="string", format="password", example="secret1234"),
+
+     *             )
+     *         )
+     *      ),
      *
-     *    ),
-     * ),
+     *      @OA\Response(
+     *          response=201,
+     *          description="Success",
      *
-     * @OA\Response(
-     *    response=201,
-     *    description="Successful Operation"
-     *    ),
+     *          @OA\JsonContent(
+     *
+     *                      @OA\Property(property="success", type="boolean", example=true),
+     *                      @OA\Property(property="message", type="string", example="User creation successful. Kindly confirm your email address by clicking the link sent to your inbox"),
+     *                      @OA\Property(property="access_token", type="string", example="randomtokenasfhajskfhajf398rureuuhfdshk"),
+     *                      @OA\Property(property="token_type", type="string", example="bearer"),
+     *                  )
+     *      ),
+     *
      * @OA\Response(
      *    response=422,
      *    description="Unprocessable Content"
      * )
      * )
      */
-    public function register(Request $request): JsonResponse
+    public function register(Request $request)
     {
         $validatedData = $request->validate([
             'first_name' => 'required|string|max:255',
