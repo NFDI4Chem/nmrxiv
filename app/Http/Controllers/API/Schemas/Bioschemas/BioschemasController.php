@@ -14,21 +14,18 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Spatie\SchemaOrg\Schema;
-use App\Http\Controllers\API\Schemas\Bioschemas\BioschemasHelper;
-
 
 /**
- * Implement Bioschemas profiles types on nmrXiv project, study, and dataset
- * to enable exporting their metadata with a json endpoint, including the
- * samples and molecules.
+ * Implement Bioschemas types on nmrXiv project, study, and dataset, including the
+ * samples and molecules details.
  */
 class BioschemasController extends Controller
 {
     /**
      * Implement Bioschemas upon request by model's name to generate a project, study, or dataset schema.
      *
-     * @link https://bioschemas.org/profiles/Study/0.3-DRAFT
-     * @link https://bioschemas.org/profiles/Dataset/1.0-RELEASE
+     * @link https://bioschemas.org/types/Study/0.3-DRAFT
+     * @link https://schema.org/Dataset
      *
      * @param  Illuminate\Http\Request  $request
      * @param  App\Models\User  $username
@@ -79,10 +76,10 @@ class BioschemasController extends Controller
     }
 
     /**
-     * Implement Bioschemas upon request by model id to generate a project, study, or dataset schema.
+     * Implement Bioschemas upon request by model's id to generate a project, study, or dataset schema.
      *
-     * @link https://bioschemas.org/profiles/Study/0.3-DRAFT
-     * @link https://bioschemas.org/profiles/Dataset/1.0-RELEASE
+     * @link https://bioschemas.org/types/Study/0.3-DRAFT
+     * @link https://schema.org/Dataset
      *
      * @param  Illuminate\Http\Request  $request
      * @param  string  $identifier
@@ -99,32 +96,35 @@ class BioschemasController extends Controller
                 $projectSchema = $this->project($model);
 
                 return $projectSchema;
+
             } elseif ($namespace == 'Study') {
                 $studySchema = $this->study($model);
 
                 return $studySchema;
-            } elseif ($namespace == 'Dataset') {
 
+            } elseif ($namespace == 'Dataset') {
                 $datasetSchema = $this->dataset($model);
 
                 return $datasetSchema;
             }
+
         } else {
             throw new AuthorizationException;
         }
     }
 
     /**
-     * Implement Bioschemas' MolecularEntity on molecules found in a sample.
+     * Use Bioschemas MolecularEntity type to represent molecules found in a sample.
      *
-     * @link https://bioschemas.org/profiles/MolecularEntity/0.5-RELEASE
+     * @link https://bioschemas.org/types/MolecularEntity/0.3-RELEASE-2019_09_02
      *
      * @param  App\Models\Sample  $sample
-     * @return array $molecules
+     * @return array $moleculesSchemas
      */
-    public function getMolecules($sample)
+    public function prepareMoleculesSchemas($sample)
     {
-        $molecules = [];
+        $moleculesSchemas = [];
+
         foreach ($sample->molecules as &$molecule) {
             $inchiKey = $molecule->inchi_key;
             $pubchemLink = 'https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/inchikey/'.$inchiKey.'/property/IUPACName/JSON';
@@ -134,7 +134,7 @@ class BioschemasController extends Controller
 
             $moleculeSchema = Schema::MolecularEntity();
             $moleculeSchema['@id'] = $inchiKey;
-            $moleculeSchema['dct:conformsTo'] = BioschemasHelper::conformsTo(['https://bioschemas.org/profiles/MolecularEntity/0.5-RELEASE']);
+            $moleculeSchema['dct:conformsTo'] = BioschemasHelper::conformsTo(['https://bioschemas.org/types/MolecularEntity/0.3-RELEASE-2019_09_02']);
             $moleculeSchema['identifier'] = $inchiKey;
             $moleculeSchema->name($molecule->cas);
             $moleculeSchema->url('https://pubchem.ncbi.nlm.nih.gov/compound/'.$cid);
@@ -146,17 +146,17 @@ class BioschemasController extends Controller
             $moleculeSchema->smiles([$molecule->SMILES, $molecule->absolute_smiles, $molecule->canonical_smiles]);
             $moleculeSchema->hasRepresentation($molecule->MOL);
             $moleculeSchema->description('Percentage composition: '.$molecule->pivot->percentage_composition.'%');
-            array_push($molecules, $moleculeSchema);
+            array_push($moleculesSchemas, $moleculeSchema);
         }
 
-        return $molecules;
+        return $moleculesSchemas;
     }
 
     /**
-     * Implement Bioschemas' ChemicalSubstance on samples found in studies.
+     * Use Bioschemas ChemicalSubstance type to represent samples found in studies.
      *
-     * @link https://bioschemas.org/profiles/ChemicalSubstance/0.4-RELEASE
-     * @link https://bioschemas.org/profiles/Study/0.3-DRAFT
+     * @link https://bioschemas.org/types/ChemicalSubstance/0.3-RELEASE-2019_09_02
+     * @link https://bioschemas.org/types/Study/0.3-DRAFT
      *
      * @param  App\Models\Study  $study
      * @return object $sampleSchema
@@ -164,26 +164,24 @@ class BioschemasController extends Controller
     public function getSample($study)
     {
         $sample = $study->sample;
-        $molecules = $this->getMolecules($sample);
+        $molecules = $this->prepareMoleculesSchemas($sample);
 
-        $sampleSchema = Bioschemas::ChemicalSubstance();
+        $sampleSchema = Schema::ChemicalSubstance();
         $sampleSchema['@id'] = $study->doi;
-        $sampleSchema['dct:conformsTo'] = BioschemasHelper::conformsTo(['https://bioschemas.org/profiles/ChemicalSubstance/0.4-RELEASE']);
+        $sampleSchema['dct:conformsTo'] = BioschemasHelper::conformsTo(['https://bioschemas.org/types/ChemicalSubstance/0.3-RELEASE-2019_09_02']);
         $sampleSchema->name($study->project->name.'.'.$sample->name);
         $sampleSchema->description($sample->description);
         $sampleSchema->url(env('APP_URL').'/'.explode(':', $study->identifier ? $study->identifier : ':')[1]);
-        $sampleSchema->hasBioChemEntityPart($this->getMolecules($sample));
+        $sampleSchema->hasBioChemEntityPart($this->prepareMoleculesSchemas($sample));
 
         return $sampleSchema;
     }
 
     /**
-     * Get NMRium info from a dataset.
-     *
-     * @link https://bioschemas.org/profiles/Dataset/1.0-RELEASE
+     * Represent NMRium info as PropertyValue schemas.
      *
      * @param  App\Models\Dataset  $dataset
-     * @return array $nmriumInfo
+     * @return array $array
      */
     public function prepareNMRiumInfo($dataset)
     {
@@ -221,59 +219,61 @@ class BioschemasController extends Controller
             $relaxationTimeProperty = BioschemasHelper::preparePropertyValue('relaxation time measurement', 'FIX:0000202', $relaxationTime, 'http://purl.obolibrary.org/obo/UO_0000010');
 
             $keywords = [$solvent, $dimension.'D', $experiment];
-            foreach ($nucleus as $e) {
-                array_push($keywords, $e);
+            foreach ($nucleus as $keyword) {
+                array_push($keywords, $keyword);
             }
             $variables = [$solventProperty, $nucleusProperty,  $dimensionProperty, $probeNameProperty,
                 $experimentProperty, $temperatureProperty, $baseFrequencyProperty, $fieldStrengthProperty, $numberOfScansProperty, $pulseSequenceProperty, $spectralWidthProperty, $numberOfPointsProperty, $relaxationTimeProperty, ];
 
-            return [$keywords, $variables, $experiment];
+            $array = [$keywords, $variables, $experiment];
+
+            return $array;
         }
     }
 
     /**
-
+     *  Use Bioschemas Study type to represent studies found in a project with their datasets.
      *
-     * @link https://bioschemas.org/profiles/Study/0.3-DRAFT
+     * @link https://bioschemas.org/types/Study/0.3-DRAFT
      *
      * @param  App\Models\Project  $project
-     * @return array $schemas
+     * @return array $studiesSchemas
      */
     public function prepareStudies($project)
     {
-        $schemas = [];
+        $studiesSchemas = [];
         foreach ($project->studies as $study) {
             $studySchema = $this->studyLite($study);
             $studySchema->hasPart($this->prepareDatasets($study));
-            array_push($schemas, $studySchema);
+            array_push($studiesSchemas, $studySchema);
         }
 
-        return $schemas;
+        return $studiesSchemas;
     }
 
     /**
-     * @link https://bioschemas.org/profiles/Dataset/1.0-RELEASE
+     * Use Schema.org Dataset type to represent datasets found in a study.
+     *
+     * @link https://schema.org/Dataset
      *
      * @param  App\Models\Study  $study
-     * @return array $schemas
+     * @return array $datasetsSchemas
      */
     public function prepareDatasets($study)
     {
-        $schemas = [];
+        $datasetsSchemas = [];
         foreach ($study->datasets as $dataset) {
             $datasetSchema = $this->datasetLite($dataset);
-            array_push($schemas, $datasetSchema);
+            array_push($datasetsSchemas, $datasetSchema);
         }
 
-        return $schemas;
+        return $datasetsSchemas;
     }
 
-    
-
     /**
-     * Implement Bioschemas' Dataset.
+     * Use Schema.org Dataset type to represent an nmrXiv dataset without its relations.
      *
-     * @link https://bioschemas.org/profiles/Dataset/1.0-RELEASE
+     * @link https://schema.org/Dataset
      *
      * @param  App\Models\Dataset  $dataset
      * @return object $datasetSchema
@@ -285,7 +285,7 @@ class BioschemasController extends Controller
             $prefix = $dataset->study->project->name.':'.$dataset->study->name.'.';
             $datasetSchema = Schema::Dataset();
             $datasetSchema['@id'] = $dataset->doi;
-            $datasetSchema['dct:conformsTo'] = BioschemasHelper::conformsTo(['https://bioschemas.org/profiles/Dataset/1.0-RELEASE', 'https://isa-specs.readthedocs.io/en/latest/isamodel.html#assay']);
+            $datasetSchema['dct:conformsTo'] = BioschemasHelper::conformsTo(['https://schema.org/Dataset', 'https://isa-specs.readthedocs.io/en/latest/isamodel.html#assay']);
             $datasetSchema->name($prefix.$nmriumInfo[2]);
             $datasetSchema->description($dataset->description);
             $datasetSchema->keywords($nmriumInfo[0]);
@@ -303,20 +303,22 @@ class BioschemasController extends Controller
             return $datasetSchema;
         }
     }
+
     /**
-     * Implement Bioschemas' Dataset, along with the project and study it belongs to.
+     * Use Schema.org Dataset type to represent an nmrXiv dataset with its relations.
      *
-     * @link https://bioschemas.org/profiles/Dataset/1.0-RELEASE
-     * @link https://bioschemas.org/profiles/Study/0.3-DRAFT
+     * @link https://schema.org/Dataset
+     * @link https://bioschemas.org/types/Study/0.3-DRAFT
      *
      * @param  App\Models\Dataset  $dataset
      * @return object $datasetSchema
      */
     public function dataset($dataset)
     {
-        $datasetSchema = $this->datasetLite($dataset);
         $projectSchema = $this->projectLite($dataset->project);
         $studySchema = $this->studyLite($dataset->study);
+        $datasetSchema = $this->datasetLite($dataset);
+
         $studySchema->isPartOf($projectSchema);
         $datasetSchema->isPartOf($studySchema);
 
@@ -324,9 +326,9 @@ class BioschemasController extends Controller
     }
 
     /**
-     * Implement Bioschemas' Study.
+     * Use Bioschemas Study type to represent an nmrXiv study without its relations.
      *
-     * @link https://bioschemas.org/profiles/Study/0.3-DRAFT
+     * @link https://bioschemas.org/types/Study/0.3-DRAFT
      *
      * @param  App\Models\Study  $study
      * @return object $studySchema
@@ -336,7 +338,7 @@ class BioschemasController extends Controller
         $prefix = $study->project->name.':';
         $studySchema = Bioschemas::Study();
         $studySchema['@id'] = $study->doi;
-        $studySchema['dct:conformsTo'] = BioschemasHelper::conformsTo(['https://bioschemas.org/profiles/Study/0.3-DRAFT', 'https://isa-specs.readthedocs.io/en/latest/isamodel.html#study']);
+        $studySchema['dct:conformsTo'] = BioschemasHelper::conformsTo(['https://bioschemas.org/types/Study/0.3-DRAFT', 'https://isa-specs.readthedocs.io/en/latest/isamodel.html#study']);
         $studySchema->name($prefix.$study->name);
         $studySchema->description($study->description);
         $studySchema->keywords(BioschemasHelper::getTags($study));
@@ -351,12 +353,11 @@ class BioschemasController extends Controller
 
         return $studySchema;
     }
-    
+
     /**
-     * Implement Bioschemas' Study, including the sample and molecules, along
-     * with the project it belongs to and, briefly, the datasets it contains.
+     * Use Bioschemas Study type to represent an nmrXiv study with its relations.
      *
-     * @link https://bioschemas.org/profiles/Study/0.3-DRAFT
+     * @link https://bioschemas.org/types/Study/0.3-DRAFT
      *
      * @param  App\Models\Study  $study
      * @return object $studySchema
@@ -371,9 +372,9 @@ class BioschemasController extends Controller
     }
 
     /**
-     * Implement Bioschemas' project.
+     * Use Bioschemas Study type to represent an nmrXiv project without its relations.
      *
-     * @link https://bioschemas.org/profiles/Study/0.3-DRAFT
+     * @link https://bioschemas.org/types/Study/0.3-DRAFT
      *
      * @param  App\Models\Project  $project
      * @return object $projectSchema
@@ -382,7 +383,7 @@ class BioschemasController extends Controller
     {
         $projectSchema = Bioschemas::Study();
         $projectSchema['@id'] = $project->doi;
-        $projectSchema['dct:conformsTo'] = BioschemasHelper::conformsTo(['https://bioschemas.org/profiles/Study/0.3-DRAFT', 'https://isa-specs.readthedocs.io/en/latest/isamodel.html#investigation']);
+        $projectSchema['dct:conformsTo'] = BioschemasHelper::conformsTo(['https://bioschemas.org/types/Study/0.3-DRAFT', 'https://isa-specs.readthedocs.io/en/latest/isamodel.html#investigation']);
         $projectSchema->name($project->name);
         $projectSchema->description($project->description);
         $projectSchema->keywords(BioschemasHelper::getTags($project));
@@ -399,10 +400,9 @@ class BioschemasController extends Controller
     }
 
     /**
-     * Implement Bioschemas' project along with brief details about
-     * the studies and datasets it contains.
+     * Use Bioschemas Study type to represent an nmrXiv project with its relations.
      *
-     * @link https://bioschemas.org/profiles/Study/0.3-DRAFT
+     * @link https://bioschemas.org/types/Study/0.3-DRAFT
      *
      * @param  App\Models\Project  $project
      * @return object $projectSchema

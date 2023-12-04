@@ -4,15 +4,13 @@ namespace App\Http\Controllers\API\Schemas\Bioschemas;
 
 use Spatie\SchemaOrg\Schema;
 
-
-
 class BioschemasHelper
 {
     /**
      * Use Schema.org PropertyValue type to represent terms from controlled vocabularies.
      *
      * @link https://schema.org/PropertyValue
-     * 
+     *
      * @param  string  $name
      * @param  string  $id
      * @param  string  $value
@@ -30,12 +28,11 @@ class BioschemasHelper
         return $propertyValueSchema;
     }
 
-
     /**
      * Use Schema.org DefinedTerm type to represent terms from controlled vocabularies.
      *
      * @link https://schema.org/DefinedTerm
-     * 
+     *
      * @param  string  $name
      * @param  array  $alternameName
      * @param  string  $identifier
@@ -53,7 +50,7 @@ class BioschemasHelper
         $definedTermSchema->inDefinedTermSet($inDefinedTermSet);
 
         return $definedTermSchema;
-    }   
+    }
 
     /**
      * Use Schema.org DefinedTermSet type to represent controlled vocabularies.
@@ -77,13 +74,12 @@ class BioschemasHelper
      * Use Schema.org Person type to represent a person.
      *
      * @link https://schema.org/Person
-     * 
+     *
      * @param  string  $id
      * @param  string  $givenName
      * @param  string  $familyName
      * @param  string  $email
      * @param  string  $affiliation
-     * 
      * @return object $personSchema
      */
     public static function preparePerson($id, $givenName, $familyName, $email, $affiliation)
@@ -97,8 +93,8 @@ class BioschemasHelper
 
         return $personSchema;
     }
-    
-    /** 
+
+    /**
      * Use Schema.org Person type to represent the authors of a model.
      *
      * @link https://schema.org/Person.
@@ -107,16 +103,16 @@ class BioschemasHelper
      * @return array $authorsSchemas
      */
     public static function prepareAuthors($model)
-        {
+    {
         $helper = new self();
         $authorsSchemas = [];
         foreach ($model->authors as &$author) {
             $authorSchema = $helper->preparePerson($author->orcid_id, $author->given_name, $author->family_name, $author->email_id, $author->affiliation);
             array_push($authorsSchemas, $authorSchema);
         }
+
         return $authorsSchemas;
     }
-
 
     /**
      * Use Schema.org CreativeWork type to represent a model's citations.
@@ -137,6 +133,7 @@ class BioschemasHelper
             $citationSchema->identifier($citation->doi);
             array_push($citationsSchemas, $citationSchema);
         }
+
         return $citationsSchemas;
     }
 
@@ -165,7 +162,7 @@ class BioschemasHelper
 
     /**
      * Use Schema.org Organization type to represent nmrXiv as a publisher.
-     * 
+     *
      * @link https://schema.org/Organization
      *
      * @return object $publisherSchema
@@ -178,7 +175,6 @@ class BioschemasHelper
 
         return $publisherSchema;
     }
-
 
     /**
      * Use Schema.org DataCatalog type with only few properties to represent nmrXiv as the repository to be
@@ -199,7 +195,7 @@ class BioschemasHelper
 
     /**
      * Get NMRium info from a dataset.
-     * 
+     *
      * @param  App\Models\Dataset  $dataset
      * @return object $info
      */
@@ -224,11 +220,9 @@ class BioschemasHelper
             $spectra = $NMRiumInfo->data->spectra[0];
             $info = $spectra->info;
         }
+
         return $info;
     }
-
-
-    
 
     /**
      * Use Schema.org CreativeWork type to represent Schema.org and ISA types that an object conforms to.
@@ -246,6 +240,7 @@ class BioschemasHelper
             $creativeWorkSchema['@id'] = $url;
             array_push($confromsToList, $creativeWorkSchema);
         }
+
         return $confromsToList;
     }
 
@@ -266,4 +261,3 @@ class BioschemasHelper
         return $tags;
     }
 }
-
