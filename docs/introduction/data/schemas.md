@@ -1,50 +1,55 @@
 # Data Schemas
 
-Data schemas enable structuring the data in a well-designed form by providing precise definitions of entities with relations among them. Additionally, they enable data indexing and feasible metadata export making those schema a valuable asset to improve data findability on the web, and to enhance machine-readability and data analysis, especially when considering that many of the available schemas support ontologies usage by accepting/requesting values to be provided as ontology terms and providing links and identifiers to the terms.
+Data schemas play a crucial role in organizing information effectively by offering precise definitions of entities and their relationships. These structured forms not only facilitate data indexing but also enable seamless metadata export. As valuable assets, these schemas significantly contribute to enhancing data findability on the web. Moreover, they play a pivotal role in improving machine-readability and facilitating data analysis. A noteworthy aspect is that many of these schemas support the utilization of ontologies. They achieve this by either accepting or requesting values to be provided as ontology terms and by providing links and identifiers to these terms, further enhancing the depth and richness of the structured data.
 
 ## nmrXiv Data Model 
-nmrXiv uses the ISA [(Investigation, Study, Assay)](https://isa-tools.org/format/specification.html) approach to capture the experimental metadata in a structured format, though it has opted for a different terminology than the one used by ISA:
-- Investigation ⇛ Project
-- Study ⇛ Study 
-- Assay ⇛ Experiment 
+nmrXiv initially adopted the ISA [(Investigation, Study, Assay)](https://isa-tools.org/format/specification.html) approach for structuring experimental metadata, as outlined by the ISA specifications. However, nmrXiv has chosen a distinct terminology to align with its specific requirements:
 
-For more details about the objects and relations among them, please check the [Data Model folder](/submission-guides/data-model/project.html)
+- ISA Investigation ⇛ nmrXiv Project
+- ISA Study ⇛ nmrXiv Study 
+- ISA Assay ⇛ nmrXiv Dataset 
+
+For a comprehensive understanding of the objects and their relationships, you can refer to the [Data Model folder](/submission-guides/data-model/project.html).
+
+As each study corresponds to one sample and each dataset corresponds to one spectrum, nmrXiv frontend tends to display these later, more chemistry-friendly terms to enhance user experience. 
+
+In a recent development, nmrXiv has extended its data model to accommodate the submission of individual samples independently, eliminating the requirement to include them in projects. This enhancement aims to streamline the submission process, reducing complexity and offering users greater flexibility when submitting single samples to the platform.
 
 ## Data Schemas in nmrXiv
-nmrXiv focus on obtaining DOIs for the different entities and describing the data with ontology terms led to prioritizing a list of schemas. Some have been already implemented, and others will be coming soon. Here you can find a list of those schemas:
+nmrXiv's emphasis on obtaining Digital Object Identifiers (DOIs) for various entities, coupled with a commitment to describe the data using ontology terms, has prompted the prioritization of a list of schemas. While some schemas have already been implemented, others are in the pipeline and will be introduced soon. Below is a list of these schemas:
 
-### Bioschemas (Repository, Project, Studay, Dataset, Sample)
+### Bioschemas (Repository, Project, Studay, Dataset, Sample, Molecule)
 
 [Bioschemas](https://bioschemas.org/) aims to improve the Findability of life sciences resources (such as datasets) on the Web by using [Schema.org](https://schema.org/) markup in the websites, so that they are indexable by search engines and other services. Bioschemas is making two main contributions:
 - Proposing new [types and properties](https://bioschemas.org/types) to [Schema.org](https://schema.org/) to allow for the description of life science resources.
 - Defining usage [profiles](https://bioschemas.org/profiles) over the [Schema.org](https://schema.org/) types that identify the essential properties to use in describing a resource.[1]
 
-nmrXiv uses Bioschemas profiles to describe both data structuring components (such as datasets) and experiment-related components (such as samples and molecules). Missing profiles will be contributed to Bioschemas and discussion about NMR-specific schemas is going on. Here is a list of the used profiles/types:
+nmrXiv uses Bioschemas types to describe both data structuring components (such as datasets) and experiment-related components (such as samples and molecules). Here is a list of the used types:
 
-#### [DataCatalog](https://bioschemas.org/profiles/DataCatalog/0.3-RELEASE-2019_07_01)
-DataCatalog profile can be used as a guide to describe repositories, and thus, it is used to describe nmrXiv repository.[DataCatalog API endpoint link](https://www.postman.com/nmrxiv-jena/workspace/nmrxiv/request/17195598-31c24120-14f0-41c4-b511-292fd310db79)
+#### [DataCatalog](https://schema.org/DataCatalog)
+The DataCatalog type can be used to describe repositories, and thus, it is used to describe nmrXiv repository.[DataCatalog API endpoint link](https://www.postman.com/nmrxiv-jena/workspace/nmrxiv/request/17195598-31c24120-14f0-41c4-b511-292fd310db79)
 
-#### [Project](https://github.com/NFDI4Chem/nmrxiv/blob/main/app/Models/Bioschema/Project.php) 
-[Project type](https://schema.org/Project) already exists in [Schema.org](https://schema.org/), but it refers to enterprises rather than a scientific investigation. However, as the project metadata is somehow similar to the study metadata (id, name, URL, etc.), nmrXiv initially defines a new project type similarly to the [study](https://bioschemas.org/types/Study/0.3-DRAFT) provided by [Bioschemas](https://bioschemas.org/). Further enhancements will be applied upon discussion with field experts, and possible submission to [Bioschemas](https://bioschemas.org/) will take place. Project properties allow linking with the included studies and their inner data. [Project API endpoint link](https://www.postman.com/nmrxiv-jena/workspace/nmrxiv/request/17195598-d7481762-e431-4975-b786-9cfd7f007d56).
 
-#### [Study](https://bioschemas.org/profiles/Study/0.2-DRAFT)
-Study profile is currently still a draft in Bioschemas. It is used in nmrXiv to describe the study, and its properties are used to link the study to the corresponding sample and the contained datasets, while being a part of a project. [Study API endpoint link](https://www.postman.com/nmrxiv-jena/workspace/nmrxiv/request/17195598-910d6c75-2a1d-42ff-9f0d-b669bbfa6db5).
+#### [Study](https://bioschemas.org/types/Study/0.3-DRAFT)
+While the [Schema.org](https://schema.org/) already encompasses a [Project type](https://schema.org/Project), it primarily pertains to enterprises rather than scientific investigations. Given the similarity in metadata structure between project and study in nmrXiv (e.g., id, name, URL), nmrXiv leverages the [study draft](https://bioschemas.org/types/Study/0.3-DRAFT) offered by Bioschemas to represent projects. This enables seamless linking to included studies and their respective datasets. [Project API endpoint link](https://www.postman.com/nmrxiv-jena/workspace/nmrxiv/request/17195598-d7481762-e431-4975-b786-9cfd7f007d56).
 
-#### [Sample](https://bioschemas.org/profiles/Sample/0.2-RELEASE-2018_11_10)
-Sample profile is used in nmrXiv to describe NMR samples. It is attached to the study as a value of "about" property indicating that the study is about this sample. Furthermore, the molecules existing in the Sample are added to it as a value of the property "additionalProperty". There is no API endpoint for the Sample as it can be found in the Study.
+Moreover, nmrXiv adopts the [study draft](https://bioschemas.org/types/Study/0.3-DRAFT) to describe the study. The properties of this draft can establish connections between the study, its parent project, its associated sample, and the contained datasets. Importantly, this study entity is an integral part of a broader project. [Study API endpoint link](https://www.postman.com/nmrxiv-jena/workspace/nmrxiv/request/17195598-910d6c75-2a1d-42ff-9f0d-b669bbfa6db5).
 
-#### [MolecularEntity](https://bioschemas.org/profiles/MolecularEntity/0.5-RELEASE)
-MolecularEntity can be used for any constitutionally or isotopically distinct atom, molecule, ion, etc., identifiable as a separately distinguishable entity. At the moment, it is used in nmrXiv only to describe the molecules in a sample, but further usages such as describing the nucleus or the solvent are possible too. There is no API endpoint for the MolecularEntity as it can be found in the Study ⇛ Sample.
+#### [ChemicalSubstance](https://bioschemas.org/types/ChemicalSubstance/0.3-RELEASE-2019_09_02)
+The ChemicalSubstance type is used in nmrXiv to characterize NMR samples. It is associated with the study through the "about" property, indicating that the study pertains to this specific sample. Additionally, the molecules present in the sample are incorporated into it as values of the "hasBioChemEntityPart" property. While there is no dedicated API endpoint for the Sample, it can be accessed within the Study.
 
-#### [Dataset](https://bioschemas.org/profiles/Dataset/1.0-RELEASE)
-Dataset schema is used in nmrXiv to describe the datasets there. Each dataset is linked to the parent project and study through the property "isPartOf". [Dataset API endpoint link](https://www.postman.com/nmrxiv-jena/workspace/nmrxiv/request/17195598-0408e3df-3c8f-4899-b440-eda6d8f71193).
+#### [MolecularEntity](https://bioschemas.org/types/MolecularEntity/0.3-RELEASE-2019_09_02)
+The MolecularEntity erves to characterize any constitutionally or isotopically distinct atom, molecule, ion, etc., identifiable as a separately distinguishable entity. Currently, its application in nmrXiv is focused on describing the molecules present in a sample. However, it holds potential for broader applications, such as detailing the nucleus or the solvent. While there is no dedicated API endpoint for the MolecularEntity, it is accessible within the Study ⇛ Sample structure.
+
+#### [Dataset](https://schema.org/Dataset)
+The Dataset schema is used in nmrXiv to describe the datasets there. Each dataset is linked to its parent project and study through the "isPartOf" property. [Dataset API endpoint link](https://www.postman.com/nmrxiv-jena/workspace/nmrxiv/request/17195598-0408e3df-3c8f-4899-b440-eda6d8f71193).
 
 
 ### ISA (Sample, Assay, Ontology)
 
 [ISA is a metadata framework](https://isa-tools.org/) to manage a diverse set of life science, environmental, and biomedical experiments that employ one or a combination of technologies, built around the **I**nvestigation (the project context), **S**tudy (a unit of research), and **A**ssay (analytical measurement) data model and serializations (tabular, JSON and RDF).[2]
 
-nmrXiv will comply with ISA Schema specifications to capture NMR metadata (Assay, Sample, and Ontology) to provide a detailed description of the experimental metadata for both synthetic and biological experiments (i.e., sample characteristics, technology and measurement types, sample-to-data relationships). ISA enables interoperability with other platforms and services while keeping the information in a simplistic and open-text format that is FAIR compliant. nmrXiv back-end will be designed to support ISA for newly entered data. However, ISA still comes with few limitations from the data management (repository) perspective, configurable templates on the go and redundant data being some of them. nmrXiv will contribute to extending the existing ISA models with NMR domain-specific requirements to ensure total flexibility for the end user to define their own templates while still being complaint with ISA Specifications and the minimum information standards. 
+nmrXiv will comply with ISA Schema specifications to capture NMR metadata (Assay, Sample, and Ontology) to provide a detailed description of the experimental metadata for both synthetic and biological experiments (i.e., sample characteristics, technology and measurement types, sample-to-data relationships). ISA enables interoperability with other platforms and services while keeping the information in a simplistic and open-text format that is FAIR-compliant. nmrXiv back-end will be designed to support ISA for newly entered data. However, ISA still comes with few limitations from the data management (repository) perspective, configurable templates on the go and redundant data being some of them. nmrXiv will contribute to extending the existing ISA models with NMR domain-specific requirements to ensure total flexibility for the end user to define their own templates while still being complaint with ISA Specifications and the minimum information standards. 
 
 ![ISA Specifications](/img/nmrXiv-isa.png) 
 
@@ -96,5 +101,5 @@ Complying with the DataCite schema enables the creation of new [Digital Object I
 Complying with [OpenAIRE Guidelines for Data Archive Managers](https://guidelines.openaire.eu/en/latest/) ensures compatibility with the OpenAIRE infrastructure, which facilitates interoperability with other repositories already adhering to those guidelines, enhancing data exposure and visibility. OpenAIRE has already adopted the DataCite Metadata Schema, yet with some minor adjustments, such as accepting other persistent identifier schemes rather than the DOI and some changes in the obligations of properties.
 
  # References
-1- [https://bioschemas.org/](https://bioschemas.org/)
-2- [https://isa-tools.org/](https://isa-tools.org/)
+1. [https://bioschemas.org/](https://bioschemas.org/)
+2. [https://isa-tools.org/](https://isa-tools.org/)
