@@ -14,12 +14,12 @@ trait HasDOI
             $identifier = $this->getIdentifier($this, 'identifier');
 
             if ($this->doi == null) {
+                $title = null;
                 $authors = [];
                 $users = [];
                 $suffix = null;
                 $url = 'https://www.nmrxiv.org/';
                 $publicationYear = Carbon::now()->year;
-
                 $license = License::where([['id', $this->license_id]])->firstOrFail();
                 $dates = [
                     [
@@ -34,6 +34,11 @@ trait HasDOI
                         'date' => $this->updated_at,
                         'dateType' => 'Updated',
                     ],
+                ];
+
+                $description = [
+                    'description' => $this->description,
+                    'descriptionType' => 'Other',
                 ];
 
                 if ($this instanceof Project) {
@@ -142,11 +147,6 @@ trait HasDOI
                         'rightsIdentifierScheme' => 'SPDX',
                         'schemeUri' => 'https://spdx.org/licenses/',
                     ],
-                ];
-
-                $description = [
-                    'description' => $this->description,
-                    'descriptionType' => 'Other',
                 ];
 
                 $attributes = [
