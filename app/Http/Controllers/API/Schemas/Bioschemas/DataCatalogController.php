@@ -5,10 +5,9 @@ namespace App\Http\Controllers\API\Schemas\Bioschemas;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Spatie\SchemaOrg\Schema;
-use App\Http\Controllers\API\Schemas\Bioschemas\BioschemasHelper;
- 
+
 /**
- * Use Schema.org DataCatalog type to represent nmrXiv as a repository. 
+ * Use Schema.org DataCatalog type to represent nmrXiv as a repository.
  */
 class DataCatalogController extends Controller
 {
