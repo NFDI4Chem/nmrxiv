@@ -18,7 +18,7 @@ class DataCatalogController extends Controller
      * @link https://schema.org/DataCatalog
      *
      * @param  Illuminate\Http\Request  $request
-     * @return object $dataCatalog
+     * @return object $dataCatalogSchema
      */
     public function dataCatalogSchema(Request $request)
     {
@@ -29,37 +29,36 @@ class DataCatalogController extends Controller
         $nmrXivProvider->name(env('NMRXIV_PROVIDER'));
         $nmrXivProvider->url(env('NMRXIV_PROVIDER_URL'));
 
-        $dataCatalog = Schema::DataCatalog();
-        $dataCatalog['@id'] = url(env('APP_URL'));
-        $dataCatalog['dct:conformsTo'] = BioschemasHelper::conformsTo(['https://schema.org/DataCatalog']);
-        $dataCatalog->description(env('APP_DESCRIPTION'));
-        $dataCatalog->keywords($keywords);
-        $dataCatalog->name(env('APP_NAME'));
-        $dataCatalog->provider($nmrXivProvider);
-        $dataCatalog->url(env('APP_URL'));
-        $dataCatalog->identifier(env('APP_URL'));
-        $dataCatalog->license('https://mit-license.org/');
-        $dataCatalog->contributor($contributors);
-        $dataCatalog->isAccessibleForFree(true);
+        $dataCatalogSchema = Schema::DataCatalog();
+        $dataCatalogSchema['@id'] = url(env('APP_URL'));
+        $dataCatalogSchema['dct:conformsTo'] = BioschemasHelper::conformsTo(['https://schema.org/DataCatalog']);
+        $dataCatalogSchema->description(env('APP_DESCRIPTION'));
+        $dataCatalogSchema->keywords($keywords);
+        $dataCatalogSchema->name(env('APP_NAME'));
+        $dataCatalogSchema->provider($nmrXivProvider);
+        $dataCatalogSchema->url(env('APP_URL'));
+        $dataCatalogSchema->identifier(env('APP_URL'));
+        $dataCatalogSchema->license('https://mit-license.org/');
+        $dataCatalogSchema->contributor($contributors);
+        $dataCatalogSchema->isAccessibleForFree(true);
 
-        $dataCatalog->measurementTechnique(env('MEASUREMENT_TECHNIQUE'));
+        $dataCatalogSchema->measurementTechnique(env('MEASUREMENT_TECHNIQUE'));
 
-        return $dataCatalog;
+        return $dataCatalogSchema;
     }
 
     /**
-     * Prepare Keywords.
+     * Prepare keywords associated with nmrXiv.
      *
-     * @param null
      * @return array $keywords
      */
     public function prepareKeywords()
     {
-        //Prepare Defined Term Set
+        //Prepare Defined Term Sets
         $chmo = BioschemasHelper::prepareDefinedTermSet('Chemical Methods Ontology', 'http://purl.obolibrary.org/obo/chmo.owl');
         $nmrcv = BioschemasHelper::prepareDefinedTermSet('nuclear magnetic resonance CV', 'http://nmrml.org/cv/');
 
-        //Prepare Defined Term
+        //Prepare Defined Terms
         $nmr = BioschemasHelper::prepareDefinedTerm('nuclear magnetic resonance spectroscopy', ['NMR', 'NMR spectroscopy', 'nuclear magnetic resonance (NMR) spectroscopy'], 'CHMO:0000591', 'http://purl.obolibrary.org/obo/CHMO_0000591', $chmo);
         $pulsedNMR = BioschemasHelper::prepareDefinedTerm('pulsed nuclear magnetic resonance spectroscopy', ['NMR', 'nuclear magnetic resonance spectroscopy', 'NMR spectroscopy'], 'CHMO:0000613', 'https://ontobee.org/ontology/CHMO?iri=http://purl.obolibrary.org/obo/CHMO_0000613', $chmo);
         $oneDNMR = BioschemasHelper::prepareDefinedTerm('one-dimensional nuclear magnetic resonance spectroscopy', ['1D NMR spectroscopy', '1-D NMR', 'one-dimensional nuclear magnetic resonance spectroscopy', '1D NMR', '1D nuclear magnetic resonance spectroscopy'], 'CHMO:0000592', 'http://purl.obolibrary.org/obo/CHMO_0000592', $chmo);
@@ -78,9 +77,8 @@ class DataCatalogController extends Controller
     }
 
     /**
-     * Prepare Contributors.
+     * Prepare contributors to nmrXiv.
      *
-     * @param null
      * @return array $contributors
      */
     public function prepareContributors()
@@ -93,20 +91,20 @@ class DataCatalogController extends Controller
         $David = BioschemasHelper::preparePerson('0000-0001-7499-1693', 'David', 'Rauh', null, null);
         $Guido = BioschemasHelper::preparePerson('0000-0003-1022-4326', 'Guido', 'Pauli', null, 'University of Illinois');
         $Hamed = BioschemasHelper::preparePerson(null, 'Hamed', 'Musallam', 'hamed.musallam@uni-jena.de', 'Friedrich-Schiller-Universität Jena');
-        $Johannes = BioschemasHelper::preparePerson('0000-0003-2060-842X', 'Johannes', 'Liermann', null, null);
-        $Julien = BioschemasHelper::preparePerson('0000-0002-3416-2572', 'Julien', 'Wist', null, null);
-        $Kohulan = BioschemasHelper::preparePerson('0000-0003-1066-7792', 'Kohulan', 'Rajan', null, null);
-        $Luc = BioschemasHelper::preparePerson('0000-0002-4943-2643', 'Luc', 'Patiny', null, null);
+        $Johannes = BioschemasHelper::preparePerson('0000-0003-2060-842X', 'Johannes', 'Liermann', 'liermann@uni-mainz.de', 'Johannes Gutenberg-Universität Mainz');
+        $Julien = BioschemasHelper::preparePerson('0000-0002-3416-2572', 'Julien', 'Wist', null, 'Murdoch University: Murdoch, WA, AU');
+        $Kohulan = BioschemasHelper::preparePerson('0000-0003-1066-7792', 'Kohulan', 'Rajan', 'kohulan.rajan@uni-jena.de', 'Friedrich-Schiller-Universität Jena');
+        $Luc = BioschemasHelper::preparePerson('0000-0002-4943-2643', 'Luc', 'Patiny', null, 'École Polytechnique Fédérale de Lausanne: Lausanne, VD, CH');
         $Markus = BioschemasHelper::preparePerson(null, 'Markus', 'Lange', null, null);
         $Nazar = BioschemasHelper::preparePerson('0000-0002-5870-8496', 'Nazar', 'Stefaniuk', null, null);
-        $Nils = BioschemasHelper::preparePerson('0000-0002-0990-9582', 'Nils', 'Schlörer', null, null);
-        $Nisha = BioschemasHelper::preparePerson('0009-0006-4755-1039', 'Nisha', 'Sharma', null, null);
-        $Noura = BioschemasHelper::preparePerson('0009-0001-5998-5030', 'Noura', 'Rayya', null, null);
+        $Nils = BioschemasHelper::preparePerson('0000-0002-0990-9582', 'Nils', 'Schlörer', null, 'Friedrich-Schiller-Universität Jena');
+        $Nisha = BioschemasHelper::preparePerson('0009-0006-4755-1039', 'Nisha', 'Sharma', 'nisha.sharma@uni-jena.de', 'Friedrich-Schiller-Universität Jena');
+        $Noura = BioschemasHelper::preparePerson('0009-0001-5998-5030', 'Noura', 'Rayya', 'noura.rayya@uni-jena.de', 'Friedrich-Schiller-Universität Jena');
         $Pascal = BioschemasHelper::preparePerson(null, 'Pascal', 'Scherreiks', null, null);
-        $Stefan = BioschemasHelper::preparePerson('0000-0002-5990-4157', 'Stefan', 'Kuhn', null, null);
-        $Steffen = BioschemasHelper::preparePerson('0000-0002-7899-7192', 'Steffen', 'Neumann', null, null);
-        $Tillmann = BioschemasHelper::preparePerson('0000-0003-4480-8661', 'Tillmann', 'Fischer', null, null);
-        $Venkata = BioschemasHelper::preparePerson('0000-0002-2564-3243', 'Venkata Chandrasekhar', 'Nainala', null, null);
+        $Stefan = BioschemasHelper::preparePerson('0000-0002-5990-4157', 'Stefan', 'Kuhn', null, 'University of Tartu, Tartu');
+        $Steffen = BioschemasHelper::preparePerson('0000-0002-7899-7192', 'Steffen', 'Neumann', null, 'Leibniz-Institut für Pflanzenbiochemie, Halle');
+        $Tillmann = BioschemasHelper::preparePerson('0000-0003-4480-8661', 'Tillmann', 'Fischer', null, 'Leibniz-Institut für Pflanzenbiochemie, Halle');
+        $Venkata = BioschemasHelper::preparePerson('0000-0002-2564-3243', 'Venkata Chandrasekhar', 'Nainala', 'chandu.nainala@uni-jena.de', 'Friedrich-Schiller-Universität Jena');
 
         $contributors = [$Annett, $Christian, $Christoph, $Darina, $Guido, $Hamed, $Johannes, $Julien, $Kohulan, $Luc, $Markus, $Nazar, $Nils, $Nisha, $Noura, $Pascal, $Stefan, $Steffen, $Tillmann, $Venkata];
 
