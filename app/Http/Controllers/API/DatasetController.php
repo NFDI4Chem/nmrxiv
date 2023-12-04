@@ -78,7 +78,7 @@ class DatasetController extends Controller
         $id = $request->query('id');
 
         if ($id) {
-            return $Dataset = DatasetResource::collection(Dataset::where([['is_public', true], ['identifier', str_replace('D', '', $id)]])->get());
+            return DatasetResource::collection(Dataset::where([['is_public', true], ['identifier', str_replace('D', '', $id)]])->get());
         } else {
             return response()->json([
                 'message' => 'Input missing.',
