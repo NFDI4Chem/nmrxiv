@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\API\Schemas\Bioschema;
+namespace App\Http\Controllers\API\Schemas\Bioschemas;
 
 use App\Http\Controllers\Controller;
-use App\Models\Bioschema\BioSchema;
+use App\Models\Bioschemas\Bioschemas;
 use App\Models\Dataset;
 use App\Models\NMRium;
 use App\Models\Project;
@@ -20,7 +20,7 @@ use Spatie\SchemaOrg\Schema;
  * to enable exporting their metadata with a json endpoint, including the
  * samples and molecules.
  */
-class BiochemaController extends Controller
+class BioschemasController extends Controller
 {
     /**
      * Implement Bioschemas upon request by model's name to generate a project, study, or dataset schema.
@@ -45,14 +45,12 @@ class BiochemaController extends Controller
             if ($project->is_public) {
                 $projectSchema = $this->project($project);
                 if ($studyName) {
-                    // send study back with project info added to it\
                     $study = Study::where([['slug', $studyName], ['owner_id', $user->id], ['project_id', $project->id]])->firstOrFail();
                     if ($study) {
                         if ($study->is_public) {
                             $studySchema = $this->study($study);
                             if ($datasetName) {
                                 $dataset = Dataset::where([['slug', $datasetName], ['owner_id', $user->id], ['project_id', $project->id], ['study_id', $study->id]])->firstOrFail();
-                                // send dataset with project and study details
                                 if ($dataset) {
                                     if ($dataset->is_public) {
                                         $datasetSchema = $this->dataset($dataset);
@@ -114,9 +112,50 @@ class BiochemaController extends Controller
         }
     }
 
+        /**
+     * Get Defined Term for ontology term.
+     *
+     *
+     * @param  string  $name
+     * @param  array  $alternameName
+     * @param  string  $identifier
+     * @param  string  $url
+     * @param  object  $inDefinedTermSet
+     * @return object $definedTerm
+     */
+    public function getDefinedTerm($name, $alternateName, $identifier, $url, $inDefinedTermSet)
+    {
+        $definedTerm = Schema::DefinedTerm();
+        $definedTerm->name($name);
+        $definedTerm->alternateName($alternateName);
+        $definedTerm->identifier($identifier);
+        $definedTerm->url($url);
+        $definedTerm->inDefinedTermSet($inDefinedTermSet);
+
+        return $definedTerm;
+    }
+
+    /**
+     * Get Defined Term set for ontology service.
+     *
+     *
+     * @param  string  $name
+     * @param  string  $url
+     * @return object $definedTermSet
+     */
+    public function getDefinedTermSet($name, $url)
+    {
+        $definedTermSet = Schema::DefinedTermSet();
+        $definedTermSet->name($name);
+        $definedTermSet->url($url);
+
+        return $definedTermSet;
+    }
+
     /**
      * Get Property value from ontologies.
      *
+     * @param  string  $name
      * @param  string  $ontologyID
      * @param  string  $value
      * @param  string  $unitUrl
@@ -223,7 +262,7 @@ class BiochemaController extends Controller
      *
      * @link https://bioschemas.org/profiles/MolecularEntity/0.5-RELEASE
      *
-     * @param  App\Models\BioSample  $sample
+     * @param  App\Models\Sample  $sample
      * @return array $molecules
      */
     public function getMolecules($sample)
@@ -233,24 +272,24 @@ class BiochemaController extends Controller
             $inchiKey = $molecule->inchi_key;
             $pubchemLink = 'https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/inchikey/'.$inchiKey.'/property/IUPACName/JSON';
             $json = json_decode(Http::get($pubchemLink)->body(), true);
-            // $cid = $json['PropertyTable']['Properties'][0]['CID'];
-            // $iupacName = $json['PropertyTable']['Properties'][0]['IUPACName'];
+            $cid = $json['PropertyTable']['Properties'][0]['CID'];
+            $iupacName = $json['PropertyTable']['Properties'][0]['IUPACName'];
 
-            // $moleculeSchema = Schema::MolecularEntity();
-            // $moleculeSchema['@id'] = $inchiKey;
-            // $moleculeSchema['dct:conformsTo'] = $this->conformsTo(['https://bioschemas.org/profiles/MolecularEntity/0.5-RELEASE']);
-            // $moleculeSchema['identifier'] = $inchiKey;
-            // $moleculeSchema->name($molecule->cas);
-            // $moleculeSchema->url('https://pubchem.ncbi.nlm.nih.gov/compound/'.$cid);
-            // $moleculeSchema->inChI('InChI='.$molecule->standard_inchi);
-            // $moleculeSchema->inChIKey($inchiKey);
-            // $moleculeSchema->iupacName($iupacName);
-            // $moleculeSchema->molecularFormula($molecule->molecular_formula);
-            // $moleculeSchema->molecularWeight($molecule->molecular_weight);
-            // $moleculeSchema->smiles([$molecule->SMILES, $molecule->absolute_smiles, $molecule->canonical_smiles]);
-            // $moleculeSchema->hasRepresentation($molecule->MOL);
-            // $moleculeSchema->description('Percentage composition: '.$molecule->pivot->percentage_composition.'%');
-            // array_push($molecules, $moleculeSchema);
+            $moleculeSchema = Schema::MolecularEntity();
+            $moleculeSchema['@id'] = $inchiKey;
+            $moleculeSchema['dct:conformsTo'] = $this->conformsTo(['https://bioschemas.org/profiles/MolecularEntity/0.5-RELEASE']);
+            $moleculeSchema['identifier'] = $inchiKey;
+            $moleculeSchema->name($molecule->cas);
+            $moleculeSchema->url('https://pubchem.ncbi.nlm.nih.gov/compound/'.$cid);
+            $moleculeSchema->inChI($molecule->standard_inchi);
+            $moleculeSchema->inChIKey($inchiKey);
+            $moleculeSchema->iupacName($iupacName);
+            $moleculeSchema->molecularFormula($molecule->molecular_formula);
+            $moleculeSchema->molecularWeight($molecule->molecular_weight);
+            $moleculeSchema->smiles([$molecule->SMILES, $molecule->absolute_smiles, $molecule->canonical_smiles]);
+            $moleculeSchema->hasRepresentation($molecule->MOL);
+            $moleculeSchema->description('Percentage composition: '.$molecule->pivot->percentage_composition.'%');
+            array_push($molecules, $moleculeSchema);
         }
 
         return $molecules;
@@ -268,7 +307,9 @@ class BiochemaController extends Controller
     public function getSample($study)
     {
         $sample = $study->sample;
-        $sampleSchema = BioSchema::ChemicalSubstance();
+        $molecules = $this->getMolecules($sample);
+
+        $sampleSchema = Bioschemas::ChemicalSubstance();
         $sampleSchema['@id'] = $study->doi;
         $sampleSchema['dct:conformsTo'] = $this->conformsTo(['https://bioschemas.org/profiles/ChemicalSubstance/0.4-RELEASE']);
         $sampleSchema->name($study->project->name.'.'.$sample->name);
@@ -283,7 +324,6 @@ class BiochemaController extends Controller
      * Get NMRium info from a dataset.
      *
      * @link https://bioschemas.org/profiles/Dataset/1.0-RELEASE
-     * @link https://bioschemas.org/profiles/Study/0.3-DRAFT
      *
      * @param  App\Models\Dataset  $dataset
      * @return array $nmriumInfo
@@ -355,12 +395,10 @@ class BiochemaController extends Controller
     /**
      * Get Dataset download details info from a dataset.
      *
-     * @link https://bioschemas.org/profiles/Dataset/1.0-RELEASE
-     * @link https://schema.org/distribution
      * @link https://schema.org/DataDownload
      *
      * @param  App\Models\Dataset  $dataset
-     * return object $distribution
+     * @return object $distribution
      */
     public function getDistribution($dataset)
     {
@@ -373,6 +411,8 @@ class BiochemaController extends Controller
         $distribution->name($dataset->project->name);
         $distribution->encodingFormat('zip');
         $distribution->contentURL($contentURL);
+
+        return $distribution;
     }
 
     /**
@@ -393,13 +433,12 @@ class BiochemaController extends Controller
     }
 
     /**
-     * Implement Bioschemas' study with only few properties, including the sample and molecules,
-     * to be included in the project schema.
+
      *
      * @link https://bioschemas.org/profiles/Study/0.3-DRAFT
      *
      * @param  App\Models\Project  $project
-     * @return object $projectSchema
+     * @return array $schemas
      */
     public function prepareStudies($project)
     {
@@ -413,6 +452,12 @@ class BiochemaController extends Controller
         return $schemas;
     }
 
+    /**
+     * @link https://bioschemas.org/profiles/Dataset/1.0-RELEASE
+     *
+     * @param  App\Models\Study  $study
+     * @return array $schemas
+     */
     public function prepareDatasets($study)
     {
         $schemas = [];
@@ -424,6 +469,11 @@ class BiochemaController extends Controller
         return $schemas;
     }
 
+    /**
+     * @link https://schema.org/organization
+     *
+     * @return object $publisher
+     */
     public function preparePublisher()
     {
         $publisher = Schema::Organization();
@@ -434,14 +484,11 @@ class BiochemaController extends Controller
     }
 
     /**
-     * Implement Bioschemas' Dataset, along with the project and study it belongs to.
+     * Implement Bioschemas' Dataset.
      *
      * @link https://bioschemas.org/profiles/Dataset/1.0-RELEASE
-     * @link https://bioschemas.org/profiles/Study/0.3-DRAFT
      *
      * @param  App\Models\Dataset  $dataset
-     * @param  App\Models\Study  $study
-     * @param  App\Models\Project  $project
      * @return object $datasetSchema
      */
     public function datasetLite($dataset)
@@ -469,7 +516,15 @@ class BiochemaController extends Controller
             return $datasetSchema;
         }
     }
-
+    /**
+     * Implement Bioschemas' Dataset, along with the project and study it belongs to.
+     *
+     * @link https://bioschemas.org/profiles/Dataset/1.0-RELEASE
+     * @link https://bioschemas.org/profiles/Study/0.3-DRAFT
+     *
+     * @param  App\Models\Dataset  $dataset
+     * @return object $datasetSchema
+     */
     public function dataset($dataset)
     {
         $datasetSchema = $this->datasetLite($dataset);
@@ -482,8 +537,7 @@ class BiochemaController extends Controller
     }
 
     /**
-     * Implement Bioschemas' Study, including the sample and molecules, along
-     * with the project it belongs to and, briefly, the datasets it contains.
+     * Implement Bioschemas' Study.
      *
      * @link https://bioschemas.org/profiles/Study/0.3-DRAFT
      *
@@ -493,7 +547,7 @@ class BiochemaController extends Controller
     public function studyLite($study)
     {
         $prefix = $study->project->name.':';
-        $studySchema = BioSchema::Study();
+        $studySchema = Bioschemas::Study();
         $studySchema['@id'] = $study->doi;
         $studySchema['dct:conformsTo'] = $this->conformsTo(['https://bioschemas.org/profiles/Study/0.3-DRAFT', 'https://isa-specs.readthedocs.io/en/latest/isamodel.html#study']);
         $studySchema->name($prefix.$study->name);
@@ -510,7 +564,16 @@ class BiochemaController extends Controller
 
         return $studySchema;
     }
-
+    
+    /**
+     * Implement Bioschemas' Study, including the sample and molecules, along
+     * with the project it belongs to and, briefly, the datasets it contains.
+     *
+     * @link https://bioschemas.org/profiles/Study/0.3-DRAFT
+     *
+     * @param  App\Models\Study  $study
+     * @return object $studySchema
+     */
     public function study($study)
     {
         $studySchema = $this->studyLite($study);
@@ -521,20 +584,16 @@ class BiochemaController extends Controller
     }
 
     /**
-     * Implement Bioschemas' project along with brief details about
-     * the studies and datasets it contains.
+     * Implement Bioschemas' project.
      *
      * @link https://bioschemas.org/profiles/Study/0.3-DRAFT
-     * @link https://bioschemas.org/profiles/Dataset/1.0-RELEASE
-     * @link https://bioschemas.org/profiles/Sample/0.2-RELEASE-2018_11_10
-     * @link https://bioschemas.org/types/MolecularEntity/0.3-RELEASE-2019_09_02
      *
      * @param  App\Models\Project  $project
      * @return object $projectSchema
      */
     public function projectLite($project)
     {
-        $projectSchema = BioSchema::Study();
+        $projectSchema = Bioschemas::Study();
         $projectSchema['@id'] = $project->doi;
         $projectSchema['dct:conformsTo'] = $this->conformsTo(['https://bioschemas.org/profiles/Study/0.3-DRAFT', 'https://isa-specs.readthedocs.io/en/latest/isamodel.html#investigation']);
         $projectSchema->name($project->name);
@@ -552,6 +611,15 @@ class BiochemaController extends Controller
         return $projectSchema;
     }
 
+    /**
+     * Implement Bioschemas' project along with brief details about
+     * the studies and datasets it contains.
+     *
+     * @link https://bioschemas.org/profiles/Study/0.3-DRAFT
+     *
+     * @param  App\Models\Project  $project
+     * @return object $projectSchema
+     */
     public function project($project)
     {
         $projectSchema = $this->projectLite($project);

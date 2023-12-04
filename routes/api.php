@@ -5,8 +5,8 @@ use App\Http\Controllers\API\Auth\RegisterController;
 use App\Http\Controllers\API\Auth\UserController;
 use App\Http\Controllers\API\FileSystemController;
 use App\Http\Controllers\API\ProjectController;
-use App\Http\Controllers\API\Schemas\Bioschema\BiochemaController;
-use App\Http\Controllers\API\Schemas\Bioschema\DataCatalogController;
+use App\Http\Controllers\API\Schemas\Bioschemas\BioschemasController;
+use App\Http\Controllers\API\Schemas\Bioschemas\DataCatalogController;
 use App\Http\Controllers\API\Schemas\DataCite\DataCiteController;
 use App\Http\Controllers\API\SearchController;
 use Illuminate\Support\Facades\Route;
@@ -40,10 +40,10 @@ Route::prefix('v1')->group(function () {
         ->name('public.projects');
 
     Route::prefix('schemas')->group(function () {
-        Route::prefix('bioschema')->group(function () {
-            Route::get('/', [DataCatalogController::class, 'dataCatalogSchema'])->name('bioschema.datacatalog');
-            Route::get('/{username}/{project}/{study?}/{dataset?}', [BiochemaController::class, 'modelSchemaByName'])->name('bioschema.model');
-            Route::get('/{id}', [BiochemaController::class, 'modelSchemaByID'])->name('bioschema.id');
+        Route::prefix('bioschemas')->group(function () {
+            Route::get('/', [DataCatalogController::class, 'dataCatalogSchema'])->name('bioschemas.datacatalog');
+            Route::get('/{username}/{project}/{study?}/{dataset?}', [BiochemaController::class, 'modelSchemaByName'])->name('bioschemas.model');
+            Route::get('/{id}', [BiochemaController::class, 'modelSchemaByID'])->name('bioschemas.id');
         });
 
         Route::prefix('datacite')->group(function () {
