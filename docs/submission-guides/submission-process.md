@@ -57,7 +57,7 @@ Before you start submitting your data, you need to:
 A small clip showcasing the Step-1 of file upload process.
 
 
-### Step 2 - Assignment & Meta data
+### Step 2 - Auto Processing, Assignments and Validation
 
 - In this step, your data is organized into samples, and you have the opportunity to input missing metadata for these samples. On the left side, you can observe that 7 samples have been created, collectively comprising 8 spectra. Please wait for a moment until all the metadata for the spectra has been processed.
 - The `Samples Validation` section remains Incomplete, as your upload lacks certain metadata required to meet community standards. Currently, we are verifying the mandatory metadata specified by [DataCite](https://datacite.org/) necessary to obtain a [DOI](https://www.doi.org/) in addition to requesting an image for the project. Click on the `Import now` button to automatically import the missing Spectra information.
@@ -102,7 +102,7 @@ A small clip showcasing the Step-1 of file upload process.
 
 A small clip showcasing the Step-2 of file upload process.
 
-### Step 3 - Publish  
+### Step 3 - Publish data  
 
 - You've reached the final stage of the submission process and you are almost there. At the top, you have the option to either publish the project as a `Project` or simply publish the `Samples`, which you can find listed on this screen.
 If you choose to publish as a `Project`, you need to provide the necessary minimum requirements, such as:
