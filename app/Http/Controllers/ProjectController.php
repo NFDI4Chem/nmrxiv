@@ -315,6 +315,15 @@ class ProjectController extends Controller
                 $validation->process();
                 $validation = $validation->fresh();
 
+                foreach($project->studies as $study){
+                    $study->license_id = $project->license_id;
+                    $study->save();
+                    foreach($study->datasets as $dataset){
+                        $dataset->license_id = $project->license_id;
+                        $dataset->save();
+                    }
+                }
+
                 $status = true;
 
                 foreach ($validation['report']['project']['studies'] as $study) {

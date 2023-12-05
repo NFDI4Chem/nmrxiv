@@ -828,7 +828,7 @@ export default {
             });
         },
         updateProject() {
-            if (this.publishForm.enableProjectMode) {
+            // if (this.publishForm.enableProjectMode) {
                 if (
                     this.publishForm.project.tag &&
                     this.publishForm.project.tag != ""
@@ -861,7 +861,7 @@ export default {
                 // .then((res) => {
                 //     console.log("success");
                 // });
-            }
+            // }
         },
         updateSpecies(species) {
             if (species && species != "") {
