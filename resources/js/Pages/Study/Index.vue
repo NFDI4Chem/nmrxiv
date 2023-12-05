@@ -39,9 +39,13 @@
                     </button>
                 </div>
             </div>
-            <div class="flex-shrink-0 ml-4">
+            <div
+                class="flex-shrink-0 ml-4"
+                v-if="
+                    editable && project.draft_id !== null && !project.is_deleted
+                "
+            >
                 <a
-                    v-if="editable && project.draft_id !== null"
                     type="button"
                     class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                     :href="'/upload?draft_id=' + project.draft_id"
@@ -49,7 +53,6 @@
                     + Manage Samples
                 </a>
                 <div
-                    v-if="editable && project.draft_id !== null"
                     class="text-center text-xs cursor-pointer hover:text-blue-700 mt-2"
                 >
                     <a
