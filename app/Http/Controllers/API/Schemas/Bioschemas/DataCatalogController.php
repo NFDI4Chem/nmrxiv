@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API\Schemas\Bioschemas;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 use Spatie\SchemaOrg\Schema;
 
 /**
@@ -25,23 +26,23 @@ class DataCatalogController extends Controller
         $contributors = $this->prepareContributors();
 
         $nmrXivProvider = Schema::Organization();
-        $nmrXivProvider->name(env('NMRXIV_PROVIDER'));
-        $nmrXivProvider->url(env('NMRXIV_PROVIDER_URL'));
+        $nmrXivProvider->name(Config::get('schemas.bioschema.provider'));
+        $nmrXivProvider->url(Config::get('schemas.bioschema.provider_url'));
 
         $dataCatalogSchema = Schema::DataCatalog();
-        $dataCatalogSchema['@id'] = url(env('APP_URL'));
+        $dataCatalogSchema['@id'] = url(Config::get('app.url'));
         $dataCatalogSchema['dct:conformsTo'] = BioschemasHelper::conformsTo(['https://schema.org/DataCatalog']);
         $dataCatalogSchema->description(env('APP_DESCRIPTION'));
         $dataCatalogSchema->keywords($keywords);
-        $dataCatalogSchema->name(env('APP_NAME'));
+        $dataCatalogSchema->name(Config::get('app.name'));
         $dataCatalogSchema->provider($nmrXivProvider);
-        $dataCatalogSchema->url(env('APP_URL'));
-        $dataCatalogSchema->identifier(env('APP_URL'));
+        $dataCatalogSchema->url(Config::get('app.url'));
+        $dataCatalogSchema->identifier(Config::get('app.url'));
         $dataCatalogSchema->license('https://mit-license.org/');
         $dataCatalogSchema->contributor($contributors);
         $dataCatalogSchema->isAccessibleForFree(true);
 
-        $dataCatalogSchema->measurementTechnique(env('MEASUREMENT_TECHNIQUE'));
+        $dataCatalogSchema->measurementTechnique(Config::get('schemas.ontologies.measurement_technique'));
 
         return $dataCatalogSchema;
     }

@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\API\Schemas\Bioschemas;
 
 use App\Http\Controllers\Controller;
-use App\Models\Bioschemas\Bioschemas;
 use App\Models\Dataset;
 use App\Models\NMRium;
 use App\Models\Project;
 use App\Models\Sample;
+use App\Models\Schemas\Bioschemas;
 use App\Models\Study;
 use App\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
