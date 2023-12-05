@@ -165,7 +165,7 @@ class DraftController extends Controller
         $validation->process();
 
         return response()->json([
-            'project' => Project::with(['studies.datasets', 'owner', 'citations', 'authors'])->where('draft_id', $draft->id)->first(),
+            'project' => Project::with(['studies.datasets', 'owner', 'citations', 'authors', 'tags'])->where('draft_id', $draft->id)->first(),
             'validation' => $validation,
         ]);
     }
@@ -215,7 +215,7 @@ class DraftController extends Controller
             $team_id = $user->current_team_id;
         }
 
-        return DB::transaction(function () use ($draft, $user, $user_id, $team, $team_id, $request, $project) {
+        return DB::transaction(function () use ($draft, $user, $user_id, $team, $team_id, $project) {
             $nmrXivValidation = null;
             if (! $project) {
                 $project = Project::create([
@@ -243,12 +243,12 @@ class DraftController extends Controller
                     );
                 }
 
-                $project->syncTagsWithType($request->get('tags_array'), 'Project');
+                // $project->syncTagsWithType($request->get('tags_array'), 'Project');
                 $project->save();
             } else {
                 $project->name = $draft->name;
                 $project->description = $draft->description;
-                $project->syncTagsWithType($request->get('tags_array'), 'Project');
+                // $project->syncTagsWithType($request->get('tags_array'), 'Project');
                 $project->save();
             }
 
