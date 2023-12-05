@@ -41,6 +41,8 @@ trait HasDOI
                     'descriptionType' => 'Other',
                 ];
 
+                $citations = [];
+
                 if ($this instanceof Project) {
                     $title = $this->name;
                     $users = $this->allUsers();
