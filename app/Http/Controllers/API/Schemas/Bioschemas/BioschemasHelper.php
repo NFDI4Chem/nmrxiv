@@ -148,7 +148,7 @@ class BioschemasHelper
     public static function prepareDataDownload($dataset)
     {
         $url = env('APP_URL');
-        $user = $dataset->owner;
+        $user = $dataset->owner->username;
         $slug = $dataset->project->slug;
         $contentURL = $url.'/'.$user.'/datasets/'.$slug;
 
