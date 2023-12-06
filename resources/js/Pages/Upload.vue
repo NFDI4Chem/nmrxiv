@@ -462,20 +462,56 @@
                                                     }}
                                                     ({{ studies.length }})
                                                     <div
-                                                        v-if="
-                                                            importPendingSamples.length >
-                                                            0
-                                                        "
                                                         class="float-right cursor-pointer tooltip"
-                                                        @click="autoImport()"
+                                                        @click="
+                                                            toggleCompoundDetails()
+                                                        "
                                                     >
-                                                        <ArrowDownOnSquareStackIcon
-                                                            class="w-5 h-5 mr-1 text-gray-600 hover:text-gray-500"
-                                                        />
+                                                        <svg
+                                                            v-if="
+                                                                !showCompoundDetails
+                                                            "
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            fill="none"
+                                                            viewBox="0 0 24 24"
+                                                            stroke-width="1.5"
+                                                            stroke="currentColor"
+                                                            class="w-5 h-5 mr-1 text-gray-600 hover:text-gray-500 inline"
+                                                        >
+                                                            <path
+                                                                stroke-linecap="round"
+                                                                stroke-linejoin="round"
+                                                                d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m5.231 13.481L15 17.25m-4.5-15H5.625c-.621 0-1.125.504-1.125 1.125v16.5c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9zm3.75 11.625a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"
+                                                            />
+                                                        </svg>
+                                                        <svg
+                                                            v-else
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            fill="none"
+                                                            viewBox="0 0 24 24"
+                                                            stroke-width="1.5"
+                                                            stroke="currentColor"
+                                                            class="w-5 h-5 mr-1 text-gray-600 hover:text-gray-500 inline"
+                                                        >
+                                                            <path
+                                                                stroke-linecap="round"
+                                                                stroke-linejoin="round"
+                                                                d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                                            />
+                                                        </svg>
+
                                                         <span
                                                             class="bg-gray-900 text-center text-white px-2 py-1 shadow-lg rounded-md tooltiptextbottom"
-                                                            >Click to auto
-                                                            import spectra</span
+                                                            ><span
+                                                                v-if="
+                                                                    !showCompoundDetails
+                                                                "
+                                                                >Show</span
+                                                            ><span v-else
+                                                                >Hide</span
+                                                            >
+                                                            compound
+                                                            details</span
                                                         >
                                                     </div>
                                                 </div>
@@ -497,7 +533,7 @@
                                                                 study.id
                                                                 ? 'bg-gray-800 text-white'
                                                                 : 'hover:bg-gray-200 hover:bg-opacity-50',
-                                                            'cursor-pointer flex py-4 border-b border-blue-gray-200',
+                                                            'cursor-pointer flex py-4 border-b-4 border-blue-gray-200',
                                                         ]"
                                                     >
                                                         <div
@@ -516,6 +552,22 @@
                                                                 "
                                                                 class="font-medium text-blue-gray-900"
                                                             >
+                                                                <div
+                                                                    class="border-b border-gray-100 mb-4 border"
+                                                                    v-if="
+                                                                        showCompoundDetails
+                                                                    "
+                                                                >
+                                                                    <Depictor2D
+                                                                        class="-py-4 -px-4 rounded-md"
+                                                                        :molecule="
+                                                                            study
+                                                                                .sample
+                                                                                .molecules[0]
+                                                                                .canonical_smiles
+                                                                        "
+                                                                    ></Depictor2D>
+                                                                </div>
                                                                 <a>
                                                                     {{
                                                                         study.name
@@ -537,6 +589,7 @@
                                                                         alt=""
                                                                     />
                                                                 </span>
+
                                                                 <div
                                                                     class="mt-1 text-blue-gray-500"
                                                                 >
@@ -1601,6 +1654,7 @@ import {
 } from "@heroicons/vue/24/solid";
 import SpectraEditor from "@/Shared/SpectraEditor.vue";
 import Depictor from "@/Shared/Depictor.vue";
+import Depictor2D from "@/Shared/Depictor2D.vue";
 import slider from "vue3-slider";
 import VueTagsInput from "@sipec/vue3-tags-input";
 import "ontology-elements/dist/index.js";
@@ -1620,6 +1674,7 @@ export default {
         Validation,
         SpectraEditor,
         Depictor,
+        Depictor2D,
         slider,
         VueTagsInput,
     },
@@ -1635,6 +1690,7 @@ export default {
             loadingStep: false,
             spectraLoadingStatus: false,
             spectraLoadingMessage: null,
+            showCompoundDetails: false,
 
             currentDraft: null,
             drafts: [],
@@ -1805,6 +1861,9 @@ export default {
         this.showPrimer = !this.primed;
     },
     methods: {
+        toggleCompoundDetails() {
+            this.showCompoundDetails = !this.showCompoundDetails;
+        },
         showSamplesSummary() {
             this.displaySamplesSummaryInfo = true;
             this.selectedStudy = null;
