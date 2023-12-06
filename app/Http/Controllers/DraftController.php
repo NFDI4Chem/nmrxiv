@@ -92,15 +92,13 @@ class DraftController extends Controller
                             ['level', 0],
                             ['draft_id', $draft->id],
                         ])
-                        ->orderBy('created_at', 'DESC')
-                        ->orderBy('type')
+                        ->orderBy('name')
                         ->get(),
                 ],
                 'missing_files' => FileSystemObject::where([
                     ['draft_id', $draft->id],
                     ['status', 'missing'],
-                ])
-                    ->count(),
+                ])->count(),
             ]);
     }
 
@@ -429,7 +427,7 @@ class DraftController extends Controller
             $draft->current_step = 2;
             $draft->save();
 
-            $studies = json_decode($project->studies->load(['datasets', 'sample.molecules', 'tags']));
+            $studies = json_decode($project->studies()->orderBy('name')->get()->load(['datasets', 'sample.molecules', 'tags']));
 
             if (count($studies) == 0) {
                 return redirect()->back()->withErrors(['studies' => 'nmrXiv requires raw or processed raw instrument output files. If you data is from a single sample organise all the files in one folder and click proceed. If you have multiple samples, group your data in subfolders with each subfolder corresponding to a sample. Thank you.']);
@@ -448,7 +446,7 @@ class DraftController extends Controller
     {
         $project = Project::where('draft_id', $draft->id)->first();
 
-        $studies = json_decode($project->studies->orderBy('created_at', 'DESC')->load(['datasets', 'sample.molecules', 'tags']));
+        $studies = json_decode($project->studies->load(['datasets', 'sample.molecules', 'tags']));
 
         return response()->json([
             'project' => $project->load(['owner']),

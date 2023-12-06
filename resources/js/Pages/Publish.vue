@@ -829,38 +829,38 @@ export default {
         },
         updateProject() {
             // if (this.publishForm.enableProjectMode) {
-                if (
-                    this.publishForm.project.tag &&
-                    this.publishForm.project.tag != ""
-                ) {
-                    let exists = false;
-                    this.publishForm.project.tags.forEach((t) => {
-                        if (t.text == this.publishForm.project.tag) {
-                            exists = true;
-                        }
-                    });
-                    if (!exists) {
-                        this.publishForm.project.tags.push({
-                            text: this.publishForm.project.tag,
-                        });
-                        this.publishForm.project.tag = "";
+            if (
+                this.publishForm.project.tag &&
+                this.publishForm.project.tag != ""
+            ) {
+                let exists = false;
+                this.publishForm.project.tags.forEach((t) => {
+                    if (t.text == this.publishForm.project.tag) {
+                        exists = true;
                     }
-                }
-                this.loadingStep = true;
-                axios.put(route("dashboard.project.update", this.project.id), {
-                    name: this.publishForm.project.name,
-                    description: this.publishForm.project.description,
-                    tags: this.publishForm.project.tags,
-                    tags_array: this.publishForm.project.tags
-                        ? this.publishForm.project.tags.map((a) => a.text)
-                        : [],
-                    license_id: this.license ? this.license.id : null,
-                    species: this.publishForm.project.species,
-                    release_date: this.publishForm.releaseDate,
                 });
-                // .then((res) => {
-                //     console.log("success");
-                // });
+                if (!exists) {
+                    this.publishForm.project.tags.push({
+                        text: this.publishForm.project.tag,
+                    });
+                    this.publishForm.project.tag = "";
+                }
+            }
+            this.loadingStep = true;
+            axios.put(route("dashboard.project.update", this.project.id), {
+                name: this.publishForm.project.name,
+                description: this.publishForm.project.description,
+                tags: this.publishForm.project.tags,
+                tags_array: this.publishForm.project.tags
+                    ? this.publishForm.project.tags.map((a) => a.text)
+                    : [],
+                license_id: this.license ? this.license.id : null,
+                species: this.publishForm.project.species,
+                release_date: this.publishForm.releaseDate,
+            });
+            // .then((res) => {
+            //     console.log("success");
+            // });
             // }
         },
         updateSpecies(species) {
