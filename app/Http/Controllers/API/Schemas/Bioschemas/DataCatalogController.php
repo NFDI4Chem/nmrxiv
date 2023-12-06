@@ -4,118 +4,72 @@ namespace App\Http\Controllers\API\Schemas\Bioschemas;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 use Spatie\SchemaOrg\Schema;
 
 /**
- * Implement Bioschemas Data Catalog type on nmrXiv as a repository to enable exporting
- * its metadata with a json endpoint.
+ * Use Schema.org DataCatalog type to represent nmrXiv as a repository.
  */
 class DataCatalogController extends Controller
 {
     /**
-     * Implement Bioschemas Data Catalog type on nmrXiv as a repository.
+     * Use Schema.org DataCatalog type to represent nmrXiv as a repository.
      *
-     * @link https://bioschemas.org/profiles/DataCatalog/0.3-RELEASE-2019_07_01
+     * @link https://schema.org/DataCatalog
      *
      * @param  Illuminate\Http\Request  $request
-     * @return object $dataCatalog
+     * @return object $dataCatalogSchema
      */
     public function dataCatalogSchema(Request $request)
     {
-        $creativeWork = Schema::CreativeWork();
-        $creativeWork['@id'] = 'https://schema.org/DataCatalog"';
-
-        $confromsTo = $creativeWork;
-
         $keywords = $this->prepareKeywords();
         $contributors = $this->prepareContributors();
 
         $nmrXivProvider = Schema::Organization();
-        $nmrXivProvider->name(env('NMRXIV_PROVIDER'));
-        $nmrXivProvider->url(env('NMRXIV_PROVIDER_URL'));
+        $nmrXivProvider->name(Config::get('schemas.bioschema.provider'));
+        $nmrXivProvider->url(Config::get('schemas.bioschema.provider_url'));
 
-        $dataCatalog = Schema::DataCatalog();
-        $dataCatalog['@id'] = url(env('APP_URL'));
-        $dataCatalog['dct:conformsTo'] = $confromsTo;
-        $dataCatalog->description(env('APP_DESCRIPTION'));
-        $dataCatalog->keywords($keywords);
-        $dataCatalog->name(env('APP_NAME'));
-        $dataCatalog->provider($nmrXivProvider);
-        $dataCatalog->url(env('APP_URL'));
-        $dataCatalog->identifier(env('APP_URL'));
-        $dataCatalog->license('https://mit-license.org/');
-        $dataCatalog->contributor($contributors);
-        $dataCatalog->isAccessibleForFree(true);
+        $dataCatalogSchema = Schema::DataCatalog();
+        $dataCatalogSchema['@id'] = url(Config::get('app.url'));
+        $dataCatalogSchema['dct:conformsTo'] = BioschemasHelper::conformsTo(['https://schema.org/DataCatalog']);
+        $dataCatalogSchema->description(env('APP_DESCRIPTION'));
+        $dataCatalogSchema->keywords($keywords);
+        $dataCatalogSchema->name(Config::get('app.name'));
+        $dataCatalogSchema->provider($nmrXivProvider);
+        $dataCatalogSchema->url(Config::get('app.url'));
+        $dataCatalogSchema->identifier(Config::get('app.url'));
+        $dataCatalogSchema->license('https://mit-license.org/');
+        $dataCatalogSchema->contributor($contributors);
+        $dataCatalogSchema->isAccessibleForFree(true);
 
-        $dataCatalog->measurementTechnique(env('MEASUREMENT_TECHNIQUE'));
+        $dataCatalogSchema->measurementTechnique(Config::get('schemas.ontologies.measurement_technique'));
 
-        return $dataCatalog;
+        return $dataCatalogSchema;
     }
 
     /**
-     * Get Defined Term for ontology term.
+     * Prepare keywords associated with nmrXiv.
      *
-     *
-     * @param  string  $name
-     * @param  array  $alternameName
-     * @param  string  $identifier
-     * @param  string  $url
-     * @param  object  $inDefinedTermSet
-     * @return object $definedTerm
-     */
-    public function getDefinedTerm($name, $alternateName, $identifier, $url, $inDefinedTermSet)
-    {
-        $definedTerm = Schema::DefinedTerm();
-        $definedTerm->name($name);
-        $definedTerm->alternateName($alternateName);
-        $definedTerm->identifier($identifier);
-        $definedTerm->url($url);
-        $definedTerm->inDefinedTermSet($inDefinedTermSet);
-
-        return $definedTerm;
-    }
-
-    /**
-     * Get Defined Term set for ontology service.
-     *
-     *
-     * @param  string  $name
-     * @param  string  $url
-     * @return object $definedTermSet
-     */
-    public function getDefinedTermSet($name, $url)
-    {
-        $definedTermSet = Schema::DefinedTermSet();
-        $definedTermSet->name($name);
-        $definedTermSet->url($url);
-
-        return $definedTermSet;
-    }
-
-    /**
-     * Prepare Keywords.
-     *
-     * @param null
      * @return array $keywords
      */
     public function prepareKeywords()
     {
-        //Prepare Defined Term Set
-        $chmo = $this->getDefinedTermSet('Chemical Methods Ontology', 'http://purl.obolibrary.org/obo/chmo.owl');
-        $nmrcv = $this->getDefinedTermSet('nuclear magnetic resonance CV', 'http://nmrml.org/cv/');
+        //Prepare Defined Term Sets
+        $chmo = BioschemasHelper::prepareDefinedTermSet('Chemical Methods Ontology', 'http://purl.obolibrary.org/obo/chmo.owl');
+        $nmrcv = BioschemasHelper::prepareDefinedTermSet('nuclear magnetic resonance CV', 'http://nmrml.org/cv/');
 
-        //Prepare Defined Term
-        $nmr = $this->getDefinedTerm('nuclear magnetic resonance spectroscopy', ['NMR', 'NMR spectroscopy', 'nuclear magnetic resonance (NMR) spectroscopy'], 'CHMO:0000591', 'http://purl.obolibrary.org/obo/CHMO_0000591', $chmo);
-        $pulsedNMR = $this->getDefinedTerm('pulsed nuclear magnetic resonance spectroscopy', ['NMR', 'nuclear magnetic resonance spectroscopy', 'NMR spectroscopy'], 'CHMO:0000613', 'https://ontobee.org/ontology/CHMO?iri=http://purl.obolibrary.org/obo/CHMO_0000613', $chmo);
-        $oneDNMR = $this->getDefinedTerm('one-dimensional nuclear magnetic resonance spectroscopy', ['1D NMR spectroscopy', '1-D NMR', 'one-dimensional nuclear magnetic resonance spectroscopy', '1D NMR', '1D nuclear magnetic resonance spectroscopy'], 'CHMO:0000592', 'http://purl.obolibrary.org/obo/CHMO_0000592', $chmo);
-        $twoDNMR = $this->getDefinedTerm('two-dimensional nuclear magnetic resonance spectroscopy', ['2-D NMR', '2D NMR', 'two-dimensional nuclear magnetic resonance spectroscopy', '2D NMR spectroscopy', 'two-dimensional NMR', '2D nuclear magnetic resonance'], 'CHMO:0000598', 'http://purl.obolibrary.org/obo/CHMO_0000598', $chmo);
-        $cosy = $this->getDefinedTerm('correlation spectroscopy spectrum', ['COSY spectra', 'COSY spectrum', 'COSY NMR spectrum', 'COSY NMR spectra'], 'CHMO:0002450', 'http://purl.obolibrary.org/obo/CHMO_0002450', $chmo);
-        $hsqc = $this->getDefinedTerm('heteronuclear single quantum coherence', ['HSQC'], 'CHMO:0000604', 'http://purl.obolibrary.org/obo/CHMO_0000604', $chmo);
-        $hmbc = $this->getDefinedTerm('heteronuclear multiple bond coherence', ['HMBC NMR', 'HMBC'], 'CHMO:0000601', 'http://purl.obolibrary.org/obo/CHMO_0000601', $chmo);
-        $noesy = $this->getDefinedTerm('two-dimensional nuclear Overhauser enhancement spectrum', ['2D NOESY-NMR spectrum', '2D NOESY-NMR spectra', '2D NOESY spectra', '2D NOESY spectrum'], 'CHMO:0001171', 'http://purl.obolibrary.org/obo/CHMO_0001171', $chmo);
-        $brukerNMR = $this->getDefinedTerm('Bruker', [], 'NMR:1400256', 'http://nmrML.org/nmrCV#NMR:1400256', $nmrcv);
-        $joel = $this->getDefinedTerm('JEOL', [], 'NMR:1400258', 'http://nmrML.org/nmrCV#NMR:1400258', $nmrcv);
-        $nmreData = $this->getDefinedTerm('NMReDATA', [], 'format:3906', 'http://edamontology.org/format_3906', $nmrcv);
+        //Prepare Defined Terms
+        $nmr = BioschemasHelper::prepareDefinedTerm('nuclear magnetic resonance spectroscopy', ['NMR', 'NMR spectroscopy', 'nuclear magnetic resonance (NMR) spectroscopy'], 'CHMO:0000591', 'http://purl.obolibrary.org/obo/CHMO_0000591', $chmo);
+        $pulsedNMR = BioschemasHelper::prepareDefinedTerm('pulsed nuclear magnetic resonance spectroscopy', ['NMR', 'nuclear magnetic resonance spectroscopy', 'NMR spectroscopy'], 'CHMO:0000613', 'https://ontobee.org/ontology/CHMO?iri=http://purl.obolibrary.org/obo/CHMO_0000613', $chmo);
+        $oneDNMR = BioschemasHelper::prepareDefinedTerm('one-dimensional nuclear magnetic resonance spectroscopy', ['1D NMR spectroscopy', '1-D NMR', 'one-dimensional nuclear magnetic resonance spectroscopy', '1D NMR', '1D nuclear magnetic resonance spectroscopy'], 'CHMO:0000592', 'http://purl.obolibrary.org/obo/CHMO_0000592', $chmo);
+        $twoDNMR = BioschemasHelper::prepareDefinedTerm('two-dimensional nuclear magnetic resonance spectroscopy', ['2-D NMR', '2D NMR', 'two-dimensional nuclear magnetic resonance spectroscopy', '2D NMR spectroscopy', 'two-dimensional NMR', '2D nuclear magnetic resonance'], 'CHMO:0000598', 'http://purl.obolibrary.org/obo/CHMO_0000598', $chmo);
+        $cosy = BioschemasHelper::prepareDefinedTerm('correlation spectroscopy spectrum', ['COSY spectra', 'COSY spectrum', 'COSY NMR spectrum', 'COSY NMR spectra'], 'CHMO:0002450', 'http://purl.obolibrary.org/obo/CHMO_0002450', $chmo);
+        $hsqc = BioschemasHelper::prepareDefinedTerm('heteronuclear single quantum coherence', ['HSQC'], 'CHMO:0000604', 'http://purl.obolibrary.org/obo/CHMO_0000604', $chmo);
+        $hmbc = BioschemasHelper::prepareDefinedTerm('heteronuclear multiple bond coherence', ['HMBC NMR', 'HMBC'], 'CHMO:0000601', 'http://purl.obolibrary.org/obo/CHMO_0000601', $chmo);
+        $noesy = BioschemasHelper::prepareDefinedTerm('two-dimensional nuclear Overhauser enhancement spectrum', ['2D NOESY-NMR spectrum', '2D NOESY-NMR spectra', '2D NOESY spectra', '2D NOESY spectrum'], 'CHMO:0001171', 'http://purl.obolibrary.org/obo/CHMO_0001171', $chmo);
+        $brukerNMR = BioschemasHelper::prepareDefinedTerm('Bruker', [], 'NMR:1400256', 'http://nmrML.org/nmrCV#NMR:1400256', $nmrcv);
+        $joel = BioschemasHelper::prepareDefinedTerm('JEOL', [], 'NMR:1400258', 'http://nmrML.org/nmrCV#NMR:1400258', $nmrcv);
+        $nmreData = BioschemasHelper::prepareDefinedTerm('NMReDATA', [], 'format:3906', 'http://edamontology.org/format_3906', $nmrcv);
 
         $keywords = [$nmr, $pulsedNMR, $oneDNMR, $twoDNMR, $cosy, $hsqc, $hmbc, $noesy, $brukerNMR, $joel, $nmreData];
 
@@ -123,52 +77,34 @@ class DataCatalogController extends Controller
     }
 
     /**
-     * Get Person from given and family names.
+     * Prepare contributors to nmrXiv.
      *
-     *
-     * @param  string  $givenName
-     * @param  string  $familyName
-     * @return object $Person
-     */
-    public function getPerson($id, $givenName, $familyName)
-    {
-        $contributor = Schema::Person();
-        $contributor->identifier($id);
-        $contributor->givenName($givenName);
-        $contributor->familyName($familyName);
-
-        return $contributor;
-    }
-
-    /**
-     * Prepare Contributors.
-     *
-     * @param null
      * @return array $contributors
      */
     public function prepareContributors()
     {
-        $Annett = $this->getPerson('0000-0002-2542-0867', 'Annett', 'Schröter');
-        $Christian = $this->getPerson(null, 'Christian', 'Popp');
-        $Christoph = $this->getPerson('0000-0001-6966-0814', 'Christoph', 'Steinbeck');
-        $Darina = $this->getPerson(null, 'Darina', 'Storozhuk');
-        $David = $this->getPerson('0000-0001-7499-1693', 'David', 'Rauh');
-        $Guido = $this->getPerson('0000-0003-1022-4326', 'Guido', 'Pauli');
-        $Hamed = $this->getPerson(null, 'Hamed', 'Musallam');
-        $Johannes = $this->getPerson('0000-0003-2060-842X', 'Johannes', 'Liermann');
-        $Julien = $this->getPerson('0000-0002-3416-2572', 'Julien', 'Wist');
-        $Kohulan = $this->getPerson('0000-0003-1066-7792', 'Kohulan', 'Rajan');
-        $Luc = $this->getPerson('0000-0002-4943-2643', 'Luc', 'Patiny');
-        $Markus = $this->getPerson(null, 'Markus', 'Lange');
-        $Nazar = $this->getPerson('0000-0002-5870-8496', 'Nazar', 'Stefaniuk');
-        $Nils = $this->getPerson('0000-0002-0990-9582', 'Nils', 'Schlörer');
-        $Nisha = $this->getPerson('0009-0006-4755-1039', 'Nisha', 'Sharma');
-        $Noura = $this->getPerson('0009-0001-5998-5030', 'Noura', 'Rayya');
-        $Pascal = $this->getPerson(null, 'Pascal', 'Scherreiks');
-        $Stefan = $this->getPerson('0000-0002-5990-4157', 'Stefan', 'Kuhn');
-        $Steffen = $this->getPerson('0000-0002-7899-7192', 'Steffen', 'Neumann');
-        $Tillmann = $this->getPerson('0000-0003-4480-8661', 'Tillmann', 'Fischer');
-        $Venkata = $this->getPerson('0000-0002-2564-3243', 'Venkata Chandrasekhar', 'Nainala');
+
+        $Annett = BioschemasHelper::preparePerson('0000-0002-2542-0867', 'Annett', 'Schröter', 'annett.schroeter@uni-jena.de', 'Friedrich-Schiller-Universität Jena');
+        $Christian = BioschemasHelper::preparePerson(null, 'Christian', 'Popp', null, null);
+        $Christoph = BioschemasHelper::preparePerson('0000-0001-6966-0814', 'Christoph', 'Steinbeck', 'christoph.steinbeck@uni-jena.de', 'Friedrich-Schiller-Universität Jena');
+        $Darina = BioschemasHelper::preparePerson(null, 'Darina', 'Storozhuk', 'darina.storozhuk@uni-jena.de', 'Friedrich-Schiller-Universität Jena');
+        $David = BioschemasHelper::preparePerson('0000-0001-7499-1693', 'David', 'Rauh', null, null);
+        $Guido = BioschemasHelper::preparePerson('0000-0003-1022-4326', 'Guido', 'Pauli', null, 'University of Illinois');
+        $Hamed = BioschemasHelper::preparePerson(null, 'Hamed', 'Musallam', 'hamed.musallam@uni-jena.de', 'Friedrich-Schiller-Universität Jena');
+        $Johannes = BioschemasHelper::preparePerson('0000-0003-2060-842X', 'Johannes', 'Liermann', 'liermann@uni-mainz.de', 'Johannes Gutenberg-Universität Mainz');
+        $Julien = BioschemasHelper::preparePerson('0000-0002-3416-2572', 'Julien', 'Wist', null, 'Murdoch University: Murdoch, WA, AU');
+        $Kohulan = BioschemasHelper::preparePerson('0000-0003-1066-7792', 'Kohulan', 'Rajan', 'kohulan.rajan@uni-jena.de', 'Friedrich-Schiller-Universität Jena');
+        $Luc = BioschemasHelper::preparePerson('0000-0002-4943-2643', 'Luc', 'Patiny', null, 'École Polytechnique Fédérale de Lausanne: Lausanne, VD, CH');
+        $Markus = BioschemasHelper::preparePerson(null, 'Markus', 'Lange', null, null);
+        $Nazar = BioschemasHelper::preparePerson('0000-0002-5870-8496', 'Nazar', 'Stefaniuk', null, null);
+        $Nils = BioschemasHelper::preparePerson('0000-0002-0990-9582', 'Nils', 'Schlörer', null, 'Friedrich-Schiller-Universität Jena');
+        $Nisha = BioschemasHelper::preparePerson('0009-0006-4755-1039', 'Nisha', 'Sharma', 'nisha.sharma@uni-jena.de', 'Friedrich-Schiller-Universität Jena');
+        $Noura = BioschemasHelper::preparePerson('0009-0001-5998-5030', 'Noura', 'Rayya', 'noura.rayya@uni-jena.de', 'Friedrich-Schiller-Universität Jena');
+        $Pascal = BioschemasHelper::preparePerson(null, 'Pascal', 'Scherreiks', null, null);
+        $Stefan = BioschemasHelper::preparePerson('0000-0002-5990-4157', 'Stefan', 'Kuhn', null, 'University of Tartu, Tartu');
+        $Steffen = BioschemasHelper::preparePerson('0000-0002-7899-7192', 'Steffen', 'Neumann', null, 'Leibniz-Institut für Pflanzenbiochemie, Halle');
+        $Tillmann = BioschemasHelper::preparePerson('0000-0003-4480-8661', 'Tillmann', 'Fischer', null, 'Leibniz-Institut für Pflanzenbiochemie, Halle');
+        $Venkata = BioschemasHelper::preparePerson('0000-0002-2564-3243', 'Venkata Chandrasekhar', 'Nainala', 'chandu.nainala@uni-jena.de', 'Friedrich-Schiller-Universität Jena');
 
         $contributors = [$Annett, $Christian, $Christoph, $Darina, $Guido, $Hamed, $Johannes, $Julien, $Kohulan, $Luc, $Markus, $Nazar, $Nils, $Nisha, $Noura, $Pascal, $Stefan, $Steffen, $Tillmann, $Venkata];
 
