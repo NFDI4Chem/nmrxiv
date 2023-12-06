@@ -6,9 +6,9 @@
                 class="text-center px-3 py-2 bg-red-50 text-red-700 border-b"
             >
                 <b>Warning: </b> This project is deleted. At the end of the
-                30-day period, the project and all of its resources are deleted
-                and cannot be recovered. You can restore a deleted project
-                within the 30-day recovery period.
+                30-day period, this project and all of its resources will be
+                deleted permanently and cannot be recovered. You can only
+                restore a deleted project within the 30-day recovery period.
             </div>
             <div
                 v-if="!project.is_public && project.is_published"
@@ -77,7 +77,10 @@
                                     <span>Edit</span>
                                 </button>
                             </div>
-                            <div class="inline-flex items-center mt-3">
+                            <div
+                                class="inline-flex items-center mt-3"
+                                v-if="!project.is_deleted"
+                            >
                                 <access-dialogue
                                     :available-roles="availableRoles"
                                     :role="role"
@@ -319,7 +322,11 @@
                             {{ formatDateTime(project.updated_at) }}
                         </div>
                         <div
-                            v-if="!project.is_public && !project.is_published"
+                            v-if="
+                                !project.is_public &&
+                                !project.is_published &&
+                                !project.is_deleted
+                            "
                             class="flex-nowrap"
                         >
                             <Publish :project="project" />
