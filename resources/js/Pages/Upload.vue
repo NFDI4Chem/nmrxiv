@@ -467,52 +467,31 @@
                                                             toggleCompoundDetails()
                                                         "
                                                     >
-                                                        <svg
+                                                        <EyeIcon
+                                                            class="w-4 h-4 mr-1 text-gray-600 hover:text-gray-500"
                                                             v-if="
                                                                 !showCompoundDetails
                                                             "
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                            fill="none"
-                                                            viewBox="0 0 24 24"
-                                                            stroke-width="1.5"
-                                                            stroke="currentColor"
-                                                            class="w-5 h-5 mr-1 text-gray-600 hover:text-gray-500 inline"
-                                                        >
-                                                            <path
-                                                                stroke-linecap="round"
-                                                                stroke-linejoin="round"
-                                                                d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m5.231 13.481L15 17.25m-4.5-15H5.625c-.621 0-1.125.504-1.125 1.125v16.5c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9zm3.75 11.625a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"
-                                                            />
-                                                        </svg>
-                                                        <svg
+                                                        />
+                                                        <EyeSlashIcon
+                                                            class="w-4 h-4 mr-1 text-gray-600 hover:text-gray-500"
                                                             v-else
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                            fill="none"
-                                                            viewBox="0 0 24 24"
-                                                            stroke-width="1.5"
-                                                            stroke="currentColor"
-                                                            class="w-5 h-5 mr-1 text-gray-600 hover:text-gray-500 inline"
-                                                        >
-                                                            <path
-                                                                stroke-linecap="round"
-                                                                stroke-linejoin="round"
-                                                                d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                                                            />
-                                                        </svg>
+                                                        />
 
-                                                        <span
-                                                            class="bg-gray-900 text-center text-white px-2 py-1 shadow-lg rounded-md tooltiptextbottom"
-                                                            ><span
+                                                        <div
+                                                            class="bg-gray-900 text-center text-white px-2 py-1 shadow-lg rounded-md tooltiptextleft"
+                                                        >
+                                                            <span
                                                                 v-if="
                                                                     !showCompoundDetails
                                                                 "
-                                                                >Show</span
+                                                                >Show Compound
+                                                                details</span
                                                             ><span v-else
-                                                                >Hide</span
+                                                                >Hide Compound
+                                                                details</span
                                                             >
-                                                            compound
-                                                            details</span
-                                                        >
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div
@@ -1601,7 +1580,15 @@
                                             </svg>
                                             <div
                                                 v-html="spectraLoadingMessage"
+                                                class="my-4"
                                             ></div>
+                                            <button
+                                                type="button"
+                                                class="inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                                                @click="showSamplesSummary"
+                                            >
+                                                Cancel
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -1651,6 +1638,8 @@ import {
     TrashIcon,
     PencilIcon,
     ArrowDownOnSquareStackIcon,
+    EyeIcon,
+    EyeSlashIcon,
 } from "@heroicons/vue/24/solid";
 import SpectraEditor from "@/Shared/SpectraEditor.vue";
 import Depictor from "@/Shared/Depictor.vue";
@@ -1671,6 +1660,8 @@ export default {
         TrashIcon,
         PencilIcon,
         ArrowDownOnSquareStackIcon,
+        EyeIcon,
+        EyeSlashIcon,
         Validation,
         SpectraEditor,
         Depictor,
@@ -1859,12 +1850,22 @@ export default {
             }
         });
         this.showPrimer = !this.primed;
+
+        let localItems = this.findLocalItems("show_compound_details");
+        if (localItems.length > 0) {
+            this.showCompoundDetails = JSON.parse(localItems[0].val);
+        }
     },
     methods: {
         toggleCompoundDetails() {
             this.showCompoundDetails = !this.showCompoundDetails;
+            localStorage.setItem(
+                "show_compound_details",
+                this.showCompoundDetails
+            );
         },
         showSamplesSummary() {
+            this.spectraLoadingStatus = false;
             this.displaySamplesSummaryInfo = true;
             this.selectedStudy = null;
             this.setQueryStringParameter("sample", null);
