@@ -96,7 +96,6 @@ class BioschemasController extends Controller
                 $projectSchema = $this->project($model);
 
                 return $projectSchema;
-
             } elseif ($namespace == 'Study') {
                 $studySchema = $this->study($model);
 
@@ -107,7 +106,6 @@ class BioschemasController extends Controller
 
                 return $datasetSchema;
             }
-
         } else {
             throw new AuthorizationException;
         }
