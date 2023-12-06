@@ -17,6 +17,7 @@ trait HasDOI
                 $title = null;
                 $authors = [];
                 $users = [];
+                $tags = [];
                 $suffix = null;
                 $url = 'https://www.nmrxiv.org/';
                 $publicationYear = Carbon::now()->year;
@@ -35,6 +36,12 @@ trait HasDOI
                         'dateType' => 'Updated',
                     ],
                 ];
+
+                // $keywords = [];
+                // foreach ($this->tags as &$tag) {
+                //     $tag = $tag->name;
+                //     array_push($keywords, $tag);
+                // }
 
                 $description = [
                     'description' => $this->description,
@@ -151,6 +158,12 @@ trait HasDOI
                     ],
                 ];
 
+                // $subjects = [];
+                // foreach ($keywords as $keyword) {
+                //     $subject = ['subject' => $keyword,];
+                //     array_push($subjects, $subject);
+                // }
+
                 $attributes = [
                     'creators' => count($creators) > 0 ? $creators : $contributors,
                     'titles' => [
@@ -159,6 +172,7 @@ trait HasDOI
                         ],
                     ],
                     'publisher' => 'nmrXiv',
+                    //'subjects' =>$subjects,
                     'contributors' => $contributors,
                     'publicationYear' => $publicationYear,
                     'dates' => $dates,
@@ -166,7 +180,7 @@ trait HasDOI
                     'resourceType' => $this->resourceType,
                     'resourceTypeGeneral' => 'Dataset',
                     'rights' => $rights,
-                    'description' => $description,
+                    'descriptions' => [$description],
                     'relatedIdentifiers' => $relatedIdentifiers,
                     'url' => $url,
                     'isActive' => true,
