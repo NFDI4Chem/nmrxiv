@@ -476,7 +476,7 @@
                                     !publishForm.terms &&
                                     !publishForm.conditions
                                 "
-                                @click="publish"
+                                @click="showPublishConfirmationModal = true"
                             >
                                 Publish
                             </button>
@@ -617,6 +617,29 @@
                     </div>
                 </div>
             </div>
+            <jet-confirmation-modal
+                :show="showPublishConfirmationModal"
+                @close="showPublishConfirmationModal = false"
+            >
+                <template #title> Are you sure you want to publish? </template>
+
+                <template #content>
+                    Once the data is published you will no longer be able to
+                    change the data uploaded! If published as a project, you may
+                    add more compounds (spectra) to the project later.
+                </template>
+
+                <template #footer>
+                    <jet-secondary-button
+                        @click="showPublishConfirmationModal = false"
+                    >
+                        Cancel
+                    </jet-secondary-button>
+                    <jet-success-button class="ml-2" @click="publish">
+                        Publish Now
+                    </jet-success-button>
+                </template>
+            </jet-confirmation-modal>
         </div>
     </app-layout>
 </template>
@@ -663,6 +686,8 @@ import {
 import SpectraEditor from "@/Shared/SpectraEditor.vue";
 import ToggleButton from "@/Shared/ToggleButton.vue";
 import "ontology-elements/dist/index.js";
+import JetConfirmationModal from "@/Jetstream/ConfirmationModal.vue";
+import JetSuccessButton from "@/Jetstream/SuccessButton.vue";
 
 export default {
     components: {
@@ -701,6 +726,8 @@ export default {
         CalendarIcon,
         StudyInfo,
         CitationCard,
+        JetConfirmationModal,
+        JetSuccessButton,
     },
     props: ["user", "team", "project", "teamRole", "draft"],
 
@@ -739,6 +766,7 @@ export default {
             projectSpecies: "",
             status: "draft",
             validation: null,
+            showPublishConfirmationModal: false,
         };
     },
     computed: {
@@ -920,6 +948,7 @@ export default {
             this.manageCitationElement.toggleDialog();
         },
         publish() {
+            this.showPublishConfirmationModal = false;
             if (this.publishForm.conditions && this.publishForm.terms) {
                 this.errors = null;
                 axios
