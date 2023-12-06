@@ -105,11 +105,7 @@ trait HasDOI
                                 'schemeUri' => 'https://orcid.org',
                             ],
                         ],
-                        'affiliations' => [
-                            [
-                                'affiliation' => $author->affiliation ? $author->affiliation : null,
-                            ],
-                        ],
+                        'affiliation' => [$author->affiliation ? $author->affiliation : null,],
                     ];
                     array_push($creators, $creator);
                 }
