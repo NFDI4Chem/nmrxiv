@@ -171,7 +171,13 @@
                     >
                         {{ study.name }}
                     </p>
-                    <div class="mt-1 h-14 overflow-hidden">
+                    <div
+                        class="mt-1 h-14 overflow-hidden"
+                        v-if="
+                            study.experiment_types &&
+                            study.experiment_types.length > 0
+                        "
+                    >
                         <span
                             v-for="type in study.experiment_types"
                             :key="type"
