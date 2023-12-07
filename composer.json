@@ -10,6 +10,7 @@
     "require": {
         "php": "^8.1",
         "aws/aws-sdk-php": "^3.208",
+        "darkaonline/l5-swagger": "^8.5",
         "doctrine/dbal": "^3.1",
         "guzzlehttp/guzzle": "^7.4",
         "http-interop/http-factory-guzzle": "^1.2",
@@ -30,7 +31,7 @@
         "mpociot/versionable": "^4.3",
         "nfdi4chem/orcid": "master",
         "owen-it/laravel-auditing": "^13.5.1",
-        "predis/predis": "*",
+        "predis/predis": "^2.2",
         "spatie/laravel-backup": "^8.3",
         "spatie/laravel-cookie-consent": "^3.2.1",
         "spatie/laravel-permission": "^5.1",
@@ -84,6 +85,7 @@
     "extra": {
         "laravel": {
             "dont-discover": [
+                "laravel/telescope"
             ]
         }
     },

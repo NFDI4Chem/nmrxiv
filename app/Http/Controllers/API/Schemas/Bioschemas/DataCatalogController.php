@@ -20,6 +20,24 @@ class DataCatalogController extends Controller
      * @param  Illuminate\Http\Request  $request
      * @return object $dataCatalogSchema
      */
+
+    /**
+     * Bioschema
+     *
+     * @OA\Get (
+     *     path="/api/v1/schemas/bioschemas/",
+     *     tags={"schemas"},
+     *
+     * @OA\Response(
+     *    response=200,
+     *    description="Success",
+     * ),
+     * @OA\Response(
+     *    response=500,
+     *    description="Internal Server Error"
+     * )
+     * )
+     */
     public function dataCatalogSchema(Request $request)
     {
         $keywords = $this->prepareKeywords();
