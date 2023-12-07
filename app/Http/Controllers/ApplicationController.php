@@ -87,14 +87,14 @@ class ApplicationController extends Controller
                     ]);
                     break;
                 case 'study':
-                    if($project){
+                    if ($project) {
                         return Inertia::render('Public/Project/Study', [
                             'project' => (new ProjectResource($project))->lite(false, []),
                             'tab' => $tab,
                             'study' => (new StudyResource($study))->lite(false, ['tags', 'sample', 'datasets', 'molecules']),
                         ]);
                         break;
-                    }else{
+                    } else {
                         return Inertia::render('Public/Sample/Show', [
                             'tab' => $tab,
                             'study' => (new StudyResource($study))->lite(false, ['tags', 'sample', 'datasets', 'molecules', 'owner', 'license']),
