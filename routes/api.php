@@ -8,7 +8,7 @@ use App\Http\Controllers\API\FileSystemController;
 use App\Http\Controllers\API\ProjectController;
 use App\Http\Controllers\API\Schemas\Bioschemas\BioschemasController;
 use App\Http\Controllers\API\Schemas\Bioschemas\DataCatalogController;
-use App\Http\Controllers\API\Schemas\Datacite\DataCiteController;
+use App\Http\Controllers\API\Schemas\DataCite\DataCiteController;
 use App\Http\Controllers\API\SearchController;
 use App\Http\Controllers\API\StudyController;
 use Illuminate\Support\Facades\Route;

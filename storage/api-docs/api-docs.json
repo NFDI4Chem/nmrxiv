@@ -75,11 +75,8 @@
                     "auth"
                 ],
                 "summary": "Register",
-                "description": "Register by providing details.",
-                "operationId": "authRegister",
+                "operationId": "8e6941c33edf331589fa028519f82817",
                 "requestBody": {
-                    "description": "Pass registration details.",
-                    "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
@@ -129,7 +126,32 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Successful Operation"
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User creation successful. Kindly confirm your email address by clicking the link sent to your inbox"
+                                        },
+                                        "access_token": {
+                                            "type": "string",
+                                            "example": "randomtokenasfhajskfhajf398rureuuhfdshk"
+                                        },
+                                        "token_type": {
+                                            "type": "string",
+                                            "example": "bearer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "422": {
                         "description": "Unprocessable Content"
@@ -237,6 +259,157 @@
                 }
             }
         },
+        "/api/v1/schemas/bioschemas/{username}/{project}": {
+            "get": {
+                "tags": [
+                    "schemas"
+                ],
+                "summary": "Fetch bioschema for public model based on user id and slug",
+                "description": "Fetch bioschema for public model based on user id and slug",
+                "operationId": "bioschemaModelByName",
+                "parameters": [
+                    {
+                        "name": "username",
+                        "in": "path",
+                        "description": "nmrXiv username",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "project",
+                        "in": "path",
+                        "description": "nmrXiv project slug e.g. cheminfo-nmr-dataset-1",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/v1/schemas/bioschemas/{id}": {
+            "get": {
+                "tags": [
+                    "schemas"
+                ],
+                "summary": "Fetch bischema for model based on identifier",
+                "description": "Fetch bischema for model based on identifier",
+                "operationId": "bioschemaModel",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Public model identifier for Project,Sample or Dataset e.g. P10 for Project,S70 for Sample or D399 for Dataset",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/v1/schemas/bioschemas/": {
+            "get": {
+                "tags": [
+                    "schemas"
+                ],
+                "summary": "Bioschema",
+                "operationId": "62c4756fdea25126d74d16746907c7c9",
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/v1/schemas/datacite/{username}/{project}": {
+            "get": {
+                "tags": [
+                    "schemas"
+                ],
+                "summary": "Fetch datacite schema for public model based on user id and slug",
+                "description": "Fetch datacite schema for public model based on user id and slug",
+                "operationId": "dataciteModelByName",
+                "parameters": [
+                    {
+                        "name": "username",
+                        "in": "path",
+                        "description": "nmrXiv username",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "project",
+                        "in": "path",
+                        "description": "nmrXiv project slug e.g. cheminfo-nmr-dataset-1",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/v1/schemas/datacite/{id}": {
+            "get": {
+                "tags": [
+                    "schemas"
+                ],
+                "summary": "Fetch datacite schema for model based on identifier",
+                "description": "Fetch datacite schema for model based on identifier",
+                "operationId": "dataciteModel",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Public model identifier for Project,Sample or Dataset e.g. P10 for Project,S70 for Sample or D399 for Dataset",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/api/v1/search": {
             "post": {
                 "tags": [
@@ -330,6 +503,15 @@
                         "description": "Internal Server Error"
                     }
                 }
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "token": {
+                "type": "apiKey",
+                "name": "Authorization",
+                "in": "header"
             }
         }
     }
