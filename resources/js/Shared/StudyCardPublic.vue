@@ -178,13 +178,14 @@
                             study.experiment_types.length > 0
                         "
                     >
-                        <span
-                            v-for="type in study.experiment_types"
-                            :key="type"
-                            class="mt-1 inline-flex items-center rounded-full bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10"
-                        >
-                            {{ type }}
-                        </span>
+                        <div v-for="type in study.experiment_types" :key="type">
+                            <span
+                                v-if="type && type != null"
+                                class="mt-1 inline-flex items-center rounded-full bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10"
+                            >
+                                {{ type }}
+                            </span>
+                        </div>
                     </div>
                 </div>
 
