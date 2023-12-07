@@ -34,6 +34,48 @@ class BioschemasController extends Controller
      * @param  App\Models\Dataset  $datasetName Optional
      * @return object
      */
+    /**
+     * Bioschema
+     *
+     * @OA\Get (
+     *     path="/api/v1/schemas/bioschemas/{username}/{project}",
+     *     summary="Fetch bioschema for public model based on user id and slug",
+     *     description="Fetch bioschema for public model based on user id and slug",
+     *     operationId="bioschemaModelByName",
+     *     tags={"schemas"},
+     *
+     * @OA\Parameter(
+     *  name="username",
+     *  in="path",
+     *  description="nmrXiv username",
+     *  required=true,
+     *
+     *      @OA\Schema(
+     *          type="string",
+     *    )
+     * ),
+     *
+     * @OA\Parameter(
+     *  name="project",
+     *  in="path",
+     *  description="nmrXiv project slug e.g. cheminfo-nmr-dataset-1",
+     *  required=true,
+     *
+     *      @OA\Schema(
+     *          type="string",
+     *    )
+     * ),
+     *
+     * @OA\Response(
+     *    response=200,
+     *    description="Success",
+     * ),
+     * @OA\Response(
+     *    response=500,
+     *    description="Internal Server Error"
+     * )
+     * )
+     */
     public function modelSchemaByName(Request $request, $username, $projectName, $studyName = null, $datasetName = null)
     {
         $user = User::where('username', $username)->firstOrFail();
@@ -84,6 +126,37 @@ class BioschemasController extends Controller
      * @param  Illuminate\Http\Request  $request
      * @param  string  $identifier
      * @return object
+     */
+    /**
+     * Bioschema
+     *
+     * @OA\Get (
+     *     path="/api/v1/schemas/bioschemas/{id}",
+     *     summary="Fetch bischema for model based on identifier",
+     *     description="Fetch bischema for model based on identifier",
+     *     operationId="bioschemaModel",
+     *     tags={"schemas"},
+     *
+     * @OA\Parameter(
+     *  name="id",
+     *  in="path",
+     *  description="Public model identifier for Project,Sample or Dataset e.g. P10 for Project,S70 for Sample or D399 for Dataset",
+     *  required=true,
+     *
+     *      @OA\Schema(
+     *          type="string",
+     *    )
+     * ),
+     *
+     * @OA\Response(
+     *    response=200,
+     *    description="Success",
+     * ),
+     * @OA\Response(
+     *    response=500,
+     *    description="Internal Server Error"
+     * )
+     * )
      */
     public function modelSchemaByID(Request $request, $identifier)
     {
