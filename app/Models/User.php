@@ -22,9 +22,9 @@ class User extends Authenticatable implements MustVerifyEmail
     use HasRoles;
     use HasStudies;
     use HasTeams;
+    use Impersonate;
     use Notifiable;
     use TwoFactorAuthenticatable;
-    use Impersonate;
 
     /**
      * The attributes that are mass assignable.
