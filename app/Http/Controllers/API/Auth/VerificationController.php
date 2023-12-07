@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Auth;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\Events\Verified;
 use Illuminate\Http\Request;
 
 class VerificationController extends Controller
@@ -16,15 +17,21 @@ class VerificationController extends Controller
             return response()->json(['msg' => 'Invalid/Expired url provided.'], 401);
         }
 
+        $user = User::findOrFail($user_id);
+
+        if (! hash_equals((string) $request->route('hash'), sha1($user->getEmailForVerification()))) {
+            throw new AuthorizationException;
+        }
+
         if ($request->user() && $request->user()->getKey() != $user_id) {
             Auth::logout();
             throw new AuthorizationException;
         }
 
-        $user = User::findOrFail($user_id);
-
         if (! $user->hasVerifiedEmail()) {
-            $user->markEmailAsVerified();
+            if ($user->markEmailAsVerified()) {
+                event(new Verified($user));
+            }
         }
 
         return redirect()->route('welcome')->with('success', 'Email verification Successful');
