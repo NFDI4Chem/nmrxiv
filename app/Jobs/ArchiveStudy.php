@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use ZipStream;
 
-class ArchiveStudy implements ShouldQueue, ShouldBeUnique
+class ArchiveStudy implements ShouldBeUnique, ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
