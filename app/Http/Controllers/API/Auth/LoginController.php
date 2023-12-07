@@ -12,7 +12,7 @@ class LoginController extends Controller
 {
     /**
      * @OA\Post(
-     * path="/api/v1/auth/login",
+     * path="/api/auth/login",
      * summary="Sign in",
      * description="Login by email and password",
      * operationId="authLogin",
@@ -42,6 +42,7 @@ class LoginController extends Controller
      */
     public function login(Request $request): JsonResponse
     {
+
         if (! Auth::attempt($request->only('email', 'password'))) {
             return response()->json([
                 'message' => 'Invalid login details',
@@ -49,6 +50,12 @@ class LoginController extends Controller
         }
 
         $user = User::where('email', $request['email'])->firstOrFail();
+
+        if (! $user->hasVerifiedEmail()) {
+            return response()->json([
+                'message' => 'Account is not yet verified. Please verify your email address by clicking on the link we just emailed to you.',
+            ], 403);
+        }
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -60,7 +67,7 @@ class LoginController extends Controller
 
     /**
      *  @OA\Get(
-     *      path="/api/v1/auth/logout",
+     *      path="/api/auth/logout",
      *      summary="Sign out",
      *      tags={"auth"},
      *      security={{"sanctum":{}}},

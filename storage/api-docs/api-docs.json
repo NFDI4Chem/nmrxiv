@@ -5,7 +5,7 @@
         "version": "1.0"
     },
     "paths": {
-        "/api/v1/auth/login": {
+        "/api/auth/login": {
             "post": {
                 "tags": [
                     "auth"
@@ -50,13 +50,13 @@
                 }
             }
         },
-        "/api/v1/auth/logout": {
+        "/api/auth/logout": {
             "get": {
                 "tags": [
                     "auth"
                 ],
                 "summary": "Sign out",
-                "operationId": "84358406c526dc97519e0eab688b4efe",
+                "operationId": "bb179b35112b2c8080588c87953175f7",
                 "responses": {
                     "200": {
                         "description": "successful operation"
@@ -69,13 +69,13 @@
                 ]
             }
         },
-        "/api/v1/auth/register": {
+        "/api/auth/register": {
             "post": {
                 "tags": [
                     "auth"
                 ],
                 "summary": "Register",
-                "operationId": "8e6941c33edf331589fa028519f82817",
+                "operationId": "de84cda3271107bdf3d3ae044d8afcf1",
                 "requestBody": {
                     "content": {
                         "application/json": {
@@ -157,6 +157,44 @@
                         "description": "Unprocessable Content"
                     }
                 }
+            }
+        },
+        "/api/auth/user/info": {
+            "get": {
+                "tags": [
+                    "auth"
+                ],
+                "summary": "User info",
+                "operationId": "a76271ca4e85fa6e7470052cbe6c4429",
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/auth/email/resend": {
+            "get": {
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Resend verification email",
+                "operationId": "c8b11569af83c4d423af040f6c0cd2fa",
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
             }
         },
         "/api/v1/datasets": {
@@ -510,6 +548,12 @@
         "securitySchemes": {
             "token": {
                 "type": "apiKey",
+                "name": "Authorization",
+                "in": "header"
+            },
+            "sanctum": {
+                "type": "apiKey",
+                "description": "Enter token in format (Bearer <token>)",
                 "name": "Authorization",
                 "in": "header"
             }

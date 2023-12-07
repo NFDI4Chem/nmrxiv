@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\ConsoleController;
 use App\Http\Controllers\Admin\CurationController;
 use App\Http\Controllers\Admin\LicenseController;
 use App\Http\Controllers\Admin\UsersController;
+use App\Http\Controllers\API\Auth\VerificationController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\Auth\SocialController;
 use App\Http\Controllers\AuthorController;
@@ -63,6 +64,8 @@ Route::get('/', function () {
 Route::supportBubble();
 
 Route::impersonate();
+
+Route::get('/email/verify/{id}/{hash}', [VerificationController::class, 'verify'])->name('verification.verify');
 
 Route::group(['middleware' => 'verified'], function () {
     if (Jetstream::hasTeamFeatures()) {

@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\API\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Team;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 
 class RegisterController extends Controller
 {
@@ -13,7 +16,7 @@ class RegisterController extends Controller
      * Register
      *
      * @OA\Post (
-     *     path="/api/v1/auth/register",
+     *     path="/api/auth/register",
      *     tags={"auth"},
      *
      *     @OA\RequestBody(
@@ -56,26 +59,38 @@ class RegisterController extends Controller
      */
     public function register(Request $request)
     {
-        $validatedData = $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8',
-            'username' => 'required|string',
-        ]);
+        $validateUser = Validator::make($request->all(),
+            [
+                'first_name' => 'required|string|max:255',
+                'last_name' => 'required|string|max:255',
+                'email' => 'required|string|email|max:255|unique:users',
+                'password' => 'required|string|min:8',
+                'username' => 'required|string',
+            ]);
 
-        $user = User::create([
-            'name' => $validatedData['first_name'].' '.$validatedData['last_name'],
-            'first_name' => $validatedData['first_name'],
-            'last_name' => $validatedData['last_name'],
-            'email' => $validatedData['email'],
-            'username' => $validatedData['username'],
-            'orcid_id' => $request['orcid_id'],
-            'affiliation' => $request['affiliation'],
-            'password' => Hash::make($validatedData['password']),
-        ]);
+        if ($validateUser->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'validation error',
+                'errors' => $validateUser->errors(),
+            ], 401);
+        }
 
-        $user->sendEmailVerificationNotification();
+        $user = DB::transaction(function () use ($request) {
+            return tap(User::create([
+                'name' => $request['first_name'].' '.$request['last_name'],
+                'first_name' => $request['first_name'],
+                'last_name' => $request['last_name'],
+                'email' => $request['email'],
+                'username' => $request['username'],
+                'orcid_id' => $request['orcid_id'],
+                'affiliation' => $request['affiliation'],
+                'password' => Hash::make($request['password']),
+            ]), function (User $user) {
+                $this->createTeam($user);
+                $user->sendEmailVerificationNotification();
+            });
+        });
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -86,5 +101,19 @@ class RegisterController extends Controller
             'token_type' => 'Bearer',
         ],
             201);
+    }
+
+    /**
+     * Create a personal team for the user.
+     *
+     * @return void
+     */
+    protected function createTeam(User $user)
+    {
+        $user->ownedTeams()->save(Team::forceCreate([
+            'user_id' => $user->id,
+            'name' => explode(' ', $user->first_name.' '.$user->last_name, 2)[0]."'s Team",
+            'personal_team' => true,
+        ]));
     }
 }
