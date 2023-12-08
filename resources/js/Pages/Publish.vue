@@ -116,9 +116,9 @@
                                 <div id="project-keywords" class="mb-3">
                                     <label
                                         for="description"
-                                        class="block text-sm font-medium text-gray-700"
+                                        class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
                                     >
-                                        Keywords (Optional)
+                                        Keywords
                                     </label>
                                     <div>
                                         <vue-tags-input
@@ -533,6 +533,7 @@
                                         <Validation
                                             :project="project"
                                             :validation="validation"
+                                            :draft="draft.id"
                                         ></Validation>
                                     </div>
                                 </div>

@@ -534,7 +534,10 @@
                                                                 <div
                                                                     class="border-b border-gray-100 mb-4 border"
                                                                     v-if="
-                                                                        showCompoundDetails
+                                                                        showCompoundDetails &&
+                                                                        study
+                                                                            .sample
+                                                                            .molecules[0]
                                                                     "
                                                                 >
                                                                     <Depictor2D
@@ -1831,7 +1834,13 @@ export default {
                             (d) => d.id == this.draft_id
                         );
                     }
-                    this.selectDraft(selectedDraft);
+                    if (selectedDraft) {
+                        this.selectDraft(selectedDraft);
+                    } else {
+                        if (response.data.default.id == this.draft_id) {
+                            this.selectDraft(response.data.default);
+                        }
+                    }
                     this.loading = false;
                 } else {
                     alert(
@@ -1892,6 +1901,7 @@ export default {
             }
             this.$nextTick(() => {
                 if (this.step == "2") {
+                    this.showPrimer = false;
                     this.loadSamplesSummary();
                 } else {
                     this.selectStep(1);
@@ -1989,6 +1999,10 @@ export default {
             if (id == 1) {
                 // this.loadingStep = true;
                 this.$nextTick(function () {
+                    this.setQueryStringParameter(
+                        "draft_id",
+                        this.currentDraft.id
+                    );
                     this.setQueryStringParameter("step", 1);
                     this.step = "1";
                     if (this.$refs.fsbRef) {
