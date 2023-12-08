@@ -215,7 +215,7 @@
                 }
             }
         },
-        "/api/v1/dataset/?id={id}": {
+        "/api/v1/dataset/{id}": {
             "get": {
                 "tags": [
                     "public"
@@ -226,7 +226,7 @@
                 "parameters": [
                     {
                         "name": "id",
-                        "in": "query",
+                        "in": "path",
                         "description": "Public dataset identifier e.g. D12",
                         "required": true,
                         "schema": {
@@ -265,7 +265,7 @@
                 }
             }
         },
-        "/api/v1/project/?id={id}": {
+        "/api/v1/project/{id}": {
             "get": {
                 "tags": [
                     "public"
@@ -276,7 +276,7 @@
                 "parameters": [
                     {
                         "name": "id",
-                        "in": "query",
+                        "in": "path",
                         "description": "Public project identifier e.g. P12",
                         "required": true,
                         "schema": {
@@ -511,7 +511,7 @@
                 }
             }
         },
-        "/api/v1/sample/?id={id}": {
+        "/api/v1/sample/{id}": {
             "get": {
                 "tags": [
                     "public"
@@ -522,7 +522,7 @@
                 "parameters": [
                     {
                         "name": "id",
-                        "in": "query",
+                        "in": "path",
                         "description": "Public sample identifier e.g. S12",
                         "required": true,
                         "schema": {
