@@ -634,13 +634,11 @@
                                                                         )
                                                                     "
                                                                     class="cursor-pointer bg-red-800 text-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
-                                                                    :href="
-                                                                        route(
-                                                                            'dashboard.study.datasets',
-                                                                            study.id
-                                                                        ) +
-                                                                        '?dsid=' +
-                                                                        dataset.id
+                                                                    @click="
+                                                                        update(
+                                                                            study,
+                                                                            'structure'
+                                                                        )
                                                                     "
                                                                 >
                                                                     Edit
@@ -714,6 +712,7 @@ export default {
         project: Object,
         validation: Object,
         mode: String,
+        draft: Number,
     },
     methods: {
         getStatus(value) {
@@ -729,10 +728,12 @@ export default {
                     model: model,
                 });
             } else {
-                // route(
-                //     'dashboard.studies',
-                //     study.id
-                // )
+                window.location.replace(
+                    "/upload?draft_id=" +
+                        this.draft +
+                        "&step=2&sample=" +
+                        model.id
+                );
             }
         },
     },
