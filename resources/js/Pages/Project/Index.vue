@@ -318,7 +318,7 @@
                                 </a>
                                 <span
                                     class="bg-gray-900 text-center text-white px-2 py-1 shadow-lg rounded-md tooltiptextbottom"
-                                    >Open draft in the summary view</span
+                                    >Open project in the summary view</span
                                 >
                             </div>
                             <div v-if="!project.is_public" class="tooltip">
@@ -349,7 +349,7 @@
                                 </a>
                                 <span
                                     class="bg-gray-900 text-center text-white px-2 py-1 shadow-lg rounded-md tooltiptextbottom"
-                                    >Open draft/project settings view</span
+                                    >Open project settings view</span
                                 >
                             </div>
                             <!-- <div class="tooltip">
@@ -408,7 +408,15 @@ export default {
         getLink(project) {
             if (!project.is_public) {
                 if (project.draft_id) {
-                    return router.visit("upload?draft_id=" + project.draft_id);
+                    if (project.is_deleted) {
+                        return router.visit(
+                            this.route("dashboard.projects", [project.id])
+                        );
+                    } else {
+                        return router.visit(
+                            "/upload?draft_id=" + project.draft_id
+                        );
+                    }
                 } else {
                     alert(
                         "Draft missing. Please contact us at info.nmrxiv@uni-jena.de."

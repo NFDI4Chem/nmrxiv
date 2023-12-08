@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\DatasetResource;
 use App\Http\Resources\ProjectResource;
 use App\Http\Resources\StudyResource;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
@@ -38,7 +39,6 @@ class ApplicationController extends Controller
         $resolvedModel = resolveIdentifier($identifier);
         $namespace = $resolvedModel['namespace'];
         $model = $resolvedModel['model'];
-
         if ($model) {
             $studyId = $request->get('id');
             $tab = $request->get('tab');
@@ -87,12 +87,20 @@ class ApplicationController extends Controller
                     ]);
                     break;
                 case 'study':
-                    return Inertia::render('Public/Project/Study', [
-                        'project' => (new ProjectResource($project))->lite(false, []),
-                        'tab' => $tab,
-                        'study' => (new StudyResource($study))->lite(false, ['tags', 'sample', 'datasets', 'molecules']),
-                    ]);
-                    break;
+                    if ($project) {
+                        return Inertia::render('Public/Project/Study', [
+                            'project' => (new ProjectResource($project))->lite(false, []),
+                            'tab' => $tab,
+                            'study' => (new StudyResource($study))->lite(false, ['tags', 'sample', 'datasets', 'molecules']),
+                        ]);
+                        break;
+                    } else {
+                        return Inertia::render('Public/Sample/Show', [
+                            'tab' => $tab,
+                            'study' => (new StudyResource($study))->lite(false, ['tags', 'sample', 'datasets', 'molecules', 'owner', 'license']),
+                        ]);
+                        break;
+                    }
                 case 'dataset':
                     return Inertia::render('Public/Project/Dataset', [
                         'project' => (new ProjectResource($project))->lite(false, []),

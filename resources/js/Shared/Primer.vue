@@ -1,5 +1,5 @@
 <template>
-    <section class="bg-white">
+    <section class="bg-white mt-4 border-t">
         <div class="relative mx-auto px-12 py-8">
             <div class="relative">
                 <div>
@@ -10,6 +10,12 @@
                             Basic Concepts
                         </p>
                         <p class="mt-3">
+                            Submission to nmrXiv is divided into 3 steps <br />
+                            1) File upload <br />
+                            2) Auto - Processing, Assignments and Validation
+                            <br />
+                            3) Publish <br /><br />
+
                             In nmrXiv, data is organised as
                             <b class="text-teal-700">projects</b>. Consider a
                             project is equivalent to your publication with the
