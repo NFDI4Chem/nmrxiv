@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\API\Schemas\Datacite;
+namespace App\Http\Controllers\API\Schemas\DataCite;
 
 use App\Http\Controllers\Controller;
 use App\Models\Dataset;
@@ -9,7 +9,7 @@ use App\Models\Study;
 use App\Models\User;
 use Illuminate\Http\Request;
 
-class DataciteController extends Controller
+class DataCiteController extends Controller
 {
     /**
      * Implement DataCite metadata schema on nmrXiv project, study, and dataset to enable exporting
@@ -27,6 +27,48 @@ class DataciteController extends Controller
      * @param  App\Models\Study  $studyName Optional
      * @param  App\Models\Dataset  $datasetName Optional
      * @return object
+     */
+    /**
+     * Datacite
+     *
+     * @OA\Get (
+     *     path="/api/v1/schemas/datacite/{username}/{project}",
+     *     summary="Fetch datacite schema for public model based on user id and slug",
+     *     description="Fetch datacite schema for public model based on user id and slug",
+     *     operationId="dataciteModelByName",
+     *     tags={"schemas"},
+     *
+     * @OA\Parameter(
+     *  name="username",
+     *  in="path",
+     *  description="nmrXiv username",
+     *  required=true,
+     *
+     *      @OA\Schema(
+     *          type="string",
+     *    )
+     * ),
+     *
+     * @OA\Parameter(
+     *  name="project",
+     *  in="path",
+     *  description="nmrXiv project slug e.g. cheminfo-nmr-dataset-1",
+     *  required=true,
+     *
+     *      @OA\Schema(
+     *          type="string",
+     *    )
+     * ),
+     *
+     * @OA\Response(
+     *    response=200,
+     *    description="Success",
+     * ),
+     * @OA\Response(
+     *    response=500,
+     *    description="Internal Server Error"
+     * )
+     * )
      */
     public function modelSchemaByName(Request $request, $username, $projectName, $studyName = null, $datasetName = null)
     {
@@ -69,6 +111,37 @@ class DataciteController extends Controller
      * @param  Illuminate\Http\Request  $request
      * @param  string  $identifier
      * @return object
+     */
+    /**
+     * Datacite
+     *
+     * @OA\Get (
+     *     path="/api/v1/schemas/datacite/{id}",
+     *     summary="Fetch datacite schema for model based on identifier",
+     *     description="Fetch datacite schema for model based on identifier",
+     *     operationId="dataciteModel",
+     *     tags={"schemas"},
+     *
+     * @OA\Parameter(
+     *  name="id",
+     *  in="path",
+     *  description="Public model identifier for Project,Sample or Dataset e.g. P10 for Project,S70 for Sample or D399 for Dataset",
+     *  required=true,
+     *
+     *      @OA\Schema(
+     *          type="string",
+     *    )
+     * ),
+     *
+     * @OA\Response(
+     *    response=200,
+     *    description="Success",
+     * ),
+     * @OA\Response(
+     *    response=500,
+     *    description="Internal Server Error"
+     * )
+     * )
      */
     public function modelSchemaByID(Request $request, $identifier)
     {

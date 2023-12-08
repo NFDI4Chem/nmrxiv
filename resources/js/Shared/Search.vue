@@ -157,7 +157,7 @@
                                                     <div
                                                         v-if="currentRefinement"
                                                         class="border rounded-md"
-                                                    >
+                                                    > 
                                                         <span
                                                             v-if="
                                                                 index.hits
@@ -366,7 +366,9 @@ export default {
         return {
             open,
             onSelect(item) {
-                window.location = item.url;
+                if(item.url && item.url !== undefined){
+                    window.location = item.url;
+                }
             },
         };
     },
@@ -375,13 +377,7 @@ export default {
             projects: [],
             recent: [],
             quickActions: [
-                {
-                    name: "Ask a question...",
-                    icon: DocumentPlusIcon,
-                    shortcut: "N",
-                    url: this.mailTo,
-                },
-                {
+            {
                     name: "Learn Spectral analysis...",
                     icon: TagIcon,
                     shortcut: "F",
@@ -389,6 +385,12 @@ export default {
                 },
                 //   { name: "Add hashtag...", icon: HashtagIcon, shortcut: "H", url: "#" },
                 //   { name: "Add label...", icon: TagIcon, shortcut: "L", url: "#" },
+                {
+                    name: "For queries/feedback write to us at info.nmrxiv@uni-jena.de",
+                    icon: DocumentPlusIcon,
+                    shortcut: "N",
+                    url: "https://docs.nmrxiv.org/FAQs.html#how-to-reach-to-you",
+                },
             ],
             selected: null,
             department: "all",
@@ -400,11 +402,7 @@ export default {
 
     computed: {
         index() {
-            return this.$page.props.SCOUT_PREFIX + "projects";
-        },
-
-        mailTo() {
-            return "mailto:" + String(this.$page.props.mailFromAddress);
+            return this.$page.props.SCOUT_PREFIX + "projects" ;
         },
     },
 

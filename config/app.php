@@ -185,6 +185,7 @@ return [
         App\Providers\DOIServiceProvider::class,
 
         Lab404\Impersonate\ImpersonateServiceProvider::class,
+        L5Swagger\L5SwaggerServiceProvider::class,
     ],
 
     /*

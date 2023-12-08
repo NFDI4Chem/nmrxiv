@@ -90,16 +90,14 @@
                                 <p
                                     class="truncate text-md font-bold text-dark-600"
                                 >
-                                    Title
+                                    Name
                                 </p>
                                 <a
                                     v-if="!getStatus(validation.project.title)"
                                     target="_blank"
                                     :href="
-                                        route(
-                                            'dashboard.projects',
-                                            project.id
-                                        ) + '?edit=title'
+                                        route('publish', project.draft_id) +
+                                        '?edit=title#project-details'
                                     "
                                     class="cursor-pointer bg-red-800 text-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
                                 >
@@ -125,10 +123,8 @@
                                     "
                                     target="_blank"
                                     :href="
-                                        route(
-                                            'dashboard.projects',
-                                            project.id
-                                        ) + '?edit=description'
+                                        route('publish', project.draft_id) +
+                                        '?edit=description#project-details'
                                     "
                                     class="cursor-pointer bg-red-800 text-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
                                 >
@@ -152,10 +148,8 @@
                                     "
                                     target="_blank"
                                     :href="
-                                        route(
-                                            'dashboard.projects',
-                                            project.id
-                                        ) + '?edit=keywords'
+                                        route('publish', project.draft_id) +
+                                        '?edit=keywords#project-details'
                                     "
                                     class="cursor-pointer bg-red-800 text-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
                                 >
@@ -179,10 +173,8 @@
                                     "
                                     target="_blank"
                                     :href="
-                                        route(
-                                            'dashboard.projects',
-                                            project.id
-                                        ) + '?edit=citation'
+                                        route('publish', project.draft_id) +
+                                        '?edit=citation#project-details'
                                     "
                                     class="cursor-pointer bg-red-800 text-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
                                 >
@@ -206,10 +198,8 @@
                                     "
                                     target="_blank"
                                     :href="
-                                        route(
-                                            'dashboard.projects',
-                                            project.id
-                                        ) + '?edit=authors'
+                                        route('publish', project.draft_id) +
+                                        '?edit=authors#project-details'
                                     "
                                     class="cursor-pointer bg-red-800 text-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
                                 >
@@ -233,10 +223,8 @@
                                     "
                                     target="_blank"
                                     :href="
-                                        route(
-                                            'dashboard.projects',
-                                            project.id
-                                        ) + '?edit=license'
+                                        route('publish', project.draft_id) +
+                                        '?edit=license#publish-details'
                                     "
                                     class="cursor-pointer bg-red-800 text-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
                                 >
@@ -258,10 +246,8 @@
                                     v-if="!getStatus(validation.project.image)"
                                     target="_blank"
                                     :href="
-                                        route(
-                                            'dashboard.projects',
-                                            project.id
-                                        ) + '?edit=profile_image'
+                                        route('publish', project.draft_id) +
+                                        '?edit=profile_image#publish-details'
                                     "
                                     class="cursor-pointer bg-red-800 text-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
                                 >
@@ -648,13 +634,11 @@
                                                                         )
                                                                     "
                                                                     class="cursor-pointer bg-red-800 text-white ml-auto inline-block py-0.5 px-3 text-xs rounded-full"
-                                                                    :href="
-                                                                        route(
-                                                                            'dashboard.study.datasets',
-                                                                            study.id
-                                                                        ) +
-                                                                        '?dsid=' +
-                                                                        dataset.id
+                                                                    @click="
+                                                                        update(
+                                                                            study,
+                                                                            'structure'
+                                                                        )
                                                                     "
                                                                 >
                                                                     Edit
@@ -728,6 +712,7 @@ export default {
         project: Object,
         validation: Object,
         mode: String,
+        draft: Number,
     },
     methods: {
         getStatus(value) {
@@ -743,10 +728,12 @@ export default {
                     model: model,
                 });
             } else {
-                // route(
-                //     'dashboard.studies',
-                //     study.id
-                // )
+                window.location.replace(
+                    "/upload?draft_id=" +
+                        this.draft +
+                        "&step=2&sample=" +
+                        model.id
+                );
             }
         },
     },
