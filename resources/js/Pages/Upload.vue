@@ -1684,7 +1684,7 @@ export default {
             loadingStep: false,
             spectraLoadingStatus: false,
             spectraLoadingMessage: null,
-            showCompoundDetails: false,
+            showCompoundDetails: true,
 
             currentDraft: null,
             drafts: [],
