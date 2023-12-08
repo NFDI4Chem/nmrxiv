@@ -42,7 +42,7 @@ class DatasetController extends Controller
 
     /**
      * @OA\Get(
-     * path="/api/v1/dataset/?id={id}",
+     * path="/api/v1/dataset/{id}",
      * summary="Fetch nmrXiv public datasets based on identifier",
      * description="Fetch details of nmrXiv public dataset based on identifier.",
      * operationId="publicDataset",
@@ -50,7 +50,7 @@ class DatasetController extends Controller
      *
      * @OA\Parameter(
      *  name="id",
-     *  in="query",
+     *  in="path",
      *  description="Public dataset identifier e.g. D12",
      *  required=true,
      *
