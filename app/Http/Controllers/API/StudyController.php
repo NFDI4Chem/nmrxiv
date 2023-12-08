@@ -42,7 +42,7 @@ class StudyController extends Controller
 
     /**
      * @OA\Get(
-     * path="/api/v1/sample/?id={id}",
+     * path="/api/v1/sample/{id}",
      * summary="Fetch nmrXiv public samples based on identifier",
      * description="Fetch details of nmrXiv public sample based on identifier.",
      * operationId="publicSample",
@@ -50,7 +50,7 @@ class StudyController extends Controller
      *
      * @OA\Parameter(
      *  name="id",
-     *  in="query",
+     *  in="path",
      *  description="Public sample identifier e.g. S12",
      *  required=true,
      *
