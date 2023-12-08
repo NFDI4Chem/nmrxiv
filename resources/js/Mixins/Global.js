@@ -260,21 +260,6 @@ export default {
             }
             return hash;
         },
-        findLocalItems(query) {
-            var i,
-                results = [];
-            for (i in localStorage) {
-                if (localStorage.hasOwnProperty(i)) {
-                    if (i.match(query) || (!query && typeof i === "string")) {
-                        let value = JSON.parse(localStorage.getItem(i));
-                        if (value) {
-                            results.push({ key: i, val: value });
-                        }
-                    }
-                }
-            }
-            return results;
-        },
         slugify(str) {
             str = str.replace(/^\s+|\s+$/g, "");
             str = str.toLowerCase();

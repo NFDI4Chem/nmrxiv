@@ -29,7 +29,14 @@
             <small v-if="study.identifier" class="text-gray-500"
                 >#{{ study.identifier }}</small
             >
-            <Link :href="route('dashboard.studies', [study.id])">
+            <Link
+                :href="
+                    '/upload?step=2&draft_id=' +
+                    study.draft_id +
+                    '&sample=' +
+                    study.id
+                "
+            >
                 <div
                     class="flex items-center font-bold text-lg text-gray-600 truncate ellipsis"
                 >
@@ -90,7 +97,7 @@
                         <p class="text-xs text-gray-600">Private</p>
                     </div>
                 </div>
-                <div class="float-right p-1 text-xs text-gray-600">
+                <div class="float-left p-1 text-xs text-gray-600">
                     <span class="text-gray-400">Last updated on</span>
                     {{ formatDate(study.updated_at) }}
                 </div>

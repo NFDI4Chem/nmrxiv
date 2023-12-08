@@ -5,6 +5,12 @@
                 <div class="px-6">
                     <div class="py-4">
                         <div>
+                            <span
+                                class="ml-12 text-sm font-bold text-teal-600 group-hover:text-teal-800"
+                                >Step 3 / 3 -
+
+                                <span> Publish data </span>
+                            </span>
                             <div
                                 class="w-full sm:flex sm:items-center sm:justify-between"
                             >
@@ -12,14 +18,18 @@
                                     class="text-sm text-gray-700 uppercase font-bold tracking-widest"
                                 >
                                     <Link
-                                        class="mx-2 inline-flex items-center px-2.5 py-1 text-md font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                                        :href="'/upload'"
+                                        class="ml-1 mr-2 inline-flex items-center px-2.5 py-1 text-md font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                        :href="
+                                            '/upload?draft_id=' +
+                                            draft.id +
+                                            '&step=2'
+                                        "
                                     >
                                         ←
                                     </Link>
                                     <span>
                                         <p class="inline">
-                                            DRAFT: <b>{{ draft.name }}</b>
+                                            <b>{{ draft.name }}</b>
                                         </p>
                                     </span>
                                 </h3>
@@ -31,490 +41,456 @@
         </template>
         <div class="mb-10">
             <div v-if="status == 'draft'">
-                <div v-if="!validationStatus" class="p-4">
-                    <Validation
-                        :project="project"
-                        :validation="validation"
-                    ></Validation>
-                </div>
-                <div v-else>
-                    <div class="p-4">
-                        <div class="p-8">
-                            <div>
-                                <label
-                                    class="block tracking-wider text-sm font-medium text-gray-700, block text-sm font-medium text-gray-700"
+                <div id="project-details" class="p-4">
+                    <div class="p-8">
+                        <div>
+                            <label
+                                class="block tracking-wider text-sm font-medium text-gray-700, block text-sm font-medium text-gray-700"
+                            >
+                                <small v-if="publishForm.enableProjectMode"
+                                    >PUBLISH AS PROJECT</small
                                 >
-                                    <small v-if="publishForm.enableProjectMode"
-                                        >PUBLISH AS PROJECT</small
+                                <small v-else>PUBLISH SAMPLES</small>
+                            </label>
+                            <toggle-button
+                                v-model:enabled="publishForm.enableProjectMode"
+                                @blur="updateDraft"
+                            />
+                        </div>
+                        <div v-if="publishForm.enableProjectMode">
+                            <div class="p-4 bg-gray-100 rounded-md">
+                                <div id="project-name" class="mb-3">
+                                    <label
+                                        for="project-name"
+                                        class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
                                     >
-                                    <small v-else>PUBLISH SAMPLES</small>
-                                </label>
-                                <toggle-button
-                                    v-model:enabled="
-                                        publishForm.enableProjectMode
-                                    "
-                                    @blur="updateDraft"
-                                />
-                            </div>
-                            <div v-if="publishForm.enableProjectMode">
-                                <div class="p-4 bg-gray-100 rounded-md">
-                                    <div
-                                        id="tour-step-project-name"
-                                        class="mb-3"
-                                    >
-                                        <label
-                                            for="project-name"
-                                            class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
-                                        >
-                                            Project Name
-                                        </label>
-                                        <div class="mt-1">
-                                            <input
-                                                v-model="
-                                                    publishForm.project.name
-                                                "
-                                                type="text"
-                                                name="project-name"
-                                                class="block w-full shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm border-gray-300 rounded-md"
-                                                @blur="updateProject"
-                                            />
-                                        </div>
-                                        <jet-input-error
-                                            :message="publishForm.errors.name"
-                                            class="mt-2"
+                                        Project Name
+                                    </label>
+                                    <div class="mt-1">
+                                        <input
+                                            v-model="publishForm.project.name"
+                                            type="text"
+                                            name="project-name"
+                                            class="block w-full shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm border-gray-300 rounded-md"
+                                            @blur="updateProject"
                                         />
                                     </div>
-                                    <div
-                                        id="tour-step-project-desc"
-                                        class="mb-3"
+                                    <jet-input-error
+                                        :message="publishForm.errors.name"
+                                        class="mt-2"
+                                    />
+                                </div>
+                                <div id="project-desc" class="mb-3">
+                                    <label
+                                        for="description"
+                                        class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
                                     >
-                                        <label
-                                            for="description"
-                                            class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
-                                        >
-                                            <span
-                                                @click="
-                                                    publishForm.project.description =
-                                                        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore'
-                                                "
-                                                >Project Description
-                                            </span>
-                                        </label>
-                                        <div class="mt-1">
-                                            <textarea
-                                                id="description"
-                                                v-model="
-                                                    publishForm.project
-                                                        .description
-                                                "
-                                                name="description"
-                                                placeholder="Describe this project"
-                                                rows="3"
-                                                class="block w-full shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm border border-gray-300 rounded-md"
-                                                @blur="updateProject"
-                                            ></textarea>
-                                        </div>
-                                        <jet-input-error
-                                            :message="
-                                                publishForm.errors.description
+                                        <span
+                                            @click="
+                                                publishForm.project.description =
+                                                    'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore'
                                             "
-                                            class="mt-2"
+                                            >Project Description
+                                        </span>
+                                    </label>
+                                    <div class="mt-1">
+                                        <textarea
+                                            id="description"
+                                            v-model="
+                                                publishForm.project.description
+                                            "
+                                            name="project-description"
+                                            placeholder="Describe this project"
+                                            rows="3"
+                                            class="block w-full shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm border border-gray-300 rounded-md"
+                                            @blur="updateProject"
+                                        ></textarea>
+                                    </div>
+                                    <jet-input-error
+                                        :message="
+                                            publishForm.errors.description
+                                        "
+                                        class="mt-2"
+                                    />
+                                </div>
+                                <div id="project-keywords" class="mb-3">
+                                    <label
+                                        for="description"
+                                        class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
+                                    >
+                                        Keywords
+                                    </label>
+                                    <div>
+                                        <vue-tags-input
+                                            v-model="publishForm.project.tag"
+                                            placeholder="Type a keyword or keywords separated by comma (,) and press enter"
+                                            :separators="[';', ',']"
+                                            max-width="100%"
+                                            :tags="publishForm.project.tags"
+                                            @blur="updateProject"
+                                            @tags-changed="
+                                                (newTags) =>
+                                                    (publishForm.project.tags =
+                                                        newTags)
+                                            "
                                         />
                                     </div>
-                                    <div
-                                        id="tour-step-project-keywords"
-                                        class="mb-3"
-                                    >
+                                    <jet-input-error
+                                        :message="publishForm.errors.tags"
+                                        class="mt-2"
+                                    />
+                                </div>
+                                <div>
+                                    <div id="project-organism" class="mb-3">
                                         <label
                                             for="description"
                                             class="block text-sm font-medium text-gray-700"
                                         >
-                                            Keywords (Optional)
+                                            Organism (Optional)
                                         </label>
-                                        <div>
-                                            <vue-tags-input
-                                                v-model="
-                                                    publishForm.project.tag
-                                                "
-                                                placeholder="Type a keyword or keywords separated by comma (,) and press enter"
-                                                :separators="[';', ',']"
-                                                max-width="100%"
-                                                :tags="publishForm.project.tags"
-                                                @blur="updateProject"
-                                                @tags-changed="
-                                                    (newTags) =>
-                                                        (publishForm.project.tags =
-                                                            newTags)
-                                                "
-                                            />
-                                        </div>
-                                        <jet-input-error
-                                            :message="publishForm.errors.tags"
-                                            class="mt-2"
-                                        />
-                                    </div>
-                                    <div>
-                                        <div class="mb-3">
-                                            <label
-                                                for="description"
-                                                class="block text-sm font-medium text-gray-700"
-                                            >
-                                                Organism (Optional)
-                                            </label>
 
+                                        <div
+                                            class="mt-2 sm:flex sm:items-start sm:justify-between"
+                                        >
                                             <div
-                                                class="mt-2 sm:flex sm:items-start sm:justify-between"
+                                                class="text-sm text-gray-500 w-full"
                                             >
-                                                <div
-                                                    class="text-sm text-gray-500 w-full"
-                                                >
-                                                    <ontology-autocomplete
-                                                        class="rounded-md"
-                                                        format="text"
-                                                        :value="projectSpecies"
-                                                        placeholder="Search species"
-                                                        @change="
-                                                            projectSpecies =
-                                                                $event.detail[0]
-                                                        "
-                                                    ></ontology-autocomplete>
-                                                </div>
-                                                <div
-                                                    class="mt-5 sm:ml-6 sm:mt-0 sm:flex sm:flex-shrink-0 sm:items-center"
-                                                >
-                                                    <button
-                                                        type="button"
-                                                        class="inline-flex items-center gap-x-1.5 py-3 bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-                                                        @click="
-                                                            updateSpecies(
-                                                                projectSpecies
-                                                            )
-                                                        "
-                                                    >
-                                                        <svg
-                                                            class="-ml-0.5 h-5 w-5 text-gray-400"
-                                                            viewBox="0 0 20 20"
-                                                            fill="currentColor"
-                                                            aria-hidden="true"
-                                                        >
-                                                            <path
-                                                                d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z"
-                                                            ></path>
-                                                        </svg>
-                                                        Add
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            <div class="mt-2">
-                                                <div
-                                                    v-for="(
-                                                        species, $index
-                                                    ) in publishForm.project
-                                                        .species"
-                                                    :key="$index"
-                                                    class="bg-gray-100 border text-gray-800 mb-0.5 inline-flex truncate break-words items-center px-3 py-2 rounded-full text-sm font-medium mr-1"
-                                                >
-                                                    <ontology-term-annotation
-                                                        :annotation="species"
-                                                    ></ontology-term-annotation>
-                                                    <span
-                                                        class="cursor-pointer"
-                                                        @click="
-                                                            removeSpecies(
-                                                                $index
-                                                            )
-                                                        "
-                                                    >
-                                                        <svg
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                            viewBox="0 0 24 24"
-                                                            fill="currentColor"
-                                                            class="w-5 h-5 ml-2"
-                                                        >
-                                                            <path
-                                                                fill-rule="evenodd"
-                                                                d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm-1.72 6.97a.75.75 0 10-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 101.06 1.06L12 13.06l1.72 1.72a.75.75 0 101.06-1.06L13.06 12l1.72-1.72a.75.75 0 10-1.06-1.06L12 10.94l-1.72-1.72z"
-                                                                clip-rule="evenodd"
-                                                            />
-                                                        </svg>
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="mb-2">
-                                        <div class="relative pl-2">
-                                            <div
-                                                class="absolute inset-0 flex items-center"
-                                                aria-hidden="true"
-                                            >
-                                                <div
-                                                    class="w-full border-t border-gray-300"
-                                                ></div>
+                                                <ontology-autocomplete
+                                                    class="rounded-md"
+                                                    format="text"
+                                                    :value="projectSpecies"
+                                                    placeholder="Search species"
+                                                    @change="
+                                                        projectSpecies =
+                                                            $event.detail[0]
+                                                    "
+                                                ></ontology-autocomplete>
                                             </div>
                                             <div
-                                                class="relative flex items-center justify-between"
+                                                class="mt-5 sm:ml-6 sm:mt-0 sm:flex sm:flex-shrink-0 sm:items-center"
                                             >
-                                                <span
-                                                    class="px-3 -ml-4 rounded text-sm bg-gray-100 font-medium text-gray-500 after:content-['*'] after:ml-0.5 after:text-red-500"
-                                                >
-                                                    Citation
-                                                </span>
                                                 <button
                                                     type="button"
-                                                    class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                                    class="inline-flex items-center gap-x-1.5 py-3 bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
                                                     @click="
-                                                        toggleManageCitation
+                                                        updateSpecies(
+                                                            projectSpecies
+                                                        )
                                                     "
                                                 >
-                                                    <PencilIcon
-                                                        class="w-4 h-4 mr-1 text-gray-600"
-                                                    />
-                                                    <span>Edit</span>
+                                                    <svg
+                                                        class="-ml-0.5 h-5 w-5 text-gray-400"
+                                                        viewBox="0 0 20 20"
+                                                        fill="currentColor"
+                                                        aria-hidden="true"
+                                                    >
+                                                        <path
+                                                            d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z"
+                                                        ></path>
+                                                    </svg>
+                                                    Add
                                                 </button>
                                             </div>
                                         </div>
-                                        <dd
-                                            class="mt-2 text-md text-gray-900 space-y-5 focus:pointer-events-auto"
+                                        <div class="mt-2">
+                                            <div
+                                                v-for="(
+                                                    species, $index
+                                                ) in publishForm.project
+                                                    .species"
+                                                :key="$index"
+                                                class="bg-gray-100 border text-gray-800 mb-0.5 inline-flex truncate break-words items-center px-3 py-2 rounded-full text-sm font-medium mr-1"
+                                            >
+                                                <ontology-term-annotation
+                                                    :annotation="species"
+                                                ></ontology-term-annotation>
+                                                <span
+                                                    class="cursor-pointer"
+                                                    @click="
+                                                        removeSpecies($index)
+                                                    "
+                                                >
+                                                    <svg
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        viewBox="0 0 24 24"
+                                                        fill="currentColor"
+                                                        class="w-5 h-5 ml-2"
+                                                    >
+                                                        <path
+                                                            fill-rule="evenodd"
+                                                            d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm-1.72 6.97a.75.75 0 10-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 101.06 1.06L12 13.06l1.72 1.72a.75.75 0 101.06-1.06L13.06 12l1.72-1.72a.75.75 0 10-1.06-1.06L12 10.94l-1.72-1.72z"
+                                                            clip-rule="evenodd"
+                                                        />
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-2">
+                                    <div class="relative pl-2">
+                                        <div
+                                            class="absolute inset-0 flex items-center"
+                                            aria-hidden="true"
+                                        >
+                                            <div
+                                                class="w-full border-t border-gray-300"
+                                            ></div>
+                                        </div>
+                                        <div
+                                            class="relative flex items-center justify-between"
+                                        >
+                                            <span
+                                                class="px-3 -ml-4 rounded text-sm bg-gray-100 font-medium text-gray-500 after:content-['*'] after:ml-0.5 after:text-red-500"
+                                            >
+                                                Citation
+                                            </span>
+                                            <button
+                                                type="button"
+                                                class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                                @click="toggleManageCitation"
+                                            >
+                                                <PencilIcon
+                                                    class="w-4 h-4 mr-1 text-gray-600"
+                                                />
+                                                <span>Edit</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <dd
+                                        class="mt-2 text-md text-gray-900 space-y-5 focus:pointer-events-auto"
+                                    >
+                                        <div
+                                            class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-2"
                                         >
                                             <div
                                                 class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-2"
                                             >
-                                                <div
-                                                    class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-2"
-                                                >
-                                                    <citation-card
-                                                        :citations="
-                                                            project.citations
-                                                        "
-                                                    />
-                                                </div>
-                                            </div>
-                                        </dd>
-                                    </div>
-                                    <div class="mb-2">
-                                        <div class="relative pl-2">
-                                            <div
-                                                class="absolute inset-0 flex items-center"
-                                                aria-hidden="true"
-                                            >
-                                                <div
-                                                    class="w-full border-t border-gray-300"
-                                                ></div>
-                                            </div>
-                                            <div
-                                                class="relative flex items-center justify-between"
-                                            >
-                                                <span
-                                                    class="px-3 -ml-4 rounded text-sm bg-gray-100 font-medium text-gray-500 after:content-['*'] after:ml-0.5 after:text-red-500"
-                                                >
-                                                    Author
-                                                </span>
-                                                <button
-                                                    type="button"
-                                                    class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                                                    @click="toggleManageAuthor"
-                                                >
-                                                    <PencilIcon
-                                                        class="w-4 h-4 mr-1 text-gray-600"
-                                                    />
-                                                    <span>Edit</span>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <dd
-                                            class="mt-2 text-md text-gray-900 space-y-5"
-                                        >
-                                            <div
-                                                class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-3"
-                                            >
-                                                <author-card
-                                                    :authors="project.authors"
+                                                <citation-card
+                                                    :citations="
+                                                        project.citations
+                                                    "
                                                 />
                                             </div>
-                                        </dd>
-                                    </div>
+                                        </div>
+                                    </dd>
                                 </div>
-                            </div>
-                            <div class="mt-3">
-                                <label
-                                    class="block text-sm font-medium text-gray-700, block text-sm font-medium text-gray-700"
-                                >
-                                    {{
-                                        pluralize(
-                                            "SAMPLE",
-                                            project.studies.length
-                                        )
-                                    }}
-                                    ({{ project.studies.length }})
-                                </label>
-                                <div>
-                                    <div
-                                        class="mt-4 mb-8 mx-auto max-w-md grid gap-8 sm:max-w-lg lg:grid-cols-4 lg:max-w-7xl"
+                                <div class="mb-2">
+                                    <div class="relative pl-2">
+                                        <div
+                                            class="absolute inset-0 flex items-center"
+                                            aria-hidden="true"
+                                        >
+                                            <div
+                                                class="w-full border-t border-gray-300"
+                                            ></div>
+                                        </div>
+                                        <div
+                                            class="relative flex items-center justify-between"
+                                        >
+                                            <span
+                                                class="px-3 -ml-4 rounded text-sm bg-gray-100 font-medium text-gray-500 after:content-['*'] after:ml-0.5 after:text-red-500"
+                                            >
+                                                Author
+                                            </span>
+                                            <button
+                                                type="button"
+                                                class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                                @click="toggleManageAuthor"
+                                            >
+                                                <PencilIcon
+                                                    class="w-4 h-4 mr-1 text-gray-600"
+                                                />
+                                                <span>Edit</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <dd
+                                        class="mt-2 text-md text-gray-900 space-y-5"
                                     >
                                         <div
-                                            v-for="study in project.studies"
-                                            :key="study.uuid"
+                                            class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-3"
                                         >
-                                            <study-info :study="study" />
+                                            <author-card
+                                                :authors="project.authors"
+                                            />
                                         </div>
-                                    </div>
+                                    </dd>
                                 </div>
                             </div>
-                            <div class="mt-3">
-                                <label
-                                    class="block text-sm font-medium text-gray-700, block text-sm font-medium text-gray-700"
+                        </div>
+                        <div class="mt-3">
+                            <label
+                                class="block text-sm font-medium text-gray-700, block text-sm font-medium text-gray-700"
+                            >
+                                {{
+                                    pluralize("SAMPLE", project.studies.length)
+                                }}
+                                ({{ project.studies.length }})
+                            </label>
+                            <div>
+                                <div
+                                    class="mt-4 mb-8 mx-auto max-w-md grid gap-8 sm:max-w-lg lg:grid-cols-4 lg:max-w-7xl"
                                 >
-                                    Release Date
-                                </label>
-                                <Datepicker
-                                    v-model="publishForm.releaseDate"
-                                    @update:modelValue="updateProject"
-                                ></Datepicker>
-                                <p class="mt-1 text-sm text-gray-500">
-                                    Publish your data now or choose a release
-                                    date to auto publish your project to public.
-                                </p>
-                            </div>
-                            <div class="mt-5">
-                                <!--License -->
-                                <div class="mb-4">
-                                    <div>
-                                        <div
-                                            class="mt-6 grid grid-cols-1 gap-x-4 sm:grid-cols-1"
-                                        >
-                                            <div v-if="licenses">
-                                                <span
-                                                    class="float-right text-xs cursor-pointer hover:text-blue-700 mt-2"
-                                                >
-                                                    <a
-                                                        target="_blank"
-                                                        href="https://docs.nmrxiv.org/submission-guides/licenses"
-                                                        >How to choose the right
-                                                        license?</a
-                                                    >
-                                                </span>
-                                                <select-rich
-                                                    v-model:selected="license"
-                                                    label="License"
-                                                    :items="licenses"
-                                                    @update:selected="
-                                                        updateProject
-                                                    "
-                                                />
-                                            </div>
-                                        </div>
+                                    <div
+                                        v-for="study in project.studies"
+                                        :key="study.uuid"
+                                    >
+                                        <study-info :study="study" />
                                     </div>
                                 </div>
                             </div>
-                            <div class="mt-5">
-                                <h3 class="text-lg font-bold text-gray-400">
-                                    Terms & Conditions
-                                </h3>
-
-                                <div class="mt-3">
-                                    <div class="ml-2">
-                                        <div class="flex items-top">
-                                            <input
-                                                id="conditions"
-                                                v-model="publishForm.conditions"
-                                                type="checkbox"
-                                                class="rounded mt-1 border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                                                name="conditions"
-                                            />
-                                            <div class="ml-2 text-sm">
-                                                <span
-                                                    v-if="
-                                                        publishForm.enableProjectMode
-                                                    "
-                                                >
-                                                    I understand once the
-                                                    project is published, all
-                                                    the underlying samples and
-                                                    spectra will also be made
-                                                    public and agree to make
-                                                    this data persistently
-                                                    available in the nmrXiv
-                                                    platform.
-                                                </span>
-                                                <span v-else>
-                                                    I understand once the
-                                                    samples are published, all
-                                                    the underlying spectra will
-                                                    also be made public and
-                                                    agree to make this data
-                                                    persistently available in
-                                                    the nmrXiv platform.
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="mt-2">
-                                    <div class="ml-2">
-                                        <div class="flex items-center">
-                                            <input
-                                                id="terms"
-                                                v-model="publishForm.terms"
-                                                type="checkbox"
-                                                class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                                                name="terms"
-                                            />
-                                            <div class="ml-2 text-sm">
-                                                I agree to the
+                        </div>
+                        <div id="release" class="mt-3">
+                            <label
+                                class="block text-sm font-medium text-gray-700, block text-sm font-medium text-gray-700"
+                            >
+                                Release Date
+                            </label>
+                            <Datepicker
+                                v-model="publishForm.releaseDate"
+                                @update:modelValue="updateProject"
+                            ></Datepicker>
+                            <p class="mt-1 text-sm text-gray-500">
+                                Publish your data now or choose a release date
+                                to auto publish your project to public.
+                            </p>
+                        </div>
+                        <div class="mt-5">
+                            <!--License -->
+                            <div id="license" class="mb-4">
+                                <div>
+                                    <div
+                                        class="mt-6 grid grid-cols-1 gap-x-4 sm:grid-cols-1"
+                                    >
+                                        <div v-if="licenses">
+                                            <span
+                                                class="float-right text-xs cursor-pointer hover:text-blue-700 mt-2"
+                                            >
                                                 <a
                                                     target="_blank"
-                                                    :href="route('terms.show')"
-                                                    class="underline text-sm text-gray-600 hover:text-gray-900"
-                                                    >Terms of Service</a
+                                                    href="https://docs.nmrxiv.org/submission-guides/licenses"
+                                                    >How to choose the right
+                                                    license?</a
                                                 >
-                                                and
-                                                <a
-                                                    target="_blank"
-                                                    :href="route('policy.show')"
-                                                    class="underline text-sm text-gray-600 hover:text-gray-900"
-                                                    >Privacy Policy</a
-                                                >
-                                                and hereby also grant nmrXiv
-                                                permissions to distribute the
-                                                datasets (and meta-data) under
-                                                the specified license.
-                                            </div>
+                                            </span>
+                                            <select-rich
+                                                v-model:selected="license"
+                                                label="License"
+                                                :items="licenses"
+                                                @update:selected="updateProject"
+                                            />
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        <div class="mt-5">
+                            <h3 class="text-lg font-bold text-gray-400">
+                                Terms & Conditions
+                            </h3>
 
-                        <div>
-                            <div class="px-8 pb-8 pt-0">
-                                <button
-                                    type="button"
-                                    :class="[
-                                        !publishForm.terms ||
-                                        !publishForm.conditions
-                                            ? 'bg-gray-200 cursor-not-allowed'
-                                            : 'bg-green-600 hover:bg-green-700',
-                                        'inline-flex w-full justify-center rounded-md border border-transparent px-4 py-2 text-base font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 sm:w-auto sm:text-sm',
-                                    ]"
-                                    :disabled="
-                                        !publishForm.terms &&
-                                        !publishForm.conditions
-                                    "
-                                    @click="publish"
-                                >
-                                    Publish
-                                </button>
-                                <Link
-                                    type="button"
-                                    class="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                                    :href="route('dashboard')"
-                                >
-                                    Not right yet
-                                </Link>
+                            <div class="mt-3">
+                                <div class="ml-2">
+                                    <div class="flex items-top">
+                                        <input
+                                            id="conditions"
+                                            v-model="publishForm.conditions"
+                                            type="checkbox"
+                                            class="rounded mt-1 border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                                            name="conditions"
+                                        />
+                                        <div class="ml-2 text-sm">
+                                            <span
+                                                v-if="
+                                                    publishForm.enableProjectMode
+                                                "
+                                            >
+                                                I understand once the project is
+                                                published, all the underlying
+                                                samples and spectra will also be
+                                                made public and agree to make
+                                                this data persistently available
+                                                in the nmrXiv platform.
+                                            </span>
+                                            <span v-else>
+                                                I understand once the samples
+                                                are published, all the
+                                                underlying spectra will also be
+                                                made public and agree to make
+                                                this data persistently available
+                                                in the nmrXiv platform.
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div v-if="errors">
-                                <div class="rounded-md bg-red-50 p-4 mx-4 mb-4">
+                            <div class="mt-2">
+                                <div class="ml-2">
+                                    <div class="flex items-center">
+                                        <input
+                                            id="terms"
+                                            v-model="publishForm.terms"
+                                            type="checkbox"
+                                            class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                                            name="terms"
+                                        />
+                                        <div class="ml-2 text-sm">
+                                            I agree to the
+                                            <a
+                                                target="_blank"
+                                                :href="route('terms.show')"
+                                                class="underline text-sm text-gray-600 hover:text-gray-900"
+                                                >Terms of Service</a
+                                            >
+                                            and
+                                            <a
+                                                target="_blank"
+                                                :href="route('policy.show')"
+                                                class="underline text-sm text-gray-600 hover:text-gray-900"
+                                                >Privacy Policy</a
+                                            >
+                                            and hereby also grant nmrXiv
+                                            permissions to distribute the
+                                            datasets (and meta-data) under the
+                                            specified license.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div id="publish-details">&nbsp;</div>
+                        <div class="px-8 pb-8 pt-0">
+                            <button
+                                type="button"
+                                :class="[
+                                    !publishForm.terms ||
+                                    !publishForm.conditions
+                                        ? 'bg-gray-200 cursor-not-allowed'
+                                        : 'bg-green-600 hover:bg-green-700',
+                                    'inline-flex w-full justify-center rounded-md border border-transparent px-4 py-2 text-base font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 sm:w-auto sm:text-sm',
+                                ]"
+                                :disabled="
+                                    !publishForm.terms &&
+                                    !publishForm.conditions
+                                "
+                                @click="showPublishConfirmationModal = true"
+                            >
+                                Publish
+                            </button>
+                            <Link
+                                type="button"
+                                class="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                                :href="route('dashboard')"
+                            >
+                                Not right yet
+                            </Link>
+                        </div>
+                        <div v-if="errors">
+                            <div class="rounded-md bg-red-50 p-4 mx-4 mb-4">
+                                <div>
                                     <div class="flex">
                                         <div class="flex-shrink-0">
                                             <!-- Heroicon name: mini/x-circle -->
@@ -552,39 +528,47 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
 
-                        <div class="mx-4">
-                            <div
-                                class="flex flex-wrap items-center bg-gray-50 py-2.5 px-4 text-xs text-gray-700"
-                            >
-                                <b>Whats next?</b>
-                                <div>
-                                    <p>
-                                        Upon clicking publish, your project is
-                                        submitted to our queue system for
-                                        automatic processing. Once successfully
-                                        processed, your data is assigned with
-                                        stable identifiers, and DOIs are
-                                        generated. You will receive an email
-                                        with citation details and other helpful
-                                        information to share your datasets.
-                                    </p>
+                                    <div v-if="validation" class="mt-6">
+                                        <Validation
+                                            :project="project"
+                                            :validation="validation"
+                                            :draft="draft.id"
+                                        ></Validation>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div v-if="project">
-                            <manage-author
-                                ref="manageAuthorElement"
-                                :project="project"
-                            />
-                            <manage-citation
-                                ref="manageCitationElement"
-                                :project="project"
-                            />
+                    </div>
+
+                    <div class="mx-4">
+                        <div
+                            class="flex flex-wrap items-center bg-gray-50 py-2.5 px-4 text-xs text-gray-700"
+                        >
+                            <b>Whats next?</b>
+                            <div>
+                                <p>
+                                    Upon clicking publish, your project is
+                                    submitted to our queue system for automatic
+                                    processing. Once successfully processed,
+                                    your data is assigned with stable
+                                    identifiers, and DOIs are generated. You
+                                    will receive an email with citation details
+                                    and other helpful information to share your
+                                    datasets.
+                                </p>
+                            </div>
                         </div>
+                    </div>
+                    <div v-if="project">
+                        <manage-author
+                            ref="manageAuthorElement"
+                            :project="project"
+                        />
+                        <manage-citation
+                            ref="manageCitationElement"
+                            :project="project"
+                        />
                     </div>
                 </div>
             </div>
@@ -634,6 +618,29 @@
                     </div>
                 </div>
             </div>
+            <jet-confirmation-modal
+                :show="showPublishConfirmationModal"
+                @close="showPublishConfirmationModal = false"
+            >
+                <template #title> Are you sure you want to publish? </template>
+
+                <template #content>
+                    Once the data is published you will no longer be able to
+                    change the data uploaded! If published as a project, you may
+                    add more compounds (spectra) to the project later.
+                </template>
+
+                <template #footer>
+                    <jet-secondary-button
+                        @click="showPublishConfirmationModal = false"
+                    >
+                        Cancel
+                    </jet-secondary-button>
+                    <jet-success-button class="ml-2" @click="publish">
+                        Publish Now
+                    </jet-success-button>
+                </template>
+            </jet-confirmation-modal>
         </div>
     </app-layout>
 </template>
@@ -680,6 +687,8 @@ import {
 import SpectraEditor from "@/Shared/SpectraEditor.vue";
 import ToggleButton from "@/Shared/ToggleButton.vue";
 import "ontology-elements/dist/index.js";
+import JetConfirmationModal from "@/Jetstream/ConfirmationModal.vue";
+import JetSuccessButton from "@/Jetstream/SuccessButton.vue";
 
 export default {
     components: {
@@ -718,8 +727,10 @@ export default {
         CalendarIcon,
         StudyInfo,
         CitationCard,
+        JetConfirmationModal,
+        JetSuccessButton,
     },
-    props: ["user", "team", "project", "validation", "teamRole", "draft"],
+    props: ["user", "team", "project", "teamRole", "draft"],
 
     setup() {
         const manageAuthorElement = ref(null);
@@ -752,10 +763,11 @@ export default {
             licenses: null,
             license: null,
             returnUrl: "/dashboard",
-            validationStatus: true,
             errors: null,
             projectSpecies: "",
             status: "draft",
+            validation: null,
+            showPublishConfirmationModal: false,
         };
     },
     computed: {
@@ -782,12 +794,6 @@ export default {
     },
 
     mounted() {
-        this.validationStatus = true;
-        this.validation.project.studies.forEach((study) => {
-            if (study.status == false) {
-                this.validationStatus = false;
-            }
-        });
         if (this.draft) {
             this.publishForm.project.name = this.project.name
                 ? this.project.name
@@ -811,31 +817,80 @@ export default {
                 : [];
         }
         this.loadLicenses();
+
+        this.$nextTick(() => {
+            const urlSearchParams = new URLSearchParams(window.location.search);
+            const params = Object.fromEntries(urlSearchParams.entries());
+            let edit = params["edit"];
+
+            if (edit == "citation") {
+                this.toggleManageCitation();
+            } else if (edit == "title") {
+                this.scrollTo(document.getElementById("project-name"));
+            } else if (edit == "description") {
+                this.scrollTo(document.getElementById("project-desc"));
+            } else if (edit == "keywords") {
+                this.scrollTo(document.getElementById("project-keywords"));
+            } else if (edit == "organism") {
+                this.scrollTo(document.getElementById("project-organism"));
+            } else if (edit == "license") {
+                this.scrollTo(document.getElementById("license"));
+            } else if (edit == "release") {
+                this.scrollTo(document.getElementById("release"));
+            } else if (edit == "authors") {
+                this.toggleManageAuthor();
+            }
+        });
     },
     methods: {
+        scrollTo(element) {
+            this.$nextTick(() => {
+                element.classList.add("shake");
+                setTimeout(function () {
+                    element.classList.remove("shake");
+                }, 2500);
+            });
+        },
         updateDraft() {
             axios.put("/dashboard/drafts/" + this.draft.id, {
                 project_enabled: this.publishForm.enableProjectMode ? 1 : 0,
             });
         },
         updateProject() {
-            if (this.publishForm.enableProjectMode) {
-                this.loadingStep = true;
-                axios.put(route("dashboard.project.update", this.project.id), {
-                    name: this.publishForm.project.name,
-                    description: this.publishForm.project.description,
-                    tags: this.publishForm.project.tags,
-                    tags_array: this.publishForm.project.tags
-                        ? this.publishForm.project.tags.map((a) => a.text)
-                        : [],
-                    license_id: this.license ? this.license.id : null,
-                    species: this.publishForm.project.species,
-                    release_date: this.publishForm.releaseDate,
+            // if (this.publishForm.enableProjectMode) {
+            if (
+                this.publishForm.project.tag &&
+                this.publishForm.project.tag != ""
+            ) {
+                let exists = false;
+                this.publishForm.project.tags.forEach((t) => {
+                    if (t.text == this.publishForm.project.tag) {
+                        exists = true;
+                    }
                 });
-                // .then((res) => {
-                //     console.log("success");
-                // });
+                if (!exists) {
+                    this.publishForm.project.tags.push({
+                        text: this.publishForm.project.tag,
+                    });
+                    this.publishForm.project.tag = "";
+                }
             }
+            this.loadingStep = true;
+            axios.put(route("dashboard.project.update", this.project.id), {
+                name: this.publishForm.project.name,
+                description: this.publishForm.project.description,
+                tags: this.publishForm.project.tags,
+                tags_array: this.publishForm.project.tags
+                    ? this.publishForm.project.tags.map((a) => a.text)
+                    : [],
+                license_id: this.license ? this.license.id : null,
+                species: this.publishForm.project.species,
+                release_date: this.publishForm.releaseDate,
+            });
+            // .then((res) => {
+            //     console.log("success");
+            // });
+            // }
         },
         updateSpecies(species) {
             if (species && species != "") {
@@ -894,6 +949,7 @@ export default {
             this.manageCitationElement.toggleDialog();
         },
         publish() {
+            this.showPublishConfirmationModal = false;
             if (this.publishForm.conditions && this.publishForm.terms) {
                 this.errors = null;
                 axios
@@ -903,6 +959,7 @@ export default {
                     )
                     .catch((err) => {
                         this.errors = err.response.data.errors;
+                        this.validation = err.response.data.validation.report;
                     })
                     .then((response) => {
                         this.status = response.data.project.status;

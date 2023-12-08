@@ -37,6 +37,7 @@ class DeleteProject
             if ($draft) {
                 $draft->update(['is_deleted' => true]);
             }
+            $project->name = $project->name.'- deleted';
             $project->deleted_on = Carbon::now();
             $project->is_deleted = true;
             $project->sendNotification('deletion', $this->prepareSendList($project));
