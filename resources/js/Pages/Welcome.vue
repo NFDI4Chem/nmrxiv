@@ -1,6 +1,7 @@
 <template>
     <div class="bg-white">
-        <Head title="Welcome"></Head>
+        <Head title="Welcome to nmrXiv"></Head>
+        <FlashMessages />
         <main>
             <div class="relative index_beams">
                 <header>
@@ -853,6 +854,7 @@ import {
 import { ChevronDownIcon } from "@heroicons/vue/24/solid";
 import ToolTip from "@/Shared/ToolTip.vue";
 import FAQs from "@/App/FAQs.vue";
+import FlashMessages from "@/Shared/FlashMessages.vue";
 
 const Search = [
     {
@@ -989,6 +991,7 @@ export default {
         ToolTip,
         Projects,
         FAQs,
+        FlashMessages,
     },
 
     props: {
@@ -1013,7 +1016,7 @@ export default {
     },
 
     mounted() {
-        axios.get(route("bioschema.datacatalog")).then((response) => {
+        axios.get(route("bioschemas.datacatalog")).then((response) => {
             this.schema = response.data;
         });
     },

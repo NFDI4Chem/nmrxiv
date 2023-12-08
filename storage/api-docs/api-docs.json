@@ -1,0 +1,562 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "nmrXiv",
+        "version": "1.0"
+    },
+    "paths": {
+        "/api/auth/login": {
+            "post": {
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Sign in",
+                "description": "Login by email and password",
+                "operationId": "authLogin",
+                "requestBody": {
+                    "description": "Pass user credentials",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "nisha.sharma@email.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "secret1234"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Operation"
+                    },
+                    "401": {
+                        "description": "Wrong Credentials Response"
+                    }
+                }
+            }
+        },
+        "/api/auth/logout": {
+            "get": {
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Sign out",
+                "operationId": "bb179b35112b2c8080588c87953175f7",
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/auth/register": {
+            "post": {
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Register",
+                "operationId": "de84cda3271107bdf3d3ae044d8afcf1",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "first_name",
+                                    "last_name",
+                                    "email",
+                                    "password",
+                                    "username"
+                                ],
+                                "properties": {
+                                    "first_name": {
+                                        "type": "string",
+                                        "format": "first_name",
+                                        "example": "Nisha"
+                                    },
+                                    "last_name": {
+                                        "type": "string",
+                                        "format": "last_name",
+                                        "example": "Sharma"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "nisha.sharma@email.com"
+                                    },
+                                    "username": {
+                                        "type": "string",
+                                        "format": "username",
+                                        "example": "nis123"
+                                    },
+                                    "orcid_id": {
+                                        "type": "string",
+                                        "format": "orcid_id",
+                                        "example": "0009-0006-4755-1039"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "secret1234"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User creation successful. Kindly confirm your email address by clicking the link sent to your inbox"
+                                        },
+                                        "access_token": {
+                                            "type": "string",
+                                            "example": "randomtokenasfhajskfhajf398rureuuhfdshk"
+                                        },
+                                        "token_type": {
+                                            "type": "string",
+                                            "example": "bearer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Content"
+                    }
+                }
+            }
+        },
+        "/api/auth/user/info": {
+            "get": {
+                "tags": [
+                    "auth"
+                ],
+                "summary": "User info",
+                "operationId": "a76271ca4e85fa6e7470052cbe6c4429",
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/auth/email/resend": {
+            "get": {
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Resend verification email",
+                "operationId": "c8b11569af83c4d423af040f6c0cd2fa",
+                "responses": {
+                    "200": {
+                        "description": "successful operation"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/datasets": {
+            "get": {
+                "tags": [
+                    "public"
+                ],
+                "summary": "Fetch all public datasets",
+                "description": "Fetch details for all publicly available datasets on nmrXiv.",
+                "operationId": "publicDatasets",
+                "responses": {
+                    "200": {
+                        "description": "Successful Operation"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/v1/dataset/{id}": {
+            "get": {
+                "tags": [
+                    "public"
+                ],
+                "summary": "Fetch nmrXiv public datasets based on identifier",
+                "description": "Fetch details of nmrXiv public dataset based on identifier.",
+                "operationId": "publicDataset",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Public dataset identifier e.g. D12",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Operation"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/v1/projects": {
+            "get": {
+                "tags": [
+                    "public"
+                ],
+                "summary": "Fetch all public projects",
+                "description": "Fetch details for all publicly available projects on nmrXiv.",
+                "operationId": "publicProjects",
+                "responses": {
+                    "200": {
+                        "description": "Successful Operation"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/v1/project/{id}": {
+            "get": {
+                "tags": [
+                    "public"
+                ],
+                "summary": "Fetch nmrXiv public project based on identifier",
+                "description": "Fetch details of nmrXiv public project based on identifier.",
+                "operationId": "publicProject",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Public project identifier e.g. P12",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Operation"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/v1/schemas/bioschemas/{username}/{project}": {
+            "get": {
+                "tags": [
+                    "schemas"
+                ],
+                "summary": "Fetch bioschema for public model based on user id and slug",
+                "description": "Fetch bioschema for public model based on user id and slug",
+                "operationId": "bioschemaModelByName",
+                "parameters": [
+                    {
+                        "name": "username",
+                        "in": "path",
+                        "description": "nmrXiv username",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "project",
+                        "in": "path",
+                        "description": "nmrXiv project slug e.g. cheminfo-nmr-dataset-1",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/v1/schemas/bioschemas/{id}": {
+            "get": {
+                "tags": [
+                    "schemas"
+                ],
+                "summary": "Fetch bischema for model based on identifier",
+                "description": "Fetch bischema for model based on identifier",
+                "operationId": "bioschemaModel",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Public model identifier for Project,Sample or Dataset e.g. P10 for Project,S70 for Sample or D399 for Dataset",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/v1/schemas/bioschemas/": {
+            "get": {
+                "tags": [
+                    "schemas"
+                ],
+                "summary": "Bioschema",
+                "operationId": "62c4756fdea25126d74d16746907c7c9",
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/v1/schemas/datacite/{username}/{project}": {
+            "get": {
+                "tags": [
+                    "schemas"
+                ],
+                "summary": "Fetch datacite schema for public model based on user id and slug",
+                "description": "Fetch datacite schema for public model based on user id and slug",
+                "operationId": "dataciteModelByName",
+                "parameters": [
+                    {
+                        "name": "username",
+                        "in": "path",
+                        "description": "nmrXiv username",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "project",
+                        "in": "path",
+                        "description": "nmrXiv project slug e.g. cheminfo-nmr-dataset-1",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/v1/schemas/datacite/{id}": {
+            "get": {
+                "tags": [
+                    "schemas"
+                ],
+                "summary": "Fetch datacite schema for model based on identifier",
+                "description": "Fetch datacite schema for model based on identifier",
+                "operationId": "dataciteModel",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Public model identifier for Project,Sample or Dataset e.g. P10 for Project,S70 for Sample or D399 for Dataset",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/v1/search": {
+            "post": {
+                "tags": [
+                    "search"
+                ],
+                "summary": "Get compound details by Compound name, SMILES, InChi & InChiKey.",
+                "description": "Get compound details by Compound name, SMILES, InChi & InChiKey.",
+                "operationId": "search",
+                "requestBody": {
+                    "description": "Pass search query and type such as InChiKey, InChi, SMILES & text",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "query",
+                                    "type"
+                                ],
+                                "properties": {
+                                    "query": {
+                                        "type": "string",
+                                        "format": "query",
+                                        "example": "AAAAWQOPBUPWEV-UHFFFAOYSA-N"
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "format": "type",
+                                        "example": "InChiKey"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Operation"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/api/v1/samples": {
+            "get": {
+                "tags": [
+                    "public"
+                ],
+                "summary": "Fetch all public samples",
+                "description": "Fetch details for all publicly available samples on nmrXiv.",
+                "operationId": "publicSamples",
+                "responses": {
+                    "200": {
+                        "description": "Successful Operation"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/v1/sample/{id}": {
+            "get": {
+                "tags": [
+                    "public"
+                ],
+                "summary": "Fetch nmrXiv public samples based on identifier",
+                "description": "Fetch details of nmrXiv public sample based on identifier.",
+                "operationId": "publicSample",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Public sample identifier e.g. S12",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Operation"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "token": {
+                "type": "apiKey",
+                "name": "Authorization",
+                "in": "header"
+            },
+            "sanctum": {
+                "type": "apiKey",
+                "description": "Enter token in format (Bearer <token>)",
+                "name": "Authorization",
+                "in": "header"
+            }
+        }
+    }
+}

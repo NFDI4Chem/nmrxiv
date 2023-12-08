@@ -20,6 +20,15 @@ class RouteServiceProvider extends ServiceProvider
     public const HOME = '/dashboard';
 
     /**
+     * The path to the "welcome" route for your application.
+     *
+     * This is used by Laravel verification to redirect users after successful verification.
+     *
+     * @var string
+     */
+    public const WELCOME = '/';
+
+    /**
      * The controller namespace for the application.
      *
      * When present, controller route declarations will automatically be prefixed with this namespace.

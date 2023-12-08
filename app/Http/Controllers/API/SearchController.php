@@ -252,7 +252,7 @@ class SearchController extends Controller
                     $statement = $statement.')';
                 }
                 $statement = $statement.' LIMIT '.$limit;
-                // dd($statement );
+            // dd($statement );
             } else {
                 if ($query) {
                     $query = str_replace("'", "''", $query);

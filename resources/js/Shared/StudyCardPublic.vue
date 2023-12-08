@@ -171,14 +171,21 @@
                     >
                         {{ study.name }}
                     </p>
-                    <div class="mt-1 h-14 overflow-hidden">
-                        <span
-                            v-for="type in study.experiment_types"
-                            :key="type"
-                            class="mt-1 inline-flex items-center rounded-full bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10"
-                        >
-                            {{ type }}
-                        </span>
+                    <div
+                        class="mt-1 h-14 overflow-hidden"
+                        v-if="
+                            study.experiment_types &&
+                            study.experiment_types.length > 0
+                        "
+                    >
+                        <div v-for="type in study.experiment_types" :key="type">
+                            <span
+                                v-if="type && type != null"
+                                class="mt-1 inline-flex items-center rounded-full bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10"
+                            >
+                                {{ type }}
+                            </span>
+                        </div>
                     </div>
                 </div>
 

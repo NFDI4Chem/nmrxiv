@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use ZipStream;
 
-class ArchiveStudy implements ShouldQueue, ShouldBeUnique
+class ArchiveStudy implements ShouldBeUnique, ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -62,12 +62,13 @@ class ArchiveStudy implements ShouldQueue, ShouldBeUnique
                         $bucket = config('filesystems.disks.'.env('FILESYSTEM_DRIVER').'.bucket');
                         $s3keys = [];
                         $environment = env('APP_ENV', 'local');
+                        $relative_URL = $fsObject->relative_url;
                         if ($fsObject->type == 'file') {
                             if (Storage::has($path)) {
                                 array_push($s3keys, substr($fsObject->path, 1));
                             }
                         } else {
-
+                            $relative_URL = $relative_URL.'/';
                             $command = [
                                 'Bucket' => $bucket,
                             ];
@@ -102,12 +103,13 @@ class ArchiveStudy implements ShouldQueue, ShouldBeUnique
                         foreach ($s3keys as $key) {
                             $s3path = 's3://'.$bucket.'/'.$key;
                             if ($streamRead = fopen($s3path, 'r')) {
-                                $sPath = explode($fsObject->relative_url, $key)[1];
+                                $sPath = explode($relative_URL, $key)[1];
                                 if ($sPath != '') {
-                                    $sPath = $fsObject->key.'/'.explode($fsObject->relative_url, $key)[1];
+                                    $sPath = $fsObject->key.'/'.explode($relative_URL, $key)[1];
                                 } else {
                                     $sPath = $fsObject->key;
                                 }
+                                $sPath = preg_replace('#/+#', '/', $sPath);
                                 $zip->addFileFromStream($sPath, $streamRead);
                             } else {
                                 exit('Could not open stream for reading');
