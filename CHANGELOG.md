@@ -1,5 +1,45 @@
 # Changelog
 
+## [1.1.0-rc.15](https://github.com/NFDI4Chem/nmrxiv/compare/v1.0.0-rc.15...v1.1.0-rc.15) (2023-12-08)
+
+
+### Features
+
+* add public api for Dataset and Samples ([265d3bc](https://github.com/NFDI4Chem/nmrxiv/commit/265d3bcb8ede27039e3c8ea07db385b9aa47e7f9))
+
+
+### Bug Fixes
+
+* add L5 Swagger package and fix imort error ([385a0ec](https://github.com/NFDI4Chem/nmrxiv/commit/385a0ecc9180fb1142cfd98e832d4567904d003d))
+* add swagger doc for auths and public projects ([f7ce84f](https://github.com/NFDI4Chem/nmrxiv/commit/f7ce84f9b2818478799755146024a6f0b57d6416))
+* add swagger for bioschemas ([dcd05f8](https://github.com/NFDI4Chem/nmrxiv/commit/dcd05f8952dd2988dc12706e5dd83ecfab177362))
+* add unique constraint to shouldbeunique ([8850dfb](https://github.com/NFDI4Chem/nmrxiv/commit/8850dfbee9714a2b863d86a40606775e5c5b01a0))
+* added confirmation modal to the publish screen ([9861022](https://github.com/NFDI4Chem/nmrxiv/commit/98610223b19d952b71231a4493bf6d412eb9903a))
+* api endpoints updates ([c8d34f0](https://github.com/NFDI4Chem/nmrxiv/commit/c8d34f00e9791be46f1dd09ddacc38a8c70ad3fc))
+* app env check updates ([b3a3a9a](https://github.com/NFDI4Chem/nmrxiv/commit/b3a3a9a859d0e433f5055819f22a7695fcb8d988))
+* disabled action when project is deleted. ([54838aa](https://github.com/NFDI4Chem/nmrxiv/commit/54838aaff32ac360b91318502fc2d58db748b792))
+* enabled compounds preview and other minor updates ([0dca4ee](https://github.com/NFDI4Chem/nmrxiv/commit/0dca4ee6c5dcf05ff4235111f26cf69b567ff275))
+* enabled compounds summary info view by default ([3184be0](https://github.com/NFDI4Chem/nmrxiv/commit/3184be0b7b4bf99104ee5e22bc5b5fd905295533))
+* Exception missing import fix ([f81b025](https://github.com/NFDI4Chem/nmrxiv/commit/f81b02552ad771411845068a233ae040b5f5cf3c))
+* failing tests resolved ([b853010](https://github.com/NFDI4Chem/nmrxiv/commit/b8530102ee6314cda016679aeeb862e78a89bf3c))
+* formatting and composer conflict resolution ([64ccbfc](https://github.com/NFDI4Chem/nmrxiv/commit/64ccbfc689f2e5c19ecf9f28f5bca13aa109780d))
+* formatting, UX/UI updates and zipping bug fix ([1718138](https://github.com/NFDI4Chem/nmrxiv/commit/17181389d2f930ba1e5d109ff22a862445d1135c))
+* hide empty tags placeholder ([cb33a78](https://github.com/NFDI4Chem/nmrxiv/commit/cb33a78620b584a1fc334824ef7aab29da2e345d))
+* independent sample rendering issue fix ([9e7d565](https://github.com/NFDI4Chem/nmrxiv/commit/9e7d565fcc805caeb37bd8870ef9d2be332fdacf))
+* many datacite fixes ([58a3960](https://github.com/NFDI4Chem/nmrxiv/commit/58a3960c9c569b0c371b2c30e6da896a1138b35b)), closes [#560](https://github.com/NFDI4Chem/nmrxiv/issues/560)
+* move query to path in models swagger ([c519798](https://github.com/NFDI4Chem/nmrxiv/commit/c5197988958e9bc739445cdf0ddf36422a1e96e3))
+* moved env to config and various other minor refactoring ([2b2460a](https://github.com/NFDI4Chem/nmrxiv/commit/2b2460acee49dbb228ab392785567c21c6d3a7b2))
+* project archival mail issue ([3bf9608](https://github.com/NFDI4Chem/nmrxiv/commit/3bf9608d0e4d9fd6f5694d9e5959906282636c96))
+* refactored upload view, updated controllers and various bug fixes ([4fb0d5f](https://github.com/NFDI4Chem/nmrxiv/commit/4fb0d5fb0dbd6726bdc9054368f12553423c68df))
+* register api 422 error in swagger ([5c08136](https://github.com/NFDI4Chem/nmrxiv/commit/5c08136a5b1fb7cbfa41385b5ceb6ed58f25aa96))
+* remove abstract Bioschemas models ([63daccf](https://github.com/NFDI4Chem/nmrxiv/commit/63daccf2549eb09b3e3a2a7aeb26549855291bfa))
+* resolve 404 error in Search ([526e92a](https://github.com/NFDI4Chem/nmrxiv/commit/526e92a2b6e9342facbbee637e3619992faaefb1)), closes [#846](https://github.com/NFDI4Chem/nmrxiv/issues/846)
+* restore project - draft bug fix and dashboard broken links fix ([b0057db](https://github.com/NFDI4Chem/nmrxiv/commit/b0057dbad28057ebd58f7a8a8b346997e4b04fc8))
+* samples mode publishing bug fix ([d8caad8](https://github.com/NFDI4Chem/nmrxiv/commit/d8caad8a32231c10d85e8a89f484f2d2077c63ed))
+* updating delete projects names to enable name reusing ([ed3e18c](https://github.com/NFDI4Chem/nmrxiv/commit/ed3e18c5697c2365106dfb6cbb706bb72cf77510))
+* ux/ui improvements and other bug fixes ([3406aa9](https://github.com/NFDI4Chem/nmrxiv/commit/3406aa94b03b6eade5b2086aa0ff3c76174f1c92))
+* various minor fixes ([f61f25c](https://github.com/NFDI4Chem/nmrxiv/commit/f61f25cbc7eabed6ec1ba4ba212366bf5f18e333))
+
 ## [1.1.0-rc.14](https://github.com/NFDI4Chem/nmrxiv/compare/v1.0.0-rc.14...v1.1.0-rc.14) (2023-11-28)
 
 
