@@ -42,7 +42,7 @@ class ProjectController extends Controller
 
     /**
      * @OA\Get(
-     * path="/api/v1/project/?id={id}",
+     * path="/api/v1/project/{id}",
      * summary="Fetch nmrXiv public project based on identifier",
      * description="Fetch details of nmrXiv public project based on identifier.",
      * operationId="publicProject",
@@ -50,7 +50,7 @@ class ProjectController extends Controller
      *
      * @OA\Parameter(
      *  name="id",
-     *  in="query",
+     *  in="path",
      *  description="Public project identifier e.g. P12",
      *  required=true,
      *
