@@ -136,13 +136,13 @@ class DatasetController extends Controller
     {
         $content = $request->get('img');
         $study = $dataset->study;
-        if ($content){
-            if($study->project) {
+        if ($content) {
+            if ($study->project) {
                 $path = '/projects/'.$study->project->uuid.'/'.$study->uuid.'/'.$dataset->slug.'.svg';
                 Storage::disk(env('FILESYSTEM_DRIVER_PUBLIC'))->put($path, $content, 'public');
                 $dataset->dataset_photo_path = $path;
                 $dataset->save();
-            }else{
+            } else {
                 $path = '/samples/'.$study->uuid.'/'.$dataset->slug.'.svg';
                 Storage::disk(env('FILESYSTEM_DRIVER_PUBLIC'))->put($path, $content, 'public');
                 $dataset->dataset_photo_path = $path;
