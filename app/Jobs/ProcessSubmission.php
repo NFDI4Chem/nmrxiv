@@ -109,7 +109,7 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
 
                 ArchiveProject::dispatch($project);
 
-                Notification::send($project->owner, new DraftProcessedNotification($project));
+                $project->sendNotification('publish', $this->prepareSendList($project));
             }
         } else {
             $logs = 'Moving files in progress';
@@ -202,5 +202,25 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                 $this->moveFolder($fsObjectChild, $draft, $path);
             }
         }
+    }
+
+    /**
+     * Prepare Sent to list.
+     *
+     * @param  App\Models\Project  $project
+     * @return void
+     */
+    public function prepareSendList($project)
+    {
+        $sendTo = [];
+        foreach ($project->allUsers() as $member) {
+            if ($member->projectMembership->role == 'creator' || $member->projectMembership->role == 'owner') {
+                array_push($sendTo, $member);
+            } else {
+                array_push($sendTo, $project->owner);
+            }
+        }
+
+        return $sendTo;
     }
 }

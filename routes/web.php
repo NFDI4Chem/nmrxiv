@@ -15,6 +15,7 @@ use App\Http\Controllers\DatasetController;
 use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\DraftController;
 use App\Http\Controllers\FileSystemController;
+use App\Http\Controllers\OEmbedController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectInvitationController;
 use App\Http\Controllers\ProjectMemberController;
@@ -366,3 +367,6 @@ Route::get('datasets/{owner}/{slug}', [DatasetController::class, 'publicDatasetV
 
 Route::get('spectra', [StudyController::class, 'publicStudiesView'])
     ->name('public.spectra');
+
+Route::get('services/oembed', [OEmbedController::class, 'spectra']);
+Route::get('embed/{id}', [OEmbedController::class, 'embed']);
