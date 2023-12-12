@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Events\DraftProcessed;
 use App\Events\ProjectArchival;
 use App\Events\ProjectDeletion;
 use App\Notifications\ProjectDeletionFailureNotification;
@@ -355,6 +356,9 @@ class Project extends Model implements Auditable
                 break;
             case 'deletionFailure':
                 Notification::send($sendTo, new ProjectDeletionFailureNotification($this));
+                break;
+            case 'publish':
+                event(new DraftProcessed($this, $sendTo));
                 break;
         }
     }
