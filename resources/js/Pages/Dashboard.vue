@@ -44,13 +44,71 @@
                 </div>
             </div>
         </template>
-        <div v-if="projects.length > 0" class="px-12 py-8 mx-auto max-w-4xl">
-            <team-projects
-                :team="team"
-                :team-role="teamRole"
-                :mode="'create'"
-                :projects="projects"
-            ></team-projects>
+        <div v-if="projects.length > 0">
+            <div
+                class="relative border-gray-200 pt-4 pb-4 pl-10 border-b mt-3 border-gray-100"
+            >
+                <div class="mx-auto flex items-left justify-between">
+                    <Menu as="div" class="relative inline-block text-left">
+                        <div>
+                            <MenuButton
+                                class="group inline-flex justify-center text-sm font-medium text-gray-700 hover:text-gray-900"
+                            >
+                                Sort by:&nbsp;<span
+                                    class="capitalize font-black text-gray-900"
+                                    >{{ sort.name }}</span
+                                >
+                                <ChevronDownIcon
+                                    class="flex-shrink-0 -mr-1 ml-1 h-5 w-5 text-gray-400 group-hover:text-gray-500"
+                                    aria-hidden="true"
+                                />
+                            </MenuButton>
+                        </div>
+
+                        <transition
+                            enter-active-class="transition ease-out duration-100"
+                            enter-from-class="transform opacity-0 scale-95"
+                            enter-to-class="transform opacity-100 scale-100"
+                            leave-active-class="transition ease-in duration-75"
+                            leave-from-class="transform opacity-100 scale-100"
+                            leave-to-class="transform opacity-0 scale-95"
+                        >
+                            <MenuItems
+                                class="origin-top-left absolute left-0 mt-2 w-40 rounded-md shadow-2xl bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
+                            >
+                                <div class="py-1">
+                                    <MenuItem
+                                        v-for="option in sortOptions"
+                                        :key="option.name"
+                                        v-slot="{ active }"
+                                    >
+                                        <a
+                                            :class="[
+                                                option.current
+                                                    ? 'font-medium text-gray-900'
+                                                    : 'text-gray-500',
+                                                active ? 'bg-gray-100' : '',
+                                                'block px-4 py-2 text-sm cursor-pointer',
+                                            ]"
+                                            @click="sort = option"
+                                        >
+                                            {{ option.name }}
+                                        </a>
+                                    </MenuItem>
+                                </div>
+                            </MenuItems>
+                        </transition>
+                    </Menu>
+                </div>
+            </div>
+            <div class="px-12 py-8 mx-auto max-w-4xl">
+                <team-projects
+                    :team="team"
+                    :team-role="teamRole"
+                    :mode="'create'"
+                    :projects="projects"
+                ></team-projects>
+            </div>
         </div>
         <div v-else>
             <div class="max-w-lg my-6 py-6 mx-auto">
@@ -300,9 +358,19 @@ import Create from "@/Shared/CreateButton.vue";
 import Onboarding from "@/App/Onboarding.vue";
 import { useMagicKeys } from "@vueuse/core";
 import { getCurrentInstance } from "vue";
-import { watchEffect } from "vue";
+import { watchEffect, watch } from "vue";
 import { Link } from "@inertiajs/vue3";
 import { computed } from "vue";
+import { ChevronDownIcon } from "@heroicons/vue/24/solid";
+import {
+    Menu,
+    MenuButton,
+    MenuItem,
+    MenuItems,
+    TransitionChild,
+    TransitionRoot,
+} from "@headlessui/vue";
+import { router } from "@inertiajs/vue3";
 
 const { meta, u } = useMagicKeys();
 
@@ -314,8 +382,31 @@ export default {
         Create,
         Onboarding,
         Link,
+        ChevronDownIcon,
+        Menu,
+        MenuItem,
+        MenuItems,
+        MenuButton,
+        TransitionChild,
+        TransitionRoot,
     },
     props: ["user", "team", "projects", "teamRole", "filters"],
+    data() {
+        return {
+            sortOptions: [
+                { name: "Creation", value: "created_by", current: true },
+                { name: "Last Updated", value: "updated_at", current: false },
+                { name: "Status", value: "status", current: false },
+                { name: "Archived", value: "is_archived", current: false },
+                { name: "Visibility", value: "is_public", current: false },
+            ],
+            sort: {
+                name: "Creation",
+                value: "created_by",
+                current: true,
+            },
+        };
+    },
     setup() {
         const app = getCurrentInstance();
         const openDatasetCreateDialog = (data) => {
@@ -331,7 +422,6 @@ export default {
                 });
             }
         });
-
         return {
             openDatasetCreateDialog,
         };
@@ -353,6 +443,21 @@ export default {
                 draft_id: this.filters.draft_id,
             });
         }
+    },
+    watch: {
+        sort: {
+            deep: true,
+            handler: (sort) => {
+                router.get(
+                    "dashboard",
+                    { sort: sort.value },
+                    {
+                        preserveState: true,
+                        replace: true,
+                    }
+                );
+            },
+        },
     },
 };
 </script>

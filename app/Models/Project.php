@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Notification;
+use Lacodix\LaravelModelFilter\Traits\IsSortable;
 use Laravel\Scout\Searchable;
 use Maize\Markable\Markable;
 use Maize\Markable\Models\Bookmark;
@@ -28,6 +29,7 @@ class Project extends Model implements Auditable
     use HasDOI;
     use HasFactory;
     use HasTags;
+    use IsSortable;
     use Markable;
     use \OwenIt\Auditing\Auditable;
     use Searchable;
@@ -54,6 +56,13 @@ class Project extends Model implements Auditable
         'release_date',
         'deleted_on',
         'species',
+    ];
+
+    protected array $sortable = [
+        'is_archived',
+        'status',
+        'created_at' => 'desc',
+        'updated_at',
     ];
 
     protected static $marks = [

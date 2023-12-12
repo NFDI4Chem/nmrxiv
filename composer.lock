@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d3eb252f0540120ab4f2875fabb90efa",
+    "content-hash": "39edd218f758dbbe6afe1ae97d0c08cb",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -2120,6 +2120,86 @@
                 "source": "https://github.com/404labfr/laravel-impersonate/tree/1.7.4"
             },
             "time": "2023-01-25T16:56:05+00:00"
+        },
+        {
+            "name": "lacodix/laravel-model-filter",
+            "version": "v1.11.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/lacodix/laravel-model-filter.git",
+                "reference": "1a5f7a5fc001dcd4bd89c25877b5a9e09270576c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/lacodix/laravel-model-filter/zipball/1a5f7a5fc001dcd4bd89c25877b5a9e09270576c",
+                "reference": "1a5f7a5fc001dcd4bd89c25877b5a9e09270576c",
+                "shasum": ""
+            },
+            "require": {
+                "ext-intl": "*",
+                "illuminate/contracts": "^9.0|^10.0",
+                "php": "^8.1",
+                "spatie/laravel-package-tools": "^1.13.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.13",
+                "illuminate/database": "^9.47|^10.0",
+                "illuminate/support": "^9.47|^10.0",
+                "laravel/pint": "^1.0",
+                "nunomaduro/collision": "^6.0",
+                "nunomaduro/larastan": "^2.0.1",
+                "nunomaduro/phpinsights": "^2.6",
+                "orchestra/testbench": "^7.19|^8.0",
+                "pestphp/pest": "^1.21",
+                "pestphp/pest-plugin-faker": "^1.0",
+                "pestphp/pest-plugin-laravel": "^1.1",
+                "phpstan/extension-installer": "^1.1",
+                "phpstan/phpstan-deprecation-rules": "^1.0",
+                "phpstan/phpstan-phpunit": "^1.0",
+                "phpunit/phpunit": "^9.5",
+                "rector/rector": "^0.15.7"
+            },
+            "type": "laravel-package",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Lacodix\\LaravelModelFilter\\LaravelModelFilterServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Lacodix\\LaravelModelFilter\\": "src",
+                    "Lacodix\\LaravelModelFilter\\Database\\Factories\\": "database/factories"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Dominik Müller",
+                    "email": "dominik@lacodix.de",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A Laravel package to filter, search and sort models with ease while fetching from database.",
+            "homepage": "https://github.com/lacodix/laravel-model-filter",
+            "keywords": [
+                "eloquent",
+                "filter",
+                "filters",
+                "lacodix",
+                "laravel",
+                "model",
+                "search"
+            ],
+            "support": {
+                "issues": "https://github.com/lacodix/laravel-model-filter/issues",
+                "source": "https://github.com/lacodix/laravel-model-filter/tree/v1.11.2"
+            },
+            "time": "2023-11-28T10:36:46+00:00"
         },
         {
             "name": "larabug/larabug",

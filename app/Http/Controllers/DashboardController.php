@@ -18,12 +18,19 @@ class DashboardController extends Controller
         if ($team) {
             $team->users = $team->allUsers();
             if (! $team->personal_team) {
-                $projects = Project::with('users', 'owner')->where([['team_id', $team->id], ['is_deleted', false]])->orderBy('updated_at', 'DESC')->get();
+                $projects = Project::with('users', 'owner')->where([['team_id', $team->id], ['is_deleted', false]])
+                    ->when($request->input('sort'), function ($query, $sort) {
+                        $query->sort(["{$sort}" => 'desc']);
+                    }, function ($query) {
+                        $query->sort(['updated_at' => 'desc']);
+                    })->get();
             } else {
-                $projects = Project::with('users', 'owner')->where([['owner_id', $user->id], ['is_deleted', false]])
-                    ->where('team_id', $team->id)
-                    ->orderBy('updated_at', 'DESC')
-                    ->get();
+                $projects = Project::with('users', 'owner')->where([['owner_id', $user->id], ['is_deleted', false], ['team_id', $team->id]])
+                    ->when($request->input('sort'), function ($query, $sort) {
+                        $query->sort(["{$sort}" => 'desc']);
+                    }, function ($query) {
+                        $query->sort(['updated_at' => 'desc']);
+                    })->get();
             }
         }
 
