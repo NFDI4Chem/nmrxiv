@@ -23,6 +23,6 @@ class ProjectArchival
     public function handle(object $event): void
     {
         Notification::send($event->sendTo, new ProjectArchivalNotification($event->project));
-        Notification::send(User::role(['super-admin'])->get(), new ProjectArchivalNotificationToAdmins($this));
+        Notification::send(User::role(['super-admin'])->get(), new ProjectArchivalNotificationToAdmins($event->project));
     }
 }
