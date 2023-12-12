@@ -13,8 +13,8 @@ export default defineConfig({
     },
 
     logo:  { 
-      light: "/logo.svg",
-      dark: "/logo-dark.svg",
+      light: "/img/logo.svg",
+      dark: "/img/dark-logo.svg",
       alt : "nmrXiv" 
     },
 

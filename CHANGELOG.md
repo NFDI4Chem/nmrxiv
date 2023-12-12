@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.1.0-rc.16](https://github.com/NFDI4Chem/nmrxiv/compare/v1.0.0-rc.16...v1.1.0-rc.16) (2023-12-12)
+
+
+### Features
+
+* exposed oembed endpoints ([6b2e32a](https://github.com/NFDI4Chem/nmrxiv/commit/6b2e32ab8a3bf245470850845c5cbafacfc1aab7))
+
+
+### Bug Fixes
+
+* failing preview save method for independent samples fix ([e9e340b](https://github.com/NFDI4Chem/nmrxiv/commit/e9e340b06eb71f604b4c4d572691822a61a40355))
+* fixes [#961](https://github.com/NFDI4Chem/nmrxiv/issues/961) ([cbc0670](https://github.com/NFDI4Chem/nmrxiv/commit/cbc0670515b1269553d14f9bae774010951420de))
+* formatting changes ([a8b21d2](https://github.com/NFDI4Chem/nmrxiv/commit/a8b21d23851b2be36381b67a2578be07b4be9271))
+* notify admin on project release ([b8831a9](https://github.com/NFDI4Chem/nmrxiv/commit/b8831a9097bf185baeb667754535c070ffccbcec))
+* published horizon assets ([a7954c6](https://github.com/NFDI4Chem/nmrxiv/commit/a7954c681a16e60b0b9769dcb9e557081a0b2048))
+* updated tags and other on blur event triggers and save details ([46eee9c](https://github.com/NFDI4Chem/nmrxiv/commit/46eee9ccb136b03b32c99c4979153f6cba500816))
+
 ## [1.1.0-rc.15](https://github.com/NFDI4Chem/nmrxiv/compare/v1.0.0-rc.15...v1.1.0-rc.15) (2023-12-08)
 
 
