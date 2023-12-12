@@ -23,7 +23,7 @@ class InviteTeamMember implements InvitesTeamMembers
      * @param  mixed  $team
      * @return void
      */
-    public function invite($user, $team, string $email, ?string $role = null)
+    public function invite($user, $team, string $email, string $role = null)
     {
         Gate::forUser($user)->authorize('addTeamMember', $team);
 

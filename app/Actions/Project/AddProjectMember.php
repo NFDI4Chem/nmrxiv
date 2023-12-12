@@ -18,7 +18,7 @@ class AddProjectMember
      * @param  mixed  $project
      * @return void
      */
-    public function add($user, $project, string $email, ?string $role = null)
+    public function add($user, $project, string $email, string $role = null)
     {
         Gate::forUser($user)->authorize('addProjectMember', $project);
 
