@@ -199,9 +199,13 @@ class BioschemasController extends Controller
         foreach ($sample->molecules as &$molecule) {
             $inchiKey = $molecule->inchi_key;
             $pubchemLink = 'https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/inchikey/'.$inchiKey.'/property/IUPACName/JSON';
-            $json = json_decode(Http::get($pubchemLink)->body(), true);
-            $cid = $json['PropertyTable']['Properties'][0]['CID'];
-            $iupacName = $json['PropertyTable']['Properties'][0]['IUPACName'];
+            $pubchemDataJSON = json_decode(Http::get($pubchemLink)->body(), true);
+            $cid = '';
+            $iupacName = '';
+            if (array_key_exists('PropertyTable', $pubchemDataJSON)) {
+                $cid = $pubchemDataJSON['PropertyTable']['Properties'][0]['CID'];
+                $iupacName = $pubchemDataJSON['PropertyTable']['Properties'][0]['IUPACName'];
+            }
 
             $moleculeSchema = Schema::MolecularEntity();
             $moleculeSchema['@id'] = $inchiKey;

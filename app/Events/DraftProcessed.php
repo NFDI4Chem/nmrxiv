@@ -12,14 +12,17 @@ class DraftProcessed implements ShouldBroadcastNow
 
     public $project;
 
+    public $sendTo;
+
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct($project)
+    public function __construct($project, $sendTo)
     {
         $this->project = $project;
+        $this->sendTo = $sendTo;
     }
 
     /**

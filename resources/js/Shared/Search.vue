@@ -157,7 +157,7 @@
                                                     <div
                                                         v-if="currentRefinement"
                                                         class="border rounded-md"
-                                                    > 
+                                                    >
                                                         <span
                                                             v-if="
                                                                 index.hits
@@ -366,7 +366,7 @@ export default {
         return {
             open,
             onSelect(item) {
-                if(item.url && item.url !== undefined){
+                if (item.url && item.url !== undefined) {
                     window.location = item.url;
                 }
             },
@@ -377,7 +377,7 @@ export default {
             projects: [],
             recent: [],
             quickActions: [
-            {
+                {
                     name: "Learn Spectral analysis...",
                     icon: TagIcon,
                     shortcut: "F",
@@ -402,7 +402,7 @@ export default {
 
     computed: {
         index() {
-            return this.$page.props.SCOUT_PREFIX + "projects" ;
+            return this.$page.props.SCOUT_PREFIX + "projects";
         },
     },
 
