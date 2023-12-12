@@ -1421,15 +1421,8 @@
                                                                                             :tags="
                                                                                                 studyForm.tags
                                                                                             "
-                                                                                            @blur="
-                                                                                                saveStudyDetails
-                                                                                            "
                                                                                             @tags-changed="
-                                                                                                (
-                                                                                                    newTags
-                                                                                                ) =>
-                                                                                                    (studyForm.tags =
-                                                                                                        newTags)
+                                                                                                updateTags
                                                                                             "
                                                                                         />
                                                                                         <jet-input-error
@@ -1729,6 +1722,7 @@ export default {
             editor: null,
 
             showPrimer: false,
+            busy: false,
 
             steps: [
                 {
@@ -2195,55 +2189,59 @@ export default {
             }
         },
         selectStudy(study, index, datasetIndex = null) {
-            if (study.internal_status == "complete") {
-                this.selectedStudyIndex = index;
-                this.selectedStudy = study;
-                this.setQueryStringParameter("sample", study.id);
-                this.studyForm.name = this.selectedStudy.name;
-                this.studyForm.description =
-                    this.selectedStudy.description.replace(/<\/br>/g, " ");
-                this.studyForm.species = JSON.parse(this.selectedStudy.species)
-                    ? JSON.parse(this.selectedStudy.species)
-                    : [];
-                let tags = [];
-                this.selectedStudy.tags.forEach((t) => {
-                    tags.push({
-                        text: t.name["en"],
+            if (!this.busy) {
+                if (study.internal_status == "complete") {
+                    this.selectedStudyIndex = index;
+                    this.selectedStudy = study;
+                    this.setQueryStringParameter("sample", study.id);
+                    this.studyForm.name = this.selectedStudy.name;
+                    this.studyForm.description =
+                        this.selectedStudy.description.replace(/<\/br>/g, " ");
+                    this.studyForm.species = JSON.parse(
+                        this.selectedStudy.species
+                    )
+                        ? JSON.parse(this.selectedStudy.species)
+                        : [];
+                    let tags = [];
+                    this.selectedStudy.tags.forEach((t) => {
+                        tags.push({
+                            text: t.name["en"],
+                        });
                     });
-                });
-                this.studyForm.tags = tags;
-                let editorState = JSON.parse(
-                    JSON.stringify(this.displaySamplesSummaryInfo)
-                );
-                if (this.displaySamplesSummaryInfo) {
-                    this.displaySamplesSummaryInfo = false;
-                }
-                this.$nextTick(() => {
-                    if (editorState) {
-                        if (this.$refs.spectraEditorREF) {
-                            this.$refs.spectraEditorREF.registerEvents();
+                    this.studyForm.tags = tags;
+                    let editorState = JSON.parse(
+                        JSON.stringify(this.displaySamplesSummaryInfo)
+                    );
+                    if (this.displaySamplesSummaryInfo) {
+                        this.displaySamplesSummaryInfo = false;
+                    }
+                    this.$nextTick(() => {
+                        if (editorState) {
+                            if (this.$refs.spectraEditorREF) {
+                                this.$refs.spectraEditorREF.registerEvents();
+                            }
+                        }
+                        this.editor = OCL.StructureEditor.createSVGEditor(
+                            "structureSearchEditor",
+                            1
+                        );
+                    });
+                    if (this.studyForm.description == "") {
+                        if (study.has_nmrium) {
+                            this.autoGenerateDescription();
                         }
                     }
-                    this.editor = OCL.StructureEditor.createSVGEditor(
-                        "structureSearchEditor",
-                        1
-                    );
-                });
-                if (this.studyForm.description == "") {
-                    if (study.has_nmrium) {
-                        this.autoGenerateDescription();
+                    if (
+                        this.selectedStudy &&
+                        this.selectedStudy.sample.molecules.length == 0
+                    ) {
+                        this.autoImportMolecularData(this.selectedStudy);
                     }
-                }
-                if (
-                    this.selectedStudy &&
-                    this.selectedStudy.sample.molecules.length == 0
-                ) {
-                    this.autoImportMolecularData(this.selectedStudy);
-                }
-                if (!datasetIndex) {
-                    this.selectedDSIndex = 0;
-                } else {
-                    this.selectedDSIndex = datasetIndex;
+                    if (!datasetIndex) {
+                        this.selectedDSIndex = 0;
+                    } else {
+                        this.selectedDSIndex = datasetIndex;
+                    }
                 }
             }
         },
@@ -2282,21 +2280,21 @@ export default {
             this.spectraLoadingStatus = e.status;
             this.spectraLoadingMessage = e.message;
         },
-        saveStudyDetails() {
-            if (this.studyForm.tag && this.studyForm.tag != "") {
-                let exists = false;
-                this.studyForm.tags.forEach((t) => {
-                    if (t.text == this.studyForm.tag) {
-                        exists = true;
-                    }
-                });
-                if (!exists) {
-                    this.studyForm.tags.push({ text: this.studyForm.tag });
-                    this.studyForm.tag = "";
-                }
+        updateTags(e) {
+            this.busy = true;
+            if (!e.type) {
+                this.studyForm.tags = e;
             }
-            this.loadingStep = true;
             this.studyForm.tags_array = this.studyForm.tags.map((a) => a.text);
+            this.saveStudyDetails();
+        },
+        saveStudyDetails() {
+            this.busy = true;
+            this.spectraLoading({
+                status: true,
+                message: "Saving updates",
+            });
+            this.loadingStep = true;
             axios
                 .put(
                     "/dashboard/studies/" + this.selectedStudy.id + "/update",
@@ -2304,6 +2302,11 @@ export default {
                 )
                 .catch((error) => {
                     this.loadingStep = false;
+                    this.spectraLoading({
+                        status: false,
+                        message: "Update save error",
+                    });
+                    this.busy = false;
                     Object.keys(error.response.data.errors).forEach((key) => {
                         error.response.data.errors[key] =
                             error.response.data.errors[key].join(", ");
@@ -2314,6 +2317,11 @@ export default {
                 })
                 .then((response) => {
                     if (response) {
+                        this.busy = false;
+                        this.spectraLoading({
+                            status: false,
+                            message: "Updates saved",
+                        });
                         this.loadingStep = false;
                         this.studies[this.selectedStudyIndex] = response.data;
                         this.studyForm.hasErrors = false;
