@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Team;
 use App\Models\User;
+use Illuminate\Auth\Events\Verified;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -59,7 +60,7 @@ class RegisterController extends Controller
      */
     public function register(Request $request)
     {
-        $validateUser = Validator::make($request->all(),
+        $validateUserDetails = Validator::make($request->all(),
             [
                 'first_name' => 'required|string|max:255',
                 'last_name' => 'required|string|max:255',
@@ -68,15 +69,17 @@ class RegisterController extends Controller
                 'username' => 'required|string|max:255|unique:users',
             ]);
 
-        if ($validateUser->fails()) {
+        if ($validateUserDetails->fails()) {
             return response()->json([
                 'status' => false,
                 'message' => 'validation error',
-                'errors' => $validateUser->errors(),
+                'errors' => $validateUserDetails->errors(),
             ], 401);
         }
 
-        $user = DB::transaction(function () use ($request) {
+        $authUser = auth('sanctum')->user();
+
+        $user = DB::transaction(function () use ($request, $authUser) {
             return tap(User::create([
                 'name' => $request['first_name'].' '.$request['last_name'],
                 'first_name' => $request['first_name'],
@@ -86,13 +89,25 @@ class RegisterController extends Controller
                 'orcid_id' => $request['orcid_id'],
                 'affiliation' => $request['affiliation'],
                 'password' => Hash::make($request['password']),
-            ]), function (User $user) {
+            ]), function (User $user) use ($authUser) {
                 $this->createTeam($user);
-                $user->sendEmailVerificationNotification();
+                if ($authUser && $authUser->hasRole('eln')) {
+                    $expiresAt = now()->addDays(3);
+                    $user->sendWelcomeNotification($expiresAt);
+                    if ($user->markEmailAsVerified()) {
+                        event(new Verified($user));
+                    }
+                } else {
+                    $user->sendEmailVerificationNotification();
+                }
             });
         });
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+        if ($authUser) {
+            $token = $user->createToken('eln_token')->plainTextToken;
+        } else {
+            $token = $user->createToken('auth_token')->plainTextToken;
+        }
 
         return response()->json([
             'success' => true,

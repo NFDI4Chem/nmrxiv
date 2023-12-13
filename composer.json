@@ -38,6 +38,7 @@
         "spatie/laravel-query-builder": "^5.6",
         "spatie/laravel-support-bubble": "^1.2",
         "spatie/laravel-tags": "^4.3",
+        "spatie/laravel-welcome-notification": "^2.3.2",
         "spatie/schema-org": "^3.11",
         "tightenco/ziggy": "^1.0"
     },
