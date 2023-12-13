@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\ProjectResource;
 use App\Models\Project;
 use Illuminate\Http\Request;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class ProjectController extends Controller
 {
@@ -29,15 +30,15 @@ class ProjectController extends Controller
      */
     public function all(Request $request)
     {
-        $sort = $request->get('sort');
+        $publicFields = ['id', 'name', 'identifier', 'url'];
 
-        if ($sort == 'latest') {
-            return ProjectResource::collection(Project::where('is_public', true)->orderByDesc('updated_at')->paginate(15));
-        } elseif ($sort == 'trending') {
-            return ProjectResource::collection(Project::where('is_public', true)->paginate(15));
-        }
+        $query = Project::select($publicFields)->where('is_public', true);
 
-        return ProjectResource::collection(Project::where('is_public', true)->paginate(15));
+        $projects = QueryBuilder::for($query)
+        ->paginate()
+        ->appends(request()->query());
+
+        return $projects;
     }
 
     /**
@@ -78,7 +79,7 @@ class ProjectController extends Controller
         $id = $request->query('id');
 
         if ($id) {
-            return ProjectResource::collection(Project::where([['is_public', true], ['identifier', str_replace('P', '', $id)]])->get());
+            return Project::where([['is_public', true], ['identifier', str_replace('P', '', $id)]])->get()->pluck('identifier');
         } else {
             return response()->json([
                 'message' => 'Input missing.',
