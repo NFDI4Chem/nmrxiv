@@ -19,7 +19,7 @@
         "larabug/larabug": "^3.0",
         "laravel/framework": "^10.0",
         "laravel/horizon": "^5.9",
-        "laravel/jetstream": "^2.3",
+        "laravel/jetstream": "^4.0",
         "laravel/sanctum": "^3.2",
         "laravel/scout": "^9.4",
         "laravel/tinker": "^2.5",

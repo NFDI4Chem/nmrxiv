@@ -9,9 +9,11 @@ export default defineConfig({
         port: 8080
     }, 
     plugins: [
-        laravel([
-            'resources/js/app.js',
-        ]),
+        laravel({
+            input: 'resources/js/app.js',
+            ssr: 'resources/js/ssr.js',
+            refresh: true,
+        }),
         vue({
             template: {
                 transformAssetUrls: {
