@@ -278,13 +278,13 @@ class BioschemasController extends Controller
             }
 
             if ($experiment == 'proton') {
-                $experimentSchema = BioschemasHelper::prepareDefinedTerm('proton nuclear magnetic resonance spectrum', ['1H NMR spectra', '1H NMR spectrum', '1H spectrum', 'proton NMR spectrum', 'proton NMR spectra'], 'CHMO:0000838', 'http://purl.obolibrary.org/obo/CHMO_0000838', $chmo);
+                $experimentSchema = BioschemasHelper::prepareDefinedTerm('1H nuclear magnetic resonance spectroscopy', ['1H-NMR spectrometry', 'proton nuclear magnetic resonance spectroscopy', '1H-NMR spectroscopy', '1H-NMR', '1H NMR', '1H NMR spectroscopy', '1H nuclear magnetic resonance spectrometry', 'proton NMR'], 'CHMO:0000593', 'http://purl.obolibrary.org/obo/CHMO_0000593', $chmo);
             } elseif ($experiment == 'c13') {
-                $experimentSchema = BioschemasHelper::prepareDefinedTerm('carbon-13 nuclear magnetic resonance spectrum', ['13C NMR spectra', 'carbon-13 NMR spectra', 'carbon-13 NMR spectrum', '13C NMR spectrum'], 'CHMO:0000837', 'http://purl.obolibrary.org/obo/CHMO_0000837', $chmo);
+                $experimentSchema = BioschemasHelper::prepareDefinedTerm('13C nuclear magnetic resonance spectroscopy', ['13C-NMR spectrometry', '13C nuclear magnetic resonance spectrometry', '13C-NMR spectroscopy', 'carbon NMR', '13C NMR spectroscopy', '13C NMR', 'C-NMR'], 'CHMO:0000595', 'http://purl.obolibrary.org/obo/CHMO_0000595', $chmo);
             } elseif ($experiment == 'cosy') {
-                $experimentSchema = BioschemasHelper::prepareDefinedTerm('correlation spectroscopy spectrum', ['COSY spectra', 'COSY NMR spectra', 'COSY spectrum', 'COSY NMR spectrum'], 'CHMO:0002450', 'http://purl.obolibrary.org/obo/CHMO_0002450', $chmo);
+                $experimentSchema = BioschemasHelper::prepareDefinedTerm('correlation spectroscopy', ['correlation spectrometry', 'correlated spectroscopy', 'correlated spectrometry', 'COSY'], 'CHMO:0000599', 'http://purl.obolibrary.org/obo/CHMO_0000599', $chmo);
             } elseif ($experiment == 'hmbc') {
-                $experimentSchema = BioschemasHelper::prepareDefinedTerm('heteronuclear multiple bond coherence spectrum', ['HMBC spectrum', 'HMBC spectra'], 'CHMO:0000935', 'http://purl.obolibrary.org/obo/CHMO_0000935', $chmo);
+                $experimentSchema = BioschemasHelper::prepareDefinedTerm('heteronuclear multiple bond coherence', ['HMBC', 'HMBC NMR'], 'CHMO:0000601', 'http://purl.obolibrary.org/obo/CHMO_0000601', $chmo);
             } elseif ($experiment == 'hmqc') {
                 $experimentSchema = BioschemasHelper::prepareDefinedTerm('heteronuclear multiple quantum coherence', ['HMQC', 'HMQC NMR'], 'CHMO:0000603', 'http://purl.obolibrary.org/obo/CHMO_0000603', $chmo);
             } elseif ($experiment == 'hsqc') {
