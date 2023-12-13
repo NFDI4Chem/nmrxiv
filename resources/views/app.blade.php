@@ -12,7 +12,7 @@
 
         <!-- Styles / Scripts -->
         @vite(['resources/js/app.js'])
-
+        @inertiaHead
         @routes
         
         @env ('production')

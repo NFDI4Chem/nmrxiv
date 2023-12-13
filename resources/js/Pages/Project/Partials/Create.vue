@@ -392,9 +392,9 @@ export default {
 
     methods: {
         createProject() {
-            this.createProjectForm.owner_id = this.$page.props.user.id;
+            this.createProjectForm.owner_id = this.$page.props.auth.user.id;
             this.createProjectForm.team_id =
-                this.$page.props.user.current_team.id;
+                this.$page.props.auth.user.current_team.id;
             this.createProjectForm.post(route("dashboard.project.create"), {
                 preserveScroll: true,
                 onSuccess: () => {

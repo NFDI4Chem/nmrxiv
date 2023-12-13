@@ -820,7 +820,6 @@ import JetButton from "@/Jetstream/Button.vue";
 import SelectRich from "@/Shared/SelectRich.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import VueTagsInput from "@sipec/vue3-tags-input";
-import { inject } from "vue";
 
 const publishingOptions = [
     {

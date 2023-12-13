@@ -326,7 +326,6 @@ import {
     SwitchLabel,
 } from "@headlessui/vue";
 import SelectRich from "@/Shared/SelectRich.vue";
-import { inject } from "vue";
 
 export default {
     components: {
@@ -381,9 +380,9 @@ export default {
     },
     methods: {
         createStudy() {
-            this.createStudyForm.owner_id = this.$page.props.user.id;
+            this.createStudyForm.owner_id = this.$page.props.auth.user.id;
             this.createStudyForm.team_id =
-                this.$page.props.user.current_team.id;
+                this.$page.props.auth.user.current_team.id;
             this.createStudyForm.project_id = this.project.id;
             this.createStudyForm.post(route("dashboard.study.create"), {
                 preserveScroll: true,

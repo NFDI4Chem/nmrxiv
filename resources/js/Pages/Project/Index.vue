@@ -223,7 +223,7 @@
                                             (team &&
                                                 team.id != project.team_id) ||
                                             project.owner_id !=
-                                                $page.props.user.id
+                                                $page.props.auth.user.id
                                         "
                                         class="text-sm text-gray-600"
                                     >

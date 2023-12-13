@@ -595,7 +595,7 @@ export default {
         },
     },
     mounted() {
-        if (!this.$page.props.user.onboarded) {
+        if (!this.$page.props.auth.user.onboarded) {
             this.open = true;
         }
     },
@@ -617,7 +617,7 @@ export default {
         },
         onboardingComplete() {
             this.open = false;
-            axios.post("/onboarding/complete").then((resp) => {
+            axios.post("/onboarding/complete").then(() => {
                 router.reload({
                     only: ["user", "user.permissions", "user.roles"],
                 });

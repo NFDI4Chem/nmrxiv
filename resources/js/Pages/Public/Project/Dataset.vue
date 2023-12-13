@@ -1,5 +1,25 @@
 <template>
-    <Head :title="dataset.data.name + ' - ' + study.data.name" />
+<Head>
+  <title>{{ dataset.data.name + ' - ' + study.data.name }}</title>
+  <meta name="description" content="Your nmrxiv description">
+  <meta property="og:title" content="nmrXiv-msXiv-VibSpecDB synergies weekly meeting agenda">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Google Docs">
+  <meta property="og:url" content="https://docs.google.com/document/d/1kq53WvSkvlY5QdgU6-AP2szXuPAfUMxq4x7uAKP9aX4/edit?usp=embed_facebook">
+  <meta property="og:image" content="https://lh7-us.googleusercontent.com/docs/AHkbwyJM4oyOCYTE0UI2J6YeyMCjJtFVCYB3hNPlxoQeMvL5ULxddInOt7igI6zjTN0yo4wmjVvG-IpE1d3ZHuLyL2feyg2dzdw_FEaq4hUd6MY4jfM=w1200-h630-p">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="google" content="notranslate">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge;">
+  <meta name="fragment" content="!">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <link rel="shortcut icon" href="https://ssl.gstatic.com/docs/documents/images/kix-favicon-2023q4.ico">
+  <link rel="chrome-webstore-item" href="https://chrome.google.com/webstore/detail/ghbmnnjooekpmoecnnnilnnbdlolhkhi">
+  <link rel="chrome-webstore-item" href="https://chrome.google.com/webstore/detail/apdfllckaahabafndbhieahigkjlhalf">
+  <link rel="manifest" href="/document/manifest.json" crossorigin="use-credentials">
+
+</Head>
     <project-layout :project="project" :selected-tab="tab">
         <template #project-content>
             <div

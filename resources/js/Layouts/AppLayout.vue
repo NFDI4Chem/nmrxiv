@@ -279,7 +279,7 @@
                     </div>
                     <flash-messages />
                     <div class="ml-4 flex items-center md:ml-6">
-                        <span v-if="$page.props.user.first_name != null">
+                        <span v-if="$page.props.auth.user.first_name != null">
                             <div class="ml-5 mt-2 tooltip">
                                 <a
                                     class="cursor-pointer"
@@ -302,7 +302,7 @@
                             >
                             <notification
                                 ref="notificationElement"
-                                :notification="$page.props.user.notifications"
+                                :notification="$page.props.auth.user.notifications"
                             />
                         </span>
 
@@ -331,7 +331,7 @@
                             >
                         </div>
                         <!-- <div
-                            v-if="$page.props.user.first_name != null"
+                            v-if="$page.props.auth.user.first_name != null"
                             class="ml-5 tooltip"
                         >
                             <a
@@ -357,14 +357,14 @@
                             >
                         </div> -->
                         <Menu
-                            v-if="$page.props.user"
+                            v-if="$page.props.auth.user"
                             as="div"
                             class="ml-3 relative"
                         >
                             <div
                                 v-if="
-                                    $page.props.user.current_team &&
-                                    $page.props.user.current_team.personal_team
+                                    $page.props.auth.user.current_team &&
+                                    $page.props.auth.user.current_team.personal_team
                                 "
                                 id="tour-step-account-management"
                             >
@@ -378,9 +378,9 @@
                                     <img
                                         class="h-8 w-8 rounded-full object-cover"
                                         :src="
-                                            $page.props.user.profile_photo_url
+                                            $page.props.auth.user.profile_photo_url
                                         "
-                                        :alt="$page.props.user.first_name"
+                                        :alt="$page.props.auth.user.first_name"
                                     />
                                 </MenuButton>
                                 <span v-else class="inline-flex rounded-md">
@@ -391,13 +391,13 @@
                                         <img
                                             class="h-8 w-8 rounded-full object-cover mr-2"
                                             :src="
-                                                $page.props.user
+                                                $page.props.auth.user
                                                     .profile_photo_url
                                             "
-                                            :alt="$page.props.user.first_name"
+                                            :alt="$page.props.auth.user.first_name"
                                         />
                                         <span class="flex md:block hidden">{{
-                                            $page.props.user.first_name
+                                            $page.props.auth.user.first_name
                                         }}</span>
 
                                         <svg
@@ -418,8 +418,8 @@
                             <div v-else>
                                 <MenuButton
                                     v-if="
-                                        $page.props.user &&
-                                        $page.props.user.current_team
+                                        $page.props.auth.user &&
+                                        $page.props.auth.user.current_team
                                     "
                                     type="button"
                                     class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition"
@@ -427,15 +427,15 @@
                                     <img
                                         class="h-8 w-8 rounded-full object-cover mr-2"
                                         :src="
-                                            $page.props.user.current_team
+                                            $page.props.auth.user.current_team
                                                 .profile_photo_url
                                         "
                                         :alt="
-                                            $page.props.user.current_team.name
+                                            $page.props.auth.user.current_team.name
                                         "
                                     />
                                     <span class="flex md:block hidden">{{
-                                        $page.props.user.current_team.name
+                                        $page.props.auth.user.current_team.name
                                     }}</span>
 
                                     <svg
@@ -490,7 +490,7 @@
                                     >
                                         <div
                                             v-if="
-                                                !$page.props.user.current_team
+                                                !$page.props.auth.user.current_team
                                                     .personal_team
                                             "
                                             class="block px-4 pt-2 text-xs text-gray-400"
@@ -499,7 +499,7 @@
                                         </div>
                                         <form
                                             v-if="
-                                                !$page.props.user.current_team
+                                                !$page.props.auth.user.current_team
                                                     .personal_team
                                             "
                                             @submit.prevent="
@@ -523,11 +523,11 @@
                                                     </svg>
                                                     <div>
                                                         {{
-                                                            $page.props.user
+                                                            $page.props.auth.user
                                                                 .first_name
                                                         }}
                                                         {{
-                                                            $page.props.user
+                                                            $page.props.auth.user
                                                                 .last_name
                                                         }}
                                                     </div>
@@ -546,7 +546,7 @@
                                             "
                                         >
                                             <template
-                                                v-for="team in $page.props.user
+                                                v-for="team in $page.props.auth.user
                                                     .all_teams"
                                                 :key="team.id"
                                             >
@@ -650,7 +650,7 @@
                             </transition>
                         </Menu>
                         <Menu
-                            v-if="!$page.props.user.first_name"
+                            v-if="!$page.props.auth.user.first_name"
                             as="div"
                             class="ml-3 relative"
                         >
@@ -682,7 +682,7 @@
             >
                 <slot name="header"></slot>
                 <slot></slot>
-                <project-create></project-create>
+                <!-- <project-create></project-create> -->
                 <!-- <submission></submission> -->
             </main>
         </div>
@@ -700,8 +700,8 @@ import JetDropdownLink from "@/Jetstream/DropdownLink.vue";
 import FlashMessages from "@/Shared/FlashMessages.vue";
 import AnnouncementBanner from "@/Shared/AnnouncementBanner.vue";
 import AppTour from "@/App/Tour.vue";
-import ProjectCreate from "@/Pages/Project/Partials/Create.vue";
-import StudyCreate from "@/Pages/Study/Partials/Create.vue";
+// import ProjectCreate from "@/Pages/Project/Partials/Create.vue";
+// import StudyCreate from "@/Pages/Study/Partials/Create.vue";
 import Submission from "@/Shared/Submission.vue";
 import Notification from "@/Shared/Notification.vue";
 import { ref } from "vue";
@@ -807,7 +807,7 @@ const navigation = [
 
 export default {
     components: {
-        ProjectCreate,
+        // ProjectCreate,
         AppTour,
         JetBanner,
         JetApplicationLogo,
@@ -840,7 +840,7 @@ export default {
         TrashIcon,
         FolderIcon,
         Squares2X2Icon,
-        StudyCreate,
+        // StudyCreate,
         Submission,
         Notification,
         SwatchIcon,
@@ -884,14 +884,14 @@ export default {
             }
         },
         filteredNavigation() {
-            if (this.$page.props.user.first_name) {
+            if (this.$page.props.auth.user.first_name) {
                 return this.navigation;
             } else {
                 return this.navigation.filter((i) => !i.auth);
             }
         },
         personalTeam() {
-            return this.$page.props.user.all_teams.filter(
+            return this.$page.props.auth.user.all_teams.filter(
                 (t) => t.personal_team
             )[0];
         },
@@ -929,13 +929,13 @@ export default {
             this.notificationElement.toggleShowNotificationDialog(notification);
         },
         hasUnreadNotification() {
-            return this.$page.props.user.notifications
-                ? this.$page.props.user.notifications.length > 0
+            return this.$page.props.auth.user.notifications
+                ? this.$page.props.auth.user.notifications.length > 0
                 : false;
         },
         countNotification() {
-            return this.$page.props.user.notifications
-                ? this.$page.props.user.notifications.length
+            return this.$page.props.auth.user.notifications
+                ? this.$page.props.auth.user.notifications.length
                 : 0;
         },
     },

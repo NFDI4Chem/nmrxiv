@@ -295,7 +295,7 @@
 </template>
 
 <script>
-import { Dropzone } from "dropzone";
+import Dropzone from "dropzone";
 import { router } from "@inertiajs/vue3";
 import StudyContent from "@/Pages/Study/Content.vue";
 import FileDetails from "@/Shared/FileDetails.vue";

@@ -177,7 +177,7 @@ export default {
 
     methods: {
         editAnnouncement() {
-            //this.editAnnouncementForm.creator_id = this.$page.props.user.id;
+            //this.editAnnouncementForm.creator_id = this.$page.props.auth.user.id;
             this.editAnnouncementForm.put(
                 route(
                     "console.announcements.edit",

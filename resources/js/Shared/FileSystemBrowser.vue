@@ -601,7 +601,7 @@
 <script>
 import JetDialogModal from "@/Jetstream/DialogModal.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
-import { Dropzone } from "dropzone";
+import Dropzone from "dropzone";
 import axiosRetry from "axios-retry";
 import FileDetails from "@/Shared/FileDetails.vue";
 import SelectInput from "@/Shared/SelectInput.vue";

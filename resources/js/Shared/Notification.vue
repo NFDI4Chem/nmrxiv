@@ -211,7 +211,7 @@ export default {
         return {
             open: false,
             info: {},
-            notifications: this.$page.props.user.notifications,
+            notifications: this.$page.props.auth.user.notifications,
             notificationForm: this.$inertia.form({
                 _method: "POST",
                 id: "",
@@ -245,7 +245,7 @@ export default {
                     onSuccess: () => {
                         this.notificationForm.reset();
                         this.notifications =
-                            this.$page.props.user.notifications;
+                            this.$page.props.auth.user.notifications;
                     },
                     onError: (err) => console.error(err),
                 }
@@ -259,7 +259,7 @@ export default {
                     onSuccess: () => {
                         this.markAllAsReadForm.reset();
                         this.notifications =
-                            this.$page.props.user.notifications;
+                            this.$page.props.auth.user.notifications;
                     },
                     onError: (err) => console.error(err),
                 }
