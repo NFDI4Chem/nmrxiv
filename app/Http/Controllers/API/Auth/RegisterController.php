@@ -65,7 +65,7 @@ class RegisterController extends Controller
                 'last_name' => 'required|string|max:255',
                 'email' => 'required|string|email|max:255|unique:users',
                 'password' => 'required|string|min:8',
-                'username' => 'required|string',
+                'username' => 'required|string|max:255|unique:users',
             ]);
 
         if ($validateUser->fails()) {
