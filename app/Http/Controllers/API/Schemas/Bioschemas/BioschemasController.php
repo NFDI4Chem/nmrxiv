@@ -253,6 +253,55 @@ class BioschemasController extends Controller
     }
 
     /**
+     * Represent the NMR experiment as a DefinedTerm
+     *
+     * @param  App\Models\Dataset  $dataset
+     * @return array $array
+     */
+    public function prepareExperiment($dataset)
+    {
+        $info = BioschemasHelper::getNMRiumInfo($dataset);
+        $experimentSchema = null;
+        if ($info) {
+            $chmo = BioschemasHelper::prepareDefinedTermSet('Chemical Methods Ontology', 'http://purl.obolibrary.org/obo/chmo.owl');
+
+            $nucleus = $info->nucleus;
+            $experiment = $info->experiment;
+            $experimentSchema = $experiment;
+
+            if ($experiment == '1d') {
+                if ($nucleus == '1H') {
+                    $experiment = 'proton';
+                } elseif ($nucleus == '13C') {
+                    $experiment = 'c13';
+                }
+            }
+
+            if ($experiment == 'proton') {
+                $experimentSchema = BioschemasHelper::prepareDefinedTerm('proton nuclear magnetic resonance spectrum', ['1H NMR spectra', '1H NMR spectrum', '1H spectrum', 'proton NMR spectrum', 'proton NMR spectra'], 'CHMO:0000838', 'http://purl.obolibrary.org/obo/CHMO_0000838', $chmo);
+            } elseif ($experiment == 'c13') {
+                $experimentSchema = BioschemasHelper::prepareDefinedTerm('carbon-13 nuclear magnetic resonance spectrum', ['13C NMR spectra', 'carbon-13 NMR spectra', 'carbon-13 NMR spectrum', '13C NMR spectrum'], 'CHMO:0000837', 'http://purl.obolibrary.org/obo/CHMO_0000837', $chmo);
+            } elseif ($experiment == 'cosy') {
+                $experimentSchema = BioschemasHelper::prepareDefinedTerm('correlation spectroscopy spectrum', ['COSY spectra', 'COSY NMR spectra', 'COSY spectrum', 'COSY NMR spectrum'], 'CHMO:0002450', 'http://purl.obolibrary.org/obo/CHMO_0002450', $chmo);
+            } elseif ($experiment == 'hmbc') {
+                $experimentSchema = BioschemasHelper::prepareDefinedTerm('heteronuclear multiple bond coherence spectrum', ['HMBC spectrum', 'HMBC spectra'], 'CHMO:0000935', 'http://purl.obolibrary.org/obo/CHMO_0000935', $chmo);
+            } elseif ($experiment == 'hmqc') {
+                $experimentSchema = BioschemasHelper::prepareDefinedTerm('heteronuclear multiple quantum coherence', ['HMQC', 'HMQC NMR'], 'CHMO:0000603', 'http://purl.obolibrary.org/obo/CHMO_0000603', $chmo);
+            } elseif ($experiment == 'hsqc') {
+                $experimentSchema = BioschemasHelper::prepareDefinedTerm('heteronuclear single quantum coherence', ['HSQC'], 'CHMO:0000604', 'http://purl.obolibrary.org/obo/CHMO_0000604', $chmo);
+            } elseif ($experiment == 'tocsy') {
+                $experimentSchema = BioschemasHelper::prepareDefinedTerm('total correlation spectroscopy', ['homonuclear Hartmann-Hahn spectroscopy', 'homonuclear Hartmann Hahn spectroscopy', 'total correlation spectrometry', 'HOHAHA spectroscopy', 'TOCSY', 'total correlated spectroscopy', 'homonuclear Hartmann,Hahn spectroscopy', 'HOHAHA spectrometry'], 'CHMO:0000605', 'http://purl.obolibrary.org/obo/CHMO_0000605', $chmo);
+            } elseif ($experiment == 'roesy') {
+                $experimentSchema = BioschemasHelper::prepareDefinedTerm('rotating frame Overhauser effect spectroscopy', ['rotating frame Overhauser enhancement spectroscopy', 'rotating frame Overhauser enhancement spectrometry', 'rOesy', 'cross-relaxation appropriate for minimolecules eμlated by locked spins', 'ROESY', 'CAMELPSIN', 'rotational Overhauser effect spectroscopy', 'rotating frame Overhauser effect spectrometry', 'ROESY NMR'], 'CHMO:0000610', 'http://purl.obolibrary.org/obo/CHMO_0000610', $chmo);
+            } elseif ($experiment == 'dept') {
+                $experimentSchema = BioschemasHelper::prepareDefinedTerm('distortionless enhancement with polarization transfer', ['distortionless enhancement with polarisation transfer', 'distortionless enhancement by polarisation transfer', 'distortionless enhancement by polarization transfer', 'DEPT NMR', 'DEPT', 'distortionless enhancement with polarization transfer'], 'CHMO:0000596', 'http://purl.obolibrary.org/obo/CHMO_0000596', $chmo);
+            }
+        }
+
+        return $experimentSchema;
+    }
+
+    /**
      * Represent NMRium info as PropertyValue schemas.
      *
      * @param  App\Models\Dataset  $dataset
@@ -283,7 +332,7 @@ class BioschemasController extends Controller
             $nucleusProperty = BioschemasHelper::preparePropertyValue('acquisition nucleus', 'NMR:1400083', $nucleus, null);
             $dimensionProperty = BioschemasHelper::preparePropertyValue('NMR spectrum by dimensionality', 'NMR:1000117', $dimension, null);
             $probeNameProperty = BioschemasHelper::preparePropertyValue('NMR probe', 'OBI:0000516', $probeName, null);
-            $experimentProperty = BioschemasHelper::preparePropertyValue('pulsed nuclear magnetic resonance spectroscopy', 'CHMO:0000613', $experiment, null);
+            //$experimentProperty = BioschemasHelper::preparePropertyValue('pulsed nuclear magnetic resonance spectroscopy', 'CHMO:0000613', $experiment, null);
             $temperatureProperty = BioschemasHelper::preparePropertyValue('Temperature', 'NCIT:C25206', $temperature, 'https://ontobee.org/ontology/UO?iri=http://purl.obolibrary.org/obo/UO_0000012');
             $baseFrequencyProperty = BioschemasHelper::preparePropertyValue('irradiation frequency', 'NMR:1400026', $baseFrequency, 'http://purl.obolibrary.org/obo/UO_0000325');
             $fieldStrengthProperty = BioschemasHelper::preparePropertyValue('magnetic field strength', 'MR:1400253', $fieldStrength, 'http://purl.obolibrary.org/obo/UO_0000228');
@@ -293,12 +342,12 @@ class BioschemasController extends Controller
             $numberOfPointsProperty = BioschemasHelper::preparePropertyValue('number of data points', 'NMR:1000176', $numberOfPoints, 'points');
             $relaxationTimeProperty = BioschemasHelper::preparePropertyValue('relaxation time measurement', 'FIX:0000202', $relaxationTime, 'http://purl.obolibrary.org/obo/UO_0000010');
 
-            $keywords = [$solvent, $dimension.'D', $experiment];
+            $keywords = [$solvent, $dimension.'D'];
             foreach ($nucleus as $keyword) {
                 array_push($keywords, $keyword);
             }
             $variables = [$solventProperty, $nucleusProperty,  $dimensionProperty, $probeNameProperty,
-                $experimentProperty, $temperatureProperty, $baseFrequencyProperty, $fieldStrengthProperty, $numberOfScansProperty, $pulseSequenceProperty, $spectralWidthProperty, $numberOfPointsProperty, $relaxationTimeProperty, ];
+                $temperatureProperty, $baseFrequencyProperty, $fieldStrengthProperty, $numberOfScansProperty, $pulseSequenceProperty, $spectralWidthProperty, $numberOfPointsProperty, $relaxationTimeProperty, ];
 
             $array = [$keywords, $variables, $experiment];
 
@@ -371,7 +420,7 @@ class BioschemasController extends Controller
             $datasetSchema->datePublished($dataset->release_date);
             $datasetSchema->distribution(BioschemasHelper::prepareDataDownload($dataset));
             $datasetSchema->includedInDataCatalog(BioschemasHelper::prepareDataCatalogLite());
-            $datasetSchema->measurementTechnique(env('MEASUREMENT_TECHNIQUE'));
+            $datasetSchema->measurementTechnique($this->prepareExperiment($dataset));
             $datasetSchema->variableMeasured($nmriumInfo[1]);
             $datasetSchema->isAccessibleForFree(true);
 
