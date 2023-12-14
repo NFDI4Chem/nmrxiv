@@ -44,7 +44,7 @@
                 </div>
             </div>
         </template>
-        <div v-if="projects.length > 0">
+        <div v-if="projects.data.length > 0">
             <div
                 class="relative border-gray-200 pt-4 pb-4 pl-10 border-b mt-3 border-gray-100"
             >
@@ -106,8 +106,14 @@
                     :team="team"
                     :team-role="teamRole"
                     :mode="'create'"
-                    :projects="projects"
+                    :projects="projects.data"
                 ></team-projects>
+            </div>
+            <div
+                class="p-10 border-t border-gray-200"
+                v-if="projects.total > projects.per_page"
+            >
+                <Pagination :links="projects.links"></Pagination>
             </div>
         </div>
         <div v-else>
@@ -362,6 +368,7 @@ import { watchEffect, watch } from "vue";
 import { Link } from "@inertiajs/vue3";
 import { computed } from "vue";
 import { ChevronDownIcon } from "@heroicons/vue/24/solid";
+import Pagination from "@/Shared/Pagination.vue";
 import {
     Menu,
     MenuButton,
@@ -383,6 +390,7 @@ export default {
         Onboarding,
         Link,
         ChevronDownIcon,
+        Pagination,
         Menu,
         MenuItem,
         MenuItems,
