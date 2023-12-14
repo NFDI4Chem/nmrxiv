@@ -279,7 +279,7 @@
                     </div>
                     <flash-messages />
                     <div class="ml-4 flex items-center md:ml-6">
-                        <span v-if="$page.props.auth.user.first_name != null">
+                        <span v-if="$page.props.auth.user && $page.props.auth.user.first_name != null">
                             <div class="ml-5 mt-2 tooltip">
                                 <a
                                     class="cursor-pointer"
@@ -650,7 +650,7 @@
                             </transition>
                         </Menu>
                         <Menu
-                            v-if="!$page.props.auth.user.first_name"
+                            v-if="$page.props.auth.user && !$page.props.auth.user.first_name"
                             as="div"
                             class="ml-3 relative"
                         >
@@ -884,7 +884,7 @@ export default {
             }
         },
         filteredNavigation() {
-            if (this.$page.props.auth.user.first_name) {
+            if (this.$page.props.auth.user && this.$page.props.auth.user.first_name) {
                 return this.navigation;
             } else {
                 return this.navigation.filter((i) => !i.auth);
