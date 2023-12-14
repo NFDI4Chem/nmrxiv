@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\ProjectResource;
 use App\Models\Project;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -30,13 +30,18 @@ class ProjectController extends Controller
      */
     public function all(Request $request)
     {
-        $publicFields = ['id', 'name', 'identifier', 'url'];
+        $publicFields = ['name', 'identifier'];
+        $hidden = ['private_url', 'is_bookmarked', 'is_published', 'project_photo_url'];
 
         $query = Project::select($publicFields)->where('is_public', true);
 
         $projects = QueryBuilder::for($query)
-        ->paginate()
-        ->appends(request()->query());
+            ->paginate()
+            ->appends(request()->query());
+
+        $projects->through(function ($value) use ($hidden) {
+            return $value->makeHidden($hidden);
+        });
 
         return $projects;
     }
@@ -74,17 +79,19 @@ class ProjectController extends Controller
      * )
      * )
      */
-    public function id(Request $request)
+    public function id(Request $request, $id)
     {
-        $id = $request->query('id');
+        try {
+            $hidden = ['private_url', 'is_bookmarked', 'is_published', 'project_photo_url'];
 
-        if ($id) {
-            return Project::where([['is_public', true], ['identifier', str_replace('P', '', $id)]])->get()->pluck('identifier');
-        } else {
+            if ($id) {
+                return Project::select(['name', 'identifier', 'description', 'doi', 'download_url', 'project_photo_path'])->where([['is_public', true], ['identifier', str_replace(['P', 'NMRXIV:'], '', strtoupper($id))]])->first()->setHidden($hidden);
+            }
+
+        } catch (QueryException $e) {
             return response()->json([
-                'message' => 'Input missing.',
-            ],
-                400);
+                'message' => 'Unprocessable Entity',
+            ], 422);
         }
     }
 }
