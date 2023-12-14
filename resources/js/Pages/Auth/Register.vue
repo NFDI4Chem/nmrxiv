@@ -35,7 +35,11 @@
             </div>
             <!-- First Name -->
             <div class="mt-4">
-                <jet-label for="first_name" value="First Name" />
+                <jet-label
+                    class="after:content-['*'] after:ml-0.5 after:text-red-500"
+                    for="first_name"
+                    value="First Name"
+                />
                 <jet-input
                     id="first_name"
                     v-model="form.first_name"
@@ -48,9 +52,14 @@
             </div>
             <!-- Last Name -->
             <div class="mt-4">
-                <jet-label for="last_name" value="Last Name" />
+                <jet-label
+                    class="after:content-['*'] after:ml-0.5 after:text-red-500"
+                    for="last_name"
+                    value="Last Name"
+                />
                 <jet-input
                     id="last_name"
+                    name="lastname"
                     v-model="form.last_name"
                     type="text"
                     class="mt-1 block w-full"
@@ -61,7 +70,11 @@
             </div>
             <!-- Email -->
             <div class="mt-4">
-                <jet-label for="email" value="Email" />
+                <jet-label
+                    class="after:content-['*'] after:ml-0.5 after:text-red-500"
+                    for="email"
+                    value="Email"
+                />
                 <jet-input
                     id="email"
                     v-model="form.email"
@@ -72,7 +85,11 @@
             </div>
             <!-- Username -->
             <div class="mt-4">
-                <jet-label for="username" value="Username" />
+                <jet-label
+                    class="after:content-['*'] after:ml-0.5 after:text-red-500"
+                    for="username"
+                    value="Username"
+                />
                 <jet-input
                     id="username"
                     v-model="form.username"
@@ -83,7 +100,11 @@
             </div>
             <!-- ORCID iD -->
             <div class="mt-4">
-                <jet-label for="orcid" value="ORCID iD" />
+                <jet-label
+                    class="after:content-['(optional)'] after:ml-0.5 after:text-gray-500"
+                    for="orcid"
+                    value="ORCID iD"
+                />
                 <div class="mt-1 flex rounded-md shadow-sm">
                     <div
                         class="relative flex items-stretch flex-grow focus-within:z-10"
@@ -114,7 +135,11 @@
             </div>
             <!-- Password -->
             <div class="mt-4">
-                <jet-label for="password" value="Password" />
+                <jet-label
+                    class="after:content-['*'] after:ml-0.5 after:text-red-500"
+                    for="password"
+                    value="Password"
+                />
                 <jet-input
                     id="password"
                     v-model="form.password"
@@ -128,6 +153,7 @@
             <div class="mt-4">
                 <jet-label
                     for="password_confirmation"
+                    class="after:content-['*'] after:ml-0.5 after:text-red-500"
                     value="Confirm Password"
                 />
                 <jet-input
