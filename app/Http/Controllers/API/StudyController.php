@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\StudyResource;
 use App\Models\Study;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class StudyController extends Controller
 {
@@ -29,15 +30,20 @@ class StudyController extends Controller
      */
     public function all(Request $request)
     {
-        $sort = $request->get('sort');
+        $publicFields = ['name', 'identifier', 'download_url'];
+        $hidden = ['datasets', 'private_url', 'is_bookmarked', 'is_published', 'study_preview_urls', 'study_photo_url'];
 
-        if ($sort == 'latest') {
-            return StudyResource::collection(Study::where('is_public', true)->orderByDesc('updated_at')->paginate(15));
-        } elseif ($sort == 'trending') {
-            return StudyResource::collection(Study::where('is_public', true)->paginate(15));
-        }
+        $query = Study::select($publicFields)->where('is_public', true);
 
-        return StudyResource::collection(Study::where('is_public', true)->paginate(15));
+        $studies = QueryBuilder::for($query)
+            ->paginate()
+            ->appends(request()->query());
+
+        $studies->through(function ($value) use ($hidden) {
+            return $value->makeHidden($hidden);
+        });
+
+        return $studies;
     }
 
     /**
@@ -73,17 +79,20 @@ class StudyController extends Controller
      * )
      * )
      */
-    public function id(Request $request)
+    public function id(Request $request, $id)
     {
-        $id = $request->query('id');
 
-        if ($id) {
-            return StudyResource::collection(Study::where([['is_public', true], ['identifier', str_replace('S', '', $id)]])->get());
-        } else {
+        try {
+            $hidden = ['private_url', 'is_bookmarked', 'is_published', 'study_photo_url'];
+
+            if ($id) {
+                return Study::select(['name', 'identifier', 'description', 'doi', 'download_url', 'study_photo_path'])->where([['is_public', true], ['identifier', str_replace(['S', 'NMRXIV:'], '', strtoupper($id))]])->first()->setHidden($hidden);
+            }
+
+        } catch (QueryException $e) {
             return response()->json([
-                'message' => 'Input missing.',
-            ],
-                400);
+                'message' => 'Unprocessable Entity',
+            ], 422);
         }
     }
 }
