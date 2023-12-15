@@ -59,7 +59,7 @@
                             </div>
                         </TransitionChild>
                         <div class="flex-shrink-0 flex items-center px-4">
-                            <Link :href="route('welcome')">
+                            <Link :href="route('landing')">
                                 <jet-application-logo
                                     class="block h-8 w-auto"
                                 />
@@ -118,7 +118,7 @@
                         <div
                             class="bg-white border-b pb-4 pt-4 flex flex-shrink-0 px-4"
                         >
-                            <Link :href="route('welcome')">
+                            <Link :href="route('landing')">
                                 <jet-application-mark
                                     class="block h-8 p-0.5 ml-1.5 w-auto"
                                 />
@@ -171,7 +171,7 @@
         >
           <Bars3Icon class="h-6 w-6" aria-hidden="true" />
         </button> -->
-                    <Link class="ml-2" :href="route('welcome')">
+                    <Link class="ml-2" :href="route('landing')">
                         <jet-application-logo class="block h-10 w-auto" />
                     </Link>
                 </div>

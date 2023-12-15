@@ -362,9 +362,19 @@ export default {
                     });
             }
         },
+        fixLineError(mol) {
+            let lineNumber = mol.molfile
+                .substring(0, mol.molfile.indexOf("V2000"))
+                .split("\n").length;
+            if (lineNumber == 3) {
+                mol.molfile = "\n" + mol.molfile;
+            }
+            return mol;
+        },
         updateMolecularData(molecules) {
             if (molecules.length > 0) {
                 molecules.forEach((mol) => {
+                    mol = this.fixLineError(mol);
                     axios
                         .post(
                             "https://api.naturalproducts.net/latest/chem/standardize",
