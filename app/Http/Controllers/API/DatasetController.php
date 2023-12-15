@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\DatasetResource;
 use App\Models\Dataset;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class DatasetController extends Controller
 {
@@ -29,15 +30,20 @@ class DatasetController extends Controller
      */
     public function all(Request $request)
     {
-        $sort = $request->get('sort');
+        $publicFields = ['name', 'identifier', 'type', 'dataset_photo_path'];
+        $hidden = ['private_url', 'is_bookmarked', 'is_published', 'project_photo_url'];
 
-        if ($sort == 'latest') {
-            return DatasetResource::collection(Dataset::where('is_public', true)->orderByDesc('updated_at')->paginate(15));
-        } elseif ($sort == 'trending') {
-            return DatasetResource::collection(Dataset::where('is_public', true)->paginate(15));
-        }
+        $query = Dataset::select($publicFields)->where('is_public', true);
 
-        return DatasetResource::collection(Dataset::where('is_public', true)->paginate(15));
+        $datasets = QueryBuilder::for($query)
+            ->paginate()
+            ->appends(request()->query());
+
+        $datasets->through(function ($value) use ($hidden) {
+            return $value->makeHidden($hidden);
+        });
+
+        return $datasets;
     }
 
     /**
@@ -73,17 +79,19 @@ class DatasetController extends Controller
      * )
      * )
      */
-    public function id(Request $request)
+    public function id(Request $request, $id)
     {
-        $id = $request->query('id');
+        try {
+            $hidden = ['private_url', 'is_bookmarked', 'is_published'];
 
-        if ($id) {
-            return DatasetResource::collection(Dataset::where([['is_public', true], ['identifier', str_replace('D', '', $id)]])->get());
-        } else {
+            if ($id) {
+                return Dataset::select(['name', 'identifier', 'description', 'doi', 'dataset_photo_path'])->where([['is_public', true], ['identifier', str_replace(['D', 'NMRXIV:'], '', strtoupper($id))]])->first()->setHidden($hidden);
+            }
+
+        } catch (QueryException $e) {
             return response()->json([
-                'message' => 'Input missing.',
-            ],
-                400);
+                'message' => 'Unprocessable Entity',
+            ], 422);
         }
     }
 }
