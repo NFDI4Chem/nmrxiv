@@ -20,13 +20,13 @@ class RouteServiceProvider extends ServiceProvider
     public const HOME = '/dashboard';
 
     /**
-     * The path to the "welcome" route for your application.
+     * The path to the "landing" route for your application.
      *
      * This is used by Laravel verification to redirect users after successful verification.
      *
      * @var string
      */
-    public const WELCOME = '/';
+    public const LANDING = '/';
 
     /**
      * The controller namespace for the application.
