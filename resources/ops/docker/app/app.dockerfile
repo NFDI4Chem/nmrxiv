@@ -6,12 +6,10 @@ RUN apk add git
 RUN docker-php-ext-install exif
 RUN docker-php-ext-install gd
 RUN docker-php-ext-install zip
-RUN docker-php-ext-install sockets
-#RUN docker-php-ext-install pdo_mysql
+#RUN docker-php-ext-install sockets
 RUN pecl install apcu
 RUN docker-php-ext-enable apcu
 RUN docker-php-ext-install pcntl
-#RUN apk update && apk add postgresql-client
 RUN apk --update add postgresql15-client --repository=https://dl-cdn.alpinelinux.org/alpine/edge/main
 
 RUN set -ex \
