@@ -28,10 +28,10 @@ class RegisterController extends Controller
      *             @OA\Schema(
      *       required={"first_name","last_name","email","password","username"},
      *
-     *       @OA\Property(property="first_name", type="string", format="first_name", example="Nisha"),
-     *       @OA\Property(property="last_name", type="string", format="last_name", example="Sharma"),
-     *       @OA\Property(property="email", type="string", format="email", example="nisha.sharma@email.com"),
-     *       @OA\Property(property="username", type="string", format="username", example="nis123"),
+     *       @OA\Property(property="first_name", type="string", format="first_name", example="John"),
+     *       @OA\Property(property="last_name", type="string", format="last_name", example="Doe"),
+     *       @OA\Property(property="email", type="string", format="email", example="john.doe@email.com"),
+     *       @OA\Property(property="username", type="string", format="username", example="doe123"),
      *       @OA\Property(property="orcid_id", type="string", format="orcid_id", example="0009-0006-4755-1039"),
      *       @OA\Property(property="password", type="string", format="password", example="secret1234"),
 
