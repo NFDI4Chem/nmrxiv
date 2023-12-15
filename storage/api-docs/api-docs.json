@@ -27,7 +27,7 @@
                                     "email": {
                                         "type": "string",
                                         "format": "email",
-                                        "example": "nisha.sharma@email.com"
+                                        "example": "john.doe@email.com"
                                     },
                                     "password": {
                                         "type": "string",
@@ -91,22 +91,22 @@
                                     "first_name": {
                                         "type": "string",
                                         "format": "first_name",
-                                        "example": "Nisha"
+                                        "example": "John"
                                     },
                                     "last_name": {
                                         "type": "string",
                                         "format": "last_name",
-                                        "example": "Sharma"
+                                        "example": "Doe"
                                     },
                                     "email": {
                                         "type": "string",
                                         "format": "email",
-                                        "example": "nisha.sharma@email.com"
+                                        "example": "john.doe@email.com"
                                     },
                                     "username": {
                                         "type": "string",
                                         "format": "username",
-                                        "example": "nis123"
+                                        "example": "doe123"
                                     },
                                     "orcid_id": {
                                         "type": "string",
