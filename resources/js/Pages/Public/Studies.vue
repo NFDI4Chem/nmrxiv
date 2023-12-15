@@ -68,7 +68,7 @@
                         Browse Spectra (Samples)
                     </div>
                     <p>
-                        Explore, analyze, and share raw spectra and assignments.
+                        Explore, analyse, and share raw spectra and assignments.
                         Learn more about
                         <a
                             class="text-teal-900"

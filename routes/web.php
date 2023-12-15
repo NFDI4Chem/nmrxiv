@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\LicenseController;
 use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\API\Auth\VerificationController;
 use App\Http\Controllers\ApplicationController;
+use App\Http\Controllers\Auth\MyWelcomeController;
 use App\Http\Controllers\Auth\SocialController;
 use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\CitationController;
@@ -31,6 +32,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Jetstream\Jetstream;
+use Spatie\WelcomeNotification\WelcomesNewUsers;
 
 Route::group([
     'prefix' => 'auth',
@@ -60,7 +62,7 @@ Route::get('/', function () {
         }),
     ]);
     // }
-})->name('welcome');
+})->name('landing');
 
 Route::supportBubble();
 
@@ -72,6 +74,11 @@ Route::group(['middleware' => 'verified'], function () {
     if (Jetstream::hasTeamFeatures()) {
         Route::delete('/teams/{team}', [TeamController::class, 'destroy'])->name('app.teams.destroy');
     }
+});
+
+Route::group(['middleware' => ['web', WelcomesNewUsers::class]], function () {
+    Route::get('welcome/{user}', [MyWelcomeController::class, 'showWelcomeForm'])->name('welcome');
+    Route::post('welcome/{user}', [MyWelcomeController::class, 'savePassword'])->name('password.set');
 });
 
 Route::group(['middleware' => ['auth', 'verified']], function () {

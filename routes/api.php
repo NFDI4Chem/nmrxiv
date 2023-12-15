@@ -44,21 +44,21 @@ Route::prefix('v1')->group(function () {
     Route::get('projects', [ProjectController::class, 'all'])
         ->name('public.projects');
 
-    Route::get('project', [ProjectController::class, 'id'])
+    Route::get('project/{id}', [ProjectController::class, 'id'])
         ->name('public.project');
 
     //Public Samples
     Route::get('samples', [StudyController::class, 'all'])
         ->name('public.samples');
 
-    Route::get('sample', [StudyController::class, 'id'])
+    Route::get('sample/{id}', [StudyController::class, 'id'])
         ->name('public.sample');
 
     //Public Datasets
     Route::get('datasets', [DatasetController::class, 'all'])
         ->name('public.datasets');
 
-    Route::get('dataset', [DatasetController::class, 'id'])
+    Route::get('dataset/{id}', [DatasetController::class, 'id'])
         ->name('public.dataset');
 
     Route::prefix('schemas')->group(function () {
