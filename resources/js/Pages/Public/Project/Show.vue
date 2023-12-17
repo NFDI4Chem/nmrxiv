@@ -155,7 +155,7 @@
 import ProjectLayout from "@/Pages/Public/Project/Layout.vue";
 import AuthorCard from "@/Shared/AuthorCard.vue";
 import CitationCard from "@/Shared/CitationCard.vue";
-import "ontology-elements/dist/index.js";
+// import "ontology-elements/dist/index.js";
 import Citation from "@/Shared/Citation.vue";
 import { Head } from "@inertiajs/vue3";
 

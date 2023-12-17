@@ -656,9 +656,9 @@ import JetInputError from "@/Jetstream/InputError.vue";
 import axios from "axios";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import JetButton from "@/Jetstream/Button.vue";
-import VueTagsInput from "@sipec/vue3-tags-input";
+// import VueTagsInput from "@sipec/vue3-tags-input";
 import { ref } from "vue";
-import slider from "vue3-slider";
+// import slider from "vue3-slider";
 import Validation from "@/Shared/Validation.vue";
 import Datepicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
@@ -686,7 +686,7 @@ import {
 } from "@heroicons/vue/24/solid";
 import SpectraEditor from "@/Shared/SpectraEditor.vue";
 import ToggleButton from "@/Shared/ToggleButton.vue";
-import "ontology-elements/dist/index.js";
+// import "ontology-elements/dist/index.js";
 import JetConfirmationModal from "@/Jetstream/ConfirmationModal.vue";
 import JetSuccessButton from "@/Jetstream/SuccessButton.vue";
 
@@ -698,8 +698,8 @@ export default {
         Citation,
         ToolTip,
         Datepicker,
-        VueTagsInput,
-        slider,
+        // VueTagsInput,
+        // slider,
         SelectRich,
         AppLayout,
         computed,

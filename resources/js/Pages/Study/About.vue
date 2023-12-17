@@ -601,7 +601,7 @@ import {
     InformationCircleIcon,
 } from "@heroicons/vue/24/solid";
 import StudyContent from "@/Pages/Study/Content.vue";
-import slider from "vue3-slider";
+// import slider from "vue3-slider";
 import OCL from "openchemlib/full";
 import ToolTip from "@/Shared/ToolTip.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
@@ -611,7 +611,7 @@ export default {
         StudyContent,
         ToolTip,
         PlusSmallIcon,
-        slider,
+        // slider,
         TrashIcon,
         PencilIcon,
         InformationCircleIcon,

@@ -1,29 +1,26 @@
-import { createSSRApp, h } from "vue";
-import { renderToString } from "@vue/server-renderer";
 import { createInertiaApp } from "@inertiajs/vue3";
 import createServer from "@inertiajs/vue3/server";
-import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
+import { renderToString } from "@vue/server-renderer";
+import { createSSRApp, h } from "vue";
 import { ZiggyVue } from "../../vendor/tightenco/ziggy/dist/vue.m";
-
-const appName = import.meta.env.VITE_APP_NAME || "Laravel";
+import { Ziggy } from "./ziggy.js";
+import helpers from "./Mixins/Global.js";
 
 createServer((page) =>
     createInertiaApp({
         page,
         render: renderToString,
-        title: (title) => `${title} - ${appName}`,
-        resolve: (name) =>
-            resolvePageComponent(
-                `./Pages/${name}.vue`,
-                import.meta.glob("./Pages/**/*.vue")
-            ),
+        resolve: (name) => {
+            const pages = import.meta.glob("./Pages/**/*.vue", { eager: true });
+            return pages[`./Pages/${name}.vue`];
+        },
         setup({ App, props, plugin }) {
-            return createSSRApp({ render: () => h(App, props) })
+            return createSSRApp({
+                render: () => h(App, props),
+            })
                 .use(plugin)
-                .use(ZiggyVue, {
-                    ...page.props.ziggy,
-                    location: new URL(page.props.ziggy.location),
-                });
+                .use(ZiggyVue, Ziggy)
+                .mixin(helpers);
         },
     })
 );

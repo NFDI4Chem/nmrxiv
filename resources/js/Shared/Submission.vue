@@ -1726,9 +1726,9 @@
 import JetDialogModal from "@/Jetstream/DialogModal.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import JetButton from "@/Jetstream/Button.vue";
-import VueTagsInput from "@sipec/vue3-tags-input";
+// import VueTagsInput from "@sipec/vue3-tags-input";
 import { ref } from "vue";
-import slider from "vue3-slider";
+// import slider from "vue3-slider";
 import OCL from "openchemlib/full";
 import SelectRich from "@/Shared/SelectRich.vue";
 import SpectraEditor from "@/Shared/SpectraEditor.vue";
@@ -1754,8 +1754,8 @@ export default {
         JetDialogModal,
         JetSecondaryButton,
         JetButton,
-        VueTagsInput,
-        slider,
+        // VueTagsInput,
+        // slider,
         SelectRich,
         XCircleIcon,
         PencilIcon,

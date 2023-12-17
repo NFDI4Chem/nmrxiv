@@ -1679,9 +1679,9 @@ import {
 import SpectraEditor from "@/Shared/SpectraEditor.vue";
 import Depictor from "@/Shared/Depictor.vue";
 import Depictor2D from "@/Shared/Depictor2D.vue";
-import slider from "vue3-slider";
-import VueTagsInput from "@sipec/vue3-tags-input";
-import "ontology-elements/dist/index.js";
+// import slider from "vue3-slider";
+// import VueTagsInput from "@sipec/vue3-tags-input";
+// import "ontology-elements/dist/index.js";
 
 export default {
     components: {
@@ -1701,8 +1701,8 @@ export default {
         SpectraEditor,
         Depictor,
         Depictor2D,
-        slider,
-        VueTagsInput,
+        // slider,
+        // VueTagsInput,
     },
     props: ["draft_id"],
     setup() {

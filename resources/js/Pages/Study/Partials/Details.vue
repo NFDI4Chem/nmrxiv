@@ -801,8 +801,8 @@ import {
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import StudyActivity from "@/Pages/Study/Partials/Activity.vue";
-import { ColorPicker } from "vue3-colorpicker";
-import "vue3-colorpicker/style.css";
+// import { ColorPicker } from "vue3-colorpicker";
+// import "vue3-colorpicker/style.css";
 import { Switch, SwitchGroup, SwitchLabel } from "@headlessui/vue";
 import {
     ClipboardDocumentIcon,
@@ -819,7 +819,7 @@ import {
 import JetButton from "@/Jetstream/Button.vue";
 import SelectRich from "@/Shared/SelectRich.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
-import VueTagsInput from "@sipec/vue3-tags-input";
+// import VueTagsInput from "@sipec/vue3-tags-input";
 
 const publishingOptions = [
     {
@@ -870,7 +870,7 @@ export default {
         QuestionMarkCircleIcon,
         ExclamationCircleIcon,
         XMarkIcon,
-        ColorPicker,
+        // ColorPicker,
         Switch,
         SwitchGroup,
         SwitchLabel,
@@ -878,7 +878,7 @@ export default {
         CheckIcon,
         ChevronDownIcon,
         SelectRich,
-        VueTagsInput,
+        // VueTagsInput,
     },
     props: ["study", "role", "studyPermissions"],
     setup() {

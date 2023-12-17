@@ -367,7 +367,9 @@ export default {
             open,
             onSelect(item) {
                 if (item.url && item.url !== undefined) {
-                    window.location = item.url;
+                    if(window){
+                        window.location = item.url;
+                    }
                 }
             },
         };
@@ -408,10 +410,12 @@ export default {
 
     methods: {
         submit() {
-            if (this.query && this.query != "") {
-                window.location.href = "/search?query=" + this.query;
-            } else {
-                window.location.href = "/search";
+            if(window){
+                if (this.query && this.query != "") {
+                    window.location.href = "/search?query=" + this.query;
+                } else {
+                    window.location.href = "/search";
+                }
             }
         },
         searchFunction(helper) {

@@ -728,12 +728,14 @@ export default {
                     model: model,
                 });
             } else {
-                window.location.replace(
-                    "/upload?draft_id=" +
-                        this.draft +
-                        "&step=2&sample=" +
-                        model.id
-                );
+                if (window) {
+                    window.location.replace(
+                        "/upload?draft_id=" +
+                            this.draft +
+                            "&step=2&sample=" +
+                            model.id
+                    );
+                }
             }
         },
     },

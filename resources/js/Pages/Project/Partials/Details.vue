@@ -865,8 +865,8 @@ import {
 } from "@headlessui/vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import ProjectActivity from "@/Pages/Project/Partials/Activity.vue";
-import { ColorPicker } from "vue3-colorpicker";
-import "vue3-colorpicker/style.css";
+// import { ColorPicker } from "vue3-colorpicker";
+// import "vue3-colorpicker/style.css";
 import { Switch, SwitchGroup, SwitchLabel } from "@headlessui/vue";
 import {
     ClipboardDocumentIcon,
@@ -876,7 +876,7 @@ import {
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import SelectRich from "@/Shared/SelectRich.vue";
 import JetButton from "@/Jetstream/Button.vue";
-import VueTagsInput from "@sipec/vue3-tags-input";
+// import VueTagsInput from "@sipec/vue3-tags-input";
 import { router } from "@inertiajs/vue3";
 const publishingOptions = [
     {
@@ -911,7 +911,7 @@ export default defineComponent({
         DialogOverlay,
         DialogTitle,
         TransitionChild,
-        ColorPicker,
+        // ColorPicker,
         JetActionMessage,
         JetInputError,
         XMarkIcon,
@@ -935,7 +935,7 @@ export default defineComponent({
         CheckIcon,
         ChevronDownIcon,
         SelectRich,
-        VueTagsInput,
+        // VueTagsInput,
     },
     props: ["project", "role", "projectPermissions"],
     setup() {

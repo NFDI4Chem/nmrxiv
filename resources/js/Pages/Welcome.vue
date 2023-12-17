@@ -1,6 +1,22 @@
 <template>
     <div class="bg-white">
-        <Head title="Welcome to nmrXiv"></Head>
+        <Head>
+  <title>Welcome</title>
+  <meta name="description" content="Open, FAIR and Consensus-Driven NMR spectroscopy data repository and analysis platform">
+  <meta property="og:title" content="nmrXiv - Open, FAIR and Consensus-Driven NMR spectroscopy data repository and analysis platform">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="nmrXiv">
+  <meta property="og:url" content="https://nmrxiv.org">
+  <meta property="og:image" content="">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge;">
+  <meta name="fragment" content="!">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <link rel="shortcut icon" href="https://nmrxiv.org/favicon.ico">
+  <link rel="manifest" href="/document/manifest.json" crossorigin="use-credentials">
+</Head>
         <FlashMessages />
         <main>
             <div class="relative index_beams">
@@ -995,10 +1011,10 @@ export default {
     },
 
     props: {
-        spectra: String,
-        projects: String,
-        compounds: String,
-        techniques: String,
+        spectra: Number,
+        projects: Number,
+        compounds: Number,
+        techniques: Number,
     },
 
     setup() {
