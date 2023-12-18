@@ -995,10 +995,10 @@ export default {
     },
 
     props: {
-        spectra: String,
-        projects: String,
-        compounds: String,
-        techniques: String,
+        spectra: Number,
+        projects: Number,
+        compounds: Number,
+        techniques: Number,
     },
 
     setup() {
