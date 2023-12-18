@@ -13,7 +13,7 @@ Regards,
 The nmrXiv Team
 
 @component('mail::button', ['url' =>  $url, 'color' => 'green'])
-View Project
+View Samples
 @endcomponent
 
 @component('mail::subcopy')
