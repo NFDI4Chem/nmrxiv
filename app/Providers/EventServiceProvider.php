@@ -7,11 +7,13 @@ use App\Events\ProjectArchival as ProjectArchivalEvent;
 use App\Events\ProjectDeletion as ProjectDeletionEvent;
 use App\Events\ProjectInvite as ProjectInviteEvent;
 use App\Events\StudyInvite as StudyInviteEvent;
+use App\Events\StudyPublish as StudyPublishEvent;
 use App\Listeners\ProjectArchival as ProjectArchivalListener;
 use App\Listeners\ProjectDeletion as ProjectDeletionListener;
 use App\Listeners\ProjectInvite as ProjectInviteListener;
 use App\Listeners\SendDraftProcessedNotification;
 use App\Listeners\StudyInvite as StudyInviteListener;
+use App\Listeners\StudyPublish as StudyPublishListener;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -48,6 +50,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         StudyInviteEvent::class => [
             StudyInviteListener::class,
+        ],
+        StudyPublishEvent::class => [
+            StudyPublishListener::class,
         ],
 
     ];
