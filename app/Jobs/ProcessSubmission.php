@@ -5,9 +5,9 @@ namespace App\Jobs;
 use App\Actions\Project\AssignIdentifier;
 use App\Actions\Project\PublishProject;
 use App\Actions\Study\PublishStudy;
+use App\Events\StudyPublish;
 use App\Models\FileSystemObject;
 use App\Models\Project;
-use App\Notifications\DraftProcessedNotification;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -15,7 +15,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 
 class ProcessSubmission implements ShouldBeUnique, ShouldQueue
@@ -173,10 +172,12 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                     }
                 }
 
+                //Notification::send($this->prepareSendList($project), new StudyPublishNotification($_studies));
+                event(new StudyPublish($_studies, $this->prepareSendList($project)));
+
                 $project->delete();
                 $draft->delete();
 
-                // Notification::send($project->owner, new DraftProcessedNotification($project));
             }
         }
     }
