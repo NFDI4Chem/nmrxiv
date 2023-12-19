@@ -2,25 +2,25 @@
 
 namespace App\Notifications;
 
-use App\Mail\ProjectPublishNotifyAdmins;
+use App\Mail\StudyPublish;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 
-class ProjectPublishNotificationToAdmins extends Notification implements ShouldQueue
+class StudyPublishNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    private $project;
+    private $studies;
 
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct($project)
+    public function __construct($studies)
     {
-        $this->project = $project;
+        $this->studies = $studies;
     }
 
     /**
@@ -42,7 +42,7 @@ class ProjectPublishNotificationToAdmins extends Notification implements ShouldQ
      */
     public function toMail($notifiable)
     {
-        return (new ProjectPublishNotifyAdmins($this->project))->to($notifiable->email);
+        return (new StudyPublish($this->studies))->to($notifiable->email);
     }
 
     /**
