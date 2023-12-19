@@ -44,15 +44,21 @@ Route::prefix('v1')->group(function () {
     Route::get('/{id}', [DataController::class, 'id'])
         ->name('public.project');
 
-    Route::prefix('schemas')->group(function () {
+    Route::prefix('submission')->group(function () {
         Route::prefix('bioschemas')->group(function () {
             Route::get('/', [DataCatalogController::class, 'dataCatalogSchema'])->name('bioschemas.datacatalog');
             Route::get('/{username}/{project}/{study?}/{dataset?}', [BioschemasController::class, 'modelSchemaByName'])->name('bioschemas.model');
             Route::get('/{id}', [BioschemasController::class, 'modelSchemaByID'])->name('bioschemas.id');
         });
+    });
+
+    Route::prefix('schemas')->group(function () {
+        Route::prefix('bioschemas')->group(function () {
+            Route::get('/', [DataCatalogController::class, 'dataCatalogSchema'])->name('bioschemas.datacatalog');
+            Route::get('/{id}', [BioschemasController::class, 'modelSchemaByID'])->name('bioschemas.id');
+        });
 
         Route::prefix('datacite')->group(function () {
-            Route::get('/{username}/{project}/{study?}/{dataset?}', [DataCiteController::class, 'modelSchemaByName']);
             Route::get('/{id}', [DataCiteController::class, 'modelSchemaByID']);
         });
     });

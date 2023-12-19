@@ -258,44 +258,6 @@
                 }
             }
         },
-        "/api/v1/schemas/bioschemas/{username}/{project}": {
-            "get": {
-                "tags": [
-                    "schemas"
-                ],
-                "summary": "Fetch bioschema for public model based on user id and slug",
-                "description": "Fetch bioschema for public model based on user id and slug",
-                "operationId": "bioschemaModelByName",
-                "parameters": [
-                    {
-                        "name": "username",
-                        "in": "path",
-                        "description": "nmrXiv username",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "project",
-                        "in": "path",
-                        "description": "nmrXiv project slug e.g. cheminfo-nmr-dataset-1",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Success"
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
-                    }
-                }
-            }
-        },
         "/api/v1/schemas/bioschemas/{id}": {
             "get": {
                 "tags": [
@@ -332,44 +294,6 @@
                 ],
                 "summary": "Bioschema",
                 "operationId": "62c4756fdea25126d74d16746907c7c9",
-                "responses": {
-                    "200": {
-                        "description": "Success"
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
-                    }
-                }
-            }
-        },
-        "/api/v1/schemas/datacite/{username}/{project}": {
-            "get": {
-                "tags": [
-                    "schemas"
-                ],
-                "summary": "Fetch datacite schema for public model based on user id and slug",
-                "description": "Fetch datacite schema for public model based on user id and slug",
-                "operationId": "dataciteModelByName",
-                "parameters": [
-                    {
-                        "name": "username",
-                        "in": "path",
-                        "description": "nmrXiv username",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "project",
-                        "in": "path",
-                        "description": "nmrXiv project slug e.g. cheminfo-nmr-dataset-1",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "Success"

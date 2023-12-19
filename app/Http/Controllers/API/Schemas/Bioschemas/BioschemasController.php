@@ -21,101 +21,101 @@ use Spatie\SchemaOrg\Schema;
  */
 class BioschemasController extends Controller
 {
-    /**
-     * Implement Bioschemas upon request by model's name to generate a project, study, or dataset schema.
-     *
-     * @link https://bioschemas.org/types/Study/0.3-DRAFT
-     * @link https://schema.org/Dataset
-     *
-     * @param  Illuminate\Http\Request  $request
-     * @param  App\Models\User  $username
-     * @param  App\Models\Project  $projectName
-     * @param  App\Models\Study  $studyName Optional
-     * @param  App\Models\Dataset  $datasetName Optional
-     * @return object
-     */
-    /**
-     * Bioschema
-     *
-     * @OA\Get (
-     *     path="/api/v1/schemas/bioschemas/{username}/{project}",
-     *     summary="Fetch bioschema for public model based on user id and slug",
-     *     description="Fetch bioschema for public model based on user id and slug",
-     *     operationId="bioschemaModelByName",
-     *     tags={"schemas"},
-     *
-     * @OA\Parameter(
-     *  name="username",
-     *  in="path",
-     *  description="nmrXiv username",
-     *  required=true,
-     *
-     *      @OA\Schema(
-     *          type="string",
-     *    )
-     * ),
-     *
-     * @OA\Parameter(
-     *  name="project",
-     *  in="path",
-     *  description="nmrXiv project slug e.g. cheminfo-nmr-dataset-1",
-     *  required=true,
-     *
-     *      @OA\Schema(
-     *          type="string",
-     *    )
-     * ),
-     *
-     * @OA\Response(
-     *    response=200,
-     *    description="Success",
-     * ),
-     * @OA\Response(
-     *    response=500,
-     *    description="Internal Server Error"
-     * )
-     * )
-     */
-    public function modelSchemaByName(Request $request, $username, $projectName, $studyName = null, $datasetName = null)
-    {
-        $user = User::where('username', $username)->firstOrFail();
-        if ($user) {
-            $project = Project::where([['slug', $projectName], ['owner_id', $user->id]])->firstOrFail();
-        }
-        if ($project) {
-            if ($project->is_public) {
-                $projectSchema = $this->project($project);
-                if ($studyName) {
-                    $study = Study::where([['slug', $studyName], ['owner_id', $user->id], ['project_id', $project->id]])->firstOrFail();
-                    if ($study) {
-                        if ($study->is_public) {
-                            $studySchema = $this->study($study);
-                            if ($datasetName) {
-                                $dataset = Dataset::where([['slug', $datasetName], ['owner_id', $user->id], ['project_id', $project->id], ['study_id', $study->id]])->firstOrFail();
-                                if ($dataset) {
-                                    if ($dataset->is_public) {
-                                        $datasetSchema = $this->dataset($dataset);
-                                    } else {
-                                        throw new AuthorizationException;
-                                    }
+    // /**
+    //  * Implement Bioschemas upon request by model's name to generate a project, study, or dataset schema.
+    //  *
+    //  * @link https://bioschemas.org/types/Study/0.3-DRAFT
+    //  * @link https://schema.org/Dataset
+    //  *
+    //  * @param  Illuminate\Http\Request  $request
+    //  * @param  App\Models\User  $username
+    //  * @param  App\Models\Project  $projectName
+    //  * @param  App\Models\Study  $studyName Optional
+    //  * @param  App\Models\Dataset  $datasetName Optional
+    //  * @return object
+    //  */
+    // /**
+    //  * Bioschema
+    //  *
+    //  * @OA\Get (
+    //  *     path="/api/v1/schemas/bioschemas/{username}/{project}",
+    //  *     summary="Fetch bioschema for public model based on user id and slug",
+    //  *     description="Fetch bioschema for public model based on user id and slug",
+    //  *     operationId="bioschemaModelByName",
+    //  *     tags={"schemas"},
+    //  *
+    //  * @OA\Parameter(
+    //  *  name="username",
+    //  *  in="path",
+    //  *  description="nmrXiv username",
+    //  *  required=true,
+    //  *
+    //  *      @OA\Schema(
+    //  *          type="string",
+    //  *    )
+    //  * ),
+    //  *
+    //  * @OA\Parameter(
+    //  *  name="project",
+    //  *  in="path",
+    //  *  description="nmrXiv project slug e.g. cheminfo-nmr-dataset-1",
+    //  *  required=true,
+    //  *
+    //  *      @OA\Schema(
+    //  *          type="string",
+    //  *    )
+    //  * ),
+    //  *
+    //  * @OA\Response(
+    //  *    response=200,
+    //  *    description="Success",
+    //  * ),
+    //  * @OA\Response(
+    //  *    response=500,
+    //  *    description="Internal Server Error"
+    //  * )
+    //  * )
+    //  */
+    // public function modelSchemaByName(Request $request, $username, $projectName, $studyName = null, $datasetName = null)
+    // {
+    //     $user = User::where('username', $username)->firstOrFail();
+    //     if ($user) {
+    //         $project = Project::where([['slug', $projectName], ['owner_id', $user->id]])->firstOrFail();
+    //     }
+    //     if ($project) {
+    //         if ($project->is_public) {
+    //             $projectSchema = $this->project($project);
+    //             if ($studyName) {
+    //                 $study = Study::where([['slug', $studyName], ['owner_id', $user->id], ['project_id', $project->id]])->firstOrFail();
+    //                 if ($study) {
+    //                     if ($study->is_public) {
+    //                         $studySchema = $this->study($study);
+    //                         if ($datasetName) {
+    //                             $dataset = Dataset::where([['slug', $datasetName], ['owner_id', $user->id], ['project_id', $project->id], ['study_id', $study->id]])->firstOrFail();
+    //                             if ($dataset) {
+    //                                 if ($dataset->is_public) {
+    //                                     $datasetSchema = $this->dataset($dataset);
+    //                                 } else {
+    //                                     throw new AuthorizationException;
+    //                                 }
 
-                                    return $datasetSchema;
-                                }
-                            }
+    //                                 return $datasetSchema;
+    //                             }
+    //                         }
 
-                            return $studySchema;
-                        } else {
-                            throw new AuthorizationException;
-                        }
-                    }
-                }
+    //                         return $studySchema;
+    //                     } else {
+    //                         throw new AuthorizationException;
+    //                     }
+    //                 }
+    //             }
 
-                return $projectSchema;
-            } else {
-                throw new AuthorizationException;
-            }
-        }
-    }
+    //             return $projectSchema;
+    //         } else {
+    //             throw new AuthorizationException;
+    //         }
+    //     }
+    // }
 
     /**
      * Implement Bioschemas upon request by model's id to generate a project, study, or dataset schema.
