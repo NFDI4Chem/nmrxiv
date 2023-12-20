@@ -10,10 +10,12 @@ class StudyResource extends JsonResource
 
     private array $properties = ['sample', 'users', 'license'];
 
-    public function lite(bool $lite, array $properties): self
+    public function lite(bool $lite, ?array $properties = []): self
     {
         $this->lite = $lite;
-        $this->properties = $properties;
+        if ($properties && count($properties) > 0) {
+            $this->properties = $properties;
+        }
 
         return $this;
     }
