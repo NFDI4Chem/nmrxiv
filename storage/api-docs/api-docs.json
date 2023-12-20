@@ -197,37 +197,19 @@
                 ]
             }
         },
-        "/api/v1/datasets": {
+        "/api/v1/list/{model}": {
             "get": {
                 "tags": [
                     "public"
                 ],
-                "summary": "Fetch all public datasets",
-                "description": "Fetch details for all publicly available datasets on nmrXiv.",
-                "operationId": "publicDatasets",
-                "responses": {
-                    "200": {
-                        "description": "Successful Operation"
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
-                    }
-                }
-            }
-        },
-        "/api/v1/dataset/{id}": {
-            "get": {
-                "tags": [
-                    "public"
-                ],
-                "summary": "Fetch nmrXiv public datasets based on identifier",
-                "description": "Fetch details of nmrXiv public dataset based on identifier.",
-                "operationId": "publicDataset",
+                "summary": "Fetch all models",
+                "description": "Fetch details for all publicly available models on nmrXiv.",
+                "operationId": "publicModels",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "model",
                         "in": "path",
-                        "description": "Public dataset identifier e.g. D12",
+                        "description": "data model",
                         "required": true,
                         "schema": {
                             "type": "string"
@@ -238,46 +220,25 @@
                     "200": {
                         "description": "Successful Operation"
                     },
-                    "400": {
-                        "description": "Bad Request"
-                    },
                     "500": {
                         "description": "Internal Server Error"
                     }
                 }
             }
         },
-        "/api/v1/projects": {
+        "/api/v1/{id}": {
             "get": {
                 "tags": [
                     "public"
                 ],
-                "summary": "Fetch all public projects",
-                "description": "Fetch details for all publicly available projects on nmrXiv.",
-                "operationId": "publicProjects",
-                "responses": {
-                    "200": {
-                        "description": "Successful Operation"
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
-                    }
-                }
-            }
-        },
-        "/api/v1/project/{id}": {
-            "get": {
-                "tags": [
-                    "public"
-                ],
-                "summary": "Fetch nmrXiv public project based on identifier",
-                "description": "Fetch details of nmrXiv public project based on identifier.",
-                "operationId": "publicProject",
+                "summary": "Fetch nmrXiv public model based on identifier",
+                "description": "Fetch details of nmrXiv public model based on identifier.",
+                "operationId": "publicModel",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "Public project identifier e.g. P12",
+                        "description": "Public model identifier e.g. P1, S3, D12",
                         "required": true,
                         "schema": {
                             "type": "string"
@@ -489,56 +450,6 @@
                     },
                     "404": {
                         "description": "Not Found"
-                    }
-                }
-            }
-        },
-        "/api/v1/samples": {
-            "get": {
-                "tags": [
-                    "public"
-                ],
-                "summary": "Fetch all public samples",
-                "description": "Fetch details for all publicly available samples on nmrXiv.",
-                "operationId": "publicSamples",
-                "responses": {
-                    "200": {
-                        "description": "Successful Operation"
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
-                    }
-                }
-            }
-        },
-        "/api/v1/sample/{id}": {
-            "get": {
-                "tags": [
-                    "public"
-                ],
-                "summary": "Fetch nmrXiv public samples based on identifier",
-                "description": "Fetch details of nmrXiv public sample based on identifier.",
-                "operationId": "publicSample",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "Public sample identifier e.g. S12",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful Operation"
-                    },
-                    "400": {
-                        "description": "Bad Request"
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
                     }
                 }
             }
