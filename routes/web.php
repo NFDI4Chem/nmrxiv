@@ -70,6 +70,8 @@ Route::impersonate();
 
 Route::get('/email/verify/{id}/{hash}', [VerificationController::class, 'verify'])->name('verification.verify');
 
+Route::get('projects/{url}', [ProjectController::class, 'shared'])->name('shared.projects');
+
 Route::group(['middleware' => 'verified'], function () {
     if (Jetstream::hasTeamFeatures()) {
         Route::delete('/teams/{team}', [TeamController::class, 'destroy'])->name('app.teams.destroy');
