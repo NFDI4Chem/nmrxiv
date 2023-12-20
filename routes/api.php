@@ -6,6 +6,7 @@ use App\Http\Controllers\API\Auth\UserController;
 use App\Http\Controllers\API\Auth\VerificationController;
 use App\Http\Controllers\API\DataController;
 use App\Http\Controllers\API\FileSystemController;
+use App\Http\Controllers\API\SubmissionController;
 use App\Http\Controllers\API\Schemas\Bioschemas\BioschemasController;
 use App\Http\Controllers\API\Schemas\Bioschemas\DataCatalogController;
 use App\Http\Controllers\API\Schemas\DataCite\DataCiteController;
@@ -45,10 +46,11 @@ Route::prefix('v1')->group(function () {
         ->name('public.project');
 
     Route::prefix('submission')->group(function () {
-        Route::prefix('bioschemas')->group(function () {
-            Route::get('/', [DataCatalogController::class, 'dataCatalogSchema'])->name('bioschemas.datacatalog');
-            Route::get('/{username}/{project}/{study?}/{dataset?}', [BioschemasController::class, 'modelSchemaByName'])->name('bioschemas.model');
-            Route::get('/{id}', [BioschemasController::class, 'modelSchemaByID'])->name('bioschemas.id');
+        Route::middleware(['auth:sanctum'])->group(function () {
+            Route::post('/create', [SubmissionController::class, 'create'])->name('submission.create');
+            Route::get('/retrieve', [SubmissionController::class, 'retrieve'])->name('submission.retrieve');
+
+            Route::get('/{eln}/{id}/{action}', [SubmissionController::class, 'relay'])->name('submission.retrieve');
         });
     });
 
