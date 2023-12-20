@@ -325,7 +325,7 @@
                             v-if="
                                 !project.is_public &&
                                 !project.is_published &&
-                                !project.is_deleted
+                                !project.is_deleted && canUpdateProject
                             "
                             class="flex-nowrap"
                         >

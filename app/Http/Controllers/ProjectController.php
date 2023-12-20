@@ -140,6 +140,33 @@ class ProjectController extends Controller
         ]);
     }
 
+    public function shared(Request $request, $url, GetLicense $getLicense)
+    {
+        $project = Project::where([['is_public', false], ['is_archived', false], ['url', $url]])->firstOrFail();
+
+        $user = User::factory()->withPersonalTeam()->create();
+        $team = $project->nonPersonalTeam();
+        $license = null;
+        if ($project->license_id) {
+            $license = $getLicense->getLicensebyId($project->license_id);
+        }
+        $user->delete();
+
+        return Inertia::render('Project/Show', [
+            'project' => $project,
+            'team' => null,
+            'members' => $project->allUsers(),
+            'availableRoles' => array_values(Jetstream::$roles),
+            'role' => 'reviewer',
+            'teamRole' => null,
+            'license' => $license ? $license[0] : null,
+            'projectPermissions' => [
+                'canDeleteProject' => false,
+                'canUpdateProject' => false,
+            ],
+        ]);
+    }
+
     public function studies(Request $request, Project $project)
     {
         if (! Gate::forUser($request->user())->check('viewProject', $project)) {
