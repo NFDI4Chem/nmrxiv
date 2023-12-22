@@ -25,7 +25,7 @@ export default {
     },
     mounted() {
         let max = this.limit ? this.limit : 8;
-        axios.get("/api/v1/projects").then((response) => {
+        axios.get("/api/v1/list/projects").then((response) => {
             this.projects = response.data.data.slice(0, max);
         });
     },
