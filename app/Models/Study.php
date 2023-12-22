@@ -208,7 +208,7 @@ class Study extends Model implements Auditable
 
     public function datasets()
     {
-        return $this->hasMany(Dataset::class);
+        return $this->hasMany(Dataset::class)->orderBy('name');
     }
 
     /**
