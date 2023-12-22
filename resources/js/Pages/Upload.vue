@@ -1402,7 +1402,7 @@
                                                                                 >
                                                                                     <label
                                                                                         for="description"
-                                                                                        class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
+                                                                                        class="block text-sm font-medium text-gray-700"
                                                                                     >
                                                                                         Sample
                                                                                         Description
