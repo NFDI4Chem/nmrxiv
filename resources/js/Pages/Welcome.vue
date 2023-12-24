@@ -337,16 +337,16 @@
                                 target="_blank"
                                 ><img
                                     class="col-span-2 w-full object-contain lg:col-span-1"
-                                    src="/img/angewandte-chemie.png"
-                                    alt="Angewandte Chemie"
+                                    src="/img/jnp.png"
+                                    alt="Journal of Natural Products"
                             /></a>
                             <a
                                 href="https://onlinelibrary.wiley.com/page/journal/15213773/homepage/notice-to-authors"
                                 target="_blank"
                                 ><img
                                     class="col-span-2 w-full object-contain lg:col-span-1"
-                                    src="/img/jnp.png"
-                                    alt="Journal of Natural Products"
+                                    src="/img/angewandte-chemie.png"
+                                    alt="Angewandte Chemie"
                             /></a>
                             <img
                                 class="col-span-2 max-h-12 w-full object-contain lg:col-span-1"
