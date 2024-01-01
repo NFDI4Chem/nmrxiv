@@ -168,7 +168,7 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
         Route::get('projects/{project}/validation', [ProjectController::class, 'validation'])
             ->name('dashboard.project.validation');
 
-        Route::post('projects/{project}/publish', [ProjectController::class, 'publish'])
+        Route::put('projects/{project}/publish', [ProjectController::class, 'publish'])
             ->name('dashboard.project.publish');
 
         Route::post('projects/{project}/members', [ProjectMemberController::class, 'memberStore'])

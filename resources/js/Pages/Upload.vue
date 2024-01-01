@@ -1990,6 +1990,7 @@ export default {
                 });
         },
         closeDraft() {
+            this.loadingStep = true;
             this.fetchValidations().then(() => {
                 if (this.validationStatus) {
                     this.loadingStep = true;
@@ -2008,18 +2009,13 @@ export default {
                             this.validation = this.parseJSON(
                                 response.data.validation.report
                             );
-                            // this.validationStatus = true;
-                            // this.validation.project.studies.forEach((study) => {
-                            //     if (study.status == false) {
-                            //         this.validationStatus = false;
-                            //     }
-                            // });
                             if (this.project) {
                                 window.location =
                                     "/publish/" + this.currentDraft.id;
                             }
                         });
                 } else {
+                    this.loadingStep = false;
                     this.showSamplesSummary();
                     alert(
                         "Samples validation failed: Please provide all meta data to proceed"
