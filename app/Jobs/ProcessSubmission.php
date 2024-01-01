@@ -71,6 +71,8 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                         ->get();
 
                     foreach ($projectFSObjects as $FSObject) {
+                        $FSObject->project_id = $project->id;
+                        $FSObject->save();
                         $this->moveFolder($FSObject, $draft, $projectPath);
                     }
 
