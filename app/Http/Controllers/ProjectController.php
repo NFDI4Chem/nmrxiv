@@ -286,7 +286,7 @@ class ProjectController extends Controller
                 $validation->process();
                 $validation = $validation->fresh();
                 if ($validation['report']['project']['status']) {
-                    $project->release_date = $request->get('releaseDate');
+                    $project->release_date = $request->get('release_date');
                     $project->status = 'queued';
                     $project->save();
 
@@ -307,7 +307,7 @@ class ProjectController extends Controller
                 $draft->project_enabled = false;
                 $draft->save();
 
-                $project->release_date = $request->get('releaseDate');
+                $project->release_date = $request->get('release_date');
                 $project->status = 'queued';
                 $project->save();
 
