@@ -330,6 +330,7 @@ export default {
                 this.spectraError = null;
                 this.currentMolecules = [];
                 this.updateLoadingStatus(true);
+
                 if (iframe) {
                     if (this.dataset && this.dataset.has_nmrium) {
                         this.infoLog("Loading Spectra from NMRium JSON..");

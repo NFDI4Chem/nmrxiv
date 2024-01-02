@@ -376,4 +376,7 @@ Route::get('spectra', [StudyController::class, 'publicStudiesView'])
     ->name('public.spectra');
 
 Route::get('services/oembed', [OEmbedController::class, 'spectra']);
-Route::get('embed/{id}', [OEmbedController::class, 'embed']);
+
+Route::group(['middleware' => 'embed'], function () {
+    Route::get('embed/{id}', [OEmbedController::class, 'embed']);
+});
