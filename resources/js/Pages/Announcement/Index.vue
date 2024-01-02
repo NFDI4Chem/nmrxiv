@@ -33,7 +33,7 @@
                                 class="relative w-full border-0 px-6 py-3 rounded-r focus:shadow-outline"
                                 autocomplete="off"
                                 type="text"
-                                name="search"
+                                name="announcements-search"
                                 placeholder="Search…"
                             />
                         </div>

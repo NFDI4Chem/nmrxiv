@@ -100,7 +100,7 @@
                                 />
                             </g>
                         </svg>
-                        <span class="ml-2">Public</span>
+                        <span class="ml-2">Public&nbsp;</span>
                     </span>
                     <span
                         v-else
@@ -212,6 +212,15 @@
                                             >
                                                 ARCHIVED
                                             </span>
+                                            <span
+                                                v-if="
+                                                    project.doi != null &&
+                                                    project.release_date
+                                                "
+                                                class="ml-4 inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-yellow-100 text-red-800 capitalize"
+                                            >
+                                                EMBARGO
+                                            </span>
                                         </span>
                                     </div>
                                 </div>
@@ -280,9 +289,10 @@
                                 <span
                                     v-if="
                                         !project.is_public &&
-                                        project.is_published
+                                        project.release_date &&
+                                        project.doi
                                     "
-                                    class="inline-flex items-center mt-2 px-3 py-0.5 rounded-full text-sm font-medium bg-yellow-100 text-red-800 capitalize"
+                                    class="inline-flex items-center mt-2 px-3 py-0.5 -ml-6 mt-4 text-sm font-medium bg-yellow-100 text-red-800 capitalize"
                                 >
                                     PUBLISHED -&emsp;
                                     <b
@@ -418,9 +428,15 @@ export default {
                         );
                     }
                 } else {
-                    alert(
-                        "Draft missing. Please contact us at info.nmrxiv@uni-jena.de."
-                    );
+                    if (project.doi && project.release_date) {
+                        return router.visit(
+                            this.route("dashboard.projects", [project.id])
+                        );
+                    } else {
+                        alert(
+                            "Draft missing. Please contact us at info.nmrxiv@uni-jena.de."
+                        );
+                    }
                 }
             } else {
                 return router.visit(
