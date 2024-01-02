@@ -9,6 +9,7 @@ use App\Notifications\ProjectDeletionFailureNotification;
 use App\Notifications\ProjectDeletionReminderNotification;
 use App\Traits\CacheClear;
 use Auth;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -85,7 +86,9 @@ class Project extends Model implements Auditable
             return true;
         } else {
             if ($this->release_date && $this->doi) {
-                return true;
+                return Carbon::now()->startOfDay()->gte($this->release_date);
+            } else {
+                return false;
             }
         }
 

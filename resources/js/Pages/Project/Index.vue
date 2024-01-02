@@ -213,8 +213,10 @@
                                             </span>
                                             <span
                                                 v-if="
-                                                    project.doi != null &&
-                                                    project.release_date
+                                                    project.draft_id == null &&
+                                                    !project.is_archived &&
+                                                    project.release_date &&
+                                                    !project.is_published
                                                 "
                                                 class="ml-4 inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-yellow-100 text-red-800 capitalize"
                                             >
