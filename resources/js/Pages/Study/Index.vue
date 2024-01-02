@@ -19,7 +19,7 @@
                             class="relative w-full border-0 px-6 py-3 rounded-full focus:shadow-outline"
                             autocomplete="off"
                             type="text"
-                            name="search"
+                            name="samples-search"
                             placeholder="Search…"
                         />
                     </div>
