@@ -150,21 +150,19 @@
                         <span class="ml-2">Private</span>
                     </span>
                 </div>
-                <a>
-                    <div
-                        class="flex justify-between items-center bg-white shadow-md border rounded-lg px-6 py-8"
-                    >
-                        <div
-                            class="flex-grow cursor-pointer"
-                            @click="getLink(project)"
-                        >
-                            <div class="flex justify-between items-baseline">
-                                <div class="font-bold text-xl text-gray-600">
-                                    <div class="flex items-center">
+                <div class="rounded overflow-hidden border shadow-lg">
+                    <div class="px-6 py-4">
+                        <div class="flex justify-between items-center bg-white">
+                            <div
+                                class="flex-grow cursor-pointer"
+                                @click="getLink(project)"
+                            >
+                                <div class="grid grid-cols-1">
+                                    <div class="font-bold text-xl mb-2">
                                         <span
                                             class="cursor-pointer flex max-w-2xl break-words block"
                                         >
-                                            <span class="-ml-2 mr-1">
+                                            <div class="float-end">
                                                 <StarIcon
                                                     :class="[
                                                         project.is_bookmarked
@@ -172,8 +170,9 @@
                                                             : 'text-gray-200',
                                                         'h-6 w-6 flex-shrink-0 -ml-1 mr-1',
                                                     ]"
-                                                ></StarIcon> </span
-                                            >{{ project.name }}
+                                                ></StarIcon>
+                                            </div>
+                                            {{ project.name }}
                                             <span
                                                 v-if="
                                                     project.draft_id != null &&
@@ -221,176 +220,160 @@
                                             >
                                                 EMBARGO
                                             </span>
+                                            <div
+                                                class="flex items-baseline mt-1"
+                                            >
+                                                <span
+                                                    class="text-sm text-gray-600"
+                                                >
+                                                    <div
+                                                        v-if="
+                                                            (team &&
+                                                                team.id !=
+                                                                    project.team_id) ||
+                                                            project.owner_id !=
+                                                                $page.props.user
+                                                                    .id
+                                                        "
+                                                        class="text-sm text-gray-600"
+                                                    >
+                                                        <span
+                                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                                                        >
+                                                            Shared by:
+                                                            {{
+                                                                project.owner
+                                                                    ? project
+                                                                          .owner
+                                                                          .first_name
+                                                                    : ""
+                                                            }}
+                                                            {{
+                                                                project.owner
+                                                                    ? project
+                                                                          .owner
+                                                                          .last_name
+                                                                    : ""
+                                                            }}</span
+                                                        >
+                                                    </div>
+                                                </span>
+                                            </div>
                                         </span>
                                     </div>
                                 </div>
                             </div>
-                            <div class="flex items-baseline mt-1">
-                                <span class="text-sm text-gray-600">
-                                    <div
-                                        v-if="
-                                            (team &&
-                                                team.id != project.team_id) ||
-                                            project.owner_id !=
-                                                $page.props.user.id
-                                        "
-                                        class="text-sm text-gray-600"
+                            <div class="border-l cursor-pointer">
+                                <div class="tooltip">
+                                    <a
+                                        target="_blank"
+                                        :href="getProjectSummaryLink(project)"
+                                        class="text-gray-500 hover:text-gray-900"
                                     >
-                                        <span
-                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke-width="1.5"
+                                            stroke="currentColor"
+                                            class="h-5 w-5 text-gray-600 ml-4"
                                         >
-                                            Shared by:
-                                            {{
-                                                project.owner
-                                                    ? project.owner.first_name
-                                                    : ""
-                                            }}
-                                            {{
-                                                project.owner
-                                                    ? project.owner.last_name
-                                                    : ""
-                                            }}</span
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
+                                            />
+                                        </svg>
+                                    </a>
+                                    <span
+                                        class="bg-gray-900 text-center text-white px-2 py-1 shadow-lg rounded-md tooltiptextbottom"
+                                        >Open project in the summary view</span
+                                    >
+                                </div>
+                                <div v-if="!project.is_public" class="tooltip">
+                                    <a
+                                        target="_blank"
+                                        :href="getProjectSettingsLink(project)"
+                                        class="text-gray-500 hover:text-gray-900"
+                                    >
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke-width="1.5"
+                                            stroke="currentColor"
+                                            class="h-5 w-5 text-gray-600 ml-4"
                                         >
-                                    </div>
-                                </span>
-                            </div>
-                            <div class="grid grid-cols-1">
-                                <div>
-                                    <dd
-                                        class="text-xs text-gray-900 space-y-5 mt-1"
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 011.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.56.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.893.149c-.425.07-.765.383-.93.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 01-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.397.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 01-.12-1.45l.527-.737c.25-.35.273-.806.108-1.204-.165-.397-.505-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.107-1.204l-.527-.738a1.125 1.125 0 01.12-1.45l.773-.773a1.125 1.125 0 011.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894z"
+                                            />
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                                            />
+                                        </svg>
+                                    </a>
+                                    <span
+                                        class="bg-gray-900 text-center text-white px-2 py-1 shadow-lg rounded-md tooltiptextbottom"
+                                        >Open project settings view</span
                                     >
-                                        <p>
-                                            <span
-                                                v-for="tag in project.tags"
-                                                :key="tag.id"
-                                                class="mt-1 inline-flex items-center rounded-full bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10"
-                                            >
-                                                {{ tag.name["en"] }}
-                                            </span>
-                                        </p>
-                                    </dd>
                                 </div>
-                                <div
-                                    class="text-xs text-gray-400 pr-5 mb-1 mt-1 truncate ..."
-                                >
-                                    {{ project.description }}
-                                </div>
-                                <div class="text-xs mt-1 text-gray-400 pr-5">
-                                    <span class="font-bold text-gray-600"
-                                        >Updated on</span
-                                    >
-                                    {{ formatDate(project.updated_at) }}
-                                    &middot;
-                                    <span class="font-bold text-gray-600"
-                                        >Created on</span
-                                    >
-                                    {{ formatDate(project.created_at) }}
-                                </div>
-                                <span
-                                    v-if="
-                                        !project.is_public &&
-                                        project.release_date &&
-                                        project.doi
-                                    "
-                                    class="inline-flex items-center mt-2 px-3 py-0.5 -ml-6 mt-4 text-sm font-medium bg-yellow-100 text-red-800 capitalize"
-                                >
-                                    PUBLISHED -&emsp;
-                                    <b
-                                        >Release date:
-                                        {{
-                                            formatDate(project.release_date)
-                                        }}</b
-                                    >
-                                </span>
                             </div>
                         </div>
-                        <div class="border-l cursor-pointer">
-                            <div class="tooltip">
-                                <a
-                                    target="_blank"
-                                    :href="getProjectSummaryLink(project)"
-                                    class="text-gray-500 hover:text-gray-900"
-                                >
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke-width="1.5"
-                                        stroke="currentColor"
-                                        class="h-5 w-5 text-gray-600 ml-4"
-                                    >
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
-                                        />
-                                    </svg>
-                                </a>
-                                <span
-                                    class="bg-gray-900 text-center text-white px-2 py-1 shadow-lg rounded-md tooltiptextbottom"
-                                    >Open project in the summary view</span
-                                >
-                            </div>
-                            <div v-if="!project.is_public" class="tooltip">
-                                <a
-                                    target="_blank"
-                                    :href="getProjectSettingsLink(project)"
-                                    class="text-gray-500 hover:text-gray-900"
-                                >
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke-width="1.5"
-                                        stroke="currentColor"
-                                        class="h-5 w-5 text-gray-600 ml-4"
-                                    >
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 011.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.56.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.893.149c-.425.07-.765.383-.93.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 01-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.397.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 01-.12-1.45l.527-.737c.25-.35.273-.806.108-1.204-.165-.397-.505-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.107-1.204l-.527-.738a1.125 1.125 0 01.12-1.45l.773-.773a1.125 1.125 0 011.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894z"
-                                        />
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                                        />
-                                    </svg>
-                                </a>
-                                <span
-                                    class="bg-gray-900 text-center text-white px-2 py-1 shadow-lg rounded-md tooltiptextbottom"
-                                    >Open project settings view</span
-                                >
-                            </div>
-                            <!-- <div class="tooltip">
-                                <a
-                                    target="_blank"
-                                    :href="getProjectSettingsLink(project)"
-                                    class="text-gray-500 hover:text-gray-900"
-                                >
-                                    
-<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5 text-gray-600 ml-4">
-  <path stroke-linecap="round" stroke-linejoin="round" d="M3 3v1.5M3 21v-6m0 0l2.77-.693a9 9 0 016.208.682l.108.054a9 9 0 006.086.71l3.114-.732a48.524 48.524 0 01-.005-10.499l-3.11.732a9 9 0 01-6.085-.711l-.108-.054a9 9 0 00-6.208-.682L3 4.5M3 15V4.5" />
-</svg>
 
-                                </a>
-                                <span
-                                    class="bg-gray-900 text-center text-white px-2 py-1 shadow-lg rounded-md tooltiptextbottom"
-                                    >Open validations report</span
-                                >
-                            </div> -->
-                            <!-- <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                class="h-8 w-8 text-gray-600 fill-current ml-4"
-              >
-                <path
-                  d="M9.3 8.7a1 1 0 0 1 1.4-1.4l4 4a1 1 0 0 1 0 1.4l-4 4a1 1 0 0 1-1.4-1.4l3.29-3.3-3.3-3.3z"
-                ></path>
-              </svg> -->
+                        <p
+                            v-if="project.description"
+                            class="text-gray-700 text-base line-clamp-2 ... pr-10"
+                        >
+                            {{ project.description }}
+                        </p>
+                        <p
+                            class="text-gray-500 text-base line-clamp-2 ... pr-10"
+                            v-else
+                        >
+                            <i>-- No description --</i>
+                        </p>
+                    </div>
+                    <div class="px-6 pt-1 pb-2">
+                        <span
+                            v-for="tag in project.tags"
+                            :key="tag.id"
+                            class="inline-block bg-gray-100 rounded-full px-3 py-1 text-sm text-gray-600 mr-2 mb-2"
+                        >
+                            # {{ tag.name["en"] }}
+                        </span>
+                    </div>
+                    <div class="px-6 pt-2 border-t">
+                        <div class="text-xs text-gray-400 mb-2">
+                            <span class="font-bold text-gray-600"
+                                >Updated on</span
+                            >
+                            {{ formatDate(project.updated_at) }}
+                            &nbsp;&middot;&nbsp;
+                            <span class="font-bold text-gray-600"
+                                >Created on</span
+                            >
+                            {{ formatDate(project.created_at) }}
+                        </div>
+                        <div
+                            v-if="
+                                !project.is_public &&
+                                project.release_date &&
+                                project.doi
+                            "
+                            class="float mt-1 border-t px-3 py-0.5 -mx-6 mt-4 text-sm font-medium bg-yellow-100 text-red-800 capitalize"
+                        >
+                            PUBLISHED -&emsp;
+                            <b
+                                >Release date:
+                                {{ formatDate(project.release_date) }}</b
+                            >
                         </div>
                     </div>
-                </a>
+                </div>
             </div>
         </span>
     </div>
