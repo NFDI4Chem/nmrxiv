@@ -133,6 +133,22 @@
                 </div>
                 <jet-input-error :message="error.orcid" class="mt-2" />
             </div>
+            <!-- Affiliation -->
+            <div class="col-span-6 sm:col-span-4">
+                <jet-label
+                    class="after:content-['(optional)'] after:ml-0.5 after:text-gray-500"
+                    for="affiliation"
+                    value="Affiliation"
+                />
+                <jet-input
+                    id="affiliation"
+                    v-model="form.affiliation"
+                    type="text"
+                    class="mt-1 block w-full"
+                    autocomplete="affiliation"
+                />
+                <jet-input-error :message="error.affiliation" class="mt-2" />
+            </div>
             <!-- Password -->
             <div class="mt-4">
                 <jet-label
