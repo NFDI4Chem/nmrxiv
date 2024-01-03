@@ -19,14 +19,18 @@ class XFrameOptions
 
         $option = 'SAMEORIGIN';
 
-        $xframeOptions = $xframeOptions = env('X_FRAME_OPTIONS', 'SAMEORIGIN');
-
-        if ($request->routeIs('iframe') && $xframeOptions) {
-            if (strpos($xframeOptions, 'ALLOW-FROM') !== false) {
-                $url = trim(str_replace('ALLOW-FROM', '', $xframeOptions));
-
-                $response->header('Content-Security-Policy', 'frame-ancestors '.$url);
+        if ($request->routeIs('embed')) {
+            $xframeOptions = env('X_FRAME_OPTIONS', $option);
+            if ($xframeOptions) {
+                $host = $request->getHttpHost();
+                $xframeOptions = str_replace('*', $host, $xframeOptions);
+                if (strpos($xframeOptions, 'ALLOW-FROM') !== false) {
+                    $url = trim(str_replace('ALLOW-FROM', '', $xframeOptions));
+                    $response->header('Content-Security-Policy', 'frame-ancestors '.$url);
+                }
             }
+        } else {
+            $xframeOptions = $option;
         }
 
         return $response->header('X-Frame-Options', $xframeOptions);
