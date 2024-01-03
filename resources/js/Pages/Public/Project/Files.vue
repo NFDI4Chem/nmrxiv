@@ -2,9 +2,7 @@
     <Head :title="'Files - ' + project.data.name" />
     <project-layout :project="project" :selected-tab="tab">
         <template #project-content>
-            <div
-                class="pb-10 mb-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-6"
-            >
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-6">
                 <div v-if="project.data.files">
                     <nav
                         v-if="$page.props.selectedFolder"

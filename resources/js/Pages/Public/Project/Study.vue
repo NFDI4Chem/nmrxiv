@@ -123,11 +123,17 @@
                             </span>
                         </div>
                     </div>
-                    <p
-                        style="max-width: 100ch !important"
-                        class="prose mt-1 text-sm text-blue-gray-500"
-                        v-html="md(study.data.description)"
-                    ></p>
+                    <div>
+                        <p
+                            class="overflow-scroll mt-1 px-0 relative text-sm text-blue-gray-500 h-64 pb-10"
+                            v-html="md(study.data.description)"
+                        ></p>
+                        <div class="relative" aria-hidden="true">
+                            <div
+                                class="absolute -inset-x-20 bottom-0 bg-gradient-to-t from-white pt-[7%]"
+                            ></div>
+                        </div>
+                    </div>
                 </div>
                 <div v-if="study.data.tags.length > 0" class="mt-4">
                     <div class="relative">

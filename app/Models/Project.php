@@ -84,12 +84,13 @@ class Project extends Model implements Auditable
     {
         if ($this->is_public) {
             return true;
+        } else {
+            if ($this->release_date && $this->doi) {
+                return Carbon::now()->startOfDay()->gte($this->release_date);
+            } else {
+                return false;
+            }
         }
-        //  else {
-        // if ($this->release_date) {
-        //     return ! Carbon::now()->startOfDay()->gte($this->release_date);
-        // }
-        // }
 
         return false;
     }

@@ -47,6 +47,38 @@ class SanitizeProjects extends Command
             return $this->localise();
         } elseif ($name == 'projects') {
             return $this->cleanProjects();
+        } elseif ($name == 'files') {
+            return $this->cleanFSObjects();
+        }
+    }
+
+    public function cleanFSObjects()
+    {
+        $projects = Project::where([
+            ['is_public', true],
+        ])->get();
+
+        foreach ($projects as $project) {
+            DB::transaction(function () use ($project) {
+                $fsObjects = FileSystemObject::with(
+                    'children'
+                )->where([['project_id', $project->id], ['level', 0]])
+                    ->orderBy('type')
+                    ->get();
+
+                if (count($fsObjects) == 0) {
+                    echo $project->id.' - '.$project->doi;
+                    echo "\r\n";
+                    $projectFSObject = FileSystemObject::where([['project_id', $project->id], ['level', 1]])->first();
+                    if ($projectFSObject) {
+                        $parent = $projectFSObject->parent;
+                        if ($parent->project_id == 0) {
+                            $parent->project_id = $project->id;
+                            $parent->save();
+                        }
+                    }
+                }
+            });
         }
     }
 
