@@ -4,14 +4,12 @@ use App\Http\Controllers\API\Auth\LoginController;
 use App\Http\Controllers\API\Auth\RegisterController;
 use App\Http\Controllers\API\Auth\UserController;
 use App\Http\Controllers\API\Auth\VerificationController;
-use App\Http\Controllers\API\DatasetController;
+use App\Http\Controllers\API\DataController;
 use App\Http\Controllers\API\FileSystemController;
-use App\Http\Controllers\API\ProjectController;
 use App\Http\Controllers\API\Schemas\Bioschemas\BioschemasController;
 use App\Http\Controllers\API\Schemas\Bioschemas\DataCatalogController;
 use App\Http\Controllers\API\Schemas\DataCite\DataCiteController;
 use App\Http\Controllers\API\SearchController;
-use App\Http\Controllers\API\StudyController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -40,26 +38,11 @@ Route::prefix('v1')->group(function () {
         Route::get('/children/{file}', [FileSystemController::class, 'children']);
     });
 
-    //Public Projects
-    Route::get('projects', [ProjectController::class, 'all'])
+    Route::get('/list/{model}', [DataController::class, 'all'])
         ->name('public.projects');
 
-    Route::get('project', [ProjectController::class, 'id'])
+    Route::get('/{id}', [DataController::class, 'id'])
         ->name('public.project');
-
-    //Public Samples
-    Route::get('samples', [StudyController::class, 'all'])
-        ->name('public.samples');
-
-    Route::get('sample', [StudyController::class, 'id'])
-        ->name('public.sample');
-
-    //Public Datasets
-    Route::get('datasets', [DatasetController::class, 'all'])
-        ->name('public.datasets');
-
-    Route::get('dataset', [DatasetController::class, 'id'])
-        ->name('public.dataset');
 
     Route::prefix('schemas')->group(function () {
         Route::prefix('bioschemas')->group(function () {

@@ -40,6 +40,32 @@
             </div>
         </template>
         <div class="mb-10">
+            <div
+                v-if="publishForm.processing"
+                class="absolute w-full h-full text-center py-12 pt-24 bg-opacity-90 bg-white z-50"
+            >
+                <svg
+                    class="animate-spin -ml-1 mr-3 h-5 w-5 text-dark flex-inline inline"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                >
+                    <circle
+                        class="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        stroke-width="4"
+                    ></circle>
+                    <path
+                        class="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                </svg>
+                Saving...
+            </div>
             <div v-if="status == 'draft'">
                 <div id="project-details" class="p-4">
                     <div class="p-8">
@@ -68,7 +94,7 @@
                                     </label>
                                     <div class="mt-1">
                                         <input
-                                            v-model="publishForm.project.name"
+                                            v-model="publishForm.name"
                                             type="text"
                                             name="project-name"
                                             class="block w-full shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm border-gray-300 rounded-md"
@@ -87,7 +113,7 @@
                                     >
                                         <span
                                             @click="
-                                                publishForm.project.description =
+                                                publishForm.description =
                                                     'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore'
                                             "
                                             >Project Description
@@ -96,9 +122,7 @@
                                     <div class="mt-1">
                                         <textarea
                                             id="description"
-                                            v-model="
-                                                publishForm.project.description
-                                            "
+                                            v-model="publishForm.description"
                                             name="project-description"
                                             placeholder="Describe this project"
                                             rows="3"
@@ -122,16 +146,15 @@
                                     </label>
                                     <div>
                                         <vue-tags-input
-                                            v-model="publishForm.project.tag"
+                                            v-model="publishForm.tag"
                                             placeholder="Type a keyword or keywords separated by comma (,) and press enter"
                                             :separators="[';', ',']"
                                             max-width="100%"
-                                            :tags="publishForm.project.tags"
+                                            :tags="publishForm.tags"
                                             @blur="updateProject"
                                             @tags-changed="
                                                 (newTags) =>
-                                                    (publishForm.project.tags =
-                                                        newTags)
+                                                    (publishForm.tags = newTags)
                                             "
                                         />
                                     </div>
@@ -196,8 +219,7 @@
                                             <div
                                                 v-for="(
                                                     species, $index
-                                                ) in publishForm.project
-                                                    .species"
+                                                ) in publishForm.species"
                                                 :key="$index"
                                                 class="bg-gray-100 border text-gray-800 mb-0.5 inline-flex truncate break-words items-center px-3 py-2 rounded-full text-sm font-medium mr-1"
                                             >
@@ -317,6 +339,64 @@
                                         </div>
                                     </dd>
                                 </div>
+                                <div class="px-2">
+                                    <div
+                                        class="relative flex items-center justify-between"
+                                    >
+                                        <span
+                                            class="px-3 -ml-4 rounded text-sm bg-gray-100 font-medium text-gray-500 after:content-['(Optional)'] after:ml-0.5 after:text-gray-500"
+                                        >
+                                            Project Image
+                                        </span>
+                                    </div>
+                                    <input
+                                        ref="photo"
+                                        type="file"
+                                        class="hidden"
+                                        @change="updatePhotoPreview"
+                                    />
+
+                                    <div v-show="!photoPreview" class="mt-2">
+                                        <img
+                                            :src="
+                                                project.project_photo_url
+                                                    ? project.project_photo_url
+                                                    : 'https://via.placeholder.com/400x200'
+                                            "
+                                            :alt="project.name"
+                                            class="h-24 w-72 rounded-md object-cover"
+                                        />
+                                    </div>
+
+                                    <div v-show="photoPreview" class="mt-2">
+                                        <span
+                                            class="block h-24 w-72 rounded"
+                                            :style="
+                                                'background-size: cover; background-repeat: no-repeat; background-position: center center; background-image: url(\'' +
+                                                photoPreview +
+                                                '\');'
+                                            "
+                                        >
+                                        </span>
+                                    </div>
+
+                                    <jet-secondary-button
+                                        class="mt-2 mr-2"
+                                        type="button"
+                                        @click.prevent="selectNewPhoto"
+                                    >
+                                        Select A New Photo
+                                    </jet-secondary-button>
+
+                                    <!-- <jet-secondary-button
+                                                        type="button"
+                                                        class="mt-2"
+                                                        @click.prevent="deletePhoto"
+                                                        v-if="project.project_photo_path"
+                                                    >
+                                                        Remove Photo
+                                                    </jet-secondary-button> -->
+                                </div>
                             </div>
                         </div>
                         <div class="mt-3">
@@ -348,7 +428,7 @@
                                 Release Date
                             </label>
                             <Datepicker
-                                v-model="publishForm.releaseDate"
+                                v-model="publishForm.release_date"
                                 @update:modelValue="updateProject"
                             ></Datepicker>
                             <p class="mt-1 text-sm text-gray-500">
@@ -467,7 +547,8 @@
                                 type="button"
                                 :class="[
                                     !publishForm.terms ||
-                                    !publishForm.conditions
+                                    !publishForm.conditions ||
+                                    publishForm.processing
                                         ? 'bg-gray-200 cursor-not-allowed'
                                         : 'bg-green-600 hover:bg-green-700',
                                     'inline-flex w-full justify-center rounded-md border border-transparent px-4 py-2 text-base font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 sm:w-auto sm:text-sm',
@@ -744,21 +825,21 @@ export default {
     data() {
         return {
             publishForm: this.$inertia.form({
-                _method: "POST",
-                project: {
-                    name: "",
-                    description: "",
-                    error_message: null,
-                    tags: [],
-                    tag: "",
-                    tags_array: [],
-                    owner_id: null,
-                    species: [],
-                },
+                _method: "PUT",
+                name: "",
+                description: "",
+                error_message: null,
+                tags: [],
+                tag: "",
+                tags_array: [],
+                owner_id: null,
+                species: [],
+                photo: null,
                 conditions: false,
+                license_id: null,
                 terms: false,
                 enableProjectMode: false,
-                releaseDate: this.setReleaseDate(),
+                release_date: this.setReleaseDate(),
             }),
             licenses: null,
             license: null,
@@ -768,6 +849,7 @@ export default {
             status: "draft",
             validation: null,
             showPublishConfirmationModal: false,
+            photoPreview: null,
         };
     },
     computed: {
@@ -795,24 +877,24 @@ export default {
 
     mounted() {
         if (this.draft) {
-            this.publishForm.project.name = this.project.name
+            this.publishForm.name = this.project.name
                 ? this.project.name
                 : this.draft.name;
             this.publishForm.enableProjectMode = this.draft.project_enabled;
-            this.publishForm.project.description = this.project.description;
+            this.publishForm.description = this.project.description;
             let tags = [];
             this.project.tags.forEach((t) => {
                 tags.push({
                     text: t.name["en"],
                 });
             });
-            this.publishForm.project.tags = tags;
+            this.publishForm.tags = tags;
             this.license = this.project.license;
             this.status =
                 this.project.status && this.project.status != ""
                     ? this.project.status
                     : "draft";
-            this.publishForm.project.species = JSON.parse(this.project.species)
+            this.publishForm.species = JSON.parse(this.project.species)
                 ? JSON.parse(this.project.species)
                 : [];
         }
@@ -843,6 +925,23 @@ export default {
         });
     },
     methods: {
+        selectNewPhoto() {
+            this.$refs.photo.click();
+        },
+        updatePhotoPreview() {
+            const photo = this.$refs.photo.files[0];
+
+            if (!photo) return;
+
+            const reader = new FileReader();
+
+            reader.onload = (e) => {
+                this.photoPreview = e.target.result;
+            };
+
+            reader.readAsDataURL(photo);
+            this.updateProject();
+        },
         scrollTo(element) {
             this.$nextTick(() => {
                 element.classList.add("shake");
@@ -858,35 +957,57 @@ export default {
         },
         updateProject() {
             // if (this.publishForm.enableProjectMode) {
-            if (
-                this.publishForm.project.tag &&
-                this.publishForm.project.tag != ""
-            ) {
+            if (this.$refs.photo) {
+                this.publishForm.photo = this.$refs.photo.files[0];
+            }
+
+            if (this.publishForm.tag && this.publishForm.tag != "") {
                 let exists = false;
-                this.publishForm.project.tags.forEach((t) => {
-                    if (t.text == this.publishForm.project.tag) {
+                this.publishForm.tags.forEach((t) => {
+                    if (t.text == this.publishForm.tag) {
                         exists = true;
                     }
                 });
                 if (!exists) {
-                    this.publishForm.project.tags.push({
-                        text: this.publishForm.project.tag,
+                    this.publishForm.tags.push({
+                        text: this.publishForm.tag,
                     });
-                    this.publishForm.project.tag = "";
+                    this.publishForm.tag = "";
                 }
             }
             this.loadingStep = true;
-            axios.put(route("dashboard.project.update", this.project.id), {
-                name: this.publishForm.project.name,
-                description: this.publishForm.project.description,
-                tags: this.publishForm.project.tags,
-                tags_array: this.publishForm.project.tags
-                    ? this.publishForm.project.tags.map((a) => a.text)
-                    : [],
-                license_id: this.license ? this.license.id : null,
-                species: this.publishForm.project.species,
-                release_date: this.publishForm.releaseDate,
-            });
+
+            this.publishForm.license_id = this.license ? this.license.id : null;
+            this.publishForm.species = this.publishForm.species;
+            this.publishForm.owner_id = this.project.owner_id;
+            this.publishForm.tags_array = this.publishForm.tags
+                ? this.publishForm.tags.map((a) => a.text)
+                : [];
+            this.publishForm.post(
+                route("dashboard.project.update", this.project.id),
+                {
+                    preserveScroll: true,
+                    onSuccess: () => {},
+                    onError: (err) => {},
+                }
+            );
+
+            // axios.put(route("dashboard.project.update", this.project.id), {
+            //     name: this.publishForm.name,
+            //     description: this.publishForm.description,
+            //     tags: this.publishForm.tags,
+            //     tags_array: this.publishForm.tags
+            //         ? this.publishForm.tags.map((a) => a.text)
+            //         : [],
+            //     license_id: this.license ? this.license.id : null,
+            //     species: this.publishForm.species,
+            //     release_date: this.publishForm.release_date,
+            //     photo: this.$refs.photo ? this.$refs.photo.files[0] : null
+            // }, {
+            //         headers: {
+            //         'Content-Type': 'multipart/form-data'
+            //         }
+            //     });
             // .then((res) => {
             //     console.log("success");
             // });
@@ -894,14 +1015,14 @@ export default {
         },
         updateSpecies(species) {
             if (species && species != "") {
-                this.publishForm.project.species.push(species);
+                this.publishForm.species.push(species);
                 this.projectSpecies = "";
                 this.updateProject();
             }
         },
         removeSpecies(index) {
             if (index > -1) {
-                this.publishForm.project.species.splice(index, 1);
+                this.publishForm.species.splice(index, 1);
             }
         },
         getTarget(id) {
@@ -919,10 +1040,14 @@ export default {
             return link;
         },
         setReleaseDate() {
-            var current_date = new Date();
-            var relase_date = new Date();
-            relase_date.setDate(current_date.getDate());
-            return relase_date;
+            if (!this.project.release_date) {
+                var current_date = new Date();
+                var relase_date = new Date();
+                relase_date.setDate(current_date.getDate());
+                return relase_date;
+            } else {
+                return this.project.release_date;
+            }
         },
         loadLicenses() {
             if (this.$page.props.licenses) {

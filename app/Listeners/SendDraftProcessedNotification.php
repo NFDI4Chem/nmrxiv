@@ -4,7 +4,7 @@ namespace App\Listeners;
 
 use App\Models\User;
 use App\Notifications\DraftProcessedNotification;
-use App\Notifications\ProjectPublishNotificationToAdmins;
+use App\Notifications\DraftProcessedNotificationToAdmin;
 use Illuminate\Support\Facades\Notification;
 
 class SendDraftProcessedNotification
@@ -25,6 +25,6 @@ class SendDraftProcessedNotification
     public function handle(object $event): void
     {
         Notification::send($event->sendTo, new DraftProcessedNotification($event->project));
-        Notification::send(User::role(['super-admin'])->get(), new ProjectPublishNotificationToAdmins($event->project));
+        Notification::send(User::role(['super-admin'])->get(), new DraftProcessedNotificationToAdmin($event->project, null));
     }
 }

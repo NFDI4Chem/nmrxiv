@@ -34,7 +34,7 @@ class VerificationController extends Controller
             }
         }
 
-        return redirect()->route('welcome')->with('success', 'Email verification Successful');
+        return redirect()->route('landing')->with('success', 'Email verification Successful');
     }
 
     /**

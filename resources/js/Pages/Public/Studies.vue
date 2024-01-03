@@ -6,6 +6,7 @@
                     class="relative pt-10 dark:border-white/5 mx-8 py-12 sm:py-12"
                 >
                     <div
+                        v-if="!molecule"
                         class="absolute inset-0 bg-gradient-to-r from-[#36b49f] to-[#DBFF75] opacity-40 [mask-image:radial-gradient(farthest-side_at_top,white,transparent)] dark:from-[#36b49f]/30 dark:to-[#DBFF75]/30 dark:opacity-100"
                     >
                         <svg
@@ -62,68 +63,208 @@
                             </svg>
                         </svg>
                     </div>
-                    <div
-                        class="text-4xl mb-3 font-bold tracking-tight text-gray-900"
-                    >
-                        Browse Spectra (Samples)
+                    <div v-if="!molecule">
+                        <div
+                            class="text-4xl mb-3 font-bold tracking-tight text-gray-900"
+                        >
+                            Browse Spectra (Samples)
+                        </div>
+                        <p>
+                            Explore, analyse, and share raw spectra and
+                            assignments. Learn more about
+                            <a
+                                class="text-teal-900"
+                                href="https://docs.nmrxiv.org/docs/introduction/intro"
+                                target="_blank"
+                                >spectra</a
+                            >.
+                        </p>
                     </div>
-                    <p>
-                        Explore, analyze, and share raw spectra and assignments.
-                        Learn more about
-                        <a
-                            class="text-teal-900"
-                            href="https://docs.nmrxiv.org/docs/introduction/intro"
-                            target="_blank"
-                            >spectra</a
-                        >.
-                    </p>
-                </div>
-                <div
-                    v-if="molecule"
-                    class="border-t mx-auto px-4 sm:px-6 lg:px-8"
-                >
-                    <div
-                        class="mx-auto flex max-w-2xl items-center justify-between gap-x-8 lg:mx-0 lg:max-w-none"
-                    >
-                        <div class="flex items-center gap-x-6">
-                            <img
-                                :src="
-                                    $page.props.CM_API +
-                                    'depict/2D?smiles=' +
-                                    molecule.canonical_smiles
-                                "
-                                alt=""
-                                class="h-32 w-32 rounded rounded-full flex-none"
-                            />
-                            <h1>
-                                <div class="text-sm leading-6 text-gray-500">
-                                    <span class="text-gray-700">{{
-                                        molecule.identifier
-                                    }}</span>
+                    <div v-if="molecule">
+                        <div
+                            class="mx-auto flex max-w-2xl items-center justify-between gap-x-8 lg:mx-0 lg:max-w-none"
+                        >
+                            <div class="flex items-center gap-x-6">
+                                <div
+                                    class="aspect-h-2 aspect-w-3 overflow-hidden rounded-lg shadow-md border"
+                                >
+                                    <img
+                                        :src="
+                                            $page.props.CM_API +
+                                            'depict/2D?height=360&width=360&smiles=' +
+                                            molecule.canonical_smiles
+                                        "
+                                        class="bg-white object-cover object-center"
+                                    />
                                 </div>
                                 <div
-                                    class="mt-1 text-base font-semibold leading-6 text-gray-900"
+                                    class="mx-auto mt-14 max-w-2xl sm:mt-16 lg:col-span-3 lg:row-span-2 lg:row-end-2 lg:mt-0 lg:max-w-none"
                                 >
-                                    <span v-if="molecule.iupac_name">{{
-                                        molecule.iupac_name
-                                    }}</span
-                                    ><br />
-                                    <span v-if="molecule.canonical_smiles">{{
-                                        molecule.canonical_smiles
-                                    }}</span>
+                                    <div class="flex flex-col-reverse">
+                                        <div class="mt-4">
+                                            <h1
+                                                class="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl"
+                                            >
+                                                {{ molecule.iupac_name }}
+                                            </h1>
+                                            <p
+                                                class="mt-2 text-sm text-gray-500"
+                                            >
+                                                {{ molecule.canonical_smiles }}
+                                            </p>
+                                            <div>
+                                                <h3
+                                                    class="mt-3 text-sm text-gray-500"
+                                                >
+                                                    <a>
+                                                        <span
+                                                            class="absolute inset-0"
+                                                        ></span>
+                                                        Molecular Formula:
+                                                        <span
+                                                            class="text-base inline font-semibold text-gray-900"
+                                                            >{{
+                                                                molecule.molecular_formula
+                                                            }}</span
+                                                        >
+                                                    </a>
+                                                    &emsp; &middot; &emsp;
+                                                    <a>
+                                                        <span
+                                                            class="absolute inset-0"
+                                                        ></span>
+                                                        Molecular Weight:
+                                                        <span
+                                                            class="text-base inline font-semibold text-gray-900"
+                                                            >{{
+                                                                molecule.molecular_weight
+                                                            }}</span
+                                                        >
+                                                    </a>
+                                                </h3>
+                                            </div>
+                                            <p
+                                                v-if="molecule.synonyms"
+                                                class="mt-3 text-gray-500"
+                                            >
+                                                <span
+                                                    class="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-sm mr-2 font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10 mt-2"
+                                                    v-for="synonym in molecule.synonyms
+                                                        .split(',')
+                                                        .slice(1, 20)"
+                                                >
+                                                    {{ synonym }}
+                                                </span>
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <div
+                                                class="flex items-center inline"
+                                            >
+                                                <p class="mr-3">
+                                                    {{ molecule.identifier }}
+                                                </p>
+
+                                                <svg
+                                                    class="text-yellow-400 h-5 w-5 flex-shrink-0"
+                                                    x-state:on="Active"
+                                                    x-state:off="Default"
+                                                    x-state-description='Active: "text-yellow-400", Default: "text-gray-300"'
+                                                    viewBox="0 0 20 20"
+                                                    fill="currentColor"
+                                                    aria-hidden="true"
+                                                >
+                                                    <path
+                                                        fill-rule="evenodd"
+                                                        d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401z"
+                                                        clip-rule="evenodd"
+                                                    ></path>
+                                                </svg>
+                                                <svg
+                                                    class="text-yellow-400 h-5 w-5 flex-shrink-0"
+                                                    x-state-description='undefined: "text-yellow-400", undefined: "text-gray-300"'
+                                                    viewBox="0 0 20 20"
+                                                    fill="currentColor"
+                                                    aria-hidden="true"
+                                                >
+                                                    <path
+                                                        fill-rule="evenodd"
+                                                        d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401z"
+                                                        clip-rule="evenodd"
+                                                    ></path>
+                                                </svg>
+                                                <svg
+                                                    class="text-yellow-400 h-5 w-5 flex-shrink-0"
+                                                    x-state-description='undefined: "text-yellow-400", undefined: "text-gray-300"'
+                                                    viewBox="0 0 20 20"
+                                                    fill="currentColor"
+                                                    aria-hidden="true"
+                                                >
+                                                    <path
+                                                        fill-rule="evenodd"
+                                                        d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401z"
+                                                        clip-rule="evenodd"
+                                                    ></path>
+                                                </svg>
+                                                <svg
+                                                    class="text-yellow-400 h-5 w-5 flex-shrink-0"
+                                                    x-state-description='undefined: "text-yellow-400", undefined: "text-gray-300"'
+                                                    viewBox="0 0 20 20"
+                                                    fill="currentColor"
+                                                    aria-hidden="true"
+                                                >
+                                                    <path
+                                                        fill-rule="evenodd"
+                                                        d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401z"
+                                                        clip-rule="evenodd"
+                                                    ></path>
+                                                </svg>
+                                                <svg
+                                                    class="text-gray-300 h-5 w-5 flex-shrink-0"
+                                                    x-state-description='undefined: "text-yellow-400", undefined: "text-gray-300"'
+                                                    viewBox="0 0 20 20"
+                                                    fill="currentColor"
+                                                    aria-hidden="true"
+                                                >
+                                                    <path
+                                                        fill-rule="evenodd"
+                                                        d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401z"
+                                                        clip-rule="evenodd"
+                                                    ></path>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- <div
+                                        class="mt-10 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2"
+                                    >
+                                        <button
+                                            type="button"
+                                            class="flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-50"
+                                        >
+                                            Pay $220
+                                        </button>
+                                        <button
+                                            type="button"
+                                            class="flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-50 px-8 py-3 text-base font-medium text-indigo-700 hover:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-50"
+                                        >
+                                            Preview
+                                        </button>
+                                    </div> -->
                                 </div>
-                            </h1>
+                            </div>
+
+                            <!-- <div class="flex items-center gap-x-4 sm:gap-x-6">
+            <a
+                :href="
+                    '/upload?compound=' + molecule.identifier
+                "
+                class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            >
+                Upload Spectra
+            </a>
+        </div> -->
                         </div>
-                        <!-- <div class="flex items-center gap-x-4 sm:gap-x-6">
-                            <a
-                                :href="
-                                    '/upload?compound=' + molecule.identifier
-                                "
-                                class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                            >
-                                Upload Spectra
-                            </a>
-                        </div> -->
                     </div>
                 </div>
             </div>

@@ -17,7 +17,7 @@ class LicenseSeeder extends Seeder
         $licenses = [
             /*Creative Commons*/
             [
-                'title' => 'Creative Commons Zero v1.0 Universal (CC0-1.0)',
+                'title' => 'Creative Commons Zero v1.0 Universal (CC0 1.0)',
                 'slug' => 'cc0-1.0',
                 'spdx_id' => 'CC0-1.0',
                 'url' => 'https://creativecommons.org/publicdomain/zero/1.0/legalcode',
@@ -26,7 +26,7 @@ class LicenseSeeder extends Seeder
                 'category' => 'Creative Commons',
             ],
             [
-                'title' => 'Creative Commons Attribution Non Commercial Share Alike 4.0 International (CC-BY-NC-SA-4.0)',
+                'title' => 'Creative Commons Attribution Non Commercial Share Alike 4.0 International (CC BY-NC-SA 4.0)',
                 'slug' => 'cc-by-nc-sa-4.0',
                 'spdx_id' => 'CC-BY-NC-SA-4.0',
                 'url' => 'https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode',
@@ -35,7 +35,7 @@ class LicenseSeeder extends Seeder
                 'category' => 'Creative Commons',
             ],
             [
-                'title' => 'Creative Commons Attribution Share Alike 4.0 International (CC-BY-SA-4.0)',
+                'title' => 'Creative Commons Attribution Share Alike 4.0 International (CC BY-SA 4.0)',
                 'slug' => 'cc-by-sa-4.0',
                 'spdx_id' => 'CC-BY-SA-4.0',
                 'url' => 'https://creativecommons.org/licenses/by-sa/4.0/legalcode',
@@ -44,7 +44,7 @@ class LicenseSeeder extends Seeder
                 'category' => 'Creative Commons',
             ],
             [
-                'title' => 'Creative Commons Attribution Share Alike 3.0 Unported (CC-BY-SA-3.0)',
+                'title' => 'Creative Commons Attribution Share Alike 3.0 Unported (CC BY-SA 3.0)',
                 'slug' => 'cc-by-sa-3.0',
                 'spdx_id' => 'CC-BY-SA-3.0',
                 'url' => 'https://creativecommons.org/licenses/by-sa/3.0/legalcode',
@@ -53,7 +53,7 @@ class LicenseSeeder extends Seeder
                 'category' => 'Creative Commons',
             ],
             [
-                'title' => 'Creative Commons Attribution 4.0 International (CC-BY-4.0)',
+                'title' => 'Creative Commons Attribution 4.0 International (CC BY 4.0)',
                 'slug' => 'cc-by-4.0',
                 'spdx_id' => 'CC-BY-4.0',
                 'url' => 'https://creativecommons.org/licenses/by/4.0/legalcode',
@@ -62,7 +62,7 @@ class LicenseSeeder extends Seeder
                 'category' => 'Creative Commons',
             ],
             [
-                'title' => 'Creative Commons Attribution Non Commercial 4.0 International (CC-BY-NC-4.0)',
+                'title' => 'Creative Commons Attribution Non Commercial 4.0 International (CC BY-NC 4.0)',
                 'slug' => 'cc-by-nc-4.0',
                 'spdx_id' => 'CC-BY-NC-4.0',
                 'url' => 'https://creativecommons.org/licenses/by-nc/4.0/legalcode',
@@ -71,7 +71,7 @@ class LicenseSeeder extends Seeder
                 'category' => 'Creative Commons',
             ],
             [
-                'title' => 'Creative Commons Attribution 3.0 Unported (CC-BY-3.0)',
+                'title' => 'Creative Commons Attribution 3.0 Unported (CC BY 3.0)',
                 'slug' => 'cc-by-3.0',
                 'spdx_id' => 'CC-BY-3.0',
                 'url' => 'https://creativecommons.org/licenses/by/3.0/legalcode',
@@ -80,7 +80,7 @@ class LicenseSeeder extends Seeder
                 'category' => 'Creative Commons',
             ],
             [
-                'title' => 'Creative Commons Attribution 3.0 IGO (CC-BY-3.0-IGO)',
+                'title' => 'Creative Commons Attribution 3.0 IGO (CC BY 3.0 IGO)',
                 'slug' => 'cc-by-3.0-igo',
                 'spdx_id' => 'CC-BY-3.0-IGO',
                 'url' => 'https://creativecommons.org/licenses/by/3.0/igo/legalcode',
@@ -89,7 +89,7 @@ class LicenseSeeder extends Seeder
                 'category' => 'Creative Commons',
             ],
             [
-                'title' => 'Creative Commons Attribution Non Commercial Share Alike 3.0 IGO (CC-BY-NC-SA-3.0-IGO)',
+                'title' => 'Creative Commons Attribution Non Commercial Share Alike 3.0 IGO (CC BY-NC-SA 3.0)',
                 'slug' => 'cc-by-3.0-igo',
                 'spdx_id' => 'CC-BY-NC-SA-3.0-IGO',
                 'url' => 'https://creativecommons.org/licenses/by-nc-sa/3.0/igo/legalcode',
@@ -98,7 +98,7 @@ class LicenseSeeder extends Seeder
                 'category' => 'Creative Commons',
             ],
             [
-                'title' => 'Creative Commons Attribution No Derivatives 4.0 International (CC-BY-ND-4.0)',
+                'title' => 'Creative Commons Attribution No Derivatives 4.0 International (CC BY-ND 4.0)',
                 'slug' => 'cc-by-nd-4.0',
                 'spdx_id' => 'CC-BY-ND-4.0',
                 'url' => 'https://creativecommons.org/licenses/by-nd/4.0/legalcode',
@@ -107,7 +107,7 @@ class LicenseSeeder extends Seeder
                 'category' => 'Creative Commons',
             ],
             [
-                'title' => 'Creative Commons Attribution Non Commercial No Derivatives 4.0 International (CC-BY-NC-ND-4.0)',
+                'title' => 'Creative Commons Attribution Non Commercial No Derivatives 4.0 International (CC BY-NC-ND 4.0)',
                 'slug' => 'cc-by-nc-nd-4.0',
                 'spdx_id' => 'CC-BY-NC-ND-4.0',
                 'url' => 'https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode',
@@ -117,7 +117,7 @@ class LicenseSeeder extends Seeder
             ],
             /*GPL*/
             [
-                'title' => 'GNU General Public License v2.0 only (GPL-2.0-only)',
+                'title' => 'GNU General Public License v2.0 only (GNU GPL)',
                 'slug' => 'gpl-2.0',
                 'spdx_id' => 'GPL-2.0-only',
                 'url' => 'https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html',
@@ -126,7 +126,7 @@ class LicenseSeeder extends Seeder
                 'category' => 'GPL',
             ],
             [
-                'title' => 'GNU Lesser General Public License v3.0 only (LGPL-3.0-only)',
+                'title' => 'GNU Lesser General Public License v3.0 only (GNU LGPL)',
                 'slug' => 'lgpl-3.0',
                 'spdx_id' => 'LGPL-3.0-only',
                 'url' => 'http://www.gnu.org/licenses/lgpl-3.0.html',
@@ -135,7 +135,7 @@ class LicenseSeeder extends Seeder
                 'category' => 'GPL',
             ],
             [
-                'title' => 'GNU Affero General Public License v3.0 (AGPL-3.0)',
+                'title' => 'GNU Affero General Public License v3.0 (GNU AGPL)',
                 'slug' => 'agpl-3.0',
                 'spdx_id' => 'AGPL-3.0',
                 'url' => 'https://www.gnu.org/licenses/agpl-3.0.html',
@@ -144,7 +144,7 @@ class LicenseSeeder extends Seeder
                 'category' => 'GPL',
             ],
             [
-                'title' => 'GNU Free Documentation License v1.3 (GFDL-1.3)',
+                'title' => 'GNU Free Documentation License v1.3 (GNU FDL)',
                 'slug' => 'gfdl-1.3',
                 'spdx_id' => 'GFDL-1.3',
                 'url' => 'https://www.gnu.org/licenses/fdl-1.3.html',
@@ -155,7 +155,7 @@ class LicenseSeeder extends Seeder
 
             /*Open Data Commons*/
             [
-                'title' => 'Open Data Commons Database Contents License (DbCL-1.0)',
+                'title' => 'Open Data Commons Database Contents License (DbCL)',
                 'slug' => '',
                 'spdx_id' => '',
                 'url' => 'https://opendatacommons.org/licenses/dbcl/1-0/',
@@ -164,7 +164,7 @@ class LicenseSeeder extends Seeder
                 'category' => 'Open Data Commons',
             ],
             [
-                'title' => 'Open Data Commons Open Database License (ODbL-1.0)',
+                'title' => 'Open Data Commons Open Database License (ODbL)',
                 'slug' => 'odbl-1.0',
                 'spdx_id' => 'ODbL-1.0',
                 'url' => 'https://opendatacommons.org/licenses/odbl/1-0/',
@@ -173,7 +173,7 @@ class LicenseSeeder extends Seeder
                 'category' => 'Open Data Commons',
             ],
             [
-                'title' => 'Open Data Commons Public Domain Dedication and License (PDDL-1.0)',
+                'title' => 'Open Data Commons Public Domain Dedication and License (PDDL)',
                 'slug' => 'pddl-1.0',
                 'spdx_id' => 'PDDL-1.0',
                 'url' => 'https://opendatacommons.org/licenses/pddl/1.0/',
@@ -182,7 +182,7 @@ class LicenseSeeder extends Seeder
                 'category' => 'Open Data Commons',
             ],
             [
-                'title' => 'Open Data Commons Attribution License v1.0 (ODC-By-1.0)',
+                'title' => 'Open Data Commons Attribution License v1.0 (ODC-By)',
                 'slug' => 'odc-by-1.0',
                 'spdx_id' => 'ODC-By-1.0',
                 'url' => 'https://opendatacommons.org/licenses/by/1-0/index.html',
