@@ -496,6 +496,7 @@
                                                 </div>
                                                 <div
                                                     id="tour-step-side-panel-studies"
+                                                    class="no-scrollbar"
                                                     style="
                                                         height: 74vh;
                                                         overflow: scroll !important;
@@ -550,27 +551,31 @@
                                                                         "
                                                                     ></Depictor2D>
                                                                 </div>
-                                                                <a>
-                                                                    {{
-                                                                        study.name
-                                                                    }}</a
+                                                                <div
+                                                                    class="px-2 pb-1"
                                                                 >
-                                                                <span
-                                                                    v-if="
-                                                                        study
-                                                                            .sample
-                                                                            .molecules
-                                                                            .length >
-                                                                        0
-                                                                    "
-                                                                    class="float-right"
-                                                                >
-                                                                    <img
-                                                                        class="flex-shrink-0 -mt-0.5 h-6 w-6 text-blue-gray-400"
-                                                                        src="https://upload.wikimedia.org/wikipedia/sco/3/35/ChEBI_logo.png"
-                                                                        alt=""
-                                                                    />
-                                                                </span>
+                                                                    <a>
+                                                                        {{
+                                                                            study.name
+                                                                        }}</a
+                                                                    >
+                                                                    <span
+                                                                        v-if="
+                                                                            study
+                                                                                .sample
+                                                                                .molecules
+                                                                                .length >
+                                                                            0
+                                                                        "
+                                                                        class="float-right"
+                                                                    >
+                                                                        <img
+                                                                            class="flex-shrink-0 -mt-0.5 h-6 w-6 text-blue-gray-400"
+                                                                            src="https://upload.wikimedia.org/wikipedia/sco/3/35/ChEBI_logo.png"
+                                                                            alt=""
+                                                                        />
+                                                                    </span>
+                                                                </div>
 
                                                                 <div
                                                                     class="mt-1 text-blue-gray-500"
@@ -586,22 +591,23 @@
                                                                                 study.has_nmrium
                                                                                     ? 'bg-green-100 text-gray-800'
                                                                                     : 'bg-gray-100 text-gray-800',
-                                                                                'mb-0.5 inline-flex truncate break-words items-center px-3 py-0.5 rounded-full text-xs font-medium mr-1',
+                                                                                'mb-0.5 truncate break-words items-center px-3 py-0.5 rounded-full text-xs font-medium mr-1',
                                                                             ]"
                                                                         >
-                                                                            <span
-                                                                                >{{
+                                                                            <div>
+                                                                                {{
                                                                                     ds.name
                                                                                 }}
                                                                                 <span
+                                                                                    class="uppercase"
                                                                                     v-if="
                                                                                         ds.type
                                                                                     "
                                                                                     >({{
                                                                                         ds.type
                                                                                     }})</span
-                                                                                ></span
-                                                                            >
+                                                                                >
+                                                                            </div>
                                                                         </div>
                                                                     </span>
                                                                 </div>
@@ -974,7 +980,7 @@
                                                         <div>
                                                             <div>
                                                                 <div
-                                                                    class="px-4 py-1.5 -mx-2 bg-gray-50 border-b"
+                                                                    class="px-4 py-1.5 -mx-2 bg-gray-50 border-b px-4 py-3 flex items-center font-semibold text-sm text-slate-900 dark:text-slate-200 bg-slate-50/90 dark:bg-slate-700/90 backdrop-blur-sm ring-1 ring-slate-900/10 dark:ring-black/10"
                                                                 >
                                                                     <h1
                                                                         class="text-2xl font-extrabold text-gray-900"
@@ -984,9 +990,45 @@
                                                                         }}
                                                                     </h1>
                                                                 </div>
+
                                                                 <div
-                                                                    class="overflow-y-scroll h-[calc(100vh-153px)]"
+                                                                    @scroll="
+                                                                        onScroll
+                                                                    "
+                                                                    class="scroll-smooth overflow-y-scroll h-[calc(100vh-153px)]"
                                                                 >
+                                                                    <div
+                                                                        v-if="
+                                                                            !hideDownArrow
+                                                                        "
+                                                                        class="absolute bottom-0 right-0 object-right-bottom rounded-xl overflow-auto p-8"
+                                                                    >
+                                                                        <div
+                                                                            class="flex justify-center"
+                                                                        >
+                                                                            <a
+                                                                                href="#chemical-composition"
+                                                                            >
+                                                                                <div
+                                                                                    class="drop-shadow-md animate-bounce bg-gray-300 dark:bg-slate-800 p-2 w-10 h-10 ring-1 ring-slate-900/5 dark:ring-slate-200/20 shadow-lg rounded-full flex items-center justify-center"
+                                                                                >
+                                                                                    <svg
+                                                                                        class="w-6 h-6 text-white-500"
+                                                                                        fill="none"
+                                                                                        stroke-linecap="round"
+                                                                                        stroke-linejoin="round"
+                                                                                        stroke-width="2"
+                                                                                        viewBox="0 0 24 24"
+                                                                                        stroke="currentColor"
+                                                                                    >
+                                                                                        <path
+                                                                                            d="M19 14l-7 7m0 0l-7-7m7 7V3"
+                                                                                        ></path>
+                                                                                    </svg>
+                                                                                </div>
+                                                                            </a>
+                                                                        </div>
+                                                                    </div>
                                                                     <div
                                                                         class="px-2 sm:px-2 md:px-0 pb-24"
                                                                     >
@@ -1010,6 +1052,7 @@
                                                                                 ></SpectraEditor>
                                                                             </div>
                                                                         </div>
+
                                                                         <div
                                                                             class="px-2"
                                                                         >
@@ -1020,6 +1063,7 @@
                                                                                     class="sm:flex sm:items-center sm:justify-between"
                                                                                 >
                                                                                     <h3
+                                                                                        id="chemical-composition"
                                                                                         class="text-xl font-bold text-gray-900 after:content-['*'] after:ml-0.5 after:text-red-500"
                                                                                     >
                                                                                         Chemical
@@ -1088,10 +1132,9 @@
                                                                                                         >
                                                                                                             <div>
                                                                                                                 <div
-                                                                                                                    class="text-sm"
+                                                                                                                    class="text-sm break-words"
                                                                                                                 >
                                                                                                                     <a
-                                                                                                                        href="#"
                                                                                                                         class="font-medium text-gray-900"
                                                                                                                         >{{
                                                                                                                             molecule.standard_inchi
@@ -1100,7 +1143,7 @@
                                                                                                                 </div>
                                                                                                             </div>
                                                                                                             <div
-                                                                                                                class="mt-2 text-sm text-gray-700"
+                                                                                                                class="mt-2 text-sm"
                                                                                                             >
                                                                                                                 <div
                                                                                                                     class="rounded-md border mb-3"
@@ -1359,7 +1402,7 @@
                                                                                 >
                                                                                     <label
                                                                                         for="description"
-                                                                                        class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
+                                                                                        class="block text-sm font-medium text-gray-700"
                                                                                     >
                                                                                         Sample
                                                                                         Description
@@ -1678,6 +1721,7 @@ export default {
             spectraLoadingStatus: false,
             spectraLoadingMessage: null,
             showCompoundDetails: true,
+            hideDownArrow: false,
 
             currentDraft: null,
             drafts: [],
@@ -1860,6 +1904,9 @@ export default {
         }
     },
     methods: {
+        onScroll() {
+            this.hideDownArrow = true;
+        },
         toggleCompoundDetails() {
             this.showCompoundDetails = !this.showCompoundDetails;
             localStorage.setItem(
@@ -1943,6 +1990,7 @@ export default {
                 });
         },
         closeDraft() {
+            this.loadingStep = true;
             this.fetchValidations().then(() => {
                 if (this.validationStatus) {
                     this.loadingStep = true;
@@ -1961,18 +2009,13 @@ export default {
                             this.validation = this.parseJSON(
                                 response.data.validation.report
                             );
-                            // this.validationStatus = true;
-                            // this.validation.project.studies.forEach((study) => {
-                            //     if (study.status == false) {
-                            //         this.validationStatus = false;
-                            //     }
-                            // });
                             if (this.project) {
                                 window.location =
                                     "/publish/" + this.currentDraft.id;
                             }
                         });
                 } else {
+                    this.loadingStep = false;
                     this.showSamplesSummary();
                     alert(
                         "Samples validation failed: Please provide all meta data to proceed"

@@ -144,7 +144,7 @@ class Study extends Model implements Auditable
     protected function getPublicUrlAttribute()
     {
         // return env('APP_URL', null).'/projects/'.$this->owner->username.'/'.urlencode($this->project->slug).'?tab=study&id='.$this->slug;
-        return env('APP_URL', null).'/S'.$this->getAttributes()['identifier'];
+        return env('APP_URL', null).'/S'.$this->getRawOriginal('identifier');
     }
 
     protected function getPrivateUrlAttribute()
@@ -208,7 +208,7 @@ class Study extends Model implements Auditable
 
     public function datasets()
     {
-        return $this->hasMany(Dataset::class);
+        return $this->hasMany(Dataset::class)->orderBy('name');
     }
 
     /**
