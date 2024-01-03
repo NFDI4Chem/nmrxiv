@@ -1,0 +1,10 @@
+repos:
+- repo: https://github.com/matchory/pre-commit-laravel
+  rev: v1.0.1
+  hooks:
+    - id: laravel-pint
+# - repo: https://github.com/matchory/pre-commit-laravel
+#   rev: v1.0.1
+#   hooks:
+#     - id: laravel-tests
+#       args: ["--parallel"]

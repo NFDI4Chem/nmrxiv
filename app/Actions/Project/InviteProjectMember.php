@@ -22,7 +22,7 @@ class InviteProjectMember
      * @param  mixed  $project
      * @return void
      */
-    public function invite($user, $project, string $email, string $role = null, string $message = null)
+    public function invite($user, $project, string $email, ?string $role = null, ?string $message = null)
     {
         // Gate::forUser($user)->authorize('addProjectMember', $project);
 
