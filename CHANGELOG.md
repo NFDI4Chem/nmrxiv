@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.0.1-rc.18](https://github.com/NFDI4Chem/nmrxiv/compare/v1.0.0-rc.18...v1.0.1-rc.18) (2024-01-03)
+
+
+### Bug Fixes
+
+* middleware embed removed - applied to all web requests ([bbc3809](https://github.com/NFDI4Chem/nmrxiv/commit/bbc3809c45684f7a27d9530d77745d52748a0524))
+* moved x-frame-options to the application level and is overridden for the embed endpoints ([598e2ce](https://github.com/NFDI4Chem/nmrxiv/commit/598e2ce51b17d763a4c3a42b059506c1e5c9ae0a))
+* update user error fix ([564c5a8](https://github.com/NFDI4Chem/nmrxiv/commit/564c5a827e6e0639a7e3d38178c8138fe524c887))
+* updated route name check ([4ac95d6](https://github.com/NFDI4Chem/nmrxiv/commit/4ac95d6946edf782bc226cecbd84b9dab96e46fb))
+
 ## [1.1.0-rc.17](https://github.com/NFDI4Chem/nmrxiv/compare/v1.0.0-rc.17...v1.1.0-rc.17) (2024-01-03)
 
 
