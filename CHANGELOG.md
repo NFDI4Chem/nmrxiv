@@ -1,5 +1,48 @@
 # Changelog
 
+## [1.1.0-rc.17](https://github.com/NFDI4Chem/nmrxiv/compare/v1.0.0-rc.17...v1.1.0-rc.17) (2024-01-03)
+
+
+### Features
+
+* enabled auto verification and initial password set for ELN user registrations ([913aedf](https://github.com/NFDI4Chem/nmrxiv/commit/913aedf16335519c1ffa65d9bcd58b7f63a40a9a))
+* enabled eln role ([8ba0541](https://github.com/NFDI4Chem/nmrxiv/commit/8ba05412530abc536d16a1016307f921179a24b5))
+* installed pre-commit hooks ([145168f](https://github.com/NFDI4Chem/nmrxiv/commit/145168f8a1f0e8aed40b02ea09015909ae4f1a66))
+* notify user and admin on sample release. ([fc58d3b](https://github.com/NFDI4Chem/nmrxiv/commit/fc58d3b8d18cb35525dc482ecf3c9e22ae75f940))
+
+
+### Bug Fixes
+
+* added loading for validation calls, implemented project image in the publish view and refactored publish form ([a84a6e7](https://github.com/NFDI4Chem/nmrxiv/commit/a84a6e72896cb4e2c5cdc637636f0d123b41bacc))
+* added loading screen to publish page ([b201909](https://github.com/NFDI4Chem/nmrxiv/commit/b2019096c75a25c0211c1c844693aa17417833fa))
+* Added recommended journals to welcome page ([bbe2dc9](https://github.com/NFDI4Chem/nmrxiv/commit/bbe2dc92d42fd537f38f2bc2e2af39ca54e890b7))
+* added visual hints to registration from - required fields ([a6aec65](https://github.com/NFDI4Chem/nmrxiv/commit/a6aec6550b5772be226f2356e2963636b7aece72))
+* correcting journal links ([7e52fe3](https://github.com/NFDI4Chem/nmrxiv/commit/7e52fe3844e2e63a380a189a17a7c5092b3bd3ca))
+* dashboard index ui updates ([dae0fdc](https://github.com/NFDI4Chem/nmrxiv/commit/dae0fdc79988e7541cfa2ab69bf6ba29592de895))
+* description fixed height with scroll ([0147e35](https://github.com/NFDI4Chem/nmrxiv/commit/0147e35a32d23a979953d428c5de674ffd864c6d))
+* disabled project delete while its being queued and processed. fixes [#982](https://github.com/NFDI4Chem/nmrxiv/issues/982) ([08b3771](https://github.com/NFDI4Chem/nmrxiv/commit/08b3771f1bb5bb7dbb6436a12d94868adee1c817))
+* extended query capabilities ([49bc165](https://github.com/NFDI4Chem/nmrxiv/commit/49bc165f3461783da46af04e40dc3076573d83e0))
+* fixes [#978](https://github.com/NFDI4Chem/nmrxiv/issues/978) ([7207c75](https://github.com/NFDI4Chem/nmrxiv/commit/7207c753c9749cc215b7462f49419709c9f3c98b))
+* fixes [#980](https://github.com/NFDI4Chem/nmrxiv/issues/980), [#978](https://github.com/NFDI4Chem/nmrxiv/issues/978), [#977](https://github.com/NFDI4Chem/nmrxiv/issues/977) ([714b486](https://github.com/NFDI4Chem/nmrxiv/commit/714b486dbf84473a6eb8fe0de6dd94d4927a0f9e))
+* fixes [#983](https://github.com/NFDI4Chem/nmrxiv/issues/983) ([5509d4c](https://github.com/NFDI4Chem/nmrxiv/commit/5509d4c0366d194acba656d3a6f0a60c47faaec0))
+* invalid key identifier bug fix ([a2e5492](https://github.com/NFDI4Chem/nmrxiv/commit/a2e54920323c40ed6fdc297cdfc5afb103cbd1b6))
+* listing projects 500 error bug fix ([341d7ff](https://github.com/NFDI4Chem/nmrxiv/commit/341d7ffa601b373165debefc4b9c0a5ee1fc7f38))
+* more search autocomplete issue fix, dashboard projects list - embargo projects link missing issue fix ([d18c35e](https://github.com/NFDI4Chem/nmrxiv/commit/d18c35eb05ce6b7fe3e9f48cf1456b366c3b1d87))
+* Release date reset bug fix and autocomplete input field issue fix ([935fab8](https://github.com/NFDI4Chem/nmrxiv/commit/935fab80f12b45bbe35f99c1068161f8e98c1935))
+* remove always pull policy for pgsql ms ([b43949b](https://github.com/NFDI4Chem/nmrxiv/commit/b43949b333c28f05761ac6f4758a32e2a4ab090f))
+* resolved bottom padding issue, added helper to resolve empty files in public projects issue and bug fix ([ac7ed13](https://github.com/NFDI4Chem/nmrxiv/commit/ac7ed131b1ad66b6ad6eac6b4dd789af565d8f9b))
+* strong typing ([2417b87](https://github.com/NFDI4Chem/nmrxiv/commit/2417b87aebdd32f9e5c832d42a5c181c75d0de3d))
+* unique username constrain added ([d8c3c0d](https://github.com/NFDI4Chem/nmrxiv/commit/d8c3c0dbc47e2dbda025a680a1342bd2b034d474))
+* unnecessary bottom padding removed in files view ([a305aab](https://github.com/NFDI4Chem/nmrxiv/commit/a305aab26cb3eb8b65b85fc6ef4e40417a17bedb))
+* update default values in api ([a34ce88](https://github.com/NFDI4Chem/nmrxiv/commit/a34ce885323e1659569d57ff19630639d478ec86))
+* update license's abbreviations ([37c60e1](https://github.com/NFDI4Chem/nmrxiv/commit/37c60e159b660928cc9adffb9ae4792d0208ffa0))
+* update php version in Dockerfile ([363abd0](https://github.com/NFDI4Chem/nmrxiv/commit/363abd0bb95724c3acdf59cc3878d465841199f5))
+* updated composer lock file ([3bc9c49](https://github.com/NFDI4Chem/nmrxiv/commit/3bc9c496bde2f48e22b7be4b24f39217d37a6a73))
+* updated molecules santise scripts ([6625be7](https://github.com/NFDI4Chem/nmrxiv/commit/6625be7074648f021fc50de5c7f00751ee95d54b))
+* updated php version to 8.2 to resolve symphony compatibility issues ([aa584e5](https://github.com/NFDI4Chem/nmrxiv/commit/aa584e5ebac7afad1b93600e27b2d744be1e3f62))
+* updated spectra search - molecule view ([12769f2](https://github.com/NFDI4Chem/nmrxiv/commit/12769f25bd71c404565ee9694b7139479c6a9dc5))
+* various minor updates ([f21d393](https://github.com/NFDI4Chem/nmrxiv/commit/f21d3935489d68010c258b949f2ba66822e50b61))
+
 ## [1.1.0-rc.16](https://github.com/NFDI4Chem/nmrxiv/compare/v1.0.0-rc.16...v1.1.0-rc.16) (2023-12-12)
 
 
