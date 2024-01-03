@@ -19,7 +19,7 @@ class XFrameOptions
 
         $option = 'SAMEORIGIN';
 
-        if ($request->routeIs('embed')) {
+        if ($request->route()->getName() == 'embed') {
             $xframeOptions = env('X_FRAME_OPTIONS', $option);
             if ($xframeOptions) {
                 $host = $request->getHttpHost();
