@@ -319,7 +319,7 @@ class ProjectController extends Controller
                 $validation->process();
                 $validation = $validation->fresh();
                 if ($validation['report']['project']['status']) {
-                    $project->release_date = $request->get('releaseDate');
+                    $project->release_date = $request->get('release_date');
                     $project->status = 'queued';
                     $project->save();
 
@@ -340,7 +340,7 @@ class ProjectController extends Controller
                 $draft->project_enabled = false;
                 $draft->save();
 
-                $project->release_date = $request->get('releaseDate');
+                $project->release_date = $request->get('release_date');
                 $project->status = 'queued';
                 $project->save();
 
@@ -419,8 +419,12 @@ class ProjectController extends Controller
             ]);
         }
 
-        $creator->delete($project);
+        if ($project->status = 'processing' || $project->status = 'queued') {
+            return redirect()->route('dashboard')->with('error', 'It is not possible to delete a project that is currently being processed or queued.');
+        } else {
+            $creator->delete($project);
 
-        return redirect()->route('dashboard')->with('success', 'Project deleted successfully');
+            return redirect()->route('dashboard')->with('success', 'Project deleted successfully');
+        }
     }
 }

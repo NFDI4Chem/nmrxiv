@@ -551,27 +551,31 @@
                                                                         "
                                                                     ></Depictor2D>
                                                                 </div>
-                                                                <a>
-                                                                    {{
-                                                                        study.name
-                                                                    }}</a
+                                                                <div
+                                                                    class="px-2 pb-1"
                                                                 >
-                                                                <span
-                                                                    v-if="
-                                                                        study
-                                                                            .sample
-                                                                            .molecules
-                                                                            .length >
-                                                                        0
-                                                                    "
-                                                                    class="float-right"
-                                                                >
-                                                                    <img
-                                                                        class="flex-shrink-0 -mt-0.5 h-6 w-6 text-blue-gray-400"
-                                                                        src="https://upload.wikimedia.org/wikipedia/sco/3/35/ChEBI_logo.png"
-                                                                        alt=""
-                                                                    />
-                                                                </span>
+                                                                    <a>
+                                                                        {{
+                                                                            study.name
+                                                                        }}</a
+                                                                    >
+                                                                    <span
+                                                                        v-if="
+                                                                            study
+                                                                                .sample
+                                                                                .molecules
+                                                                                .length >
+                                                                            0
+                                                                        "
+                                                                        class="float-right"
+                                                                    >
+                                                                        <img
+                                                                            class="flex-shrink-0 -mt-0.5 h-6 w-6 text-blue-gray-400"
+                                                                            src="https://upload.wikimedia.org/wikipedia/sco/3/35/ChEBI_logo.png"
+                                                                            alt=""
+                                                                        />
+                                                                    </span>
+                                                                </div>
 
                                                                 <div
                                                                     class="mt-1 text-blue-gray-500"
@@ -587,22 +591,23 @@
                                                                                 study.has_nmrium
                                                                                     ? 'bg-green-100 text-gray-800'
                                                                                     : 'bg-gray-100 text-gray-800',
-                                                                                'mb-0.5 inline-flex truncate break-words items-center px-3 py-0.5 rounded-full text-xs font-medium mr-1',
+                                                                                'mb-0.5 truncate break-words items-center px-3 py-0.5 rounded-full text-xs font-medium mr-1',
                                                                             ]"
                                                                         >
-                                                                            <span
-                                                                                >{{
+                                                                            <div>
+                                                                                {{
                                                                                     ds.name
                                                                                 }}
                                                                                 <span
+                                                                                    class="uppercase"
                                                                                     v-if="
                                                                                         ds.type
                                                                                     "
                                                                                     >({{
                                                                                         ds.type
                                                                                     }})</span
-                                                                                ></span
-                                                                            >
+                                                                                >
+                                                                            </div>
                                                                         </div>
                                                                     </span>
                                                                 </div>
@@ -1127,10 +1132,9 @@
                                                                                                         >
                                                                                                             <div>
                                                                                                                 <div
-                                                                                                                    class="text-sm"
+                                                                                                                    class="text-sm break-words"
                                                                                                                 >
                                                                                                                     <a
-                                                                                                                        href="#"
                                                                                                                         class="font-medium text-gray-900"
                                                                                                                         >{{
                                                                                                                             molecule.standard_inchi
@@ -1139,7 +1143,7 @@
                                                                                                                 </div>
                                                                                                             </div>
                                                                                                             <div
-                                                                                                                class="mt-2 text-sm text-gray-700"
+                                                                                                                class="mt-2 text-sm"
                                                                                                             >
                                                                                                                 <div
                                                                                                                     class="rounded-md border mb-3"
@@ -1398,7 +1402,7 @@
                                                                                 >
                                                                                     <label
                                                                                         for="description"
-                                                                                        class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
+                                                                                        class="block text-sm font-medium text-gray-700"
                                                                                     >
                                                                                         Sample
                                                                                         Description
@@ -1986,6 +1990,7 @@ export default {
                 });
         },
         closeDraft() {
+            this.loadingStep = true;
             this.fetchValidations().then(() => {
                 if (this.validationStatus) {
                     this.loadingStep = true;
@@ -2004,18 +2009,13 @@ export default {
                             this.validation = this.parseJSON(
                                 response.data.validation.report
                             );
-                            // this.validationStatus = true;
-                            // this.validation.project.studies.forEach((study) => {
-                            //     if (study.status == false) {
-                            //         this.validationStatus = false;
-                            //     }
-                            // });
                             if (this.project) {
                                 window.location =
                                     "/publish/" + this.currentDraft.id;
                             }
                         });
                 } else {
+                    this.loadingStep = false;
                     this.showSamplesSummary();
                     alert(
                         "Samples validation failed: Please provide all meta data to proceed"
