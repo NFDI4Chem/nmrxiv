@@ -123,7 +123,11 @@
 
             <!-- Orcid Id -->
             <div class="col-span-6 sm:col-span-4">
-                <jet-label for="orcid" value="ORCID iD" />
+                <jet-label
+                    class="after:content-['(optional)'] after:ml-0.5 after:text-gray-500"
+                    for="orcid"
+                    value="ORCID iD"
+                />
                 <div class="mt-1 flex rounded-md shadow-sm">
                     <div
                         class="relative flex items-stretch flex-grow focus-within:z-10"
@@ -154,6 +158,26 @@
                     </div>
                 </div>
                 <jet-input-error :message="error.orcid" class="mt-2" />
+            </div>
+
+            <!-- Affiliation -->
+            <div class="col-span-6 sm:col-span-4">
+                <jet-label
+                    class="after:content-['(optional)'] after:ml-0.5 after:text-gray-500"
+                    for="affiliation"
+                    value="Affiliation"
+                />
+                <jet-input
+                    id="affiliation"
+                    v-model="form.affiliation"
+                    type="text"
+                    class="mt-1 block w-full"
+                    autocomplete="affiliation"
+                />
+                <jet-input-error
+                    :message="form.errors.affiliation"
+                    class="mt-2"
+                />
             </div>
 
             <div v-if="!user" class="col-span-6 sm:col-span-4">
@@ -209,10 +233,11 @@
         </template>
     </jet-form-section>
     <!-- Find ORCID iD Modal -->
-    <!-- <select-orcid-id
+    <select-orcid-id
         ref="selectOrcidIdElement"
-        :orcidId="form.orcid_id"
-    /> -->
+        v-model:orcidId="form.orcid_id"
+        v-model:affiliation="form.affiliation"
+    />
 </template>
 
 <script>
@@ -224,6 +249,7 @@ import JetLabel from "@/Jetstream/Label.vue";
 import JetActionMessage from "@/Jetstream/ActionMessage.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import SelectOrcidId from "@/Shared/SelectOrcidId.vue";
+import { ref } from "vue";
 
 export default {
     components: {
@@ -235,6 +261,14 @@ export default {
         JetLabel,
         JetSecondaryButton,
         SelectOrcidId,
+        ref,
+    },
+
+    setup() {
+        const selectOrcidIdElement = ref(null);
+        return {
+            selectOrcidIdElement,
+        };
     },
 
     props: ["user"],
@@ -248,6 +282,7 @@ export default {
                 email: this.user ? this.user.email : "",
                 username: this.user ? this.user.username : "",
                 orcid_id: this.user ? this.user.orcid_id : "",
+                affiliation: this.user ? this.user.affiliation : "",
                 password: null,
                 password_confirmation: null,
                 terms: true,
