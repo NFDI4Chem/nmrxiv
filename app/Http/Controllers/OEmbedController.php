@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\DatasetResource;
 use App\Http\Resources\StudyResource;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -60,6 +61,12 @@ class OEmbedController extends Controller
                 ]);
             } elseif ($namespace == 'Dataset') {
                 $dataset = $model;
+                $study = $dataset->study;
+
+                return Inertia::render('Public/Embed/Dataset', [
+                    'study' => (new StudyResource($study))->lite(false, ['tags', 'sample', 'datasets', 'molecules', 'owner', 'license']),
+                    'dataset' => (new DatasetResource($dataset)),
+                ]);
             }
         }
     }

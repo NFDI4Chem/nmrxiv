@@ -84,12 +84,13 @@ class Project extends Model implements Auditable
     {
         if ($this->is_public) {
             return true;
+        } else {
+            if ($this->release_date && $this->doi) {
+                return Carbon::now()->startOfDay()->gte($this->release_date);
+            } else {
+                return false;
+            }
         }
-        //  else {
-        // if ($this->release_date) {
-        //     return ! Carbon::now()->startOfDay()->gte($this->release_date);
-        // }
-        // }
 
         return false;
     }
@@ -266,7 +267,7 @@ class Project extends Model implements Auditable
     protected function getPublicUrlAttribute()
     {
         // return env('APP_URL', null).'/projects/'.$this->owner->username.'/'.urlencode($this->slug);
-        return env('APP_URL', null).'/P'.$this->getAttributes()['identifier'];
+        return env('APP_URL', null).'/P'.$this->getRawOriginal('identifier');
     }
 
     protected function getPrivateUrlAttribute()

@@ -18,7 +18,7 @@ class AddStudyMember
      * @param  mixed  $study
      * @return void
      */
-    public function add($user, $study, string $email, string $role = null)
+    public function add($user, $study, string $email, ?string $role = null)
     {
         Gate::forUser($user)->authorize('addStudyMember', $study);
 

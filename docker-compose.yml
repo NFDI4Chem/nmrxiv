@@ -27,7 +27,6 @@ services:
         #   - minio
     pgsql:
         image: "informaticsmatters/rdkit-cartridge-debian:latest"
-        pull_policy: always
         ports:
             - "${FORWARD_DB_PORT:-5432}:5432"
         environment:
