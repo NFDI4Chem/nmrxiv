@@ -17,22 +17,10 @@ class XFrameOptions
     {
         $response = $next($request);
 
-        $option = 'SAMEORIGIN';
-
         if ($request->route()->getName() == 'embed') {
-            $xframeOptions = env('X_FRAME_OPTIONS', $option);
-            if ($xframeOptions) {
-                $host = $request->getHttpHost();
-                $xframeOptions = str_replace('*', $host, $xframeOptions);
-                if (strpos($xframeOptions, 'ALLOW-FROM') !== false) {
-                    $url = trim(str_replace('ALLOW-FROM', '', $xframeOptions));
-                    $response->header('Content-Security-Policy', 'frame-ancestors '.$url);
-                }
-            }
-        } else {
-            $xframeOptions = $option;
+            $response->header('Content-Security-Policy', 'frame-ancestors frame-src data: blob: *');
         }
 
-        return $response->header('X-Frame-Options', $xframeOptions);
+        return $response;
     }
 }
