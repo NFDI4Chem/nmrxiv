@@ -18,9 +18,11 @@ class XFrameOptions
         $response = $next($request);
 
         if ($request->route()->getName() == 'embed') {
-            $response->header('Content-Security-Policy', "default-src 'self'; base-uri 'self'; block-all-mixed-content; frame-src data: blob: *; img-src 'self'; style-src 'unsafe-inline' *;");
-        }
+            return $response->header('Content-Security-Policy', "default-src 'self'; base-uri 'self'; block-all-mixed-content; frame-src data: blob: *; img-src 'self'; style-src 'unsafe-inline' *;");
+        } else {
+            $xframeOptions = 'SAMEORIGIN';
 
-        return $response;
+            return $response->header('X-Frame-Options', $xframeOptions);
+        }
     }
 }
