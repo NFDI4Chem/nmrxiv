@@ -226,7 +226,7 @@
                                 >
                                 <span class="block text-teal-200"
                                     >NMR spectroscopy data repository and
-                                    analysis platform. test</span
+                                    analysis platform.</span
                                 >
                             </h1>
                             <p
