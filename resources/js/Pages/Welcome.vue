@@ -306,11 +306,11 @@
                                     >{{ spectra }} Spectra</span
                                 >
                             </p>
-                            <p>
+                            <!-- <p>
                                 <span class="block text-2xl font-bold"
                                     >{{ techniques }} Techniques</span
                                 >
-                            </p>
+                            </p> -->
                         </div>
                     </div>
                 </div>
