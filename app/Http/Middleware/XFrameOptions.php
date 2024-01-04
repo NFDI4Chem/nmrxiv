@@ -18,7 +18,7 @@ class XFrameOptions
         $response = $next($request);
 
         if ($request->route()->getName() == 'embed') {
-            $response->header('Content-Security-Policy', 'frame-ancestors frame-src data: blob: *');
+            $response->header("Content-Security-Policy', 'default-src 'self'; base-uri 'self'; block-all-mixed-content; frame-src data: blob: *; img-src 'self'; style-src 'unsafe-inline' *;");
         }
 
         return $response;
