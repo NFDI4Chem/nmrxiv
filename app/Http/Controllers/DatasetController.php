@@ -86,9 +86,9 @@ class DatasetController extends Controller
                         $experiment = $spectrum['info']['experiment'];
                         $nucleus = $spectrum['info']['nucleus'];
                         if (is_array($nucleus)) {
-                            $nucleus = implode('-', $nucleus);
+                            $nucleus = implode('-', trim($nucleus));
                         }
-                        $dataset->type = $experiment.','.$nucleus;
+                        $dataset->type = $experiment.':'.$nucleus;
                     }
                 }
 

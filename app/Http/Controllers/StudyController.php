@@ -245,10 +245,10 @@ class StudyController extends Controller
                         if ($experimentDetailsExists) {
                             $experiment = $spectra['info']['experiment'];
                             $nucleus = $spectra['info']['nucleus'];
-                            if (is_array($nucleus)) {
-                                $nucleus = implode('-', $nucleus);
+                            if (! is_string($nucleus)) {
+                                $nucleus = str_replace(' ', '', implode('-', $nucleus));
                             }
-                            array_push($type, $experiment.' - '.$nucleus);
+                            array_push($type, $experiment.':'.$nucleus);
                         }
                         $pathsMatch = false;
                     }
