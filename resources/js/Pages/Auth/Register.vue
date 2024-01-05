@@ -134,7 +134,7 @@
                 <jet-input-error :message="error.orcid" class="mt-2" />
             </div>
             <!-- Affiliation -->
-            <div class="col-span-6 sm:col-span-4">
+            <div class="mt-4 col-span-6 sm:col-span-4">
                 <jet-label
                     class="after:content-['(optional)'] after:ml-0.5 after:text-gray-500"
                     for="affiliation"
