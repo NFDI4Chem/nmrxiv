@@ -24,6 +24,12 @@ def main():
     rename_folders()
     structure_folders()
     delete_empty_folders(os.getcwd())
+    d= counter()
+    print('The number of molecules with both 1D and 2D spectra is: ' + d[0])
+    print('The number of molecules with only 2D spectra is: ' + d[1])
+    print('The number of molecules with only 1D spectra is: ' + d[2])
+    
+    
     print('\nThe process has ended successfully')
 if __name__ == "__main__":
     sys.exit(main())

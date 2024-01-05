@@ -31,6 +31,15 @@ def get_sdf_as_SDMolSupplier(url, name):
     
     return SDMolSupplier(name)
 
+"""NMRshiftDB Import Helpers.
+
+This module includes functions used to export NMRShiftDB database as an SDF file with NMReData entries,
+which are to detect the locations of the raw NMR files and download them too. 
+Finally, the downloaded files are unzipped and restructured for nmrXiv submission.
+""" 
+
+
+
 def get_authors(mol):
     """Returns the authors from the corresponding tag in an rdkit.Chem.rdchem Mol (mol)"""
     
@@ -87,8 +96,10 @@ def get_name(mol):
         'Parasorbic acid', 'patchouli alcohol', 'Limonene', '-Thujone', 'Galantamine', 'Shikimic acid',
         'Ibuprofen', 'Nicotine', 'beta-Thujone', 'Sorbic acid', 'Brazilein', 'Pulegone',
         'EUGENOL', 'Chitosamine', 'Abietic acid', 'Friedelin',  'Arbutin', 
-        'beta Glucosamine Hydrochloride','-D-Glucopyranoside', '-D-Mannopyranoside', '-D-Galactopyranoside',
-          '-D-Glucopyranoside', 'beta Lactose']
+        'beta Glucosamine Hydrochloride','beta Lactose']
+    
+    nils = ['beta-D-Glucopyranoside', 'beta-D-Galactopyranoside', 'alpha-D-Mannopyranoside', 
+            'alpha-D-Glucopyranoside', 'alpha-D-Galactopyranoside']
     
     name = Mol.GetProp(mol, 'CHEMNAME')
     
@@ -103,7 +114,14 @@ def get_name(mol):
                 name = synonym 
                 break
         else:
-            name = name[:name.find('; ')]
+            if 'beta;-D-' in name or 'alpha;-D-' in name:
+                name = name.replace(';', '')
+                for synonym in nils:
+                    if synonym in name:
+                        name = synonym 
+                        break
+            else:
+                name = name[:name.find('; ')]
     elif '  ' in name:
         name = name[:name.find('  ')]
     
@@ -175,7 +193,7 @@ def download_zips(MolSupplier):
     number_of_projects =0
     number_of_molecules =0
     number_of_spectra =0
-    number_of_3d = 0
+
     
 
     for mol in MolSupplier:
@@ -203,9 +221,6 @@ def download_zips(MolSupplier):
 
         tag_links = get_links(mol)
         number_of_spectra += len(tag_links)
-        if any('1D' in key for key in tag_links) and any('2D' in key for key in tag_links):
-            number_of_3d +=1
-        
  
         for tag in tag_links:
             if not os.path.exists(tag):
@@ -216,9 +231,7 @@ def download_zips(MolSupplier):
         os.chdir("../../..")
         
         
-    return [number_of_projects, number_of_molecules, number_of_spectra, number_of_3d]
-
-
+    return [number_of_projects, number_of_molecules, number_of_spectra]
 
 def unzipper():
     """Create folders for each dataset and unzip the downloaded spectrum file there. 
@@ -276,20 +289,24 @@ def get_Bruker_number(innerFolder):
         if line[-1] == '/':
             line = line[:-1]
         line = line[line.rfind('/')+1:]
-        return line
+        
     else:
-        print(innerFolder)
-        pass
-    pass
+        line = -1
+    
+    return line
+    
+    
+
 
 def rename_folders():
 
     """Rename the Bruker folders for spectra that were initially named by users to 
     their original instrument name."""
-    
+    n = 0
     for authors in os.listdir("./"):
         if os.path.isdir("./" + authors):
             project_folder = os.getcwd() + '/' + authors
+            print(authors)
             for molecule in os.listdir(project_folder):
                 if os.path.isdir(project_folder + '/' + molecule):
                     study_folder = project_folder + '/' + molecule
@@ -319,8 +336,16 @@ def rename_folders():
                                             for item2 in os.listdir(innerFolder):                
                                                     if os.path.isdir(innerFolder + '/' + item2):
                                                         innerFolder +=  '/' + item2
+                                        
+                                        if "acqu" not in os.listdir(innerFolder):
+                                            if "PROTON" in innerFolder:
+                                                n = "1"
+                                            elif "CARBON" in innerFolder:
+                                                n = "2"
+                                        else:
+                                            n = get_Bruker_number(innerFolder)
+                                        print(n)
                                         suffix = innerFolder[innerFolder.rfind("/")+1:]
-                                        n = get_Bruker_number(innerFolder)
                                         target = innerFolder[:innerFolder.rfind(suffix)] +n
                                         os.rename(innerFolder, target)
                                         tags_dict[item] = n
@@ -406,4 +431,38 @@ def delete_empty_folders(root):
             deleted.add(current_dir)
 
     return deleted
+
+def counter():
+    
+    d3 = 0
+    d2 = 0
+    d1 = 0
+    for authors in os.listdir("./"):
+        if os.path.isdir("./" + authors):
+            project_folder = os.getcwd() + '/' + authors
+            for molecule in os.listdir(project_folder):
+                if os.path.isdir(project_folder + '/' + molecule):
+                    study_folder = project_folder + '/' + molecule
+                    d_dict = {'d3':0, 'd2':0,'d1':0}
+                    for item in os.listdir(study_folder):
+                        if 'nmredata' in item:
+                            nmredata = study_folder + '/' + item
+                            mol = SDMolSupplier(nmredata)[0]
+                            spectra_tags = [tag for tag in mol.GetPropNames() if "1D" in tag or "2D" in tag]
+
+                            if any('1D' in tag for tag in spectra_tags) and any('2D' in tag for tag in spectra_tags):
+                                d_dict['d3'] += 1
+                            elif any('2D' in tag for tag in spectra_tags):
+                                 d_dict['d2'] += 1
+                            elif any('1D' in tag for tag in spectra_tags):
+                                d_dict['d1'] += 1
+                    if (d_dict['d3'] > 0) or (d_dict['d2'] > 0 and d_dict['d1'] > 0):
+                        d3 += 1
+                    elif d_dict['d2'] > 0 and d_dict['d3'] == 0: 
+                        d2 += 1
+                    elif d_dict['d1'] > 0 and d_dict['d3'] == 0:
+                        d1 += 1
+                    else:
+                        print(study_folder)
+    return [d3,d2,d1]
                   
