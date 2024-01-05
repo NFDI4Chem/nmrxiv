@@ -588,7 +588,7 @@
                                                                     >
                                                                         <div
                                                                             :class="[
-                                                                                study.has_nmrium
+                                                                                ds.has_nmrium
                                                                                     ? 'bg-green-100 text-gray-800'
                                                                                     : 'bg-gray-100 text-gray-800',
                                                                                 'mb-0.5 truncate break-words items-center px-3 py-0.5 rounded-full text-xs font-medium mr-1',
