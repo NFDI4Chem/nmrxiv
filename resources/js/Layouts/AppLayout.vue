@@ -110,7 +110,7 @@
         </TransitionRoot>
         <div
             v-if="collapseSidebar"
-            class="hidden fixed bg-white border-r md:flex md:flex-shrink-0 md:inset-y-0 z-10"
+            class="hidden fixed bg-white border-r md:flex md:flex-shrink-0 md:inset-y-0 z-20"
         >
             <div class="flex flex-col w-20">
                 <div class="flex-1 flex flex-col min-h-0 overflow-y-auto">
@@ -158,7 +158,7 @@
         </div>
         <div
             v-if="!collapseSidebar"
-            class="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 z-10"
+            class="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 z-20"
         >
             <div
                 class="flex flex-col flex-grow border-r border-gray-200 bg-white overflow-y-auto"
@@ -253,7 +253,7 @@
             ]"
         >
             <div
-                class="sticky top-0 z-10 flex-shrink-0 flex h-16 bg-white shadow"
+                class="sticky top-0 z-20 flex-shrink-0 flex h-16 bg-white shadow"
             >
                 <button
                     type="button"
