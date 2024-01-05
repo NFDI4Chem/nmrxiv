@@ -186,6 +186,7 @@ export default {
                                     ];
                                     this.selectedSpectraData.spectra.forEach(
                                         (spec) => {
+                                            spec.info = spec["originalData"];
                                             delete spec["data"];
                                             delete spec["meta"];
                                             delete spec["originalData"];
