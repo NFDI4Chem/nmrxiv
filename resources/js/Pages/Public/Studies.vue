@@ -316,7 +316,7 @@
                             leave-to-class="transform opacity-0 scale-95"
                         >
                             <MenuItems
-                                class="origin-top-left absolute left-0 mt-2 w-40 rounded-md shadow-2xl bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
+                                class="origin-top-left absolute left-0 mt-2 w-40 rounded-md shadow-2xl bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10"
                             >
                                 <div class="py-1">
                                     <MenuItem
