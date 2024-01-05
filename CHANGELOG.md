@@ -1,5 +1,25 @@
 # Changelog
 
+## [1.0.1-rc.19](https://github.com/NFDI4Chem/nmrxiv/compare/v1.0.0-rc.19...v1.0.1-rc.19) (2024-01-05)
+
+
+### Bug Fixes
+
+* 'X-Frame-Options' to 'sameorigin' fix ([0cf285b](https://github.com/NFDI4Chem/nmrxiv/commit/0cf285b986e05f4847356f52b94eb31054bfe1a7))
+* ancestor header issue fix - allowing all domain iframe src embed ([ef7f306](https://github.com/NFDI4Chem/nmrxiv/commit/ef7f306aa34f567079103b4fa3d1cd5eeea968af))
+* auto-preprocessing issue fix ([c96c728](https://github.com/NFDI4Chem/nmrxiv/commit/c96c728c84da1e4952689a5785b497197c9e13ec))
+* CSP issue fix ([b933085](https://github.com/NFDI4Chem/nmrxiv/commit/b93308532abb5e3661a2286827411171fac8a2de))
+* css classes issue fix ([e051ad5](https://github.com/NFDI4Chem/nmrxiv/commit/e051ad5d4b25ff446692a58b1e8dbffb851275bb))
+* enabled height and width props in spectral viewer component ([d348640](https://github.com/NFDI4Chem/nmrxiv/commit/d348640bddde0849426b49307b77e721a0f3846e))
+* frame src enabled ([bc7d7ef](https://github.com/NFDI4Chem/nmrxiv/commit/bc7d7ef7d16fc25af04e045948e58946e7f382da))
+* hid static stars ([2d22729](https://github.com/NFDI4Chem/nmrxiv/commit/2d227290d6ab123c4e30ef15ef4b39c48f500891))
+* removed test message ([f9172fe](https://github.com/NFDI4Chem/nmrxiv/commit/f9172fee39099dd2d3aa5f7831c37369832c9692))
+* revert checkout action to 2 ([0fcaae7](https://github.com/NFDI4Chem/nmrxiv/commit/0fcaae7078fb328026522a80e0b9b50bdc97555f))
+* techniques hidden ([ffac34f](https://github.com/NFDI4Chem/nmrxiv/commit/ffac34ff19efc96db0f95aed4559c8293457d8fb))
+* Too few arguments to function fix ([c8f4790](https://github.com/NFDI4Chem/nmrxiv/commit/c8f479005102d90778a13eacf230c8e4093f8b22))
+* update checkout action ([8ca8c11](https://github.com/NFDI4Chem/nmrxiv/commit/8ca8c11e777bada1b265d53a05330d520b874156))
+* various styling updates and error handling changes on spectra editor ([2d5760b](https://github.com/NFDI4Chem/nmrxiv/commit/2d5760b2dee36738eda3309ab09bc57dfc4c084d))
+
 ## [1.0.1-rc.18](https://github.com/NFDI4Chem/nmrxiv/compare/v1.0.0-rc.18...v1.0.1-rc.18) (2024-01-03)
 
 
