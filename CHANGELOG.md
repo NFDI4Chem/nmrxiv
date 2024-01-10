@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1-rc.20](https://github.com/NFDI4Chem/nmrxiv/compare/v1.0.0-rc.20...v1.0.1-rc.20) (2024-01-10)
+
+
+### Bug Fixes
+
+* add NMRium info checks ([53b0f03](https://github.com/NFDI4Chem/nmrxiv/commit/53b0f036419c26728a72731f765caad1aa381a8c))
+
 ## [1.0.1-rc.19](https://github.com/NFDI4Chem/nmrxiv/compare/v1.0.0-rc.19...v1.0.1-rc.19) (2024-01-05)
 
 
