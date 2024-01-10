@@ -203,7 +203,7 @@
                     "public"
                 ],
                 "summary": "Fetch all models",
-                "description": "Fetch details for all publicly available models on nmrXiv.",
+                "description": "Fetch details for all publicly available models (i.e. projects, samples, datasets) on nmrXiv.",
                 "operationId": "publicModels",
                 "parameters": [
                     {
@@ -212,7 +212,8 @@
                         "description": "data model",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "type": "string",
+                            "enum": ["projects", "samples", "datasets"]
                         }
                     }
                 ],
