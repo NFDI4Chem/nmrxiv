@@ -213,7 +213,11 @@
                         "required": true,
                         "schema": {
                             "type": "string",
-                            "enum": ["projects", "samples", "datasets"]
+                            "enum": [
+                                "projects",
+                                "samples",
+                                "datasets"
+                            ]
                         }
                     }
                 ],
