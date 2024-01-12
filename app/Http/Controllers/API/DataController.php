@@ -56,7 +56,6 @@ class DataController extends Controller
                     ->where('is_public', true)
                     ->allowedSorts($allowedSorts)
                     ->allowedFilters($allowedFilters)
-                    ->defaultSort($defaultSort)
                     ->paginate($per_page)
                     ->appends(request()->query())
             );
@@ -66,7 +65,6 @@ class DataController extends Controller
                     ->where('is_public', true)
                     ->allowedSorts($allowedSorts)
                     ->allowedFilters($allowedFilters)
-                    ->defaultSort($defaultSort)
                     ->paginate($per_page)
                     ->appends(request()->query())
             );
@@ -76,7 +74,6 @@ class DataController extends Controller
                     ->where('is_public', true)
                     ->allowedSorts($allowedSorts)
                     ->allowedFilters($allowedFilters)
-                    ->defaultSort($defaultSort)
                     ->paginate($per_page)
                     ->appends(request()->query())
             );
