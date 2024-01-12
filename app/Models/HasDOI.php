@@ -12,11 +12,8 @@ trait HasDOI
             $identifier = $this->getIdentifier($this, 'identifier');
 
             if ($this->doi == null) {
-
                 $suffix = null;
-
                 $url = 'https://www.nmrxiv.org/';
-
                 if ($this instanceof Project) {
 
                     $suffix = 'P'.$identifier;
@@ -68,6 +65,17 @@ trait HasDOI
 
     public function updateDOI($doiService)
     {
+        $doi_host = env('DOI_HOST', null);
+
+        if (! is_null($doi_host)) {
+            $doi = $this->doi;
+            if ($doi !== null) {
+                $attributes = $this->getMetadata();
+                $doiResponse = $doiService->updateDOI($doi, $attributes);
+                $this->datacite_schema = $doiResponse;
+                $this->save();
+            }
+        }
     }
 
     public function getIdentifier($model, $key)
