@@ -112,7 +112,7 @@
                 v-if="!readonly"
                 :class="[fullScreen ? 'px-6 py-4' : 'px-5', '']"
             >
-                <form class="py-2 mb-3">
+                <div class="py-2 mb-3">
                     <div id="fs-dropzone-message" class="text-center">
                         <div
                             type="button"
@@ -145,6 +145,19 @@
                                 >
                                     to "{{ $page.props.selectedFolder }}" folder
                                 </span>
+                                <form enctype="multipart/form-data">
+                                    or
+                                    <button
+                                        type="button"
+                                        class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white px-2 border border-blue-500 hover:border-transparent rounded"
+                                        id="fs-dropzone-click-target"
+                                    >
+                                        select files
+                                    </button>
+                                    <div
+                                        id="fs-dropzone-hidden-input-container"
+                                    ></div>
+                                </form>
                                 <div class="text-sm text-gray-400">
                                     Need help? Check out our
                                     <a
@@ -199,7 +212,7 @@
                             </div>
                         </div>
                     </div>
-                </form>
+                </div>
             </div>
             <div v-if="loading">
                 <div class="h-[calc(100vh-260px)] text-center py-12">
@@ -903,8 +916,11 @@ export default {
                     uploadMultiple: true,
                     disablePreviews: true,
                     parallelUploads: 100,
+                    useFsAccessApi: false,
                     autoQueue: false,
                     maxFiles: 20000,
+                    clickable: "#fs-dropzone-click-target",
+                    hiddenInputContainer: "#fs-dropzone-hidden-input-container",
                     dictDefaultMessage: document.querySelector(
                         "#fs-dropzone-message"
                     ).innerHTML,
