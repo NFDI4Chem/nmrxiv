@@ -14,16 +14,22 @@ class DashboardController extends Controller
         $user = $request->user();
         $team = $user->currentTeam;
         $projects = [];
+        $samples = [];
 
         if ($team) {
             $team->users = $team->allUsers();
             if (! $team->personal_team) {
                 $projects = Project::with('users', 'owner')->where([['team_id', $team->id], ['is_deleted', false]])->orderBy('updated_at', 'DESC')->get();
+                $samples = Study::with('users', 'owner', 'sample.molecules')->where([['project_id', null], ['team_id', $team->id], ['is_deleted', false]])->orderBy('updated_at', 'DESC')->get();
             } else {
                 $projects = Project::with('users', 'owner')->where([['owner_id', $user->id], ['is_deleted', false]])
                     ->where('team_id', $team->id)
                     ->orderBy('updated_at', 'DESC')
                     ->get();
+
+                $samples = Study::with('users', 'owner')->where([['project_id', null], ['owner_id', $user->id], ['is_deleted', false]])
+                    ->where('team_id', $team->id)
+                    ->orderBy('updated_at', 'DESC')->get();
             }
         }
 
@@ -31,6 +37,7 @@ class DashboardController extends Controller
             'filters' => $request->all('action', 'draft_id'),
             'team' => $team,
             'projects' => $projects->load('tags'),
+            'samples' => $samples->load('sample.molecules'),
             'teamRole' => $user->teamRole($team),
         ]);
     }
