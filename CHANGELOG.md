@@ -1,5 +1,28 @@
 # Changelog
 
+## [1.1.0-rc.21](https://github.com/NFDI4Chem/nmrxiv/compare/v1.0.0-rc.21...v1.1.0-rc.21) (2024-01-15)
+
+
+### Features
+
+* updated OA schema to include enum values ([8534f88](https://github.com/NFDI4Chem/nmrxiv/commit/8534f882205559ab8e224b5b677bcd59d17c8be2))
+
+
+### Bug Fixes
+
+* added is_null check to request photo to avoid 500 error ([be04a3e](https://github.com/NFDI4Chem/nmrxiv/commit/be04a3e993ada4c210d0fbc97e9f6934df119584))
+* enabled file select ([e1680fa](https://github.com/NFDI4Chem/nmrxiv/commit/e1680fa5e0fafeb83547da8fa24b245c4cf0d3b8))
+* enabled select files on click ([16397a3](https://github.com/NFDI4Chem/nmrxiv/commit/16397a3193e3cf89aea3d82ea9450f7e477a34f7))
+* Issues with default sort (disabled for now) ([574b4f3](https://github.com/NFDI4Chem/nmrxiv/commit/574b4f374df7439ed9a57112d88bdf0e5278d988))
+* published project policy issues fix ([f03801f](https://github.com/NFDI4Chem/nmrxiv/commit/f03801f6085e4ff88dc7d32e43fe1f83718a5743))
+* removed deleted word concatenation to project name upon deletion ([0776172](https://github.com/NFDI4Chem/nmrxiv/commit/0776172eb084b8539e7d402dda443819af4448b2))
+* resolve cooloff period value. ([201f6ff](https://github.com/NFDI4Chem/nmrxiv/commit/201f6ff017ac57b83aba20e02e75aceef83931e3)), closes [#1014](https://github.com/NFDI4Chem/nmrxiv/issues/1014)
+* resolved [#1018](https://github.com/NFDI4Chem/nmrxiv/issues/1018) ([677eb54](https://github.com/NFDI4Chem/nmrxiv/commit/677eb54f9ac48f0692b2b55f0f7424c4084387a8))
+* resolved permanent loading screen while navigation forward and backward between steps ([1447070](https://github.com/NFDI4Chem/nmrxiv/commit/14470702ecc728dc6062028d5eb67fdf14d7f804))
+* resolves [#1010](https://github.com/NFDI4Chem/nmrxiv/issues/1010) ([12a1363](https://github.com/NFDI4Chem/nmrxiv/commit/12a13630f5cbfd1587e204adc0ed2e10956f871d))
+* resolves [#996](https://github.com/NFDI4Chem/nmrxiv/issues/996) ([4471c3b](https://github.com/NFDI4Chem/nmrxiv/commit/4471c3b87f99053b08975bc4b2a26aaec1d1089a))
+* side bar layout changes ([a4b80f2](https://github.com/NFDI4Chem/nmrxiv/commit/a4b80f2098ec5869932ac71d2f89f02f9dabf453))
+
 ## [1.0.1-rc.20](https://github.com/NFDI4Chem/nmrxiv/compare/v1.0.0-rc.20...v1.0.1-rc.20) (2024-01-10)
 
 
