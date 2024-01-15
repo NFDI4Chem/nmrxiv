@@ -14,15 +14,13 @@
                         >
                             <span
                                 v-if="
-                                    study.molecules[0] &&
-                                    study.molecules[0].canonical_smiles
+                                    molecules[0] &&
+                                    molecules[0].canonical_smiles
                                 "
                             >
                                 <Depictor2D
                                     class="py-2"
-                                    :molecule="
-                                        study.molecules[0].canonical_smiles
-                                    "
+                                    :molecule="molecules[0].canonical_smiles"
                                     :show-download="false"
                                 ></Depictor2D>
                             </span>
@@ -127,12 +125,17 @@ export default {
         Depictor2D,
     },
     props: ["study"],
-    setup() {},
     data() {
         return {
             selectedPreviewIndex: 0,
         };
     },
-    methods: {},
+    computed: {
+        molecules() {
+            return this.study.molecules
+                ? this.study.molecules
+                : this.study.sample.molecules;
+        },
+    },
 };
 </script>
