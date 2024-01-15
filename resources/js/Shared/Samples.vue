@@ -1,7 +1,7 @@
 <template>
     <div>
         <div v-if="!loading && studies">
-            <div v-if="studies.length == 0">
+            <div v-if="studies.length > 0">
                 <div
                     class="mt-8 mx-auto max-w-md grid gap-8 sm:max-w-lg lg:grid-cols-3 lg:max-w-7xl"
                 >

@@ -386,7 +386,7 @@ class ProjectController extends Controller
             ]);
         }
 
-        if ($project->status = 'processing' || $project->status = 'queued') {
+        if ($project->status == 'processing' || $project->status == 'queued') {
             return redirect()->route('dashboard')->with('error', 'It is not possible to delete a project that is currently being processed or queued.');
         } else {
             $creator->delete($project);
