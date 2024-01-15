@@ -16,6 +16,7 @@
         "http-interop/http-factory-guzzle": "^1.2",
         "inertiajs/inertia-laravel": "^0.6.9",
         "lab404/laravel-impersonate": "^1.7",
+        "lacodix/laravel-model-filter": "^1.11",
         "larabug/larabug": "^3.0",
         "laravel/framework": "^10.0",
         "laravel/horizon": "^5.9",
