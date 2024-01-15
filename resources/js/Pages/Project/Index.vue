@@ -1,13 +1,13 @@
 <template>
     <div>
-        <div class="flex items-baseline justify-between">
+        <!-- <div class="flex items-baseline justify-between">
             <div id="tour-step-projects">
                 <h2 class="text-lg">Projects</h2>
-                <!-- <div class="mt-2 text-sm text-gray-700"> -->
-                <!-- <div class="max-w-2xl">You may house a variety of projects.</div> -->
-                <!-- </div> -->
+                <div class="mt-2 text-sm text-gray-700">
+                <div class="max-w-2xl">You may house a variety of projects.</div>
+                </div>
             </div>
-        </div>
+        </div> -->
         <span v-if="projects.length <= 0">
             <div v-if="mode == 'create' && editableTeamRole" class="mt-4">
                 <div class="px-6 py-4 bg-white shadow-md rounded-lg">
@@ -368,7 +368,7 @@
                             "
                             class="float mt-1 border-t px-3 py-0.5 -mx-6 mt-4 text-sm font-medium bg-yellow-100 text-red-800 capitalize"
                         >
-                            PUBLISHED -&emsp;
+                            &nbsp;&nbsp;
                             <b
                                 >Release date:
                                 {{ formatDate(project.release_date) }}</b

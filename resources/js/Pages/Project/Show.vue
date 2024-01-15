@@ -11,13 +11,14 @@
                 restore a deleted project within the 30-day recovery period.
             </div>
             <div
-                v-if="!project.is_public && project.is_published"
+                v-if="
+                    !project.is_public && !project.is_published && project.doi
+                "
                 class="text-center px-3 py-2 bg-green-50 text-green-700 border-b"
             >
-                <b>Info: </b> This project is published and set to be released
-                on {{ formatDate(project.release_date) }}. You cannot edit a
-                published project, please create a new version to updated the
-                project.
+                <b>Info: </b> This project is in embargo and set to be released
+                on {{ formatDate(project.release_date) }}. You cannot edit the
+                project, please create a new version to updated the project.
             </div>
             <div v-if="project.is_public">
                 <div
@@ -31,9 +32,9 @@
                     v-else
                     class="text-center px-3 py-2 bg-green-50 text-green-700 border-b"
                 >
-                    <b>Info: </b> This project is published. You cannot edit a
-                    published project, please create a new version to updated
-                    the project.
+                    <b>Info: </b> This project is archived. You cannot edit a
+                    archived project, please create a new version to updated the
+                    project.
                 </div>
             </div>
             <div v-if="project.is_public && project.doi != null">
@@ -325,17 +326,23 @@
                             v-if="
                                 !project.is_public &&
                                 !project.is_published &&
-                                !project.is_deleted
+                                !project.is_deleted &&
+                                !project.doi
                             "
                             class="flex-nowrap"
                         >
                             <Publish :project="project" />
                         </div>
-                        <div v-if="!project.is_public && project.is_published">
+                        <div
+                            v-if="
+                                !project.is_public &&
+                                !project.is_published &&
+                                project.doi
+                            "
+                        >
                             <span
-                                class="ml-4 inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-yellow-100 text-red-800 capitalize"
+                                class="ml-4 py-2 inline-flex items-center px-3 rounded-md text-sm font-medium bg-yellow-100 text-red-800 capitalize"
                             >
-                                PUBLISHED -&emsp;
                                 <b
                                     >Release date:
                                     {{ formatDate(project.release_date) }}</b
