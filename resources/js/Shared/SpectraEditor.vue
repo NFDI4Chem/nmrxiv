@@ -105,6 +105,7 @@ export default {
             resetInProgress: false,
             info: null,
             version: null,
+            eventRegistered: false,
         };
     },
     computed: {
@@ -124,12 +125,12 @@ export default {
         },
     },
     watch: {
-        dataset: {
-            immediate: true,
-            handler() {
-                this.loadSpectra();
-            },
-        },
+        // dataset: {
+        //     immediate: true,
+        //     handler() {
+        //         this.loadSpectra();
+        //     },
+        // },
         study: {
             immediate: true,
             handler() {
@@ -233,14 +234,14 @@ export default {
                     }
                 }
             };
-            if (!this.$props.eventRegistered) {
+            if (!this.eventRegistered) {
                 console.log("events registered");
                 window.addEventListener("message", saveNMRiumUpdates);
-                this.$props.eventRegistered = true;
+                this.eventRegistered = true;
             }
             // else {
-            // window.removeEventListener("message", saveNMRiumUpdates);
-            // this.$props.eventRegistered = false;
+            //     window.removeEventListener("message", saveNMRiumUpdates);
+            //     this.$props.eventRegistered = false;
             // }
         },
         loadSpectra() {
@@ -492,7 +493,7 @@ export default {
         updateLoadingStatus(status, message) {
             this.$emit("loading", {
                 status: status,
-                message: message,
+                message: message ? message : "",
             });
         },
         infoLog(message, reset) {

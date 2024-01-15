@@ -49,7 +49,10 @@ export default {
                 setTimeout(() => {
                     this.isVisible = false;
                 }, 2500);
-                this.copyToClipboard(this.doi, targetInput);
+                this.copyToClipboard(
+                    "https://doi.org/" + this.doi,
+                    targetInput
+                );
             }
         },
     },
