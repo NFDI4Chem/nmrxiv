@@ -131,25 +131,59 @@
                             aria-label="Sidebar"
                             class="flex flex-col items-center py-4 px-0"
                         >
-                            <Link
-                                v-for="item in filteredNavigation"
-                                :key="item.name"
-                                :href="item.href"
-                                :class="[
-                                    $page.url === item.href
-                                        ? ' border-r-4 bg-gray-200 border-r-black'
-                                        : '',
-                                    'w-full px-7 hover:bg-gray-700 hover:text-white group flex items-center py-3 text-sm font-medium ' +
-                                        item.bg,
-                                ]"
-                            >
-                                <component
-                                    :is="item.icon"
-                                    class="h-6 w-6"
-                                    aria-hidden="true"
-                                />
-                                <span class="sr-only"> {{ item.name }} </span>
-                            </Link>
+                            <div v-for="item in filteredNavigation">
+                                <div
+                                    v-if="!$page.props.user.first_name"
+                                    class="border-t"
+                                >
+                                    &nbsp;
+                                </div>
+                                <Link
+                                    :key="item.name"
+                                    :href="item.href"
+                                    v-if="item.name"
+                                    :class="[
+                                        $page.url === item.href
+                                            ? 'bg-gray-900 border-y text-white'
+                                            : 'bg-gray-200 border-y',
+                                        'w-full px-10 hover:bg-gray-700 hover:text-white group flex items-center py-4 text-md font-small ' +
+                                            item.bg,
+                                    ]"
+                                >
+                                    <component
+                                        :is="item.icon"
+                                        class="h-6 w-6"
+                                        aria-hidden="true"
+                                    />
+                                    <span class="sr-only">
+                                        {{ item.name }}
+                                    </span>
+                                </Link>
+                                <Link
+                                    v-for="child in item.children"
+                                    :id="child.id"
+                                    :key="child.name"
+                                    :href="child.href"
+                                    :class="[
+                                        $page.url === child.href
+                                            ? 'bg-gray-900 text-white'
+                                            : '',
+                                        'w-full px-10 hover:bg-gray-700 hover:text-white group flex items-center py-3 text-md font-small ' +
+                                            child.bg,
+                                    ]"
+                                >
+                                    <component
+                                        :is="child.icon"
+                                        class="h-6 w-6"
+                                        aria-hidden="true"
+                                    />
+                                    <span class="flex-1 sr-only">
+                                        {{ child.name }}
+                                    </span>
+                                </Link>
+                                <div class="border-b">&nbsp;</div>
+                                <div>&nbsp;</div>
+                            </div>
                         </nav>
                     </div>
                     <div class="flex-shrink-0 flex pb-5"></div>
@@ -195,22 +229,23 @@
                         <div
                             v-for="item in filteredNavigation"
                             :key="item.name"
-                            :class="[item.auth ? 'border-t' : '']"
+                            :class="[item.auth ? 'border-t pb-4' : '']"
                         >
                             <div
                                 v-if="item.prefix"
-                                class="p-2 bg-gray-100 text-gray-500 text-sm border-b"
+                                class="p-2 bg-gray-100 text-gray-500 text-sm border-y"
                             >
                                 {{ item.prefix }}
                             </div>
                             <Link
                                 :id="item.id"
                                 :href="item.href"
+                                v-if="item.name"
                                 :class="[
                                     $page.url === item.href
                                         ? ' border-r-4 bg-gray-200 border-r-black'
                                         : '',
-                                    'w-full px-7 hover:bg-gray-700 hover:text-white group flex items-center py-3 text-sm font-medium ' +
+                                    'w-full px-7 hover:bg-gray-700 hover:text-white group flex items-center py-3 text-md font-medium ' +
                                         item.bg,
                                 ]"
                             >
@@ -230,13 +265,13 @@
                                     $page.url === child.href
                                         ? ' border-r-4 bg-gray-200 border-r-black'
                                         : '',
-                                    'w-full px-10 hover:bg-gray-700 hover:text-white group flex items-center py-1.5 text-sm font-small ' +
+                                    'w-full px-10 hover:bg-gray-700 hover:text-white group flex items-center py-1.5 text-md font-small ' +
                                         child.bg,
                                 ]"
                             >
                                 <component
                                     :is="child.icon"
-                                    class="mr-3 ml-2 h-4 w-4"
+                                    class="mr-3 ml-2 h-5 w-5"
                                     aria-hidden="true"
                                 />
                                 <span class="flex-1"> {{ child.name }} </span>
@@ -489,19 +524,11 @@
                                         "
                                     >
                                         <div
-                                            v-if="
-                                                !$page.props.user.current_team
-                                                    .personal_team
-                                            "
                                             class="block px-4 pt-2 text-xs text-gray-400"
                                         >
                                             Personal Account
                                         </div>
                                         <form
-                                            v-if="
-                                                !$page.props.user.current_team
-                                                    .personal_team
-                                            "
                                             @submit.prevent="
                                                 switchToTeam(personalTeam)
                                             "
@@ -509,6 +536,25 @@
                                             <jet-dropdown-link as="button">
                                                 <div class="flex items-center">
                                                     <svg
+                                                        v-if="
+                                                            $page.props.user
+                                                                .current_team
+                                                                .personal_team
+                                                        "
+                                                        class="mr-2 h-5 w-5 text-green-400"
+                                                        fill="none"
+                                                        stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        stroke="currentColor"
+                                                        viewBox="0 0 24 24"
+                                                    >
+                                                        <path
+                                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                                        ></path>
+                                                    </svg>
+                                                    <svg
+                                                        v-else
                                                         class="mr-2 h-5 w-5 text-gray-400"
                                                         fill="none"
                                                         stroke-linecap="round"
@@ -521,6 +567,7 @@
                                                             d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                                                         ></path>
                                                     </svg>
+
                                                     <div>
                                                         {{
                                                             $page.props.user
@@ -740,27 +787,6 @@ const secondaryNavigation = [
 
 const navigation = [
     {
-        auth: false,
-        name: "Projects",
-        href: "/projects",
-        icon: FolderIcon,
-        bg: "bg-white",
-    },
-    {
-        auth: false,
-        name: "Spectra",
-        href: "/spectra",
-        icon: Squares2X2Icon,
-        bg: "bg-white",
-    },
-    {
-        auth: false,
-        name: "Compounds",
-        href: "/compounds",
-        icon: SwatchIcon,
-        bg: "bg-white",
-    },
-    {
         auth: true,
         name: "Dashboard",
         href: "/dashboard",
@@ -799,6 +825,32 @@ const navigation = [
                 href: "/dashboard/trashed",
                 id: "tour-step-trash",
                 icon: TrashIcon,
+                bg: "bg-white",
+            },
+        ],
+    },
+    {
+        prefix: "Public",
+        children: [
+            {
+                auth: false,
+                name: "Projects",
+                href: "/projects",
+                icon: FolderIcon,
+                bg: "bg-white",
+            },
+            {
+                auth: false,
+                name: "Spectra",
+                href: "/spectra",
+                icon: Squares2X2Icon,
+                bg: "bg-white",
+            },
+            {
+                auth: false,
+                name: "Compounds",
+                href: "/compounds",
+                icon: SwatchIcon,
                 bg: "bg-white",
             },
         ],
