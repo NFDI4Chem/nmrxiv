@@ -280,7 +280,7 @@ export default {
         },
         copyToClipboard(text, element) {
             if (typeof element == "string") {
-                document.getElementById(id).select();
+                document.getElementById(element).select();
             } else {
                 element.select();
             }
