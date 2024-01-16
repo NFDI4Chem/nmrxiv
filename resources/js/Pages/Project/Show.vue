@@ -341,12 +341,15 @@
                             "
                         >
                             <span
-                                class="ml-4 py-2 inline-flex items-center px-3 rounded-md text-sm font-medium bg-yellow-100 text-red-800 capitalize"
+                                class="ml-4 py-2 inline-flex items-center px-3 rounded-md text-sm font-medium bg-yellow-100 text-red-800 capitalize hover:bg-yellow-200"
                             >
                                 <button @click="showPublishDialog = true">
                                     Release date:
                                     {{ formatDate(project.release_date) }}
                                 </button>
+                                <PencilIcon
+                                    class="w-4 h-4 ml-2 text-gray-600"
+                                />
                             </span>
                         </div>
                     </div>
@@ -689,7 +692,9 @@
                                                 <jet-secondary-button
                                                     type="button"
                                                     class="ml-2"
-                                                    @click="showPublishDialog=false"
+                                                    @click="
+                                                        showPublishDialog = false
+                                                    "
                                                 >
                                                     Cancel
                                                 </jet-secondary-button>
