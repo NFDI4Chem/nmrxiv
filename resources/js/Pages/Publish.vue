@@ -962,18 +962,20 @@ export default {
             }
 
             if (this.publishForm.tag && this.publishForm.tag != "") {
-                let exists = false;
-                this.publishForm.tags.forEach((t) => {
-                    if (t.text == this.publishForm.tag) {
-                        exists = true;
+                this.publishForm.tag.split(",").forEach((_t) => {
+                    let exists = false;
+                    this.publishForm.tags.forEach((t) => {
+                        if (t.text == _t) {
+                            exists = true;
+                        }
+                    });
+                    if (!exists) {
+                        this.publishForm.tags.push({
+                            text: _t,
+                        });
                     }
                 });
-                if (!exists) {
-                    this.publishForm.tags.push({
-                        text: this.publishForm.tag,
-                    });
-                    this.publishForm.tag = "";
-                }
+                this.publishForm.tag = "";
             }
             this.loadingStep = true;
 
