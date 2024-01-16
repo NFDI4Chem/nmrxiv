@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.1.0-rc.22](https://github.com/NFDI4Chem/nmrxiv/compare/v1.0.0-rc.22...v1.1.0-rc.22) (2024-01-16)
+
+
+### Features
+
+* enable update of release date ([3469095](https://github.com/NFDI4Chem/nmrxiv/commit/3469095220ea34fba8571d94e10fbc01448219c8))
+
+
+### Bug Fixes
+
+* edit embargo confirmations message ([f1a37bd](https://github.com/NFDI4Chem/nmrxiv/commit/f1a37bd6d7b9ec492a8a7e0c7d05812dc4dca188))
+* resolves [#1007](https://github.com/NFDI4Chem/nmrxiv/issues/1007) ([cb4cb0f](https://github.com/NFDI4Chem/nmrxiv/commit/cb4cb0fe39897c03fee44b9b766331c2103163c6))
+* resolves [#999](https://github.com/NFDI4Chem/nmrxiv/issues/999) ([ae0de01](https://github.com/NFDI4Chem/nmrxiv/commit/ae0de014ca569295ef7d2ad4b1dfbe37cad33d42))
+
 ## [1.1.0-rc.21](https://github.com/NFDI4Chem/nmrxiv/compare/v1.0.0-rc.21...v1.1.0-rc.21) (2024-01-15)
 
 
