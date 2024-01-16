@@ -13,11 +13,11 @@
         >
             <template #study-section>
                 <div class="px-4 sm:px-6 md:px-0">
-                    <div v-if="selectedDataset && study.is_public" class="p-4">
+                    <div v-if="study.is_public" class="p-4">
                         <div class="float-right">
                             <div class="flex-0.5 self-center">
                                 <Menu
-                                    v-if="selectedDataset && study.is_public"
+                                    v-if="study.is_public"
                                     as="div"
                                     class="relative text-left"
                                 >
@@ -55,7 +55,7 @@
                                                     >
                                                         <div class="flex-grow">
                                                             <input
-                                                                id="datasetPublicURLCopy"
+                                                                id="studyPublicURLCopy"
                                                                 readonly
                                                                 type="text"
                                                                 :value="
@@ -73,7 +73,7 @@
                                                             @click="
                                                                 copyToClipboard(
                                                                     shareURL,
-                                                                    'datasetPublicURLCopy'
+                                                                    'studyPublicURLCopy'
                                                                 )
                                                             "
                                                         >
@@ -181,18 +181,16 @@
                             </div>
                         </div> -->
 
-                        <div v-if="selectedDataset" class="mb-7">
+                        <div class="mb-7">
                             <SpectraEditor
                                 v-if="canUpdateStudy"
                                 ref="spectraEditorREF"
-                                :dataset="selectedDataset"
                                 :project="project"
                                 :study="study"
                             ></SpectraEditor>
                             <SpectraViewer
                                 v-else
                                 ref="spectraViewerREF"
-                                :dataset="selectedDataset"
                                 :project="project"
                                 :study="study"
                             ></SpectraViewer>
@@ -280,7 +278,7 @@ export default {
             return String(this.$page.props.url);
         },
         shareURL() {
-            return this.selectedDataset.public_url;
+            return this.study.public_url;
         },
         canUpdateStudy() {
             return this.studyPermissions
@@ -289,17 +287,17 @@ export default {
         },
     },
     mounted() {
-        const urlSearchParams = new URLSearchParams(window.location.search);
-        const params = Object.fromEntries(urlSearchParams.entries());
-        let dsId = params["dsid"];
-        this.study.datasets.forEach((ds) => {
-            if (ds.id == dsId) {
-                this.selectedDataset = ds;
-            }
-        });
-        if (!this.selectedDataset) {
-            this.selectedDataset = this.study.datasets[0];
-        }
+        // const urlSearchParams = new URLSearchParams(window.location.search);
+        // const params = Object.fromEntries(urlSearchParams.entries());
+        // let dsId = params["dsid"];
+        // this.study.datasets.forEach((ds) => {
+        //     if (ds.id == dsId) {
+        //         this.selectedDataset = ds;
+        //     }
+        // });
+        // if (!this.selectedDataset) {
+        //     this.selectedDataset = this.study.datasets[0];
+        // }
         this.$nextTick(function () {
             if (this.$refs.spectraEditorREF) {
                 this.$refs.spectraEditorREF.registerEvents();
@@ -318,55 +316,6 @@ export default {
                     this.loading = false;
                 });
         }
-    },
-    methods: {
-        openDatasetCreateDialog() {
-            this.emitter.emit("openDatasetCreateDialog", {
-                draft_id: this.project.draft_id,
-                return_url: "/studies/" + this.study.id + "/datasets",
-            });
-        },
-        updateDataSet() {
-            if (this.selectedDataset) {
-                if (this.selectedSpectraData != null) {
-                    this.autoSaving = true;
-                    axios
-                        .post(
-                            "/dashboard/datasets/" +
-                                this.selectedDataset.id +
-                                "/nmriumInfo",
-                            {
-                                spectra: this.selectedSpectraData,
-                                molecules: this.currentMolecules,
-                            }
-                        )
-                        .catch((error) => {
-                            console.log(error.data);
-                        })
-                        .then((response) => {
-                            let i = 0;
-                            this.study.datasets.forEach((ds) => {
-                                if (ds.id == response.data.id) {
-                                    this.study.datasets[i] = response.data;
-                                    this.selectedDataset =
-                                        this.study.datasets[i];
-                                    if (this.selectedDataset.nmrium_info) {
-                                        let nmrium_info = JSON.parse(
-                                            this.selectedDataset.nmrium_info
-                                        );
-                                        if (nmrium_info) {
-                                            this.selectedSpectraData =
-                                                nmrium_info["spectra"];
-                                        }
-                                    }
-                                }
-                                i = i + 1;
-                            });
-                            this.autoSaving = false;
-                        });
-                }
-            }
-        },
     },
 };
 </script>
