@@ -88,7 +88,7 @@
                                 <div id="project-name" class="mb-3">
                                     <label
                                         for="project-name"
-                                        class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
+                                        class="block text-sm font-medium text-gray-500 after:content-['*'] after:ml-0.5 after:text-red-500"
                                     >
                                         Project Name
                                     </label>
@@ -109,7 +109,7 @@
                                 <div id="project-desc" class="mb-3">
                                     <label
                                         for="description"
-                                        class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
+                                        class="block text-sm font-medium text-gray-500 after:content-['*'] after:ml-0.5 after:text-red-500"
                                     >
                                         <span
                                             @click="
@@ -140,7 +140,7 @@
                                 <div id="project-keywords" class="mb-3">
                                     <label
                                         for="description"
-                                        class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
+                                        class="block text-sm font-medium text-gray-500 after:content-['*'] after:ml-0.5 after:text-red-500"
                                     >
                                         Keywords
                                     </label>
@@ -167,7 +167,7 @@
                                     <div id="project-organism" class="mb-3">
                                         <label
                                             for="description"
-                                            class="block text-sm font-medium text-gray-700"
+                                            class="block text-sm font-medium text-gray-500"
                                         >
                                             Organism (Optional)
                                         </label>
@@ -432,8 +432,12 @@
                                 @update:modelValue="updateProject"
                             ></Datepicker>
                             <p class="mt-1 text-sm text-gray-500">
-                                Publish your data now or choose a release date
-                                to auto publish your project to public.
+                                Publish your data now immediately or set a
+                                future release date to automatically make your
+                                project public. If you opt for a future release
+                                date, you have the flexibility to modify the
+                                publication date and choose to publish instantly
+                                from your project's dashboard view.
                             </p>
                         </div>
                         <div class="mt-5">
