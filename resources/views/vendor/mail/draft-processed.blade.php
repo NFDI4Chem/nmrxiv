@@ -28,6 +28,8 @@ Please find the details below.
 {{ __('Your submission is processed and your project **:projectName** would be auto-published on chosen release date :releaseDate', ['projectName' => $project->name , 'releaseDate' => $releaseDate]) }}
 
 You will recieve an email confirmation with further details once your project has been published successfully.
+
+You have the option to modify the release date or opt for an immediate publication by clicking on the 'View Project' button below. From there, you can click the release date and make any necessary updates.
 @endif
 
 Follow our [documentation](https://docs.nmrxiv.org/) to learn more.
