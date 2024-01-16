@@ -547,7 +547,27 @@
                     <div>
                         <div id="publish-details">&nbsp;</div>
                         <div class="px-8 pb-8 pt-0">
-                            <button
+                            <jet-success-button
+                                v-if="isReleasedToday()"
+                                type="button"
+                                :class="[
+                                    !publishForm.terms ||
+                                    !publishForm.conditions ||
+                                    publishForm.processing
+                                        ? 'bg-gray-200 cursor-not-allowed'
+                                        : 'bg-green-600 hover:bg-green-700',
+                                    'ml-2',
+                                ]"
+                                :disabled="
+                                    !publishForm.terms &&
+                                    !publishForm.conditions
+                                "
+                                @click="showPublishConfirmationModal = true"
+                            >
+                                Publish Now
+                            </jet-success-button>
+                            <jet-success-button
+                                v-else
                                 type="button"
                                 :class="[
                                     !publishForm.terms ||
@@ -563,14 +583,14 @@
                                 "
                                 @click="showPublishConfirmationModal = true"
                             >
-                                Publish
-                            </button>
+                                Publish with Embargo
+                            </jet-success-button>
                             <Link
                                 type="button"
                                 class="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
                                 :href="route('dashboard')"
                             >
-                                Not right yet
+                                NOT RIGHT YET
                             </Link>
                         </div>
                         <div v-if="errors">
@@ -708,14 +728,13 @@
                 @close="showPublishConfirmationModal = false"
             >
                 <template #title> Are you sure you want to publish? </template>
-
-                <template #content>
+                <template v-if="isReleasedToday()" #content>
                     Once the data is published you will no longer be able to
                     change the data uploaded! If published as a project, you may
-                    add more compounds (spectra) to the project later.
+                    add more samples (spectra) to the project later.
                 </template>
 
-                <template #footer>
+                <template v-if="isReleasedToday()" #footer>
                     <jet-secondary-button
                         @click="showPublishConfirmationModal = false"
                     >
@@ -723,6 +742,26 @@
                     </jet-secondary-button>
                     <jet-success-button class="ml-2" @click="publish">
                         Publish Now
+                    </jet-success-button>
+                </template>
+                <template v-if="!isReleasedToday()" #content>
+                    Opting for an Embargo publication grants your project a DOI,
+                    yet it stays private exclusively for you. You have the
+                    option to share the project with others and can adjust the
+                    release date or promptly make it public through the
+                    project's dashboard view. But once the data is published you
+                    will no longer be able to change the data uploaded! If
+                    published as a project, you may add more samples (spectra)
+                    to the project later if desired.
+                </template>
+                <template v-if="!isReleasedToday()" #footer>
+                    <jet-secondary-button
+                        @click="showPublishConfirmationModal = false"
+                    >
+                        Cancel
+                    </jet-secondary-button>
+                    <jet-success-button class="ml-2" @click="publish">
+                        Publish with Embargo
                     </jet-success-button>
                 </template>
             </jet-confirmation-modal>
@@ -1096,6 +1135,15 @@ export default {
                         this.status = response.data.project.status;
                         // this.trackProject();
                     });
+            }
+        },
+        isReleasedToday() {
+            var currentDate = new Date();
+            var releaseDate = new Date(this.publishForm.release_date);
+            if (releaseDate > currentDate) {
+                return false;
+            } else {
+                return true;
             }
         },
         // trackProject() {

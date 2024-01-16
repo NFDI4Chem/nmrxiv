@@ -25,9 +25,11 @@ Please find the details below.
 {{ __(':publicUrl', ['publicUrl' => $publicUrl]) }}
 
 @else
-{{ __('Your submission is processed and your project **:projectName** would be auto-published on chosen release date :releaseDate', ['projectName' => $project->name , 'releaseDate' => $releaseDate]) }}
+{{ __('Your submission is processed and is published as Embargo and your project **:projectName** would be made public on chosen release date :releaseDate', ['projectName' => $project->name , 'releaseDate' => $releaseDate]) }}
 
-You will recieve an email confirmation with further details once your project has been published successfully.
+You will recieve an email confirmation with further details once your project has been made public successfully.
+
+Please Note: Opting for an Embargo publication grants your project a DOI, yet it stays private exclusively for you. You have the option to share the project with others and can adjust the release date or promptly make it public through the project's dashboard view.
 @endif
 
 Follow our [documentation](https://docs.nmrxiv.org/) to learn more.
