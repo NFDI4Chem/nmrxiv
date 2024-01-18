@@ -292,7 +292,7 @@
                         </div>
                         <div class="flex-nowrap">
                             <Link
-                                v-if="canDeleteProject"
+                                v-if="canManageProjectSetings"
                                 :href="
                                     route(
                                         'dashboard.project.settings',
@@ -1114,6 +1114,11 @@ export default {
         canUpdateProject() {
             return this.projectPermissions
                 ? this.projectPermissions.canUpdateProject
+                : false;
+        },
+        canManageProjectSetings() {
+            return this.projectPermissions
+                ? this.projectPermissions.canManageSettings
                 : false;
         },
     },

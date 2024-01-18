@@ -20,6 +20,6 @@ class StudyInvite
      */
     public function handle(object $event): void
     {
-        Notification::send($event->$invitedUser, new StudyInviteNotification($event->$invitation));
+        Notification::send($event->invitedUser, new StudyInviteNotification($event->invitation));
     }
 }

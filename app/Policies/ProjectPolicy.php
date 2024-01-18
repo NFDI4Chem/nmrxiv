@@ -83,6 +83,16 @@ class ProjectPolicy
     }
 
     /**
+     * Determine whether the user can delete the model.
+     *
+     * @return mixed
+     */
+    public function manageSettings(User $user, Project $project)
+    {
+        return $user->ownsProject($project);
+    }
+
+    /**
      * Determine whether the user can add project members.
      *
      * @return mixed
