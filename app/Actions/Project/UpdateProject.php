@@ -48,9 +48,9 @@ class UpdateProject
 
             $project
                 ->forceFill([
-                    'name' => $input['name'],
-                    'slug' => Str::slug($input['name'], '-'),
-                    'description' => $input['description'] ? $input['description'] : $project->description,
+                    'name' => array_key_exists('name', $input) ? $input['name'] : $project->name,
+                    'slug' => array_key_exists('name', $input) ? Str::slug($input['name'], '-') : $project->slug,
+                    'description' => array_key_exists('description', $input) ? $input['description'] : $project->description,
                     'color' => array_key_exists('color', $input)
                         ? $input['color']
                         : $project->color,
