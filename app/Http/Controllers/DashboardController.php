@@ -48,7 +48,7 @@ class DashboardController extends Controller
 
         $projects = $user->sharedProjects->load('owner');
 
-        $studies = $user->sharedStudies->load('owner');
+        $studies = $user->sharedStudies->load('owner','sample.molecules');
 
         return Inertia::render('SharedWithMe', [
             'projects' => $projects,

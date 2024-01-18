@@ -393,7 +393,6 @@ class ProjectController extends Controller
 
     public function updateReleaseDate(Request $request, UpdateProject $updater, Project $project)
     {
-        //dd($request->all());
         $updater->update($project, $request->all());
 
         return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('success', "Project's release date updated successfully");
