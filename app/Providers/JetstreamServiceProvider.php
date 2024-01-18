@@ -60,7 +60,7 @@ class JetstreamServiceProvider extends ServiceProvider
             'study:update',
             'dataset:read',
             'dataset:update',
-        ])->description('Can read and/or update project, sample and dataset (spectra) information. Additionally owner can manage users in the project. Note: Only creator can delete the project.');
+        ])->description('Can read and/or update project, sample and dataset(spectra) information. Additionally owner can also manage users in the project. Please be aware that only the creator is authorized to delete/deprecate the project.');
 
         Jetstream::role('collaborator', 'Collaborator', [
             'project:create',
@@ -71,12 +71,12 @@ class JetstreamServiceProvider extends ServiceProvider
             'study:update',
             'dataset:read',
             'dataset:update',
-        ])->description('Can read and/or update project, sample and dataset information.');
+        ])->description('Can read and/or update project, sample and dataset(spectra) information.');
 
         Jetstream::role('reviewer', 'Reviewer', [
             'project:read',
             'study:read',
             'dataset:read',
-        ])->description('Can only read project, sample and dataset information.');
+        ])->description('Can only read project, sample and dataset(spectra) information.');
     }
 }
