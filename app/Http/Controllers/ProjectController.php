@@ -138,6 +138,7 @@ class ProjectController extends Controller
             'projectPermissions' => [
                 'canDeleteProject' => Gate::check('deleteProject', $project),
                 'canUpdateProject' => Gate::check('updateProject', $project),
+                'canManageSettings' => Gate::check('manageSettings', $project),
             ],
         ]);
     }
@@ -153,13 +154,16 @@ class ProjectController extends Controller
 
     public function settings(Request $request, Project $project)
     {
-        if (! Gate::forUser($request->user())->check('deleteProject', $project)) {
+        if (! Gate::forUser($request->user())->check('manageSettings', $project)) {
             throw new AuthorizationException;
         }
 
         return Inertia::render('Project/Settings', [
             'project' => $project,
             'schema' => $environment = env('SCHEMA_VERSION', 'local'),
+            'projectPermissions' => [
+                'canDeleteProject' => Gate::check('deleteProject', $project),
+            ],
         ]);
     }
 
