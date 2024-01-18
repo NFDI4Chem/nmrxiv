@@ -74,16 +74,36 @@
                     </div>
                 </div>
             </div>
-            <div v-if="!project.is_public && !project.is_deleted">
+            <div
+                v-if="
+                    !project.is_public &&
+                    !project.is_deleted &&
+                    projectPermissions.canDeleteProject
+                "
+            >
                 <project-delete :project="project"></project-delete>
             </div>
-            <div v-if="project.is_deleted">
+            <div
+                v-if="project.is_deleted && projectPermissions.canDeleteProject"
+            >
                 <project-restore :project="project"></project-restore>
             </div>
-            <div v-if="project.is_public && !project.is_archived">
+            <div
+                v-if="
+                    project.is_public &&
+                    !project.is_archived &&
+                    projectPermissions.canDeleteProject
+                "
+            >
                 <project-archive :project="project"></project-archive>
             </div>
-            <div v-if="project.is_public && project.is_archived">
+            <div
+                v-if="
+                    project.is_public &&
+                    project.is_archived &&
+                    projectPermissions.canDeleteProject
+                "
+            >
                 <project-unarchive :project="project"></project-unarchive>
             </div>
         </div>
@@ -109,6 +129,6 @@ export default {
         ProjectUnarchive,
         InformationCircleIcon,
     },
-    props: ["project", "studies", "schema"],
+    props: ["project", "studies", "schema", "projectPermissions"],
 };
 </script>
