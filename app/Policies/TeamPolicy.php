@@ -47,7 +47,9 @@ class TeamPolicy
      */
     public function update(User $user, Team $team)
     {
-        return $user->ownsTeam($team);
+        if ($user->hasTeamRole($user->currentTeam->fresh(), 'owner') || $user->ownsTeam($team)) {
+            return true;
+        }
     }
 
     /**
@@ -57,7 +59,9 @@ class TeamPolicy
      */
     public function addTeamMember(User $user, Team $team)
     {
-        return $user->ownsTeam($team);
+        if ($user->hasTeamRole($user->currentTeam->fresh(), 'owner') || $user->ownsTeam($team)) {
+            return true;
+        }
     }
 
     /**
@@ -67,7 +71,9 @@ class TeamPolicy
      */
     public function updateTeamMember(User $user, Team $team)
     {
-        return $user->ownsTeam($team);
+        if ($user->hasTeamRole($user->currentTeam->fresh(), 'owner') || $user->ownsTeam($team)) {
+            return true;
+        }
     }
 
     /**
@@ -77,7 +83,9 @@ class TeamPolicy
      */
     public function removeTeamMember(User $user, Team $team)
     {
-        return $user->ownsTeam($team);
+        if ($user->hasTeamRole($user->currentTeam->fresh(), 'owner') || $user->ownsTeam($team)) {
+            return true;
+        }
     }
 
     /**
