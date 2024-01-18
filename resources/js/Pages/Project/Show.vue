@@ -32,9 +32,9 @@
                     v-else
                     class="text-center px-3 py-2 bg-green-50 text-green-700 border-b"
                 >
-                    <b>Info: </b> This project is archived. You cannot edit a
-                    archived project, please create a new version to updated the
-                    project.
+                    <b>Info: </b> This project is public. You cannot edit a
+                    published project, please create a new version to updated
+                    the project.
                 </div>
             </div>
             <div v-if="project.is_public && project.doi != null">
@@ -341,16 +341,469 @@
                             "
                         >
                             <span
-                                class="ml-4 py-2 inline-flex items-center px-3 rounded-md text-sm font-medium bg-yellow-100 text-red-800 capitalize"
+                                class="ml-4 py-2 inline-flex items-center px-3 rounded-md text-sm font-medium bg-yellow-100 text-red-800 capitalize hover:bg-yellow-200"
                             >
-                                <b
-                                    >Release date:
-                                    {{ formatDate(project.release_date) }}</b
-                                >
+                                <button @click="showPublishDialog = true">
+                                    Release date:
+                                    {{ formatDate(project.release_date) }}
+                                </button>
+                                <PencilIcon
+                                    class="w-4 h-4 ml-2 text-gray-600"
+                                />
                             </span>
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <div>
+                <TransitionRoot
+                    :show="showPublishDialog"
+                    as="template"
+                    @after-leave="query = ''"
+                    appear
+                >
+                    <Dialog as="div" class="relative z-10">
+                        <TransitionChild
+                            as="template"
+                            enter="ease-out duration-300"
+                            enter-from="opacity-0"
+                            enter-to="opacity-100"
+                            leave="ease-in duration-200"
+                            leave-from="opacity-100"
+                            leave-to="opacity-0"
+                        >
+                            <div
+                                class="fixed inset-0 bg-gray-500 bg-opacity-25 transition-opacity"
+                            />
+                        </TransitionChild>
+
+                        <div
+                            class="fixed inset-0 z-10 overflow-y-auto p-4 sm:p-6 md:p-20"
+                        >
+                            <TransitionChild
+                                as="template"
+                                enter="ease-out duration-300"
+                                enter-from="opacity-0 scale-95"
+                                enter-to="opacity-100 scale-100"
+                                leave="ease-in duration-200"
+                                leave-from="opacity-100 scale-100"
+                                leave-to="opacity-0 scale-95"
+                            >
+                                <DialogPanel
+                                    class="mx-auto max-w-3xl transform overflow-hidden rounded-xl bg-white shadow-2xl ring-1 ring-black ring-opacity-5 transition-all"
+                                >
+                                    <div
+                                        v-if="
+                                            status == 'queued' ||
+                                            status == 'processing' ||
+                                            status == 'complete'
+                                        "
+                                    >
+                                        <div class="py-16">
+                                            <div class="text-center">
+                                                <p
+                                                    class="text-sm font-semibold text-indigo-600 uppercase tracking-wide"
+                                                >
+                                                    {{ project.name }}
+                                                </p>
+                                                <span v-if="status == 'queued'">
+                                                    <div
+                                                        class="m-3 relative clear-both border-dotted border-2 border-gray-300 rounded-lg"
+                                                    >
+                                                        <span
+                                                            class="inline-flex items-center px-4 py-2 font-semibold leading-6 text-sm rounded-md text-sky-500 bg-white transition ease-in-out duration-150 cursor-not-allowed"
+                                                            disabled=""
+                                                            ><h1
+                                                                class="capitalize text-4xl font-extrabold text-gray-900 tracking-tight sm:text-5xl"
+                                                            >
+                                                                {{ status }}
+                                                            </h1></span
+                                                        >
+                                                    </div>
+                                                    <Link
+                                                        type="button"
+                                                        :href="
+                                                            route('dashboard')
+                                                        "
+                                                        class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                                    >
+                                                        Go to Dashboard
+                                                    </Link>
+                                                </span>
+                                                <span
+                                                    v-if="
+                                                        status == 'processing'
+                                                    "
+                                                >
+                                                    <div
+                                                        class="m-3 relative clear-both border-dotted border-2 border-gray-300 rounded-lg"
+                                                    >
+                                                        <span
+                                                            class="inline-flex items-center px-4 py-2 font-semibold leading-6 text-sm rounded-md text-sky-500 bg-white transition ease-in-out duration-150 cursor-not-allowed"
+                                                            disabled=""
+                                                            ><h1
+                                                                class="capitalize text-4xl font-extrabold text-gray-900 tracking-tight sm:text-5xl"
+                                                            >
+                                                                {{ status }}
+                                                            </h1></span
+                                                        ><span
+                                                            class="flex absolute h-3 w-3 top-0 right-0 -mt-1 -mr-1"
+                                                            ><span
+                                                                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"
+                                                            ></span
+                                                            ><span
+                                                                class="relative inline-flex rounded-full h-3 w-3 bg-sky-500"
+                                                            ></span
+                                                        ></span>
+                                                    </div>
+                                                    <Link
+                                                        type="button"
+                                                        :href="
+                                                            route('dashboard')
+                                                        "
+                                                        class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                                    >
+                                                        Go to Dashboard
+                                                    </Link>
+                                                </span>
+                                                <span
+                                                    v-if="status == 'complete'"
+                                                >
+                                                    <div
+                                                        class="m-3 clear-both relative border-dotted border-2 border-gray-300 rounded-lg"
+                                                    >
+                                                        <span
+                                                            class="inline-flex items-center px-4 py-2 font-semibold leading-6 text-sm rounded-md text-sky-500 bg-white transition ease-in-out duration-150 cursor-not-allowed"
+                                                            disabled=""
+                                                            ><h1
+                                                                class="capitalize text-4xl font-extrabold text-gray-900 tracking-tight sm:text-5xl"
+                                                            >
+                                                                {{ status }}
+                                                            </h1></span
+                                                        ><span
+                                                            class="flex absolute h-3 w-3 top-0 right-0 -mt-1 -mr-1"
+                                                            ><span
+                                                                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"
+                                                            ></span
+                                                            ><span
+                                                                class="relative inline-flex rounded-full h-3 w-3 bg-sky-500"
+                                                            ></span
+                                                        ></span>
+                                                    </div>
+                                                    <Link
+                                                        type="button"
+                                                        :href="
+                                                            route('dashboard')
+                                                        "
+                                                        class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                                    >
+                                                        Go to Dashboard
+                                                    </Link>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div
+                                            v-if="status != 'complete'"
+                                            class="w-full"
+                                        >
+                                            <div
+                                                class="flex flex-wrap items-center bg-gray-50 py-2.5 px-4 text-xs text-gray-700"
+                                            >
+                                                <b>Whats next?</b>
+                                                <div>
+                                                    <p>
+                                                        Please allow some time
+                                                        to process your
+                                                        submission. You will
+                                                        recieve an email once
+                                                        your submission is
+                                                        processed. You will
+                                                        receive an email with
+                                                        citation details and
+                                                        other helpful
+                                                        information to share
+                                                        your datasets.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div v-else>
+                                        <div class="p-8">
+                                            <div>
+                                                <label
+                                                    class="block tracking-wider text-sm font-medium text-gray-700, block text-sm font-medium text-gray-700"
+                                                >
+                                                    <small>PROJECT NAME</small>
+                                                </label>
+                                                <h1
+                                                    class="text-2xl font-extrabold text-gray-900"
+                                                >
+                                                    {{ project.name }}
+                                                </h1>
+                                            </div>
+                                            <div class="mt-3">
+                                                <label
+                                                    class="block text-sm font-medium text-gray-700, block text-sm font-medium text-gray-700"
+                                                >
+                                                    Release Date
+                                                </label>
+                                                <Datepicker
+                                                    v-model="
+                                                        project.release_date
+                                                    "
+                                                ></Datepicker>
+                                                <p
+                                                    class="mt-1 text-sm text-gray-500"
+                                                >
+                                                    Publish your data now or
+                                                    choose a release date to
+                                                    auto publish your project to
+                                                    public.
+                                                </p>
+                                            </div>
+                                            <div class="mt-5">
+                                                <h3
+                                                    class="text-lg font-bold text-gray-400"
+                                                >
+                                                    Terms & Conditions
+                                                </h3>
+
+                                                <div class="mt-3">
+                                                    <div class="ml-2">
+                                                        <div
+                                                            class="flex items-top"
+                                                        >
+                                                            <input
+                                                                type="checkbox"
+                                                                class="rounded mt-1 border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                                                                id="conditions"
+                                                                v-model="
+                                                                    project.conditions
+                                                                "
+                                                                name="conditions"
+                                                            />
+                                                            <div
+                                                                class="ml-2 text-sm"
+                                                            >
+                                                                I understand
+                                                                once the project
+                                                                is published,
+                                                                all the
+                                                                underlying
+                                                                samples and
+                                                                spectra will
+                                                                also be made
+                                                                public and agree
+                                                                to make this
+                                                                data
+                                                                persistently
+                                                                available in the
+                                                                nmrXiv platfor
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="mt-2">
+                                                    <div class="ml-2">
+                                                        <div
+                                                            class="flex items-center"
+                                                        >
+                                                            <input
+                                                                type="checkbox"
+                                                                class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                                                                id="terms"
+                                                                v-model="
+                                                                    project.terms
+                                                                "
+                                                                name="terms"
+                                                            />
+                                                            <div
+                                                                class="ml-2 text-sm"
+                                                            >
+                                                                I agree to the
+                                                                <a
+                                                                    target="_blank"
+                                                                    :href="
+                                                                        route(
+                                                                            'terms.show'
+                                                                        )
+                                                                    "
+                                                                    class="underline text-sm text-gray-600 hover:text-gray-900"
+                                                                    >Terms of
+                                                                    Service</a
+                                                                >
+                                                                and
+                                                                <a
+                                                                    target="_blank"
+                                                                    :href="
+                                                                        route(
+                                                                            'policy.show'
+                                                                        )
+                                                                    "
+                                                                    class="underline text-sm text-gray-600 hover:text-gray-900"
+                                                                    >Privacy
+                                                                    Policy</a
+                                                                >
+                                                                and hereby also
+                                                                grant nmrXiv
+                                                                permissions to
+                                                                distribute the
+                                                                datasets (and
+                                                                meta-data) under
+                                                                the specified
+                                                                license.
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <div class="px-8 pb-8 pt-0">
+                                                <jet-success-button
+                                                    type="button"
+                                                    :class="[
+                                                        !project.terms &&
+                                                        !project.conditions
+                                                            ? 'bg-gray-200 cursor-not-allowed'
+                                                            : 'bg-green-600 hover:bg-green-700',
+                                                        'ml-2',
+                                                    ]"
+                                                    @click="
+                                                        showPublishConfirmationModal = true
+                                                    "
+                                                    :disabled="
+                                                        !project.terms &&
+                                                        !project.conditions
+                                                    "
+                                                >
+                                                    Publish now
+                                                </jet-success-button>
+                                                <jet-secondary-button
+                                                    type="button"
+                                                    class="ml-2"
+                                                    @click="updatePublishDate()"
+                                                >
+                                                    Update publish date
+                                                </jet-secondary-button>
+                                                <jet-secondary-button
+                                                    type="button"
+                                                    class="ml-2"
+                                                    @click="
+                                                        showPublishDialog = false
+                                                    "
+                                                >
+                                                    Cancel
+                                                </jet-secondary-button>
+                                            </div>
+                                            <div v-if="errors">
+                                                <div
+                                                    class="rounded-md bg-red-50 p-4 mx-4 mb-4"
+                                                >
+                                                    <div class="flex">
+                                                        <div
+                                                            class="flex-shrink-0"
+                                                        >
+                                                            <svg
+                                                                class="h-5 w-5 text-red-400"
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                viewBox="0 0 20 20"
+                                                                fill="currentColor"
+                                                                aria-hidden="true"
+                                                            >
+                                                                <path
+                                                                    fill-rule="evenodd"
+                                                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
+                                                                    clip-rule="evenodd"
+                                                                />
+                                                            </svg>
+                                                        </div>
+                                                        <div class="ml-3">
+                                                            <h3
+                                                                class="text-sm font-medium text-red-800"
+                                                            >
+                                                                Error publishing
+                                                                your project
+                                                            </h3>
+                                                            <div
+                                                                class="mt-2 text-sm text-red-700"
+                                                            >
+                                                                <ul
+                                                                    role="list"
+                                                                    class="list-disc space-y-1 pl-5"
+                                                                >
+                                                                    <li>
+                                                                        {{
+                                                                            errors
+                                                                        }}
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="w-full">
+                                            <div
+                                                class="flex flex-wrap items-center bg-gray-50 py-2.5 px-4 text-xs text-gray-700"
+                                            >
+                                                <b>Whats next?</b>
+                                                <div>
+                                                    <p>
+                                                        Upon clicking publish,
+                                                        your project is
+                                                        submitted to our queue
+                                                        system for automatic
+                                                        processing. Once
+                                                        successfully processed,
+                                                        your data is assigned
+                                                        with stable identifiers,
+                                                        and DOIs are generated.
+                                                        You will receive an
+                                                        email with citation
+                                                        details and other
+                                                        helpful information to
+                                                        share your datasets.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </DialogPanel>
+                            </TransitionChild>
+                        </div>
+                    </Dialog>
+                </TransitionRoot>
+                <jet-confirmation-modal
+                    :show="showPublishConfirmationModal"
+                    @close="showPublishConfirmationModal = false"
+                >
+                    <template #title>
+                        Are you sure you want to publish?
+                    </template>
+
+                    <template #content>
+                        Once the data is published you will no longer be able to
+                        change the data uploaded! If published as a project, you
+                        may add more compounds (spectra) to the project later.
+                    </template>
+
+                    <template #footer>
+                        <jet-secondary-button
+                            @click="showPublishConfirmationModal = false"
+                        >
+                            Cancel
+                        </jet-secondary-button>
+                        <jet-success-button class="ml-2" @click="publish">
+                            Publish Now
+                        </jet-success-button>
+                    </template>
+                </jet-confirmation-modal>
             </div>
         </template>
         <div class="p-12 pt-8">
@@ -582,6 +1035,16 @@ import Publish from "@/Shared/Publish.vue";
 import AuthorCard from "@/Shared/AuthorCard.vue";
 import CitationCard from "@/Shared/CitationCard.vue";
 import DOIBadge from "@/Shared/DOIBadge.vue";
+import Datepicker from "@vuepic/vue-datepicker";
+import JetConfirmationModal from "@/Jetstream/ConfirmationModal.vue";
+import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
+import JetSuccessButton from "@/Jetstream/SuccessButton.vue";
+import {
+    Dialog,
+    DialogPanel,
+    TransitionChild,
+    TransitionRoot,
+} from "@headlessui/vue";
 
 export default {
     components: {
@@ -601,6 +1064,14 @@ export default {
         AuthorCard,
         CitationCard,
         DOIBadge,
+        Dialog,
+        DialogPanel,
+        TransitionChild,
+        TransitionRoot,
+        Datepicker,
+        JetConfirmationModal,
+        JetSecondaryButton,
+        JetSuccessButton,
     },
     props: [
         "project",
@@ -623,7 +1094,16 @@ export default {
         };
     },
     data() {
-        return {};
+        return {
+            form: this.$inertia.form({
+                _method: "PUT",
+                name: this.project.name,
+                enableProjectMode: this.project.enableProjectMode,
+                release_date: this.project.release_date,
+            }),
+            showPublishDialog: false,
+            showPublishConfirmationModal: false,
+        };
     },
     computed: {
         canDeleteProject() {
@@ -685,6 +1165,40 @@ export default {
         toggleManageCitation() {
             this.manageCitationElement.toggleDialog();
             //this.emitter.emit("openAddCitationDialog", {});
+        },
+        publish() {
+            this.showPublishConfirmationModal = false;
+            this.showPublishDialog = false;
+            this.form.release_date = new Date();
+            if (this.project.conditions && this.project.terms) {
+                this.errors = null;
+                this.form
+                    .post(
+                        route("dashboard.project.publish", this.project.id),
+                        this.form
+                    )
+                    .catch((err) => {
+                        this.errors = err.response.data.errors;
+                        this.validation = err.response.data.validation.report;
+                    })
+                    .then((response) => {
+                        this.status = response.data.project.status;
+                        this.showPublishDialog = false;
+                    });
+            }
+        },
+        updatePublishDate() {
+            this.form.release_date = this.project.release_date;
+            this.form.put(
+                route("dashboard.project.updateReleaseDate", this.project.id),
+                {
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        this.showPublishDialog = false;
+                    },
+                    onError: (err) => {},
+                }
+            );
         },
     },
 };
