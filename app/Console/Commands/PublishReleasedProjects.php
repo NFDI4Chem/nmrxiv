@@ -40,7 +40,7 @@ class PublishReleasedProjects extends Command
             ])->get();
             foreach ($projects as $project) {
                 $release_date = Carbon::parse($project->release_date);
-                if ($release_date->isToday()) {
+                if ($release_date->isPast()) {
                     $publisher->publish($project);
                     Notification::send($project->owner, new DraftProcessedNotification($project));
                 }

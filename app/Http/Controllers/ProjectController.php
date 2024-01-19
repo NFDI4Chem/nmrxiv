@@ -138,6 +138,7 @@ class ProjectController extends Controller
             'projectPermissions' => [
                 'canDeleteProject' => Gate::check('deleteProject', $project),
                 'canUpdateProject' => Gate::check('updateProject', $project),
+                'canManageSettings' => Gate::check('manageSettings', $project),
             ],
         ]);
     }
@@ -153,13 +154,16 @@ class ProjectController extends Controller
 
     public function settings(Request $request, Project $project)
     {
-        if (! Gate::forUser($request->user())->check('deleteProject', $project)) {
+        if (! Gate::forUser($request->user())->check('manageSettings', $project)) {
             throw new AuthorizationException;
         }
 
         return Inertia::render('Project/Settings', [
             'project' => $project,
             'schema' => $environment = env('SCHEMA_VERSION', 'local'),
+            'projectPermissions' => [
+                'canDeleteProject' => Gate::check('deleteProject', $project),
+            ],
         ]);
     }
 
@@ -286,7 +290,7 @@ class ProjectController extends Controller
             $release_date = $input['release_date'];
             if (! $project->is_public && ! is_null($project->doi) && ! is_null($release_date)) {
                 $release_date = Carbon::parse($release_date);
-                if ($release_date->isToday()) {
+                if ($release_date->isPast()) {
                     $updater->update($project, $request->all());
                     $publisher->publish($project);
                     $project->sendNotification('publish', $this->prepareSendList($project));
@@ -389,7 +393,6 @@ class ProjectController extends Controller
 
     public function updateReleaseDate(Request $request, UpdateProject $updater, Project $project)
     {
-        //dd($request->all());
         $updater->update($project, $request->all());
 
         return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('success', "Project's release date updated successfully");

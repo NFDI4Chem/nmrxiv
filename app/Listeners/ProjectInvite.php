@@ -20,6 +20,6 @@ class ProjectInvite
      */
     public function handle(object $event): void
     {
-        Notification::send($event->$invitedUser, new ProjectInviteNotification($event->$invitation));
+        Notification::send($event->invitedUser, new ProjectInviteNotification($event->invitation));
     }
 }
