@@ -2,6 +2,7 @@
 
 Dear admin,
 
+@if($releasedToday)
 A new project has been published. Please find the details below.
 
 {{ __('**Project Name**:') }}
@@ -9,6 +10,17 @@ A new project has been published. Please find the details below.
 
 {{ __('**Project Id**:') }}
 {{ __(':projectId', ['projectId' => $projectId]) }}
+
+@else
+A new project has been published as Embargo. Please find the details below.
+
+{{ __('**Project Name**:') }}
+{{ __(':project', ['project' => $projectName]) }}
+
+{{ __('**Project Id**:') }}
+{{ __(':projectId', ['projectId' => $projectId]) }}
+
+@endif
 
 Regards,
 
