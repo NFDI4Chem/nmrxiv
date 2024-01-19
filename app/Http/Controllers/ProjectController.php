@@ -290,7 +290,7 @@ class ProjectController extends Controller
             $release_date = $input['release_date'];
             if (! $project->is_public && ! is_null($project->doi) && ! is_null($release_date)) {
                 $release_date = Carbon::parse($release_date);
-                if ($release_date->isToday()) {
+                if ($release_date->isPast()) {
                     $updater->update($project, $request->all());
                     $publisher->publish($project);
                     $project->sendNotification('publish', $this->prepareSendList($project));
