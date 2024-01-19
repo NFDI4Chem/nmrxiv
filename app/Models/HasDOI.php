@@ -63,7 +63,7 @@ trait HasDOI
         }
     }
 
-    public function updateDOI($doiService)
+    public function updateDOIMetadata($doiService)
     {
         $doi_host = env('DOI_HOST', null);
 
