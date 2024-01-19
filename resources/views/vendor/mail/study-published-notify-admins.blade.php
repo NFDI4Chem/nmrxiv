@@ -2,11 +2,20 @@
 
 Dear admin,
 
+@if($releasedToday)
 New samples has been published. Please find the details below.
 
 @foreach ($samples as $sample)
     Sample Name- {{ $sample->name }} , DOI- {{ $sample->doi }}
 @endforeach
+
+@else
+New samples has been published as Embargo. Please find the details below.
+
+@foreach ($samples as $sample)
+    Sample Name- {{ $sample->name }} , DOI- {{ $sample->doi }}
+@endforeach
+@endif
 
 Regards,
 
