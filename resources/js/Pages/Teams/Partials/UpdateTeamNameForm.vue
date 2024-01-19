@@ -9,7 +9,7 @@
         <template #form>
             <!-- Team Owner Information -->
             <div class="col-span-6">
-                <jet-label value="Team Owner" />
+                <jet-label value="Team Creator" />
 
                 <div class="flex items-center mt-2">
                     <img
