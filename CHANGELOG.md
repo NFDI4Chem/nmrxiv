@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.0.1-rc.23](https://github.com/NFDI4Chem/nmrxiv/compare/v1.0.0-rc.23...v1.0.1-rc.23) (2024-01-19)
+
+
+### Bug Fixes
+
+* make study non-editable when published as ([1b3290b](https://github.com/NFDI4Chem/nmrxiv/commit/1b3290ba9586144f55b8eb9fe3be0235b26b6958))
+* release date past check updated ([c2c68be](https://github.com/NFDI4Chem/nmrxiv/commit/c2c68be08bbf156a2d810b8fa751a456142e566e))
+* skip ([ff187e5](https://github.com/NFDI4Chem/nmrxiv/commit/ff187e54edfb26fe0c68672d7202eec0681113f5))
+* study is_published logic update ([7908ea2](https://github.com/NFDI4Chem/nmrxiv/commit/7908ea2bff37a9ca25388e5ba2f3e3b2b6fadcf5))
+* study sharing view issue ([4fa2538](https://github.com/NFDI4Chem/nmrxiv/commit/4fa2538e413bde3be351f5e6382ac14b5441b357))
+* update access rights for owners ([2ed0a75](https://github.com/NFDI4Chem/nmrxiv/commit/2ed0a750331776c890e1fddc00763e46443e452b))
+* update mail body for admin when published as ([11cd371](https://github.com/NFDI4Chem/nmrxiv/commit/11cd37147391af2ddb4fc4885d7e65e72386be2a))
+* update team policy for owner ([dbffdec](https://github.com/NFDI4Chem/nmrxiv/commit/dbffdec8b27a9f4f68a3ee91e75f57cd41a3ff09))
+
 ## [1.1.0-rc.22](https://github.com/NFDI4Chem/nmrxiv/compare/v1.0.0-rc.22...v1.1.0-rc.22) (2024-01-16)
 
 
