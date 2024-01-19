@@ -49,6 +49,8 @@ class TeamPolicy
     {
         if ($user->hasTeamRole($user->currentTeam->fresh(), 'owner') || $user->ownsTeam($team)) {
             return true;
+        } else {
+            return false;
         }
     }
 
@@ -61,6 +63,8 @@ class TeamPolicy
     {
         if ($user->hasTeamRole($user->currentTeam->fresh(), 'owner') || $user->ownsTeam($team)) {
             return true;
+        } else {
+            return false;
         }
     }
 
@@ -73,6 +77,8 @@ class TeamPolicy
     {
         if ($user->hasTeamRole($user->currentTeam->fresh(), 'owner') || $user->ownsTeam($team)) {
             return true;
+        } else {
+            return false;
         }
     }
 
@@ -85,6 +91,8 @@ class TeamPolicy
     {
         if ($user->hasTeamRole($user->currentTeam->fresh(), 'owner') || $user->ownsTeam($team)) {
             return true;
+        } else {
+            return false;
         }
     }
 
