@@ -41,8 +41,10 @@ class PublishReleasedProjects extends Command
             foreach ($projects as $project) {
                 $release_date = Carbon::parse($project->release_date);
                 if ($release_date->isPast()) {
-                    $publisher->publish($project);
-                    Notification::send($project->owner, new DraftProcessedNotification($project));
+                    if (! is_null($project->doi) && ! $project->is_archived) {
+                        $publisher->publish($project);
+                        Notification::send($project->owner, new DraftProcessedNotification($project));
+                    }
                 }
             }
         });
