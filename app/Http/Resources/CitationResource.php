@@ -18,7 +18,6 @@ class CitationResource extends JsonResource
             'doi' => $this->doi,
             'title' => $this->title,
             'authors' => $this->authors,
-            'abstract' => $this->abstract,
             'citation_text' => $this->citation_text,
         ];
     }
