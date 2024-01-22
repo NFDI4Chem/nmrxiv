@@ -24,7 +24,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('nmrxiv:publish')->daily();
+        // $schedule->command('nmrxiv:publish')->daily();
         $schedule->command('nmrxiv:delete-projects')->daily();
         $schedule->command('nmrxiv:index-molecules')->daily();
         $schedule->command('nmrxiv:delete-citations')->weekly();
