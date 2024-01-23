@@ -573,7 +573,7 @@ export default {
         fetchCitations() {
             this.loading = true;
             this.error = "";
-            this.query = this.extractDoi(this.query);
+            this.query = this.extractQueryParam(this.query);
             let isDOI = new RegExp(/\b(10[.][0-9]{4,}(?:[.][0-9]+)*)\b/g).test(
                 this.query
             );
@@ -630,7 +630,7 @@ export default {
             axios
                 .get(this.$page.props.DATACITE_API + this.query)
                 .then((res) => {
-                    if (res && res.data) {
+                    if (res && res.data && res.data.data) {
                         this.fetchedCitations = this.formatCitationResponse(
                             res.data.data,
                             "datacite"

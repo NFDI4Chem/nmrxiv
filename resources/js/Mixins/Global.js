@@ -213,7 +213,7 @@ export default {
             downloadLink.click();
         },
         /*Extract Doi from URL*/
-        extractDoi(query) {
+        extractQueryParam(query) {
             if (query.indexOf("http") > -1) {
                 var url = new URL(query);
                 query = url.pathname.replace("/", "");
@@ -321,7 +321,7 @@ export default {
         },
 
         /*Extract Doi from URL*/
-        extractDoi(query) {
+        extractQueryParam(query) {
             if (query.indexOf("http") > -1) {
                 var url = new URL(query);
                 query = url.pathname.replace("/", "");
