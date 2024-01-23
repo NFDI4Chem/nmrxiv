@@ -129,33 +129,6 @@
                                     </div>
                                     <div class="sm:col-span-6">
                                         <label
-                                            for="abstract"
-                                            class="block text-sm font-medium text-gray-700"
-                                        >
-                                            Abstract
-                                        </label>
-                                        <div class="mt-1">
-                                            <textarea
-                                                id="abstract"
-                                                v-model="form.abstract"
-                                                name="abstract"
-                                                type="abstract"
-                                                autocomplete="abstract"
-                                                :class="[
-                                                    isEdit
-                                                        ? 'shadow-sm focus:ring-red-500 focus:border-red-500 block w-full sm:text-sm border-red-500 rounded-md bg-gray-100'
-                                                        : '',
-                                                    'shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md',
-                                                ]"
-                                            />
-                                            <jet-input-error
-                                                :message="form.errors.abstract"
-                                                class="mt-2"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div class="sm:col-span-6">
-                                        <label
                                             for="orcid"
                                             class="block text-sm font-medium text-gray-700"
                                         >
@@ -303,7 +276,7 @@
                                             Notifications
                                         </legend>
                                         <div
-                                            style="height: 40vh"
+                                            style="height: auto"
                                             class="divide-y divide-gray-200"
                                         >
                                             <div
@@ -345,22 +318,6 @@
                                                             fetchedCitations.doi
                                                         }}
                                                     </p>
-                                                    <p
-                                                        v-if="
-                                                            fetchedCitations.abstract
-                                                        "
-                                                        id="citation-doi"
-                                                        class="font-bold text-gray-500 mt-2"
-                                                    >
-                                                        Abstract
-                                                    </p>
-                                                    <div
-                                                        id="citation-abstract"
-                                                        class="text-xs text-gray-500"
-                                                        v-html="
-                                                            fetchedCitations.abstract
-                                                        "
-                                                    ></div>
                                                 </div>
                                             </div>
                                         </div>
@@ -462,13 +419,7 @@
                                             </div>
                                             <div
                                                 class="sm:flex sm:justify-between"
-                                            >
-                                                <div
-                                                    v-if="element.abstract"
-                                                    class="text-xs font-medium text-gray-900"
-                                                    v-html="element.abstract"
-                                                ></div>
-                                            </div>
+                                            ></div>
                                         </div>
                                     </li>
                                 </ul>
@@ -582,7 +533,6 @@ export default {
                 doi: "",
                 title: "",
                 authors: "",
-                abstract: "",
                 citation_text: "",
                 errors: {},
             }),
@@ -623,7 +573,7 @@ export default {
         fetchCitations() {
             this.loading = true;
             this.error = "";
-            this.query = this.extractDoi(this.query);
+            this.query = this.extractQueryParam(this.query);
             let isDOI = new RegExp(/\b(10[.][0-9]{4,}(?:[.][0-9]+)*)\b/g).test(
                 this.query
             );
@@ -653,9 +603,6 @@ export default {
                 })
                 .catch((err) => {
                     console.log(err);
-                })
-                .finally(() => {
-                    this.loading = false;
                 });
         },
         /*Make REST Call to Crossref API */
@@ -668,6 +615,25 @@ export default {
                         this.fetchedCitations = this.formatCitationResponse(
                             res.data.message,
                             "crossref"
+                        );
+                    } else {
+                        this.fetchDataFromDatacite(this.query);
+                    }
+                })
+                .catch((err) => {
+                    this.fetchDataFromDatacite(this.query);
+                });
+        },
+        /*Make REST call to Datacite API */
+        fetchDataFromDatacite(query) {
+            this.fetchedCitations = [];
+            axios
+                .get(this.$page.props.DATACITE_API + this.query)
+                .then((res) => {
+                    if (res && res.data && res.data.data) {
+                        this.fetchedCitations = this.formatCitationResponse(
+                            res.data.data,
+                            "datacite"
                         );
                     }
                 })
@@ -833,8 +799,35 @@ export default {
                             " ) " +
                             pageInfo;
                         this.formattedCitationRes.doi = obj.doi ? obj.doi : "";
-                        this.formattedCitationRes.abstract = obj.abstractText
-                            ? obj.abstractText
+                        break;
+                    case "datacite":
+                        journalTitle = obj.attributes.titles
+                            ? obj.attributes.titles[0].title
+                            : "";
+                        yearofPublication = obj.attributes.publicationYear
+                            ? obj.attributes.publicationYear
+                            : null;
+                        volume = obj.attributes.volume
+                            ? obj.attributes.volume
+                            : "";
+                        issue = obj.attributes.issue
+                            ? obj.attributes.issue
+                            : "";
+                        pageInfo = obj.attributes.page
+                            ? obj.attributes.page
+                            : "";
+
+                        this.formattedCitationRes.title = journalTitle;
+                        if (obj.attributes.creators) {
+                            this.formattedCitationRes.authors =
+                                obj.attributes.creators
+                                    .map((author) => author.name)
+                                    .join(", ");
+                        }
+                        this.formattedCitationRes.citation_text =
+                            journalTitle + " " + yearofPublication;
+                        this.formattedCitationRes.doi = obj.attributes
+                            ? obj.attributes["doi"]
                             : "";
                         break;
                     case "crossref":
@@ -868,12 +861,10 @@ export default {
                             " ) " +
                             pageInfo;
                         this.formattedCitationRes.doi = obj.DOI ? obj.DOI : "";
-                        this.formattedCitationRes.abstract = obj.abstract
-                            ? obj.abstract
-                            : "";
                         break;
                 }
             }
+            this.loading = false;
             return this.formattedCitationRes;
         },
         /*Confirm delete and prepare request*/
@@ -887,7 +878,6 @@ export default {
                     doi: citation.doi ? citation.doi : null,
                     title: citation.title ? citation.title : null,
                     authors: citation.authors ? citation.authors : null,
-                    abstract: citation.abstract ? citation.abstract : null,
                     citation_text: citation.citation_text
                         ? citation.citation_text
                         : null,
