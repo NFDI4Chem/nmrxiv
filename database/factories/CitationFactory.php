@@ -32,7 +32,6 @@ class CitationFactory extends Factory
             'doi' => null,
             'title' => $this->faker->title(),
             'authors' => $author,
-            'abstract' => $this->faker->text(),
             'citation_text' => $this->faker->text(),
         ];
     }
