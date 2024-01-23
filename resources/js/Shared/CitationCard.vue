@@ -19,16 +19,9 @@
                 <p class="text-sm text-gray-500">
                     {{ citation.citation_text }}
                 </p>
-                <p v-if="citation.doi" class="text-sm font-sm text-gray-500">
-                    DOI -
-                    <a :href="citation.doi" class="text-teal-900">{{
-                        citation.doi
-                    }}</a>
+                <p v-if="citation.doi" class="text-sm font-sm text-teal-500">
+                    DOI - {{ citation.doi }}
                 </p>
-                <div
-                    class="text-sm text-gray-500 truncate line-clamp-2 ..."
-                    v-html="citation.abstract"
-                ></div>
             </a>
         </div>
     </div>
