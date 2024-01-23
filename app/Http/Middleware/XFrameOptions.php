@@ -20,9 +20,15 @@ class XFrameOptions
         if ($request->route()->getName() == 'embed') {
             return $response->header('Content-Security-Policy', 'frame-src data: blob: *');
         } else {
-            $xframeOptions = 'SAMEORIGIN';
 
-            return $response->header('X-Frame-Options', $xframeOptions);
+            if ($response instanceof \Illuminate\Http\Response) {
+                $xframeOptions = 'SAMEORIGIN';
+
+                return $response->header('X-Frame-Options', $xframeOptions);
+            } else {
+                return $response;
+            }
+
         }
     }
 }

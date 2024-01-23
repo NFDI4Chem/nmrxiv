@@ -910,7 +910,7 @@ export default {
         fetchAuthors() {
             this.loading = true;
             this.error = "";
-            this.query = this.extractDoi(this.query);
+            this.query = this.extractQueryParam(this.query);
             this.fetchedAuthors = [];
             let isDOI = new RegExp(/\b(10[.][0-9]{4,}(?:[.][0-9]+)*)\b/g).test(
                 this.query
@@ -949,9 +949,7 @@ export default {
                 })
                 .catch((err) => {
                     console.log(err);
-                })
-                .finally(() => {
-                    this.loading = false;
+                    this.fetchDataFromCrossref(this.query);
                 });
         },
         /*Make REST Call to Crossref API */
@@ -964,6 +962,26 @@ export default {
                         this.fetchedAuthors = this.formatAuthorResponse(
                             res.data.message.author,
                             "crossref"
+                        );
+                    } else {
+                        this.fetchDataFromDatacite(this.query);
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
+                    this.fetchDataFromDatacite(this.query);
+                });
+        },
+        /*Make REST call to Datacite API */
+        fetchDataFromDatacite(query) {
+            this.fetchedAuthors = [];
+            axios
+                .get(this.$page.props.DATACITE_API + this.query)
+                .then((res) => {
+                    if (res && res.data && res.data.data) {
+                        this.fetchedAuthors = this.formatAuthorResponse(
+                            res.data.data.attributes.creators,
+                            "datacite"
                         );
                     }
                 })
@@ -1019,8 +1037,30 @@ export default {
                             formattedAuthors.push(a);
                         });
                         break;
+                    case "datacite":
+                        authors.forEach((author) => {
+                            var a = {};
+                            a.firstName = author.givenName;
+                            a.lastName = author.familyName;
+                            if (
+                                author.nameIdentifiers &&
+                                author.nameIdentifiers[0] &&
+                                author.nameIdentifiers[0]
+                                    .nameIdentifierScheme == "ORCID"
+                            ) {
+                                a.orcidId = this.extractQueryParam(
+                                    author.nameIdentifiers[0].nameIdentifier
+                                );
+                            }
+                            a.affiliation = author.affiliation
+                                ? author.affiliation[0]
+                                : "";
+                            formattedAuthors.push(a);
+                        });
+                        break;
                 }
             }
+            this.loading = false;
             return formattedAuthors;
         },
         /*Format the response*/
