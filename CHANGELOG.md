@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.0.1-rc.24](https://github.com/NFDI4Chem/nmrxiv/compare/v1.0.0-rc.24...v1.0.1-rc.24) (2024-01-23)
+
+
+### Bug Fixes
+
+* additional author search from datacite api. ([476f5f9](https://github.com/NFDI4Chem/nmrxiv/commit/476f5f9ab35d608cd7028ec2ea407a53f316b115))
+* additional search for citation from datacite ([fe36bc7](https://github.com/NFDI4Chem/nmrxiv/commit/fe36bc71182ce648d47005e878d336169606ffb1))
+* authors sorting issue ([bbfcd23](https://github.com/NFDI4Chem/nmrxiv/commit/bbfcd23f21dcf3d4d0b6ea3138da34aedcfdd469))
+* citation link ([af88f5e](https://github.com/NFDI4Chem/nmrxiv/commit/af88f5e75825922f9d9015d3c29cad70de440ac9)), closes [#1033](https://github.com/NFDI4Chem/nmrxiv/issues/1033)
+* enable addition of duplicate citations ([4a40754](https://github.com/NFDI4Chem/nmrxiv/commit/4a40754ee0b71e6cf3fc8a6bca851f8b85b1e484))
+* notification css fix ([04939f5](https://github.com/NFDI4Chem/nmrxiv/commit/04939f599b09f12abb94e0f6e4ca9256dc4c2a42))
+* remove instances of abstract from tests ([f398131](https://github.com/NFDI4Chem/nmrxiv/commit/f398131e746076f891e511a2510c916918fa5790))
+* resolved [#1031](https://github.com/NFDI4Chem/nmrxiv/issues/1031) ([570455b](https://github.com/NFDI4Chem/nmrxiv/commit/570455b231dd5c01b821c50945e17974bf59d07d))
+* resolved publish based on release day daily issue ([badb231](https://github.com/NFDI4Chem/nmrxiv/commit/badb23103ea2ada7a49d763dabfd6f7e96026afc))
+* resolves [#1048](https://github.com/NFDI4Chem/nmrxiv/issues/1048) ([a7ef632](https://github.com/NFDI4Chem/nmrxiv/commit/a7ef6321a5224e0d494f1e1a0653dec676caf9a0))
+* ugrade get-gke-cred github actions ([876c521](https://github.com/NFDI4Chem/nmrxiv/commit/876c5211376bd534a6fee13b06dc1513e8dac21a))
+* update gke-cred authentication ([a5364c9](https://github.com/NFDI4Chem/nmrxiv/commit/a5364c9c5ade586de8bb8098bb75f4e25e6eb899))
+
 ## [1.0.1-rc.23](https://github.com/NFDI4Chem/nmrxiv/compare/v1.0.0-rc.23...v1.0.1-rc.23) (2024-01-19)
 
 
