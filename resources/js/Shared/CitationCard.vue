@@ -22,10 +22,6 @@
                 <p v-if="citation.doi" class="text-sm font-sm text-teal-500">
                     DOI - {{ citation.doi }}
                 </p>
-                <div
-                    class="text-sm text-gray-500 truncate line-clamp-2 ..."
-                    v-html="citation.abstract"
-                ></div>
             </a>
         </div>
     </div>
