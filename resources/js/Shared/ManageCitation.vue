@@ -717,7 +717,7 @@ export default {
                     _citationObj = {};
                 });
             }
-            const keys = ["title"];
+            const keys = ["doi"];
             this.citationsForm.citations = this.citationsForm.citations.filter(
                 (value, index, self) =>
                     self.findIndex((v) =>
