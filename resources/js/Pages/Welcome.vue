@@ -557,7 +557,7 @@
                                     <div class="mt-6">
                                         <a
                                             target="_blank"
-                                            href="https://docs.nmrxiv.org/docs/developer-guides/API"
+                                            href="https://docs.nmrxiv.org/developer-guides/api.html"
                                             class="inline-flex bg-gradient-to-r from-indigo-600 to-teal-600 bg-origin-border px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white hover:from-indigo-700 hover:to-teal-700"
                                         >
                                             API Documentation
@@ -1025,7 +1025,7 @@ const footerNavigation = {
         },
         {
             name: "API Status",
-            href: "https://docs.nmrxiv.org/docs/developer-guides/API",
+            href: "https://docs.nmrxiv.org/developer-guides/api.html",
         },
     ],
     About: [
