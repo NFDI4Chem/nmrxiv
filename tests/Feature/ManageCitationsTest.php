@@ -145,7 +145,6 @@ class ManageCitationsTest extends TestCase
                     'doi' => $citation->doi,
                     'title' => $citation->title,
                     'authors' => $citation->authors,
-                    'abstract' => $citation->abstract,
                     'citation_text' => $citation->citation_text,
                 ]],
             ];

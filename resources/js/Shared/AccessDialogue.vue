@@ -694,7 +694,7 @@
                                                         class="flex items-center"
                                                     >
                                                         <div
-                                                            class="text-sm text-gray-600"
+                                                            class="text-sm font-semibold text-gray-700"
                                                             :class="{
                                                                 'font-semibold':
                                                                     addMemberForm.role ==
@@ -722,7 +722,7 @@
                                                         </svg>
                                                     </div>
                                                     <div
-                                                        class="mt-2 text-xs text-gray-600"
+                                                        class="mt-2 text-xs text-gray-600 text-left"
                                                     >
                                                         {{ role.description }}
                                                     </div>

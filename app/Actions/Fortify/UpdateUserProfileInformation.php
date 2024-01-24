@@ -43,7 +43,7 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
                 'name' => $input['username'] ? $input['username'] : $user->name,
                 'email' => $input['email'],
                 'orcid_id' => $input['orcid_id'],
-                'affiliation' => $input['affiliation'],
+                'affiliation' => $input['affiliation'] ? $input['affiliation'] : null,
             ])->save();
         }
     }

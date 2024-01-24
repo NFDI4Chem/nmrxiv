@@ -20,10 +20,10 @@ class ArchiveProject
             $study->datasets()->update(['is_archived' => $archiveState]);
         }
         $project->is_archived = $archiveState;
-        $project->save();
         if ($project->is_archived) {
             $project->sendNotification('archival', $this->prepareSendList($project));
         }
+        $project->save();
     }
 
     /**

@@ -106,7 +106,7 @@ class ProcessProject implements ShouldBeUnique, ShouldQueue
 
             $release_date = Carbon::parse($project->release_date);
 
-            if ($release_date->isToday()) {
+            if ($release_date->isPast()) {
                 $publisher->publish($project);
             }
 

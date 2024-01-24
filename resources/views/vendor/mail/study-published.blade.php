@@ -11,9 +11,11 @@ Please find the details below.
 @endforeach
 
 @else
-{{ __('Your submission is processed and your sample would be auto-published on chosen release date :releaseDate', ['releaseDate' => $releaseDate]) }}
+{{ __('Your submission is processed and is published as Embargo and your sample(s) would be made public on chosen release date :releaseDate', ['releaseDate' => $releaseDate]) }}
 
-You will recieve an email confirmation with further details once your sample has been published successfully.
+You will recieve an email confirmation with further details once your sample has been made public successfully.
+
+Please Note: Opting for an Embargo publication grants your sample a DOI, yet it stays private exclusively for you. You have the option to share the sample with others and can adjust the release date or promptly make it public through the project's dashboard view.
 @endif
 
 Follow our [documentation](https://docs.nmrxiv.org/) to learn more.

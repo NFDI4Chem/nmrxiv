@@ -112,7 +112,7 @@
                 v-if="!readonly"
                 :class="[fullScreen ? 'px-6 py-4' : 'px-5', '']"
             >
-                <form class="py-2 mb-3">
+                <div class="py-2 mb-3">
                     <div id="fs-dropzone-message" class="text-center">
                         <div
                             type="button"
@@ -136,7 +136,7 @@
                             <span
                                 class="mt-2 block text-lg font-bold text-blue-600"
                             >
-                                Drop Files or Folders to upload
+                                Drop Files or Folders
                                 <span
                                     v-if="
                                         $page.props.selectedFolder &&
@@ -145,6 +145,23 @@
                                 >
                                     to "{{ $page.props.selectedFolder }}" folder
                                 </span>
+                                <form
+                                    class="inline"
+                                    enctype="multipart/form-data"
+                                >
+                                    or
+                                    <button
+                                        type="button"
+                                        class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white px-2 border border-blue-500 hover:border-transparent rounded"
+                                        id="fs-dropzone-click-target"
+                                    >
+                                        Select folders
+                                    </button>
+                                    to upload
+                                    <div
+                                        id="fs-dropzone-hidden-input-container"
+                                    ></div>
+                                </form>
                                 <div class="text-sm text-gray-400">
                                     Need help? Check out our
                                     <a
@@ -199,7 +216,7 @@
                             </div>
                         </div>
                     </div>
-                </form>
+                </div>
             </div>
             <div v-if="loading">
                 <div class="h-[calc(100vh-260px)] text-center py-12">
@@ -903,8 +920,11 @@ export default {
                     uploadMultiple: true,
                     disablePreviews: true,
                     parallelUploads: 100,
+                    useFsAccessApi: false,
                     autoQueue: false,
                     maxFiles: 20000,
+                    clickable: "#fs-dropzone-click-target",
+                    hiddenInputContainer: "#fs-dropzone-hidden-input-container",
                     dictDefaultMessage: document.querySelector(
                         "#fs-dropzone-message"
                     ).innerHTML,
@@ -913,6 +933,10 @@ export default {
                     },
                 };
                 vm.dropzone = new Dropzone("#fs-dropzone", options);
+                vm.dropzone.hiddenFileInput.setAttribute(
+                    "webkitdirectory",
+                    true
+                );
                 vm.dropzone.on("processing", (file) => {
                     vm.dropzone.options.url = file.uploadURL;
                     vm.status = "UPLOAD IN PROGRESS";
@@ -942,9 +966,14 @@ export default {
                     }
                 });
                 vm.dropzone.on("addedfile", (file) => {
-                    vm.selectedFSO.push(file);
                     if (file.fullPath) {
                         vm.logs[file.fullPath] = {
+                            status: "Queued",
+                            messages: [],
+                        };
+                    } else if (file.webkitRelativePath) {
+                        file.fullPath = file.webkitRelativePath;
+                        vm.logs[file.webkitRelativePath] = {
                             status: "Queued",
                             messages: [],
                         };
@@ -954,6 +983,7 @@ export default {
                             messages: [],
                         };
                     }
+                    vm.selectedFSO.push(file);
                 });
                 vm.dropzone.on("addedfiles", (files) => {
                     if (files.length > 0) {

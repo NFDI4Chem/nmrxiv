@@ -73,13 +73,14 @@ class HandleInertiaRequests extends Middleware
             'SCOUT_PREFIX' => (env('SCOUT_PREFIX')),
             'europemcWSApi' => (env('EUROPEMC_WS_API')),
             'dataciteURL' => env('DATACITE_ENDPOINT'),
-            'collOffPeriod' => env('COOL_OFF_PERIOD'),
+            'coolOffPeriod' => env('COOL_OFF_PERIOD'),
             'mailFromAddress' => env('MAIL_FROM_ADDRESS'),
             'orcidSearchApi' => env('ORCID_ID_SEARCH_API'),
             'orcidPersonApi' => env('ORCID_ID_PERSON_API'),
             'orcidEmploymentApi' => env('ORCID_ID_EMPLOYMENT_API'),
             'CM_API' => env('CM_API'),
             'CROSSREF_API' => env('CROSSREF_API'),
+            'DATACITE_API' => env('DATACITE_API'),
         ]);
     }
 }

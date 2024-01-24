@@ -18,7 +18,7 @@ class DataController extends Controller
      * @OA\Get(
      * path="/api/v1/list/{model}",
      * summary="Fetch all models",
-     * description="Fetch details for all publicly available models on nmrXiv.",
+     * description="Fetch details for all publicly available models (i.e. projects, samples, datasets) on nmrXiv.",
      * operationId="publicModels",
      * tags={"public"},
      *
@@ -30,7 +30,8 @@ class DataController extends Controller
      *
      *      @OA\Schema(
      *          type="string",
-     *    )
+     *          enum={"projects", "samples", "datasets"}
+     *      )
      * ),
      *
      * @OA\Response(
@@ -56,7 +57,6 @@ class DataController extends Controller
                     ->where('is_public', true)
                     ->allowedSorts($allowedSorts)
                     ->allowedFilters($allowedFilters)
-                    ->defaultSort($defaultSort)
                     ->paginate($per_page)
                     ->appends(request()->query())
             );
@@ -66,7 +66,6 @@ class DataController extends Controller
                     ->where('is_public', true)
                     ->allowedSorts($allowedSorts)
                     ->allowedFilters($allowedFilters)
-                    ->defaultSort($defaultSort)
                     ->paginate($per_page)
                     ->appends(request()->query())
             );
@@ -76,7 +75,6 @@ class DataController extends Controller
                     ->where('is_public', true)
                     ->allowedSorts($allowedSorts)
                     ->allowedFilters($allowedFilters)
-                    ->defaultSort($defaultSort)
                     ->paginate($per_page)
                     ->appends(request()->query())
             );

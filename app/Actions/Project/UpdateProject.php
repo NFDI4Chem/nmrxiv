@@ -33,11 +33,12 @@ class UpdateProject
 
             if (array_key_exists('photo', $input)) {
                 $image = $input['photo'];
-                $s3 = Storage::disk(env('FILESYSTEM_DRIVER_PUBLIC'));
-                $file_name =
-                    uniqid().'.'.$image->getClientOriginalExtension();
-                $s3filePath = '/projects/'.$file_name;
-                $s3->put($s3filePath, file_get_contents($image), 'public');
+                if (! is_null($image)) {
+                    $s3 = Storage::disk(env('FILESYSTEM_DRIVER_PUBLIC'));
+                    $file_name = uniqid().'.'.$image->getClientOriginalExtension();
+                    $s3filePath = '/projects/'.$file_name;
+                    $s3->put($s3filePath, file_get_contents($image), 'public');
+                }
             }
 
             $is_public = array_key_exists('is_public', $input) ? $input['is_public'] : $project->is_public;
@@ -47,9 +48,9 @@ class UpdateProject
 
             $project
                 ->forceFill([
-                    'name' => $input['name'],
-                    'slug' => Str::slug($input['name'], '-'),
-                    'description' => $input['description'] ? $input['description'] : $project->description,
+                    'name' => array_key_exists('name', $input) ? $input['name'] : $project->name,
+                    'slug' => array_key_exists('name', $input) ? Str::slug($input['name'], '-') : $project->slug,
+                    'description' => array_key_exists('description', $input) ? $input['description'] : $project->description,
                     'color' => array_key_exists('color', $input)
                         ? $input['color']
                         : $project->color,

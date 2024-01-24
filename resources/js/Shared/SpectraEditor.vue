@@ -27,7 +27,16 @@
                 <span v-if="info">{{ info }}</span>
             </small>
         </div>
-        <div v-if="spectraError">
+        <iframe
+            name="submissionNMRiumIframe"
+            frameborder="0"
+            allowfullscreen
+            class="rounded-md border"
+            style="width: 100%; height: 75vh; max-height: 600px"
+            :src="nmriumURL"
+            @load="loadSpectra()"
+        ></iframe>
+        <div class="mt-4" v-if="spectraError && spectraError.length > 0">
             <div class="rounded-md bg-red-50 p-4">
                 <div class="flex">
                     <div class="flex-shrink-0">
@@ -51,8 +60,8 @@
                         </h3>
                         <div class="mt-2 text-sm text-red-700">
                             <ul role="list" class="list-disc space-y-1 pl-5">
-                                <li>
-                                    {{ spectraError }}
+                                <li v-for="error in spectraError">
+                                    {{ error }}
                                 </li>
                             </ul>
                         </div>
@@ -60,15 +69,6 @@
                 </div>
             </div>
         </div>
-        <iframe
-            name="submissionNMRiumIframe"
-            frameborder="0"
-            allowfullscreen
-            class="rounded-md border"
-            style="width: 100%; height: 75vh; max-height: 600px"
-            :src="nmriumURL"
-            @load="loadSpectra()"
-        ></iframe>
         <Versions ref="versionsElement" :dataset="dataset" />
     </div>
 </template>
@@ -97,7 +97,7 @@ export default {
     },
     data() {
         return {
-            spectraError: null,
+            spectraError: [],
             selectedSpectraData: null,
             autoSaving: false,
             currentMolecules: [],
@@ -105,6 +105,7 @@ export default {
             resetInProgress: false,
             info: null,
             version: null,
+            eventRegistered: false,
         };
     },
     computed: {
@@ -124,12 +125,12 @@ export default {
         },
     },
     watch: {
-        dataset: {
-            immediate: true,
-            handler() {
-                this.loadSpectra();
-            },
-        },
+        // dataset: {
+        //     immediate: true,
+        //     handler() {
+        //         this.loadSpectra();
+        //     },
+        // },
         study: {
             immediate: true,
             handler() {
@@ -153,16 +154,20 @@ export default {
                         this.saveStudyPreview(data.data);
                     }
                 }
+                if (type == "nmr-wrapper:error") {
+                    if (this.spectraError) {
+                        this.spectraError.push(data);
+                    } else {
+                        this.spectraError = [data];
+                    }
+                    this.updateLoadingStatus(false);
+                    return;
+                }
                 if (data && data.source == "data") {
                     if (
                         e.origin != "https://nmriumdev.nmrxiv.org" &&
                         e.origin != "https://nmrium.nmrxiv.org"
                     ) {
-                        return;
-                    }
-                    if (type == "nmr-wrapper:error") {
-                        this.spectraError = e.data;
-                        this.updateLoadingStatus(false);
                         return;
                     }
                     let state = data.state;
@@ -182,6 +187,7 @@ export default {
                                     ];
                                     this.selectedSpectraData.spectra.forEach(
                                         (spec) => {
+                                            spec.info = spec["originalData"];
                                             delete spec["data"];
                                             delete spec["meta"];
                                             delete spec["originalData"];
@@ -228,13 +234,15 @@ export default {
                     }
                 }
             };
-            if (!this.$props.eventRegistered) {
+            if (!this.eventRegistered) {
+                console.log("events registered");
                 window.addEventListener("message", saveNMRiumUpdates);
-                this.$props.eventRegistered = true;
-            } else {
-                window.removeEventListener("message", saveNMRiumUpdates);
-                this.$props.eventRegistered = false;
+                this.eventRegistered = true;
             }
+            // else {
+            //     window.removeEventListener("message", saveNMRiumUpdates);
+            //     this.$props.eventRegistered = false;
+            // }
         },
         loadSpectra() {
             this.infoLog("Loading Spectra..");
@@ -485,7 +493,7 @@ export default {
         updateLoadingStatus(status, message) {
             this.$emit("loading", {
                 status: status,
-                message: message,
+                message: message ? message : "",
             });
         },
         infoLog(message, reset) {

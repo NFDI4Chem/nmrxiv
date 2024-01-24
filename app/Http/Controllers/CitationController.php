@@ -49,7 +49,6 @@ class CitationController extends Controller
                             'doi' => array_key_exists('doi', $citation) ? $citation['doi'] : null,
                             'title' => array_key_exists('title', $citation) ? $citation['title'] : null,
                             'authors' => array_key_exists('authors', $citation) ? $citation['authors'] : null,
-                            'abstract' => array_key_exists('abstract', $citation) ? $citation['abstract'] : null,
                             'citation_text' => array_key_exists('citation_text', $citation) ? $citation['citation_text'] : null,
                         ]);
                     } else {
@@ -57,7 +56,6 @@ class CitationController extends Controller
                             'doi' => array_key_exists('doi', $citation) ? $citation['doi'] : null,
                             'title' => array_key_exists('title', $citation) ? $citation['title'] : null,
                             'authors' => array_key_exists('authors', $citation) ? $citation['authors'] : null,
-                            'abstract' => array_key_exists('abstract', $citation) ? $citation['abstract'] : null,
                             'citation_text' => array_key_exists('citation_text', $citation) ? $citation['citation_text'] : null,
                         ]);
                     }

@@ -38,7 +38,7 @@
             frameborder="0"
             allowfullscreen
             class="rounded-md border"
-            style="width: 100%; height: 75vh; max-height: 600px"
+            :style="'width: ' + width + '%; height: ' + height + 'vh;'"
             :src="nmriumURL"
             @load="loadSpectra()"
         ></iframe>
@@ -292,9 +292,26 @@
 <script>
 export default {
     props: {
-        dataset: Object,
-        project: Object,
-        study: Object,
+        dataset: {
+            type: Object,
+            default: null,
+        },
+        project: {
+            type: Object,
+            default: null,
+        },
+        study: {
+            type: Object,
+            default: null,
+        },
+        height: {
+            type: Number,
+            default: 100,
+        },
+        width: {
+            type: Number,
+            default: 100,
+        },
     },
     data() {
         return {

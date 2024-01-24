@@ -169,6 +169,8 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
             ->name('dashboard.project.activity');
         Route::get('projects/{project}/validation', [ProjectController::class, 'validation'])
             ->name('dashboard.project.validation');
+        Route::put('projects/{project}/updateReleaseDate', [ProjectController::class, 'updateReleaseDate'])
+            ->name('dashboard.project.updateReleaseDate');
 
         Route::put('projects/{project}/publish', [ProjectController::class, 'publish'])
             ->name('dashboard.project.publish');
@@ -379,6 +381,4 @@ Route::get('spectra', [StudyController::class, 'publicStudiesView'])
 
 Route::get('services/oembed', [OEmbedController::class, 'spectra']);
 
-Route::group(['middleware' => 'embed'], function () {
-    Route::get('embed/{id}', [OEmbedController::class, 'embed'])->name('embed');
-});
+Route::get('embed/{id}', [OEmbedController::class, 'embed'])->name('embed');
