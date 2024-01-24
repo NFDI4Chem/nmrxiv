@@ -1,10 +1,9 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: ingress-resource-dev
+  name: ingress-resource-prod
   annotations:
     kubernetes.io/ingress.class: "nginx"
-    #kubernetes.io/ingress.global-static-ip-name: nmrxiv-dev-ip-address
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     cert-manager.io/issuer: "letsencrypt-dev"
     nginx.ingress.kubernetes.io/proxy-body-size: 200M
@@ -12,15 +11,15 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-connect-timeout: "1800"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "1800"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "1800"
-
 spec:
   tls:
   - hosts:
-      - dev.nmrxiv.org
-    secretName: nmrxiv-app-dev-tls
+      - nmrxiv.org
+      - www.nmrxiv.org
+    secretName: nmrxiv-app-prod-tls
   - hosts:
-      - docs.nmrxiv.org
-    secretName: nmrxiv-app-doc-tls
+      - nmrium.nmrxiv.org
+    secretName: nmrxiv-prod-nmrium-tls
   - hosts:
       - nmriumdev.nmrxiv.org
     secretName: nmrxiv-nmrium-tls
@@ -31,7 +30,7 @@ spec:
       - dbdev.nmrxiv.org
     secretName: nmrxiv-dbdev-tls
   rules:
-  - host: dev.nmrxiv.org
+  - host: nmrxiv.org
     http:
       paths:
       - pathType: Prefix
@@ -41,17 +40,7 @@ spec:
             name: nmrxiv-nmrxiv-app
             port:
               number: 80
-  - host: docs.nmrxiv.org
-    http:
-      paths:
-      - pathType: Prefix
-        path: "/"
-        backend:
-          service:
-            name: doc-nmrxiv-doc
-            port:
-              number: 80
-  - host: nmriumdev.nmrxiv.org
+  - host: nmrium.nmrxiv.org
     http:
       paths:
       - pathType: Prefix
@@ -61,7 +50,7 @@ spec:
             name: nmrxiv-nmrium
             port:
               number: 80
-  - host: msdev.nmrxiv.org
+  - host: ms.nmrxiv.org
     http:
       paths:
       - pathType: Prefix

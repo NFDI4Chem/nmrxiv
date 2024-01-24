@@ -17,22 +17,18 @@ class XFrameOptions
     {
         $response = $next($request);
 
-        $option = 'SAMEORIGIN';
-
-        if ($request->routeIs('embed')) {
-            $xframeOptions = env('X_FRAME_OPTIONS', $option);
-            if ($xframeOptions) {
-                $host = $request->getHttpHost();
-                $xframeOptions = str_replace('*', $host, $xframeOptions);
-                if (strpos($xframeOptions, 'ALLOW-FROM') !== false) {
-                    $url = trim(str_replace('ALLOW-FROM', '', $xframeOptions));
-                    $response->header('Content-Security-Policy', 'frame-ancestors '.$url);
-                }
-            }
+        if ($request->route()->getName() == 'embed') {
+            return $response->header('Content-Security-Policy', 'frame-src data: blob: *');
         } else {
-            $xframeOptions = $option;
-        }
 
-        return $response->header('X-Frame-Options', $xframeOptions);
+            if ($response instanceof \Illuminate\Http\Response) {
+                $xframeOptions = 'SAMEORIGIN';
+
+                return $response->header('X-Frame-Options', $xframeOptions);
+            } else {
+                return $response;
+            }
+
+        }
     }
 }

@@ -588,7 +588,7 @@
                                                                     >
                                                                         <div
                                                                             :class="[
-                                                                                study.has_nmrium
+                                                                                ds.has_nmrium
                                                                                     ? 'bg-green-100 text-gray-800'
                                                                                     : 'bg-gray-100 text-gray-800',
                                                                                 'mb-0.5 truncate break-words items-center px-3 py-0.5 rounded-full text-xs font-medium mr-1',
@@ -975,6 +975,7 @@
                                                 </div>
                                                 <div v-else>
                                                     <div
+                                                        v-if="selectedStudy"
                                                         class="mx-auto flex flex-col md:px-0 xl:px-0"
                                                     >
                                                         <div>
@@ -2035,12 +2036,15 @@ export default {
             });
             if (id == 1) {
                 // this.loadingStep = true;
+                this.selectedStudyIndex = null;
+                this.selectedStudy = null;
                 this.$nextTick(function () {
                     this.setQueryStringParameter(
                         "draft_id",
                         this.currentDraft.id
                     );
                     this.setQueryStringParameter("step", 1);
+                    this.setQueryStringParameter("sample", null);
                     this.step = "1";
                     if (this.$refs.fsbRef) {
                         this.$refs.fsbRef.annotate();
@@ -2053,15 +2057,6 @@ export default {
                     // }
                     this.setQueryStringParameter("step", 2);
                     this.step = "2";
-                    if (this.querySample) {
-                        let i = 0;
-                        this.studies.forEach((s) => {
-                            if (s.id == this.querySample) {
-                                this.selectStudy(s, i);
-                            }
-                            i = i + 1;
-                        });
-                    }
                     this.fetchValidations();
                     this.updateAutoImportList();
                 });
@@ -2152,6 +2147,19 @@ export default {
                     ) {
                         this.loadingStep = false;
                         this.selectStep(2);
+                        this.$nextTick(() => {
+                            if (this.querySample) {
+                                let i = 0;
+                                this.studies.forEach((s) => {
+                                    if (s.id == this.querySample) {
+                                        this.selectStudy(s, i);
+                                    }
+                                    i = i + 1;
+                                });
+                            } else {
+                                this.showSamplesSummary();
+                            }
+                        });
                         this.inprogressStudies = this.studies.filter(
                             (study) => study.internal_status != "complete"
                         );

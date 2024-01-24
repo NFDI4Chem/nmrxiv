@@ -65,7 +65,7 @@ class ProjectPolicy
      */
     public function updateProject(User $user, Project $project)
     {
-        if ($project->is_public || $project->is_archived || $project->is_deleted || $project->is_published) {
+        if ($project->is_public || $project->is_archived || $project->is_deleted || $project->is_published || (! $project->is_published && $project->doi)) {
             return false;
         }
 
@@ -80,6 +80,16 @@ class ProjectPolicy
     public function deleteProject(User $user, Project $project)
     {
         return $user->isProjectCreator($project);
+    }
+
+    /**
+     * Determine whether the user can delete the model.
+     *
+     * @return mixed
+     */
+    public function manageSettings(User $user, Project $project)
+    {
+        return $user->ownsProject($project);
     }
 
     /**
