@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.1-rc.25](https://github.com/NFDI4Chem/nmrxiv/compare/v1.0.0-rc.25...v1.0.1-rc.25) (2024-01-25)
+
+
+### Bug Fixes
+
+* disallow bots ([0042951](https://github.com/NFDI4Chem/nmrxiv/commit/0042951b183cafb6cb87f7af0012627834fbab65))
+* include nmrium table in backup ([b4c17ae](https://github.com/NFDI4Chem/nmrxiv/commit/b4c17aedcbfc857d4b2423f94b76f671587e730a))
+
 ## [1.0.1-rc.24](https://github.com/NFDI4Chem/nmrxiv/compare/v1.0.0-rc.24...v1.0.1-rc.24) (2024-01-23)
 
 
