@@ -33,7 +33,7 @@ class UpdateStudy
                 'color' => array_key_exists('color', $input) ? $input['color'] : $study->color,
                 'starred' => array_key_exists('starred', $input) ? $input['starred'] : $study->starred,
                 'location' => array_key_exists('location', $input) ? $input['location'] : $study->location,
-                'url' => array_key_exists('url', $input) ? $input['url'] : $study->url,
+                'obfuscationcode' => array_key_exists('obfuscationcode', $input) ? $input['obfuscationcode'] : $study->obfuscationcode,
                 'type' => array_key_exists('type', $input) ? $input['type'] : $study->type,
                 'species' => array_key_exists('species', $input) ? $input['species'] : $study->species,
                 'access' => array_key_exists('access', $input) ? $input['access'] : 'restricted',

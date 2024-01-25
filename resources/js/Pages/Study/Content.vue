@@ -9,23 +9,10 @@
             :available-roles="availableRoles"
             :study-permissions="studyPermissions"
             :study-role="studyRole"
+            :preview="preview"
         >
             <template #scontent>
                 <div class="bg-white shadow-md rounded-lg">
-                    <div class="md:hidden">
-                        <label for="tabs" class="sr-only">Select a tab</label>
-                        <select
-                            class="block w-full focus:ring-teal-500 focus:border-teal-500 border-gray-300 rounded-md"
-                        >
-                            <option
-                                v-for="tab in subNavigation"
-                                :key="tab.name"
-                                :selected="tab.name === current"
-                            >
-                                {{ tab.name }}
-                            </option>
-                        </select>
-                    </div>
                     <div class="hidden md:block">
                         <div
                             class="border-b border-t rounded-t-md border-gray-200 pl-4"
@@ -37,7 +24,15 @@
                                 <Link
                                     v-for="tab in subNavigation"
                                     :key="tab.name"
-                                    :href="route(tab.route, [study.id])"
+                                    :href="
+                                        preview
+                                            ? route(tab.preview, [
+                                                  project.url,
+                                                  study.id,
+                                                  tab.model,
+                                              ])
+                                            : route(tab.route, [study.id])
+                                    "
                                     :class="[
                                         tab.name == current
                                             ? 'border-teal-500 text-teal-600'
@@ -81,13 +76,27 @@ import {
     Squares2X2Icon,
 } from "@heroicons/vue/24/outline";
 const subNavigation = [
-    { name: "About", route: "dashboard.studies", icon: CircleStackIcon },
+    {
+        name: "About",
+        route: "dashboard.studies",
+        preview: "preview",
+        icon: CircleStackIcon,
+        model: "study",
+    },
     {
         name: "Spectra",
         route: "dashboard.study.datasets",
+        preview: "preview",
         icon: Squares2X2Icon,
+        model: "datasets",
     },
-    { name: "Files", route: "dashboard.study.files", icon: FolderOpenIcon },
+    {
+        name: "Files",
+        route: "dashboard.study.files",
+        preview: "preview",
+        icon: FolderOpenIcon,
+        model: "files",
+    },
 ];
 
 export default {
@@ -105,6 +114,7 @@ export default {
         "studyPermissions",
         "studyRole",
         "model",
+        "preview",
     ],
     setup() {
         return {
