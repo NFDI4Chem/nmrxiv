@@ -139,7 +139,7 @@ export default {
                 reader.addEventListener("loadend", () => {
                     let svg = reader.result;
                     axios
-                        .post("/dashboard/datasets/" + this.id + "/preview", {
+                        .post("/dashboard/datasets/" + this.id + "/snapshot", {
                             img: svg,
                         })
                         .then((response) => {

@@ -176,7 +176,11 @@
                     class="mt-8 mx-auto max-w-md grid gap-8 sm:max-w-lg lg:grid-cols-4 lg:max-w-7xl"
                 >
                     <div v-for="study in studies.data" :key="study.uuid">
-                        <study-card :study="study" />
+                        <study-card
+                            :preview="preview"
+                            :obfuscation-code="project.url"
+                            :study="study"
+                        />
                     </div>
                 </div>
                 <div
@@ -267,6 +271,10 @@ export default {
             default: null,
             type: String,
         },
+        preview: {
+            default: false,
+            type: Boolean,
+        },
     },
     data() {
         return {
@@ -279,9 +287,15 @@ export default {
         if (this.studies.length == 0) {
             if (this.project) {
                 this.loading = true;
-                this.fetchStudies(
-                    route("dashboard.project.studies", this.project.id)
-                );
+                if (!this.preview) {
+                    this.fetchStudies(
+                        route("dashboard.project.studies", this.project.id)
+                    );
+                } else {
+                    this.fetchStudies(
+                        route("studies.preview", this.project.url)
+                    );
+                }
             }
         }
     },

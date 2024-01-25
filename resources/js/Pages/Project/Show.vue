@@ -12,7 +12,10 @@
             </div>
             <div
                 v-if="
-                    !project.is_public && !project.is_published && project.doi
+                    !project.is_public &&
+                    !project.is_published &&
+                    project.doi &&
+                    !preview
                 "
                 class="text-center px-3 py-2 bg-green-50 text-green-700 border-b"
             >
@@ -35,6 +38,13 @@
                     <b>Info: </b> This project is public. You cannot edit a
                     published project, please create a new version to updated
                     the project.
+                </div>
+            </div>
+            <div v-if="preview">
+                <div
+                    class="text-center px-3 py-2 bg-green-50 text-green-700 border-b"
+                >
+                    <b>Info: </b> You are viewing the project in read-only mode.
                 </div>
             </div>
             <div v-if="project.is_public && project.doi != null">
@@ -337,7 +347,8 @@
                             v-if="
                                 !project.is_public &&
                                 !project.is_published &&
-                                project.doi
+                                project.doi &&
+                                !preview
                             "
                         >
                             <span
@@ -1012,6 +1023,7 @@
                     :project="project"
                     :role="role"
                     :team-role="teamRole"
+                    :preview="preview"
                 />
             </div>
         </div>
@@ -1082,6 +1094,7 @@ export default {
         "role",
         "teamRole",
         "license",
+        "preview",
     ],
     setup() {
         const projectDetailsElement = ref(null);

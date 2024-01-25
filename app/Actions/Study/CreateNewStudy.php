@@ -36,7 +36,7 @@ class CreateNewStudy
                 'color' => array_key_exists('color', $input) ? $input['color'] : null,
                 'starred' => array_key_exists('starred', $input) ? $input['starred'] : null,
                 'location' => array_key_exists('location', $input) ? $input['location'] : null,
-                'url' => Str::random(40),
+                'obfuscationcode' => Str::random(40),
                 'type' => array_key_exists('type', $input) ? $input['type'] : null,
                 'uuid' => Str::uuid(),
                 'access' => array_key_exists('access', $input) ? $input['access'] : 'restricted',
