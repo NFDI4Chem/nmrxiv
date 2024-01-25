@@ -70,7 +70,11 @@ Route::impersonate();
 
 Route::get('/email/verify/{id}/{hash}', [VerificationController::class, 'verify'])->name('verification.verify');
 
-Route::get('projects/{url}', [ProjectController::class, 'shared'])->name('shared.projects');
+Route::get('project/{url}', [ProjectController::class, 'review'])->name('project.preview');
+Route::get('project/{url}/studies', [ProjectController::class, 'reviewerStudies'])->name('studies.preview');
+Route::get('study/{obfuscationCode}/{study}', [StudyController::class, 'review'])->name('study.preview');
+Route::get('study/{obfuscationCode}/{study}/datasets', [StudyController::class, 'datasetsPreview'])->name('datasets.preview');
+Route::get('study/{obfuscationCode}/{study}/files', [StudyController::class, 'filesPreview'])->name('files.preview');
 
 Route::group(['middleware' => 'verified'], function () {
     if (Jetstream::hasTeamFeatures()) {

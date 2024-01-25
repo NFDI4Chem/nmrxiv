@@ -1012,6 +1012,7 @@
                     :project="project"
                     :role="role"
                     :team-role="teamRole"
+                    :preview="preview"
                 />
             </div>
         </div>
@@ -1082,6 +1083,7 @@ export default {
         "role",
         "teamRole",
         "license",
+        "preview",
     ],
     setup() {
         const projectDetailsElement = ref(null);
