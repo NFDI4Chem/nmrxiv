@@ -10,6 +10,7 @@
             :study-permissions="studyPermissions"
             :study-role="studyRole"
             current="Files"
+            :preview="preview"
         >
             <template #study-section>
                 <div class="divide-y divide-gray-200 sm:col-span-9">
@@ -330,6 +331,7 @@ export default {
         "availableRoles",
         "studyPermissions",
         "studyRole",
+        "preview",
     ],
     setup() {
         return {};

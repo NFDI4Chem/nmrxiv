@@ -143,18 +143,15 @@ class ProjectController extends Controller
         ]);
     }
 
-    public function shared(Request $request, $url, GetLicense $getLicense)
+    public function review(Request $request, $obfuscationCode, GetLicense $getLicense)
     {
-        $project = Project::where([['is_archived', false], ['url', $url]])->firstOrFail();
-
+        $project = Project::where([['is_archived', false], ['url', $obfuscationCode]])->firstOrFail();
+        $project->load('projectInvitations', 'tags', 'authors', 'citations', 'owner');
         if (! $project->is_public) {
-            $user = User::factory()->withPersonalTeam()->create();
-            $team = $project->nonPersonalTeam();
             $license = null;
             if ($project->license_id) {
                 $license = $getLicense->getLicensebyId($project->license_id);
             }
-            $user->delete();
 
             return Inertia::render('Project/Show', [
                 'project' => $project,
@@ -168,6 +165,7 @@ class ProjectController extends Controller
                     'canDeleteProject' => false,
                     'canUpdateProject' => false,
                 ],
+                'preview' => true,
             ]);
         } else {
             $identifier = explode(':', $project->identifier)[1];
@@ -175,6 +173,14 @@ class ProjectController extends Controller
             return redirect()->route('public', $identifier);
         }
 
+    }
+
+    public function reviewerStudies(Request $request, $obfuscationCode)
+    {
+        $project = Project::where([['is_archived', false], ['url', $obfuscationCode]])->firstOrFail();
+        if ($project) {
+            return StudyResource::collection(Study::where('project_id', $project->id)->filter($request->only('search', 'sort', 'mode'))->paginate(9)->withQueryString());
+        }
     }
 
     public function studies(Request $request, Project $project)

@@ -9,6 +9,7 @@ use App\Http\Resources\StudyResource;
 use App\Models\FileSystemObject;
 use App\Models\Molecule;
 use App\Models\NMRium;
+use App\Models\Project;
 use App\Models\Sample;
 use App\Models\Study;
 use Auth;
@@ -101,6 +102,33 @@ class StudyController extends Controller
         ]);
     }
 
+    public function review(Request $request, $obfuscationCode, Study $study, GetLicense $getLicense)
+    {
+        $project = Project::where([['is_archived', false], ['url', $obfuscationCode]])->firstOrFail();
+
+        $team = $project->nonPersonalTeam;
+
+        $license = null;
+        if ($study->license_id) {
+            $license = $getLicense->getLicensebyId($study->license_id);
+        }
+
+        return Inertia::render('Study/About', [
+            'study' => $study->load('users', 'owner', 'studyInvitations', 'tags', 'sample.molecules'),
+            'team' => $team ? $team->load('users', 'owner') : null,
+            'project' => $project ? $project->load('users', 'owner') : null,
+            'members' => $study->allUsers(),
+            'availableRoles' => null,
+            'preview' => true,
+            'studyRole' => 'reviewer',
+            'license' => $license ? $license[0] : null,
+            'studyPermissions' => [
+                'canDeleteStudy' => false,
+                'canUpdateStudy' => false,
+            ],
+        ]);
+    }
+
     public function protocols(Request $request, Study $study)
     {
         return Inertia::render('Study/Protocols', [
@@ -128,6 +156,59 @@ class StudyController extends Controller
             'studyPermissions' => [
                 'canDeleteStudy' => Gate::check('deleteStudy', $study),
                 'canUpdateStudy' => Gate::check('updateStudy', $study),
+            ],
+        ]);
+    }
+
+    public function datasetsPreview(Request $request, $obfuscationCode, Study $study)
+    {
+        $project = Project::where([['is_archived', false], ['url', $obfuscationCode]])->firstOrFail();
+
+        $team = $project->nonPersonalTeam;
+
+        return Inertia::render('Study/Datasets', [
+            'study' => $study->load('users', 'owner', 'studyInvitations', 'datasets'),
+            'team' => $team ? $team->load('users', 'owner') : null,
+            'project' => $project ? $project->load('users', 'owner') : null,
+            'members' => $study->allUsers(),
+            'preview' => true,
+            'availableRoles' => null,
+            'studyRole' => 'reviewer',
+            'studyPermissions' => [
+                'canDeleteStudy' => false,
+                'canUpdateStudy' => false,
+            ],
+        ]);
+    }
+
+    public function filesPreview(Request $request, $obfuscationCode, Study $study)
+    {
+        $project = Project::where([['is_archived', false], ['url', $obfuscationCode]])->firstOrFail();
+
+        $team = $project->nonPersonalTeam;
+        $studyFSObject = $study->fsObject;
+
+        return Inertia::render('Study/Files', [
+            'study' => $study->load('users', 'owner', 'studyInvitations'),
+            'team' => $team ? $team->load('users', 'owner') : null,
+            'project' => $project ? $project->load('users', 'owner') : null,
+            'members' => $study->allUsers(),
+            'preview' => true,
+            'availableRoles' => null,
+            'studyRole' => 'reviewer',
+            'studyPermissions' => [
+                'canDeleteStudy' => false,
+                'canUpdateStudy' => false,
+            ],
+            'file' => [
+                'name' => '/',
+                'children' => FileSystemObject::with('children')
+                    ->where([
+                        ['study_id', $study->id],
+                        ['level', $studyFSObject->level],
+                    ])
+                    ->orderBy('type')
+                    ->get(),
             ],
         ]);
     }
