@@ -365,7 +365,9 @@
                     />
                 </div>
                 <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div class="relative pt-12 sm:p-24 xl:col-start-1">
+                    <div
+                        class="relative pt-12 sm:p-24 xl:col-start-1"
+                    >
                         <h2
                             class="text-sm font-semibold tracking-wide uppercase"
                         >
@@ -522,7 +524,7 @@
                 </div>
                 <div class="mt-12">
                     <div
-                        class="lg:mx-auto lg:max-w-7xl lg:px-8 lg:grid lg:grid-cols-2 lg:grid-flow-col-dense lg:gap-24 overflow-x-hidden border-l"
+                        class="lg:mx-auto lg:max-w-7xl lg:px-8 lg:grid lg:grid-cols-2 lg:grid-flow-col-dense lg:gap-24 overflow-x-hidden"
                     >
                         <div
                             class="px-4 z-20 max-w-xl mx-auto sm:px-6 lg:py-32 lg:max-w-none lg:mx-0 lg:px-0 lg:col-start-2"
@@ -563,7 +565,9 @@
                             </div>
                         </div>
                         <div class="mt-12 sm:mt-16 lg:mt-0">
-                            <div class="lg:relative lg:h-full">
+                            <div
+                                class="lg:relative lg:h-full"
+                            >
                                 <img
                                     class="w-full lg:absolute lg:left-0 lg:h-full lg:w-auto lg:max-w-none"
                                     src="/img/api.png"
@@ -778,11 +782,11 @@
             <div
                 class="max-w-7xl mx-auto pt-16 pb-8 px-4 sm:px-6 lg:pt-24 lg:px-8"
             >
-                <div class="xl:grid xl:grid-cols-3 xl:gap-8">
+                <div class="md:grid md:grid-cols-3 md:gap-8">
                     <div class="mt-12 xl:mt-0 items center content-center">
                         <jet-application-logo class="p-0.5 ml-1.5" />
                     </div>
-                    <div class="grid grid-cols-2 gap-8 xl:col-span-2">
+                    <div class="grid grid-cols-2 gap-8 md:col-span-2">
                         <div class="md:grid md:grid-cols-2 md:gap-8">
                             <div>
                                 <h3
