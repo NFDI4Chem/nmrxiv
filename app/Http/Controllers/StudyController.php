@@ -87,46 +87,7 @@ class StudyController extends Controller
             $license = $getLicense->getLicensebyId($study->license_id);
         }
 
-        return Inertia::render('Study/About', [
-            'study' => $study->load('users', 'owner', 'studyInvitations', 'tags', 'sample.molecules'),
-            'team' => $team ? $team->load('users', 'owner') : null,
-            'project' => $project ? $project->load('users', 'owner') : null,
-            'members' => $study->allUsers(),
-            'availableRoles' => array_values(Jetstream::$roles),
-            'studyRole' => $study->userStudyRole(Auth::user()->email),
-            'license' => $license ? $license[0] : null,
-            'studyPermissions' => [
-                'canDeleteStudy' => Gate::check('deleteStudy', $study),
-                'canUpdateStudy' => Gate::check('updateStudy', $study),
-            ],
-        ]);
-    }
-
-    public function review(Request $request, $obfuscationCode, Study $study, GetLicense $getLicense)
-    {
-        $project = Project::where([['is_archived', false], ['url', $obfuscationCode]])->firstOrFail();
-
-        $team = $project->nonPersonalTeam;
-
-        $license = null;
-        if ($study->license_id) {
-            $license = $getLicense->getLicensebyId($study->license_id);
-        }
-
-        return Inertia::render('Study/About', [
-            'study' => $study->load('users', 'owner', 'studyInvitations', 'tags', 'sample.molecules'),
-            'team' => $team ? $team->load('users', 'owner') : null,
-            'project' => $project ? $project->load('users', 'owner') : null,
-            'members' => $study->allUsers(),
-            'availableRoles' => null,
-            'preview' => true,
-            'studyRole' => 'reviewer',
-            'license' => $license ? $license[0] : null,
-            'studyPermissions' => [
-                'canDeleteStudy' => false,
-                'canUpdateStudy' => false,
-            ],
-        ]);
+        return $this->renderTabView('About', $study, $team, $project, $license, null, false);
     }
 
     public function protocols(Request $request, Study $study)
@@ -146,71 +107,101 @@ class StudyController extends Controller
         $project = $study->project;
         $team = $project->team;
 
-        return Inertia::render('Study/Datasets', [
-            'study' => $study->load('users', 'owner', 'studyInvitations', 'datasets'),
-            'team' => $team ? $team->load('users', 'owner') : null,
-            'project' => $project ? $project->load('users', 'owner') : null,
-            'members' => $study->allUsers(),
-            'availableRoles' => array_values(Jetstream::$roles),
-            'studyRole' => $study->userStudyRole(Auth::user()->email),
-            'studyPermissions' => [
-                'canDeleteStudy' => Gate::check('deleteStudy', $study),
-                'canUpdateStudy' => Gate::check('updateStudy', $study),
-            ],
-        ]);
+        return $this->renderTabView('Datasets', $study, $team, $project, null, null, false);
     }
 
-    public function datasetsPreview(Request $request, $obfuscationCode, Study $study)
+    public function preview2(Request $request, $obfuscationCode, Study $study, $model, GetLicense $getLicense)
     {
-        $project = Project::where([['is_archived', false], ['url', $obfuscationCode]])->firstOrFail();
+        switch ($model) {
+            case 'study':
+                $project = Project::where([['is_archived', false], ['obfuscationcode', $obfuscationCode]])->firstOrFail();
+                $team = $project->nonPersonalTeam;
+                $license = null;
+                if ($study->license_id) {
+                    $license = $getLicense->getLicensebyId($study->license_id);
+                }
 
-        $team = $project->nonPersonalTeam;
+                return $this->renderTabView('About', $study, $team, $project, $license, null, true);
 
-        return Inertia::render('Study/Datasets', [
-            'study' => $study->load('users', 'owner', 'studyInvitations', 'datasets'),
-            'team' => $team ? $team->load('users', 'owner') : null,
-            'project' => $project ? $project->load('users', 'owner') : null,
-            'members' => $study->allUsers(),
-            'preview' => true,
-            'availableRoles' => null,
-            'studyRole' => 'reviewer',
-            'studyPermissions' => [
-                'canDeleteStudy' => false,
-                'canUpdateStudy' => false,
-            ],
-        ]);
+                break;
+            case 'files':
+                $project = Project::where([['is_archived', false], ['obfuscationcode', $obfuscationCode]])->firstOrFail();
+                $team = $project->nonPersonalTeam;
+                $studyFSObject = $study->fsObject;
+
+                return $this->renderTabView('Files', $study, $team, $project, null, $studyFSObject, true);
+
+                break;
+            case 'datasets':
+                $project = Project::where([['is_archived', false], ['obfuscationcode', $obfuscationCode]])->firstOrFail();
+                $team = $project->nonPersonalTeam;
+
+                return $this->renderTabView('Datasets', $study, $team, $project, null, null, true);
+
+                break;
+        }
     }
 
-    public function filesPreview(Request $request, $obfuscationCode, Study $study)
+    public function renderTabView($tab, $study, $team, $project, $license, $studyFSObject, $preview)
     {
-        $project = Project::where([['is_archived', false], ['url', $obfuscationCode]])->firstOrFail();
-
-        $team = $project->nonPersonalTeam;
-        $studyFSObject = $study->fsObject;
-
-        return Inertia::render('Study/Files', [
-            'study' => $study->load('users', 'owner', 'studyInvitations'),
-            'team' => $team ? $team->load('users', 'owner') : null,
-            'project' => $project ? $project->load('users', 'owner') : null,
-            'members' => $study->allUsers(),
-            'preview' => true,
-            'availableRoles' => null,
-            'studyRole' => 'reviewer',
-            'studyPermissions' => [
-                'canDeleteStudy' => false,
-                'canUpdateStudy' => false,
-            ],
-            'file' => [
-                'name' => '/',
-                'children' => FileSystemObject::with('children')
-                    ->where([
-                        ['study_id', $study->id],
-                        ['level', $studyFSObject->level],
-                    ])
-                    ->orderBy('type')
-                    ->get(),
-            ],
-        ]);
+        switch ($tab) {
+            case 'About':
+                return Inertia::render('Study/About', [
+                    'study' => $study->load('users', 'owner', 'studyInvitations', 'tags', 'sample.molecules'),
+                    'team' => $team ? $team->load('users', 'owner') : null,
+                    'project' => $project ? $project->load('users', 'owner') : null,
+                    'members' => $study->allUsers(),
+                    'preview' => $preview,
+                    'availableRoles' => array_values(Jetstream::$roles),
+                    'studyRole' => $preview ? null : $study->userStudyRole(Auth::user()->email),
+                    'license' => $license ? $license[0] : null,
+                    'studyPermissions' => [
+                        'canDeleteStudy' => Gate::check('deleteStudy', $study),
+                        'canUpdateStudy' => Gate::check('updateStudy', $study),
+                    ],
+                ]);
+                break;
+            case 'Files':
+                return Inertia::render('Study/Files', [
+                    'study' => $study->load('users', 'owner', 'studyInvitations'),
+                    'team' => $team ? $team->load('users', 'owner') : null,
+                    'project' => $project ? $project->load('users', 'owner') : null,
+                    'members' => $study->allUsers(),
+                    'preview' => $preview,
+                    'availableRoles' => array_values(Jetstream::$roles),
+                    'studyRole' => $preview ? null : $study->userStudyRole(Auth::user()->email),
+                    'studyPermissions' => [
+                        'canDeleteStudy' => Gate::check('deleteStudy', $study),
+                        'canUpdateStudy' => Gate::check('updateStudy', $study),
+                    ],
+                    'file' => [
+                        'name' => '/',
+                        'children' => FileSystemObject::with('children')
+                            ->where([
+                                ['study_id', $study->id],
+                                ['level', $studyFSObject->level],
+                            ])
+                            ->orderBy('type')
+                            ->get(),
+                    ],
+                ]);
+                break;
+            case 'Datasets':
+                return Inertia::render('Study/Datasets', [
+                    'study' => $study->load('users', 'owner', 'studyInvitations', 'datasets'),
+                    'team' => $team ? $team->load('users', 'owner') : null,
+                    'project' => $project ? $project->load('users', 'owner') : null,
+                    'members' => $study->allUsers(),
+                    'preview' => $preview,
+                    'availableRoles' => array_values(Jetstream::$roles),
+                    'studyRole' => $preview ? null : $study->userStudyRole(Auth::user()->email),
+                    'studyPermissions' => [
+                        'canDeleteStudy' => Gate::check('deleteStudy', $study),
+                        'canUpdateStudy' => Gate::check('updateStudy', $study),
+                    ],
+                ]);
+                break;
+        }
     }
 
     public function moleculeStore(Request $request, Study $study)
@@ -382,28 +373,7 @@ class StudyController extends Controller
         $team = $project->nonPersonalTeam;
         $studyFSObject = $study->fsObject;
 
-        return Inertia::render('Study/Files', [
-            'study' => $study->load('users', 'owner', 'studyInvitations'),
-            'team' => $team ? $team->load('users', 'owner') : null,
-            'project' => $project ? $project->load('users', 'owner') : null,
-            'members' => $study->allUsers(),
-            'availableRoles' => array_values(Jetstream::$roles),
-            'studyRole' => $study->userStudyRole(Auth::user()->email),
-            'studyPermissions' => [
-                'canDeleteStudy' => Gate::check('deleteStudy', $study),
-                'canUpdateStudy' => Gate::check('updateStudy', $study),
-            ],
-            'file' => [
-                'name' => '/',
-                'children' => FileSystemObject::with('children')
-                    ->where([
-                        ['study_id', $study->id],
-                        ['level', $studyFSObject->level],
-                    ])
-                    ->orderBy('type')
-                    ->get(),
-            ],
-        ]);
+        return $this->renderTabView('Files', $study, $team, $project, null, $studyFSObject, false);
     }
 
     public function annotations(Request $request, Study $study)
@@ -558,7 +528,7 @@ class StudyController extends Controller
         return Bookmark::toggle($study, $request->user());
     }
 
-    public function preview(Request $request, Study $study)
+    public function snapshot(Request $request, Study $study)
     {
         $content = $request->get('img');
         if ($content) {
