@@ -367,7 +367,9 @@
                                         Anyone with the link
                                         <p class="text-xs text-gray-600">
                                             Anyone on the internet with the link
-                                            can view
+                                            can view the project, along with
+                                            associated samples and datasets, in
+                                            a read-only mode.
                                         </p>
                                     </span>
                                 </div>
@@ -975,7 +977,7 @@ export default {
         copyLinkToClipboard() {
             let url =
                 this.$page.props.url +
-                "/projects/" +
+                "/project/" +
                 encodeURIComponent(this.project.url);
             let targetInput = document.getElementById("copyLink");
             if (targetInput) {

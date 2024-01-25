@@ -145,7 +145,7 @@ class ProjectController extends Controller
 
     public function review(Request $request, $obfuscationCode, GetLicense $getLicense)
     {
-        $project = Project::where([['is_archived', false], ['url', $obfuscationCode]])->firstOrFail();
+        $project = Project::where([['is_archived', false], ['obfuscationcode', $obfuscationCode]])->firstOrFail();
         $project->load('projectInvitations', 'tags', 'authors', 'citations', 'owner');
         if (! $project->is_public) {
             $license = null;
@@ -177,7 +177,7 @@ class ProjectController extends Controller
 
     public function reviewerStudies(Request $request, $obfuscationCode)
     {
-        $project = Project::where([['is_archived', false], ['url', $obfuscationCode]])->firstOrFail();
+        $project = Project::where([['is_archived', false], ['obfuscationcode', $obfuscationCode]])->firstOrFail();
         if ($project) {
             return StudyResource::collection(Study::where('project_id', $project->id)->filter($request->only('search', 'sort', 'mode'))->paginate(9)->withQueryString());
         }

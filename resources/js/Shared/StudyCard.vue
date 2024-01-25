@@ -82,7 +82,7 @@
             <Link
                 :href="
                     preview
-                        ? route('study.preview', [obfuscationCode, study.id])
+                        ? route('preview', [obfuscationCode, study.id, 'study'])
                         : route('dashboard.studies', [study.id])
                 "
             >

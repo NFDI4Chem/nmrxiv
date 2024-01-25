@@ -29,6 +29,7 @@
                                             ? route(tab.preview, [
                                                   project.url,
                                                   study.id,
+                                                  tab.model,
                                               ])
                                             : route(tab.route, [study.id])
                                     "
@@ -78,20 +79,23 @@ const subNavigation = [
     {
         name: "About",
         route: "dashboard.studies",
-        preview: "study.preview",
+        preview: "preview",
         icon: CircleStackIcon,
+        model: "study",
     },
     {
         name: "Spectra",
         route: "dashboard.study.datasets",
-        preview: "datasets.preview",
+        preview: "preview",
         icon: Squares2X2Icon,
+        model: "datasets",
     },
     {
         name: "Files",
         route: "dashboard.study.files",
-        preview: "files.preview",
+        preview: "preview",
         icon: FolderOpenIcon,
+        model: "files",
     },
 ];
 
