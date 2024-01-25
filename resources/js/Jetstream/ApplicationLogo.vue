@@ -24,10 +24,5 @@
                 fill="black"
             />
         </svg>
-        <a
-            style="font-size: 0.7em"
-            class="float-left font-bold border-red-900 text-red-900 absolute top-0 left-0 mx-1 my-1 text-xs border px-1 rounded-md"
-            >v1.0-rc</a
-        >
     </div>
 </template>
