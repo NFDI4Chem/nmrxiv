@@ -978,7 +978,7 @@ export default {
             let url =
                 this.$page.props.url +
                 "/project/" +
-                encodeURIComponent(this.project.url);
+                encodeURIComponent(this.project.obfuscationcode);
             let targetInput = document.getElementById("copyLink");
             if (targetInput) {
                 this.isVisible = true;
