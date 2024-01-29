@@ -15,7 +15,6 @@ env:
   DOCKER_HUB_PASSWORD : ${{ secrets.DOCKER_HUB_PASSWORD  }}
   REPOSITORY_NAME: nmrxiv
   REPOSITORY_NAMESPACE: nfdi4chem
-  DEV_URL: https://dev.nmrxiv.org
 
 jobs:
   # php-unit-test:
@@ -74,7 +73,6 @@ jobs:
     needs: php-unit-test
     environment:
       name: Dev
-      url: ${{ env.DEV_URL }}
     steps:
     # Checkout code
     - name: Checkout
