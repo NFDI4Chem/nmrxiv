@@ -178,7 +178,7 @@
                     <div v-for="study in studies.data" :key="study.uuid">
                         <study-card
                             :preview="preview"
-                            :obfuscation-code="project.url"
+                            :obfuscation-code="project.obfuscationcode"
                             :study="study"
                         />
                     </div>
@@ -293,7 +293,7 @@ export default {
                     );
                 } else {
                     this.fetchStudies(
-                        route("studies.preview", this.project.url)
+                        route("studies.preview", this.project.obfuscationcode)
                     );
                 }
             }
