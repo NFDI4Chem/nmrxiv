@@ -27,7 +27,7 @@
                                     :href="
                                         preview
                                             ? route(tab.preview, [
-                                                  project.url,
+                                                  project.obfuscationcode,
                                                   study.id,
                                                   tab.model,
                                               ])
