@@ -470,7 +470,7 @@ export default {
                     let svg = reader.result;
                     axios
                         .post(
-                            "/dashboard/studies/" + this.study.id + "/preview",
+                            "/dashboard/studies/" + this.study.id + "/snapshot",
                             {
                                 img: svg,
                             }

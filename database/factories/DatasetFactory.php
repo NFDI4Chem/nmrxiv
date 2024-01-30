@@ -37,7 +37,7 @@ class DatasetFactory extends Factory
             'status' => null,
             'process_logs' => null,
             'location' => null, //todo: Adjust when location field is provided in nmrXiv
-            'url' => Str::random(40),
+            'obfuscationcode' => Str::random(40),
             'description' => $this->faker->text(),
             'type' => null,  //todo: Adjust when type field is provided in nmrXiv
             'uuid' => Str::uuid(),

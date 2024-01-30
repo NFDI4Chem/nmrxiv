@@ -15,7 +15,6 @@ env:
   DOCKER_HUB_PASSWORD : ${{ secrets.DOCKER_HUB_PASSWORD  }}
   REPOSITORY_NAME: nmrxiv
   REPOSITORY_NAMESPACE: nfdi4chem
-  DEV_URL: https://dev.nmrxiv.org
 
 jobs:
   # php-unit-test:
@@ -74,7 +73,6 @@ jobs:
     needs: php-unit-test
     environment:
       name: Dev
-      url: ${{ env.DEV_URL }}
     steps:
     # Checkout code
     - name: Checkout
@@ -99,14 +97,14 @@ jobs:
 
     # Login to Docker
     - name: Log in to Docker Hub
-      uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+      uses: docker/login-action@v3
       with:
         username: ${{ env.DOCKER_HUB_USERNAME  }}
         password: ${{ env.DOCKER_HUB_PASSWORD  }}
 
     # Build and push the app Docker image
     - name: Build and push App Docker image
-      uses: docker/build-push-action@v4
+      uses: docker/build-push-action@v5
       with:
         context: .
         file: ./resources/ops/docker/app/app.dockerfile
@@ -114,12 +112,10 @@ jobs:
         build-args: |
           RELEASE_VERSION=dev-app-latest
         tags: ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:dev-app-latest
-        username: ${{ env.DOCKER_HUB_USERNAME  }}
-        password: ${{ env.DOCKER_HUB_PASSWORD  }}
 
     # Build and push the nginx Docker image
     - name: Build and push Nginx Docker image
-      uses: docker/build-push-action@v4
+      uses: docker/build-push-action@v5
       with:
         context: .
         file: ./resources/ops/docker/nginx/nginx.dockerfile
@@ -127,8 +123,6 @@ jobs:
         build-args: |
           RELEASE_VERSION=dev-nginx-latest
         tags: ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:dev-nginx-latest
-        username: ${{ env.DOCKER_HUB_USERNAME  }}
-        password: ${{ env.DOCKER_HUB_PASSWORD  }}
 
     # Deploy the latest Docker image to the GKE cluster
     - name: Deploy
