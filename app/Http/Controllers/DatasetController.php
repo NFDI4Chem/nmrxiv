@@ -132,7 +132,7 @@ class DatasetController extends Controller
         ]);
     }
 
-    public function preview(Request $request, Dataset $dataset)
+    public function snapshot(Request $request, Dataset $dataset)
     {
         $content = $request->get('img');
         $study = $dataset->study;

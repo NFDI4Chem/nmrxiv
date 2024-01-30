@@ -10,6 +10,7 @@
             :study-permissions="studyPermissions"
             :study-role="studyRole"
             current="Datasets"
+            :preview="preview"
         >
             <template #study-section>
                 <div class="px-4 sm:px-6 md:px-0">
@@ -258,6 +259,7 @@ export default {
         "studyPermissions",
         "studyRole",
         "model",
+        "preview",
     ],
     data() {
         return {
