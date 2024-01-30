@@ -62,9 +62,7 @@
                                 <div
                                     class="flex h-full flex-col overflow-y-scroll bg-white py-6 shadow-xl"
                                 >
-                                    <h2
-                                        class="text-2xl font-bold text-center"
-                                    >
+                                    <h2 class="text-2xl font-bold text-center">
                                         Notifications
                                     </h2>
                                     <div

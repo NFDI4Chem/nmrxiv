@@ -1,1 +1,0 @@
-import{_ as a,L as n,J as c,l as o,o as s,c as p,w as r,a as i}from"./app.e0b65b09.js";const _={components:{Link:n,JetApplicationLogo:c}};function l(f,m,d,k,u,L){const t=o("jet-application-logo"),e=o("Link");return s(),p(e,{href:"/"},{default:r(()=>[i(t,{class:"block w-auto"})]),_:1})}var h=a(_,[["render",l]]);export{h as J};

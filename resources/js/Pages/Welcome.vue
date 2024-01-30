@@ -237,12 +237,10 @@
                                             text="To submit data you will need an account with nmrXiv, so you will be redirected to our register page and once registered you can then go ahead and submit data. For more information please checkout our <a target='_blank' href='//docs.nmrxiv.org' class='text-gray-400' target='_blank'>documentation</a>."
                                         ></ToolTip>
                                     </Link>
-                                    <Link
-                                        href="/projects"
-                                        class="flex items-center justify-center px-4 py-3 border border-1 text-base font-medium rounded-md shadow-sm text-white bg-teal-500 sm:px-8"
-                                    >
-                                        Browse data
-                                    </Link>
+                                    <StructureSearch
+                                        mode="button"
+                                        ref="structure-search"
+                                    ></StructureSearch>
                                 </div>
                             </div>
                             <div class="flex justify-center">
@@ -319,60 +317,8 @@
                 </div>
             </div>
 
-            <div class="relative bg-transparent">
-                <div class="absolute inset-x-0 top-0 overflow-hidden pl-[50%]">
-                    <img
-                        src="/img/beams-basic.png"
-                        alt=""
-                        class="-ml-[39rem] w-[113.125rem] max-w-none"
-                    />
-                </div>
-                <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div
-                        class="relative pt-12 sm:p-24 xl:col-start-1 border-b border-slate-100"
-                    >
-                        <h2
-                            class="text-sm font-semibold tracking-wide uppercase"
-                        >
-                            <span class="bg-clip-text text-gray-600"
-                                >Metrics</span
-                            >
-                        </h2>
-                        <p class="mt-3 text-xl font-bold">
-                            Validate your spectral findings and develop
-                            new/accurate tools using state of the art AI/ML
-                            models.
-                        </p>
-                        <div
-                            class="mt-4 grid grid-cols-1 gap-y-12 gap-x-6 sm:grid-cols-2"
-                        >
-                            <p>
-                                <span class="block text-2xl font-bold"
-                                    >{{ projects }} Projects</span
-                                >
-                            </p>
-                            <p>
-                                <span class="block text-2xl font-bold"
-                                    >{{ compounds }} Compounds</span
-                                >
-                            </p>
-                            <p>
-                                <span class="block text-2xl font-bold"
-                                    >{{ spectra }} Spectra</span
-                                >
-                            </p>
-                            <!-- <p>
-                                <span class="block text-2xl font-bold"
-                                    >{{ techniques }} Techniques</span
-                                >
-                            </p> -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="border-b">
-                <div class="bg-white pb-24 pt-24">
+            <div class="border-y border-gray-200">
+                <div class="bg-white pb-12 pt-12">
                     <div class="mx-auto max-w-7xl px-6 lg:px-8">
                         <h2
                             class="text-center text-lg font-semibold leading-8 text-gray-900"
@@ -410,10 +356,62 @@
                 </div>
             </div>
 
-            <div class="relative pt-16">
+            <div class="relative bg-transparent">
+                <div class="absolute inset-x-0 top-0 overflow-hidden pl-[50%]">
+                    <img
+                        src="/img/beams-basic.png"
+                        alt=""
+                        class="-ml-[39rem] w-[113.125rem] max-w-none"
+                    />
+                </div>
+                <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div
+                        class="relative pt-12 sm:p-24 xl:col-start-1"
+                    >
+                        <h2
+                            class="text-sm font-semibold tracking-wide uppercase"
+                        >
+                            <span class="bg-clip-text text-gray-600"
+                                >Metrics</span
+                            >
+                        </h2>
+                        <!-- <p class="mt-3 text-xl font-bold">
+                            Validate your spectral findings and develop
+                            new/accurate tools using state of the art AI/ML
+                            models.
+                        </p> -->
+                        <div
+                            class="mt-4 grid grid-cols-1 gap-y-12 gap-x-6 sm:grid-cols-3"
+                        >
+                            <p class="text-center">
+                                <span class="block text-2xl font-bold"
+                                    >{{ projects }} Projects</span
+                                >
+                            </p>
+                            <p class="text-center">
+                                <span class="block text-2xl font-bold"
+                                    >{{ compounds }} Compounds</span
+                                >
+                            </p>
+                            <p class="text-center">
+                                <span class="block text-2xl font-bold"
+                                    >{{ spectra }} Spectra</span
+                                >
+                            </p>
+                            <!-- <p>
+                                <span class="block text-2xl font-bold"
+                                    >{{ techniques }} Techniques</span
+                                >
+                            </p> -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="relative">
                 <div>
                     <div
-                        class="lg:mx-auto lg:max-w-7xl lg:px-8 lg:grid lg:grid-cols-2 lg:grid-flow-col-dense lg:gap-24 overflow-x-hidden py-10 border-r"
+                        class="border-t lg:mx-auto lg:max-w-7xl lg:px-8 lg:grid lg:grid-cols-2 lg:grid-flow-col-dense lg:gap-24 overflow-x-hidden py-10 border-r"
                     >
                         <div
                             class="px-4 max-w-xl mx-auto sm:px-6 lg:py-16 lg:max-w-none lg:mx-0 lg:px-0"
@@ -458,17 +456,17 @@
                         </div>
                         <div class="mt-12 sm:mt-16 lg:mt-0">
                             <div
-                                class="pl-4 -mr-48 sm:pl-6 md:-mr-16 lg:px-0 lg:m-0 lg:relative lg:h-full"
+                                class="-mr-48 md:-mr-16 lg:px-0 lg:m-0 lg:relative lg:h-full"
                             >
                                 <img
-                                    class="w-full rounded-xl shadow-xl ring-1 ring-black ring-opacity-5 lg:absolute lg:left-0 lg:h-full lg:w-auto lg:max-w-none"
-                                    src="/img/welcome1.jpg"
+                                    class="w-full rounded-xl ring-opacity-5 lg:absolute lg:left-0 lg:h-full lg:w-auto lg:max-w-none"
+                                    src="/img/welcome1.png"
                                     alt=""
                                 />
                             </div>
                         </div>
                     </div>
-                    <div class="my-5 py-10">
+                    <div class="mb-5 pb-24 border-b">
                         <div
                             class="lg:mx-auto lg:max-w-7xl px-8 lg:grid lg:grid-cols-1 lg:grid-flow-col-dense lg:gap-24"
                         >
@@ -524,14 +522,14 @@
                         </div>
                     </div>
                 </div>
-                <div class="mt-24">
+                <div class="mt-12">
                     <div
-                        class="lg:mx-auto lg:max-w-7xl lg:px-8 lg:grid lg:grid-cols-2 lg:grid-flow-col-dense lg:gap-24 overflow-x-hidden py-10 border-l"
+                        class="lg:mx-auto lg:max-w-7xl lg:px-8 lg:grid lg:grid-cols-2 lg:grid-flow-col-dense lg:gap-24 overflow-x-hidden"
                     >
                         <div
-                            class="px-4 max-w-xl mx-auto sm:px-6 lg:py-32 lg:max-w-none lg:mx-0 lg:px-0 lg:col-start-2"
+                            class="px-4 z-20 max-w-xl mx-auto sm:px-6 lg:py-32 lg:max-w-none lg:mx-0 lg:px-0 lg:col-start-2"
                         >
-                            <div>
+                            <div class="bg-white p-5 rounded-md border">
                                 <div>
                                     <span
                                         class="h-12 w-12 rounded-md flex items-center justify-center bg-gradient-to-r from-indigo-600 to-teal-600"
@@ -566,22 +564,22 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="mt-12 sm:mt-16 lg:mt-0 lg:col-start-1">
+                        <div class="mt-12 sm:mt-16 lg:mt-0">
                             <div
-                                class="pr-4 -ml-48 sm:pr-6 md:-ml-16 lg:px-0 lg:m-0 lg:relative lg:h-full"
+                                class="lg:relative lg:h-full"
                             >
                                 <img
-                                    class="w-full rounded-xl shadow-xl ring-1 ring-black ring-opacity-5 lg:absolute lg:right-0 lg:h-full lg:w-auto lg:max-w-none"
-                                    src="https://docs.nmrxiv.org/img/postman.png"
+                                    class="w-full lg:absolute lg:left-0 lg:h-full lg:w-auto lg:max-w-none"
+                                    src="/img/api.png"
                                     alt=""
                                 />
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="mt-24">
+                <div class="mt-24 border-y pt-10">
                     <div
-                        class="lg:mx-auto lg:max-w-7xl lg:px-8 lg:grid lg:grid-cols-2 lg:grid-flow-col-dense lg:gap-24 overflow-x-hidden py-10 border-r"
+                        class="lg:mx-auto lg:max-w-7xl lg:px-8 lg:grid lg:grid-cols-2 lg:grid-flow-col-dense lg:gap-24 overflow-x-hidden py-10 pb-20 border-r"
                     >
                         <div
                             class="px-4 max-w-xl mx-auto sm:px-6 lg:py-16 lg:max-w-none lg:mx-0 lg:px-0"
@@ -745,7 +743,7 @@
                 </div>
             </div>
 
-            <div class="bg-white">
+            <div class="bg-white border-y">
                 <div
                     class="max-w-4xl mx-auto py-16 px-4 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8 lg:flex lg:items-center lg:justify-between"
                 >
@@ -784,11 +782,11 @@
             <div
                 class="max-w-7xl mx-auto pt-16 pb-8 px-4 sm:px-6 lg:pt-24 lg:px-8"
             >
-                <div class="xl:grid xl:grid-cols-3 xl:gap-8">
+                <div class="md:grid md:grid-cols-3 md:gap-8">
                     <div class="mt-12 xl:mt-0 items center content-center">
                         <jet-application-logo class="p-0.5 ml-1.5" />
                     </div>
-                    <div class="grid grid-cols-2 gap-8 xl:col-span-2">
+                    <div class="grid grid-cols-2 gap-8 md:col-span-2">
                         <div class="md:grid md:grid-cols-2 md:gap-8">
                             <div>
                                 <h3
@@ -905,7 +903,7 @@
                         </a>
                     </div>
                     <p class="mt-8 text-base text-gray-400 md:mt-0 md:order-1">
-                        &copy; 2023 nmrXiv. All rights reserved.
+                        &copy; 2024 nmrXiv. All rights reserved.
                     </p>
                 </div>
             </div>
@@ -921,6 +919,7 @@ import { Head, Link } from "@inertiajs/vue3";
 import JetApplicationLogo from "@/Jetstream/ApplicationLogo.vue";
 import Projects from "@/Shared/Projects.vue";
 import { defineComponent, h } from "vue";
+import StructureSearch from "@/App/StructureSearch.vue";
 import {
     Popover,
     PopoverButton,
@@ -1086,6 +1085,7 @@ export default {
         Projects,
         FAQs,
         FlashMessages,
+        StructureSearch,
     },
 
     props: {

@@ -22,7 +22,7 @@ class Dataset extends Model implements Auditable
         'starred',
         'location',
         'is_public',
-        'url',
+        'obfuscationcode',
         'description',
         'type',
         'uuid',

@@ -79,7 +79,13 @@
                     </div>
                 </div>
             </div>
-            <Link :href="route('dashboard.studies', [study.id])">
+            <Link
+                :href="
+                    preview
+                        ? route('preview', [obfuscationCode, study.id, 'study'])
+                        : route('dashboard.studies', [study.id])
+                "
+            >
                 <div
                     class="flex items-center font-bold truncate text-lg text-gray-600"
                 >
@@ -124,7 +130,7 @@ export default {
         Link,
         Depictor2D,
     },
-    props: ["study"],
+    props: ["study", "preview", "obfuscationCode"],
     data() {
         return {
             selectedPreviewIndex: 0,
