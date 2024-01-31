@@ -32,16 +32,17 @@ class CitationController extends Controller
             $processedCitations = [];
 
             foreach ($citations as $citation) {
-                $title = $citation['title'];
+                $doi = $citation['doi'];
 
                 Validator::make($citation, [
                     'title' => ['required', 'string'],
+                    'doi' => ['required', 'string'],
                     'authors' => ['required', 'string'],
                 ])->validate();
 
-                if (! is_null($title)) {
-                    $_citation = $project->citations->filter(function ($a) use ($title) {
-                        return $title === $a->title;
+                if (! is_null($doi)) {
+                    $_citation = $project->citations->filter(function ($a) use ($doi) {
+                        return $doi === $a->doi;
                     })->first();
                     //dd($_author);
                     if ($_citation) {

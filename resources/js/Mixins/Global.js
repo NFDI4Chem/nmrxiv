@@ -216,7 +216,11 @@ export default {
         extractQueryParam(query) {
             if (query.indexOf("http") > -1) {
                 var url = new URL(query);
-                query = url.pathname.replace("/", "");
+                if(query.indexOf("dois") > -1){
+                    query = url.pathname.replace("/dois/", "");
+                } else {
+                    query = url.pathname.replace("/", "");
+                }
             }
             return query.trim();
         },
@@ -324,7 +328,11 @@ export default {
         extractQueryParam(query) {
             if (query.indexOf("http") > -1) {
                 var url = new URL(query);
-                query = url.pathname.replace("/", "");
+                if(query.indexOf("dois") > -1){
+                    query = url.pathname.replace("/dois/", "");
+                } else {
+                    query = url.pathname.replace("/", "");
+                }
             }
             return query.trim();
         },
