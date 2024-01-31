@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.1](https://github.com/NFDI4Chem/nmrxiv/compare/v1.0.0...v1.0.1) (2024-01-31)
+
+
+### Bug Fixes
+
+* duplicate citation error ([350a17c](https://github.com/NFDI4Chem/nmrxiv/commit/350a17cf3f49f894c2ef3f2617e6c53f7a8e14de))
+* fixes [#1026](https://github.com/NFDI4Chem/nmrxiv/issues/1026) ([28612a1](https://github.com/NFDI4Chem/nmrxiv/commit/28612a11bbbf55a20af001746101e6c19f372e6c))
+
 ## [1.1.0-rc.26](https://github.com/NFDI4Chem/nmrxiv/compare/v1.0.0-rc.26...v1.1.0-rc.26) (2024-01-30)
 
 
