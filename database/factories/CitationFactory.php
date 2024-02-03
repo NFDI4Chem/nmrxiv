@@ -29,7 +29,7 @@ class CitationFactory extends Factory
         $author = $author1.', '.$author2;
 
         return [
-            'doi' => "10.102X/acs.jnatprod.1c01SS",
+            'doi' => '10.102X/acs.jnatprod.1c01SS',
             'title' => $this->faker->title(),
             'authors' => $author,
             'citation_text' => $this->faker->text(),

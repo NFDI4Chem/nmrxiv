@@ -89,7 +89,7 @@ class TeamPolicy
      */
     public function removeTeamMember(User $user, Team $team)
     {
-        if ($user->hasTeamRole($user->currentTeam->fresh(), 'owner') || $user->ownsTeam($team)) {
+        if ($user->hasTeamRole($team, 'owner') || $user->ownsTeam($team)) {
             return true;
         } else {
             return false;
