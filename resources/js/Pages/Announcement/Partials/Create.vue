@@ -74,6 +74,7 @@
                         </label>
                         <Datepicker
                             v-model="createAnnouncementForm.start_time"
+                            :min-date="new Date()"
                         ></Datepicker>
                         <jet-input-error
                             :message="createAnnouncementForm.errors.start_time"
