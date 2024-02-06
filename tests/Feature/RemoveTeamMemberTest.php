@@ -23,18 +23,22 @@ class RemoveTeamMemberTest extends TestCase
         $this->assertCount(0, $user->currentTeam->fresh()->users);
     }
 
-    /* public function test_only_team_owner_can_remove_team_members()
-     {
-         $user = User::factory()->withPersonalTeam()->create();
+    public function test_only_team_owner_can_remove_team_members()
+    {
+        $user = User::factory()->withPersonalTeam()->create();
 
-         $user->currentTeam->users()->attach(
-             $otherUser = User::factory()->create(), ['role' => 'collaborator']
-         );
+        $user->currentTeam->users()->attach(
+            $otherUser = User::factory()->withPersonalTeam()->create(), ['role' => 'collaborator']
+        );
 
-         $this->actingAs($otherUser);
+        $user->currentTeam->users()->attach(
+            $anotherUser = User::factory()->withPersonalTeam()->create(), ['role' => 'collaborator']
+        );
 
-         $response = $this->delete('/teams/'.$user->currentTeam->id.'/members/'.$user->id);
+        $this->actingAs($otherUser);
 
-         $response->assertStatus(403);
-     } */
+        $response = $this->delete('/teams/'.$user->currentTeam->id.'/members/'.$anotherUser->id);
+
+        $response->assertStatus(403);
+    }
 }

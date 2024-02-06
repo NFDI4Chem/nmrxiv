@@ -44,6 +44,25 @@ class FileSystemObject extends Model
         'has_children',
     ];
 
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
+    protected $appends = ['download_url'];
+
+    /**
+     * Get the download URL to the file system object.
+     *
+     * @return string
+     */
+    public function getDownloadUrlAttribute()
+    {
+        if ($this->model_type == 'study') {
+            return $this->study->download_url;
+        }
+    }
+
     public function children()
     {
         return $this->hasMany(FileSystemObject::class, 'parent_id', 'id');

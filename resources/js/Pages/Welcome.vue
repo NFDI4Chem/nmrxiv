@@ -226,21 +226,37 @@
                                 class="mt-10 max-w-sm mx-auto sm:max-w-none sm:flex sm:justify-center"
                             >
                                 <div
-                                    class="space-y-4 sm:space-y-0 sm:mx-auto sm:inline-grid sm:grid-cols-2 sm:gap-5"
+                                    class="space-y-4 sm:space-y-0 sm:mx-auto sm:inline-grid sm:grid-cols-3 sm:gap-5"
                                 >
                                     <Link
-                                        href="/register"
-                                        class="flex items-center justify-center px-4 py-3 border border-1 text-base font-medium rounded-md shadow-sm text-teal-700 bg-white hover:bg-teal-50 sm:px-8"
+                                        href="/projects"
+                                        class="flex items-center justify-center px-4 py-3 border border-1 text-base font-medium rounded-full shadow-sm bg-slate-900 text-white hover:bg-slate-700 sm:px-8"
                                     >
-                                        Submit data
-                                        <ToolTip
-                                            text="To submit data you will need an account with nmrXiv, so you will be redirected to our register page and once registered you can then go ahead and submit data. For more information please checkout our <a target='_blank' href='//docs.nmrxiv.org' class='text-gray-400' target='_blank'>documentation</a>."
-                                        ></ToolTip>
+                                        Browse data&nbsp;
+                                        <span
+                                            aria-hidden="true"
+                                            class="hidden text-slate-400 sm:inline"
+                                            >→</span
+                                        >
                                     </Link>
                                     <StructureSearch
                                         mode="button"
                                         ref="structure-search"
                                     ></StructureSearch>
+                                    <a
+                                        class="group inline-flex ring-1 items-center justify-center rounded-full py-2 px-4 focus:outline-none ring-slate-200 text-slate-700 hover:text-slate-900 hover:ring-slate-300 active:bg-slate-100 active:text-slate-600 focus-visible:outline-blue-600 focus-visible:ring-slate-300"
+                                        variant="outline"
+                                        color="slate"
+                                        href="/register"
+                                        ><span class="ml-3">Submit data</span>
+                                        <ToolTip
+                                            text="To submit data you will need an account with nmrXiv, so you will be redirected to our register page and once registered you can then go ahead and submit data. For more information please checkout our <a target='_blank' href='//docs.nmrxiv.org' class='text-gray-400' target='_blank'>documentation</a>."
+                                        ></ToolTip>
+                                    </a>
+                                    <Link
+                                        class="items-center justify-center px-4 py-3 text-base font-medium rounded-md text-teal-700 sm:px-8"
+                                    >
+                                    </Link>
                                 </div>
                             </div>
                             <div class="flex justify-center">
@@ -365,9 +381,7 @@
                     />
                 </div>
                 <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div
-                        class="relative pt-12 sm:p-24 xl:col-start-1"
-                    >
+                    <div class="relative pt-12 sm:p-24 xl:col-start-1">
                         <h2
                             class="text-sm font-semibold tracking-wide uppercase"
                         >
@@ -565,9 +579,7 @@
                             </div>
                         </div>
                         <div class="mt-12 sm:mt-16 lg:mt-0">
-                            <div
-                                class="lg:relative lg:h-full"
-                            >
+                            <div class="lg:relative lg:h-full">
                                 <img
                                     class="w-full lg:absolute lg:left-0 lg:h-full lg:w-auto lg:max-w-none"
                                     src="/img/api.png"

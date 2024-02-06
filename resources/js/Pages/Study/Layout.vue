@@ -63,7 +63,9 @@
                                                         preview
                                                             ? route(
                                                                   'project.preview',
-                                                                  [project.obfuscationcode]
+                                                                  [
+                                                                      project.obfuscationcode,
+                                                                  ]
                                                               )
                                                             : route(
                                                                   'dashboard.projects',

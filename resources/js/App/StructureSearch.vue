@@ -24,7 +24,7 @@
         </button>
         <button
             @click="openDialog(true)"
-            class="flex items-center justify-center px-4 py-3 border border-1 text-base font-medium rounded-md shadow-sm text-white bg-teal-500 sm:px-8"
+            class="flex items-center justify-center px-4 py-3 border border-1 text-base font-medium rounded-full shadow-sm text-white bg-teal-500 sm:px-8"
             v-if="mode == 'button'"
         >
             <svg
@@ -40,7 +40,7 @@
                     stroke-linejoin="round"
                     d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
                 /></svg
-            >&nbsp; Search Database
+            >&nbsp; Search Structure
         </button>
         <TransitionRoot
             :show="open"
@@ -84,7 +84,7 @@
                                 <h3
                                     class="text-lg font-medium leading-6 text-gray-900"
                                 >
-                                    Structure Search
+                                    Search Structure
                                 </h3>
                                 <!-- <p class="mt-1 text-sm text-gray-500">
                   Lorem ipsum dolor sit amet consectetur adipisicing elit quam corrupti
