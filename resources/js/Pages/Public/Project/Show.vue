@@ -43,9 +43,11 @@
                                 :key="$index"
                                 class="bg-gray-100 text-gray-800 mb-0.5 inline-flex truncate break-words items-center px-3 py-2 rounded-full text-sm font-medium mr-1"
                             >
-                                <ontology-term-annotation
-                                    :annotation="species"
-                                ></ontology-term-annotation>
+                                <i
+                                    ><ontology-term-annotation
+                                        :annotation="species"
+                                    ></ontology-term-annotation
+                                ></i>
                             </div>
                         </div>
                     </div>

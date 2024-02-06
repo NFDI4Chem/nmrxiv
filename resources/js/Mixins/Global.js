@@ -216,7 +216,7 @@ export default {
         extractQueryParam(query) {
             if (query.indexOf("http") > -1) {
                 var url = new URL(query);
-                if(query.indexOf("dois") > -1){
+                if (query.indexOf("dois") > -1) {
                     query = url.pathname.replace("/dois/", "");
                 } else {
                     query = url.pathname.replace("/", "");
@@ -328,7 +328,7 @@ export default {
         extractQueryParam(query) {
             if (query.indexOf("http") > -1) {
                 var url = new URL(query);
-                if(query.indexOf("dois") > -1){
+                if (query.indexOf("dois") > -1) {
                     query = url.pathname.replace("/dois/", "");
                 } else {
                     query = url.pathname.replace("/", "");

@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.0.2](https://github.com/NFDI4Chem/nmrxiv/compare/v1.0.1...v1.0.2) (2024-02-06)
+
+
+### Bug Fixes
+
+* added download links to the public files tab ([f788f74](https://github.com/NFDI4Chem/nmrxiv/commit/f788f74c4fdb62d848525fb67ea172db22d2db74))
+* remove team member test fix ([485c06d](https://github.com/NFDI4Chem/nmrxiv/commit/485c06d1bbf3d08c5a934e415dd34dc3c0692020))
+* resolved [#1073](https://github.com/NFDI4Chem/nmrxiv/issues/1073) ([b081cb8](https://github.com/NFDI4Chem/nmrxiv/commit/b081cb86890d858b34cc09153e00d06d1983a1a2))
+* resolves [#1066](https://github.com/NFDI4Chem/nmrxiv/issues/1066) ([f3ab2aa](https://github.com/NFDI4Chem/nmrxiv/commit/f3ab2aa3877cef1f34a2f7d3c3170795c90c5636))
+* tests cache ([3c2c143](https://github.com/NFDI4Chem/nmrxiv/commit/3c2c143024d4308ab28a9ec8d0b3706125e8aa05))
+
 ## [1.0.1](https://github.com/NFDI4Chem/nmrxiv/compare/v1.0.0...v1.0.1) (2024-01-31)
 
 
