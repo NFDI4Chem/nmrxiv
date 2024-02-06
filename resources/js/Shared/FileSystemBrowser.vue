@@ -407,6 +407,18 @@
                                     />
                                     Delete
                                 </a>
+                                <a
+                                    v-if="
+                                        $page.props.selectedFileSystemObject
+                                            .id &&
+                                        readonly &&
+                                        downloadURL
+                                    "
+                                    :href="downloadURL"
+                                    class="ml-4 cursor-pointer relative inline-flex items-center px-4 py-1 rounded-full border border-gray-300 bg-white text-sm font-black text-dark hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 float-right"
+                                >
+                                    Download
+                                </a>
                             </p>
                         </div>
                         <ul
@@ -507,6 +519,7 @@
                             >
                                 <File-details
                                     :file="$page.props.selectedFileSystemObject"
+                                    :project="readonly ? project : null"
                                 ></File-details>
                             </span>
                         </div>
@@ -660,7 +673,7 @@ export default {
         JetConfirmationModal,
         JetDangerButton,
     },
-    props: ["draft", "readonly", "height"],
+    props: ["draft", "readonly", "height", "project"],
 
     emits: ["loading"],
 
@@ -698,6 +711,40 @@ export default {
                     delete logsClone[key];
             });
             return logsClone;
+        },
+        nmriumURL() {
+            return this.$page.props.nmriumURL
+                ? String(this.$page.props.nmriumURL)
+                : "//nmriumdev.nmrxiv.org";
+        },
+        downloadURL() {
+            if (this.$page.props.selectedFileSystemObject.download_url) {
+                return this.$page.props.selectedFileSystemObject.download_url;
+            } else {
+                if (this.project) {
+                    if (
+                        this.$page.props.selectedFileSystemObject &&
+                        this.$page.props.selectedFileSystemObject
+                            .relative_url == "/"
+                    ) {
+                        return this.project.download_url;
+                    } else {
+                        return (
+                            this.baseURL +
+                            "/" +
+                            this.project.owner.username +
+                            "/download/" +
+                            this.project.slug +
+                            "?key=" +
+                            this.$page.props.selectedFileSystemObject.name +
+                            "&uuid=" +
+                            this.$page.props.selectedFileSystemObject.uuid
+                        );
+                    }
+                } else {
+                    return null;
+                }
+            }
         },
     },
     mounted() {
