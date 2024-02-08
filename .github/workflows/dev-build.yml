@@ -65,7 +65,7 @@ jobs:
         npm install
         npm run build
     - name: Run Test
-      run: php artisan test --parallel --cov=./ --cov-report=xml
+      run: php artisan test --parallel
 
       # Code coverage 
     - name: Upload coverage reports to Codecov
