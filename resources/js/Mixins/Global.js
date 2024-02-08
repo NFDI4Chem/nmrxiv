@@ -213,10 +213,14 @@ export default {
             downloadLink.click();
         },
         /*Extract Doi from URL*/
-        extractDoi(query) {
+        extractQueryParam(query) {
             if (query.indexOf("http") > -1) {
                 var url = new URL(query);
-                query = url.pathname.replace("/", "");
+                if (query.indexOf("dois") > -1) {
+                    query = url.pathname.replace("/dois/", "");
+                } else {
+                    query = url.pathname.replace("/", "");
+                }
             }
             return query.trim();
         },
@@ -280,7 +284,7 @@ export default {
         },
         copyToClipboard(text, element) {
             if (typeof element == "string") {
-                document.getElementById(id).select();
+                document.getElementById(element).select();
             } else {
                 element.select();
             }
@@ -321,10 +325,14 @@ export default {
         },
 
         /*Extract Doi from URL*/
-        extractDoi(query) {
+        extractQueryParam(query) {
             if (query.indexOf("http") > -1) {
                 var url = new URL(query);
-                query = url.pathname.replace("/", "");
+                if (query.indexOf("dois") > -1) {
+                    query = url.pathname.replace("/dois/", "");
+                } else {
+                    query = url.pathname.replace("/", "");
+                }
             }
             return query.trim();
         },

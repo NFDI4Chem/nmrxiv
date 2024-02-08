@@ -13,7 +13,6 @@ class Citation extends Model
         'doi',
         'title',
         'authors',
-        'abstract',
         'citation_text',
     ];
 

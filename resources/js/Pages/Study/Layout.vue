@@ -42,7 +42,7 @@
                                         role="list"
                                         class="flex items-center space-x-4"
                                     >
-                                        <li>
+                                        <li v-if="!preview">
                                             <div class="flex">
                                                 <Link
                                                     :href="route('dashboard')"
@@ -54,15 +54,23 @@
                                         <li>
                                             <div class="flex items-center">
                                                 <ChevronRightIcon
+                                                    v-if="!preview"
                                                     class="flex-shrink-0 h-5 w-5 text-gray-400"
                                                     aria-hidden="true"
                                                 />
                                                 <Link
                                                     :href="
-                                                        route(
-                                                            'dashboard.projects',
-                                                            [project.id]
-                                                        )
+                                                        preview
+                                                            ? route(
+                                                                  'project.preview',
+                                                                  [
+                                                                      project.obfuscationcode,
+                                                                  ]
+                                                              )
+                                                            : route(
+                                                                  'dashboard.projects',
+                                                                  [project.id]
+                                                              )
                                                     "
                                                     class="ml-4 text-sm font-medium text-gray-500 hover:text-gray-700"
                                                     >{{ project.name }}</Link
@@ -436,6 +444,7 @@ export default {
         "studyPermissions",
         "studyRole",
         "model",
+        "preview",
     ],
     setup() {
         const studyDetailsElement = ref(null);

@@ -49,13 +49,6 @@
                                 >
                                     Compounds
                                 </Link>
-                                <a
-                                    target="_blank"
-                                    href="https://docs.nmrxiv.org"
-                                    class="text-base font-medium text-gray-500 hover:text-gray-900"
-                                >
-                                    Docs
-                                </a>
                             </PopoverGroup>
                             <!-- <div
                             
@@ -180,13 +173,6 @@
                                                 >
                                                     Compounds
                                                 </Link>
-                                                <a
-                                                    target="_blank"
-                                                    href="https://docs.nmrxiv.org"
-                                                    class="text-base font-medium text-gray-900 hover:text-gray-700"
-                                                >
-                                                    Docs
-                                                </a>
                                             </div>
                                             <div class="mt-6">
                                                 <Link
@@ -240,23 +226,106 @@
                                 class="mt-10 max-w-sm mx-auto sm:max-w-none sm:flex sm:justify-center"
                             >
                                 <div
-                                    class="space-y-4 sm:space-y-0 sm:mx-auto sm:inline-grid sm:grid-cols-2 sm:gap-5"
+                                    class="space-y-4 sm:space-y-0 sm:mx-auto sm:inline-grid sm:grid-cols-3 sm:gap-5"
                                 >
                                     <Link
-                                        href="/register"
-                                        class="flex items-center justify-center px-4 py-3 border border-1 text-base font-medium rounded-md shadow-sm text-teal-700 bg-white hover:bg-teal-50 sm:px-8"
+                                        href="/projects"
+                                        class="flex items-center justify-center px-4 py-3 border border-1 text-base font-medium rounded-full shadow-sm bg-slate-900 text-white hover:bg-slate-700 sm:px-8"
                                     >
-                                        Submit data
+                                        Browse data&nbsp;
+                                        <span
+                                            aria-hidden="true"
+                                            class="hidden text-slate-400 sm:inline"
+                                            >→</span
+                                        >
+                                    </Link>
+                                    <StructureSearch
+                                        mode="button"
+                                        ref="structure-search"
+                                    ></StructureSearch>
+                                    <a
+                                        class="group inline-flex ring-1 items-center justify-center rounded-full py-2 px-4 focus:outline-none ring-slate-200 text-slate-700 hover:text-slate-900 hover:ring-slate-300 active:bg-slate-100 active:text-slate-600 focus-visible:outline-blue-600 focus-visible:ring-slate-300"
+                                        variant="outline"
+                                        color="slate"
+                                        href="/register"
+                                        ><span class="ml-3">Submit data</span>
                                         <ToolTip
                                             text="To submit data you will need an account with nmrXiv, so you will be redirected to our register page and once registered you can then go ahead and submit data. For more information please checkout our <a target='_blank' href='//docs.nmrxiv.org' class='text-gray-400' target='_blank'>documentation</a>."
                                         ></ToolTip>
-                                    </Link>
+                                    </a>
                                     <Link
-                                        href="/projects"
-                                        class="flex items-center justify-center px-4 py-3 border border-1 text-base font-medium rounded-md shadow-sm text-white bg-teal-500 sm:px-8"
+                                        class="items-center justify-center px-4 py-3 text-base font-medium rounded-md text-teal-700 sm:px-8"
                                     >
-                                        Browse data
                                     </Link>
+                                </div>
+                            </div>
+                            <div class="flex justify-center">
+                                <div
+                                    class="mt-8 flex flex-wrap justify-center gap-x-1 gap-y-3 sm:gap-x-2 lg:justify-start"
+                                >
+                                    <a
+                                        class="flex-none group relative isolate flex items-center rounded-lg px-2 py-0.5 text-[0.8125rem]/6 font-medium text-dark/30 transition-colors hover:text-sky-300 gap-x-3"
+                                        href="https://docs.nmrxiv.org"
+                                        target="_blank"
+                                        ><span
+                                            class="absolute inset-0 -z-10 scale-75 rounded-lg bg-white/5 opacity-0 transition group-hover:scale-100 group-hover:opacity-100"
+                                        ></span
+                                        ><svg
+                                            viewBox="0 0 16 16"
+                                            aria-hidden="true"
+                                            fill="currentColor"
+                                            class="h-4 w-4 flex-none"
+                                        >
+                                            <path
+                                                d="M7 3.41a1 1 0 0 0-.668-.943L2.275 1.039a.987.987 0 0 0-.877.166c-.25.192-.398.493-.398.812V12.2c0 .454.296.853.725.977l3.948 1.365A1 1 0 0 0 7 13.596V3.41ZM9 13.596a1 1 0 0 0 1.327.946l3.948-1.365c.429-.124.725-.523.725-.977V2.017c0-.32-.147-.62-.398-.812a.987.987 0 0 0-.877-.166L9.668 2.467A1 1 0 0 0 9 3.41v10.186Z"
+                                            ></path></svg
+                                        ><span class="self-baseline text-dark"
+                                            >Documentation</span
+                                        ></a
+                                    ><a
+                                        class="flex-none group relative isolate flex items-center rounded-lg px-2 py-0.5 text-[0.8125rem]/6 font-medium text-dark/30 transition-colors hover:text-sky-300 gap-x-3"
+                                        href="https://github.com/NFDI4Chem/nmrxiv"
+                                        ><span
+                                            class="absolute inset-0 -z-10 scale-75 rounded-lg bg-white/5 opacity-0 transition group-hover:scale-100 group-hover:opacity-100"
+                                        ></span
+                                        ><svg
+                                            viewBox="0 0 16 16"
+                                            aria-hidden="true"
+                                            fill="currentColor"
+                                            class="h-4 w-4 flex-none"
+                                        >
+                                            <path
+                                                d="M8 .198a8 8 0 0 0-8 8 7.999 7.999 0 0 0 5.47 7.59c.4.076.547-.172.547-.384 0-.19-.007-.694-.01-1.36-2.226.482-2.695-1.074-2.695-1.074-.364-.923-.89-1.17-.89-1.17-.725-.496.056-.486.056-.486.803.056 1.225.824 1.225.824.714 1.224 1.873.87 2.33.666.072-.518.278-.87.507-1.07-1.777-.2-3.644-.888-3.644-3.954 0-.873.31-1.586.823-2.146-.09-.202-.36-1.016.07-2.118 0 0 .67-.214 2.2.82a7.67 7.67 0 0 1 2-.27 7.67 7.67 0 0 1 2 .27c1.52-1.034 2.19-.82 2.19-.82.43 1.102.16 1.916.08 2.118.51.56.82 1.273.82 2.146 0 3.074-1.87 3.75-3.65 3.947.28.24.54.73.54 1.48 0 1.07-.01 1.93-.01 2.19 0 .21.14.46.55.38A7.972 7.972 0 0 0 16 8.199a8 8 0 0 0-8-8Z"
+                                            ></path></svg
+                                        ><span class="self-baseline text-dark"
+                                            >GitHub</span
+                                        ></a
+                                    ><a
+                                        class="flex-none group relative isolate flex items-center rounded-lg px-2 py-0.5 text-[0.8125rem]/6 font-medium text-dark/30 transition-colors hover:text-sky-300 gap-x-3"
+                                        href="https://nmrxiv.org/api/documentation"
+                                        target="_blank"
+                                        ><span
+                                            class="absolute inset-0 -z-10 scale-75 rounded-lg bg-white/5 opacity-0 transition group-hover:scale-100 group-hover:opacity-100"
+                                        ></span>
+
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke-width="2"
+                                            stroke="currentColor"
+                                            class="w-6 h-6"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                d="M17.25 6.75 22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3-4.5 16.5"
+                                            />
+                                        </svg>
+                                        <span class="self-baseline text-dark"
+                                            >API</span
+                                        ></a
+                                    >
                                 </div>
                             </div>
                         </div>
@@ -264,60 +333,8 @@
                 </div>
             </div>
 
-            <div class="relative bg-transparent">
-                <div class="absolute inset-x-0 top-0 overflow-hidden pl-[50%]">
-                    <img
-                        src="/img/beams-basic.png"
-                        alt=""
-                        class="-ml-[39rem] w-[113.125rem] max-w-none"
-                    />
-                </div>
-                <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div
-                        class="relative pt-12 sm:p-24 xl:col-start-1 border-b border-slate-100"
-                    >
-                        <h2
-                            class="text-sm font-semibold tracking-wide uppercase"
-                        >
-                            <span class="bg-clip-text text-gray-600"
-                                >Metrics</span
-                            >
-                        </h2>
-                        <p class="mt-3 text-xl font-bold">
-                            Validate your spectral findings and develop
-                            new/accurate tools using state of the art AI/ML
-                            models.
-                        </p>
-                        <div
-                            class="mt-4 grid grid-cols-1 gap-y-12 gap-x-6 sm:grid-cols-2"
-                        >
-                            <p>
-                                <span class="block text-2xl font-bold"
-                                    >{{ projects }} Projects</span
-                                >
-                            </p>
-                            <p>
-                                <span class="block text-2xl font-bold"
-                                    >{{ compounds }} Compounds</span
-                                >
-                            </p>
-                            <p>
-                                <span class="block text-2xl font-bold"
-                                    >{{ spectra }} Spectra</span
-                                >
-                            </p>
-                            <!-- <p>
-                                <span class="block text-2xl font-bold"
-                                    >{{ techniques }} Techniques</span
-                                >
-                            </p> -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="border-b">
-                <div class="bg-white pb-24 pt-24">
+            <div class="border-y border-gray-200">
+                <div class="bg-white pb-12 pt-12">
                     <div class="mx-auto max-w-7xl px-6 lg:px-8">
                         <h2
                             class="text-center text-lg font-semibold leading-8 text-gray-900"
@@ -355,10 +372,60 @@
                 </div>
             </div>
 
-            <div class="relative pt-16">
+            <div class="relative bg-transparent">
+                <div class="absolute inset-x-0 top-0 overflow-hidden pl-[50%]">
+                    <img
+                        src="/img/beams-basic.png"
+                        alt=""
+                        class="-ml-[39rem] w-[113.125rem] max-w-none"
+                    />
+                </div>
+                <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="relative pt-12 sm:p-24 xl:col-start-1">
+                        <h2
+                            class="text-sm font-semibold tracking-wide uppercase"
+                        >
+                            <span class="bg-clip-text text-gray-600"
+                                >Metrics</span
+                            >
+                        </h2>
+                        <!-- <p class="mt-3 text-xl font-bold">
+                            Validate your spectral findings and develop
+                            new/accurate tools using state of the art AI/ML
+                            models.
+                        </p> -->
+                        <div
+                            class="mt-4 grid grid-cols-1 gap-y-12 gap-x-6 sm:grid-cols-3"
+                        >
+                            <p class="text-center">
+                                <span class="block text-2xl font-bold"
+                                    >{{ projects }} Projects</span
+                                >
+                            </p>
+                            <p class="text-center">
+                                <span class="block text-2xl font-bold"
+                                    >{{ compounds }} Compounds</span
+                                >
+                            </p>
+                            <p class="text-center">
+                                <span class="block text-2xl font-bold"
+                                    >{{ spectra }} Spectra</span
+                                >
+                            </p>
+                            <!-- <p>
+                                <span class="block text-2xl font-bold"
+                                    >{{ techniques }} Techniques</span
+                                >
+                            </p> -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="relative">
                 <div>
                     <div
-                        class="lg:mx-auto lg:max-w-7xl lg:px-8 lg:grid lg:grid-cols-2 lg:grid-flow-col-dense lg:gap-24 overflow-x-hidden py-10 border-r"
+                        class="border-t lg:mx-auto lg:max-w-7xl lg:px-8 lg:grid lg:grid-cols-2 lg:grid-flow-col-dense lg:gap-24 overflow-x-hidden py-10 border-r"
                     >
                         <div
                             class="px-4 max-w-xl mx-auto sm:px-6 lg:py-16 lg:max-w-none lg:mx-0 lg:px-0"
@@ -403,17 +470,17 @@
                         </div>
                         <div class="mt-12 sm:mt-16 lg:mt-0">
                             <div
-                                class="pl-4 -mr-48 sm:pl-6 md:-mr-16 lg:px-0 lg:m-0 lg:relative lg:h-full"
+                                class="-mr-48 md:-mr-16 lg:px-0 lg:m-0 lg:relative lg:h-full"
                             >
                                 <img
-                                    class="w-full rounded-xl shadow-xl ring-1 ring-black ring-opacity-5 lg:absolute lg:left-0 lg:h-full lg:w-auto lg:max-w-none"
-                                    src="/img/welcome1.jpg"
+                                    class="w-full rounded-xl ring-opacity-5 lg:absolute lg:left-0 lg:h-full lg:w-auto lg:max-w-none"
+                                    src="/img/welcome1.png"
                                     alt=""
                                 />
                             </div>
                         </div>
                     </div>
-                    <div class="my-5 py-10">
+                    <div class="mb-5 pb-24 border-b">
                         <div
                             class="lg:mx-auto lg:max-w-7xl px-8 lg:grid lg:grid-cols-1 lg:grid-flow-col-dense lg:gap-24"
                         >
@@ -469,14 +536,14 @@
                         </div>
                     </div>
                 </div>
-                <div class="mt-24">
+                <div class="mt-12">
                     <div
-                        class="lg:mx-auto lg:max-w-7xl lg:px-8 lg:grid lg:grid-cols-2 lg:grid-flow-col-dense lg:gap-24 overflow-x-hidden py-10 border-l"
+                        class="lg:mx-auto lg:max-w-7xl lg:px-8 lg:grid lg:grid-cols-2 lg:grid-flow-col-dense lg:gap-24 overflow-x-hidden"
                     >
                         <div
-                            class="px-4 max-w-xl mx-auto sm:px-6 lg:py-32 lg:max-w-none lg:mx-0 lg:px-0 lg:col-start-2"
+                            class="px-4 z-20 max-w-xl mx-auto sm:px-6 lg:py-32 lg:max-w-none lg:mx-0 lg:px-0 lg:col-start-2"
                         >
-                            <div>
+                            <div class="bg-white p-5 rounded-md border">
                                 <div>
                                     <span
                                         class="h-12 w-12 rounded-md flex items-center justify-center bg-gradient-to-r from-indigo-600 to-teal-600"
@@ -502,7 +569,7 @@
                                     <div class="mt-6">
                                         <a
                                             target="_blank"
-                                            href="https://docs.nmrxiv.org/docs/developer-guides/API"
+                                            href="https://docs.nmrxiv.org/developer-guides/api.html"
                                             class="inline-flex bg-gradient-to-r from-indigo-600 to-teal-600 bg-origin-border px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white hover:from-indigo-700 hover:to-teal-700"
                                         >
                                             API Documentation
@@ -511,22 +578,20 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="mt-12 sm:mt-16 lg:mt-0 lg:col-start-1">
-                            <div
-                                class="pr-4 -ml-48 sm:pr-6 md:-ml-16 lg:px-0 lg:m-0 lg:relative lg:h-full"
-                            >
+                        <div class="mt-12 sm:mt-16 lg:mt-0">
+                            <div class="lg:relative lg:h-full">
                                 <img
-                                    class="w-full rounded-xl shadow-xl ring-1 ring-black ring-opacity-5 lg:absolute lg:right-0 lg:h-full lg:w-auto lg:max-w-none"
-                                    src="https://docs.nmrxiv.org/img/postman.png"
+                                    class="w-full lg:absolute lg:left-0 lg:h-full lg:w-auto lg:max-w-none"
+                                    src="/img/api.png"
                                     alt=""
                                 />
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="mt-24">
+                <div class="mt-24 border-y pt-10">
                     <div
-                        class="lg:mx-auto lg:max-w-7xl lg:px-8 lg:grid lg:grid-cols-2 lg:grid-flow-col-dense lg:gap-24 overflow-x-hidden py-10 border-r"
+                        class="lg:mx-auto lg:max-w-7xl lg:px-8 lg:grid lg:grid-cols-2 lg:grid-flow-col-dense lg:gap-24 overflow-x-hidden py-10 pb-20 border-r"
                     >
                         <div
                             class="px-4 max-w-xl mx-auto sm:px-6 lg:py-16 lg:max-w-none lg:mx-0 lg:px-0"
@@ -690,7 +755,7 @@
                 </div>
             </div>
 
-            <div class="bg-white">
+            <div class="bg-white border-y">
                 <div
                     class="max-w-4xl mx-auto py-16 px-4 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8 lg:flex lg:items-center lg:justify-between"
                 >
@@ -729,11 +794,11 @@
             <div
                 class="max-w-7xl mx-auto pt-16 pb-8 px-4 sm:px-6 lg:pt-24 lg:px-8"
             >
-                <div class="xl:grid xl:grid-cols-3 xl:gap-8">
+                <div class="md:grid md:grid-cols-3 md:gap-8">
                     <div class="mt-12 xl:mt-0 items center content-center">
                         <jet-application-logo class="p-0.5 ml-1.5" />
                     </div>
-                    <div class="grid grid-cols-2 gap-8 xl:col-span-2">
+                    <div class="grid grid-cols-2 gap-8 md:col-span-2">
                         <div class="md:grid md:grid-cols-2 md:gap-8">
                             <div>
                                 <h3
@@ -850,7 +915,7 @@
                         </a>
                     </div>
                     <p class="mt-8 text-base text-gray-400 md:mt-0 md:order-1">
-                        &copy; 2023 nmrXiv. All rights reserved.
+                        &copy; 2024 nmrXiv. All rights reserved.
                     </p>
                 </div>
             </div>
@@ -866,6 +931,7 @@ import { Head, Link } from "@inertiajs/vue3";
 import JetApplicationLogo from "@/Jetstream/ApplicationLogo.vue";
 import Projects from "@/Shared/Projects.vue";
 import { defineComponent, h } from "vue";
+import StructureSearch from "@/App/StructureSearch.vue";
 import {
     Popover,
     PopoverButton,
@@ -970,7 +1036,7 @@ const footerNavigation = {
         },
         {
             name: "API Status",
-            href: "https://docs.nmrxiv.org/docs/developer-guides/API",
+            href: "https://docs.nmrxiv.org/developer-guides/api.html",
         },
     ],
     About: [
@@ -1031,6 +1097,7 @@ export default {
         Projects,
         FAQs,
         FlashMessages,
+        StructureSearch,
     },
 
     props: {

@@ -65,6 +65,7 @@
                             ref="fsbRef"
                             :readonly="true"
                             :height="'h-[calc(100vh-385px)]'"
+                            :project="project.data"
                         ></file-system-browser>
                     </div>
                 </div>

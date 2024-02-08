@@ -6,6 +6,7 @@ use App\Actions\License\GetLicense;
 use App\Actions\Project\ArchiveProject;
 use App\Actions\Project\CreateNewProject;
 use App\Actions\Project\DeleteProject;
+use App\Actions\Project\PublishProject;
 use App\Actions\Project\RestoreProject;
 use App\Actions\Project\UpdateProject;
 use App\Http\Resources\ProjectResource;
@@ -16,6 +17,7 @@ use App\Models\Study;
 use App\Models\User;
 use App\Models\Validation;
 use Auth;
+use Carbon\Carbon;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Http\JsonResponse;
@@ -136,8 +138,49 @@ class ProjectController extends Controller
             'projectPermissions' => [
                 'canDeleteProject' => Gate::check('deleteProject', $project),
                 'canUpdateProject' => Gate::check('updateProject', $project),
+                'canManageSettings' => Gate::check('manageSettings', $project),
             ],
         ]);
+    }
+
+    public function review(Request $request, $obfuscationCode, GetLicense $getLicense)
+    {
+        $project = Project::where([['is_archived', false], ['obfuscationcode', $obfuscationCode]])->firstOrFail();
+        $project->load('projectInvitations', 'tags', 'authors', 'citations', 'owner');
+        if (! $project->is_public) {
+            $license = null;
+            if ($project->license_id) {
+                $license = $getLicense->getLicensebyId($project->license_id);
+            }
+
+            return Inertia::render('Project/Show', [
+                'project' => $project,
+                'team' => null,
+                'members' => $project->allUsers(),
+                'availableRoles' => array_values(Jetstream::$roles),
+                'role' => 'reviewer',
+                'teamRole' => null,
+                'license' => $license ? $license[0] : null,
+                'projectPermissions' => [
+                    'canDeleteProject' => false,
+                    'canUpdateProject' => false,
+                ],
+                'preview' => true,
+            ]);
+        } else {
+            $identifier = explode(':', $project->identifier)[1];
+
+            return redirect()->route('public', $identifier);
+        }
+
+    }
+
+    public function reviewerStudies(Request $request, $obfuscationCode)
+    {
+        $project = Project::where([['is_archived', false], ['obfuscationcode', $obfuscationCode]])->firstOrFail();
+        if ($project) {
+            return StudyResource::collection(Study::where('project_id', $project->id)->filter($request->only('search', 'sort', 'mode'))->paginate(9)->withQueryString());
+        }
     }
 
     public function studies(Request $request, Project $project)
@@ -151,13 +194,16 @@ class ProjectController extends Controller
 
     public function settings(Request $request, Project $project)
     {
-        if (! Gate::forUser($request->user())->check('deleteProject', $project)) {
+        if (! Gate::forUser($request->user())->check('manageSettings', $project)) {
             throw new AuthorizationException;
         }
 
         return Inertia::render('Project/Settings', [
             'project' => $project,
             'schema' => $environment = env('SCHEMA_VERSION', 'local'),
+            'projectPermissions' => [
+                'canDeleteProject' => Gate::check('deleteProject', $project),
+            ],
         ]);
     }
 
@@ -277,75 +323,90 @@ class ProjectController extends Controller
         return $validation->fresh();
     }
 
-    public function publish(Request $request, Project $project)
+    public function publish(Request $request, Project $project, PublishProject $publisher, UpdateProject $updater)
     {
         if ($project) {
-            $enableProjectMode = $request->get('enableProjectMode');
-            if ($enableProjectMode) {
-                $validation = $project->validation;
-                $validation->process();
-                $validation = $validation->fresh();
-                if ($validation['report']['project']['status']) {
+            $input = $request->all();
+            $release_date = $input['release_date'];
+            if (! $project->is_public && ! is_null($project->doi) && ! is_null($release_date)) {
+                $release_date = Carbon::parse($release_date);
+                if ($release_date->isPast()) {
+                    $updater->update($project, $request->all());
+                    $publisher->publish($project);
+                    $project->sendNotification('publish', $this->prepareSendList($project));
+                }
+            } else {
+
+                $enableProjectMode = $request->get('enableProjectMode');
+                if ($enableProjectMode) {
+                    $validation = $project->validation;
+                    $validation->process();
+                    $validation = $validation->fresh();
+                    if ($validation['report']['project']['status']) {
+                        $project->release_date = $request->get('release_date');
+                        $project->status = 'queued';
+                        $project->save();
+
+                        ProcessSubmission::dispatch($project);
+
+                        return response()->json([
+                            'project' => $project,
+                            'validation' => $validation,
+                        ]);
+                    } else {
+                        return response()->json([
+                            'errors' => 'Validation failing. Please provide all the required data and try again. If the problem persists, please contact us.',
+                            'validation' => $validation,
+                        ], 422);
+                    }
+                } else {
+                    $draft = $project->draft;
+                    $draft->project_enabled = false;
+                    $draft->save();
+
                     $project->release_date = $request->get('release_date');
                     $project->status = 'queued';
                     $project->save();
 
-                    ProcessSubmission::dispatch($project);
+                    $validation = $project->validation;
+                    $validation->process();
+                    $validation = $validation->fresh();
 
-                    return response()->json([
-                        'project' => $project,
-                        'validation' => $validation,
-                    ]);
-                } else {
-                    return response()->json([
-                        'errors' => 'Validation failing. Please provide all the required data and try again. If the problem persists, please contact us.',
-                        'validation' => $validation,
-                    ], 422);
-                }
-            } else {
-                $draft = $project->draft;
-                $draft->project_enabled = false;
-                $draft->save();
+                    foreach ($project->studies as $study) {
+                        $study->license_id = $project->license_id;
+                        $study->save();
+                        foreach ($study->datasets as $dataset) {
+                            $dataset->license_id = $project->license_id;
+                            $dataset->save();
+                        }
+                    }
 
-                $project->release_date = $request->get('release_date');
-                $project->status = 'queued';
-                $project->save();
+                    $status = true;
 
-                $validation = $project->validation;
-                $validation->process();
-                $validation = $validation->fresh();
+                    foreach ($validation['report']['project']['studies'] as $study) {
+                        if (! $study['status']) {
+                            $status = false;
+                        }
+                    }
+                    // add license check
+                    if ($status) {
+                        ProcessSubmission::dispatch($project);
 
-                foreach ($project->studies as $study) {
-                    $study->license_id = $project->license_id;
-                    $study->save();
-                    foreach ($study->datasets as $dataset) {
-                        $dataset->license_id = $project->license_id;
-                        $dataset->save();
+                        return response()->json([
+                            'project' => $project,
+                            'validation' => $validation,
+                        ]);
+                    } else {
+                        return response()->json([
+                            'errors' => 'Validation failing. Please provide all the required data and try again. If the problem persists, please contact us.',
+                        ], 422);
                     }
                 }
 
-                $status = true;
-
-                foreach ($validation['report']['project']['studies'] as $study) {
-                    if (! $study['status']) {
-                        $status = false;
-                    }
-                }
-                // add license check
-                if ($status) {
-                    ProcessSubmission::dispatch($project);
-
-                    return response()->json([
-                        'project' => $project,
-                        'validation' => $validation,
-                    ]);
-                } else {
-                    return response()->json([
-                        'errors' => 'Validation failing. Please provide all the required data and try again. If the problem persists, please contact us.',
-                    ], 422);
-                }
             }
+
         }
+
     }
 
     public function store(Request $request, CreateNewProject $creator)
@@ -370,6 +431,13 @@ class ProjectController extends Controller
         return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('success', 'Project updated successfully');
     }
 
+    public function updateReleaseDate(Request $request, UpdateProject $updater, Project $project)
+    {
+        $updater->update($project, $request->all());
+
+        return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('success', "Project's release date updated successfully");
+    }
+
     public function destroy(Request $request, StatefulGuard $guard, Project $project, DeleteProject $creator)
     {
         if (! Gate::forUser($request->user())->check('deleteProject', $project)) {
@@ -386,12 +454,32 @@ class ProjectController extends Controller
             ]);
         }
 
-        if ($project->status = 'processing' || $project->status = 'queued') {
+        if ($project->status == 'processing' || $project->status == 'queued') {
             return redirect()->route('dashboard')->with('error', 'It is not possible to delete a project that is currently being processed or queued.');
         } else {
             $creator->delete($project);
 
             return redirect()->route('dashboard')->with('success', 'Project deleted successfully');
         }
+    }
+
+    /**
+     * Prepare Sent to list.
+     *
+     * @param  App\Models\Project  $project
+     * @return void
+     */
+    public function prepareSendList($project)
+    {
+        $sendTo = [];
+        foreach ($project->allUsers() as $member) {
+            if ($member->projectMembership->role == 'creator' || $member->projectMembership->role == 'owner') {
+                array_push($sendTo, $member);
+            } else {
+                array_push($sendTo, $project->owner);
+            }
+        }
+
+        return $sendTo;
     }
 }

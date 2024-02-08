@@ -70,6 +70,10 @@ Route::impersonate();
 
 Route::get('/email/verify/{id}/{hash}', [VerificationController::class, 'verify'])->name('verification.verify');
 
+Route::get('project/{url}', [ProjectController::class, 'review'])->name('project.preview');
+Route::get('project/{url}/studies', [ProjectController::class, 'reviewerStudies'])->name('studies.preview');
+Route::get('study/{obfuscationCode}/{study}/{model}', [StudyController::class, 'preview2'])->name('preview');
+
 Route::group(['middleware' => 'verified'], function () {
     if (Jetstream::hasTeamFeatures()) {
         Route::delete('/teams/{team}', [TeamController::class, 'destroy'])->name('app.teams.destroy');
@@ -167,6 +171,8 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
             ->name('dashboard.project.activity');
         Route::get('projects/{project}/validation', [ProjectController::class, 'validation'])
             ->name('dashboard.project.validation');
+        Route::put('projects/{project}/updateReleaseDate', [ProjectController::class, 'updateReleaseDate'])
+            ->name('dashboard.project.updateReleaseDate');
 
         Route::put('projects/{project}/publish', [ProjectController::class, 'publish'])
             ->name('dashboard.project.publish');
@@ -216,8 +222,8 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
             ->name('dashboard.studies.nmrium');
         Route::post('studies/{study}/nmriumInfo', [StudyController::class, 'nmriumInfo'])
             ->name('dashboard.studies.nmriumInfo');
-        Route::post('studies/{study}/preview', [StudyController::class, 'preview'])
-            ->name('dashboard.study.preview');
+        Route::post('studies/{study}/snapshot', [StudyController::class, 'snapshot'])
+            ->name('dashboard.study.snapshot');
 
         Route::post('studies/{study}/molecule', [StudyController::class, 'moleculeStore'])
             ->name('study-molecule.store');
@@ -236,8 +242,8 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
             ->name('dashboard.datasets.nmrium');
         Route::post('datasets/{dataset}/nmriumInfo', [DatasetController::class, 'nmriumInfo'])
             ->name('dashboard.datasets.nmriumInfo');
-        Route::post('datasets/{dataset}/preview', [DatasetController::class, 'preview'])
-            ->name('dashboard.dataset.preview');
+        Route::post('datasets/{dataset}/snapshot', [DatasetController::class, 'snapshot'])
+            ->name('dashboard.dataset.snapshot');
 
         Route::get('drafts/{draft}/info', [DraftController::class, 'info'])
             ->name('dashboard.draft.info');

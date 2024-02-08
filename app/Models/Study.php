@@ -34,7 +34,7 @@ class Study extends Model implements Auditable
         'starred',
         'location',
         'is_public',
-        'url',
+        'obfuscationcode',
         'description',
         'type',
         'uuid',
@@ -74,10 +74,14 @@ class Study extends Model implements Auditable
         if ($this->is_public) {
             return true;
         } else {
-            if ($this->release_date) {
-                return ! Carbon::now()->startOfDay()->gte($this->release_date);
-            } else {
+            if ($this->project) {
                 return $this->project ? $this->project->is_published : false;
+            } else {
+                if ($this->release_date && $this->doi) {
+                    return Carbon::now()->startOfDay()->gte($this->release_date);
+                } else {
+                    return false;
+                }
             }
         }
 

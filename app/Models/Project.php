@@ -39,7 +39,7 @@ class Project extends Model implements Auditable
         'starred',
         'location',
         'is_public',
-        'url',
+        'obfuscationcode',
         'description',
         'type',
         'uuid',
@@ -310,7 +310,7 @@ class Project extends Model implements Auditable
     public function authors()
     {
         return $this->belongsToMany(Author::class)
-            ->withPivot('contributor_type', 'sort_order');
+            ->withPivot('contributor_type', 'sort_order')->orderBy('sort_order', 'asc');
     }
 
     public function scopeFilter($query, array $filters)

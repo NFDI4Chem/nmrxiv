@@ -44,13 +44,73 @@
                 </div>
             </div>
         </template>
-        <div v-if="projects.length > 0" class="px-12 py-8 mx-auto max-w-4xl">
-            <team-projects
-                :team="team"
-                :team-role="teamRole"
-                :mode="'create'"
-                :projects="projects"
-            ></team-projects>
+        <div v-if="projects.length > 0" class="px-8 py-8 mx-auto max-w-4xl">
+            <div>
+                <div class="sm:hidden">
+                    <label for="tabs" class="sr-only">Select a tab</label>
+                    <!-- Use an "onChange" listener to redirect the user to the selected tab URL. -->
+                    <select
+                        id="tabs"
+                        name="tabs"
+                        class="block w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
+                    >
+                        <option
+                            :selected="selectedTab === 'projects'"
+                            value="projects"
+                        >
+                            Projects
+                        </option>
+                        <option
+                            :selected="selectedTab === 'samples'"
+                            value="samples"
+                        >
+                            Samples
+                        </option>
+                    </select>
+                </div>
+                <div class="hidden sm:block">
+                    <nav class="flex space-x-4" aria-label="Tabs">
+                        <!-- Current: "bg-indigo-100 text-indigo-700", Default: "text-gray-500 hover:text-gray-700" -->
+                        <a
+                            href="?tab=projects"
+                            :class="[
+                                selectedTab == 'projects'
+                                    ? 'bg-indigo-100 text-indigo-700'
+                                    : '',
+                                'rounded-md px-3 py-2 text-sm font-medium',
+                            ]"
+                            aria-current="page"
+                            >Projects</a
+                        >
+                        <a
+                            href="?tab=samples"
+                            :class="[
+                                selectedTab == 'samples'
+                                    ? 'bg-indigo-100 text-indigo-700'
+                                    : '',
+                                'rounded-md px-3 py-2 text-sm font-medium',
+                            ]"
+                            >Samples</a
+                        >
+                    </nav>
+                </div>
+            </div>
+            <div v-if="selectedTab == 'projects'">
+                <team-projects
+                    :team="team"
+                    :team-role="teamRole"
+                    :mode="'create'"
+                    :projects="projects"
+                ></team-projects>
+            </div>
+            <div v-if="selectedTab == 'samples'">
+                <team-samples
+                    :team="team"
+                    :team-role="teamRole"
+                    :mode="'create'"
+                    :studies="samples"
+                ></team-samples>
+            </div>
         </div>
         <div v-else>
             <div class="max-w-lg my-6 py-6 mx-auto">
@@ -296,6 +356,7 @@
 <script>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import TeamProjects from "@/Pages/Project/Index.vue";
+import TeamSamples from "@/Shared/Samples.vue";
 import Create from "@/Shared/CreateButton.vue";
 import Onboarding from "@/App/Onboarding.vue";
 import { useMagicKeys } from "@vueuse/core";
@@ -311,11 +372,17 @@ export default {
         AppLayout,
         computed,
         TeamProjects,
+        TeamSamples,
         Create,
         Onboarding,
         Link,
     },
-    props: ["user", "team", "projects", "teamRole", "filters"],
+    data() {
+        return {
+            selectedTab: "projects",
+        };
+    },
+    props: ["user", "team", "projects", "samples", "teamRole", "filters"],
     setup() {
         const app = getCurrentInstance();
         const openDatasetCreateDialog = (data) => {
@@ -353,6 +420,10 @@ export default {
                 draft_id: this.filters.draft_id,
             });
         }
+
+        const urlSearchParams = new URLSearchParams(window.location.search);
+        const params = Object.fromEntries(urlSearchParams.entries());
+        this.selectedTab = params["tab"] ? params["tab"] : "projects";
     },
 };
 </script>

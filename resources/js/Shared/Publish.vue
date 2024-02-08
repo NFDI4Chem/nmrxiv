@@ -1,7 +1,7 @@
 <template>
     <div v-if="project.validation_status">
         <a
-            :href="'/publish/' + project.id"
+            :href="'/publish/' + project.draft_id"
             class="ml-4 inline-flex items-center justify-center whitespace-nowrap rounded-md border border-transparent bg-indigo-700 px-4 py-2 text-base font-medium text-white shadow-sm"
         >
             Publish

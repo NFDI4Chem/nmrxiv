@@ -1,6 +1,7 @@
 <template>
     <div>
         <button
+            v-if="mode == 'icon'"
             type="button"
             class="px-4 shadow py-3 rounded-full bg-white p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-secondary-dark focus:ring-offset-2"
             @click="openDialog(true)"
@@ -20,6 +21,26 @@
                     d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23-.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5"
                 ></path>
             </svg>
+        </button>
+        <button
+            @click="openDialog(true)"
+            class="flex items-center justify-center px-4 py-3 border border-1 text-base font-medium rounded-full shadow-sm text-white bg-teal-500 sm:px-8"
+            v-if="mode == 'button'"
+        >
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="w-5 h-5"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+                /></svg
+            >&nbsp; Search Structure
         </button>
         <TransitionRoot
             :show="open"
@@ -63,7 +84,7 @@
                                 <h3
                                     class="text-lg font-medium leading-6 text-gray-900"
                                 >
-                                    Structure Search
+                                    Search Structure
                                 </h3>
                                 <!-- <p class="mt-1 text-sm text-gray-500">
                   Lorem ipsum dolor sit amet consectetur adipisicing elit quam corrupti
@@ -186,7 +207,12 @@ export default {
         TransitionChild,
         TransitionRoot,
     },
-    props: [],
+    props: {
+        mode: {
+            type: String,
+            default: "icon",
+        },
+    },
     computed: {},
     data() {
         return {

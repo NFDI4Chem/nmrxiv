@@ -91,12 +91,7 @@
                                 </span>
                                 <div
                                     class="mt-2 max-w-xl text-sm text-gray-500"
-                                >
-                                    <!-- <p>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Recusandae
-                    voluptatibus corrupti atque repudiandae nam.
-                  </p> -->
-                                </div>
+                                ></div>
                             </div>
                             <div
                                 class="mt-5 sm:mt-0 sm:ml-6 sm:flex-shrink-0 sm:flex sm:items-center"
@@ -354,6 +349,52 @@
                                     </a>
                                 </li>
                             </ul>
+
+                            <div class="border-b pb-2">
+                                <span class="text-md font-medium">
+                                    General Access
+                                </span>
+                            </div>
+                            <div class="mt-2 flex-1 px-4 py-2 flex">
+                                <div class="flex-1 flex">
+                                    <GlobeAltIcon
+                                        class="-mr-1 mr-2 h-10 w-10 text-green-600"
+                                        aria-hidden="true"
+                                    />
+                                    <span
+                                        class="text-sm text-gray-900 font-medium mb-5"
+                                    >
+                                        Anyone with the link
+                                        <p class="text-xs text-gray-600">
+                                            Anyone on the internet with the link
+                                            can view the project, along with
+                                            associated samples and datasets, in
+                                            a read-only mode.
+                                        </p>
+                                    </span>
+                                </div>
+                                <div class="flex items-center">
+                                    <div>
+                                        <button
+                                            type="button"
+                                            id="copyLink"
+                                            class="active:bg-green-500 inline-flex mb-4 items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                                            @click="copyLinkToClipboard"
+                                        >
+                                            <LinkIcon
+                                                class="w-4 h-4 mr-1 text-gray-600"
+                                            />
+                                            <span>Copy Link</span>
+                                        </button>
+                                        <div
+                                            v-if="isVisible"
+                                            class="text-gray-500 text-xs"
+                                        >
+                                            Copied to clipboard!
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             <span v-if="team && !team.personal_team">
                                 <div class="mb-2">
                                     <h2
@@ -655,7 +696,7 @@
                                                         class="flex items-center"
                                                     >
                                                         <div
-                                                            class="text-sm text-gray-600"
+                                                            class="text-sm font-semibold text-gray-700"
                                                             :class="{
                                                                 'font-semibold':
                                                                     addMemberForm.role ==
@@ -683,7 +724,7 @@
                                                         </svg>
                                                     </div>
                                                     <div
-                                                        class="mt-2 text-xs text-gray-600"
+                                                        class="mt-2 text-xs text-gray-600 text-left"
                                                     >
                                                         {{ role.description }}
                                                     </div>
@@ -763,7 +804,12 @@ import {
     TransitionRoot,
 } from "@headlessui/vue";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
-import { ChevronDownIcon } from "@heroicons/vue/24/solid";
+import {
+    ChevronDownIcon,
+    GlobeAltIcon,
+    LinkIcon,
+} from "@heroicons/vue/24/solid";
+import { copyText } from "vue3-clipboard";
 
 export default {
     components: {
@@ -794,6 +840,8 @@ export default {
         JetSecondaryButton,
         JetSectionBorder,
         JetTextArea,
+        GlobeAltIcon,
+        LinkIcon,
     },
     props: {
         members: Object,
@@ -825,6 +873,7 @@ export default {
                 role: null,
             }),
             removeModelMemberForm: this.$inertia.form({}),
+            isVisible: false,
         };
     },
     computed: {
@@ -924,6 +973,24 @@ export default {
                     onSuccess: () => {},
                 }
             );
+        },
+        copyLinkToClipboard() {
+            let url =
+                this.$page.props.url +
+                "/project/" +
+                encodeURIComponent(this.project.obfuscationcode);
+            let targetInput = document.getElementById("copyLink");
+            if (targetInput) {
+                this.isVisible = true;
+                setTimeout(() => {
+                    this.isVisible = false;
+                }, 2500);
+                copyText(url, undefined, (error) => {
+                    if (error) {
+                        console.log(error);
+                    }
+                });
+            }
         },
     },
 };

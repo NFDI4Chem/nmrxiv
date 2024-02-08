@@ -14,15 +14,13 @@
                         >
                             <span
                                 v-if="
-                                    study.molecules[0] &&
-                                    study.molecules[0].canonical_smiles
+                                    molecules[0] &&
+                                    molecules[0].canonical_smiles
                                 "
                             >
                                 <Depictor2D
                                     class="py-2"
-                                    :molecule="
-                                        study.molecules[0].canonical_smiles
-                                    "
+                                    :molecule="molecules[0].canonical_smiles"
                                     :show-download="false"
                                 ></Depictor2D>
                             </span>
@@ -81,7 +79,13 @@
                     </div>
                 </div>
             </div>
-            <Link :href="route('dashboard.studies', [study.id])">
+            <Link
+                :href="
+                    preview
+                        ? route('preview', [obfuscationCode, study.id, 'study'])
+                        : route('dashboard.studies', [study.id])
+                "
+            >
                 <div
                     class="flex items-center font-bold truncate text-lg text-gray-600"
                 >
@@ -126,13 +130,18 @@ export default {
         Link,
         Depictor2D,
     },
-    props: ["study"],
-    setup() {},
+    props: ["study", "preview", "obfuscationCode"],
     data() {
         return {
             selectedPreviewIndex: 0,
         };
     },
-    methods: {},
+    computed: {
+        molecules() {
+            return this.study.molecules
+                ? this.study.molecules
+                : this.study.sample.molecules;
+        },
+    },
 };
 </script>

@@ -62,9 +62,7 @@
                                 <div
                                     class="flex h-full flex-col overflow-y-scroll bg-white py-6 shadow-xl"
                                 >
-                                    <h2
-                                        class="text-2xl font-bold dark:text-white text-center"
-                                    >
+                                    <h2 class="text-2xl font-bold text-center">
                                         Notifications
                                     </h2>
                                     <div
@@ -74,10 +72,10 @@
                                             class="w-64 h-1 my-8 bg-gray-200 border-0 rounded dark:bg-gray-700"
                                         />
                                         <div
-                                            class="absolute px-4 -translate-x-1/2 bg-white left-1/2 dark:bg-gray-900"
+                                            class="absolute px-4 -translate-x-1/2 bg-white left-1/2"
                                         >
                                             <svg
-                                                class="w-4 h-4 text-primary-dark dark:text-primary-dark"
+                                                class="w-4 h-4"
                                                 aria-hidden="true"
                                                 xmlns="http://www.w3.org/2000/svg"
                                                 fill="currentColor"
