@@ -69,9 +69,9 @@ jobs:
 
       # Code coverage 
     - name: Upload coverage reports to Codecov
-      uses: codecov/codecov-action@v4.0.1
+      uses: codecov/codecov-action@v3
       env:
-        token: ${{ secrets.CODECOV_TOKEN }}
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         slug: NFDI4Chem/nmrxiv
 
   # setup-build-publish-deploy:
