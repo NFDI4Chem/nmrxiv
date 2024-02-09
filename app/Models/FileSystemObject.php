@@ -59,7 +59,7 @@ class FileSystemObject extends Model
     public function getDownloadUrlAttribute()
     {
         if ($this->model_type == 'study') {
-            return $this->study->download_url;
+            return $this->study ? $this->study->download_url : null;
         }
     }
 
