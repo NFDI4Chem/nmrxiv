@@ -59,7 +59,6 @@ jobs:
         echo GITHUB_CLIENT_SECRET=${{ secrets.CLIENT_SECRET_GITHUB_DEV }} >> .env
 
         php artisan key:generate
-        php artisan migrate --seed
 
     - name: Install front-end dependencies
       run: |
