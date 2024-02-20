@@ -2,7 +2,7 @@ name : Setup, Build and Publish to Dev
 
 on:
   push:
-    branches: [code-cov]
+    branches: [development]
 
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
@@ -26,7 +26,7 @@ jobs:
     container:
       image: kirschbaumdevelopment/laravel-test-runner:8.2
 
-    services:
+    services: 
       postgres:
         image: postgres:13
         env:
