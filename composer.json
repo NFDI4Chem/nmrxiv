@@ -50,6 +50,7 @@
         "laravel/telescope": "^4.9",
         "mockery/mockery": "^1.4.2",
         "nunomaduro/collision": "^7.0",
+        "phpunit/php-code-coverage": "^10.1",
         "phpunit/phpunit": "^10.0",
         "spatie/laravel-ignition": "^2.0",
         "spatie/phpunit-snapshot-assertions": "^5.1"
