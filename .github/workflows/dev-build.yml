@@ -65,8 +65,8 @@ jobs:
         npm install
         npm run build
     - name: Run Test
-      #run: vendor/bin/phpunit --coverage-clover coverage.xml .
-      run: vendor/bin/phpunit
+      run: vendor/bin/phpunit --coverage-clover coverage.xml .
+      #run: vendor/bin/phpunit
 
       # Code coverage 
       # https://github.com/codecov/example-php/blob/main/.github/workflows/ci.yml
