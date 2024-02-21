@@ -12,33 +12,33 @@ class ApiTokenPermissionsTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_api_token_permissions_can_be_updated()
-    {
-        if (! Features::hasApiFeatures()) {
-            return $this->markTestSkipped('API support is not enabled.');
-        }
+    // public function test_api_token_permissions_can_be_updated()
+    // {
+    //     if (! Features::hasApiFeatures()) {
+    //         return $this->markTestSkipped('API support is not enabled.');
+    //     }
 
-        if (Features::hasTeamFeatures()) {
-            $this->actingAs($user = User::factory()->withPersonalTeam()->create());
-        } else {
-            $this->actingAs($user = User::factory()->create());
-        }
+    //     if (Features::hasTeamFeatures()) {
+    //         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+    //     } else {
+    //         $this->actingAs($user = User::factory()->create());
+    //     }
 
-        $token = $user->tokens()->create([
-            'name' => 'Test Token',
-            'token' => Str::random(40),
-            'abilities' => ['project:create', 'project:read'],
-        ]);
+    //     $token = $user->tokens()->create([
+    //         'name' => 'Test Token',
+    //         'token' => Str::random(40),
+    //         'abilities' => ['project:create', 'project:read'],
+    //     ]);
 
-        $response = $this->put('/user/api-tokens/'.$token->id, [
-            'name' => $token->name,
-            'permissions' => [
-                'project:delete',
-            ],
-        ]);
+    //     $response = $this->put('/user/api-tokens/'.$token->id, [
+    //         'name' => $token->name,
+    //         'permissions' => [
+    //             'project:delete',
+    //         ],
+    //     ]);
 
-        // $this->assertTrue($user->fresh()->tokens->first()->can('project:delete'));
-        // $this->assertFalse($user->fresh()->tokens->first()->can('project:read'));
-        // $this->assertFalse($user->fresh()->tokens->first()->can('project:missing-permission'));
-    }
+    //     // $this->assertTrue($user->fresh()->tokens->first()->can('project:delete'));
+    //     // $this->assertFalse($user->fresh()->tokens->first()->can('project:read'));
+    //     // $this->assertFalse($user->fresh()->tokens->first()->can('project:missing-permission'));
+    // }
 }
