@@ -1,8 +1,8 @@
-name : Setup, Build and Publish to Dev
+name : Code-cov test
 
 on:
   push:
-    branches: []
+    branches: [xyz]
 
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
