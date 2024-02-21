@@ -2,7 +2,7 @@ name : Setup, Build and Publish to Dev
 
 on:
   push:
-    branches: [development]
+    branches: [code-cov]
 
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
@@ -38,7 +38,7 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v3
       with:
         fetch-depth: 1
 
@@ -65,7 +65,8 @@ jobs:
         npm install
         npm run build
     - name: Run Test
-      run: vendor/bin/phpunit --coverage-clover coverage.xml .
+      #run: vendor/bin/phpunit --coverage-clover coverage.xml .
+      run: vendor/bin/phpunit
 
       # Code coverage 
       # https://github.com/codecov/example-php/blob/main/.github/workflows/ci.yml
