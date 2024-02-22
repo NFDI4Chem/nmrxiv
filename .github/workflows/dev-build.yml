@@ -63,6 +63,7 @@ jobs:
 
     - name: Install pcov
       run: |
+        apt-get update
         apt-get -y install php-pcov
     - name: Install front-end dependencies
       run: |
