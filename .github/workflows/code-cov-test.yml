@@ -2,7 +2,7 @@ name : Code-cov test
 
 on:
   push:
-    branches: [xyz]
+    branches: [code-cov]
 
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
@@ -33,13 +33,14 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v1
 
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
         php-version: '8.2'
         extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv
+        coverage: pcov
 
     - name: Install composer dependencies
       run: |
@@ -61,13 +62,18 @@ jobs:
         php artisan key:generate
         php artisan migrate --seed
 
+    - name: Install pcov
+      run: |
+        apt-get update
+        apt-get -y install php-pcov
+
     - name: Install front-end dependencies
       run: |
         npm install
         npm run build
     
     - name: Run tests and collect coverage
-      run: vendor/bin/phpunit --coverage-clover coverage.xml .
+      run: vendor/bin/phpunit --coverage-clover coverage.xml
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v4-beta
