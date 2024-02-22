@@ -63,8 +63,8 @@ jobs:
 
     - name: Install pcov
       run: |
-        apt-get update
-        apt-get -y install php-pcov
+        sudo apt-get update
+        sudo apt-get -y install php-pcov
 
     - name: Install front-end dependencies
       run: |
@@ -75,7 +75,7 @@ jobs:
       run: vendor/bin/phpunit --coverage-clover coverage.xml
 
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v4-beta
+      uses: codecov/codecov-action@v3
     env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_ORG_TOKEN }}
     
