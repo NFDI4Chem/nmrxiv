@@ -60,6 +60,10 @@ jobs:
 
         php artisan key:generate
         php artisan migrate --seed
+
+    - name: Install pcov
+      run: |
+        apt-get -y install php-pcov
     - name: Install front-end dependencies
       run: |
         npm install
