@@ -38,6 +38,31 @@ class ManageAuthorsTest extends TestCase
         $project = $project->fresh();
         $authors = $project->authors->toArray();
         $this->assertDatabaseHas('author_project', $authors[0]['pivot']);
+    }
+
+    /**
+     * Test if a author can be updated
+     *
+     * @return void
+     */
+    public function test_author_can_be_updated()
+    {
+        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+
+        $project = Project::factory()->create([
+            'owner_id' => $user->id,
+        ]);
+
+        $body = $this->prepareBody(null);
+
+        //Add author to project
+        $response = $this->addAuthor($body, $project->id);
+
+        $response->assertStatus(200);
+
+        //Fetch authors details
+        $project = $project->fresh();
+        $authors = $project->authors->toArray();
 
         //Update existing author
         $response = $this->updateAuthor($authors[0], $project->id);
