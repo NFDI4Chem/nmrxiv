@@ -2,7 +2,7 @@ name : Setup, Build and Publish to Dev
 
 on:
   push:
-    branches: [include-missing-tests]
+    branches: [development]
 
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
