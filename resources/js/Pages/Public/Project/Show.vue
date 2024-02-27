@@ -32,7 +32,7 @@
                         </div>
                     </div>
 
-                    <div v-if="project.data.species" class="pt-2">
+                    <div v-if="project.data.species && project.data.species.length > 0" class="pt-2">
                         <h3 class="text-xl font-extrabold text-blue-gray-900">
                             Organism
                         </h3>
