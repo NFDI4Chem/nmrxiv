@@ -127,7 +127,6 @@ class BioschemasHelper
         $citationsSchemas = [];
         foreach ($model->citations as &$citation) {
             $citationSchema = Schema::CreativeWork();
-            $citationSchema->abstract($citation->abstract);
             $citationSchema->author($citation->authors);
             $citationSchema->headline($citation->title);
             $citationSchema->identifier($citation->doi);
