@@ -408,9 +408,19 @@ export default {
                             this.route("dashboard.projects", [project.id])
                         );
                     } else {
-                        return router.visit(
-                            "/upload?draft_id=" + project.draft_id
-                        );
+                        if (
+                            project.draft.current_step &&
+                            project.draft.current_step == 3
+                        ) {
+                            router.visit("/publish/" + project.draft_id);
+                        } else {
+                            return router.visit(
+                                "/upload?draft_id=" +
+                                    project.draft_id +
+                                    "&step=" +
+                                    project.draft.current_step
+                            );
+                        }
                     }
                 } else {
                     if (project.doi && project.release_date) {
