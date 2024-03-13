@@ -37,6 +37,7 @@
                                 Chicago
                             </option>
                             <option name="citation" value="IEEE">IEEE</option>
+                            <option name="citation" value="ACS">ACS</option>
                         </select>
                     </p>
                     <p
@@ -63,9 +64,11 @@ export default {
                 Vancouver: "vancouver",
                 Chicago: "chicago-fullnote-bibliography",
                 IEEE: "ieee",
+                ACS: "american-chemical-society",
             },
             selectedFormat: "APA",
             citationText: null,
+            processedResponse: null,
         };
     },
     computed: {
@@ -105,7 +108,20 @@ export default {
                 )
                 .then(
                     (response) => {
-                        this.citationText = response.data;
+                        this.processedResponse = response.data;
+                        if (this.selectedFormat == "ACS") {
+                            var pattern = /, 20(\d{2})(?=\.)/;
+                            var matchIndex =
+                                this.processedResponse.search(pattern);
+                            this.processedResponse =
+                                this.processedResponse.substring(
+                                    0,
+                                    matchIndex
+                                ) +
+                                ". nmrXiv" +
+                                this.processedResponse.substring(matchIndex);
+                        }
+                        this.citationText = this.processedResponse;
                     },
                     (error) => {
                         console.log(error);
