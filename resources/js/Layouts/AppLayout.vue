@@ -307,10 +307,10 @@
                 </button>
                 <div class="flex-1 px-4 py-2 flex justify-between">
                     <div class="flex-1 flex">
-                        <search
+                        <!-- <search
                             :host="MEILISEARCH_HOST"
                             :akey="MEILISEARCH_PUBLICKEY"
-                        ></search>
+                        ></search> -->
                     </div>
                     <flash-messages />
                     <div class="ml-4 flex items-center md:ml-6">

@@ -2127,7 +2127,7 @@ export default {
                         "Please upload spectral data to proceed.";
                 } else if (!this.studiesExist) {
                     this.filesErrorMessage =
-                        "Please upload spectral data to proceed.";
+                        "Please organize the spectral data into folders corresponding to the given samples and re-upload. Refer to the <a href='https://docs.nmrxiv.org/submission-guides/folder-structure.html' style='color:blue' target='_blank'>documentation</a> for more details.";
                 } else {
                     this.filesErrorMessage =
                         "Please make sure you fill in all the required data before you proceed";
