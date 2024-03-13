@@ -1959,6 +1959,7 @@ export default {
             }
         },
         newDraft() {
+            console.log("newDraft method called..");
             if (this.defaultDraft) {
                 this.defaultDraft.name =
                     "Untitled Project (Draft: " +
@@ -1977,8 +1978,11 @@ export default {
                 });
             }
         },
-        updateDraft(e) {
-            this.currentDraft.name = e.target.innerText;
+        updateDraft(e, stepId) {
+            if (e) {
+                this.currentDraft.name = e.target.innerText;
+            }
+            this.currentDraft.current_step = stepId;
             this.draftForm.errors = [];
             axios
                 .put(
@@ -1991,6 +1995,7 @@ export default {
                 });
         },
         closeDraft() {
+            this.updateDraft(null, 3);
             this.loadingStep = true;
             this.fetchValidations().then(() => {
                 if (this.validationStatus) {
@@ -2035,6 +2040,7 @@ export default {
                 }
             });
             if (id == 1) {
+                this.updateDraft(null, 1);
                 // this.loadingStep = true;
                 this.selectedStudyIndex = null;
                 this.selectedStudy = null;
@@ -2051,6 +2057,7 @@ export default {
                     }
                 });
             } else if (id == 2) {
+                this.updateDraft(null, 2);
                 this.$nextTick(function () {
                     // if (this.$refs.spectraEditorREF) {
                     //     this.$refs.spectraEditorREF.registerEvents();

@@ -16,6 +16,7 @@ class UploadController extends Controller
     {
         return Inertia::render('Upload', [
             'draft_id' => $request->get('draft_id'),
+            'step' => $request->get('step'),
         ]);
     }
 

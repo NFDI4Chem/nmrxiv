@@ -24,6 +24,7 @@ class Draft extends Model
         'settings',
         'info',
         'project_enabled',
+        'current_step',
     ];
 
     public function files()
