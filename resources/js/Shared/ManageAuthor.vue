@@ -737,6 +737,7 @@ export default {
             error: "",
             showManageRoleDialog: false,
             drag: false,
+            formattedAuthors: [],
             // todo : dynamically load this from the config
             contributorType: [
                 {
@@ -881,6 +882,7 @@ export default {
             this.form.contributor_type = this.contributorType[0];
             this.isEdit = false;
             this.error = "";
+            this.formattedAuthors = [];
         },
         /*Edit author*/
         edit(author) {
@@ -911,7 +913,6 @@ export default {
             this.loading = true;
             this.error = "";
             this.query = this.extractQueryParam(this.query);
-            this.fetchedAuthors = [];
             let isDOI = new RegExp(/\b(10[.][0-9]{4,}(?:[.][0-9]+)*)\b/g).test(
                 this.query
             );
@@ -954,7 +955,6 @@ export default {
         },
         /*Make REST Call to Crossref API */
         fetchDataFromCrossref(query) {
-            this.fetchedAuthors = [];
             axios
                 .get(this.$page.props.CROSSREF_API + this.query)
                 .then((res) => {
@@ -974,7 +974,6 @@ export default {
         },
         /*Make REST call to Datacite API */
         fetchDataFromDatacite(query) {
-            this.fetchedAuthors = [];
             axios
                 .get(this.$page.props.DATACITE_API + this.query)
                 .then((res) => {
@@ -1001,7 +1000,6 @@ export default {
         },
         /*Format authors response*/
         formatAuthorResponse(authors, apiType) {
-            var formattedAuthors = [];
             if (authors && authors.length > 0) {
                 switch (apiType) {
                     case "europemc":
@@ -1022,7 +1020,7 @@ export default {
                                     ? author.authorAffiliationDetailsList
                                           .authorAffiliation[0].affiliation
                                     : "";
-                            formattedAuthors.push(a);
+                            this.formattedAuthors.push(a);
                         });
                         break;
                     case "crossref":
@@ -1034,7 +1032,7 @@ export default {
                             a.affiliation = author.affiliation[0]
                                 ? author.affiliation[0].name
                                 : "";
-                            formattedAuthors.push(a);
+                            this.formattedAuthors.push(a);
                         });
                         break;
                     case "datacite":
@@ -1055,13 +1053,20 @@ export default {
                             a.affiliation = author.affiliation
                                 ? author.affiliation[0]
                                 : "";
-                            formattedAuthors.push(a);
+                            this.formattedAuthors.push(a);
                         });
                         break;
                 }
             }
+            const keys = ["firstName", "lastName", "orcidId"];
+            this.formattedAuthors = this.formattedAuthors.filter(
+                (value, index, self) =>
+                    self.findIndex((v) =>
+                        keys.every((k) => v[k] === value[k])
+                    ) === index
+            );
             this.loading = false;
-            return formattedAuthors;
+            return this.formattedAuthors;
         },
         /*Format the response*/
         formatAuthors(authors) {
@@ -1149,6 +1154,7 @@ export default {
         },
         /*Make request to save API*/
         executeQuery() {
+            console.log("execute query method called..");
             this.authorsForm.authors = this.authors;
             const keys = ["given_name", "family_name"];
             this.authorsForm.authors = this.authorsForm.authors.filter(
@@ -1165,7 +1171,10 @@ export default {
                     this.form.contributor_type = {};
                     this.form.contributor_type = this.contributorType[0];
                     this.displayAddAuthorForms = false;
+                    this.formattedAuthors = [];
+                    this.fetchedAuthors = [];
                     this.isEdit = false;
+                    this.query = "";
                 },
                 onError: (err) => console.error(err),
             });
