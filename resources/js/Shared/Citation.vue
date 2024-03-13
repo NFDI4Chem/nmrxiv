@@ -38,6 +38,7 @@
                             </option>
                             <option name="citation" value="IEEE">IEEE</option>
                             <option name="citation" value="ACS">ACS</option>
+                            <option name="citation" value="RSC">RSC</option>
                         </select>
                     </p>
                     <p
@@ -65,6 +66,7 @@ export default {
                 Chicago: "chicago-fullnote-bibliography",
                 IEEE: "ieee",
                 ACS: "american-chemical-society",
+                RSC: "royal-society-of-chemistry",
             },
             selectedFormat: "APA",
             citationText: null,
@@ -120,6 +122,16 @@ export default {
                                 ) +
                                 ". nmrXiv" +
                                 this.processedResponse.substring(matchIndex);
+                        } else if (this.selectedFormat == "RSC") {
+                            var id = this.doi.substring(
+                                this.doi.lastIndexOf(".") + 1
+                            );
+                            this.processedResponse =
+                                this.processedResponse.slice(0, -1) +
+                                ", nmrXiv Data set:" +
+                                id +
+                                ", DOI:" +
+                                this.doi;
                         }
                         this.citationText = this.processedResponse;
                     },
