@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.1.0](https://github.com/NFDI4Chem/nmrxiv/compare/v1.0.3...v1.1.0) (2024-03-14)
+
+
+### Features
+
+* integrate code cov to build workflow ([177c639](https://github.com/NFDI4Chem/nmrxiv/commit/177c639f947d2ec08a482f48e8078aa33d772393))
+
+
+### Bug Fixes
+
+* add missing dot. ([c58dba3](https://github.com/NFDI4Chem/nmrxiv/commit/c58dba34c0ab13661995d1bb56a7e800b2cd828a)), closes [#1108](https://github.com/NFDI4Chem/nmrxiv/issues/1108)
+* enable addition of multiple authors at once. ([9d59a8e](https://github.com/NFDI4Chem/nmrxiv/commit/9d59a8ee642717f2abcc30483748d8a5cdf7a725)), closes [#646](https://github.com/NFDI4Chem/nmrxiv/issues/646)
+* release-please test ([ad0f34a](https://github.com/NFDI4Chem/nmrxiv/commit/ad0f34adcccb44382f3e80752a890c2672cd5fbb))
+
 ## [1.0.3](https://github.com/NFDI4Chem/nmrxiv/compare/v1.0.2...v1.0.3) (2024-02-09)
 
 
