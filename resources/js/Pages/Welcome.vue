@@ -340,7 +340,7 @@
                             class="text-center text-lg font-semibold leading-8 text-gray-900"
                         >
                             Recommended by leading journals as the
-                            community-trusted repository for NMR data deposition
+                            community-trusted repository for NMR data deposition.
                         </h2>
                         <div
                             class="mx-auto mt-10 grid max-w-lg grid-cols-2 md:grid-cols-4 items-center gap-x-8 gap-y-10"
