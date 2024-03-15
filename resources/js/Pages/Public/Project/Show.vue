@@ -14,6 +14,7 @@
                         :doi="project.data.doi"
                     ></Citation>
                     <ShowProjectDates
+                        class="ml-5"
                         :release_date="project.data.release_date"
                         :created_at="project.data.created_at"
                     />
