@@ -1,13 +1,21 @@
 <template>
     <div class="flex items-center text-sm text-gray-400">
         <CalendarDaysIcon
-            class="flex-shrink-0 ml-5 mr-1.5 h-5 w-5 text-teal-500"
+            class="flex-shrink-0 h-5 w-5 text-teal-500 mr-1"
             aria-hidden="true"
         />
-        <p class="text-gray-400 font-bold mr-1">Published on:</p>
-        <p class="text-gray-500">{{ formatDateTime(release_date) }} |</p>
-        <p class="text-gray-400 font-bold ml-1.5 mr-1">Created on:</p>
-        <p class="text-gray-500">{{ formatDateTime(created_at) }}</p>
+        <p v-if="release_date" class="text-gray-400 font-bold mr-1">
+            Published on:
+        </p>
+        <p v-if="release_date" class="text-gray-500">
+            {{ formatDate(release_date) }} |
+        </p>
+        <p v-if="created_at" class="text-gray-400 font-bold ml-1.5 mr-1">
+            Created on:
+        </p>
+        <p v-if="created_at" class="text-gray-500">
+            {{ formatDate(created_at) }}
+        </p>
         <p v-if="updated_at" class="text-gray-400 font-bold ml-1.5 mr-1">
             | Last updated:
         </p>

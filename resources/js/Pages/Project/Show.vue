@@ -50,6 +50,7 @@
             <div v-if="project.is_public && project.doi != null">
                 <Citation :model="'project'" :doi="project.doi"></Citation>
                 <ShowProjectDates
+                    class="ml-5"
                     :release_date="project.release_date"
                     :created_at="project.created_at"
                     :updated_at="project.updated_at"
