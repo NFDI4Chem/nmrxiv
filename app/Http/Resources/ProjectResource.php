@@ -48,6 +48,7 @@ class ProjectResource extends JsonResource
             'updated_at' => $this->updated_at,
             'download_url' => $this->download_url,
             'species' => json_decode($this->species),
+            'release_date' => $this->release_date,
             'stats' => [
                 'likes' => $this->likesCount(),
             ],
