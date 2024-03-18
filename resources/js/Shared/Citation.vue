@@ -39,6 +39,10 @@
                             <option name="citation" value="IEEE">IEEE</option>
                             <option name="citation" value="ACS">ACS</option>
                             <option name="citation" value="RSC">RSC</option>
+                            <option name="citation" value="Wiley">Wiley</option>
+                            <option name="citation" value="Springer">
+                                Springer Nature
+                            </option>
                         </select>
                     </p>
                     <p
@@ -67,6 +71,8 @@ export default {
                 IEEE: "ieee",
                 ACS: "american-chemical-society",
                 RSC: "royal-society-of-chemistry",
+                Wiley: "wiley-was",
+                Springer: "apa",
             },
             selectedFormat: "APA",
             citationText: null,
@@ -132,6 +138,28 @@ export default {
                                 id +
                                 ", DOI:" +
                                 this.doi;
+                        } else if (this.selectedFormat == "Wiley") {
+                            this.processedResponse =
+                                "[dataset] " +
+                                this.processedResponse.replace(
+                                    " [Data set]",
+                                    ""
+                                );
+                        } else if (this.selectedFormat == "Springer") {
+                            var pattern = /\(20(\d{2})\)/;
+                            var match = this.processedResponse.match(pattern);
+                            var matchIndex =
+                                this.processedResponse.search(pattern);
+                            this.processedResponse =
+                                this.processedResponse.substring(
+                                    0,
+                                    matchIndex
+                                ) +
+                                this.processedResponse
+                                    .replace(" [Data set]", "")
+                                    .substring(matchIndex + 8) +
+                                " " +
+                                match[0];
                         }
                         this.citationText = this.processedResponse;
                     },
