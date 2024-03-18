@@ -18,7 +18,7 @@ trait HasDOI
                 $users = [];
                 $keywords = [];
                 $citations = [];
-                
+
                 $url = 'https://www.nmrxiv.org/';
                 $license = License::where([['id', $this->license_id]])->firstOrFail();
                 $dates = [
@@ -40,8 +40,6 @@ trait HasDOI
                     'description' => $this->description,
                     'descriptionType' => 'Other',
                 ];
-
-                
 
                 if ($this instanceof Project) {
                     $title = $this->name;
