@@ -46,14 +46,7 @@ class DataCite implements DOIService
             'suffix' => Config::get('app.name').'.'.$suffix,
             'publisher' => Config::get('app.name'),
             'publicationYear' => now()->format('Y'),
-            'types' => [
-                'ris' => 'DATA',
-                'bibtex' => 'misc',
-                'citeproc' => 'dataset',
-                'schemaOrg' => 'Dataset',
-                'resourceType' => 'Dataset',
-                'resourceTypeGeneral' => 'Dataset',
-            ],
+            'language' => 'en',
         ];
 
         foreach ($metadata as $key => $value) {
