@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-use Carbon\Carbon;
-
 trait HasDOI
 {
     public function generateDOI($doiService)
@@ -15,11 +13,13 @@ trait HasDOI
 
             if ($this->doi == null) {
                 $title = null;
+                $suffix = null;
                 $authors = [];
                 $users = [];
-                $suffix = null;
+                $keywords = [];
+                $citations = [];
+                
                 $url = 'https://www.nmrxiv.org/';
-                $publicationYear = Carbon::now()->year;
                 $license = License::where([['id', $this->license_id]])->firstOrFail();
                 $dates = [
                     [
@@ -41,7 +41,7 @@ trait HasDOI
                     'descriptionType' => 'Other',
                 ];
 
-                $citations = [];
+                
 
                 if ($this instanceof Project) {
                     $title = $this->name;
@@ -51,6 +51,10 @@ trait HasDOI
                     $url = $url.'P'.$identifier;
                     $resourceType = 'Project';
                     $citations = $this->citations ? $this->citations : [];
+                    foreach ($this->tags as &$tag) {
+                        $keyword = $tag->name;
+                        array_push($keywords, $keyword);
+                    }
 
                 } elseif ($this instanceof Study) {
                     $title = $this->name;
@@ -98,11 +102,7 @@ trait HasDOI
                                 'schemeUri' => 'https://orcid.org',
                             ],
                         ],
-                        'affiliations' => [
-                            [
-                                'affiliation' => $author->affiliation ? $author->affiliation : null,
-                            ],
-                        ],
+                        'affiliation' => [$author->affiliation ? $author->affiliation : null],
                     ];
                     array_push($creators, $creator);
                 }
@@ -122,11 +122,7 @@ trait HasDOI
                                 'schemeUri' => 'https://orcid.org',
                             ],
                         ],
-                        'affiliations' => [
-                            [
-                                'affiliation' => $user->affiliation ? $user->affiliation : null,
-                            ],
-                        ],
+                        'affiliation' => [$author->affiliation ? $author->affiliation : null],
                     ];
                     array_push($contributors, $contributor);
                 }
@@ -150,7 +146,11 @@ trait HasDOI
                         'schemeUri' => 'https://spdx.org/licenses/',
                     ],
                 ];
-
+                $subjects = [];
+                foreach ($keywords as $keyword) {
+                    $subject = ['subject' => $keyword];
+                    array_push($subjects, $subject);
+                }
                 $attributes = [
                     'creators' => count($creators) > 0 ? $creators : $contributors,
                     'titles' => [
@@ -158,21 +158,27 @@ trait HasDOI
                             'title' => $title,
                         ],
                     ],
-                    'publisher' => 'nmrXiv',
+                    'subjects' => $subjects,
                     'contributors' => $contributors,
-                    'publicationYear' => $publicationYear,
                     'dates' => $dates,
-                    'language' => 'en',
                     'resourceType' => $this->resourceType,
                     'resourceTypeGeneral' => 'Dataset',
-                    'rights' => $rights,
-                    'description' => $description,
+                    'rightsList' => $rights,
+                    'descriptions' => [$description],
                     'relatedIdentifiers' => $relatedIdentifiers,
                     'url' => $url,
                     'isActive' => true,
                     'event' => 'publish',
                     'state' => 'findable',
                     'schemaVersion' => 'http://datacite.org/schema/kernel-4',
+                    'types' => [
+                        'ris' => 'DATA',
+                        'bibtex' => 'misc',
+                        'citeproc' => 'dataset',
+                        'schemaOrg' => 'Dataset',
+                        'resourceType' => $resourceType,
+                        'resourceTypeGeneral' => 'Dataset',
+                    ],
                 ];
 
                 // dd($attributes);
