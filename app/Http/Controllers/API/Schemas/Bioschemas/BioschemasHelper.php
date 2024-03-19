@@ -127,7 +127,6 @@ class BioschemasHelper
         $citationsSchemas = [];
         foreach ($model->citations as &$citation) {
             $citationSchema = Schema::CreativeWork();
-            $citationSchema->abstract($citation->abstract);
             $citationSchema->author($citation->authors);
             $citationSchema->headline($citation->title);
             $citationSchema->identifier($citation->doi);
@@ -149,11 +148,17 @@ class BioschemasHelper
     {
         $url = env('APP_URL');
         $user = $dataset->owner->username;
-        $slug = $dataset->project->slug;
+        if (property_exists($dataset, 'project')) {
+            $slug = $dataset->project->slug;
+            $name = $dataset->project->name;
+        } else {
+            $slug = $dataset->study->slug;
+            $name = $dataset->study->name;
+        }
         $contentURL = $url.'/'.$user.'/datasets/'.$slug;
 
         $DataDownloadSchema = Schema::DataDownload();
-        $DataDownloadSchema->name($dataset->project->name);
+        $DataDownloadSchema->name($name);
         $DataDownloadSchema->encodingFormat('zip');
         $DataDownloadSchema->contentURL($contentURL);
 
