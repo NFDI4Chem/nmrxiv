@@ -70,9 +70,27 @@ class DataCite implements DOIService
         return json_decode($contents, true);
     }
 
-    public function updateDOI($doi)
+    public function updateDOI($doi, $metadata = []) 
     {
-        return 'Datacite';
+        foreach ($metadata as $key => $value) {
+            $attributes[$key] = $value;
+        }
+
+        $body = [
+            'data' => [
+                'type' => 'dois',
+                'attributes' => $attributes,
+            ],
+        ];
+
+        $response = $this->client->put('/dois/'.urlencode($doi), 
+            [RequestOptions::JSON => $body]
+        );
+
+        $stream = $response->getBody();
+        $contents = $stream->getContents();
+
+        return json_decode($contents, true);
     }
 
     public function deleteDOI($doi)
