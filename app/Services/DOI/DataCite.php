@@ -70,7 +70,7 @@ class DataCite implements DOIService
         return json_decode($contents, true);
     }
 
-    public function updateDOI($doi, $metadata = []) 
+    public function updateDOI($doi, $metadata = [])
     {
         foreach ($metadata as $key => $value) {
             $attributes[$key] = $value;
@@ -83,7 +83,7 @@ class DataCite implements DOIService
             ],
         ];
 
-        $response = $this->client->put('/dois/'.urlencode($doi), 
+        $response = $this->client->put('/dois/'.urlencode($doi),
             [RequestOptions::JSON => $body]
         );
 
