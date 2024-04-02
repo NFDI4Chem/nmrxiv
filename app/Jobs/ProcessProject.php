@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Actions\Project\AssignIdentifier;
+use App\Actions\Project\UpdateDOI;
 use App\Actions\Project\PublishProject;
 use App\Models\FileSystemObject;
 use App\Models\Project;
@@ -45,7 +46,7 @@ class ProcessProject implements ShouldBeUnique, ShouldQueue
      *
      * @return void
      */
-    public function handle(AssignIdentifier $assigner, PublishProject $publisher)
+    public function handle(AssignIdentifier $assigner, UpdateDOI $updater, PublishProject $publisher)
     {
         $project = $this->project;
 
@@ -109,6 +110,8 @@ class ProcessProject implements ShouldBeUnique, ShouldQueue
             if ($release_date->isPast()) {
                 $publisher->publish($project);
             }
+
+            $updater->update($project->fresh());
 
             Notification::send($project->owner, new DraftProcessedNotification($project));
         }

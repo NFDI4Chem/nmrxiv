@@ -4,6 +4,7 @@ namespace App\Actions\Project;
 
 use App\Models\Project;
 use App\Models\Study;
+use App\Models\Dataset;
 use App\Services\DOI\DOIService;
 use Illuminate\Support\Collection;
 
@@ -27,7 +28,7 @@ class UpdateDOI
      * @param  mixed  $model
      * @return void
      */
-    public function assign($model)
+    public function update($model)
     {
         $project = null;
         $studies = null;
@@ -38,17 +39,19 @@ class UpdateDOI
         }
 
         if ($project) {
-            $project->updateDOIMetadata($this->doiService);
+            $project->addRelatedIdentifiers($this->doiService);
             $studies = $project->studies;
+            
         }
-
         if ($studies) {
             foreach ($studies as $study) {
                 if ($study instanceof Study) {
-                    $study->updateDOIMetadata($this->doiService);
+                    $study->addRelatedIdentifiers($this->doiService);
                     $datasets = $study->datasets;
                     foreach ($datasets as $dataset) {
-                        $dataset->updateDOIMetadata($this->doiService);
+                        if ($dataset instanceof Dataset) {
+                            $dataset->addRelatedIdentifiers($this->doiService);
+                        }
                     }
                 }
             }
