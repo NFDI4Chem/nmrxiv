@@ -238,13 +238,17 @@ class BioschemasController extends Controller
      */
     public function getSample($study)
     {
+        $prefix = '';
+        if (property_exists($study, 'project')) {
+            $prefix = $study->project->name.'.';
+        }
         $sample = $study->sample;
         $molecules = $this->prepareMoleculesSchemas($sample);
 
         $sampleSchema = Schema::ChemicalSubstance();
         $sampleSchema['@id'] = $study->doi;
         $sampleSchema['dct:conformsTo'] = BioschemasHelper::conformsTo(['https://bioschemas.org/types/ChemicalSubstance/0.3-RELEASE-2019_09_02']);
-        $sampleSchema->name($study->project->name.'.'.$sample->name);
+        $sampleSchema->name($prefix.$sample->name);
         $sampleSchema->description($sample->description);
         $sampleSchema->url(env('APP_URL').'/'.explode(':', $study->identifier ? $study->identifier : ':')[1]);
         $sampleSchema->hasBioChemEntityPart($this->prepareMoleculesSchemas($sample));
@@ -451,7 +455,11 @@ class BioschemasController extends Controller
     {
         $nmriumInfo = $this->prepareNMRiumInfo($dataset);
         if ($nmriumInfo) {
-            $prefix = $dataset->study->project->name.':'.$dataset->study->name.'.';
+            $study = $dataset->study;
+            $prefix = $dataset->study->name.'.';
+            if (property_exists($study, 'project')) {
+                $prefix = $study->project->name.':'.$prefix;
+            }
             $datasetSchema = Schema::Dataset();
             $datasetSchema['@id'] = $dataset->doi;
             $datasetSchema['dct:conformsTo'] = BioschemasHelper::conformsTo(['https://schema.org/Dataset', 'https://isa-specs.readthedocs.io/en/latest/isamodel.html#assay']);
@@ -504,7 +512,10 @@ class BioschemasController extends Controller
      */
     public function studyLite($study)
     {
-        $prefix = $study->project->name.':';
+        $prefix = '';
+        if (property_exists($study, 'project')) {
+            $prefix = $study->project->name.':';
+        }
         $studySchema = Bioschemas::Study();
         $studySchema['@id'] = $study->doi;
         $studySchema['dct:conformsTo'] = BioschemasHelper::conformsTo(['https://bioschemas.org/types/Study/0.3-DRAFT', 'https://isa-specs.readthedocs.io/en/latest/isamodel.html#study']);
@@ -534,7 +545,9 @@ class BioschemasController extends Controller
     public function study($study)
     {
         $studySchema = $this->studyLite($study);
-        $studySchema->isPartOf($this->projectLite($study->project));
+        if (property_exists($study, 'project')) {
+            $studySchema->isPartOf($this->projectLite($study->project));
+        }
         $studySchema->hasPart($this->prepareDatasets($study));
 
         return $studySchema;
