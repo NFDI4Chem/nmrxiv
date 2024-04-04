@@ -118,15 +118,15 @@ export default {
                     (response) => {
                         this.processedResponse = response.data;
                         if (this.selectedFormat == "ACS") {
-                            var pattern = /, 20(\d{2})(?=\.)/;
+                            var pattern = /20(\d{2})(?=\.)/;
                             var matchIndex =
                                 this.processedResponse.search(pattern);
                             this.processedResponse =
                                 this.processedResponse.substring(
                                     0,
-                                    matchIndex
+                                    matchIndex - 2
                                 ) +
-                                ". nmrXiv" +
+                                ". nmrXiv. " +
                                 this.processedResponse.substring(matchIndex);
                         } else if (this.selectedFormat == "RSC") {
                             var id = this.doi.substring(
