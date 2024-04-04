@@ -349,17 +349,12 @@
                         </span>
                     </div>
                     <div class="px-6 pt-2 border-t">
-                        <div class="text-xs text-gray-400 mb-2">
-                            <span class="font-bold text-gray-600"
-                                >Updated on</span
-                            >
-                            {{ formatDate(project.updated_at) }}
-                            &nbsp;&middot;&nbsp;
-                            <span class="font-bold text-gray-600"
-                                >Created on</span
-                            >
-                            {{ formatDate(project.created_at) }}
-                        </div>
+                        <ShowProjectDates
+                            class="text-xs ml-0 mb-1"
+                            :release_date="project.release_date"
+                            :created_at="project.created_at"
+                            :updated_at="project.updated_at"
+                        />
                         <div
                             v-if="
                                 !project.is_public &&
@@ -383,10 +378,12 @@
 <script>
 import { Link, router } from "@inertiajs/vue3";
 import { StarIcon } from "@heroicons/vue/24/solid";
+import ShowProjectDates from "@/Shared/ShowProjectDates.vue";
 export default {
     components: {
         Link,
         StarIcon,
+        ShowProjectDates,
     },
     props: ["projects", "mode", "teamRole", "team"],
     setup() {},
@@ -408,9 +405,19 @@ export default {
                             this.route("dashboard.projects", [project.id])
                         );
                     } else {
-                        return router.visit(
-                            "/upload?draft_id=" + project.draft_id
-                        );
+                        if (
+                            project.draft.current_step &&
+                            project.draft.current_step == 3
+                        ) {
+                            router.visit("/publish/" + project.draft_id);
+                        } else {
+                            return router.visit(
+                                "/upload?draft_id=" +
+                                    project.draft_id +
+                                    "&step=" +
+                                    project.draft.current_step
+                            );
+                        }
                     }
                 } else {
                     if (project.doi && project.release_date) {
