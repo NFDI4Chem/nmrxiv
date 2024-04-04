@@ -167,7 +167,7 @@ trait HasDOI
                         'schemeUri' => 'https://orcid.org',
                     ],
                 ],
-                'affiliation' => [$author->affiliation ? $author->affiliation : null],
+                'affiliation' => [$user->affiliation ? $user->affiliation : null],
             ];
             array_push($contributors, $contributor);
         }
