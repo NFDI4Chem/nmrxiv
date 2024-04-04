@@ -13,8 +13,13 @@
                         :model="'project'"
                         :doi="project.data.doi"
                     ></Citation>
+                    <ShowProjectDates
+                        class="ml-5"
+                        :release_date="project.data.release_date"
+                        :created_at="project.data.created_at"
+                    />
                 </div>
-                <div class="mt-2 space-y-4 divide-y divide-y-blue-gray-200">
+                <div class="mt-6 space-y-4 divide-y divide-y-blue-gray-200">
                     <div>
                         <h3 class="text-xl font-extrabold text-blue-gray-900">
                             About project
@@ -32,7 +37,13 @@
                         </div>
                     </div>
 
-                    <div v-if="project.data.species && project.data.species.length > 0" class="pt-2">
+                    <div
+                        v-if="
+                            project.data.species &&
+                            project.data.species.length > 0
+                        "
+                        class="pt-2"
+                    >
                         <h3 class="text-xl font-extrabold text-blue-gray-900">
                             Organism
                         </h3>
@@ -160,6 +171,7 @@ import CitationCard from "@/Shared/CitationCard.vue";
 import "ontology-elements/dist/index.js";
 import Citation from "@/Shared/Citation.vue";
 import { Head } from "@inertiajs/vue3";
+import ShowProjectDates from "@/Shared/ShowProjectDates.vue";
 
 export default {
     components: {
@@ -168,6 +180,7 @@ export default {
         CitationCard,
         Citation,
         Head,
+        ShowProjectDates,
     },
     props: ["project", "tab"],
     data() {

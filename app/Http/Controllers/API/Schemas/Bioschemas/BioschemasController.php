@@ -460,7 +460,6 @@ class BioschemasController extends Controller
             if (property_exists($study, 'project')) {
                 $prefix = $study->project->name.':'.$prefix;
             }
-
             $datasetSchema = Schema::Dataset();
             $datasetSchema['@id'] = $dataset->doi;
             $datasetSchema['dct:conformsTo'] = BioschemasHelper::conformsTo(['https://schema.org/Dataset', 'https://isa-specs.readthedocs.io/en/latest/isamodel.html#assay']);

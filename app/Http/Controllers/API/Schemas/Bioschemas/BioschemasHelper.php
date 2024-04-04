@@ -155,7 +155,6 @@ class BioschemasHelper
             $slug = $dataset->study->slug;
             $name = $dataset->study->name;
         }
-
         $contentURL = $url.'/'.$user.'/datasets/'.$slug;
 
         $DataDownloadSchema = Schema::DataDownload();
