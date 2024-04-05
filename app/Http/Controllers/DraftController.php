@@ -125,6 +125,7 @@ class DraftController extends Controller
         }
         $draft->name = $request->get('name') ? $request->get('name') : $draft->name;
         $draft->project_enabled = $project_enabled;
+        $draft->current_step = $request->get('current_step') ? $request->get('current_step') : 1;
         $draft->save();
 
         return $draft;
@@ -424,7 +425,7 @@ class DraftController extends Controller
                 }
             }
 
-            $draft->current_step = 2;
+            //$draft->current_step = 2;
             $draft->save();
 
             $studies = json_decode($project->studies()->orderBy('name')->get()->load(['datasets', 'sample.molecules', 'tags']));

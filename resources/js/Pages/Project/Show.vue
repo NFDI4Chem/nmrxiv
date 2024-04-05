@@ -49,6 +49,12 @@
             </div>
             <div v-if="project.is_public && project.doi != null">
                 <Citation :model="'project'" :doi="project.doi"></Citation>
+                <ShowProjectDates
+                    class="ml-5"
+                    :release_date="project.release_date"
+                    :created_at="project.created_at"
+                    :updated_at="project.updated_at"
+                />
             </div>
             <div class="bg-white border-b">
                 <div class="px-12">
@@ -321,16 +327,6 @@
                             class="text-gray-400 mt-2"
                         >
                             <DOIBadge :doi="project.doi"></DOIBadge>
-                        </div>
-                        <div
-                            class="mt-2 flex items-center text-xs text-gray-400"
-                        >
-                            <CalendarIcon
-                                class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-300"
-                                aria-hidden="true"
-                            />
-                            Updated on
-                            {{ formatDateTime(project.updated_at) }}
                         </div>
                         <div
                             v-if="
@@ -1038,7 +1034,7 @@ import { router } from "@inertiajs/vue3";
 import StudyIndex from "@/Pages/Study/Index.vue";
 import ProjectDetails from "./Partials/Details.vue";
 import { ref } from "vue";
-import { StarIcon, PencilIcon, CalendarIcon } from "@heroicons/vue/24/solid";
+import { StarIcon, PencilIcon } from "@heroicons/vue/24/solid";
 import ManageAuthor from "@/Shared/ManageAuthor.vue";
 import ToolTip from "@/Shared/ToolTip.vue";
 import ManageCitation from "@/Shared/ManageCitation.vue";
@@ -1057,6 +1053,7 @@ import {
     TransitionChild,
     TransitionRoot,
 } from "@headlessui/vue";
+import ShowProjectDates from "@/Shared/ShowProjectDates.vue";
 
 export default {
     components: {
@@ -1070,7 +1067,6 @@ export default {
         ManageAuthor,
         ToolTip,
         ManageCitation,
-        CalendarIcon,
         Citation,
         Publish,
         AuthorCard,
@@ -1084,6 +1080,7 @@ export default {
         JetConfirmationModal,
         JetSecondaryButton,
         JetSuccessButton,
+        ShowProjectDates,
     },
     props: [
         "project",
