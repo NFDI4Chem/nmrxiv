@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.1](https://github.com/NFDI4Chem/nmrxiv/compare/v1.1.0...v1.1.1) (2024-04-05)
+
+
+### Bug Fixes
+
+* add date of publication ([3ee39fb](https://github.com/NFDI4Chem/nmrxiv/commit/3ee39fbadac87deabbb9de8a01c04ff858f32bf9)), closes [#1104](https://github.com/NFDI4Chem/nmrxiv/issues/1104)
+* add publication date in dashboard ([605afa3](https://github.com/NFDI4Chem/nmrxiv/commit/605afa3b81322051d6d959ef405bcdf53fb50a22))
+
 ## [1.1.0](https://github.com/NFDI4Chem/nmrxiv/compare/v1.0.3...v1.1.0) (2024-03-14)
 
 
