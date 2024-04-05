@@ -436,7 +436,8 @@
                                         class="h-[calc(100vh-135px)] overflow-hidden"
                                     >
                                         <div class="flex-1 flex">
-                                            <nav
+                                            <div
+                                                v-if="showSummary"
                                                 aria-label="Sections"
                                                 class="flex-shrink-0 w-64 h-[calc(100vh-135px)] overflow-y-hidden bg-white border-r border-gray-200 md:flex md:flex-col"
                                             >
@@ -649,13 +650,44 @@
                                                         </div>
                                                     </a>
                                                 </div>
-                                            </nav>
+                                            </div>
                                             <div class="flex-1 px-2 bg-white">
                                                 <div
                                                     v-if="
                                                         displaySamplesSummaryInfo
                                                     "
                                                 >
+                                                    <div
+                                                        class="cursor-pointer tooltip m-3 text-gray-500 hover:text-gray-700"
+                                                        @click="
+                                                            toggleSummaryBar()
+                                                        "
+                                                    >
+                                                        <ChevronDoubleLeftIcon
+                                                            class="h-6 w-6"
+                                                            aria-hidden="true"
+                                                            v-if="showSummary"
+                                                        />
+                                                        <ChevronDoubleRightIcon
+                                                            class="h-6 w-6"
+                                                            aria-hidden="true"
+                                                            v-else
+                                                        />
+                                                        <div
+                                                            class="bg-gray-900 text-center text-white px-2 py-1 text-xs font-small shadow-lg rounded-md tooltiptextright"
+                                                        >
+                                                            <span
+                                                                v-if="
+                                                                    !showSummary
+                                                                "
+                                                                >Show Compound
+                                                                Summary</span
+                                                            ><span v-else
+                                                                >Hide Compound
+                                                                Summary</span
+                                                            >
+                                                        </div>
+                                                    </div>
                                                     <div
                                                         class="-mx-2 border-b border-b-gray-900/10 lg:border-t lg:border-t-gray-900/5"
                                                     >
@@ -983,6 +1015,42 @@
                                                                 <div
                                                                     class="px-4 py-1.5 -mx-2 bg-gray-50 border-b px-4 py-3 flex items-center font-semibold text-sm text-slate-900 dark:text-slate-200 bg-slate-50/90 dark:bg-slate-700/90 backdrop-blur-sm ring-1 ring-slate-900/10 dark:ring-black/10"
                                                                 >
+                                                                    <div
+                                                                        class="cursor-pointer tooltip m-3 text-gray-500 hover:text-gray-700"
+                                                                        @click="
+                                                                            toggleSummaryBar()
+                                                                        "
+                                                                    >
+                                                                        <ChevronDoubleLeftIcon
+                                                                            class="h-6 w-6"
+                                                                            aria-hidden="true"
+                                                                            v-if="
+                                                                                showSummary
+                                                                            "
+                                                                        />
+                                                                        <ChevronDoubleRightIcon
+                                                                            class="h-6 w-6"
+                                                                            aria-hidden="true"
+                                                                            v-else
+                                                                        />
+                                                                        <div
+                                                                            class="bg-gray-900 text-center text-white px-2 py-1 text-xs font-small shadow-lg rounded-md tooltiptextright"
+                                                                        >
+                                                                            <span
+                                                                                v-if="
+                                                                                    !showSummary
+                                                                                "
+                                                                                >Show
+                                                                                Compound
+                                                                                Summary</span
+                                                                            ><span
+                                                                                v-else
+                                                                                >Hide
+                                                                                Compound
+                                                                                Summary</span
+                                                                            >
+                                                                        </div>
+                                                                    </div>
                                                                     <h1
                                                                         class="text-2xl font-extrabold text-gray-900"
                                                                     >
@@ -1680,6 +1748,8 @@ import {
     ArrowDownOnSquareStackIcon,
     EyeIcon,
     EyeSlashIcon,
+    ChevronDoubleLeftIcon,
+    ChevronDoubleRightIcon,
 } from "@heroicons/vue/24/solid";
 import SpectraEditor from "@/Shared/SpectraEditor.vue";
 import Depictor from "@/Shared/Depictor.vue";
@@ -1708,6 +1778,8 @@ export default {
         Depictor2D,
         slider,
         VueTagsInput,
+        ChevronDoubleLeftIcon,
+        ChevronDoubleRightIcon,
     },
     props: ["draft_id"],
     setup() {
@@ -1812,6 +1884,7 @@ export default {
                 project_id: this.project ? this.project.id : null,
                 is_public: ref(false),
             }),
+            showSummary: true,
         };
     },
     computed: {
@@ -1959,6 +2032,7 @@ export default {
             }
         },
         newDraft() {
+            console.log("newDraft method called..");
             if (this.defaultDraft) {
                 this.defaultDraft.name =
                     "Untitled Project (Draft: " +
@@ -1977,8 +2051,11 @@ export default {
                 });
             }
         },
-        updateDraft(e) {
-            this.currentDraft.name = e.target.innerText;
+        updateDraft(e, stepId) {
+            if (e) {
+                this.currentDraft.name = e.target.innerText;
+            }
+            this.currentDraft.current_step = stepId;
             this.draftForm.errors = [];
             axios
                 .put(
@@ -1991,6 +2068,7 @@ export default {
                 });
         },
         closeDraft() {
+            this.updateDraft(null, 3);
             this.loadingStep = true;
             this.fetchValidations().then(() => {
                 if (this.validationStatus) {
@@ -2035,6 +2113,7 @@ export default {
                 }
             });
             if (id == 1) {
+                this.updateDraft(null, 1);
                 // this.loadingStep = true;
                 this.selectedStudyIndex = null;
                 this.selectedStudy = null;
@@ -2051,6 +2130,7 @@ export default {
                     }
                 });
             } else if (id == 2) {
+                this.updateDraft(null, 2);
                 this.$nextTick(function () {
                     // if (this.$refs.spectraEditorREF) {
                     //     this.$refs.spectraEditorREF.registerEvents();
@@ -2127,7 +2207,7 @@ export default {
                         "Please upload spectral data to proceed.";
                 } else if (!this.studiesExist) {
                     this.filesErrorMessage =
-                        "Please upload spectral data to proceed.";
+                        "Please organize the spectral data into folders corresponding to the given samples and re-upload. Refer to the <a href='https://docs.nmrxiv.org/submission-guides/folder-structure.html' style='color:blue' target='_blank'>documentation</a> for more details.";
                 } else {
                     this.filesErrorMessage =
                         "Please make sure you fill in all the required data before you proceed";
@@ -2664,6 +2744,9 @@ export default {
                     this.errorMessage = "The entered SMILES is not valid.";
                 }
             }
+        },
+        toggleSummaryBar() {
+            this.showSummary = !this.showSummary;
         },
     },
 };
