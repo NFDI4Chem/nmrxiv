@@ -66,6 +66,4 @@ jobs:
       - uses: google-github-actions/release-please-action@v4
         with:
           release-type: php
-          package-name: release-please-action
           token: ${{ secrets.GITHUB_TOKEN }}
-          prerelease: true
