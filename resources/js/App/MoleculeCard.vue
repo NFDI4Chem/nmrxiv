@@ -51,7 +51,7 @@
                     </div>
                     <div class="font-bold text-md mb-2">
                         <a class="font-semibold text-gray-600 hover:underline"
-                            >#NMRXIV:{{ molecule.identifier }}</a
+                            >#NMRXIV:M{{ molecule.identifier }}</a
                         >
                     </div>
                     <div
