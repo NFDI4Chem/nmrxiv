@@ -17,7 +17,6 @@ use App\Models\Study;
 use App\Models\User;
 use App\Models\Validation;
 use Auth;
-use Carbon\Carbon;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Http\JsonResponse;
@@ -328,19 +327,6 @@ class ProjectController extends Controller
         if ($project) {
             $input = $request->all();
             $release_date = $input['release_date'];
-            // if (! $project->is_public && ! is_null($project->doi) && ! is_null($release_date)) {
-            //     $release_date = Carbon::parse($release_date);
-            //     if ($release_date->isPast()) {
-            //         $updater->update($project, $input);
-            //         $publisher->publish($project);
-            //         $project->sendNotification('publish', $this->prepareSendList($project));
-            //         $project->status = 'complete';
-            //         $project->save();
-            //         return response()->json([
-            //             'project' => $project
-            //         ]);
-            //     }
-            // } else {
             $enableProjectMode = $request->get('enableProjectMode');
             if ($enableProjectMode) {
                 $validation = $project->validation;
@@ -406,9 +392,6 @@ class ProjectController extends Controller
                     ], 422);
                 }
             }
-
-            // }
-
         }
 
     }
