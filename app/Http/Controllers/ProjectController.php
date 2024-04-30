@@ -328,82 +328,86 @@ class ProjectController extends Controller
         if ($project) {
             $input = $request->all();
             $release_date = $input['release_date'];
-            if (! $project->is_public && ! is_null($project->doi) && ! is_null($release_date)) {
-                $release_date = Carbon::parse($release_date);
-                if ($release_date->isPast()) {
-                    $updater->update($project, $request->all());
-                    $publisher->publish($project);
-                    $project->sendNotification('publish', $this->prepareSendList($project));
-                }
-            } else {
-
-                $enableProjectMode = $request->get('enableProjectMode');
-                if ($enableProjectMode) {
-                    $validation = $project->validation;
-                    $validation->process();
-                    $validation = $validation->fresh();
-                    if ($validation['report']['project']['status']) {
-                        $project->release_date = $request->get('release_date');
-                        $project->status = 'queued';
-                        $project->save();
-
-                        ProcessSubmission::dispatch($project);
-
-                        return response()->json([
-                            'project' => $project,
-                            'validation' => $validation,
-                        ]);
-                    } else {
-                        return response()->json([
-                            'errors' => 'Validation failing. Please provide all the required data and try again. If the problem persists, please contact us.',
-                            'validation' => $validation,
-                        ], 422);
-                    }
-                } else {
-                    $draft = $project->draft;
-                    $draft->project_enabled = false;
-                    $draft->save();
-
+            // if (! $project->is_public && ! is_null($project->doi) && ! is_null($release_date)) {
+            //     $release_date = Carbon::parse($release_date);
+            //     if ($release_date->isPast()) {
+            //         $updater->update($project, $input);
+            //         $publisher->publish($project);
+            //         $project->sendNotification('publish', $this->prepareSendList($project));
+            //         $project->status = 'complete';
+            //         $project->save();
+            //         return response()->json([
+            //             'project' => $project
+            //         ]);
+            //     }
+            // } else {
+            $enableProjectMode = $request->get('enableProjectMode');
+            if ($enableProjectMode) {
+                $validation = $project->validation;
+                $validation->process();
+                $validation = $validation->fresh();
+                if ($validation['report']['project']['status']) {
                     $project->release_date = $request->get('release_date');
                     $project->status = 'queued';
                     $project->save();
 
-                    $validation = $project->validation;
-                    $validation->process();
-                    $validation = $validation->fresh();
+                    ProcessSubmission::dispatch($project);
 
-                    foreach ($project->studies as $study) {
-                        $study->license_id = $project->license_id;
-                        $study->save();
-                        foreach ($study->datasets as $dataset) {
-                            $dataset->license_id = $project->license_id;
-                            $dataset->save();
-                        }
-                    }
+                    return response()->json([
+                        'project' => $project,
+                        'validation' => $validation,
+                    ]);
+                } else {
+                    return response()->json([
+                        'errors' => 'Validation failing. Please provide all the required data and try again. If the problem persists, please contact us.',
+                        'validation' => $validation,
+                    ], 422);
+                }
+            } else {
+                $draft = $project->draft;
+                $draft->project_enabled = false;
+                $draft->save();
 
-                    $status = true;
+                $project->release_date = $request->get('release_date');
+                $project->status = 'queued';
+                $project->save();
 
-                    foreach ($validation['report']['project']['studies'] as $study) {
-                        if (! $study['status']) {
-                            $status = false;
-                        }
-                    }
-                    // add license check
-                    if ($status) {
-                        ProcessSubmission::dispatch($project);
+                $validation = $project->validation;
+                $validation->process();
+                $validation = $validation->fresh();
 
-                        return response()->json([
-                            'project' => $project,
-                            'validation' => $validation,
-                        ]);
-                    } else {
-                        return response()->json([
-                            'errors' => 'Validation failing. Please provide all the required data and try again. If the problem persists, please contact us.',
-                        ], 422);
+                foreach ($project->studies as $study) {
+                    $study->license_id = $project->license_id;
+                    $study->save();
+                    foreach ($study->datasets as $dataset) {
+                        $dataset->license_id = $project->license_id;
+                        $dataset->save();
                     }
                 }
 
+                $status = true;
+
+                foreach ($validation['report']['project']['studies'] as $study) {
+                    if (! $study['status']) {
+                        $status = false;
+                    }
+                }
+                // add license check
+                if ($status) {
+                    ProcessSubmission::dispatch($project);
+
+                    return response()->json([
+                        'project' => $project,
+                        'validation' => $validation,
+                    ]);
+                } else {
+                    return response()->json([
+                        'errors' => 'Validation failing. Please provide all the required data and try again. If the problem persists, please contact us.',
+                    ], 422);
+                }
             }
+
+            // }
 
         }
 
