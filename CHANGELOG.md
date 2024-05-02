@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.1](https://github.com/NFDI4Chem/nmrxiv/compare/v1.2.0...v1.2.1) (2024-05-02)
+
+
+### Bug Fixes
+
+* missing license id issue fix ([702b205](https://github.com/NFDI4Chem/nmrxiv/commit/702b205d027d85b1b768f5a94c1d65d456c26fc2))
+
 ## [1.2.0](https://github.com/NFDI4Chem/nmrxiv/compare/v1.1.1...v1.2.0) (2024-05-02)
 
 
