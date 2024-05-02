@@ -81,7 +81,6 @@ trait HasDOI
         $users = [];
         $keywords = [];
         $citations = [];
-        $license = License::where([['id', $this->license_id]])->firstOrFail();
         $dates = [
             [
                 'date' => $this->release_date,
@@ -181,6 +180,15 @@ trait HasDOI
             ];
             array_push($relatedIdentifiers, $relatedIdentifier);
         }
+
+        if (! $this->license_id) {
+            if ($this instanceof Study || $this instanceof Dataset) {
+                $this->license_id = $this->project->license_id;
+                $this->save();
+            }
+        }
+
+        $license = License::where([['id', $this->license_id]])->firstOrFail();
 
         $rights = [
             [
