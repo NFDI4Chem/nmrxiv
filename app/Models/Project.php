@@ -339,7 +339,7 @@ class Project extends Model implements Auditable
     /**
      * Send Notification via email.
      *
-     * @param  string  $notifyType (deletion / deletionReminder / archival / archivalAdmin)
+     * @param  string  $notifyType  (deletion / deletionReminder / archival / archivalAdmin)
      * @param  array  sendTo
      * @return void
      */
