@@ -180,7 +180,7 @@ class UsersController extends Controller
     /**
      * Delete the profile photo.
      *
-     *  @return \Illuminate\Http\RedirectResponse
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function destroyPhoto(User $user, Request $request)
     {

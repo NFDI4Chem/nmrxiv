@@ -101,7 +101,6 @@ class Study extends BaseType
      * drugs, etc. investigated by the study.
      *
      * @param  \Spatie\SchemaOrg\Contracts\BioChemEntityContract|\Spatie\SchemaOrg\Contracts\MedicalEntityContract[]  $studySubject
-
      * @return static
      */
     public function studySubject($studySubject)

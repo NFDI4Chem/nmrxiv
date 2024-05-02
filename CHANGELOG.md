@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.2.0](https://github.com/NFDI4Chem/nmrxiv/compare/v1.1.1...v1.2.0) (2024-05-02)
+
+
+### Features
+
+* unify identifiers representation (molecules to projects and spectra) ([526afa6](https://github.com/NFDI4Chem/nmrxiv/commit/526afa6c4461276f6a4253b23823d4dfff5ff6d6)), closes [#1118](https://github.com/NFDI4Chem/nmrxiv/issues/1118)
+
+
+### Bug Fixes
+
+* more formatting updates ([ebaab7c](https://github.com/NFDI4Chem/nmrxiv/commit/ebaab7c8e7d35ca7323ff7c51bfd51cdf81c2ea4))
+* republishing bug dix and formatting updates ([a2df7f3](https://github.com/NFDI4Chem/nmrxiv/commit/a2df7f3901218d15b20c4a21bc8ca38344c944a8))
+* reverted the codecov version v4 to v3 ([ab3b049](https://github.com/NFDI4Chem/nmrxiv/commit/ab3b0495b5455e588f8e0576aa04f2c3a1f249de))
+* unpublished project - publish screen access policy updates ([fbc7a7a](https://github.com/NFDI4Chem/nmrxiv/commit/fbc7a7a3965681bde07fbd1baed3672e144c907f))
+* updated version numbers of github actions ([ae45d0f](https://github.com/NFDI4Chem/nmrxiv/commit/ae45d0f6d98d6c99a2704e2ca414ca6b70a22879))
+
 ## [1.1.1](https://github.com/NFDI4Chem/nmrxiv/compare/v1.1.0...v1.1.1) (2024-04-05)
 
 
