@@ -24,8 +24,8 @@ class DataCiteController extends Controller
      * @param  Illuminate\Http\Request  $request
      * @param  App\Models\User  $username
      * @param  App\Models\Project  $projectName
-     * @param  App\Models\Study  $studyName Optional
-     * @param  App\Models\Dataset  $datasetName Optional
+     * @param  App\Models\Study  $studyName  Optional
+     * @param  App\Models\Dataset  $datasetName  Optional
      * @return object
      */
     /**
