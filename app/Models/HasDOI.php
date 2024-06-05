@@ -65,8 +65,25 @@ trait HasDOI
         }
     }
 
-    public function updateDOI($doiService)
+    /**
+     * Update Model's DataCite metadata
+     *
+     * @param  mixed  $doiService
+     * @return void
+     */
+    public function updateDOIMetadata($doiService)
     {
+        $doi_host = env('DOI_HOST', null);
+
+        if (! is_null($doi_host)) {
+            $doi = $this->doi;
+            if ($doi !== null) {
+                $attributes = $this->getMetadata();
+                $doiResponse = $doiService->updateDOI($doi, $attributes);
+                $this->datacite_schema = $doiResponse;
+                $this->save();
+            }
+        }
     }
 
     public function getIdentifier($model, $key)
