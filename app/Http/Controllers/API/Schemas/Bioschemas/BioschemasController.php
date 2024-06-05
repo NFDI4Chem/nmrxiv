@@ -30,8 +30,8 @@ class BioschemasController extends Controller
      * @param  Illuminate\Http\Request  $request
      * @param  App\Models\User  $username
      * @param  App\Models\Project  $projectName
-     * @param  App\Models\Study  $studyName  Optional
-     * @param  App\Models\Dataset  $datasetName  Optional
+     * @param  App\Models\Study  $studyName Optional
+     * @param  App\Models\Dataset  $datasetName Optional
      * @return object
      */
     /**
@@ -281,7 +281,6 @@ class BioschemasController extends Controller
                         $experiment = 'c13';
                     }
                 }
-
                 if ($experiment == 'proton') {
                     $experimentSchema = BioschemasHelper::prepareDefinedTerm('1H nuclear magnetic resonance spectroscopy', ['1H-NMR spectrometry', 'proton nuclear magnetic resonance spectroscopy', '1H-NMR spectroscopy', '1H-NMR', '1H NMR', '1H NMR spectroscopy', '1H nuclear magnetic resonance spectrometry', 'proton NMR'], 'CHMO:0000593', 'http://purl.obolibrary.org/obo/CHMO_0000593', $chmo);
                 } elseif ($experiment == 'c13') {
@@ -379,12 +378,12 @@ class BioschemasController extends Controller
             $dimensionProperty = BioschemasHelper::preparePropertyValue('NMR spectrum by dimensionality', 'NMR:1000117', $dimension, null);
             $probeNameProperty = BioschemasHelper::preparePropertyValue('NMR probe', 'OBI:0000516', $probeName, null);
             //$experimentProperty = BioschemasHelper::preparePropertyValue('pulsed nuclear magnetic resonance spectroscopy', 'CHMO:0000613', $experiment, null);
-            $temperatureProperty = BioschemasHelper::preparePropertyValue('Temperature', 'NCIT:C25206', $temperature, 'https://ontobee.org/ontology/UO?iri=http://purl.obolibrary.org/obo/UO_0000012');
+            $temperatureProperty = BioschemasHelper::preparePropertyValue('Temperature', 'NCIT:C25206', $temperature, 'http://purl.obolibrary.org/obo/UO_0000012');
             $baseFrequencyProperty = BioschemasHelper::preparePropertyValue('irradiation frequency', 'NMR:1400026', $baseFrequency, 'http://purl.obolibrary.org/obo/UO_0000325');
             $fieldStrengthProperty = BioschemasHelper::preparePropertyValue('magnetic field strength', 'MR:1400253', $fieldStrength, 'http://purl.obolibrary.org/obo/UO_0000228');
             $numberOfScansProperty = BioschemasHelper::preparePropertyValue('number of scans', 'NMR:1400087', $numberOfScans, 'scans');
             $pulseSequenceProperty = BioschemasHelper::preparePropertyValue('nuclear magnetic resonance pulse sequence', 'CHMO:0001841', $pulseSequence, null);
-            $spectralWidthProperty = BioschemasHelper::preparePropertyValue('Spectral Width', 'NCIT:C156496', $spectralWidth, null); //todo: add unit
+            $spectralWidthProperty = BioschemasHelper::preparePropertyValue('Spectral Width', 'NCIT:C156496', $spectralWidth, 'http://purl.obolibrary.org/obo/UO_0000169');
             $numberOfPointsProperty = BioschemasHelper::preparePropertyValue('number of data points', 'NMR:1000176', $numberOfPoints, 'points');
             $relaxationTimeProperty = BioschemasHelper::preparePropertyValue('relaxation time measurement', 'FIX:0000202', $relaxationTime, 'http://purl.obolibrary.org/obo/UO_0000010');
 
