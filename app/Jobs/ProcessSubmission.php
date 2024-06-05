@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Actions\Project\AssignIdentifier;
 use App\Actions\Project\PublishProject;
+use App\Actions\Project\UpdateDOI;
 use App\Actions\Study\PublishStudy;
 use App\Events\StudyPublish;
 use App\Models\FileSystemObject;
@@ -41,7 +42,7 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle(AssignIdentifier $assigner, PublishProject $projectPublisher, PublishStudy $studyPublisher)
+    public function handle(AssignIdentifier $assigner, UpdateDOI $updater, PublishProject $projectPublisher, PublishStudy $studyPublisher)
     {
         $project = $this->project;
 
@@ -107,7 +108,7 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                 if ($release_date->isPast()) {
                     $projectPublisher->publish($project);
                 }
-
+                $updater->update($project->fresh());
                 ArchiveProject::dispatch($project);
 
                 $project->sendNotification('publish', $this->prepareSendList($project));
