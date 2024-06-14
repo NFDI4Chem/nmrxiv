@@ -64,6 +64,17 @@ Route::get('/', function () {
     // }
 })->name('landing');
 
+Route::get('/about-us', function () {
+    return Inertia::render('About', [
+        'projects' => Cache::rememberForever('stats.projects', function () {
+            return Project::where('is_public', true)->get()->count();
+        }),
+        'compounds' => Cache::rememberForever('stats.compounds', function () {
+            return Molecule::whereNotNull('identifier')->get()->count();
+        }),
+    ]);
+})->name('about');
+
 Route::supportBubble();
 
 Route::impersonate();
