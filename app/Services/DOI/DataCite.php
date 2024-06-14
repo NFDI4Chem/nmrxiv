@@ -75,7 +75,7 @@ class DataCite implements DOIService
      *
      * @param  string  $doi
      * @param  array  $metadata
-     * @return array  $contents
+     * @return array $contents
      */
     public function updateDOI($doi, $metadata = [])
     {
