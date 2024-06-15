@@ -408,15 +408,36 @@
                                     class="lg:w-full lg:max-w-2xl lg:flex-auto"
                                 >
                                     <p class="text-xl leading-8 text-gray-600">
-                                        All chemists publish FAIR NMR data. To
-                                        get there, we will support scientists in
-                                        their efforts to collect, store,
+                                        <b
+                                            >All chemists publish FAIR NMR
+                                            data.</b
+                                        >
+                                        To get there, we will support scientists
+                                        in their efforts to collect, store,
                                         process, analyse, publish and re-use NMR
                                         data.<br />
-                                        nmrXiv is developed and maintained as a
-                                        part of NFDI4Chem a DFG-funded
-                                        non-commercial consortium from the
-                                        community for the community.
+                                    </p>
+                                    <p
+                                        class="italic text-md leading-7 text-gray-600 mt-4"
+                                    >
+                                        Funded by the
+                                        <a
+                                            class="text-blue-900 underline"
+                                            href="https://www.dfg.de/"
+                                            >Deutsche Forschungsgemeinschaft
+                                            (DFG, German Research Foundation)</a
+                                        >
+                                        under the
+                                        <a
+                                            class="text-blue-900 underline"
+                                            href="https://nfdi4chem.de/"
+                                            >National Research Data
+                                            Infrastructure – NFDI4Chem</a
+                                        >
+                                        – Projektnummer
+                                        <strong class="text-blue-900"
+                                            >441958208</strong
+                                        >.
                                     </p>
                                 </div>
                                 <div
@@ -474,27 +495,40 @@
                                     License
                                 </dt>
                                 <dd class="mt-1 text-gray-600">
-                                    The code for the web application is licensed
-                                    under the
+                                    nmrXiv infrastucture
+                                    <a
+                                        class="text-blue-900 underline"
+                                        href="https://github.com/NFDI4Chem/nmrxiv"
+                                        >code</a
+                                    >
+                                    is licensed under the
                                     <a
                                         class="text-blue-900 underline"
                                         href="https://opensource.org/licenses/MIT"
                                         >MIT license</a
-                                    >.
+                                    >. Every dataset on nmrXiv comes with its
+                                    own specific license. It is essential to
+                                    review the license details for each dataset
+                                    before using it.
                                 </dd>
                                 <br />
                                 <dt class="font-semibold text-gray-900">
                                     Help Desk
                                 </dt>
                                 <dd class="mt-1 text-gray-600">
-                                    If you discover any issue or need any
-                                    support please raise a ticket at our
+                                    Any issues or support requests can be raised
+                                    at our
                                     <a
                                         class="text-blue-900 underline"
                                         href="https://helpdesk.nfdi4chem.de/"
                                         >Help Desk</a
                                     >
-                                    or write to us at info.nmrxiv@uni-jena.de.
+                                    or write to us at
+                                    <a
+                                        class="text-blue-900 underline"
+                                        href="mailto:info.nmrxiv@uni-jena.de"
+                                        >info.nmrxiv@uni-jena.de</a
+                                    >.
                                 </dd>
                             </div>
                             <div>
@@ -502,11 +536,12 @@
                                     Contributors and Steering Committee
                                 </dt>
                                 <dd class="mt-1 text-gray-600">
-                                    With global contributors bringing diverse
-                                    expertise and a Steering Committee of
-                                    seasoned experts, they ensure strategic
-                                    oversight, innovation, and continuous
-                                    improvement.
+                                    At nmrXiv, our global contributors bring a
+                                    wealth of diverse expertise to our platform.
+                                    Guided by a seasoned Steering Committee, we
+                                    ensure strategic oversight, foster
+                                    innovation, and drive continuous improvement
+                                    in all our endeavors.
                                     <br /><a
                                         class="text-blue-900 underline"
                                         href="https://docs.nmrxiv.org/contribution/contributors.html"
@@ -519,10 +554,10 @@
                                     Documentation
                                 </dt>
                                 <dd class="mt-1 text-gray-600">
-                                    Our documentation-first approach allows
-                                    developers and users to discuss proposed
-                                    features and ensure that the implementations
-                                    reflect the actual use cases.
+                                    Our documentation-first approach enables our
+                                    developers and chemists to collaborate on
+                                    proposed features, ensuring implementations
+                                    accurately address real-world use cases.
                                     <br /><a
                                         class="text-blue-900 underline"
                                         href="https://docs.nmrxiv.org/introduction/intro.html"
@@ -576,45 +611,55 @@
                         <div class="mx-auto max-w-6xl px-6 lg:px-8">
                             <h2
                                 class="text-center text-lg font-semibold leading-8 text-gray-900"
-                            ></h2>
+                            >
+                                Our collaborators
+                            </h2>
                             <div
                                 class="mx-auto mt-10 grid max-w-lg grid-cols-4 items-center gap-x-8 gap-y-10 sm:max-w-xl sm:grid-cols-6 sm:gap-x-10 lg:mx-0 lg:max-w-none lg:grid-cols-5"
                             >
-                                <img
-                                    class="col-span-2 max-h-12 w-full object-contain lg:col-span-1"
-                                    src="https://www.uni-jena.de/unijenamedia/universitaet/abteilung-hochschulkommunikation/marketing/wort-bildmarke-universitaet-jena.jpg?height=335&width=1000"
-                                    alt="Transistor"
-                                    width="158"
-                                    height="48"
-                                />
-                                <img
-                                    class="col-span-2 max-h-12 w-full object-contain lg:col-span-1"
-                                    src="/img/nmrxiv-logo.png"
-                                    alt="Reform"
-                                    width="158"
-                                    height="48"
-                                />
-                                <img
-                                    class="col-span-2 max-h-12 w-full object-contain lg:col-span-1"
-                                    src="/img/uic.png"
-                                    alt="Tuple"
-                                    width="158"
-                                    height="48"
-                                />
-                                <img
-                                    class="col-span-2 max-h-12 w-full object-contain sm:col-start-2 lg:col-span-1"
-                                    src="/img/nmrium-logo.png"
-                                    alt="SavvyCal"
-                                    width="158"
-                                    height="48"
-                                />
-                                <img
-                                    class="col-span-2 col-start-2 max-h-12 w-full object-contain sm:col-start-auto lg:col-span-1"
-                                    src="/img/ct.png"
-                                    alt="Statamic"
-                                    width="158"
-                                    height="48"
-                                />
+                                <a href="https://cheminf.uni-jena.de/">
+                                    <img
+                                        class="col-span-2 max-h-12 w-full object-contain lg:col-span-1"
+                                        src="https://www.uni-jena.de/unijenamedia/universitaet/abteilung-hochschulkommunikation/marketing/wort-bildmarke-universitaet-jena.jpg?height=335&width=1000"
+                                        alt="FSU"
+                                        width="158"
+                                        height="48"
+                                    />
+                                </a>
+                                <a href="https://www.nfdi4chem.de/">
+                                    <img
+                                        class="col-span-2 max-h-12 w-full object-contain lg:col-span-1"
+                                        src="/img/nmrxiv-logo.png"
+                                        alt="NFDI4Chem"
+                                        width="158"
+                                        height="48"
+                                /></a>
+                                <a href="https://pharmacy.uic.edu/">
+                                    <img
+                                        class="col-span-2 max-h-12 w-full object-contain lg:col-span-1"
+                                        src="/img/uic.png"
+                                        alt="UIC"
+                                        width="158"
+                                        height="48"
+                                /></a>
+                                <a href="https://www.nmrium.org/">
+                                    <img
+                                        class="col-span-2 max-h-12 w-full object-contain sm:col-start-2 lg:col-span-1"
+                                        src="/img/nmrium-logo.png"
+                                        alt="NMRium"
+                                        width="158"
+                                        height="48"
+                                /></a>
+                                <a
+                                    href="https://ctb.nmrsolutions.fi/login?returnUrl=~dashboard"
+                                >
+                                    <img
+                                        class="col-span-2 col-start-2 max-h-12 w-full object-contain sm:col-start-auto lg:col-span-1"
+                                        src="/img/ct.png"
+                                        alt="CT"
+                                        width="158"
+                                        height="48"
+                                /></a>
                             </div>
                         </div>
                     </div>
