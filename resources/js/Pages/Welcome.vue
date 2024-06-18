@@ -725,10 +725,7 @@
                         <div
                             class="col-span-3 md:col-span-2 flex justify-center"
                         >
-                            <a
-                                target="_blank"
-                                href="https://cheminf.uni-jena.de/"
-                            >
+                            <a target="_blank" href="/about-us">
                                 <img
                                     class="w-48"
                                     src="https://www.uni-jena.de/unijenamedia/universitaet/abteilung-hochschulkommunikation/marketing/wort-bildmarke-universitaet-jena.jpg?height=335&width=1000"
