@@ -718,9 +718,11 @@
                 <div
                     class="max-w-7xl mx-auto content-center py-16 px-4 sm:px-6 lg:px-8"
                 >
-                    <p
-                        class="text-center text-sm font-semibold uppercase text-gray-600 tracking-wide"
-                    ></p>
+                    <h2
+                        class="text-center text-3xl mb-20 tracking-tight font-bold leading-8 text-blue-900"
+                    >
+                        nmrXiv Project Group
+                    </h2>
                     <div class="mt-6 grid grid-cols-6 gap-8">
                         <div
                             class="col-span-3 md:col-span-2 flex justify-center"
