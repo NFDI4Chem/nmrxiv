@@ -391,7 +391,6 @@
                         </div>
                     </div>
 
-                    <!-- Content section -->
                     <div
                         class="mx-auto -mt-12 max-w-6xl px-6 sm:mt-0 lg:px-8 xl:-mt-8"
                     >
@@ -420,7 +419,19 @@
                                     <p
                                         class="italic text-md leading-7 text-gray-600 mt-4"
                                     >
-                                        Funded by the
+                                        Developed at
+                                        <a
+                                            class="text-blue-900"
+                                            href="https://www.uni-jena.de/en"
+                                            >Friedrich Schiller University,
+                                            Jena</a
+                                        >
+                                        in Germany, under the leadership of
+                                        <a
+                                            class="text-blue-900"
+                                            href="https://cheminf.uni-jena.de/"
+                                            >Professor Christoph Steinbeck</a
+                                        >. Funded by the
                                         <a
                                             class="text-blue-900 underline"
                                             href="https://www.dfg.de/"
@@ -568,7 +579,152 @@
                         </dl>
                     </div>
 
-                    <!-- Logo cloud -->
+                    <div class="mx-auto mt-32 max-w-5xl px-6 sm:mt-48 lg:px-8">
+                        <div class="mx-auto max-w-2xl lg:mx-0">
+                            <h2
+                                class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl"
+                            >
+                                Our Steering Committee
+                            </h2>
+                        </div>
+                        <ul
+                            role="list"
+                            class="mx-auto mt-20 grid max-w-2xl grid-cols-2 gap-x-8 gap-y-16 text-center sm:grid-cols-3 md:grid-cols-4 lg:mx-0 lg:max-w-none lg:grid-cols-5 xl:grid-cols-6"
+                        >
+                            <li
+                                class="flex flex-col justify-center items-center"
+                            >
+                                <div
+                                    class="h-24 w-24 overflow-hidden rounded-full flex justify-center items-center"
+                                >
+                                    <img
+                                        class="mx-auto"
+                                        src="/img/gpauli.jpg"
+                                        alt="Guido Pauli"
+                                    />
+                                </div>
+                                <h3
+                                    class="mt-6 text-base font-semibold leading-7 tracking-tight text-gray-900"
+                                >
+                                    <a
+                                        href="https://pharmacy.uic.edu/profiles/gfp/"
+                                        target="_blank"
+                                        >Guido Pauli</a
+                                    >
+                                </h3>
+                            </li>
+                            <li
+                                class="flex flex-col justify-center items-center"
+                            >
+                                <div
+                                    class="bg-gray-300 h-24 w-24 overflow-hidden rounded-full flex justify-center items-center"
+                                >
+                                    <img
+                                        class="h-24 w-24"
+                                        src="/img/ph.jpg"
+                                        alt="Nils Schlörer"
+                                    />
+                                </div>
+                                <h3
+                                    class="mt-6 text-base font-semibold leading-7 tracking-tight text-gray-900"
+                                >
+                                    <a
+                                        href="https://friedolin.uni-jena.de/qisserver/rds?state=verpublish&status=init&vmfile=no&moduleCall=webInfo&publishConfFile=webInfoPerson&publishSubDir=personal&keep=y&personal.pid=16242"
+                                        target="_blank"
+                                        >Nils Schlörer</a
+                                    >
+                                </h3>
+                            </li>
+                            <li
+                                class="flex flex-col justify-center items-center"
+                            >
+                                <div
+                                    class="h-24 w-24 overflow-hidden rounded-full flex justify-center items-center"
+                                >
+                                    <img
+                                        class="mx-auto"
+                                        src="/img/jw.jpeg"
+                                        alt="Julien Wist"
+                                    />
+                                </div>
+                                <h3
+                                    class="mt-6 text-base font-semibold leading-7 tracking-tight text-gray-900"
+                                >
+                                    <a
+                                        href="https://researchportal.murdoch.edu.au/esploro/profile/julien_wist/overview"
+                                        target="_blank"
+                                        >Julien Wist</a
+                                    >
+                                </h3>
+                            </li>
+                            <li
+                                class="flex flex-col justify-center items-center"
+                            >
+                                <div
+                                    class="h-24 w-24 overflow-hidden rounded-full flex justify-center items-center"
+                                >
+                                    <img
+                                        class="mx-auto"
+                                        src="/img/lp.jpg"
+                                        alt="Luc Patiny"
+                                    />
+                                </div>
+                                <h3
+                                    class="mt-6 text-base font-semibold leading-7 tracking-tight text-gray-900"
+                                >
+                                    <a
+                                        href="https://www.linkedin.com/in/lpatiny/"
+                                        target="_blank"
+                                        >Luc Patiny</a
+                                    >
+                                </h3>
+                            </li>
+                            <li
+                                class="flex flex-col justify-center items-center"
+                            >
+                                <div
+                                    class="bg-gray-300 h-24 w-24 overflow-hidden rounded-full flex justify-center items-center"
+                                >
+                                    <img
+                                        class="h-24 w-24"
+                                        src="/img/ph.jpg"
+                                        alt="Stephan Kuhn"
+                                    />
+                                </div>
+                                <h3
+                                    class="mt-6 text-base font-semibold leading-7 tracking-tight text-gray-900"
+                                >
+                                    <a
+                                        href="https://www.linkedin.com/in/stefan-kuhn-756bb74/?originalSubdomain=ee"
+                                        target="_blank"
+                                        >Stephan Kuhn</a
+                                    >
+                                </h3>
+                            </li>
+                            <li
+                                class="flex flex-col justify-center items-center"
+                            >
+                                <div
+                                    class="h-24 w-24 overflow-hidden rounded-full flex justify-center items-center"
+                                >
+                                    <img
+                                        class="mx-auto"
+                                        src="/img/jl.jpeg"
+                                        alt="Johannes Liermann"
+                                    />
+                                </div>
+                                <h3
+                                    class="mt-6 text-base font-semibold leading-7 tracking-tight text-gray-900"
+                                >
+                                    <a
+                                        href="https://personen.uni-mainz.de/public/person/1737"
+                                        target="_blank"
+                                        >Johannes&nbsp;Liermann</a
+                                    >
+                                </h3>
+                            </li>
+                        </ul>
+                    </div>
                     <div class="relative isolate -z-10 mt-32 sm:mt-48">
                         <div
                             class="absolute inset-x-0 top-1/2 -z-10 flex -translate-y-1/2 justify-center overflow-hidden [mask-image:radial-gradient(50%_45%_at_50%_55%,white,transparent)]"
@@ -615,11 +771,11 @@
                                 Our collaborators
                             </h2>
                             <div
-                                class="mx-auto mt-10 grid max-w-lg grid-cols-4 items-center gap-x-8 gap-y-10 sm:max-w-xl sm:grid-cols-6 sm:gap-x-10 lg:mx-0 lg:max-w-none lg:grid-cols-5"
+                                class="mx-auto mt-10 grid max-w-lg grid-cols-2 md:grid-cols-5 items-center gap-x-8 gap-y-10 sm:max-w-xl sm:grid-cols-6 sm:gap-x-10 lg:mx-0 lg:max-w-none lg:grid-cols-5"
                             >
                                 <a href="https://cheminf.uni-jena.de/">
                                     <img
-                                        class="col-span-2 max-h-12 w-full object-contain lg:col-span-1"
+                                        class="col-span-1 md:col-span-2 max-h-12 w-full object-contain lg:col-span-1"
                                         src="https://www.uni-jena.de/unijenamedia/universitaet/abteilung-hochschulkommunikation/marketing/wort-bildmarke-universitaet-jena.jpg?height=335&width=1000"
                                         alt="FSU"
                                         width="158"
@@ -654,7 +810,7 @@
                                     href="https://ctb.nmrsolutions.fi/login?returnUrl=~dashboard"
                                 >
                                     <img
-                                        class="col-span-2 col-start-2 max-h-12 w-full object-contain sm:col-start-auto lg:col-span-1"
+                                        class="col-span-2 max-h-12 w-full object-contain sm:col-start-2 lg:col-span-1"
                                         src="/img/ct.png"
                                         alt="CT"
                                         width="158"
