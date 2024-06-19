@@ -49,6 +49,12 @@
                                 >
                                     Compounds
                                 </Link>
+                                <Link
+                                    href="/about-us"
+                                    class="text-base font-medium text-gray-500 hover:text-gray-900"
+                                >
+                                    About
+                                </Link>
                             </PopoverGroup>
                             <!-- <div
                             
@@ -340,7 +346,8 @@
                             class="text-center text-lg font-semibold leading-8 text-gray-900"
                         >
                             Recommended by leading journals as the
-                            community-trusted repository for NMR data deposition.
+                            community-trusted repository for NMR data
+                            deposition.
                         </h2>
                         <div
                             class="mx-auto mt-10 grid max-w-lg grid-cols-2 md:grid-cols-4 items-center gap-x-8 gap-y-10"
@@ -707,39 +714,54 @@
                     </div>
                 </div>
             </div>
-            <div class="bg-gray-50 border-t border-b border-gray-100">
+            <div class="bg-white border-t border-b border-gray-100">
                 <div
                     class="max-w-7xl mx-auto content-center py-16 px-4 sm:px-6 lg:px-8"
                 >
-                    <p
-                        class="text-center text-sm font-semibold uppercase text-gray-600 tracking-wide"
-                    ></p>
-                    <div class="mt-6 grid grid-cols-3 gap-8">
+                    <h2
+                        class="text-center text-3xl mb-20 tracking-tight font-bold leading-8 text-blue-900"
+                    >
+                        nmrXiv Project Group
+                    </h2>
+                    <div class="mt-6 grid grid-cols-6 gap-8">
                         <div
-                            class="col-span-3 md:col-span-1 flex justify-center"
+                            class="col-span-3 md:col-span-2 flex justify-center"
                         >
-                            <a
-                                target="_blank"
-                                href="https://cheminf.uni-jena.de/"
-                            >
+                            <a target="_blank" href="/about-us">
                                 <img
-                                    class="h-12"
+                                    class="w-48"
                                     src="https://www.uni-jena.de/unijenamedia/universitaet/abteilung-hochschulkommunikation/marketing/wort-bildmarke-universitaet-jena.jpg?height=335&width=1000"
                                     alt="FSU Jena"
                                 />
                             </a>
                         </div>
                         <div
-                            class="col-span-3 md:col-span-1 flex justify-center"
+                            class="col-span-3 md:col-span-2 flex justify-center"
                         >
                             <a target="_blank" href="https://www.nfdi4chem.de/">
                                 <img
-                                    class="h-12"
+                                    class="w-64"
                                     src="/img/nmrxiv-logo.png"
                                     alt="NFDI4Chem"
                                 />
                             </a>
                         </div>
+                        <div
+                            class="col-span-3 md:col-span-2 flex justify-center"
+                        >
+                            <a target="_blank" href="https://pharmacy.uic.edu/">
+                                <img
+                                    class="w-64"
+                                    src="/img/uic.png"
+                                    alt="UIC"
+                                />
+                            </a>
+                        </div>
+                    </div>
+                    <div class="mt-12 grid grid-cols-4 gap-8">
+                        <div
+                            class="col-span-3 md:col-span-1 flex justify-center"
+                        ></div>
                         <div
                             class="col-span-3 md:col-span-1 flex justify-center"
                         >
@@ -751,6 +773,19 @@
                                 />
                             </a>
                         </div>
+                        <div
+                            class="col-span-3 md:col-span-1 flex justify-center"
+                        >
+                            <a
+                                target="_blank"
+                                href="https://ctb.nmrsolutions.fi/login?returnUrl=~dashboard"
+                            >
+                                <img class="h-14" src="/img/ct.png" alt="CT" />
+                            </a>
+                        </div>
+                        <div
+                            class="col-span-3 md:col-span-1 flex justify-center"
+                        ></div>
                     </div>
                 </div>
             </div>
@@ -789,7 +824,10 @@
             </div>
         </main>
 
-        <footer class="bg-gray-50" aria-labelledby="footer-heading">
+        <footer
+            class="bg-white border-t border-gray-100"
+            aria-labelledby="footer-heading"
+        >
             <h2 id="footer-heading" class="sr-only">Footer</h2>
             <div
                 class="max-w-7xl mx-auto pt-16 pb-8 px-4 sm:px-6 lg:pt-24 lg:px-8"

@@ -9,6 +9,7 @@ use App\Http\Controllers\API\FileSystemController;
 use App\Http\Controllers\API\Schemas\Bioschemas\BioschemasController;
 use App\Http\Controllers\API\Schemas\Bioschemas\DataCatalogController;
 use App\Http\Controllers\API\Schemas\DataCite\DataCiteController;
+use App\Http\Controllers\API\Schemas\DataCite\DOIController;
 use App\Http\Controllers\API\SearchController;
 use Illuminate\Support\Facades\Route;
 
@@ -54,6 +55,7 @@ Route::prefix('v1')->group(function () {
         Route::prefix('datacite')->group(function () {
             Route::get('/{username}/{project}/{study?}/{dataset?}', [DataCiteController::class, 'modelSchemaByName']);
             Route::get('/{id}', [DataCiteController::class, 'modelSchemaByID']);
+            Route::put('/{id}', [DOIController::class, 'update']);
         });
     });
 });
