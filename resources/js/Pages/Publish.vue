@@ -430,7 +430,7 @@
                             <Datepicker
                                 v-model="publishForm.release_date"
                                 @update:modelValue="updateProject"
-                                :min-date="new Date()" 
+                                :min-date="new Date()"
                             ></Datepicker>
                             <p class="mt-1 text-sm text-gray-500">
                                 Publish your data now immediately or set a
