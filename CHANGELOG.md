@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.3.0](https://github.com/NFDI4Chem/nmrxiv/compare/v1.2.1...v1.3.0) (2024-06-19)
+
+
+### Features
+
+* about us page updates ([91395b8](https://github.com/NFDI4Chem/nmrxiv/commit/91395b8eee8eec2da6d272b9e6890f4039c6a428))
+* draft about page and landing page logos updated ([003ef67](https://github.com/NFDI4Chem/nmrxiv/commit/003ef677a707109225049bf45b58ef42aa09ad5e))
+
+
+### Bug Fixes
+
+* add unit to spectra width Bioschemas ([20078e1](https://github.com/NFDI4Chem/nmrxiv/commit/20078e139e1780cc3b5bce001cb17d863412a9a0))
+* landing page updates ([de2c38e](https://github.com/NFDI4Chem/nmrxiv/commit/de2c38e19babcecdf5f493eec37cbccd84104610))
+* replace Kelvin unit link by its purl link ([cad27b6](https://github.com/NFDI4Chem/nmrxiv/commit/cad27b606b97c3e037ef23c61ae5eb9370dc436c))
+* updated about page ([7ba5fe7](https://github.com/NFDI4Chem/nmrxiv/commit/7ba5fe785f124790bcff7fe133aa311d774f3596))
+* updated about page ([31d0b18](https://github.com/NFDI4Chem/nmrxiv/commit/31d0b182549323f2a45ab1492dbcf914b7fcf78c))
+* updated about page ([3a0934b](https://github.com/NFDI4Chem/nmrxiv/commit/3a0934b9e2c9fa0e8963018e8a1abbc5d6383676))
+
 ## [1.2.1](https://github.com/NFDI4Chem/nmrxiv/compare/v1.2.0...v1.2.1) (2024-05-02)
 
 
