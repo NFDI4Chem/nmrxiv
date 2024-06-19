@@ -10,7 +10,7 @@ interface DOIService
 
     public function getDOI($doi);
 
-    public function updateDOI($doi);
+    public function updateDOI($doi, $attributes = []);
 
     public function deleteDOI($doi);
 
