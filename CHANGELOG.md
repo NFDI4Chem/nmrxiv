@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.1](https://github.com/NFDI4Chem/nmrxiv/compare/v1.3.0...v1.3.1) (2024-06-24)
+
+
+### Bug Fixes
+
+* composer lock update ([42c86fc](https://github.com/NFDI4Chem/nmrxiv/commit/42c86fc47828464477c7eaa9e989126849e16246))
+* study tags save issue fix and ct logo update ([497471c](https://github.com/NFDI4Chem/nmrxiv/commit/497471cdc2562d062f076990d584391c5bd3153c))
+
 ## [1.3.0](https://github.com/NFDI4Chem/nmrxiv/compare/v1.2.1...v1.3.0) (2024-06-19)
 
 
