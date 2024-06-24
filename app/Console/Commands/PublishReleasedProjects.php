@@ -42,6 +42,8 @@ class PublishReleasedProjects extends Command
                 $release_date = Carbon::parse($project->release_date);
                 if ($release_date->isPast()) {
                     if (! is_null($project->doi) && ! $project->is_archived) {
+                        // echo($project->identifier);
+                        // echo("\r\n");
                         $publisher->publish($project);
                         Notification::send($project->owner, new DraftProcessedNotification($project));
                     }
