@@ -38,7 +38,7 @@
             frameborder="0"
             allowfullscreen
             class="rounded-md border"
-            :style="'width: ' + width + '%; height: ' + height + 'vh;'"
+            :style="'width: ' + width + '%; height: ' + height + 'px;'"
             :src="nmriumURL"
             @load="loadSpectra()"
         ></iframe>
@@ -306,7 +306,7 @@ export default {
         },
         height: {
             type: Number,
-            default: 100,
+            default: 600,
         },
         width: {
             type: Number,
