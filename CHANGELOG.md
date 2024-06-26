@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.2](https://github.com/NFDI4Chem/nmrxiv/compare/v1.3.1...v1.3.2) (2024-06-26)
+
+
+### Bug Fixes
+
+* formatting changes, spectra view defined height and added missing datasets info in private study views ([e10d07f](https://github.com/NFDI4Chem/nmrxiv/commit/e10d07fb9adc93dcb6e4c5cde05ca1d94a0e3983))
+
 ## [1.3.1](https://github.com/NFDI4Chem/nmrxiv/compare/v1.3.0...v1.3.1) (2024-06-24)
 
 
