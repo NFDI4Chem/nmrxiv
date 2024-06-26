@@ -196,6 +196,84 @@
                                 :study="study"
                             ></SpectraViewer>
                         </div>
+                        <div class="my-2">
+                            <div>
+                                <h2 class="text-sm font-medium text-gray-500">
+                                    Spectra Datasets
+                                </h2>
+                                <ul
+                                    role="list"
+                                    class="mt-3 grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3"
+                                >
+                                    <li
+                                        v-for="dataset in study.datasets.sort(
+                                            (a, b) => (a.name > b.name ? 1 : -1)
+                                        )"
+                                        :key="dataset.slug"
+                                        class="col-span-1 flex rounded-md shadow-sm"
+                                    >
+                                        <!-- <a
+                                            class="cursor-pointer"
+                                            :href="
+                                                '/' +
+                                                dataset.identifier.replace(
+                                                    'NMRXIV:',
+                                                    ''
+                                                )
+                                            "
+                                            target="_blank"
+                                        > -->
+                                        <!-- <div
+                                            class="flex w-16 flex-shrink-0 items-center justify-center bg-pink-600 rounded-l-md text-sm font-medium text-white"
+                                        >
+                                        
+                                        </div> -->
+                                        <div
+                                            class="flex flex-1 border-l rounded-md items-center justify-between truncate rounded-r-md border-b border-r border-t border-gray-200 bg-white"
+                                        >
+                                            <div
+                                                class="flex-1 truncate px-4 py-2 text-sm"
+                                            >
+                                                <a
+                                                    class="font-medium text-lg text-gray-900 hover:text-gray-600"
+                                                >
+                                                    {{ dataset.name }}
+                                                    <span v-if="dataset.type"
+                                                        >({{
+                                                            dataset.type.replace(
+                                                                /,\s*$/,
+                                                                ""
+                                                            )
+                                                        }})</span
+                                                    ></a
+                                                >
+                                                <p class="text-gray-900">
+                                                    DOI: {{ dataset.doi }}
+                                                </p>
+                                            </div>
+                                            <!-- <div class="flex-shrink-0 pr-2">
+                                                    <svg
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        fill="none"
+                                                        viewBox="0 0 24 24"
+                                                        stroke-width="1.5"
+                                                        stroke="currentColor"
+                                                        class="h-5 w-5 text-gray-600 ml-4"
+                                                    >
+                                                        <path
+                                                            stroke-linecap="round"
+                                                            stroke-linejoin="round"
+                                                            d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
+                                                        ></path>
+                                                    </svg>
+                                                </div> -->
+                                        </div>
+                                        <!-- </a> -->
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div>&emsp;</div>
                         <div class="pt-3">
                             <div>
                                 <label
