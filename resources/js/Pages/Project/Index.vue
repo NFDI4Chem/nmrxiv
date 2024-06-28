@@ -35,8 +35,9 @@
                     <div class="mt-3 max-w-2xl text-sm text-gray-700">
                         nmrXiv is organized around projects. Projects can
                         contain as many samples as you wish and each sample
-                        receives its very own URL. To learn more, check out our
-                        documentation.
+                        receives its very own URL. Use the "UPLOAD" button on
+                        the upper left side to start uploading projects or
+                        samples. To learn more, check out our documentation.
                     </div>
                     <!-- <button
                         type="button"
