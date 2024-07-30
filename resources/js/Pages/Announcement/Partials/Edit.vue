@@ -75,6 +75,8 @@
                         <Datepicker
                             v-model="editAnnouncementForm.start_time"
                             :min-date="new Date()"
+                            :format="customFormat"
+                            :preview-format="customFormat"
                         ></Datepicker>
                         <jet-input-error
                             :message="editAnnouncementForm.errors.start_time"
@@ -87,6 +89,8 @@
                         </label>
                         <Datepicker
                             v-model="editAnnouncementForm.end_time"
+                            :format="customFormat"
+                            :preview-format="customFormat"
                         ></Datepicker>
                         <jet-input-error
                             :message="editAnnouncementForm.errors.end_time"
@@ -157,6 +161,22 @@ export default {
     },
 
     props: [],
+    setup() {
+        // Custom format function
+        const customFormat = (date) => {
+            if (!date) return "";
+            const day = String(date.getDate()).padStart(2, "0");
+            const month = String(date.getMonth() + 1).padStart(2, "0");
+            const year = date.getFullYear();
+            const hours = String(date.getHours()).padStart(2, "0");
+            const minutes = String(date.getMinutes()).padStart(2, "0");
+            return `${day}/${month}/${year}, ${hours}:${minutes}`;
+        };
+
+        return {
+            customFormat,
+        };
+    },
 
     data() {
         return {
