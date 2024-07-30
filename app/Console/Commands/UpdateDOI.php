@@ -3,11 +3,12 @@
 namespace App\Console\Commands;
 
 use App\Models\Project;
+use App\Models\Study;
 use App\Services\DOI\DOIService;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 
-class UpdateProjectsDOI extends Command
+class UpdateDOI extends Command
 {
     /**
      * The name and signature of the console command.
@@ -21,7 +22,7 @@ class UpdateProjectsDOI extends Command
      *
      * @var string
      */
-    protected $description = 'Update DataCite DOI metadata of all the projects updated before or after a given date.';
+    protected $description = 'Update DataCite DOI metadata of all the projects, studies, and datasets updated before or after a given date.';
 
     /**
      * The DOI service instance.
@@ -56,20 +57,24 @@ class UpdateProjectsDOI extends Command
         $date = $this->argument('update-date');
         $date = $date ? Carbon::parse($date) : null;
 
-        // Fetch the projects based on the date
+        // Fetch the projects and samples (studies) based on the date
         $projects = $date ? Project::where('updated_at', $operator, $date)->get() : Project::all();
+        $studies = $date ? Study::where('updated_at', $operator, $date)->get() : Study::all();
+
+        // Cover all studies within or without projects
+        foreach ($studies as $study) {
+            echo $study->identifier."\r\n";
+            foreach ($study->datasets as $dataset) {
+                echo $dataset->identifier."\r\n";
+                $dataset->updateDOIMetadata($this->doiService);
+                $dataset->addRelatedIdentifiers($this->doiService);
+            }
+            $study->updateDOIMetadata($this->doiService);
+            $study->addRelatedIdentifiers($this->doiService);
+        }
+
         foreach ($projects as $project) {
             echo $project->identifier."\r\n";
-            foreach ($project->studies as $study) {
-                echo $study->identifier."\r\n";
-                foreach ($study->datasets as $dataset) {
-                    echo $dataset->identifier."\r\n";
-                    $dataset->updateDOIMetadata($this->doiService);
-                    $dataset->addRelatedIdentifiers($this->doiService);
-                }
-                $study->updateDOIMetadata($this->doiService);
-                $study->addRelatedIdentifiers($this->doiService);
-            }
             $project->updateDOIMetadata($this->doiService);
             $project->addRelatedIdentifiers($this->doiService);
         }
