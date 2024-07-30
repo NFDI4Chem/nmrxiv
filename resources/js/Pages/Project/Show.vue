@@ -560,6 +560,10 @@
                                                     v-model="
                                                         project.release_date
                                                     "
+                                                    :format="customFormat"
+                                                    :preview-format="
+                                                        customFormat
+                                                    "
                                                 ></Datepicker>
                                                 <p
                                                     class="mt-1 text-sm text-gray-500"
@@ -1097,10 +1101,22 @@ export default {
         const projectDetailsElement = ref(null);
         const manageAuthorElement = ref(null);
         const manageCitationElement = ref(null);
+
+        // Custom format function
+        const customFormat = (date) => {
+            if (!date) return "";
+            const day = String(date.getDate()).padStart(2, "0");
+            const month = String(date.getMonth() + 1).padStart(2, "0");
+            const year = date.getFullYear();
+            const hours = String(date.getHours()).padStart(2, "0");
+            const minutes = String(date.getMinutes()).padStart(2, "0");
+            return `${day}/${month}/${year}, ${hours}:${minutes}`;
+        };
         return {
             projectDetailsElement,
             manageAuthorElement,
             manageCitationElement,
+            customFormat,
         };
     },
     data() {
