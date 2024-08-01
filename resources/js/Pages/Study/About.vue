@@ -16,7 +16,10 @@
                 <div class="divide-y divide-gray-200 sm:col-span-9">
                     <div class="py-3 px-4 sm:p-6 lg:pb-8">
                         <div class="mt-0">
-                            <div class="mb-4">
+                            <div
+                                v-if="canUpdateStudy || study.tags.length > 0"
+                                class="mb-4"
+                            >
                                 <div class="relative">
                                     <div
                                         class="absolute inset-0 flex items-center"
