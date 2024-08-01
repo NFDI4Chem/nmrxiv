@@ -85,7 +85,7 @@
                             <div
                                 class="ml-3 font-semibold text-sm text-gray-600 uppercase tracking-wider"
                             >
-                                No studies that match the search query
+                                No samples that match the search query
                             </div>
                         </div>
                         <button
