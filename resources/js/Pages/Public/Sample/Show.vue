@@ -156,6 +156,49 @@
                     "
                     class="mt-4"
                 >
+                    <div class="gap-y-6 sm:grid-cols-6 sm:gap-x-6">
+                        <div class="pt-2 sm:col-span-6">
+                            <h2
+                                class="text-xl font-extrabold mb-3 text-blue-gray-900"
+                            >
+                                Submitter
+                            </h2>
+                        </div>
+                    </div>
+                    <div class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div
+                            class="relative rounded-lg border border-gray-300 bg-white p-5 shadow-sm flex items-center space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-pink-500"
+                        >
+                            <div class="flex-shrink-0">
+                                <img
+                                    class="h-10 w-10 rounded-full"
+                                    :src="study.data.owner.profile_photo_url"
+                                    alt=""
+                                />
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <a class="focus:outline-none">
+                                    <span
+                                        class="absolute inset-0"
+                                        aria-hidden="true"
+                                    ></span>
+                                    <p
+                                        class="text-sm font-medium text-gray-900"
+                                    >
+                                        {{
+                                            study.data.owner.first_name +
+                                            " " +
+                                            study.data.owner.last_name
+                                        }}
+                                    </p>
+                                    <p class="text-sm text-gray-500 truncate">
+                                        @ {{ study.data.owner.username }}
+                                    </p>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="relative">
                         <div
                             class="absolute inset-0 flex items-center"
