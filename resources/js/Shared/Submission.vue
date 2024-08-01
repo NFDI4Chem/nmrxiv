@@ -258,10 +258,10 @@
                                                     project can have multiple
                                                     studies.
                                                     <b class="text-teal-700"
-                                                        >A study corresponds to
-                                                        a group of NMR
-                                                        experiments of one
-                                                        sample</b
+                                                        >A sample study
+                                                        corresponds to a group
+                                                        of NMR experiments of
+                                                        one sample</b
                                                     >, e.g. 1H, 13C, APT, COSY
                                                     HSQC, HMBC, NOESY in Bruker
                                                     Format or (another study) in
