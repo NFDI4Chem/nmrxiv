@@ -306,6 +306,20 @@
                                 </span>
                             </div>
                         </div>
+                        <div
+                            v-if="!canUpdateProject"
+                            class="flex-nowrap right ml-auto"
+                        >
+                            <img
+                                :src="
+                                    project.project_photo_url
+                                        ? project.project_photo_url
+                                        : 'https://via.placeholder.com/400x200'
+                                "
+                                :alt="project.name"
+                                class="h-24 w-72 rounded-md object-cover"
+                            />
+                        </div>
                         <div class="flex-nowrap">
                             <Link
                                 v-if="canManageProjectSetings"
@@ -333,7 +347,8 @@
                                 !project.is_public &&
                                 !project.is_published &&
                                 !project.is_deleted &&
-                                !project.doi
+                                !project.doi &&
+                                role != 'reviewer'
                             "
                             class="flex-nowrap"
                         >
@@ -935,7 +950,10 @@
                     </div>
                 </div>
                 <!-- Citation -->
-                <div class="mb-8">
+                <div
+                    v-if="canUpdateProject || project.citations.length > 0"
+                    class="mb-8"
+                >
                     <div class="relative">
                         <div
                             class="absolute inset-0 flex items-center"
@@ -972,7 +990,10 @@
                 </div>
 
                 <!-- Author -->
-                <div class="mb-8">
+                <div
+                    v-if="canUpdateProject || project.authors.length > 0"
+                    class="mb-8"
+                >
                     <div class="relative">
                         <div
                             class="absolute inset-0 flex items-center"
