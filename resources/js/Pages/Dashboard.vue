@@ -44,7 +44,10 @@
                 </div>
             </div>
         </template>
-        <div v-if="projects.length > 0" class="px-8 py-8 mx-auto max-w-4xl">
+        <div
+            v-if="projects.length > 0 || samples.length > 0"
+            class="px-8 py-8 mx-auto max-w-4xl"
+        >
             <div>
                 <div class="sm:hidden">
                     <label for="tabs" class="sr-only">Select a tab</label>
