@@ -174,7 +174,7 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                         $studyPublisher->publish($study);
                     }
                 }
-
+                $updater->update($_studies);
                 //Notification::send($this->prepareSendList($project), new StudyPublishNotification($_studies));
                 event(new StudyPublish($_studies, $this->prepareSendList($project)));
 
