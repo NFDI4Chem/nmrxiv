@@ -273,12 +273,14 @@ trait HasDOI
             $this->save();
 
         } elseif ($this instanceof Study) {
-            $relatedIdentifier = [
-                'relatedIdentifier' => $this->project->doi,
-                'relatedIdentifierType' => 'DOI',
-                'relationType' => 'IsPartOf',
-            ];
-            array_push($attributes['relatedIdentifiers'], $relatedIdentifier);
+            if ($this->project) {
+                $relatedIdentifier = [
+                    'relatedIdentifier' => $this->project->doi,
+                    'relatedIdentifierType' => 'DOI',
+                    'relationType' => 'IsPartOf',
+                ];
+                array_push($attributes['relatedIdentifiers'], $relatedIdentifier);
+            }
             foreach ($this->datasets as &$dataset) {
                 $relatedIdentifier = [
                     'relatedIdentifier' => $dataset->doi,
@@ -291,12 +293,15 @@ trait HasDOI
             $this->datacite_schema = $doiResponse;
             $this->save();
         } elseif ($this instanceof Dataset) {
-            $relatedIdentifier = [
-                'relatedIdentifier' => $this->project->doi,
-                'relatedIdentifierType' => 'DOI',
-                'relationType' => 'IsPartOf',
-            ];
-            array_push($attributes['relatedIdentifiers'], $relatedIdentifier);
+            if ($this->project) {
+                $relatedIdentifier = [
+                    'relatedIdentifier' => $this->project->doi,
+                    'relatedIdentifierType' => 'DOI',
+                    'relationType' => 'IsPartOf',
+                ];
+                array_push($attributes['relatedIdentifiers'], $relatedIdentifier);
+            }
+
             $relatedIdentifier = [
                 'relatedIdentifier' => $this->study->doi,
                 'relatedIdentifierType' => 'DOI',
