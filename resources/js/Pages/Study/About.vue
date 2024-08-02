@@ -735,7 +735,7 @@ export default {
         },
         standardizeMolecules(mol) {
             return axios.post(
-                "https://api.naturalproducts.net/latest/chem/standardize",
+                "https://api.cheminf.studio/latest/chem/standardize",
                 mol
             );
         },
