@@ -385,7 +385,7 @@ export default {
                     mol = this.fixLineError(mol);
                     axios
                         .post(
-                            "https://api.naturalproducts.net/latest/chem/standardize",
+                            "https://api.cheminf.studio/latest/chem/standardize",
                             mol.molfile
                         )
                         .then((res) => {
