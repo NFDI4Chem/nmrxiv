@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.4.0](https://github.com/NFDI4Chem/nmrxiv/compare/v1.3.2...v1.4.0) (2024-08-02)
+
+
+### Features
+
+* add submitter details to separate samples. ([d5d76dc](https://github.com/NFDI4Chem/nmrxiv/commit/d5d76dca0a4fa243026d0febc9e280553312bf4f)), closes [#1147](https://github.com/NFDI4Chem/nmrxiv/issues/1147)
+
+
+### Bug Fixes
+
+* add links to the homepage metrics ([e9cb9dd](https://github.com/NFDI4Chem/nmrxiv/commit/e9cb9dd93793526f6f19b4e2a41b5ddb483c8d3d)), closes [#1131](https://github.com/NFDI4Chem/nmrxiv/issues/1131)
+* add related identifiers to the doi metadata of separate samples. ([7268148](https://github.com/NFDI4Chem/nmrxiv/commit/72681488f0f9dfd81b3f8258cef66fa9ad393d23)), closes [#1151](https://github.com/NFDI4Chem/nmrxiv/issues/1151)
+* display public samples in the user's dashboard in the absence of projects. ([2ec13cd](https://github.com/NFDI4Chem/nmrxiv/commit/2ec13cd611d3517b40d7e32da162e2cbfb23036a)), closes [#1122](https://github.com/NFDI4Chem/nmrxiv/issues/1122)
+* switched to cdk for 2d rendering ([1e2f8e2](https://github.com/NFDI4Chem/nmrxiv/commit/1e2f8e2ef9228ade5939cd9882b1ace4a4e0a282))
+* switched to cheminf studio ws API ([6a518b9](https://github.com/NFDI4Chem/nmrxiv/commit/6a518b9692521c49aaf70f7c971c29c6a6ca54b2))
+* update DataCite Meta data for unpublished projects ([2b60501](https://github.com/NFDI4Chem/nmrxiv/commit/2b60501f2e5650657f79bdd40c3eb22b4132b87e)), closes [#1143](https://github.com/NFDI4Chem/nmrxiv/issues/1143)
+* various minor updates - starting materials changes ([f901b2b](https://github.com/NFDI4Chem/nmrxiv/commit/f901b2bc594e7249697201c6c59e09bd398104de))
+
 ## [1.3.2](https://github.com/NFDI4Chem/nmrxiv/compare/v1.3.1...v1.3.2) (2024-06-26)
 
 
