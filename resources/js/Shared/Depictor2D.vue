@@ -18,7 +18,7 @@
                     width +
                     '&CIP=' +
                     CIP +
-                    '&toolkit=rdkit'
+                    '&toolkit=cdk'
                 "
                 alt=""
             />

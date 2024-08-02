@@ -196,7 +196,7 @@ class ArchiveStudy implements ShouldBeUnique, ShouldQueue
 
     // protected function standardizeMolecule($mol)
     // {
-    //     $response = Http::post('https://dev.api.naturalproducts.net/latest/chem/standardize', $mol);
+    //     $response = Http::post('https://api.cheminf.studio/latest/chem/standardize', $mol);
     //     return $response->json();
     // }
 
