@@ -111,7 +111,7 @@ class SanitizeMolecules extends Command
     protected function standardizeMolecule($mol)
     {
         try {
-            $response = Http::post('https://api.naturalproducts.net/latest/chem/standardize', $mol);
+            $response = Http::post('https://api.cheminf.studio/latest/chem/standardize', $mol);
 
             return $response->json();
         } catch (\Illuminate\Http\Client\ConnectionException $e) {

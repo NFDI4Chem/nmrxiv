@@ -2519,7 +2519,7 @@ export default {
         },
         standardizeMolecules(mol) {
             return axios.post(
-                "https://api.naturalproducts.net/latest/chem/standardize",
+                "https://api.cheminf.studio/latest/chem/standardize",
                 mol
             );
         },
@@ -2547,7 +2547,7 @@ export default {
                             // convert to smiles
                             axios
                                 .post(
-                                    "https://dev.api.naturalproducts.net/latest/chem/standardize",
+                                    "https://api.cheminf.studio/latest/latest/chem/standardize",
                                     response.data
                                 )
                                 .then((res) => {
