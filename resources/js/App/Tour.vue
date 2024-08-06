@@ -168,14 +168,14 @@ export default {
                     header: {
                         title: "Studies",
                     },
-                    content: `<small>In this panel, you have a view of all the studies in the project with the datasets they include.</small> `,
+                    content: `<small>In this panel, you have a view of all the samples in the project with the datasets they include.</small> `,
                 },
                 {
                     target: "#tour-step-select-exp",
                     header: {
                         title: "Select Experiments",
                     },
-                    content: `<small>You can navigate through different datasets (experiments) within the study through this dropdown.</small>`,
+                    content: `<small>You can navigate through different datasets (experiments) within the sample through this dropdown.</small>`,
                 },
                 {
                     target: "#tour-step-nmrium",

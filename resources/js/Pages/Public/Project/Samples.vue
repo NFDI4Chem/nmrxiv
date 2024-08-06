@@ -7,7 +7,7 @@
             >
                 <div class="flex items-baseline justify-between">
                     <div>
-                        <h2 class="text-lg mb-3 font-bold">Studies</h2>
+                        <h2 class="text-lg mb-3 font-bold">Samples</h2>
                         <div
                             v-if="!loading"
                             class="flex items-center mr-4 w-full"
@@ -65,7 +65,7 @@
                                     <div
                                         class="ml-3 font-semibold text-sm text-gray-600 uppercase tracking-wider"
                                     >
-                                        No studies
+                                        No samples
                                     </div>
                                 </div>
                             </div>

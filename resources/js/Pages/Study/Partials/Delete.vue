@@ -6,7 +6,7 @@
 
         <template #content>
             <div class="max-w-xl text-sm text-gray-600">
-                Once your study is deleted, all of its resources and data will
+                Once your sample is deleted, all of its resources and data will
                 be permanently deleted. Before deleting your study, please
                 download any data or information that you wish to retain.
             </div>
