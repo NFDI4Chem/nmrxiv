@@ -5,6 +5,21 @@
             <div
                 class="pb-10 mb-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6"
             >
+                <div
+                    class="-mx-4"
+                    v-if="study.data.is_public && study.data.doi != null"
+                >
+                    <Citation
+                        :model="'sample'"
+                        :doi="study.data.doi"
+                    ></Citation>
+                    <ShowProjectDates
+                        class="ml-5"
+                        :release_date="study.data.release_date"
+                        :created_at="study.data.created_at"
+                    />
+                </div>
+
                 <div class="border-b border-gray-200 pb-5">
                     <div class="sm:flex sm:items-baseline sm:justify-between">
                         <div class="sm:w-0 sm:flex-1">
@@ -498,6 +513,8 @@ import SpectraViewer from "@/Shared/SpectraViewer.vue";
 import Depictor2D from "@/Shared/Depictor2D.vue";
 import DOIBadge from "@/Shared/DOIBadge.vue";
 import { Head } from "@inertiajs/vue3";
+import Citation from "@/Shared/Citation.vue";
+import ShowProjectDates from "@/Shared/ShowProjectDates.vue";
 
 export default {
     components: {
@@ -512,6 +529,8 @@ export default {
         Depictor2D,
         DOIBadge,
         Head,
+        Citation,
+        ShowProjectDates,
     },
     props: ["project", "tab", "study"],
     data() {
