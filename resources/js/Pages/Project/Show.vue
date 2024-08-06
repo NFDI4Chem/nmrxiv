@@ -575,6 +575,10 @@
                                                     v-model="
                                                         project.release_date
                                                     "
+                                                    :format="customDateFormat"
+                                                    :preview-format="
+                                                        customDateFormat
+                                                    "
                                                 ></Datepicker>
                                                 <p
                                                     class="mt-1 text-sm text-gray-500"
@@ -1118,6 +1122,7 @@ export default {
         const projectDetailsElement = ref(null);
         const manageAuthorElement = ref(null);
         const manageCitationElement = ref(null);
+
         return {
             projectDetailsElement,
             manageAuthorElement,
