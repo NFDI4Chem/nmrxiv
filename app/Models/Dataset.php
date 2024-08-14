@@ -13,6 +13,7 @@ class Dataset extends Model implements Auditable
 {
     use HasDOI;
     use HasFactory;
+    use HasMIChI;
     use \OwenIt\Auditing\Auditable;
 
     protected $fillable = [
@@ -194,19 +195,18 @@ class Dataset extends Model implements Auditable
         $dict = [
             'solvent' => null,
             'nucleus' => null,
-            'dimension' => null,
-            'probeName' => null,
+            'baseFrequency' => null,
             'experiment' => null,
-            'temperature' => null,
-            'baseFrequency' => null,
-            'temperature' => null,
-            'baseFrequency' => null,
-            'fieldStrength' => null,
-            'numberOfScans' => null,
             'pulseSequence' => null,
-            'spectralWidth' => null,
-            'numberOfPoints' => null,
             'relaxationTime' => null,
+            'numberOfPoints' => null,
+            'temperature' => null,
+            'numberOfScans' => null,
+            'acquisitionTime' => null,
+            'probeName' => null,
+            'dimension' => null,
+            'fieldStrength' => null,
+            'spectralWidth' => null,
         ];
 
         if ($info) {
@@ -220,38 +220,49 @@ class Dataset extends Model implements Auditable
                     $dict['nucleus'] = $info->nucleus;
                 }
             }
-            if (property_exists($info, 'dimension')) {
-                $dict['dimension'] = $info->dimension;
-            }
-            if (property_exists($info, 'probeName')) {
-                $dict['probeName'] = $info->probeName;
+            if (property_exists($info, 'baseFrequency')) {
+                $dict['baseFrequency'] = $info->baseFrequency;
             }
             if (property_exists($info, 'experiment')) {
                 $dict['experiment'] = $info->experiment;
             }
-            if (property_exists($info, 'temperature')) {
-                $dict['temperature'] = $info->temperature;
-            }
-            if (property_exists($info, 'baseFrequency')) {
-                $dict['baseFrequency'] = $info->baseFrequency;
-            }
-            if (property_exists($info, 'fieldStrength')) {
-                $dict['fieldStrength'] = $info->fieldStrength;
-            }
-            if (property_exists($info, 'numberOfScans')) {
-                $dict['numberOfScans'] = $info->numberOfScans;
-            }
             if (property_exists($info, 'pulseSequence')) {
                 $dict['pulseSequence'] = $info->pulseSequence;
+
             }
-            if (property_exists($info, 'spectralWidth')) {
-                $dict['spectralWidth'] = $info->spectralWidth;
+            if (property_exists($info, 'relaxationTime')) {
+                $dict['relaxationTime'] = $info->relaxationTime;
+
             }
             if (property_exists($info, 'numberOfPoints')) {
                 $dict['numberOfPoints'] = $info->numberOfPoints;
             }
-            if (property_exists($info, 'relaxationTime')) {
-                $dict['relaxationTime'] = $info->relaxationTime;
+            if (property_exists($info, 'temperature')) {
+                $dict['temperature'] = $info->temperature;
+
+            }
+            if (property_exists($info, 'numberOfScans')) {
+                $dict['numberOfScans'] = $info->numberOfScans;
+            }
+            if (property_exists($info, 'acquisitionTime')) {
+                $dict['acquisitionTime'] = $info->acquisitionTime;
+
+            }
+            if (property_exists($info, 'probeName')) {
+                $dict['probeName'] = $info->probeName;
+
+            }
+            if (property_exists($info, 'dimension')) {
+                $dict['dimension'] = $info->dimension;
+
+            }
+            if (property_exists($info, 'fieldStrength')) {
+                $dict['fieldStrength'] = $info->fieldStrength;
+            }
+
+            if (property_exists($info, 'spectralWidth')) {
+                $dict['spectralWidth'] = $info->spectralWidth;
+
             }
 
             return $dict;
