@@ -5,10 +5,11 @@
                 v-if="study.is_deleted"
                 class="text-center px-3 py-1 bg-red-50 text-red-700 border-b"
             >
-                <b>Warning: </b> This study is deleted. At the end of the 30-day
-                period, this study and all of its resources will be deleted
-                permanently and cannot be recovered. You can only restore a
-                deleted study/project within the 30-day recovery period.
+                <b>Warning: </b> This sample is deleted. At the end of the
+                30-day period, this sample and all of its resources will be
+                deleted permanently and cannot be recovered. You can only
+                restore a deleted study/project within the 30-day recovery
+                period.
             </div>
             <div>
                 <div
