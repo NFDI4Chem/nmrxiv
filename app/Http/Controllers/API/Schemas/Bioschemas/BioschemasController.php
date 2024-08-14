@@ -260,7 +260,7 @@ class BioschemasController extends Controller
      */
     public function prepareExperiment($dataset)
     {
-        $info = BioschemasHelper::getNMRiumInfo($dataset);
+        $info = Dataset::getNMRiumInfo($dataset);
         $experimentSchema = null;
         if ($info) {
             if (property_exists($info, 'nucleus') && property_exists($info, 'experiment')) {
@@ -310,82 +310,26 @@ class BioschemasController extends Controller
      */
     public function prepareNMRiumInfo($dataset)
     {
-        $info = BioschemasHelper::getNMRiumInfo($dataset);
-        if ($info) {
-            $solvent = null;
-            $nucleus = null;
-            $dimension = null;
-            $probeName = null;
-            $experiment = null;
-            $temperature = null;
-            $baseFrequency = null;
-            $fieldStrength = null;
-            $numberOfScans = null;
-            $pulseSequence = null;
-            $spectralWidth = null;
-            $numberOfPoints = null;
-            $relaxationTime = null;
+        $dict = Dataset::extractNMRiumInfo($dataset);
+        if ($dict) {
+            $solventProperty = BioschemasHelper::preparePropertyValue('NMR solvent', 'NMR:1000330', $dict['solvent'], null);
+            $nucleusProperty = BioschemasHelper::preparePropertyValue('acquisition nucleus', 'NMR:1400083', $dict['nucleus'], null);
+            $dimensionProperty = BioschemasHelper::preparePropertyValue('NMR spectrum by dimensionality', 'NMR:1000117', $dict['dimension'], null);
+            $probeNameProperty = BioschemasHelper::preparePropertyValue('NMR probe', 'OBI:0000516', $dict['probeName'], null);
+            //$experimentProperty = BioschemasHelper::preparePropertyValue('pulsed nuclear magnetic resonance spectroscopy', 'CHMO:0000613', $dict['experiment'], null);
+            $temperatureProperty = BioschemasHelper::preparePropertyValue('Temperature', 'NCIT:C25206', $dict['temperature'], 'http://purl.obolibrary.org/obo/UO_0000012');
+            $baseFrequencyProperty = BioschemasHelper::preparePropertyValue('irradiation frequency', 'NMR:1400026', $dict['baseFrequency'], 'http://purl.obolibrary.org/obo/UO_0000325');
+            $fieldStrengthProperty = BioschemasHelper::preparePropertyValue('magnetic field strength', 'MR:1400253', $dict['fieldStrength'], 'http://purl.obolibrary.org/obo/UO_0000228');
+            $numberOfScansProperty = BioschemasHelper::preparePropertyValue('number of scans', 'NMR:1400087', $dict['numberOfScans'], 'scans');
+            $pulseSequenceProperty = BioschemasHelper::preparePropertyValue('nuclear magnetic resonance pulse sequence', 'CHMO:0001841', $dict['pulseSequence'], null);
+            $spectralWidthProperty = BioschemasHelper::preparePropertyValue('Spectral Width', 'NCIT:C156496', $dict['spectralWidth'], 'http://purl.obolibrary.org/obo/UO_0000169');
+            $numberOfPointsProperty = BioschemasHelper::preparePropertyValue('number of data points', 'NMR:1000176', $dict['numberOfPoints'], 'points');
+            $relaxationTimeProperty = BioschemasHelper::preparePropertyValue('relaxation time measurement', 'FIX:0000202', $dict['relaxationTime'], 'http://purl.obolibrary.org/obo/UO_0000010');
 
-            if (property_exists($info, 'solvent')) {
-                $solvent = $info->solvent;
-            }
-            if (property_exists($info, 'nucleus')) {
-                $nucleus = $info->nucleus;
-            }
-            if (is_string($nucleus)) {
-                $nucleus = [$nucleus];
-            }
-            if (property_exists($info, 'dimension')) {
-                $dimension = $info->dimension;
-            }
-            if (property_exists($info, 'probeName')) {
-                $probeName = $info->probeName;
-            }
-            if (property_exists($info, 'experiment')) {
-                $experiment = $info->experiment;
-            }
-            if (property_exists($info, 'temperature')) {
-                $temperature = $info->temperature;
-            }
-            if (property_exists($info, 'baseFrequency')) {
-                $baseFrequency = $info->baseFrequency;
-            }
-            if (property_exists($info, 'fieldStrength')) {
-                $fieldStrength = $info->fieldStrength;
-            }
-            if (property_exists($info, 'numberOfScans')) {
-                $numberOfScans = $info->numberOfScans;
-            }
-            if (property_exists($info, 'pulseSequence')) {
-                $pulseSequence = $info->pulseSequence;
-            }
-            if (property_exists($info, 'spectralWidth')) {
-                $spectralWidth = $info->spectralWidth;
-            }
-            if (property_exists($info, 'numberOfPoints')) {
-                $numberOfPoints = $info->numberOfPoints;
-            }
-            if (property_exists($info, 'relaxationTime')) {
-                $relaxationTime = $info->relaxationTime;
-            }
+            $keywords = [$dict['solvent'], $dict['dimension'].'D'];
+            if ($dict['nucleus'] !== null) {
+                foreach ($dict['nucleus'] as $keyword) {
 
-            $solventProperty = BioschemasHelper::preparePropertyValue('NMR solvent', 'NMR:1000330', $solvent, null);
-            $nucleusProperty = BioschemasHelper::preparePropertyValue('acquisition nucleus', 'NMR:1400083', $nucleus, null);
-            $dimensionProperty = BioschemasHelper::preparePropertyValue('NMR spectrum by dimensionality', 'NMR:1000117', $dimension, null);
-            $probeNameProperty = BioschemasHelper::preparePropertyValue('NMR probe', 'OBI:0000516', $probeName, null);
-            //$experimentProperty = BioschemasHelper::preparePropertyValue('pulsed nuclear magnetic resonance spectroscopy', 'CHMO:0000613', $experiment, null);
-            $temperatureProperty = BioschemasHelper::preparePropertyValue('Temperature', 'NCIT:C25206', $temperature, 'http://purl.obolibrary.org/obo/UO_0000012');
-            $baseFrequencyProperty = BioschemasHelper::preparePropertyValue('irradiation frequency', 'NMR:1400026', $baseFrequency, 'http://purl.obolibrary.org/obo/UO_0000325');
-            $fieldStrengthProperty = BioschemasHelper::preparePropertyValue('magnetic field strength', 'MR:1400253', $fieldStrength, 'http://purl.obolibrary.org/obo/UO_0000228');
-            $numberOfScansProperty = BioschemasHelper::preparePropertyValue('number of scans', 'NMR:1400087', $numberOfScans, 'scans');
-            $pulseSequenceProperty = BioschemasHelper::preparePropertyValue('nuclear magnetic resonance pulse sequence', 'CHMO:0001841', $pulseSequence, null);
-            $spectralWidthProperty = BioschemasHelper::preparePropertyValue('Spectral Width', 'NCIT:C156496', $spectralWidth, 'http://purl.obolibrary.org/obo/UO_0000169');
-            $numberOfPointsProperty = BioschemasHelper::preparePropertyValue('number of data points', 'NMR:1000176', $numberOfPoints, 'points');
-            $relaxationTimeProperty = BioschemasHelper::preparePropertyValue('relaxation time measurement', 'FIX:0000202', $relaxationTime, 'http://purl.obolibrary.org/obo/UO_0000010');
-
-            $keywords = [$solvent, $dimension.'D'];
-            if ($nucleus !== null) {
-                foreach ($nucleus as $keyword) {
                     array_push($keywords, $keyword);
                 }
             }
@@ -393,7 +337,7 @@ class BioschemasController extends Controller
             $variables = [$solventProperty, $nucleusProperty,  $dimensionProperty, $probeNameProperty,
                 $temperatureProperty, $baseFrequencyProperty, $fieldStrengthProperty, $numberOfScansProperty, $pulseSequenceProperty, $spectralWidthProperty, $numberOfPointsProperty, $relaxationTimeProperty, ];
 
-            $array = [$keywords, $variables, $experiment];
+            $array = [$keywords, $variables, $dict['experiment']];
 
             return $array;
         }
