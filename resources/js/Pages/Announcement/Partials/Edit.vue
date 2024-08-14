@@ -75,6 +75,8 @@
                         <Datepicker
                             v-model="editAnnouncementForm.start_time"
                             :min-date="new Date()"
+                            :format="customDateFormat"
+                            :preview-format="customDateFormat"
                         ></Datepicker>
                         <jet-input-error
                             :message="editAnnouncementForm.errors.start_time"
@@ -87,6 +89,8 @@
                         </label>
                         <Datepicker
                             v-model="editAnnouncementForm.end_time"
+                            :format="customDateFormat"
+                            :preview-format="customDateFormat"
                         ></Datepicker>
                         <jet-input-error
                             :message="editAnnouncementForm.errors.end_time"
