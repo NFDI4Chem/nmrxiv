@@ -183,6 +183,7 @@ return [
         App\Providers\MinioStorageServiceProvider::class,
         App\Providers\CephStorageServiceProvider::class,
         App\Providers\DOIServiceProvider::class,
+        App\Providers\MIChIServiceProvider::class,
 
         Lab404\Impersonate\ImpersonateServiceProvider::class,
         L5Swagger\L5SwaggerServiceProvider::class,
