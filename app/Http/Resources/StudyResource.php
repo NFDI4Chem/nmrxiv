@@ -40,6 +40,7 @@ class StudyResource extends JsonResource
             'identifier' => $this->identifier,
             'doi' => $this->doi,
             'created_at' => $this->created_at,
+            'release_date' => $this->release_date,
             'is_public' => $this->is_public,
             'public_url' => $this->public_url ? $this->public_url : null,
             'updated_at' => $this->updated_at,
