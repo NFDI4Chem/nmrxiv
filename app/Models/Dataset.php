@@ -150,4 +150,111 @@ class Dataset extends Model implements Auditable
             }
         });
     }
+
+    /**
+     * Get NMRium info from a dataset.
+     *
+     * @param  App\Models\Dataset  $dataset
+     * @return object $info
+     */
+    public static function getNMRiumInfo($dataset)
+    {
+        $info = null;
+        $nmrium = $dataset->nmrium;
+        if (! $nmrium) {
+            $study = $dataset->study;
+            if ($study->nmrium) {
+                $NMRiumInfo = json_decode($study->nmrium->nmrium_info);
+                foreach ($NMRiumInfo->data->spectra as $spectra) {
+                    $fileSource = $spectra->sourceSelector->files[0];
+                    $fileName = pathinfo($fileSource);
+                    if ($fileName['basename'] == $dataset->fsObject->name) {
+                        $info = $spectra->info;
+                    }
+                }
+            }
+        } else {
+            $NMRiumInfo = json_decode($nmrium->nmrium_info);
+            $spectra = $NMRiumInfo->data->spectra[0];
+            $info = $spectra->info;
+        }
+
+        return $info;
+    }
+
+    /**
+     * Extract NMRium info into an array.
+     *
+     * @param  App\Models\Dataset  $dataset
+     * @return array $array
+     */
+    public static function extractNMRiumInfo($dataset)
+    {
+        $info = self::getNMRiumInfo($dataset);
+        $dict = [
+            'solvent' => null,
+            'nucleus' => null,
+            'dimension' => null,
+            'probeName' => null,
+            'experiment' => null,
+            'temperature' => null,
+            'baseFrequency' => null,
+            'temperature' => null,
+            'baseFrequency' => null,
+            'fieldStrength' => null,
+            'numberOfScans' => null,
+            'pulseSequence' => null,
+            'spectralWidth' => null,
+            'numberOfPoints' => null,
+            'relaxationTime' => null,
+        ];
+
+        if ($info) {
+            if (property_exists($info, 'solvent')) {
+                $dict['solvent'] = $info->solvent;
+            }
+            if (property_exists($info, 'nucleus')) {
+                if (is_string($info->nucleus)) {
+                    $dict['nucleus'] = [$info->nucleus];
+                } else {
+                    $dict['nucleus'] = $info->nucleus;
+                }
+            }
+            if (property_exists($info, 'dimension')) {
+                $dict['dimension'] = $info->dimension;
+            }
+            if (property_exists($info, 'probeName')) {
+                $dict['probeName'] = $info->probeName;
+            }
+            if (property_exists($info, 'experiment')) {
+                $dict['experiment'] = $info->experiment;
+            }
+            if (property_exists($info, 'temperature')) {
+                $dict['temperature'] = $info->temperature;
+            }
+            if (property_exists($info, 'baseFrequency')) {
+                $dict['baseFrequency'] = $info->baseFrequency;
+            }
+            if (property_exists($info, 'fieldStrength')) {
+                $dict['fieldStrength'] = $info->fieldStrength;
+            }
+            if (property_exists($info, 'numberOfScans')) {
+                $dict['numberOfScans'] = $info->numberOfScans;
+            }
+            if (property_exists($info, 'pulseSequence')) {
+                $dict['pulseSequence'] = $info->pulseSequence;
+            }
+            if (property_exists($info, 'spectralWidth')) {
+                $dict['spectralWidth'] = $info->spectralWidth;
+            }
+            if (property_exists($info, 'numberOfPoints')) {
+                $dict['numberOfPoints'] = $info->numberOfPoints;
+            }
+            if (property_exists($info, 'relaxationTime')) {
+                $dict['relaxationTime'] = $info->relaxationTime;
+            }
+
+            return $dict;
+        }
+    }
 }

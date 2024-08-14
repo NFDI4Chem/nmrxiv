@@ -199,37 +199,6 @@ class BioschemasHelper
     }
 
     /**
-     * Get NMRium info from a dataset.
-     *
-     * @param  App\Models\Dataset  $dataset
-     * @return object $info
-     */
-    public static function getNMRiumInfo($dataset)
-    {
-        $info = null;
-        $nmrium = $dataset->nmrium;
-        if (! $nmrium) {
-            $study = $dataset->study;
-            if ($study->nmrium) {
-                $NMRiumInfo = json_decode($study->nmrium->nmrium_info);
-                foreach ($NMRiumInfo->data->spectra as $spectra) {
-                    $fileSource = $spectra->sourceSelector->files[0];
-                    $fileName = pathinfo($fileSource);
-                    if ($fileName['basename'] == $dataset->fsObject->name) {
-                        $info = $spectra->info;
-                    }
-                }
-            }
-        } else {
-            $NMRiumInfo = json_decode($nmrium->nmrium_info);
-            $spectra = $NMRiumInfo->data->spectra[0];
-            $info = $spectra->info;
-        }
-
-        return $info;
-    }
-
-    /**
      * Use Schema.org CreativeWork type to represent Schema.org and ISA types that an object conforms to.
      *
      * @link https://schema.org/CreativeWork
