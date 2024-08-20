@@ -24,7 +24,7 @@ trait HasDOI
 
                     if ($this->project) {
                         $projectIdentifier = $this->getIdentifier($this->project, 'identifier');
-                        $suffix = 'P'.$projectIdentifier.'.'.'S'.$identifier;
+                        $suffix = 'P'.$projectIdentifier.'.S'.$identifier;
                     } else {
                         $suffix = 'S'.$identifier;
                     }
@@ -36,16 +36,14 @@ trait HasDOI
                     $studyIdentifier = $this->getIdentifier($this->study, 'identifier');
                     if ($this->project) {
                         $projectIdentifier = $this->getIdentifier($this->project, 'identifier');
-                        $suffix = 'P'.$projectIdentifier.'.'.'S'.$studyIdentifier.'.'.'D'.$identifier;
+                        $suffix = 'P'.$projectIdentifier.'.S'.$studyIdentifier.'.D'.$identifier;
                     } else {
-                        $suffix = 'S'.$studyIdentifier.'.'.'D'.$identifier;
+                        $suffix = 'S'.$studyIdentifier.'.D'.$identifier;
                     }
                     $url = $url.'D'.$identifier;
                     $resourceType = 'Dataset';
                 }
 
-                $attributes = $this->getMetadata();
-                $attributes['url'] = $url;
                 $attributes = $this->getMetadata();
                 $attributes['url'] = $url;
                 $attributes['types'] = [
