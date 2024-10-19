@@ -53,7 +53,7 @@ class UpdateStudy
             $license_id = $licenseExists ? $input['license_id'] : $study->license_id;
 
             if ($is_public == true) {
-                $release_date = Carbon::now()->timestamp;
+                $release_date = $study->release_date;
 
                 $sample = $study->sample;
                 $sampleIdentifier = $sample->identifier ? $sample->identifier : null;

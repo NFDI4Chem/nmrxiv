@@ -330,7 +330,7 @@
                                                         "
                                                     />
                                                 </div>
-                                                <fieldset>
+                                                <!-- <fieldset>
                                                     <legend
                                                         class="text-sm font-medium text-gray-900"
                                                     >
@@ -388,7 +388,7 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </fieldset>
+                                                </fieldset> -->
                                             </div>
                                             <div>
                                                 <div v-if="form.is_public">
@@ -698,7 +698,7 @@
                                                                     form.license
                                                                 "
                                                                 :disabled="
-                                                                    !canUpdateProject
+                                                                    project.is_public
                                                                 "
                                                                 label="License"
                                                                 :items="
@@ -713,8 +713,16 @@
                                                         "
                                                         class="mt-2"
                                                     />
+                                                    <div
+                                                        class="mt-2 flex text-xs"
+                                                    >
+                                                        You can't change the
+                                                        licence once the project
+                                                        is public
+                                                    </div>
                                                 </div>
-                                                <div class="mt-6 flex text-sm">
+
+                                                <!-- <div class="mt-6 flex text-sm">
                                                     <a
                                                         target="_blank"
                                                         href="https://docs.nmrxiv.org/submission-guides/sharing.html"
@@ -729,7 +737,7 @@
                                                             sharing
                                                         </span>
                                                     </a>
-                                                </div>
+                                                </div> -->
                                                 <div
                                                     class="mt-4 flex text-sm mb-6"
                                                 >
@@ -756,36 +764,8 @@
                                         </div>
                                     </div>
                                 </div>
-                                <!--Footer-->
+
                                 <div
-                                    v-if="!form.is_public"
-                                    class="flex-shrink-0 px-4 py-4 flex justify-end"
-                                >
-                                    <jet-action-message
-                                        :on="form.recentlySuccessful"
-                                        class="mr-3 py-2 text-green-200"
-                                    >
-                                        Saved.
-                                    </jet-action-message>
-                                    <jet-secondary-button
-                                        type="button"
-                                        class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-                                        @click="open = false"
-                                    >
-                                        Cancel
-                                    </jet-secondary-button>
-                                    <jet-button
-                                        v-if="canUpdateProject"
-                                        type="submit"
-                                        class="ml-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-                                        @click="updateProject"
-                                    >
-                                        Save
-                                    </jet-button>
-                                </div>
-                                <!--Footer with confirmation-->
-                                <div
-                                    v-if="form.is_public && canUpdateProject"
                                     class="flex-shrink-0 px-4 py-4 flex justify-end"
                                 >
                                     <div class="flex items-center h-5">
@@ -802,11 +782,11 @@
                                         <label
                                             for="confirm"
                                             class="font-small text-red-700"
-                                            >I understand, if the project is
-                                            made public then all the underlying
-                                            studies and dataset will also be
-                                            made public and this version is no
-                                            longer editable.
+                                            >I understand, if the project
+                                            metadata is updated, the project
+                                            will keep its same doi, but the doi
+                                            will have new metadata and
+                                            therefore, a new metadata version.
                                         </label>
                                     </div>
                                     <jet-secondary-button
@@ -1053,12 +1033,12 @@ export default defineComponent({
             if (this.form.license) {
                 this.form.license_id = this.form.license.id;
             }
-            if (this.linkAccess) {
-                this.form.access = "link";
-                this.form.access_type = this.selectedAccessType.value;
-            } else {
-                this.form.access = "restricted";
-            }
+            // if (this.linkAccess) {
+            //     this.form.access = "link";
+            //     this.form.access_type = this.selectedAccessType.value;
+            // } else {
+            //     this.form.access = "restricted";
+            // }
             this.form.tags_array = this.form.tags.map((t) => t.text);
             if (this.form.tag != "") {
                 let tags = this.form.tag.split(",");

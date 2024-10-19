@@ -134,6 +134,10 @@ trait HasDOI
             if ($this->project) {
                 $authors = $this->project->authors ? $this->project->authors : [];
                 $citations = $this->project->citations ? $this->project->citations : [];
+                foreach ($this->tags as &$tag) {
+                    $keyword = $tag->name;
+                    array_push($keywords, $keyword);
+                }
             }
 
         } elseif ($this instanceof Dataset) {

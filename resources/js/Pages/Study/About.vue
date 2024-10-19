@@ -98,7 +98,7 @@
                                             License
                                         </span>
                                         <button
-                                            v-if="canUpdateStudy"
+                                            v-if="canUpdateStudy && !study.is_public"
                                             type="button"
                                             class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                                             @click="openStudyDetailsPane"
