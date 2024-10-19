@@ -539,6 +539,12 @@ export default {
             citationsForm: this.$inertia.form({
                 citations: [],
             }),
+            projectForm: this.$inertia.form({
+                _method: "PUT",
+                name: this.project.name,
+                enableProjectMode: this.project.enableProjectMode,
+                release_date: this.project.release_date,
+            }),
             fetchedCitations: {},
             showDialog: false,
             citations: [],
@@ -567,6 +573,9 @@ export default {
             this.showDialog = !this.showDialog;
         },
         onClose() {
+            if (this.project.is_public) {
+                this.updateProject();
+            }
             this.showDialog = false;
         },
         /*Fetch citation from DOI*/
@@ -916,6 +925,11 @@ export default {
             this.isEdit = false;
             this.fetchedCitations = {};
             this.query = "";
+        },
+        updateProject() {
+            this.projectForm.post(
+                route("dashboard.project.update", this.project.id)
+            );
         },
     },
 };

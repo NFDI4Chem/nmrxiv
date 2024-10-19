@@ -25,6 +25,7 @@ class UpdateProject
         Validator::make($input, [
             'name' => ['required', 'string', 'max:255',  Rule::unique('projects')
                 ->where('owner_id', $project->owner_id)->ignore($project->id), ],
+            'description' => ['required_if:is_public,"true"', 'min:20'],
             'license' => ['required_if:is_public,"true"'],
         ], $errorMessages)->validate();
 
@@ -107,7 +108,7 @@ class UpdateProject
             $validation = $project->validation;
 
             if (! $validation) {
-                $validation = new Validation();
+                $validation = new Validation;
                 $validation->save();
                 $project->validation()->associate($validation);
                 $project->save();

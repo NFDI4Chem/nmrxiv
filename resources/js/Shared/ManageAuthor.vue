@@ -720,6 +720,12 @@ export default {
                 email_id: null,
                 contributor_type: null,
             }),
+            projectForm: this.$inertia.form({
+                _method: "PUT",
+                name: this.project.name,
+                enableProjectMode: this.project.enableProjectMode,
+                release_date: this.project.release_date,
+            }),
             authorsForm: this.$inertia.form({
                 authors: [],
             }),
@@ -874,6 +880,9 @@ export default {
         },
         /*Reset variables on close of dialog*/
         onClose() {
+            if (this.project.is_public) {
+                this.updateProject();
+            }
             this.showDialog = false;
             this.form.reset();
             this.fetchedAuthors = [];
@@ -1288,6 +1297,11 @@ export default {
                 );
                 this.fetchedAuthors.push(user);
             }
+        },
+        updateProject() {
+            this.projectForm.post(
+                route("dashboard.project.update", this.project.id)
+            );
         },
     },
 };

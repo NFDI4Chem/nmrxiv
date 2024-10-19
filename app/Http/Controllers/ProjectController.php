@@ -16,6 +16,7 @@ use App\Models\Project;
 use App\Models\Study;
 use App\Models\User;
 use App\Models\Validation;
+use App\Services\DOI\DOIService;
 use Auth;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Auth\StatefulGuard;
@@ -31,6 +32,29 @@ use Maize\Markable\Models\Like;
 
 class ProjectController extends Controller
 {
+    /**
+     * The DOI service instance.
+     *
+     * @var \App\Services\DOI\DOIService
+     */
+    protected $doiService;
+
+    /**
+     * Create a new class instance.
+     *
+     * @return void
+     */
+    /**
+     * Create a new class instance.
+     *
+     * @return void
+     */
+    public function __construct(DOIService $doiService)
+    {
+        // Assign the DOI service instance
+        $this->doiService = $doiService;
+    }
+
     public function publicProjectView(Request $request, $owner, $slug)
     {
         $user = User::where('username', $owner)->firstOrFail();
@@ -274,7 +298,7 @@ class ProjectController extends Controller
         $validation = $project->validation;
 
         if (! $validation) {
-            $validation = new Validation();
+            $validation = new Validation;
             $validation->save();
             $project->validation()->associate($validation);
             $project->save();
@@ -302,7 +326,7 @@ class ProjectController extends Controller
         $validation = $project->validation;
 
         if (! $validation) {
-            $validation = new Validation();
+            $validation = new Validation;
             $validation->save();
             $project->validation()->associate($validation);
             $project->save();
@@ -414,6 +438,10 @@ class ProjectController extends Controller
         }
 
         $updater->update($project, $request->all());
+        if ($project->is_public) {
+            $project->updateDOIMetadata($this->doiService);
+            $project->addRelatedIdentifiers($this->doiService);
+        }
 
         return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('success', 'Project updated successfully');
     }
