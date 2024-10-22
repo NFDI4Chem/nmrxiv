@@ -67,16 +67,13 @@ class UpdateDOI extends Command
             foreach ($study->datasets as $dataset) {
                 echo $dataset->identifier."\r\n";
                 $dataset->updateDOIMetadata($this->doiService);
-                $dataset->addRelatedIdentifiers($this->doiService);
             }
             $study->updateDOIMetadata($this->doiService);
-            $study->addRelatedIdentifiers($this->doiService);
         }
 
         foreach ($projects as $project) {
             echo $project->identifier."\r\n";
             $project->updateDOIMetadata($this->doiService);
-            $project->addRelatedIdentifiers($this->doiService);
         }
     }
 }
