@@ -440,7 +440,6 @@ class ProjectController extends Controller
         $updater->update($project, $request->all());
         if ($project->is_public) {
             $project->updateDOIMetadata($this->doiService);
-            $project->addRelatedIdentifiers($this->doiService);
         }
 
         return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('success', 'Project updated successfully');

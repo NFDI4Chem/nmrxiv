@@ -94,7 +94,6 @@ class StudyController extends Controller
         $study->load(['datasets', 'sample.molecules', 'tags']);
         if ($study->is_public) {
             $study->updateDOIMetadata($this->doiService);
-            $study->addRelatedIdentifiers($this->doiService);
         }
 
         return $request->wantsJson()

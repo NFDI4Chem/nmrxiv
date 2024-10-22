@@ -39,17 +39,17 @@ class UpdateDOI
         }
 
         if ($project) {
-            $project->addRelatedIdentifiers($this->doiService);
+            $project->updateDOIMetadata($this->doiService);
             $studies = $project->studies;
         }
         if ($studies) {
             foreach ($studies as $study) {
                 if ($study instanceof Study) {
-                    $study->addRelatedIdentifiers($this->doiService);
+                    $study->updateDOIMetadata($this->doiService);
                     $datasets = $study->datasets;
                     foreach ($datasets as $dataset) {
                         if ($dataset instanceof Dataset) {
-                            $dataset->addRelatedIdentifiers($this->doiService);
+                            $dataset->updateDOIMetadata($this->doiService);
                         }
                     }
                 }
