@@ -37,6 +37,7 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
     public function __construct(Project $project)
     {
         $this->project = $project;
+
     }
 
     /**
@@ -45,7 +46,6 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
     public function handle(AssignIdentifier $assigner, UpdateDOI $updater, PublishProject $projectPublisher, PublishStudy $studyPublisher)
     {
         $project = $this->project;
-
         $project->status = 'processing';
         $project->save();
 
@@ -117,16 +117,19 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
             $logs = 'Moving files in progress';
 
             if ($project) {
+
                 $_studies = $project->studies;
                 if ($draft) {
                     $environment = env('APP_ENV', 'local');
 
                     foreach ($_studies as $study) {
                         // $study->users()->sync($project->user()->getDictionary());
+
                         $studyPath = preg_replace(
                             '~//+~',
                             '/',
                             $environment.'/samples/'.$study->uuid
+
                         );
 
                         $studyFSObjects = FileSystemObject::with('children')
@@ -154,11 +157,15 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                         }
                         $study->process_logs = $process_logs;
                         $study->draft_id = null;
-                        $study->project_id = null;
+                        if ($study->location) {
+                            $study->project_id = $study->location;
+                        } else {
+                            $study->project_id = null;
+                        }
 
                         foreach ($study->datasets as $dataset) {
                             $dataset->draft_id = null;
-                            $dataset->project_id = null;
+                            $dataset->project_id = $study->project_id;
                             $dataset->save();
                         }
 
@@ -167,7 +174,14 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                     }
                 }
                 $assigner->assign($_studies);
+
                 $release_date = Carbon::parse($project->release_date);
+                foreach ($_studies as $study) {
+                    if ($study->location) {
+                        $release_date = Carbon::now();
+                        $study->release_date = $release_date;
+                    }
+                }
 
                 if ($release_date->isPast()) {
                     foreach ($_studies as $study) {
@@ -176,7 +190,14 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                 }
                 $updater->update($_studies);
                 //Notification::send($this->prepareSendList($project), new StudyPublishNotification($_studies));
-                event(new StudyPublish($_studies, $this->prepareSendList($project)));
+
+                if ($study->location) {
+                    $selected_project = Project::where([['id', $study->location]])->firstOrFail();
+                    event(new StudyPublish($_studies, $this->prepareSendList($selected_project)));
+                    $study->location = null;
+                } else {
+                    event(new StudyPublish($_studies, $this->prepareSendList($project)));
+                }
 
                 $project->delete();
                 $draft->delete();
