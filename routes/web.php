@@ -25,6 +25,7 @@ use App\Http\Controllers\StudyInvitationController;
 use App\Http\Controllers\StudyMemberController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\UploadController;
+use App\Http\Controllers\UserController;
 use App\Models\Dataset;
 use App\Models\Molecule;
 use App\Models\Project;
@@ -395,3 +396,4 @@ Route::get('spectra', [StudyController::class, 'publicStudiesView'])
 Route::get('services/oembed', [OEmbedController::class, 'spectra']);
 
 Route::get('embed/{id}', [OEmbedController::class, 'embed'])->name('embed');
+Route::get('{user}/public-projects', [UserController::class, 'retrieveProjects'])->name('user.publicProjects');

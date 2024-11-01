@@ -274,7 +274,7 @@ class ProjectController extends Controller
         $validation = $project->validation;
 
         if (! $validation) {
-            $validation = new Validation();
+            $validation = new Validation;
             $validation->save();
             $project->validation()->associate($validation);
             $project->save();
@@ -302,7 +302,7 @@ class ProjectController extends Controller
         $validation = $project->validation;
 
         if (! $validation) {
-            $validation = new Validation();
+            $validation = new Validation;
             $validation->save();
             $project->validation()->associate($validation);
             $project->save();
@@ -327,7 +327,13 @@ class ProjectController extends Controller
         if ($project) {
             $input = $request->all();
             $release_date = $input['release_date'];
-            $enableProjectMode = $request->get('enableProjectMode');
+            $selected_project_id = $input['selected_project_id'];
+            $selected_project_license_id = $input['license_id'];
+            if ($selected_project_id) {
+                $enableProjectMode = false;
+            } else {
+                $enableProjectMode = $request->get('enableProjectMode');
+            }
             if ($enableProjectMode) {
                 $validation = $project->validation;
                 $validation->process();
@@ -363,10 +369,15 @@ class ProjectController extends Controller
                 $validation = $validation->fresh();
 
                 foreach ($project->studies as $study) {
-                    $study->license_id = $project->license_id;
+                    if ($selected_project_id) {
+                        $study->location = $selected_project_id;
+                        $study->license_id = $selected_project_license_id;
+                    } else {
+                        $study->license_id = $project->license_id;
+                    }
                     $study->save();
                     foreach ($study->datasets as $dataset) {
-                        $dataset->license_id = $project->license_id;
+                        $dataset->license_id = $study->license_id;
                         $dataset->save();
                     }
                 }
@@ -380,6 +391,7 @@ class ProjectController extends Controller
                 }
                 // add license check
                 if ($status) {
+
                     ProcessSubmission::dispatch($project);
 
                     return response()->json([

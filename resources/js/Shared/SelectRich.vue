@@ -10,7 +10,7 @@
                 class="relative w-full bg-white border border-gray-300 rounded-md shadow-sm pl-3 pr-10 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500 sm:text-sm"
             >
                 <span v-if="selected" class="block truncate">{{
-                    selected.title
+                    selected.title || selected.name
                 }}</span>
                 <span v-else class="block truncate">--Select--</span>
                 <span
@@ -51,7 +51,7 @@
                                     'block truncate',
                                 ]"
                             >
-                                <b>{{ item.title }}</b> <br />
+                                <b>{{ item.title || item.name }}</b> <br />
                                 <small
                                     v-if="item.description"
                                     v-html="item.description"
