@@ -188,15 +188,16 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                         $studyPublisher->publish($study);
                     }
                 }
-                $updater->update($_studies);
                 //Notification::send($this->prepareSendList($project), new StudyPublishNotification($_studies));
 
                 if ($study->location) {
                     $selected_project = Project::where([['id', $study->location]])->firstOrFail();
+                    $updater->update($selected_project);
                     event(new StudyPublish($_studies, $this->prepareSendList($selected_project)));
                     $study->location = null;
                 } else {
                     event(new StudyPublish($_studies, $this->prepareSendList($project)));
+                    $updater->update($_studies);
                 }
 
                 $project->delete();
