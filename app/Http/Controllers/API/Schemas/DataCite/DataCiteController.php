@@ -70,38 +70,38 @@ class DataCiteController extends Controller
      * )
      * )
      */
-    public function modelSchemaByName(Request $request, $username, $projectName, $studyName = null, $datasetName = null)
-    {
-        $user = User::where('username', $username)->firstOrFail();
-        if ($user) {
-            $project = Project::where([['slug', $projectName], ['owner_id', $user->id]])->firstOrFail();
-        }
-        if ($project) {
-            if ($studyName) {
-                // send study back without project info added to it\
-                $study = Study::where([['slug', $studyName], ['owner_id', $user->id], ['project_id', $project->id]])->firstOrFail();
-                if ($study) {
-                    if ($datasetName) {
-                        $dataset = Dataset::where([['slug', $datasetName], ['owner_id', $user->id], ['project_id', $project->id], ['study_id', $study->id]])->firstOrFail();
-                        // send dataset without project and study details
-                        if ($dataset) {
-                            $datasetDatacite = $dataset->datacite_schema;
+    // public function modelSchemaByName(Request $request, $username, $projectName, $studyName = null, $datasetName = null)
+    // {
+    //     $user = User::where('username', $username)->firstOrFail();
+    //     if ($user) {
+    //         $project = Project::where([['slug', $projectName], ['owner_id', $user->id]])->firstOrFail();
+    //     }
+    //     if ($project) {
+    //         if ($studyName) {
+    //             // send study back without project info added to it\
+    //             $study = Study::where([['slug', $studyName], ['owner_id', $user->id], ['project_id', $project->id]])->firstOrFail();
+    //             if ($study) {
+    //                 if ($datasetName) {
+    //                     $dataset = Dataset::where([['slug', $datasetName], ['owner_id', $user->id], ['project_id', $project->id], ['study_id', $study->id]])->firstOrFail();
+    //                     // send dataset without project and study details
+    //                     if ($dataset) {
+    //                         $datasetDatacite = $dataset->datacite_schema;
 
-                            return $datasetDatacite;
-                        }
-                    } else {
-                        $studyDatacite = $study->datacite_schema;
+    //                         return $datasetDatacite;
+    //                     }
+    //                 } else {
+    //                     $studyDatacite = $study->datacite_schema;
 
-                        return $studyDatacite;
-                    }
-                }
-            } else {
-                $projectDatacite = $project->datacite_schema;
+    //                     return $studyDatacite;
+    //                 }
+    //             }
+    //         } else {
+    //             $projectDatacite = $project->datacite_schema;
 
-                return $projectDatacite;
-            }
-        }
-    }
+    //             return $projectDatacite;
+    //         }
+    //     }
+    // }
 
     /**
      * Implement DataCite upon request by model id to generate a project, study, or dataset schema.
