@@ -83,6 +83,14 @@
                                 @blur="updateDraft"
                             />
                         </div>
+                        <jet-button
+                            v-if="publishForm.enableProjectMode"
+                            class="bg-gray-500 -mt-10 hover:bg-gray-700 float-right"
+                            @click="toggleManageProject"
+                        >
+                            {{ "+ Add to existing project" }}
+                        </jet-button>
+
                         <div v-if="publishForm.enableProjectMode">
                             <div class="p-4 bg-gray-100 rounded-md">
                                 <div id="project-name" class="mb-3">
@@ -677,6 +685,11 @@
                             ref="manageCitationElement"
                             :project="project"
                         />
+                        <manage-project
+                            ref="manageProjectElement"
+                            :project="project"
+                            @selected_project="handleProjectSelected"
+                        />
                     </div>
                 </div>
             </div>
@@ -790,6 +803,7 @@ import Validation from "@/Shared/Validation.vue";
 import Datepicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 import ManageAuthor from "@/Shared/ManageAuthor.vue";
+import ManageProject from "@/Shared/ManageProject.vue";
 import ToolTip from "@/Shared/ToolTip.vue";
 import ManageCitation from "@/Shared/ManageCitation.vue";
 import Citation from "@/Shared/Citation.vue";
@@ -856,15 +870,19 @@ export default {
         CitationCard,
         JetConfirmationModal,
         JetSuccessButton,
+        ManageProject,
     },
     props: ["user", "team", "project", "teamRole", "draft"],
 
     setup() {
         const manageAuthorElement = ref(null);
         const manageCitationElement = ref(null);
+        const manageProjectElement = ref(null);
+
         return {
             manageAuthorElement,
             manageCitationElement,
+            manageProjectElement,
         };
     },
 
@@ -886,6 +904,7 @@ export default {
                 terms: false,
                 enableProjectMode: false,
                 release_date: this.setReleaseDate(),
+                selected_project_id: null,
             }),
             licenses: null,
             license: null,
@@ -1121,6 +1140,9 @@ export default {
         toggleManageCitation() {
             this.manageCitationElement.toggleDialog();
         },
+        toggleManageProject() {
+            this.manageProjectElement.toggleDialog();
+        },
         publish() {
             this.showPublishConfirmationModal = false;
             if (this.publishForm.conditions && this.publishForm.terms) {
@@ -1148,6 +1170,14 @@ export default {
             } else {
                 return true;
             }
+        },
+
+        handleProjectSelected(selected_project) {
+            this.publishForm.selected_project_id = selected_project.id;
+            this.publishForm.license_id = selected_project.license_id;
+            this.publishForm.conditions = true;
+            this.publishForm.terms = true;
+            this.publish();
         },
         // trackProject() {
         //     axios
