@@ -76,46 +76,46 @@ class BioschemasController extends Controller
      * )
      * )
      */
-    public function modelSchemaByName(Request $request, $username, $projectName, $studyName = null, $datasetName = null)
-    {
-        $user = User::where('username', $username)->firstOrFail();
-        if ($user) {
-            $project = Project::where([['slug', $projectName], ['owner_id', $user->id]])->firstOrFail();
-        }
-        if ($project) {
-            if ($project->is_public) {
-                $projectSchema = $this->project($project);
-                if ($studyName) {
-                    $study = Study::where([['slug', $studyName], ['owner_id', $user->id], ['project_id', $project->id]])->firstOrFail();
-                    if ($study) {
-                        if ($study->is_public) {
-                            $studySchema = $this->study($study);
-                            if ($datasetName) {
-                                $dataset = Dataset::where([['slug', $datasetName], ['owner_id', $user->id], ['project_id', $project->id], ['study_id', $study->id]])->firstOrFail();
-                                if ($dataset) {
-                                    if ($dataset->is_public) {
-                                        $datasetSchema = $this->dataset($dataset);
-                                    } else {
-                                        throw new AuthorizationException;
-                                    }
+    // public function modelSchemaByName(Request $request, $username, $projectName, $studyName = null, $datasetName = null)
+    // {
+    //     $user = User::where('username', $username)->firstOrFail();
+    //     if ($user) {
+    //         $project = Project::where([['slug', $projectName], ['owner_id', $user->id]])->firstOrFail();
+    //     }
+    //     if ($project) {
+    //         if ($project->is_public) {
+    //             $projectSchema = $this->project($project);
+    //             if ($studyName) {
+    //                 $study = Study::where([['slug', $studyName], ['owner_id', $user->id], ['project_id', $project->id]])->firstOrFail();
+    //                 if ($study) {
+    //                     if ($study->is_public) {
+    //                         $studySchema = $this->study($study);
+    //                         if ($datasetName) {
+    //                             $dataset = Dataset::where([['slug', $datasetName], ['owner_id', $user->id], ['project_id', $project->id], ['study_id', $study->id]])->firstOrFail();
+    //                             if ($dataset) {
+    //                                 if ($dataset->is_public) {
+    //                                     $datasetSchema = $this->dataset($dataset);
+    //                                 } else {
+    //                                     throw new AuthorizationException;
+    //                                 }
 
-                                    return $datasetSchema;
-                                }
-                            }
+    //                                 return $datasetSchema;
+    //                             }
+    //                         }
 
-                            return $studySchema;
-                        } else {
-                            throw new AuthorizationException;
-                        }
-                    }
-                }
+    //                         return $studySchema;
+    //                     } else {
+    //                         throw new AuthorizationException;
+    //                     }
+    //                 }
+    //             }
 
-                return $projectSchema;
-            } else {
-                throw new AuthorizationException;
-            }
-        }
-    }
+    //             return $projectSchema;
+    //         } else {
+    //             throw new AuthorizationException;
+    //         }
+    //     }
+    // }
 
     /**
      * Implement Bioschemas upon request by model's id to generate a project, study, or dataset schema.
