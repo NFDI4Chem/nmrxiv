@@ -77,6 +77,59 @@ trait HasDOI
             $doi = $this->doi;
             if ($doi !== null) {
                 $attributes = $this->getMetadata();
+
+                if ($this instanceof Project) {
+                    foreach ($this->studies as &$study) {
+                        $relatedIdentifier = [
+                            'relatedIdentifier' => $study->doi,
+                            'relatedIdentifierType' => 'DOI',
+                            'relationType' => 'HasPart',
+                        ];
+                        array_push($attributes['relatedIdentifiers'], $relatedIdentifier);
+                        foreach ($study->datasets as &$dataset) {
+                            $relatedIdentifier = [
+                                'relatedIdentifier' => $dataset->doi,
+                                'relatedIdentifierType' => 'DOI',
+                                'relationType' => 'HasPart',
+                            ];
+                            array_push($attributes['relatedIdentifiers'], $relatedIdentifier);
+                        }
+                    }
+                } elseif ($this instanceof Study) {
+                    if ($this->project) {
+                        $relatedIdentifier = [
+                            'relatedIdentifier' => $this->project->doi,
+                            'relatedIdentifierType' => 'DOI',
+                            'relationType' => 'IsPartOf',
+                        ];
+                        array_push($attributes['relatedIdentifiers'], $relatedIdentifier);
+                    }
+                    foreach ($this->datasets as &$dataset) {
+                        $relatedIdentifier = [
+                            'relatedIdentifier' => $dataset->doi,
+                            'relatedIdentifierType' => 'DOI',
+                            'relationType' => 'HasPart',
+                        ];
+                        array_push($attributes['relatedIdentifiers'], $relatedIdentifier);
+                    }
+                } elseif ($this instanceof Dataset) {
+                    if ($this->project) {
+                        $relatedIdentifier = [
+                            'relatedIdentifier' => $this->project->doi,
+                            'relatedIdentifierType' => 'DOI',
+                            'relationType' => 'IsPartOf',
+                        ];
+                        array_push($attributes['relatedIdentifiers'], $relatedIdentifier);
+                    }
+
+                    $relatedIdentifier = [
+                        'relatedIdentifier' => $this->study->doi,
+                        'relatedIdentifierType' => 'DOI',
+                        'relationType' => 'IsPartOf',
+                    ];
+                    array_push($attributes['relatedIdentifiers'], $relatedIdentifier);
+                }
+
                 $doiResponse = $doiService->updateDOI($doi, $attributes);
                 $this->datacite_schema = $doiResponse;
                 $this->save();
@@ -132,6 +185,10 @@ trait HasDOI
             if ($this->project) {
                 $authors = $this->project->authors ? $this->project->authors : [];
                 $citations = $this->project->citations ? $this->project->citations : [];
+                foreach ($this->tags as &$tag) {
+                    $keyword = $tag->name;
+                    array_push($keywords, $keyword);
+                }
             }
 
         } elseif ($this instanceof Dataset) {
@@ -244,71 +301,5 @@ trait HasDOI
         ];
 
         return $attributes;
-    }
-
-    public function addRelatedIdentifiers($doiService)
-    {
-        $attributes = $this->getMetadata();
-        if ($this instanceof Project) {
-            foreach ($this->studies as &$study) {
-                $relatedIdentifier = [
-                    'relatedIdentifier' => $study->doi,
-                    'relatedIdentifierType' => 'DOI',
-                    'relationType' => 'HasPart',
-                ];
-                array_push($attributes['relatedIdentifiers'], $relatedIdentifier);
-                foreach ($study->datasets as &$dataset) {
-                    $relatedIdentifier = [
-                        'relatedIdentifier' => $dataset->doi,
-                        'relatedIdentifierType' => 'DOI',
-                        'relationType' => 'HasPart',
-                    ];
-                    array_push($attributes['relatedIdentifiers'], $relatedIdentifier);
-                }
-            }
-            $doiResponse = $doiService->updateDOI($this->doi, $attributes);
-            $this->datacite_schema = $doiResponse;
-            $this->save();
-
-        } elseif ($this instanceof Study) {
-            if ($this->project) {
-                $relatedIdentifier = [
-                    'relatedIdentifier' => $this->project->doi,
-                    'relatedIdentifierType' => 'DOI',
-                    'relationType' => 'IsPartOf',
-                ];
-                array_push($attributes['relatedIdentifiers'], $relatedIdentifier);
-            }
-            foreach ($this->datasets as &$dataset) {
-                $relatedIdentifier = [
-                    'relatedIdentifier' => $dataset->doi,
-                    'relatedIdentifierType' => 'DOI',
-                    'relationType' => 'HasPart',
-                ];
-                array_push($attributes['relatedIdentifiers'], $relatedIdentifier);
-            }
-            $doiResponse = $doiService->updateDOI($this->doi, $attributes);
-            $this->datacite_schema = $doiResponse;
-            $this->save();
-        } elseif ($this instanceof Dataset) {
-            if ($this->project) {
-                $relatedIdentifier = [
-                    'relatedIdentifier' => $this->project->doi,
-                    'relatedIdentifierType' => 'DOI',
-                    'relationType' => 'IsPartOf',
-                ];
-                array_push($attributes['relatedIdentifiers'], $relatedIdentifier);
-            }
-
-            $relatedIdentifier = [
-                'relatedIdentifier' => $this->study->doi,
-                'relatedIdentifierType' => 'DOI',
-                'relationType' => 'IsPartOf',
-            ];
-            array_push($attributes['relatedIdentifiers'], $relatedIdentifier);
-            $doiResponse = $doiService->updateDOI($this->doi, $attributes);
-            $this->datacite_schema = $doiResponse;
-            $this->save();
-        }
     }
 }

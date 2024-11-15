@@ -12,6 +12,7 @@ use App\Models\NMRium;
 use App\Models\Project;
 use App\Models\Sample;
 use App\Models\Study;
+use App\Services\DOI\DOIService;
 use Auth;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Auth\StatefulGuard;
@@ -28,6 +29,29 @@ use Maize\Markable\Models\Bookmark;
 
 class StudyController extends Controller
 {
+    /**
+     * The DOI service instance.
+     *
+     * @var \App\Services\DOI\DOIService
+     */
+    protected $doiService;
+
+    /**
+     * Create a new class instance.
+     *
+     * @return void
+     */
+    /**
+     * Create a new class instance.
+     *
+     * @return void
+     */
+    public function __construct(DOIService $doiService)
+    {
+        // Assign the DOI service instance
+        $this->doiService = $doiService;
+    }
+
     public function publicStudiesView(Request $request)
     {
         $moleculeId = $request->get('compound');
@@ -68,6 +92,9 @@ class StudyController extends Controller
         $study = $study->fresh();
 
         $study->load(['datasets', 'sample.molecules', 'tags']);
+        if ($study->is_public) {
+            $study->updateDOIMetadata($this->doiService);
+        }
 
         return $request->wantsJson()
             ? new JsonResponse($study, 200)

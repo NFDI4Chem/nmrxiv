@@ -77,7 +77,7 @@
                                 <button
                                     v-if="canUpdateProject"
                                     type="button"
-                                    class="inline-flex items-center shadow-sm px-4 py-1.5 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                    class="inline-flex items-center shadow-sm px-4 py-1.5 ml-2 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                                     @click="toggleDetails"
                                 >
                                     <svg
@@ -306,10 +306,7 @@
                                 </span>
                             </div>
                         </div>
-                        <div
-                            v-if="!canUpdateProject"
-                            class="flex-nowrap right ml-auto"
-                        >
+                        <div class="flex-nowrap right ml-auto">
                             <img
                                 v-if="project.project_photo_url"
                                 :src="project.project_photo_url"
@@ -921,7 +918,7 @@
                                 License
                             </span>
                             <button
-                                v-if="canUpdateProject"
+                                v-if="canUpdateProject && !project.is_public"
                                 type="button"
                                 class="inline-flex items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                                 @click="toggleDetails"
