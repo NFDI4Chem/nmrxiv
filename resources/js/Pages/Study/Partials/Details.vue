@@ -271,14 +271,14 @@
                                                         "
                                                     />
                                                 </div>
-                                                <fieldset>
+                                                <!-- <fieldset>
                                                     <legend
                                                         class="text-sm font-medium text-gray-900"
                                                     >
                                                         Privacy
                                                     </legend>
-                                                    <div class="mt-2 space-y-5">
-                                                        <!-- <div
+                                                    <div class="mt-2 space-y-5"> -->
+                                                <!-- <div
                                                             class="relative flex items-start"
                                                         >
                                                             <div
@@ -325,7 +325,7 @@
                                                                 </p>
                                                             </div>
                                                         </div> -->
-                                                        <div>
+                                                <!-- <div>
                                                             <div
                                                                 class="relative flex items-start"
                                                             >
@@ -378,7 +378,7 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </fieldset>
+                                                </fieldset> -->
                                             </div>
                                             <div class="pb-6">
                                                 <div
@@ -402,7 +402,7 @@
                                                             "
                                                             label="License"
                                                             :disabled="
-                                                                !canUpdateStudy
+                                                                study.is_public
                                                             "
                                                             :items="licenses"
                                                         />
@@ -439,6 +439,7 @@
                                                                 v-model="
                                                                     study.public_url
                                                                 "
+                                                                :readonly="true"
                                                                 type="text"
                                                                 class="rounded-l-md focus:ring-gray-500 focus:border-gray-500 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300"
                                                                 @focus="
@@ -482,6 +483,9 @@
                                                                     id="studyPublicDOICopy"
                                                                     v-model="
                                                                         study.doi
+                                                                    "
+                                                                    :readonly="
+                                                                        true
                                                                     "
                                                                     type="text"
                                                                     class="rounded-l-md focus:ring-gray-500 focus:border-gray-500 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300"
@@ -705,7 +709,7 @@
                                                         </div> 
                                                     </div>
                                                 </div>-->
-                                                <div class="mt-6 flex text-sm">
+                                                <!-- <div class="mt-6 flex text-sm">
                                                     <a
                                                         target="_blank"
                                                         href="https://docs.nmrxiv.org/submission-guides/sharing.html"
@@ -720,7 +724,7 @@
                                                             sharing
                                                         </span>
                                                     </a>
-                                                </div>
+                                                </div> -->
                                                 <div
                                                     class="mt-4 flex text-sm mb-6"
                                                 >
@@ -750,6 +754,27 @@
                                 <div
                                     class="flex-shrink-0 px-4 py-4 flex justify-end"
                                 >
+                                    <div class="flex items-center h-5">
+                                        <input
+                                            id="confirm"
+                                            v-model="confirmPublicAccess"
+                                            aria-describedby="confirm-description"
+                                            name="confirm"
+                                            type="checkbox"
+                                            class="focus:ring-teal-500 h-4 w-4 text-teal-600 border-gray-300 rounded"
+                                        />
+                                    </div>
+                                    <div class="ml-3 text-xs">
+                                        <label
+                                            for="confirm"
+                                            class="font-small text-red-700"
+                                            >I understand, if the study metadata
+                                            is updated, the study will keep its
+                                            same doi, but the doi will have new
+                                            metadata and therefore, a new
+                                            metadata version.
+                                        </label>
+                                    </div>
                                     <jet-action-message
                                         :on="form.recentlySuccessful"
                                         class="mr-3 py-2 text-green-200"
@@ -766,6 +791,7 @@
                                     <jet-button
                                         v-if="canUpdateStudy"
                                         type="submit"
+                                        :disabled="!confirmPublicAccess"
                                         class="ml-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
                                         @click="updateStudy"
                                     >
@@ -922,6 +948,7 @@ export default {
                 (option) => option.value == this.study.access_type
             )[0],
             linkAccess: this.study.access == "link",
+            confirmPublicAccess: false,
         };
     },
     computed: {
