@@ -278,7 +278,7 @@
                                                         Privacy
                                                     </legend>
                                                     <div class="mt-2 space-y-5"> -->
-                                                        <!-- <div
+                                                <!-- <div
                                                             class="relative flex items-start"
                                                         >
                                                             <div
@@ -325,7 +325,7 @@
                                                                 </p>
                                                             </div>
                                                         </div> -->
-                                                        <!-- <div>
+                                                <!-- <div>
                                                             <div
                                                                 class="relative flex items-start"
                                                             >
@@ -768,11 +768,11 @@
                                         <label
                                             for="confirm"
                                             class="font-small text-red-700"
-                                            >I understand, if the project
-                                            metadata is updated, the project
-                                            will keep its same doi, but the doi
-                                            will have new metadata and
-                                            therefore, a new metadata version.
+                                            >I understand, if the study metadata
+                                            is updated, the study will keep its
+                                            same doi, but the doi will have new
+                                            metadata and therefore, a new
+                                            metadata version.
                                         </label>
                                     </div>
                                     <jet-action-message
