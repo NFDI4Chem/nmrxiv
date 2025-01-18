@@ -9,7 +9,7 @@
             <div>
                 Find a project to publish your sample under. You can pick only a
                 project that has been published by you. <br />
-                The sample will get the same license as the chosen project and
+                The sample/s will get the same license as the chosen project and
                 will be made public shortly after publishing without embargo.
                 <br /><br />
             </div>
@@ -28,16 +28,16 @@
                 class="float-left text-md font-bold text-white mt-8 mr-2 bg-green-600"
                 @click="showPublishConfirmationModal = true"
             >
-                Publish now
+                Pick project
             </jet-secondary-button>
             <jet-confirmation-modal
                 :show="showPublishConfirmationModal"
                 @close="showPublishConfirmationModal = false"
             >
-                <template #title> Are you sure you want to publish? </template>
+                <template #title> Are you sure you want to pick that project? </template>
                 <template #content>
-                    Once the samples are published you will no longer be able to
-                    change their data or its location (the selected project).
+                    Once you confirm, all the fields you have filled in the last step will be overwritten by the 
+                    selected project details. 
                 </template>
                 <template #footer>
                     <jet-secondary-button
@@ -49,7 +49,7 @@
                         class="ml-2 font-bold text-white bg-green-600"
                         @click="save"
                     >
-                        Publish now
+                        Pick project
                     </jet-secondary-button>
                 </template>
             </jet-confirmation-modal>

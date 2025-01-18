@@ -830,6 +830,7 @@ import ToggleButton from "@/Shared/ToggleButton.vue";
 import "ontology-elements/dist/index.js";
 import JetConfirmationModal from "@/Jetstream/ConfirmationModal.vue";
 import JetSuccessButton from "@/Jetstream/SuccessButton.vue";
+import { router } from "@inertiajs/vue3";
 
 export default {
     components: {
@@ -906,6 +907,12 @@ export default {
                 release_date: this.setReleaseDate(),
                 selected_project_id: null,
             }),
+            citationsForm: this.$inertia.form({
+                citations: [],
+            }),
+            authorsForm: this.$inertia.form({
+                authors: [],
+            }),
             licenses: null,
             license: null,
             returnUrl: "/dashboard",
@@ -915,6 +922,7 @@ export default {
             validation: null,
             showPublishConfirmationModal: false,
             photoPreview: null,
+            version_one:null,
         };
     },
     computed: {
@@ -1082,6 +1090,8 @@ export default {
         },
         updateSpecies(species) {
             if (species && species != "") {
+                console.log(species);
+                console.log(typeof(species));
                 this.publishForm.species.push(species);
                 this.projectSpecies = "";
                 this.updateProject();
@@ -1136,12 +1146,17 @@ export default {
         },
         toggleManageAuthor() {
             this.manageAuthorElement.toggleDialog();
+            router.reload({ only: ["project"] });
         },
         toggleManageCitation() {
             this.manageCitationElement.toggleDialog();
+            router.reload({ only: ["project"] });
         },
         toggleManageProject() {
             this.manageProjectElement.toggleDialog();
+        },
+        duplicate(){
+
         },
         publish() {
             this.showPublishConfirmationModal = false;
@@ -1173,12 +1188,86 @@ export default {
         },
 
         handleProjectSelected(selected_project) {
+
             this.publishForm.selected_project_id = selected_project.id;
-            this.publishForm.license_id = selected_project.license_id;
-            this.publishForm.conditions = true;
-            this.publishForm.terms = true;
-            this.publish();
+            this.publishForm.name = selected_project.name;
+            this.publishForm.description = selected_project.description;
+            selected_project.tags.forEach((t) => {
+                this.publishForm.tags.push(t.name);
+            });
+            this.publishForm.species = JSON.parse(selected_project.species)
+            ? JSON.parse(selected_project.species)
+            : [];
+            this.project.citations = selected_project.citations;
+            console.log(this.project.citations);
+            this.saveCitations();
+            this.project.authors = selected_project.authors;
+            this.saveAuthors();
         },
+        
+        saveCitations() {
+            if (this.project.citations.length > 0) {
+                
+                let _citationObj = {};
+                this.project.citations.forEach((citation) => {
+                    
+                    for (var key in citation) {
+                        _citationObj[key] = citation.hasOwnProperty(key)
+                            ? citation[key]
+                            : null;
+                    }
+                    this.citationsForm.citations.push(_citationObj);
+                    _citationObj = {};
+                });
+            }
+            const keys = ["doi"];
+            this.citationsForm.citations = this.citationsForm.citations.filter(
+                (value, index, self) =>
+                    self.findIndex((v) =>
+                        keys.every((k) => v[k] === value[k])
+                    ) === index
+            );            
+            this.citationsForm.post(route("citation.save", this.project.id), {
+                preserveScroll: true,
+                onSuccess: () => {
+                    console.log(this.project.id);
+                    router.reload({ only: ["project"] });
+                    this.citationsForm.reset();
+                    // this.loadInitial();
+                    // this.form.reset();
+                    // this.displayAddCitationForms = false;
+                    // this.isEdit = false;
+                },
+                onError: (err) => console.error(err),
+            });
+        },
+        saveAuthors() {
+            this.authorsForm.authors = this.project.authors;
+            
+            const keys = ["given_name", "family_name"];
+            this.authorsForm.authors = this.authorsForm.authors.filter(
+                (value, index, self) =>
+                    self.findIndex((v) =>
+                        keys.every((k) => v[k] === value[k])
+                    ) === index
+            );
+            this.authorsForm.post(route("author.save", this.project.id), {
+                preserveScroll: true,
+                onSuccess: () => {
+                    // console.log(this.project.id);
+                    // router.reload({ only: ["project"] });
+                    // this.citationsForm.reset();
+                    // this.loadInitial();
+                    // this.form.reset();
+                    // this.displayAddCitationForms = false;
+                    // this.isEdit = false;
+                },
+                onError: (err) => console.error(err),
+            });
+        },
+        
+            
+
         // trackProject() {
         //     axios
         //         .get("/projects/status/" + this.project.id + "/queue")
