@@ -83,12 +83,32 @@
                                 @blur="updateDraft"
                             />
                         </div>
+
+                        <div v-if="publishForm.enableProjectMode">
+                            <label
+                                class="block tracking-wider text-sm font-medium text-gray-700, block text-sm font-medium text-gray-700"
+                            >
+                                <small v-if="publishForm.isVersion"
+                                    >PUBLISH WITHIN A NEW VERSION OF AN EXISTING
+                                    PROJECT</small
+                                >
+                                <small v-else>PUBLISH AS A NEW PROJECT</small>
+                            </label>
+                            <toggle-button
+                                v-model:enabled="publishForm.isVersion"
+                                @blur="updateDraft"
+                            />
+                        </div>
+
                         <jet-button
-                            v-if="publishForm.enableProjectMode"
+                            v-if="
+                                publishForm.enableProjectMode &&
+                                publishForm.isVersion
+                            "
                             class="bg-gray-500 -mt-10 hover:bg-gray-700 float-right"
                             @click="toggleManageProject"
                         >
-                            {{ "+ Add to existing project" }}
+                            {{ "+ Choose an existing project" }}
                         </jet-button>
 
                         <div v-if="publishForm.enableProjectMode">
@@ -458,23 +478,62 @@
                                     <div
                                         class="mt-6 grid grid-cols-1 gap-x-4 sm:grid-cols-1"
                                     >
-                                        <div v-if="licenses">
-                                            <span
-                                                class="float-right text-xs cursor-pointer hover:text-blue-700 mt-2"
-                                            >
-                                                <a
-                                                    target="_blank"
-                                                    href="https://docs.nmrxiv.org/submission-guides/licenses"
-                                                    >How to choose the right
-                                                    license?</a
+                                        <div v-if="!publishForm.isVersion">
+                                            <div v-if="licenses">
+                                                <span
+                                                    class="float-right text-xs cursor-pointer hover:text-blue-700 mt-2"
                                                 >
-                                            </span>
-                                            <select-rich
-                                                v-model:selected="license"
-                                                label="License"
-                                                :items="licenses"
-                                                @update:selected="updateProject"
-                                            />
+                                                    <a
+                                                        target="_blank"
+                                                        href="https://docs.nmrxiv.org/submission-guides/licenses"
+                                                        >How to choose the right
+                                                        license?</a
+                                                    >
+                                                </span>
+                                                <select-rich
+                                                    v-model:selected="license"
+                                                    label="License"
+                                                    :items="licenses"
+                                                    @update:selected="
+                                                        updateProject
+                                                    "
+                                                />
+                                            </div>
+                                        </div>
+                                        <div v-if="publishForm.isVersion">
+                                            <div
+                                                id="project-license"
+                                                class="mb-3"
+                                            >
+                                                <label
+                                                    for="project-license"
+                                                    class="block text-sm font-medium text-gray-500 after:content-['*'] after:ml-0.5 after:text-red-500"
+                                                >
+                                                    Project License
+                                                </label>
+                                                <div class="mt-1">
+                                                    <span
+                                                        v-if="
+                                                            publishForm.isVersion &&
+                                                            this.license
+                                                        "
+                                                        class="block w-full shadow-sm sm:text-sm border-gray-300 rounded-md p-2 bg-gray-100"
+                                                    >
+                                                        {{ this.license.title }}
+                                                    </span>
+                                                </div>
+                                                <p
+                                                    class="mt-1 text-sm text-gray-500"
+                                                >
+                                                    The license of published
+                                                    projects can't be edited. If
+                                                    you wish to publish your new
+                                                    samples under a different
+                                                    license, please publish them
+                                                    in a new project or as
+                                                    single samples.
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -906,6 +965,7 @@ export default {
                 enableProjectMode: false,
                 release_date: this.setReleaseDate(),
                 selected_project_id: null,
+                isVersion: false,
             }),
             citationsForm: this.$inertia.form({
                 citations: [],
@@ -922,7 +982,6 @@ export default {
             validation: null,
             showPublishConfirmationModal: false,
             photoPreview: null,
-            version_one:null,
         };
     },
     computed: {
@@ -954,14 +1013,9 @@ export default {
                 ? this.project.name
                 : this.draft.name;
             this.publishForm.enableProjectMode = this.draft.project_enabled;
+            this.publishForm.isVersion = this.draft.is_version;
             this.publishForm.description = this.project.description;
-            let tags = [];
-            this.project.tags.forEach((t) => {
-                tags.push({
-                    text: t.name["en"],
-                });
-            });
-            this.publishForm.tags = tags;
+            this.publishForm.tags = this.mapTags(this.project.tags);
             this.license = this.project.license;
             this.status =
                 this.project.status && this.project.status != ""
@@ -1026,6 +1080,7 @@ export default {
         updateDraft() {
             axios.put("/dashboard/drafts/" + this.draft.id, {
                 project_enabled: this.publishForm.enableProjectMode ? 1 : 0,
+                is_version: this.publishForm.isVersion ? 1 : 0,
             });
         },
         updateProject() {
@@ -1051,7 +1106,6 @@ export default {
                 this.publishForm.tag = "";
             }
             this.loadingStep = true;
-
             this.publishForm.license_id = this.license ? this.license.id : null;
             this.publishForm.species = this.publishForm.species;
             this.publishForm.owner_id = this.project.owner_id;
@@ -1090,8 +1144,8 @@ export default {
         },
         updateSpecies(species) {
             if (species && species != "") {
-                console.log(species);
-                console.log(typeof(species));
+                // console.log(species);
+                // console.log(typeof species);
                 this.publishForm.species.push(species);
                 this.projectSpecies = "";
                 this.updateProject();
@@ -1155,9 +1209,7 @@ export default {
         toggleManageProject() {
             this.manageProjectElement.toggleDialog();
         },
-        duplicate(){
-
-        },
+        duplicate() {},
         publish() {
             this.showPublishConfirmationModal = false;
             if (this.publishForm.conditions && this.publishForm.terms) {
@@ -1188,29 +1240,40 @@ export default {
         },
 
         handleProjectSelected(selected_project) {
-
             this.publishForm.selected_project_id = selected_project.id;
             this.publishForm.name = selected_project.name;
             this.publishForm.description = selected_project.description;
-            selected_project.tags.forEach((t) => {
-                this.publishForm.tags.push(t.name);
-            });
+            this.publishForm.license_id = selected_project.license_id;
+            this.getLicense(selected_project.license_id);
+            // this.publishForm.tags = selected_project.tags;
+            // console.log("handleProjectSelected" + this.publishForm.tags_array);
+            this.publishForm.tags = this.mapTags(selected_project.tags);
+            // todo: import photo
+            // todo: fix citations
+            this.publishForm.tags_array = this.publishForm.tags
+                ? this.publishForm.tags.map((a) => a.text)
+                : [];
+
+            // selected_project.tags.forEach((t) => {
+            //     this.publishForm.tags.push(t.name["en"]);
+            //     this.publishForm.tags_array.push(t.name["en"]);
+            //     console.log("handleProjectSelected"+this.publishForm.tags_array);
+            // });
             this.publishForm.species = JSON.parse(selected_project.species)
-            ? JSON.parse(selected_project.species)
-            : [];
+                ? JSON.parse(selected_project.species)
+                : [];
+
             this.project.citations = selected_project.citations;
-            console.log(this.project.citations);
             this.saveCitations();
             this.project.authors = selected_project.authors;
             this.saveAuthors();
+            this.updateProject();
         },
-        
+
         saveCitations() {
             if (this.project.citations.length > 0) {
-                
                 let _citationObj = {};
                 this.project.citations.forEach((citation) => {
-                    
                     for (var key in citation) {
                         _citationObj[key] = citation.hasOwnProperty(key)
                             ? citation[key]
@@ -1226,24 +1289,46 @@ export default {
                     self.findIndex((v) =>
                         keys.every((k) => v[k] === value[k])
                     ) === index
-            );            
-            this.citationsForm.post(route("citation.save", this.project.id), {
-                preserveScroll: true,
-                onSuccess: () => {
-                    console.log(this.project.id);
-                    router.reload({ only: ["project"] });
-                    this.citationsForm.reset();
+            );
+
+            axios
+                .post(
+                    route("citation.save", this.project.id),
+                    this.citationsForm,
+                    {
+                        headers: {
+                            "Content-Type": "application/json", // Set content type for JSON
+                        },
+                    }
+                )
+                .then(() => {
+                    // router.reload({ only: ["project"] }); // Refresh project data
+                    // this.citationsForm.reset();
+                    // Uncomment if needed
                     // this.loadInitial();
-                    // this.form.reset();
                     // this.displayAddCitationForms = false;
                     // this.isEdit = false;
-                },
-                onError: (err) => console.error(err),
-            });
+                })
+                .catch((err) => {
+                    console.error("Error saving citation:", err);
+                });
+
+            // this.citationsForm.post(route("citation.save", this.project.id), {
+            //     preserveScroll: true,
+            //     onSuccess: () => {
+            //         router.reload({ only: ["project"] });
+            //         this.citationsForm.reset();
+            //         // this.loadInitial();
+            //         // this.form.reset();
+            //         // this.displayAddCitationForms = false;
+            //         // this.isEdit = false;
+            //     },
+            //     onError: (err) => console.error(err),
+            // });
         },
         saveAuthors() {
             this.authorsForm.authors = this.project.authors;
-            
+
             const keys = ["given_name", "family_name"];
             this.authorsForm.authors = this.authorsForm.authors.filter(
                 (value, index, self) =>
@@ -1251,22 +1336,52 @@ export default {
                         keys.every((k) => v[k] === value[k])
                     ) === index
             );
-            this.authorsForm.post(route("author.save", this.project.id), {
-                preserveScroll: true,
-                onSuccess: () => {
-                    // console.log(this.project.id);
-                    // router.reload({ only: ["project"] });
-                    // this.citationsForm.reset();
+            axios
+                .post(route("author.save", this.project.id), this.authorsForm, {
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                })
+                .then(() => {
+                    // Uncomment if needed
+                    // router.reload({ only: ["project"] }); // Refresh project data
+                    // this.authorsForm = { authors: [] }; // Reset authors form manually
                     // this.loadInitial();
-                    // this.form.reset();
                     // this.displayAddCitationForms = false;
                     // this.isEdit = false;
-                },
-                onError: (err) => console.error(err),
+                })
+                .catch((err) => {
+                    console.error("Error saving authors:", err);
+                });
+
+            // this.authorsForm.post(route("author.save", this.project.id), {
+            //     preserveScroll: true,
+            //     onSuccess: () => {
+            //         // console.log(this.project.id);
+            //         // router.reload({ only: ["project"] });
+            //         // this.citationsForm.reset();
+            //         // this.loadInitial();
+            //         // this.form.reset();
+            //         // this.displayAddCitationForms = false;
+            //         // this.isEdit = false;
+            //     },
+            //     onError: (err) => console.error(err),
+            // });
+        },
+        getLicense(license_id) {
+            axios.get(route("license", { id: license_id })).then((res) => {
+                this.license = res.data[0];
             });
         },
-        
-            
+        mapTags(mapped) {
+            let tags = [];
+            mapped.forEach((t) => {
+                tags.push({
+                    text: t.name["en"],
+                });
+            });
+            return tags;
+        },
 
         // trackProject() {
         //     axios

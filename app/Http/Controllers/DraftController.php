@@ -123,8 +123,16 @@ class DraftController extends Controller
         } else {
             $project_enabled = false;
         }
+
+        $is_version = $request->has('is_version') ? $request->get('is_version') : $draft->is_version;
+        if ($is_version == 1) {
+            $is_version = true;
+        } else {
+            $is_version = false;
+        }
         $draft->name = $request->get('name') ? $request->get('name') : $draft->name;
         $draft->project_enabled = $project_enabled;
+        $draft->is_version = $is_version;
         $draft->current_step = $request->get('current_step') ? $request->get('current_step') : 1;
         $draft->save();
 

@@ -103,9 +103,7 @@ export default {
     computed: {
         proxySelected: {
             get() {
-                
                 return this.selected;
-
             },
 
             set(val) {

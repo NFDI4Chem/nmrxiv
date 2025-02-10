@@ -15,17 +15,32 @@ class UpdateProject
     /**
      * Create a project.
      *
-     * @return \App\Models\Project
+     * @return \App\Models\Project 
      */
     public function update(Project $project, array $input)
     {
+        $draft = $project->draft;
+        // echo $draft->relative_url;
         $errorMessages = [
             'license.required_if' => 'The license field is required when the project is made public.',
         ];
         Validator::make($input, [
-            'name' => ['required', 'string', 'max:255',  Rule::unique('projects')
-                ->where('owner_id', $project->owner_id)->ignore($project->id), ],
-            'license' => ['required_if:is_public,"true"'],
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('projects')
+                    ->where(function ($query) use ($project, $draft) {
+                        $query->where('owner_id', $project->owner_id);
+        
+                        // Add the condition to skip uniqueness check if is_version is true
+                        if ($draft->is_version) {
+                            $query->whereRaw('1 = 0'); // Always false, bypass unique check
+                        }
+                    })
+                    ->ignore($project->id), // Ignore the current project during the check
+            ],
+            'license' => ['required_if:is_public,true'],
         ], $errorMessages)->validate();
 
         return DB::transaction(function () use ($input, $project) {
@@ -79,7 +94,10 @@ class UpdateProject
                 ->save();
 
             if (array_key_exists('tags_array', $input)) {
+                echo 'tags_array,php'.json_encode($input['tags_array']);
                 $project->syncTagsWithType($input['tags_array'], 'Project');
+            } else {
+                echo 'naaah';
             }
 
             $studies = $project->studies;

@@ -78,12 +78,12 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                     }
 
                     $logs = $logs.'<br/> Moving files complete <br/> Deleteing draft';
-
+                    echo $logs;
                     $draft->delete();
                 }
 
                 $process_logs = json_decode($project->process_logs, true);
-
+                
                 $process_log = [Carbon::now()->timestamp => $logs];
 
                 if (! is_null($process_logs)) {
@@ -98,6 +98,7 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                 $project->draft_id = null;
 
                 $project->status = 'complete';
+                echo $project->status;
 
                 $project->save();
 
@@ -108,6 +109,7 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                 if ($release_date->isPast()) {
                     $projectPublisher->publish($project);
                 }
+
                 $updater->update($project->fresh());
                 ArchiveProject::dispatch($project);
 
@@ -157,15 +159,12 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                         }
                         $study->process_logs = $process_logs;
                         $study->draft_id = null;
-                        if ($study->location) {
-                            $study->project_id = $study->location;
-                        } else {
-                            $study->project_id = null;
-                        }
+                        $study->project_id = null;
+                        
 
                         foreach ($study->datasets as $dataset) {
                             $dataset->draft_id = null;
-                            $dataset->project_id = $study->project_id;
+                            $dataset->project_id = null;
                             $dataset->save();
                         }
 
@@ -176,29 +175,17 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                 $assigner->assign($_studies);
 
                 $release_date = Carbon::parse($project->release_date);
-                foreach ($_studies as $study) {
-                    if ($study->location) {
-                        $release_date = Carbon::now();
-                        $study->release_date = $release_date;
-                    }
-                }
+                
 
                 if ($release_date->isPast()) {
                     foreach ($_studies as $study) {
                         $studyPublisher->publish($study);
                     }
                 }
+                $updater->update($_studies);
                 //Notification::send($this->prepareSendList($project), new StudyPublishNotification($_studies));
-
-                if ($study->location) {
-                    $selected_project = Project::where([['id', $study->location]])->firstOrFail();
-                    $updater->update($selected_project);
-                    event(new StudyPublish($_studies, $this->prepareSendList($selected_project)));
-                    $study->location = null;
-                } else {
-                    event(new StudyPublish($_studies, $this->prepareSendList($project)));
-                    $updater->update($_studies);
-                }
+                event(new StudyPublish($_studies, $this->prepareSendList($project)));
+                
 
                 $project->delete();
                 $draft->delete();

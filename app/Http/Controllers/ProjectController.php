@@ -322,33 +322,68 @@ class ProjectController extends Controller
         return $validation->fresh();
     }
 
-    public function publish(Request $request, Project $project, PublishProject $publisher, UpdateProject $updater)
+    public function publish(Request $request, Project $project, PublishProject $publisher, UpdateProject $updater, DeleteProject $creator)
     {
         if ($project) {
             $input = $request->all();
             $release_date = $input['release_date'];
-            $selected_project_id = $input['selected_project_id'];
-            $selected_project_license_id = $input['license_id'];
-            if ($selected_project_id) {
-                $enableProjectMode = false;
-            } else {
-                $enableProjectMode = $request->get('enableProjectMode');
-            }
+            $enableProjectMode = $request->get('enableProjectMode');
+            $isVersion = $request->get('isVersion');
+            
+            // if ($selected_project_id) {
+            //     $enableProjectMode = false;
+            // } else {
+            //     $enableProjectMode = $request->get('enableProjectMode');
+            // }
             if ($enableProjectMode) {
+                
                 $validation = $project->validation;
                 $validation->process();
                 $validation = $validation->fresh();
+                
                 if ($validation['report']['project']['status']) {
-                    $project->release_date = $request->get('release_date');
-                    $project->status = 'queued';
+                    $project->release_date = $release_date;
+                    $project->status = 'queued'; 
                     $project->save();
-
+                    if ($isVersion){
+                        $selected_project_id = $input['selected_project_id'];
+                        // $selected_project_license_id = $input['license_id'];
+                        // echo "selected_project_id".$selected_project_id;
+                        $selected_project = Project::where('id', $selected_project_id)->firstOrFail();
+                        $selected_project->draft_id = $project->draft_id;
+                        $selected_project->name = $project->name;
+                        $selected_project->slug = $project->slug;
+                        $selected_project->description = $project->description;
+                        $selected_project->species = $project->species;
+                        $selected_project->tags = $project->tags;
+                        // $selected_project->citations = $project->citations;
+                        // $selected_project->authors = $project->authors;                        
+                        $selected_project->save();
+                        foreach ($project->studies as $study) {
+                            if (!$study->is_public) {
+                                $study->project_id = $selected_project_id;
+                                $study->license_id = $selected_project->license_id;
+                                $study->save();
+                                foreach ($study->datasets as $dataset) {
+                                    if (!$dataset->is_public) {
+                                        $dataset->project_id = $selected_project_id;
+                                        $dataset->license_id = $study->license_id;
+                                        $dataset->save();
+                                    }
+                                }
+                            }
+                        }
+                        $creator->deletePermanent($project);
+                        $project = $selected_project;
+                    }
+                    
                     ProcessSubmission::dispatch($project);
-
                     return response()->json([
                         'project' => $project,
                         'validation' => $validation,
                     ]);
+
+                    
                 } else {
                     return response()->json([
                         'errors' => 'Validation failing. Please provide all the required data and try again. If the problem persists, please contact us.',
@@ -369,15 +404,10 @@ class ProjectController extends Controller
                 $validation = $validation->fresh();
 
                 foreach ($project->studies as $study) {
-                    if ($selected_project_id) {
-                        $study->location = $selected_project_id;
-                        $study->license_id = $selected_project_license_id;
-                    } else {
-                        $study->license_id = $project->license_id;
-                    }
+                    $study->license_id = $project->license_id;
                     $study->save();
                     foreach ($study->datasets as $dataset) {
-                        $dataset->license_id = $study->license_id;
+                        $dataset->license_id = $project->license_id;
                         $dataset->save();
                     }
                 }

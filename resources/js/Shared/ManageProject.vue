@@ -7,8 +7,8 @@
         <template #title> Add Your Sample to a Published Project </template>
         <template #content>
             <div>
-                Find a project to publish your sample under. You can pick only a
-                project that has been published by you. <br />
+                Choose a project to publish your sample/s under. You can pick
+                only a project that has been published by you. <br />
                 The sample/s will get the same license as the chosen project and
                 will be made public shortly after publishing without embargo.
                 <br /><br />
@@ -34,10 +34,12 @@
                 :show="showPublishConfirmationModal"
                 @close="showPublishConfirmationModal = false"
             >
-                <template #title> Are you sure you want to pick that project? </template>
+                <template #title>
+                    Are you sure you want to pick that project?
+                </template>
                 <template #content>
-                    Once you confirm, all the fields you have filled in the last step will be overwritten by the 
-                    selected project details. 
+                    Once you confirm, all the fields you have filled in the last
+                    step will be overwritten by the selected project details.
                 </template>
                 <template #footer>
                     <jet-secondary-button
@@ -49,7 +51,7 @@
                         class="ml-2 font-bold text-white bg-green-600"
                         @click="save"
                     >
-                        Pick project
+                        Confirm project
                     </jet-secondary-button>
                 </template>
             </jet-confirmation-modal>

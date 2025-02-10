@@ -14,20 +14,17 @@ class UserController extends Controller
     {
         return Project::where('owner_id', $user->id)
             ->where('is_public', true)
-            ->with(['tags:name', 'citations', 'authors'])
-            ->get(['id', 'name', 'description', 'license_id', 'species'])
+            ->with(['tags', 'citations', 'authors'])
+            ->get(['id', 'name', 'description', 'license_id', 'species', 'project_photo_path'])
             ->map(function ($project) {
                 return [
                     'id' => $project->id, 
                     'name' => $project->name,
                     'description' => $project->description,
                     'license_id' => $project->license_id,
-                    'tags' => $project->tags->map(function ($tag) {
-                        return [
-                            'name' => $tag->name,
-                        ];
-                    }),
+                    'tags' => $project->tags,
                     'species' => $project->species,
+                    'project_photo_path' => $project->project_photo_path,
                     'citations' => $project->citations,
                     'authors' => $project->authors->map(function ($author) {
                     return array_merge($author->toArray(), [
