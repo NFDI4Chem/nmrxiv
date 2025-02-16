@@ -1144,8 +1144,6 @@ export default {
         },
         updateSpecies(species) {
             if (species && species != "") {
-                // console.log(species);
-                // console.log(typeof species);
                 this.publishForm.species.push(species);
                 this.projectSpecies = "";
                 this.updateProject();
@@ -1209,7 +1207,6 @@ export default {
         toggleManageProject() {
             this.manageProjectElement.toggleDialog();
         },
-        duplicate() {},
         publish() {
             this.showPublishConfirmationModal = false;
             if (this.publishForm.conditions && this.publishForm.terms) {
@@ -1245,8 +1242,6 @@ export default {
             this.publishForm.description = selected_project.description;
             this.publishForm.license_id = selected_project.license_id;
             this.getLicense(selected_project.license_id);
-            // this.publishForm.tags = selected_project.tags;
-            // console.log("handleProjectSelected" + this.publishForm.tags_array);
             this.publishForm.tags = this.mapTags(selected_project.tags);
             // todo: import photo
             // todo: fix citations
@@ -1254,11 +1249,6 @@ export default {
                 ? this.publishForm.tags.map((a) => a.text)
                 : [];
 
-            // selected_project.tags.forEach((t) => {
-            //     this.publishForm.tags.push(t.name["en"]);
-            //     this.publishForm.tags_array.push(t.name["en"]);
-            //     console.log("handleProjectSelected"+this.publishForm.tags_array);
-            // });
             this.publishForm.species = JSON.parse(selected_project.species)
                 ? JSON.parse(selected_project.species)
                 : [];
@@ -1301,30 +1291,9 @@ export default {
                         },
                     }
                 )
-                .then(() => {
-                    // router.reload({ only: ["project"] }); // Refresh project data
-                    // this.citationsForm.reset();
-                    // Uncomment if needed
-                    // this.loadInitial();
-                    // this.displayAddCitationForms = false;
-                    // this.isEdit = false;
-                })
                 .catch((err) => {
                     console.error("Error saving citation:", err);
                 });
-
-            // this.citationsForm.post(route("citation.save", this.project.id), {
-            //     preserveScroll: true,
-            //     onSuccess: () => {
-            //         router.reload({ only: ["project"] });
-            //         this.citationsForm.reset();
-            //         // this.loadInitial();
-            //         // this.form.reset();
-            //         // this.displayAddCitationForms = false;
-            //         // this.isEdit = false;
-            //     },
-            //     onError: (err) => console.error(err),
-            // });
         },
         saveAuthors() {
             this.authorsForm.authors = this.project.authors;
@@ -1342,31 +1311,9 @@ export default {
                         "Content-Type": "application/json",
                     },
                 })
-                .then(() => {
-                    // Uncomment if needed
-                    // router.reload({ only: ["project"] }); // Refresh project data
-                    // this.authorsForm = { authors: [] }; // Reset authors form manually
-                    // this.loadInitial();
-                    // this.displayAddCitationForms = false;
-                    // this.isEdit = false;
-                })
                 .catch((err) => {
                     console.error("Error saving authors:", err);
                 });
-
-            // this.authorsForm.post(route("author.save", this.project.id), {
-            //     preserveScroll: true,
-            //     onSuccess: () => {
-            //         // console.log(this.project.id);
-            //         // router.reload({ only: ["project"] });
-            //         // this.citationsForm.reset();
-            //         // this.loadInitial();
-            //         // this.form.reset();
-            //         // this.displayAddCitationForms = false;
-            //         // this.isEdit = false;
-            //     },
-            //     onError: (err) => console.error(err),
-            // });
         },
         getLicense(license_id) {
             axios.get(route("license", { id: license_id })).then((res) => {

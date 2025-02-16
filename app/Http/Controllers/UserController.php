@@ -18,7 +18,7 @@ class UserController extends Controller
             ->get(['id', 'name', 'description', 'license_id', 'species', 'project_photo_path'])
             ->map(function ($project) {
                 return [
-                    'id' => $project->id, 
+                    'id' => $project->id,
                     'name' => $project->name,
                     'description' => $project->description,
                     'license_id' => $project->license_id,
@@ -27,10 +27,10 @@ class UserController extends Controller
                     'project_photo_path' => $project->project_photo_path,
                     'citations' => $project->citations,
                     'authors' => $project->authors->map(function ($author) {
-                    return array_merge($author->toArray(), [
-                        'contributor_type' => $author->pivot->contributor_type, 
-                    ]);
-                }),
+                        return array_merge($author->toArray(), [
+                            'contributor_type' => $author->pivot->contributor_type,
+                        ]);
+                    }),
                 ];
             })
             ->toArray();

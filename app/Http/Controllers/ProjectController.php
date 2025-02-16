@@ -329,26 +329,25 @@ class ProjectController extends Controller
             $release_date = $input['release_date'];
             $enableProjectMode = $request->get('enableProjectMode');
             $isVersion = $request->get('isVersion');
-            
+
             // if ($selected_project_id) {
             //     $enableProjectMode = false;
             // } else {
             //     $enableProjectMode = $request->get('enableProjectMode');
             // }
             if ($enableProjectMode) {
-                
+
                 $validation = $project->validation;
                 $validation->process();
                 $validation = $validation->fresh();
-                
+
                 if ($validation['report']['project']['status']) {
                     $project->release_date = $release_date;
-                    $project->status = 'queued'; 
+                    $project->status = 'queued';
                     $project->save();
-                    if ($isVersion){
+                    if ($isVersion) {
                         $selected_project_id = $input['selected_project_id'];
-                        // $selected_project_license_id = $input['license_id'];
-                        // echo "selected_project_id".$selected_project_id;
+                        $selected_project_license_id = $input['license_id'];
                         $selected_project = Project::where('id', $selected_project_id)->firstOrFail();
                         $selected_project->draft_id = $project->draft_id;
                         $selected_project->name = $project->name;
@@ -357,15 +356,15 @@ class ProjectController extends Controller
                         $selected_project->species = $project->species;
                         $selected_project->tags = $project->tags;
                         // $selected_project->citations = $project->citations;
-                        // $selected_project->authors = $project->authors;                        
+                        // $selected_project->authors = $project->authors;
                         $selected_project->save();
                         foreach ($project->studies as $study) {
-                            if (!$study->is_public) {
+                            if (! $study->is_public) {
                                 $study->project_id = $selected_project_id;
                                 $study->license_id = $selected_project->license_id;
                                 $study->save();
                                 foreach ($study->datasets as $dataset) {
-                                    if (!$dataset->is_public) {
+                                    if (! $dataset->is_public) {
                                         $dataset->project_id = $selected_project_id;
                                         $dataset->license_id = $study->license_id;
                                         $dataset->save();
@@ -373,17 +372,17 @@ class ProjectController extends Controller
                                 }
                             }
                         }
-                        $creator->deletePermanent($project);
+                        $project->delete();
                         $project = $selected_project;
                     }
-                    
+
                     ProcessSubmission::dispatch($project);
+
                     return response()->json([
                         'project' => $project,
                         'validation' => $validation,
                     ]);
 
-                    
                 } else {
                     return response()->json([
                         'errors' => 'Validation failing. Please provide all the required data and try again. If the problem persists, please contact us.',

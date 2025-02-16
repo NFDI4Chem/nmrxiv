@@ -18,10 +18,9 @@ use Laravel\Scout\Searchable;
 use Maize\Markable\Markable;
 use Maize\Markable\Models\Bookmark;
 use Maize\Markable\Models\Like;
+use Mpociot\Versionable\VersionableTrait;
 use OwenIt\Auditing\Contracts\Auditable;
 use Spatie\Tags\HasTags;
-use Mpociot\Versionable\VersionableTrait;  
-
 use Storage;
 
 class Project extends Model implements Auditable
