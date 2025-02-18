@@ -64,6 +64,49 @@ class Project extends Model implements Auditable
     ];
 
     /**
+     * All fields that don't result in project versioning when updated.
+     *
+     * @var array
+     */
+    protected $dontVersionFields = ['name',
+        'slug',
+        'color',
+        'starred',
+        'location',
+        'is_public',
+        'is_deleted',
+        'is_archived',
+        'status',
+        'process_logs',
+        'location',
+        'obfuscationcode',
+        'description',
+        'sort_order',
+        'type',
+        'uuid',
+        'access',
+        'access_type',
+        'team_id',
+        'owner_id',
+        'license_id',
+        'draft_id',
+        'fs_id',
+        'release_date',
+        'project_photo_path',
+        'created_at',
+        'updated_at',
+        'datacite_schema',
+        'identifier',
+        'validation_id',
+        'validation_status',
+        'schema_version',
+        'internal_status',
+        'deleted_on',
+        'species',
+        'download_url',
+        'latest_version'];
+
+    /**
      * The accessors to append to the model's array form.
      *
      * @var array

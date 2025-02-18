@@ -49,9 +49,9 @@ class AssignIdentifier
 
                 $project->identifier = $projectIdentifier;
                 $project->save();
-                $project->fresh()->generateDOI($this->doiService);
-            }
 
+            }
+            $project->fresh()->generateDOI($this->doiService);
             $studies = $project->studies;
         }
 

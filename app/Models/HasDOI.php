@@ -11,13 +11,19 @@ trait HasDOI
         if (! is_null($doi_host)) {
             $identifier = $this->getIdentifier($this, 'identifier');
 
-            if ($this->doi == null) {
+            if ($this->doi == null || $this instanceof Project) {
                 $suffix = null;
                 $url = 'https://www.nmrxiv.org/';
 
                 if ($this instanceof Project) {
                     $suffix = 'P'.$identifier;
-                    $url = $url.'P'.$identifier;
+                    if ($this->doi != null) {
+                        $latestVersion = $this->latest_version;
+                        if ($latestVersion > 1) {
+                            $suffix = $suffix.'.v'.$latestVersion;
+                        }
+                    }
+                    $url = $url.$suffix;
                     $resourceType = 'Project';
 
                 } elseif ($this instanceof Study) {

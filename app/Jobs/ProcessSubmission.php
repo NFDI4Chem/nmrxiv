@@ -83,7 +83,7 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                 }
 
                 $process_logs = json_decode($project->process_logs, true);
-                
+
                 $process_log = [Carbon::now()->timestamp => $logs];
 
                 if (! is_null($process_logs)) {
@@ -98,10 +98,9 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                 $project->draft_id = null;
 
                 $project->status = 'complete';
-                echo $project->status;
 
                 $project->save();
-
+                // $latestVersion = $project->versions()->latest()->first();
                 $assigner->assign($project->fresh());
 
                 $release_date = Carbon::parse($project->release_date);
@@ -114,6 +113,7 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                 ArchiveProject::dispatch($project);
 
                 $project->sendNotification('publish', $this->prepareSendList($project));
+
             }
         } else {
             $logs = 'Moving files in progress';
@@ -160,7 +160,6 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                         $study->process_logs = $process_logs;
                         $study->draft_id = null;
                         $study->project_id = null;
-                        
 
                         foreach ($study->datasets as $dataset) {
                             $dataset->draft_id = null;
@@ -175,7 +174,6 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                 $assigner->assign($_studies);
 
                 $release_date = Carbon::parse($project->release_date);
-                
 
                 if ($release_date->isPast()) {
                     foreach ($_studies as $study) {
@@ -185,7 +183,6 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                 $updater->update($_studies);
                 //Notification::send($this->prepareSendList($project), new StudyPublishNotification($_studies));
                 event(new StudyPublish($_studies, $this->prepareSendList($project)));
-                
 
                 $project->delete();
                 $draft->delete();

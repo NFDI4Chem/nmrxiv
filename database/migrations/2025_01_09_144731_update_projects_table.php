@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('projects', function (Blueprint $table) {
-            $table->integer('latest_version')->default(1)->nullable();
-            $table->dropUnique(['name', 'owner_id']); 
+            $table->integer('latest_version')->default(0)->nullable();
+            $table->dropUnique(['name', 'owner_id']);
         });
     }
 
@@ -23,6 +23,6 @@ return new class extends Migration
     public function down(): void
     {
         $table->dropColumn('latest_version');
-        
+
     }
 };

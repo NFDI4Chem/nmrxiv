@@ -375,6 +375,8 @@ class ProjectController extends Controller
                         $project->delete();
                         $project = $selected_project;
                     }
+                    $project->latest_version += 1;
+                    $project->save();
 
                     ProcessSubmission::dispatch($project);
 
