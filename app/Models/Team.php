@@ -13,15 +13,6 @@ class Team extends JetstreamTeam
     use HasFactory;
 
     /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'personal_team' => 'boolean',
-    ];
-
-    /**
      * The attributes that are mass assignable.
      *
      * @var array
@@ -50,6 +41,18 @@ class Team extends JetstreamTeam
         'updated' => TeamUpdated::class,
         'deleted' => TeamDeleted::class,
     ];
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'personal_team' => 'boolean',
+        ];
+    }
 
     /**
      * Get the default team profile photo URL if no profile photo has been uploaded.
