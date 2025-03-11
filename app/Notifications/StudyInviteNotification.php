@@ -28,7 +28,7 @@ class StudyInviteNotification extends Notification
      * @param  mixed  $notifiable
      * @return array
      */
-    public function via($notifiable)
+    public function via($notifiable): array
     {
         return ['database'];
     }
@@ -39,7 +39,7 @@ class StudyInviteNotification extends Notification
      * @param  mixed  $notifiable
      * @return array
      */
-    public function toArray($notifiable)
+    public function toArray($notifiable): array
     {
         $title = 'Invitation from study - <b>'.$this->invitation->study->name.'</b>';
         $message = 'You have been invited to join the study - '.$this->invitation->study->name.' (role: '.$this->invitation['role'].') by '.$this->invitation['invited_by'].'. Please check your mail to accept or decline the invitation.';

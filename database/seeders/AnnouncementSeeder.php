@@ -16,7 +16,7 @@ class AnnouncementSeeder extends Seeder
      *
      * @return void
      */
-    public function run()
+    public function run(): void
     {
         // Get the first super admin account
         $admin = User::role('super-admin')->first();

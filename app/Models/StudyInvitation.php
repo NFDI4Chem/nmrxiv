@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
 
 class StudyInvitation extends Model
@@ -23,7 +24,7 @@ class StudyInvitation extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function study()
+    public function study(): BelongsTo
     {
         return $this->belongsTo(Study::class);
     }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -36,7 +37,7 @@ class Molecule extends Model
         );
     }
 
-    public function samples()
+    public function samples(): BelongsToMany
     {
         return $this->belongsToMany(Sample::class)
             ->withPivot('percentage_composition')

@@ -12,7 +12,7 @@ class LicenseSeeder extends Seeder
      *
      * @return void
      */
-    public function run()
+    public function run(): void
     {
         $licenses = [
             /* Creative Commons */

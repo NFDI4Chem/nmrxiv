@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+
 trait HasStudies
 {
     /**
@@ -9,7 +11,7 @@ trait HasStudies
      *
      * @var array
      */
-    public function studies()
+    public function studies(): BelongsToMany
     {
         return $this->belongsToMany(Study::class);
     }

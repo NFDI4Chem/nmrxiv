@@ -13,7 +13,7 @@ class RegistrationTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_registration_screen_can_be_rendered()
+    public function test_registration_screen_can_be_rendered(): void
     {
         if (! Features::enabled(Features::registration())) {
             return $this->markTestSkipped('Registration support is not enabled.');
@@ -24,7 +24,7 @@ class RegistrationTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_registration_screen_cannot_be_rendered_if_support_is_disabled()
+    public function test_registration_screen_cannot_be_rendered_if_support_is_disabled(): void
     {
         if (Features::enabled(Features::registration())) {
             return $this->markTestSkipped('Registration support is enabled.');
@@ -35,7 +35,7 @@ class RegistrationTest extends TestCase
         $response->assertStatus(404);
     }
 
-    public function test_new_users_can_register()
+    public function test_new_users_can_register(): void
     {
         if (! Features::enabled(Features::registration())) {
             return $this->markTestSkipped('Registration support is not enabled.');

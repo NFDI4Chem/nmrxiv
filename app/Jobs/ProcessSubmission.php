@@ -42,7 +42,7 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle(AssignIdentifier $assigner, UpdateDOI $updater, PublishProject $projectPublisher, PublishStudy $studyPublisher)
+    public function handle(AssignIdentifier $assigner, UpdateDOI $updater, PublishProject $projectPublisher, PublishStudy $studyPublisher): void
     {
         $project = $this->project;
 

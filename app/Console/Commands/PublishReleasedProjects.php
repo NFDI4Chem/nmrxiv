@@ -31,7 +31,7 @@ class PublishReleasedProjects extends Command
      *
      * @return int
      */
-    public function handle(PublishProject $publisher)
+    public function handle(PublishProject $publisher): int
     {
         return DB::transaction(function () use ($publisher) {
             $projects = Project::where([

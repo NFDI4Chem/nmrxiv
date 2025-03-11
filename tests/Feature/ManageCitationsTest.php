@@ -17,7 +17,7 @@ class ManageCitationsTest extends TestCase
      *
      * @return void
      */
-    public function test_citation_can_be_added_and_updated()
+    public function test_citation_can_be_added_and_updated(): void
     {
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 
@@ -47,7 +47,7 @@ class ManageCitationsTest extends TestCase
      *
      * @return void
      */
-    public function test_citation_can_be_detached()
+    public function test_citation_can_be_detached(): void
     {
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 
@@ -76,7 +76,7 @@ class ManageCitationsTest extends TestCase
      *
      * @return void
      */
-    public function test_citation_cannot_be_updated_or_deleted_by_reviewer()
+    public function test_citation_cannot_be_updated_or_deleted_by_reviewer(): void
     {
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 
@@ -107,7 +107,7 @@ class ManageCitationsTest extends TestCase
      *
      * @return void
      */
-    public function test_citation_cannot_be_updated_or_detached_if_project_is_public()
+    public function test_citation_cannot_be_updated_or_detached_if_project_is_public(): void
     {
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 

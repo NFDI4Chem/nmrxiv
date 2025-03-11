@@ -2,6 +2,10 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Traits\CacheClear;
 use Auth;
 use Carbon\Carbon;
@@ -140,7 +144,7 @@ class Study extends Model implements Auditable
         return $experiment_types;
     }
 
-    public function project()
+    public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class, 'project_id');
     }
@@ -156,17 +160,17 @@ class Study extends Model implements Auditable
         return env('APP_URL', null).'/studies/'.urlencode($this->url);
     }
 
-    public function draft()
+    public function draft(): BelongsTo
     {
         return $this->belongsTo(Draft::class, 'draft_id');
     }
 
-    public function fsObject()
+    public function fsObject(): HasOne
     {
         return $this->hasOne(FileSystemObject::class);
     }
 
-    public function validation()
+    public function validation(): BelongsTo
     {
         return $this->belongsTo(Validation::class, 'validation_id');
     }
@@ -176,7 +180,7 @@ class Study extends Model implements Auditable
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function studyInvitations()
+    public function studyInvitations(): HasMany
     {
         return $this->hasMany(StudyInvitation::class);
     }
@@ -205,12 +209,12 @@ class Study extends Model implements Auditable
         }
     }
 
-    public function team()
+    public function team(): BelongsTo
     {
         return $this->belongsTo(Team::class, 'team_id');
     }
 
-    public function datasets()
+    public function datasets(): HasMany
     {
         return $this->hasMany(Dataset::class)->orderBy('name');
     }
@@ -232,7 +236,7 @@ class Study extends Model implements Auditable
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function owner()
+    public function owner(): BelongsTo
     {
         return $this->belongsTo(User::class, 'owner_id');
     }
@@ -262,7 +266,7 @@ class Study extends Model implements Auditable
     /**
      * Get the sample associated with the study.
      */
-    public function sample()
+    public function sample(): HasOne
     {
         return $this->hasOne(Sample::class, 'study_id');
     }
@@ -300,7 +304,7 @@ class Study extends Model implements Auditable
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function users()
+    public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class)
             ->withPivot('role')
@@ -313,7 +317,7 @@ class Study extends Model implements Auditable
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function license()
+    public function license(): BelongsTo
     {
         return $this->belongsTo(License::class, 'license_id');
     }

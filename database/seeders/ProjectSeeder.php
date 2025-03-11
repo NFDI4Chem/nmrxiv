@@ -18,7 +18,7 @@ class ProjectSeeder extends Seeder
      *
      * @return void
      */
-    public function run()
+    public function run(): void
     {
         $password = Str::random();
         $user = User::factory()->withPersonalTeam()->create(['password' => bcrypt($password)]);

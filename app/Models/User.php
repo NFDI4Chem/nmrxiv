@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -75,7 +76,7 @@ class User extends Authenticatable implements MustVerifyEmail
      *
      * @var array
      */
-    public function linkedSocialAccounts()
+    public function linkedSocialAccounts(): HasMany
     {
         return $this->hasMany(LinkedSocialAccount::class);
     }
@@ -85,7 +86,7 @@ class User extends Authenticatable implements MustVerifyEmail
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function announcements()
+    public function announcements(): HasMany
     {
         return $this->hasMany(Announcement::class);
     }

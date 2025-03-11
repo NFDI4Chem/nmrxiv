@@ -15,7 +15,7 @@ class CephStorageServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         Storage::extend('ceph', function ($app, $config) {
             $config = [
@@ -46,5 +46,5 @@ class CephStorageServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register() {}
+    public function register(): void {}
 }

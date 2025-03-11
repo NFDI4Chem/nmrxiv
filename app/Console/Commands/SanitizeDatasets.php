@@ -26,7 +26,7 @@ class SanitizeDatasets extends Command
      *
      * @return int
      */
-    public function handle()
+    public function handle(): int
     {
         $datasets = Dataset::orderBy('id', 'ASC')->get();
 

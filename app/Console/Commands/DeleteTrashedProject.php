@@ -27,7 +27,7 @@ class DeleteTrashedProject extends Command
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         $ids = $this->argument('ids') ? explode(',', $this->argument('ids')) : null;
         if ($ids) {

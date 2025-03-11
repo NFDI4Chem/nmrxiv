@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use Illuminate\Notifications\Messages\MailMessage;
 use App\Mail\ProjectDeletion;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
@@ -28,7 +29,7 @@ class ProjectDeletionNotification extends Notification
      * @param  mixed  $notifiable
      * @return array
      */
-    public function via($notifiable)
+    public function via($notifiable): array
     {
         return ['mail'];
     }
@@ -39,7 +40,7 @@ class ProjectDeletionNotification extends Notification
      * @param  mixed  $notifiable
      * @return \Illuminate\Notifications\Messages\MailMessage
      */
-    public function toMail($notifiable)
+    public function toMail($notifiable): MailMessage
     {
         return (new ProjectDeletion($this->project))->to($notifiable->email);
     }
@@ -50,7 +51,7 @@ class ProjectDeletionNotification extends Notification
      * @param  mixed  $notifiable
      * @return array
      */
-    public function toArray($notifiable)
+    public function toArray($notifiable): array
     {
         return [
             //

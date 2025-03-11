@@ -13,7 +13,7 @@ class MoleculeFactory extends Factory
      *
      * @return array
      */
-    public function definition()
+    public function definition(): array
     {
         $cid = rand(1000, 9999);
         echo $cid;

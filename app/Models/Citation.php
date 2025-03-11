@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -21,7 +22,7 @@ class Citation extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\belongsToMany
      */
-    public function projects()
+    public function projects(): BelongsToMany
     {
         return $this->belongsToMany(Project::class);
     }

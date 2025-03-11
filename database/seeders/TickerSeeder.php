@@ -12,7 +12,7 @@ class TickerSeeder extends Seeder
      *
      * @return void
      */
-    public function run()
+    public function run(): void
     {
         $types = ['project', 'study', 'dataset', 'sample', 'assay', 'molecule'];
 

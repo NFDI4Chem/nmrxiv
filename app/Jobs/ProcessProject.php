@@ -46,7 +46,7 @@ class ProcessProject implements ShouldBeUnique, ShouldQueue
      *
      * @return void
      */
-    public function handle(AssignIdentifier $assigner, UpdateDOI $updater, PublishProject $publisher)
+    public function handle(AssignIdentifier $assigner, UpdateDOI $updater, PublishProject $publisher): void
     {
         $project = $this->project;
 

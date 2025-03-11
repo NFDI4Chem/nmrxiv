@@ -29,7 +29,7 @@ class ProjectInviteNotification extends Notification implements ShouldQueue
      * @param  mixed  $notifiable
      * @return array
      */
-    public function via($notifiable)
+    public function via($notifiable): array
     {
         return ['database'];
     }
@@ -40,7 +40,7 @@ class ProjectInviteNotification extends Notification implements ShouldQueue
      * @param  mixed  $notifiable
      * @return array
      */
-    public function toArray($notifiable)
+    public function toArray($notifiable): array
     {
         $title = 'Invitation from project - <b>'.$this->invitation->project->name.'</b>';
         $message = 'You have been invited to join the project - '.$this->invitation->project->name.' (role: '.$this->invitation['role'].') by '.$this->invitation['invited_by'].'. Please check your mail to accept or decline the invitation.';
