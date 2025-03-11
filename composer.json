@@ -15,31 +15,31 @@
         "doctrine/dbal": "^3.5",
         "guzzlehttp/guzzle": "^7.8",
         "http-interop/http-factory-guzzle": "^1.2",
-        "inertiajs/inertia-laravel": "^1.0",
+        "inertiajs/inertia-laravel": "^2.0",
         "lab404/laravel-impersonate": "^1.7",
-        "larabug/larabug": "^3.1",
-        "laravel/framework": "^11.44",
-        "laravel/horizon": "^5.22",
-        "laravel/jetstream": "^5.0",
+        "larabug/larabug": "^3.3",
+        "laravel/framework": "^12.1",
+        "laravel/horizon": "^5.30",
+        "laravel/jetstream": "^5.3",
         "laravel/sanctum": "^4.0",
-        "laravel/scout": "^10.8",
-        "laravel/tinker": "^2.9",
+        "laravel/scout": "^10.12",
+        "laravel/tinker": "^2.10.1",
         "league/flysystem-aws-s3-v3": "^3.0",
         "league/flysystem-ziparchive": "^3.0",
         "maennchen/zipstream-php": "^3.1",
-        "maize-tech/laravel-markable": "^2.2",
+        "maize-tech/laravel-markable": "^2.3",
         "meilisearch/meilisearch-php": "^1.0",
         "mpociot/versionable": "^4.4",
         "nfdi4chem/orcid": "master",
-        "owen-it/laravel-auditing": "^13.6",
+        "owen-it/laravel-auditing": "^14.0",
         "phpunit/php-code-coverage": "^10.1",
         "predis/predis": "^2.2",
-        "spatie/laravel-backup": "^8.6",
+        "spatie/laravel-backup": "^9.2",
         "spatie/laravel-cookie-consent": "^3.3",
-        "spatie/laravel-permission": "^6.2",
-        "spatie/laravel-query-builder": "^5.8",
-        "spatie/laravel-support-bubble": "^1.6",
-        "spatie/laravel-tags": "^4.6.1",
+        "spatie/laravel-permission": "^6.12",
+        "spatie/laravel-query-builder": "^6.3",
+        "spatie/laravel-support-bubble": "^1.8",
+        "spatie/laravel-tags": "^4.9",
         "spatie/laravel-welcome-notification": "^2.4",
         "spatie/schema-org": "^3.11",
         "tightenco/ziggy": "^2.0"
@@ -48,11 +48,12 @@
         "brianium/paratest": "^7.5",
         "fakerphp/faker": "^1.23",
         "laravel/pint": "^1.13",
-        "laravel/sail": "^1.26",
-        "laravel/telescope": "^5.0",
+        "laravel/sail": "^1.41",
+        "laravel/telescope": "^5.5",
         "mockery/mockery": "^1.6",
-        "nunomaduro/collision": "^8.0",
-        "phpunit/phpunit": "^11.0.1"
+        "nunomaduro/collision": "^8.6",
+        "phpunit/phpunit": "^11.5.3",
+        "laravel/pail": "^1.2.2"
     },
     "autoload": {
         "files": [
@@ -83,6 +84,10 @@
         ],
         "post-create-project-cmd": [
             "@php artisan key:generate --ansi"
+        ],
+        "dev": [
+            "Composer\\Config::disableProcessTimeout",
+            "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1\" \"php artisan pail --timeout=0\" \"npm run dev\" --names=server,queue,logs,vite"
         ]
     },
     "extra": {
