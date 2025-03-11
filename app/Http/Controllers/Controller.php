@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Routing\Controller as BaseController;
 
 /**
  * @OA\Info(
@@ -17,6 +16,6 @@ use Illuminate\Routing\Controller as BaseController;
  *     name="Authorization"
  * )
  */
-abstract class Controller extends BaseController
+abstract class Controller
 {
 }
