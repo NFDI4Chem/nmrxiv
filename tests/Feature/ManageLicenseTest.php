@@ -14,8 +14,6 @@ class ManageLicenseTest extends TestCase
 
     /**
      * Test if licenses can be fetched
-     *
-     * @return void
      */
     public function test_get_licenses(): void
     {
@@ -29,8 +27,6 @@ class ManageLicenseTest extends TestCase
 
     /**
      * Test if license in a project can be updated
-     *
-     * @return void
      */
     public function test_add_license_to_project(): void
     {
@@ -53,8 +49,6 @@ class ManageLicenseTest extends TestCase
 
     /**
      * Test if license in a project cannot be updated by reviewer
-     *
-     * @return void
      */
     public function test_license_cannot_be_added_by_reviewer(): void
     {

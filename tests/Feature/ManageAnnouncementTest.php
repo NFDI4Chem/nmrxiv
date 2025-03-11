@@ -17,8 +17,6 @@ class ManageAnnouncementTest extends TestCase
 
     /**
      * Test if an announcement can be created.
-     *
-     * @return void
      */
     public function test_announcement_can_be_created(): void
     {
@@ -50,8 +48,6 @@ class ManageAnnouncementTest extends TestCase
 
     /**
      * Test if an announcement can be updated.
-     *
-     * @return void
      */
     public function test_announcement_can_be_updated(): void
     {
@@ -83,8 +79,6 @@ class ManageAnnouncementTest extends TestCase
 
     /**
      * Test if an announcement can be deleted.
-     *
-     * @return void
      */
     public function test_announcement_can_be_deleted(): void
     {
@@ -107,8 +101,6 @@ class ManageAnnouncementTest extends TestCase
 
     /**
      * Test if an announcement cannot be managed from role other than super-admin & developer
-     *
-     * @return void
      */
     public function test_announcement_can_be_managed_only_by_admins(): void
     {
