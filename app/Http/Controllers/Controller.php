@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-
 /**
  * @OA\Info(
  *     version="1.0",
@@ -16,6 +15,4 @@ namespace App\Http\Controllers;
  *     name="Authorization"
  * )
  */
-abstract class Controller
-{
-}
+abstract class Controller {}
