@@ -14,13 +14,6 @@ use Illuminate\Support\Str;
 class DraftFactory extends Factory
 {
     /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
-    protected $model = Draft::class;
-
-    /**
      * Define the model's default state.
      *
      * @return array
