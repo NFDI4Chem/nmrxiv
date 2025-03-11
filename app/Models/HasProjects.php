@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+
 trait HasProjects
 {
     /**
@@ -9,7 +11,7 @@ trait HasProjects
      *
      * @var array
      */
-    public function projects()
+    public function projects(): BelongsToMany
     {
         return $this->belongsToMany(Project::class);
     }
@@ -19,7 +21,7 @@ trait HasProjects
      *
      * @var array
      */
-    public function activeProjects()
+    public function activeProjects(): BelongsToMany
     {
         return $this->belongsToMany(Project::class)->where([['is_deleted', false]]);
     }

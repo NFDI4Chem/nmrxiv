@@ -27,7 +27,7 @@ class ManageFiles extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): void
     {
         return DB::transaction(function () {
             $drafts = Draft::where([

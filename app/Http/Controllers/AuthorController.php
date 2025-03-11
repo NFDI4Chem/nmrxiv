@@ -43,7 +43,7 @@ class AuthorController extends Controller
                     $_author = $project->authors->filter(function ($a) use ($family_name, $given_name) {
                         return $family_name.$given_name === $a->family_name.$a->given_name;
                     })->first();
-                    //dd($_author);
+                    // dd($_author);
                     if ($_author) {
                         $_author->update([
                             'title' => array_key_exists('title', $author) ? $author['title'] : null,

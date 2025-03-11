@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Lab404\Impersonate\Models\Impersonate;
@@ -50,15 +51,6 @@ class User extends Authenticatable implements MustVerifyEmail
     ];
 
     /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
-
-    /**
      * The accessors to append to the model's array form.
      *
      * @var array
@@ -68,21 +60,31 @@ class User extends Authenticatable implements MustVerifyEmail
     ];
 
     /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+        ];
+    }
+
+    /**
      * User model and LinkedSocialAccount relationship - one to many
      *
      * @var array
      */
-    public function linkedSocialAccounts()
+    public function linkedSocialAccounts(): HasMany
     {
         return $this->hasMany(LinkedSocialAccount::class);
     }
 
     /**
      * Get the announcements created by the user
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function announcements()
+    public function announcements(): HasMany
     {
         return $this->hasMany(Announcement::class);
     }

@@ -14,10 +14,8 @@ class ManageCitationsTest extends TestCase
 
     /**
      * Test if a citation can be updated.
-     *
-     * @return void
      */
-    public function test_citation_can_be_added_and_updated()
+    public function test_citation_can_be_added_and_updated(): void
     {
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 
@@ -29,12 +27,12 @@ class ManageCitationsTest extends TestCase
 
         $body = $this->prepareBody($citation);
 
-        //Update citation
+        // Update citation
         $response = $this->updateCitation($body, $project->id);
 
         $response->assertStatus(200);
 
-        //Check if entry got created in DB
+        // Check if entry got created in DB
         $project = $project->fresh();
         $citations = $project->citations->toArray();
         $this->assertDatabaseHas('citation_project', $citations[0]['pivot']);
@@ -44,10 +42,8 @@ class ManageCitationsTest extends TestCase
 
     /**
      * Test if a citation can be deleted.
-     *
-     * @return void
      */
-    public function test_citation_can_be_detached()
+    public function test_citation_can_be_detached(): void
     {
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 
@@ -63,20 +59,18 @@ class ManageCitationsTest extends TestCase
 
         $body = $this->prepareBody($citation);
 
-        //Detach citation
+        // Detach citation
         $response = $this->detachCitation($body, $project->id);
         $response->assertStatus(200);
 
-        //Check if entry got deleted from DB
+        // Check if entry got deleted from DB
         $this->assertDatabaseMissing('citation_project', $citations[0]['pivot']);
     }
 
     /**
      * Test if the citation cannot be updated or detached by the reviewer
-     *
-     * @return void
      */
-    public function test_citation_cannot_be_updated_or_deleted_by_reviewer()
+    public function test_citation_cannot_be_updated_or_deleted_by_reviewer(): void
     {
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 
@@ -93,21 +87,19 @@ class ManageCitationsTest extends TestCase
 
         $body = $this->prepareBody($citation);
 
-        //Update citation
+        // Update citation
         $response = $this->updateCitation($body, $project->id);
         $response->assertStatus(403);
 
-        //Detach citation
+        // Detach citation
         $response = $response = $this->detachCitation($body, $project->id);
         $response->assertStatus(403);
     }
 
     /**
      * Test if the citation cannot be updated or detached if project is made public
-     *
-     * @return void
      */
-    public function test_citation_cannot_be_updated_or_detached_if_project_is_public()
+    public function test_citation_cannot_be_updated_or_detached_if_project_is_public(): void
     {
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 
@@ -120,11 +112,11 @@ class ManageCitationsTest extends TestCase
 
         $body = $this->prepareBody($citation);
 
-        //Update citation
+        // Update citation
         $response = $this->updateCitation($body, $project->id);
         $response->assertStatus(403);
 
-        //Detach citation
+        // Detach citation
         $response = $response = $this->detachCitation($body, $project->id);
         $response->assertStatus(403);
     }

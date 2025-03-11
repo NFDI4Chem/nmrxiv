@@ -2,7 +2,6 @@
 
 namespace Database\Factories;
 
-use App\Models\Study;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
@@ -10,18 +9,9 @@ use Illuminate\Support\Str;
 class StudyFactory extends Factory
 {
     /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
-    protected $model = Study::class;
-
-    /**
      * Define the model's default state.
-     *
-     * @return array
      */
-    public function definition()
+    public function definition(): array
     {
         $name = $this->faker->sentence($nbWords = 4);
         $slug = Str::slug($name, '-');
@@ -36,11 +26,11 @@ class StudyFactory extends Factory
             'is_archived' => false,
             'status' => null,
             'process_logs' => null,
-            'location' => null, //todo: Adjust when location field is provided in nmrXiv
+            'location' => null, // todo: Adjust when location field is provided in nmrXiv
             'obfuscationcode' => Str::random(40),
             'description' => $this->faker->text(),
             'sort_order' => 0,
-            'type' => null,  //todo: Adjust when type field is provided in nmrXiv
+            'type' => null,  // todo: Adjust when type field is provided in nmrXiv
             'uuid' => Str::uuid(),
             'access' => 'restricted',
             'access_type' => 'viewer',
@@ -51,7 +41,7 @@ class StudyFactory extends Factory
             'draft_id' => 1,
             'fs_id' => 1,
             'release_date' => null,
-            'study_photo_path' => null, //todo: Adjust when studies images field is provided in nmrXiv
+            'study_photo_path' => null, // todo: Adjust when studies images field is provided in nmrXiv
             'created_at' => Carbon::now()->timestamp,
             'updated_at' => Carbon::now()->timestamp,
             'doi' => null,
@@ -59,7 +49,7 @@ class StudyFactory extends Factory
             'identifier' => null,
             'validation_id' => 1,
             'validation_status' => false,
-            'internal_status' => null, //todo: provide varying values
+            'internal_status' => null, // todo: provide varying values
         ];
     }
 }

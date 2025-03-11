@@ -15,10 +15,8 @@ class ProjectSeeder extends Seeder
 {
     /**
      * Run the database seeds.
-     *
-     * @return void
      */
-    public function run()
+    public function run(): void
     {
         $password = Str::random();
         $user = User::factory()->withPersonalTeam()->create(['password' => bcrypt($password)]);
@@ -41,7 +39,7 @@ class ProjectSeeder extends Seeder
                 'project_id' => $project->id,
             ]);
 
-            //todo: add molecules to the sample
+            // todo: add molecules to the sample
 
             $datasets = Dataset::factory(5)->create([
                 'team_id' => $team->id,

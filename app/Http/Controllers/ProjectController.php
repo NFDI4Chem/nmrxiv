@@ -274,7 +274,7 @@ class ProjectController extends Controller
         $validation = $project->validation;
 
         if (! $validation) {
-            $validation = new Validation();
+            $validation = new Validation;
             $validation->save();
             $project->validation()->associate($validation);
             $project->save();
@@ -302,7 +302,7 @@ class ProjectController extends Controller
         $validation = $project->validation;
 
         if (! $validation) {
-            $validation = new Validation();
+            $validation = new Validation;
             $validation->save();
             $project->validation()->associate($validation);
             $project->save();

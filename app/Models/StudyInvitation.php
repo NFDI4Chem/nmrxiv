@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class StudyInvitation extends Model
 {
@@ -20,10 +21,8 @@ class StudyInvitation extends Model
 
     /**
      * Get the study that the invitation belongs to.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function study()
+    public function study(): BelongsTo
     {
         return $this->belongsTo(Study::class);
     }

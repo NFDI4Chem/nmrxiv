@@ -24,7 +24,7 @@ class IndexMolecules extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): void
     {
         return DB::transaction(function () {
             DB::statement('DROP TABLE IF EXISTS mols, fps');
