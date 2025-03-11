@@ -24,7 +24,7 @@ class AppServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
         if (App::environment('local')) {
             $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
@@ -37,7 +37,7 @@ class AppServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         if (App::environment('production')) {
             \URL::forceScheme('https');

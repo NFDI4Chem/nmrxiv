@@ -15,7 +15,7 @@ class UsersSeeder extends Seeder
      *
      * @return void
      */
-    public function run()
+    public function run(): void
     {
         $password = Str::random();
         $email = 'superadmin@email.com';

@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use App\Events\DraftProcessed;
 use App\Events\ProjectArchival;
 use App\Events\ProjectDeletion;
@@ -120,12 +123,12 @@ class Project extends Model implements Auditable
         );
     }
 
-    public function studies()
+    public function studies(): HasMany
     {
         return $this->hasMany(Study::class, 'project_id');
     }
 
-    public function team()
+    public function team(): BelongsTo
     {
         return $this->belongsTo(Team::class, 'team_id');
     }
@@ -135,7 +138,7 @@ class Project extends Model implements Auditable
         return $this->team()->where('personal_team', false);
     }
 
-    public function draft()
+    public function draft(): BelongsTo
     {
         return $this->belongsTo(Draft::class, 'draft_id');
     }
@@ -150,7 +153,7 @@ class Project extends Model implements Auditable
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function owner()
+    public function owner(): BelongsTo
     {
         return $this->belongsTo(User::class, 'owner_id');
     }
@@ -170,7 +173,7 @@ class Project extends Model implements Auditable
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function users()
+    public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class)
             ->withPivot('role')
@@ -248,7 +251,7 @@ class Project extends Model implements Auditable
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function projectInvitations()
+    public function projectInvitations(): HasMany
     {
         return $this->hasMany(ProjectInvitation::class);
     }
@@ -280,12 +283,12 @@ class Project extends Model implements Auditable
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function license()
+    public function license(): BelongsTo
     {
         return $this->belongsTo(License::class, 'license_id');
     }
 
-    public function validation()
+    public function validation(): BelongsTo
     {
         return $this->belongsTo(Validation::class, 'validation_id');
     }
@@ -307,7 +310,7 @@ class Project extends Model implements Auditable
      *
      * @return \Illuminate\Database\Eloquent\Relations\belongsToMany
      */
-    public function authors()
+    public function authors(): BelongsToMany
     {
         return $this->belongsToMany(Author::class)
             ->withPivot('contributor_type', 'sort_order')->orderBy('sort_order', 'asc');
@@ -331,7 +334,7 @@ class Project extends Model implements Auditable
         });
     }
 
-    public function citations()
+    public function citations(): BelongsToMany
     {
         return $this->belongsToMany(Citation::class);
     }

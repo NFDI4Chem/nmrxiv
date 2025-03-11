@@ -15,7 +15,7 @@ class MinioStorageServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         Storage::extend('minio', function ($app, $config) {
             $config = [
@@ -46,5 +46,5 @@ class MinioStorageServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register() {}
+    public function register(): void {}
 }

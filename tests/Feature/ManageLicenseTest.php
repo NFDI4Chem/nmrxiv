@@ -17,7 +17,7 @@ class ManageLicenseTest extends TestCase
      *
      * @return void
      */
-    public function test_get_licenses()
+    public function test_get_licenses(): void
     {
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 
@@ -32,7 +32,7 @@ class ManageLicenseTest extends TestCase
      *
      * @return void
      */
-    public function test_add_license_to_project()
+    public function test_add_license_to_project(): void
     {
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
         $license = License::factory()->create();
@@ -56,7 +56,7 @@ class ManageLicenseTest extends TestCase
      *
      * @return void
      */
-    public function test_license_cannot_be_added_by_reviewer()
+    public function test_license_cannot_be_added_by_reviewer(): void
     {
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 

@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -20,7 +22,7 @@ class Sample extends Model
         'project_id',
     ];
 
-    public function molecules()
+    public function molecules(): BelongsToMany
     {
         return $this->belongsToMany(Molecule::class)
             ->withPivot('percentage_composition')
@@ -30,7 +32,7 @@ class Sample extends Model
     /**
      * Get the study that owns the sample.
      */
-    public function study()
+    public function study(): BelongsTo
     {
         return $this->belongsTo(Study::class, 'study_id');
     }

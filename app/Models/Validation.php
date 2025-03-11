@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Validator;
@@ -64,17 +66,17 @@ class Validation extends Model
         ];
     }
 
-    public function studies()
+    public function studies(): HasMany
     {
         return $this->hasMany(Study::class);
     }
 
-    public function datasets()
+    public function datasets(): HasMany
     {
         return $this->hasMany(Dataset::class);
     }
 
-    public function project()
+    public function project(): HasOne
     {
         return $this->hasOne(Project::class);
     }

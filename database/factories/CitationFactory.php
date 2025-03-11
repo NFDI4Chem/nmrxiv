@@ -15,7 +15,7 @@ class CitationFactory extends Factory
      *
      * @return array
      */
-    public function definition()
+    public function definition(): array
     {
         $author1 = substr($this->faker->lastName(), 0, 1).' '.$this->faker->firstName();
         $author2 = substr($this->faker->lastName(), 0, 1).' '.$this->faker->firstName();

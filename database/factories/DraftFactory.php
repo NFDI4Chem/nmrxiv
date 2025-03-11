@@ -18,7 +18,7 @@ class DraftFactory extends Factory
      *
      * @return array
      */
-    public function definition()
+    public function definition(): array
     {
         $user = User::factory()->withPersonalTeam()->create();
         $key = Str::uuid();

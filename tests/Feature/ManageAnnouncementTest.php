@@ -20,7 +20,7 @@ class ManageAnnouncementTest extends TestCase
      *
      * @return void
      */
-    public function test_announcement_can_be_created()
+    public function test_announcement_can_be_created(): void
     {
         $user = $this->createUser('super-admin');
 
@@ -53,7 +53,7 @@ class ManageAnnouncementTest extends TestCase
      *
      * @return void
      */
-    public function test_announcement_can_be_updated()
+    public function test_announcement_can_be_updated(): void
     {
         $user = $this->createUser('super-admin');
 
@@ -86,7 +86,7 @@ class ManageAnnouncementTest extends TestCase
      *
      * @return void
      */
-    public function test_announcement_can_be_deleted()
+    public function test_announcement_can_be_deleted(): void
     {
         $user = $this->createUser('super-admin');
 
@@ -110,7 +110,7 @@ class ManageAnnouncementTest extends TestCase
      *
      * @return void
      */
-    public function test_announcement_can_be_managed_only_by_admins()
+    public function test_announcement_can_be_managed_only_by_admins(): void
     {
         $this->seed(RolesAndPermissionsSeeder::class);
 

@@ -26,7 +26,7 @@ class ReverseAuthorsFirstAndLastName extends Command
      *
      * @return int
      */
-    public function handle()
+    public function handle(): int
     {
         $ids = $this->argument('ids') ? explode(',', $this->argument('ids')) : null;
         if ($ids) {

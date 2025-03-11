@@ -37,7 +37,7 @@ class DeleteProjects implements ShouldQueue
      *
      * @return void
      */
-    public function handle(DeleteProject $deleteProject)
+    public function handle(DeleteProject $deleteProject): void
     {
         $project = $this->project;
         $deletedOn = $project->deleted_on;

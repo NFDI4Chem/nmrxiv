@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -25,7 +26,7 @@ class License extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function projects()
+    public function projects(): HasMany
     {
         return $this->hasMany(Project::class, 'project_id');
     }
@@ -35,7 +36,7 @@ class License extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function studies()
+    public function studies(): HasMany
     {
         return $this->hasMany(Study::class, 'study_id');
     }
@@ -45,7 +46,7 @@ class License extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function datasets()
+    public function datasets(): HasMany
     {
         return $this->hasMany(Dataset::class, 'dataset_id');
     }

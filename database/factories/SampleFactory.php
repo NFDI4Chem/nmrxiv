@@ -14,7 +14,7 @@ class SampleFactory extends Factory
      *
      * @return array
      */
-    public function definition()
+    public function definition(): array
     {
         $name = $this->faker->sentence($nbWords = 2);
         $slug = Str::slug($name, '-');

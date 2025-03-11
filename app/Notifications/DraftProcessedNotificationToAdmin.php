@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use Illuminate\Notifications\Messages\MailMessage;
 use App\Mail\DraftProcessedNotifyAdmins;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -32,7 +33,7 @@ class DraftProcessedNotificationToAdmin extends Notification implements ShouldQu
      * @param  mixed  $notifiable
      * @return array
      */
-    public function via($notifiable)
+    public function via($notifiable): array
     {
         return ['mail'];
     }
@@ -43,7 +44,7 @@ class DraftProcessedNotificationToAdmin extends Notification implements ShouldQu
      * @param  mixed  $notifiable
      * @return \Illuminate\Notifications\Messages\MailMessage
      */
-    public function toMail($notifiable)
+    public function toMail($notifiable): MailMessage
     {
         if ($this->project) {
             return (new DraftProcessedNotifyAdmins($this->project, null))->to($notifiable->email);
@@ -59,7 +60,7 @@ class DraftProcessedNotificationToAdmin extends Notification implements ShouldQu
      * @param  mixed  $notifiable
      * @return array
      */
-    public function toArray($notifiable)
+    public function toArray($notifiable): array
     {
         return [
             //

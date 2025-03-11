@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Laravel\Jetstream\Events\TeamCreated;
 use Laravel\Jetstream\Events\TeamDeleted;
@@ -69,12 +70,12 @@ class Team extends JetstreamTeam
      *
      * @var array
      */
-    public function projects()
+    public function projects(): HasMany
     {
         return $this->hasMany(Project::class);
     }
 
-    public function activeProjects()
+    public function activeProjects(): HasMany
     {
         return $this->hasMany(Project::class)->where([['is_deleted', false], ['is_archived', false]]);
     }

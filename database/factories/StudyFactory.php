@@ -14,7 +14,7 @@ class StudyFactory extends Factory
      *
      * @return array
      */
-    public function definition()
+    public function definition(): array
     {
         $name = $this->faker->sentence($nbWords = 4);
         $slug = Str::slug($name, '-');

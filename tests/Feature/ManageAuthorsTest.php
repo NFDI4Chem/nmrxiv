@@ -19,7 +19,7 @@ class ManageAuthorsTest extends TestCase
      *
      * @return void
      */
-    public function test_author_can_be_created_and_updated()
+    public function test_author_can_be_created_and_updated(): void
     {
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 
@@ -45,7 +45,7 @@ class ManageAuthorsTest extends TestCase
      *
      * @return void
      */
-    public function test_author_can_be_updated()
+    public function test_author_can_be_updated(): void
     {
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 
@@ -79,7 +79,7 @@ class ManageAuthorsTest extends TestCase
      *
      * @return void
      */
-    public function test_author_can_be_detached()
+    public function test_author_can_be_detached(): void
     {
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 
@@ -108,7 +108,7 @@ class ManageAuthorsTest extends TestCase
      *
      * @return void
      */
-    public function test_author_cannot_be_updated_or_deleted_by_reviewer()
+    public function test_author_cannot_be_updated_or_deleted_by_reviewer(): void
     {
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 
@@ -139,7 +139,7 @@ class ManageAuthorsTest extends TestCase
      *
      * @return void
      */
-    public function test_author_cannot_be_updated_or_detached_if_project_is_public()
+    public function test_author_cannot_be_updated_or_detached_if_project_is_public(): void
     {
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 
@@ -166,7 +166,7 @@ class ManageAuthorsTest extends TestCase
      *
      * @return void
      */
-    public function test_role_of_an_author_can_be_updated()
+    public function test_role_of_an_author_can_be_updated(): void
     {
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 
@@ -202,7 +202,7 @@ class ManageAuthorsTest extends TestCase
      *
      * @return void
      */
-    public function test_role_of_an_author_cannot_be_updated_by_reviewer()
+    public function test_role_of_an_author_cannot_be_updated_by_reviewer(): void
     {
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 
@@ -236,7 +236,7 @@ class ManageAuthorsTest extends TestCase
      *
      * @return void
      */
-    public function test_role_of_an_author_cannot_be_updated_for_random_contributor_types()
+    public function test_role_of_an_author_cannot_be_updated_for_random_contributor_types(): void
     {
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 

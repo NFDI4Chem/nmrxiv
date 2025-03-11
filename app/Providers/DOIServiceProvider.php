@@ -13,7 +13,7 @@ class DOIServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
         $this->app->bind(DOIService::class, function ($app) {
             return match (config('doi.default')) {

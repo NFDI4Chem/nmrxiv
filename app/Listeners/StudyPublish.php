@@ -25,7 +25,7 @@ class StudyPublish
      * @param  object  $event
      * @return void
      */
-    public function handle($event)
+    public function handle($event): void
     {
         Notification::send($event->sendTo, new StudyPublishNotification($event->studies));
         Notification::send(User::role(['super-admin'])->get(), new DraftProcessedNotificationToAdmin(null, $event->studies));

@@ -32,7 +32,7 @@ class UnpublishProjects extends Command
      *
      * @return int
      */
-    public function handle(UnPublishProject $unpublisher)
+    public function handle(UnPublishProject $unpublisher): int
     {
         $ids = explode(',', $this->argument('ids'));
 
