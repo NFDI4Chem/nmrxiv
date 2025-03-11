@@ -11,6 +11,6 @@ class Bioschemas extends Schema
 {
     public static function study(): Study
     {
-        return new Study();
+        return new Study;
     }
 }

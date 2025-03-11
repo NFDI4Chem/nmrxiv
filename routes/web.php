@@ -34,9 +34,7 @@ use Inertia\Inertia;
 use Laravel\Jetstream\Jetstream;
 use Spatie\WelcomeNotification\WelcomesNewUsers;
 
-Route::group([
-    'prefix' => 'auth',
-], function () {
+Route::prefix('auth')->group(function () {
     Route::get('/login/{service}', [SocialController::class, 'redirectToProvider']);
     Route::get('/login/{service}/callback', [SocialController::class, 'handleProviderCallback']);
     Route::get('/checkPassword', [UsersController::class, 'checkPassword'])
@@ -85,18 +83,18 @@ Route::get('project/{url}', [ProjectController::class, 'review'])->name('project
 Route::get('project/{url}/studies', [ProjectController::class, 'reviewerStudies'])->name('studies.preview');
 Route::get('study/{obfuscationCode}/{study}/{model}', [StudyController::class, 'preview2'])->name('preview');
 
-Route::group(['middleware' => 'verified'], function () {
+Route::middleware('verified')->group(function () {
     if (Jetstream::hasTeamFeatures()) {
         Route::delete('/teams/{team}', [TeamController::class, 'destroy'])->name('app.teams.destroy');
     }
 });
 
-Route::group(['middleware' => ['web', WelcomesNewUsers::class]], function () {
+Route::middleware('web', WelcomesNewUsers::class)->group(function () {
     Route::get('welcome/{user}', [MyWelcomeController::class, 'showWelcomeForm'])->name('welcome');
     Route::post('welcome/{user}', [MyWelcomeController::class, 'savePassword'])->name('password.set');
 });
 
-Route::group(['middleware' => ['auth', 'verified']], function () {
+Route::middleware('auth', 'verified')->group(function () {
     // License
     Route::get('licenses', [LicenseController::class, 'index'])
         ->name('licenses');
@@ -113,7 +111,7 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::post('authors/{project}/updateRole', [AuthorController::class, 'updateRole'])
         ->name('author.updateRole');
 
-    //Citation
+    // Citation
     Route::post('citations/{project}', [CitationController::class, 'save'])
         ->name('citation.save');
 
@@ -143,9 +141,7 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::get('upload', [UploadController::class, 'upload'])->name('upload');
     Route::get('publish/{draft}', [UploadController::class, 'publish'])->name('publish');
 
-    Route::group([
-        'prefix' => 'dashboard',
-    ], function () {
+    Route::prefix('dashboard')->group(function () {
         Route::get('ssubmission', [DashboardController::class, 'dashboard'])
             ->name('submission');
         Route::get('shared-with-me', [DashboardController::class, 'sharedWithMe'])
@@ -275,14 +271,12 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     });
 });
 
-Route::group([
-    'prefix' => 'admin',
-], function () {
-    Route::group(['middleware' => ['auth', 'permission:manage roles|view statistics|manage platform']], function () {
+Route::prefix('admin')->group(function () {
+    Route::middleware('auth', 'permission:manage roles|view statistics|manage platform')->group(function () {
         Route::get('console', [ConsoleController::class, 'index'])
             ->name('console');
 
-        Route::group(['middleware' => ['permission:manage roles|manage platform']], function () {
+        Route::middleware('permission:manage roles|manage platform')->group(function () {
             // Users
             Route::get('users', [UsersController::class, 'index'])
                 ->name('console.users');
@@ -305,7 +299,7 @@ Route::group([
             Route::put('users/edit/{user}/password', [UsersController::class, 'updatePassword'])
                 ->name('console.users.update-password');
 
-            Route::group(['middleware' => ['permission:manage roles']], function () {
+            Route::middleware('permission:manage roles')->group(function () {
                 Route::put('users/edit/{user}/role', [UsersController::class, 'updateRole'])
                     ->name('console.users.update-role');
             });
@@ -315,7 +309,7 @@ Route::group([
         });
 
         // Adding routes for announcements section
-        Route::group(['middleware' => ['auth', 'permission:manage roles|manage platform']], function () {
+        Route::middleware('auth', 'permission:manage roles|manage platform')->group(function () {
             // Announcements
             Route::get('announcements', [AnnouncementController::class, 'index'])
                 ->name('console.announcements');
@@ -331,7 +325,7 @@ Route::group([
         });
 
         // Adding routes for submissions curation
-        Route::group(['middleware' => ['auth', 'permission:manage roles|manage platform']], function () {
+        Route::middleware('auth', 'permission:manage roles|manage platform')->group(function () {
             // Spectra
             Route::get('spectra', [CurationController::class, 'spectra'])
                 ->name('console.spectra');

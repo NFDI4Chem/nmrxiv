@@ -28,7 +28,7 @@ class ExtractSpectra extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): void
     {
         $projects = Project::where([
             ['is_public', true],

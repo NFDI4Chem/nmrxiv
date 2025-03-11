@@ -14,10 +14,8 @@ class ManageLicenseTest extends TestCase
 
     /**
      * Test if licenses can be fetched
-     *
-     * @return void
      */
-    public function test_get_licenses()
+    public function test_get_licenses(): void
     {
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 
@@ -29,10 +27,8 @@ class ManageLicenseTest extends TestCase
 
     /**
      * Test if license in a project can be updated
-     *
-     * @return void
      */
-    public function test_add_license_to_project()
+    public function test_add_license_to_project(): void
     {
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
         $license = License::factory()->create();
@@ -53,10 +49,8 @@ class ManageLicenseTest extends TestCase
 
     /**
      * Test if license in a project cannot be updated by reviewer
-     *
-     * @return void
      */
-    public function test_license_cannot_be_added_by_reviewer()
+    public function test_license_cannot_be_added_by_reviewer(): void
     {
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 
@@ -73,7 +67,7 @@ class ManageLicenseTest extends TestCase
 
         $body = $this->prepareBody($project, $license);
 
-        //Update Project
+        // Update Project
         $response = $this->updateProject($body, $project->id);
 
         $response->assertStatus(403);

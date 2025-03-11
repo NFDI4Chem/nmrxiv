@@ -13,6 +13,9 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Notification;
 use Laravel\Scout\Searchable;
 use Maize\Markable\Markable;
@@ -120,12 +123,12 @@ class Project extends Model implements Auditable
         );
     }
 
-    public function studies()
+    public function studies(): HasMany
     {
         return $this->hasMany(Study::class, 'project_id');
     }
 
-    public function team()
+    public function team(): BelongsTo
     {
         return $this->belongsTo(Team::class, 'team_id');
     }
@@ -135,7 +138,7 @@ class Project extends Model implements Auditable
         return $this->team()->where('personal_team', false);
     }
 
-    public function draft()
+    public function draft(): BelongsTo
     {
         return $this->belongsTo(Draft::class, 'draft_id');
     }
@@ -147,10 +150,8 @@ class Project extends Model implements Auditable
 
     /**
      * Get the owner of the project.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function owner()
+    public function owner(): BelongsTo
     {
         return $this->belongsTo(User::class, 'owner_id');
     }
@@ -167,10 +168,8 @@ class Project extends Model implements Auditable
 
     /**
      * Get all of the users that belong to the project.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function users()
+    public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class)
             ->withPivot('role')
@@ -245,10 +244,8 @@ class Project extends Model implements Auditable
 
     /**
      * Get all of the pending user invitations for the project.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function projectInvitations()
+    public function projectInvitations(): HasMany
     {
         return $this->hasMany(ProjectInvitation::class);
     }
@@ -277,15 +274,13 @@ class Project extends Model implements Auditable
 
     /**
      * Get the license of the project.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function license()
+    public function license(): BelongsTo
     {
         return $this->belongsTo(License::class, 'license_id');
     }
 
-    public function validation()
+    public function validation(): BelongsTo
     {
         return $this->belongsTo(Validation::class, 'validation_id');
     }
@@ -304,10 +299,8 @@ class Project extends Model implements Auditable
 
     /**
      * Authors that belongs to project.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\belongsToMany
      */
-    public function authors()
+    public function authors(): BelongsToMany
     {
         return $this->belongsToMany(Author::class)
             ->withPivot('contributor_type', 'sort_order')->orderBy('sort_order', 'asc');
@@ -331,7 +324,7 @@ class Project extends Model implements Auditable
         });
     }
 
-    public function citations()
+    public function citations(): BelongsToMany
     {
         return $this->belongsToMany(Citation::class);
     }

@@ -2,7 +2,6 @@
 
 namespace Database\Factories;
 
-use App\Models\Dataset;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
@@ -10,18 +9,9 @@ use Illuminate\Support\Str;
 class DatasetFactory extends Factory
 {
     /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
-    protected $model = Dataset::class;
-
-    /**
      * Define the model's default state.
-     *
-     * @return array
      */
-    public function definition()
+    public function definition(): array
     {
         $name = $this->faker->word();
         $slug = Str::slug($name, '-');
@@ -36,10 +26,10 @@ class DatasetFactory extends Factory
             'is_archived' => false,
             'status' => null,
             'process_logs' => null,
-            'location' => null, //todo: Adjust when location field is provided in nmrXiv
+            'location' => null, // todo: Adjust when location field is provided in nmrXiv
             'obfuscationcode' => Str::random(40),
             'description' => $this->faker->text(),
-            'type' => null,  //todo: Adjust when type field is provided in nmrXiv
+            'type' => null,  // todo: Adjust when type field is provided in nmrXiv
             'uuid' => Str::uuid(),
             'access' => 'restricted',
             'access_type' => 'viewer',
@@ -50,7 +40,7 @@ class DatasetFactory extends Factory
             'license_id' => rand(1, 10),
             'draft_id' => 1,
             'fs_id' => 1,
-            'dataset_photo_path' => null, //todo: Adjust when datasets images field is provided in nmrXiv
+            'dataset_photo_path' => null, // todo: Adjust when datasets images field is provided in nmrXiv
             'release_date' => null,
             'created_at' => Carbon::now()->timestamp,
             'updated_at' => Carbon::now()->timestamp,
@@ -60,7 +50,7 @@ class DatasetFactory extends Factory
             'has_nmrium' => null,
             'validation_id' => 1,
             'validation_status' => false,
-            'internal_status' => null, //todo: provide varying values
+            'internal_status' => null, // todo: provide varying values
         ];
     }
 }

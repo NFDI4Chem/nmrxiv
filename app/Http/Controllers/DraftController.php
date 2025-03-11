@@ -254,7 +254,7 @@ class DraftController extends Controller
             if ($project->validation) {
                 $nmrXivValidation = $project->validation;
             } else {
-                $nmrXivValidation = new Validation();
+                $nmrXivValidation = new Validation;
                 $nmrXivValidation->save();
                 $project->validation()->associate($nmrXivValidation);
                 $project->save();
@@ -425,7 +425,7 @@ class DraftController extends Controller
                 }
             }
 
-            //$draft->current_step = 2;
+            // $draft->current_step = 2;
             $draft->save();
 
             $studies = json_decode($project->studies()->orderBy('name')->get()->load(['datasets', 'sample.molecules', 'tags']));

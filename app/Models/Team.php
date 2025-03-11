@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Laravel\Jetstream\Events\TeamCreated;
 use Laravel\Jetstream\Events\TeamDeleted;
 use Laravel\Jetstream\Events\TeamUpdated;
@@ -11,15 +12,6 @@ use Laravel\Jetstream\Team as JetstreamTeam;
 class Team extends JetstreamTeam
 {
     use HasFactory;
-
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'personal_team' => 'boolean',
-    ];
 
     /**
      * The attributes that are mass assignable.
@@ -52,6 +44,18 @@ class Team extends JetstreamTeam
     ];
 
     /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'personal_team' => 'boolean',
+        ];
+    }
+
+    /**
      * Get the default team profile photo URL if no profile photo has been uploaded.
      *
      * @return string
@@ -66,12 +70,12 @@ class Team extends JetstreamTeam
      *
      * @var array
      */
-    public function projects()
+    public function projects(): HasMany
     {
         return $this->hasMany(Project::class);
     }
 
-    public function activeProjects()
+    public function activeProjects(): HasMany
     {
         return $this->hasMany(Project::class)->where([['is_deleted', false], ['is_archived', false]]);
     }

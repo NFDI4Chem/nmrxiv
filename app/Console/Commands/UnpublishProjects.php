@@ -29,10 +29,8 @@ class UnpublishProjects extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return int
      */
-    public function handle(UnPublishProject $unpublisher)
+    public function handle(UnPublishProject $unpublisher): int
     {
         $ids = explode(',', $this->argument('ids'));
 

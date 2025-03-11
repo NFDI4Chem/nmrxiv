@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Tags\HasTags;
 
 class Draft extends Model
@@ -27,17 +29,15 @@ class Draft extends Model
         'current_step',
     ];
 
-    public function files()
+    public function files(): HasMany
     {
         return $this->hasMany(FileSystemObject::class);
     }
 
     /**
      * Get the owner of the draft.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function owner()
+    public function owner(): BelongsTo
     {
         return $this->belongsTo(User::class, 'owner_id');
     }

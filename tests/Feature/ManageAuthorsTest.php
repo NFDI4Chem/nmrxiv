@@ -16,10 +16,8 @@ class ManageAuthorsTest extends TestCase
 
     /**
      * Test if a author can be created and updated
-     *
-     * @return void
      */
-    public function test_author_can_be_created_and_updated()
+    public function test_author_can_be_created_and_updated(): void
     {
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 
@@ -29,12 +27,12 @@ class ManageAuthorsTest extends TestCase
 
         $body = $this->prepareBody(null);
 
-        //Add author to project
+        // Add author to project
         $response = $this->addAuthor($body, $project->id);
 
         $response->assertStatus(200);
 
-        //Check if entry got created in DB
+        // Check if entry got created in DB
         $project = $project->fresh();
         $authors = $project->authors->toArray();
         $this->assertDatabaseHas('author_project', $authors[0]['pivot']);
@@ -42,10 +40,8 @@ class ManageAuthorsTest extends TestCase
 
     /**
      * Test if a author can be updated
-     *
-     * @return void
      */
-    public function test_author_can_be_updated()
+    public function test_author_can_be_updated(): void
     {
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 
@@ -55,20 +51,20 @@ class ManageAuthorsTest extends TestCase
 
         $body = $this->prepareBody(null);
 
-        //Add author to project
+        // Add author to project
         $response = $this->addAuthor($body, $project->id);
 
         $response->assertStatus(200);
 
-        //Fetch authors details
+        // Fetch authors details
         $project = $project->fresh();
         $authors = $project->authors->toArray();
 
-        //Update existing author
+        // Update existing author
         $response = $this->updateAuthor($authors[0], $project->id);
         $response->assertStatus(200);
 
-        //Check if entry got updated in DB
+        // Check if entry got updated in DB
         $project = $project->fresh();
         $authors = $project->authors->toArray();
         $this->assertDatabaseHas('author_project', $authors[0]['pivot']);
@@ -76,10 +72,8 @@ class ManageAuthorsTest extends TestCase
 
     /**
      * Test if a author can be deleted
-     *
-     * @return void
      */
-    public function test_author_can_be_detached()
+    public function test_author_can_be_detached(): void
     {
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 
@@ -95,20 +89,18 @@ class ManageAuthorsTest extends TestCase
 
         $body = $this->prepareBody($author);
 
-        //Detach author
+        // Detach author
         $response = $this->detachAuthor($body, $project->id);
         $response->assertStatus(200);
 
-        //Check if entry got deleted from DB
+        // Check if entry got deleted from DB
         $this->assertDatabaseMissing('author_project', $authors[0]['pivot']);
     }
 
     /**
      * Test if the author cannot be updated or detached by the reviewer
-     *
-     * @return void
      */
-    public function test_author_cannot_be_updated_or_deleted_by_reviewer()
+    public function test_author_cannot_be_updated_or_deleted_by_reviewer(): void
     {
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 
@@ -125,21 +117,19 @@ class ManageAuthorsTest extends TestCase
 
         $body = $this->prepareBody($author);
 
-        //Update author
+        // Update author
         $response = $this->addAuthor($body, $project->id);
         $response->assertStatus(403);
 
-        //Detach author
+        // Detach author
         $response = $response = $this->detachAuthor($body, $project->id);
         $response->assertStatus(403);
     }
 
     /**
      * Test if the author cannot be updated or detached if project is made public
-     *
-     * @return void
      */
-    public function test_author_cannot_be_updated_or_detached_if_project_is_public()
+    public function test_author_cannot_be_updated_or_detached_if_project_is_public(): void
     {
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 
@@ -152,21 +142,19 @@ class ManageAuthorsTest extends TestCase
 
         $body = $this->prepareBody($author);
 
-        //Update author
+        // Update author
         $response = $this->addAuthor($body, $project->id);
         $response->assertStatus(403);
 
-        //Detach author
+        // Detach author
         $response = $response = $this->detachAuthor($body, $project->id);
         $response->assertStatus(403);
     }
 
     /**
      * Test if the role of an author can be updated
-     *
-     * @return void
      */
-    public function test_role_of_an_author_can_be_updated()
+    public function test_role_of_an_author_can_be_updated(): void
     {
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 
@@ -183,7 +171,7 @@ class ManageAuthorsTest extends TestCase
             'role' => 'DataCurator',
         ];
 
-        //Update author's role
+        // Update author's role
         $response = $this->withHeaders([
             'Accept' => 'application/json',
         ])->post('authors/'.$project->id.'/updateRole', $body);
@@ -193,16 +181,14 @@ class ManageAuthorsTest extends TestCase
         $project = $project->refresh();
         $authors = $project->authors->toArray();
 
-        //Check if entry got updated in DB
+        // Check if entry got updated in DB
         $this->assertDatabaseHas('author_project', $authors[0]['pivot']);
     }
 
     /**
      * Test if the role of an author cannot be updated by reviewer
-     *
-     * @return void
      */
-    public function test_role_of_an_author_cannot_be_updated_by_reviewer()
+    public function test_role_of_an_author_cannot_be_updated_by_reviewer(): void
     {
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 
@@ -223,7 +209,7 @@ class ManageAuthorsTest extends TestCase
             'role' => 'DataCurator',
         ];
 
-        //Update author's role
+        // Update author's role
         $response = $this->withHeaders([
             'Accept' => 'application/json',
         ])->post('authors/'.$project->id.'/updateRole', $body);
@@ -233,10 +219,8 @@ class ManageAuthorsTest extends TestCase
 
     /**
      * Test if the role of an author can be updated if the roles are other than configured type.
-     *
-     * @return void
      */
-    public function test_role_of_an_author_cannot_be_updated_for_random_contributor_types()
+    public function test_role_of_an_author_cannot_be_updated_for_random_contributor_types(): void
     {
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 
@@ -253,7 +237,7 @@ class ManageAuthorsTest extends TestCase
             'role' => $this->faker->text(),
         ];
 
-        //Update author's role
+        // Update author's role
         $response = $this->withHeaders([
             'Accept' => 'application/json',
         ])->post('authors/'.$project->id.'/updateRole', $body);
