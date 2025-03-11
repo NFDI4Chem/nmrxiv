@@ -21,6 +21,7 @@ return [
                 'timeout' => 620 * 100, // 51 minute timeout
                 'exclude_tables' => ['versions'],
             ],
+            'search_path' => 'public',
         ],
     ],
 
