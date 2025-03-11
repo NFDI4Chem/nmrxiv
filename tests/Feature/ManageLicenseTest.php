@@ -73,7 +73,7 @@ class ManageLicenseTest extends TestCase
 
         $body = $this->prepareBody($project, $license);
 
-        //Update Project
+        // Update Project
         $response = $this->updateProject($body, $project->id);
 
         $response->assertStatus(403);

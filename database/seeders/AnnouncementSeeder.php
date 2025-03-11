@@ -41,7 +41,7 @@ class AnnouncementSeeder extends Seeder
             $admin->assignRole('super-admin');
         }
 
-        //Creating seeder for the announcement table
+        // Creating seeder for the announcement table
         $announcement = Announcement::create([
             'title' => 'Scheduled-Maintenace',
             'status' => 'active',
