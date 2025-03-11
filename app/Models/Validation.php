@@ -57,9 +57,12 @@ class Validation extends Model
         }',
     ];
 
-    protected $casts = [
-        'report' => 'json',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'report' => 'json',
+        ];
+    }
 
     public function studies()
     {
