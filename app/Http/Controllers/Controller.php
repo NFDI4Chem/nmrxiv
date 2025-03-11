@@ -20,7 +20,7 @@ use Illuminate\Routing\Controller as BaseController;
  *     name="Authorization"
  * )
  */
-class Controller extends BaseController
+abstract class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 }
