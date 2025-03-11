@@ -2,9 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use App\Events\DraftProcessed;
 use App\Events\ProjectArchival;
 use App\Events\ProjectDeletion;
@@ -16,6 +13,9 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Notification;
 use Laravel\Scout\Searchable;
 use Maize\Markable\Markable;
@@ -150,8 +150,6 @@ class Project extends Model implements Auditable
 
     /**
      * Get the owner of the project.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function owner(): BelongsTo
     {
@@ -170,8 +168,6 @@ class Project extends Model implements Auditable
 
     /**
      * Get all of the users that belong to the project.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function users(): BelongsToMany
     {
@@ -248,8 +244,6 @@ class Project extends Model implements Auditable
 
     /**
      * Get all of the pending user invitations for the project.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function projectInvitations(): HasMany
     {
@@ -280,8 +274,6 @@ class Project extends Model implements Auditable
 
     /**
      * Get the license of the project.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function license(): BelongsTo
     {
@@ -307,8 +299,6 @@ class Project extends Model implements Auditable
 
     /**
      * Authors that belongs to project.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\belongsToMany
      */
     public function authors(): BelongsToMany
     {

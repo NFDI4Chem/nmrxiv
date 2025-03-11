@@ -16,8 +16,6 @@ class ManageAuthorsTest extends TestCase
 
     /**
      * Test if a author can be created and updated
-     *
-     * @return void
      */
     public function test_author_can_be_created_and_updated(): void
     {
@@ -42,8 +40,6 @@ class ManageAuthorsTest extends TestCase
 
     /**
      * Test if a author can be updated
-     *
-     * @return void
      */
     public function test_author_can_be_updated(): void
     {
@@ -76,8 +72,6 @@ class ManageAuthorsTest extends TestCase
 
     /**
      * Test if a author can be deleted
-     *
-     * @return void
      */
     public function test_author_can_be_detached(): void
     {
@@ -105,8 +99,6 @@ class ManageAuthorsTest extends TestCase
 
     /**
      * Test if the author cannot be updated or detached by the reviewer
-     *
-     * @return void
      */
     public function test_author_cannot_be_updated_or_deleted_by_reviewer(): void
     {
@@ -136,8 +128,6 @@ class ManageAuthorsTest extends TestCase
 
     /**
      * Test if the author cannot be updated or detached if project is made public
-     *
-     * @return void
      */
     public function test_author_cannot_be_updated_or_detached_if_project_is_public(): void
     {
@@ -163,8 +153,6 @@ class ManageAuthorsTest extends TestCase
 
     /**
      * Test if the role of an author can be updated
-     *
-     * @return void
      */
     public function test_role_of_an_author_can_be_updated(): void
     {
@@ -199,8 +187,6 @@ class ManageAuthorsTest extends TestCase
 
     /**
      * Test if the role of an author cannot be updated by reviewer
-     *
-     * @return void
      */
     public function test_role_of_an_author_cannot_be_updated_by_reviewer(): void
     {
@@ -233,8 +219,6 @@ class ManageAuthorsTest extends TestCase
 
     /**
      * Test if the role of an author can be updated if the roles are other than configured type.
-     *
-     * @return void
      */
     public function test_role_of_an_author_cannot_be_updated_for_random_contributor_types(): void
     {

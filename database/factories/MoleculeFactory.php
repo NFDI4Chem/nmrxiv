@@ -2,7 +2,6 @@
 
 namespace Database\Factories;
 
-use App\Models\Molecule;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -10,8 +9,6 @@ class MoleculeFactory extends Factory
 {
     /**
      * Define the model's default state.
-     *
-     * @return array
      */
     public function definition(): array
     {

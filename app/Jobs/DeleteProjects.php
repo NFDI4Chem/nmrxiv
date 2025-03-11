@@ -34,8 +34,6 @@ class DeleteProjects implements ShouldQueue
 
     /**
      * Execute the job.
-     *
-     * @return void
      */
     public function handle(DeleteProject $deleteProject): void
     {

@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Tags\HasTags;
 
 class Draft extends Model
@@ -36,8 +36,6 @@ class Draft extends Model
 
     /**
      * Get the owner of the draft.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function owner(): BelongsTo
     {

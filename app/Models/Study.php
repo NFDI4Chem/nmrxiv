@@ -2,16 +2,16 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Traits\CacheClear;
 use Auth;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Laravel\Scout\Searchable;
 use Maize\Markable\Markable;
@@ -177,8 +177,6 @@ class Study extends Model implements Auditable
 
     /**
      * Get all of the pending user invitations for the study.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function studyInvitations(): HasMany
     {
@@ -233,8 +231,6 @@ class Study extends Model implements Auditable
 
     /**
      * Get the owner of the project.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function owner(): BelongsTo
     {
@@ -301,8 +297,6 @@ class Study extends Model implements Auditable
 
     /**
      * Get all of the users that belong to the study.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function users(): BelongsToMany
     {
@@ -314,8 +308,6 @@ class Study extends Model implements Auditable
 
     /**
      * Get the license of the study.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function license(): BelongsTo
     {

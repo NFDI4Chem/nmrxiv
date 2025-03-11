@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class License extends Model
 {
@@ -23,8 +23,6 @@ class License extends Model
 
     /**
      * Define hasMany relation with projects
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function projects(): HasMany
     {
@@ -33,8 +31,6 @@ class License extends Model
 
     /**
      * Define hasMany relation with studies
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function studies(): HasMany
     {
@@ -43,8 +39,6 @@ class License extends Model
 
     /**
      * Define hasMany relation with datasets
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function datasets(): HasMany
     {

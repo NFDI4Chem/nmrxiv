@@ -26,8 +26,6 @@ class AssignDOIs extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return int
      */
     public function handle(AssignIdentifier $assigner): int
     {

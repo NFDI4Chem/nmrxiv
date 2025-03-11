@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Citation extends Model
 {
@@ -19,8 +19,6 @@ class Citation extends Model
 
     /**
      * Projects that belongs to citations.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\belongsToMany
      */
     public function projects(): BelongsToMany
     {

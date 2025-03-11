@@ -43,8 +43,6 @@ class ProcessProject implements ShouldBeUnique, ShouldQueue
 
     /**
      * Execute the job.
-     *
-     * @return void
      */
     public function handle(AssignIdentifier $assigner, UpdateDOI $updater, PublishProject $publisher): void
     {

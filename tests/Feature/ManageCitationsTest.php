@@ -14,8 +14,6 @@ class ManageCitationsTest extends TestCase
 
     /**
      * Test if a citation can be updated.
-     *
-     * @return void
      */
     public function test_citation_can_be_added_and_updated(): void
     {
@@ -44,8 +42,6 @@ class ManageCitationsTest extends TestCase
 
     /**
      * Test if a citation can be deleted.
-     *
-     * @return void
      */
     public function test_citation_can_be_detached(): void
     {
@@ -73,8 +69,6 @@ class ManageCitationsTest extends TestCase
 
     /**
      * Test if the citation cannot be updated or detached by the reviewer
-     *
-     * @return void
      */
     public function test_citation_cannot_be_updated_or_deleted_by_reviewer(): void
     {
@@ -104,8 +98,6 @@ class ManageCitationsTest extends TestCase
 
     /**
      * Test if the citation cannot be updated or detached if project is made public
-     *
-     * @return void
      */
     public function test_citation_cannot_be_updated_or_detached_if_project_is_public(): void
     {
