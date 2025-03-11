@@ -59,7 +59,7 @@ class ArchiveProject implements ShouldBeUnique, ShouldQueue
                     $fsObject = $project->fsObject;
 
                     if (! $fsObject) {
-                        $fsObject = new FileSystemObject();
+                        $fsObject = new FileSystemObject;
                         $fsObject->type = 'directory';
                         $fsObject->name = $project->slug;
                         $environment = env('APP_ENV', 'local');

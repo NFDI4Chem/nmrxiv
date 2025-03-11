@@ -26,10 +26,8 @@ class AssignIdentifiers extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return int
      */
-    public function handle(DOIService $doiService)
+    public function handle(DOIService $doiService): int
     {
         return DB::transaction(function () use ($doiService) {
             $projects = Project::where([

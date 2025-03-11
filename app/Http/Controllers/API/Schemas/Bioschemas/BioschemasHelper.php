@@ -104,7 +104,7 @@ class BioschemasHelper
      */
     public static function prepareAuthors($model)
     {
-        $helper = new self();
+        $helper = new self;
         $authorsSchemas = [];
         foreach ($model->authors as &$author) {
             $authorSchema = $helper->preparePerson($author->orcid_id, $author->given_name, $author->family_name, $author->email_id, $author->affiliation);

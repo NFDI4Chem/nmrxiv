@@ -32,10 +32,8 @@ class DeleteAuthors implements ShouldQueue
 
     /**
      * Execute the job.
-     *
-     * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         foreach ($this->authors as $author) {
             if (! DB::table('author_project')->where('author_id', $author->id)->exists()) {

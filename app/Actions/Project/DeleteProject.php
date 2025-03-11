@@ -92,14 +92,14 @@ class DeleteProject
     {
         $datasets = $study->datasets;
         $sample = $study->sample;
-        //Detach Molecules and Delete Sample
+        // Detach Molecules and Delete Sample
         if ($sample) {
             $this->deleteSample($sample);
         }
         foreach ($datasets as $dataset) {
             $this->deleteDatasets($dataset);
         }
-        //Delete Study
+        // Delete Study
         $study->delete();
     }
 
@@ -115,7 +115,7 @@ class DeleteProject
         if ($nmriumInfo) {
             $this->deleteNMRium($nmriumInfo);
         }
-        //Delete Dataset
+        // Delete Dataset
         $dataset->delete();
     }
 
@@ -133,26 +133,26 @@ class DeleteProject
         $draft = $project->draft;
         $validation = $project->validation;
 
-        //Detach Authors
+        // Detach Authors
         if ($authors && count($authors) > 0) {
             $project->authors()->detach(
                 $authors
             );
         }
-        //Detach Citations
+        // Detach Citations
         if ($citations && count($citations) > 0) {
             $project->citations()->detach(
                 $citations
             );
         }
-        //Delete Validations
+        // Delete Validations
         if ($validation) {
             $validation->delete();
         }
-        //Delete Project
+        // Delete Project
         $project->delete();
 
-        //Delete Draft and Files
+        // Delete Draft and Files
         if ($draft) {
             $this->deleteDraft($draft);
         }
@@ -183,12 +183,12 @@ class DeleteProject
      */
     public function deleteDraft($draft)
     {
-        //Delete Files
+        // Delete Files
         $files = $draft->files;
         foreach ($files as $file) {
             $this->deleteFSO($file);
         }
-        //Delete Draft
+        // Delete Draft
         $draft = $draft->refresh();
         $draft->delete();
     }

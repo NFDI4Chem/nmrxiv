@@ -17,10 +17,8 @@ class ManageAnnouncementTest extends TestCase
 
     /**
      * Test if an announcement can be created.
-     *
-     * @return void
      */
-    public function test_announcement_can_be_created()
+    public function test_announcement_can_be_created(): void
     {
         $user = $this->createUser('super-admin');
 
@@ -37,12 +35,12 @@ class ManageAnnouncementTest extends TestCase
             'user_id' => $announcement->user_id,
         ];
 
-        //Create Announcement
+        // Create Announcement
         $response = $this->createAnnouncement($body);
 
         $response->assertStatus(200);
 
-        //Check if entry got created in DB
+        // Check if entry got created in DB
         $this->assertDatabaseHas('announcements', [
             'title' => $body['title'],
         ]);
@@ -50,10 +48,8 @@ class ManageAnnouncementTest extends TestCase
 
     /**
      * Test if an announcement can be updated.
-     *
-     * @return void
      */
-    public function test_announcement_can_be_updated()
+    public function test_announcement_can_be_updated(): void
     {
         $user = $this->createUser('super-admin');
 
@@ -71,11 +67,11 @@ class ManageAnnouncementTest extends TestCase
             'user_id' => $announcement->user_id,
         ];
 
-        //Edit Announcement
+        // Edit Announcement
         $response = $this->editAnnouncement($body, $announcement->id);
         $response->assertStatus(200);
 
-        //Check if entry got edited in DB
+        // Check if entry got edited in DB
         $this->assertDatabaseHas('announcements', [
             'title' => $body['title'],
         ]);
@@ -83,10 +79,8 @@ class ManageAnnouncementTest extends TestCase
 
     /**
      * Test if an announcement can be deleted.
-     *
-     * @return void
      */
-    public function test_announcement_can_be_deleted()
+    public function test_announcement_can_be_deleted(): void
     {
         $user = $this->createUser('super-admin');
 
@@ -94,12 +88,12 @@ class ManageAnnouncementTest extends TestCase
             'user_id' => $user->id,
         ]);
 
-        //Delete Announcement
+        // Delete Announcement
         $response = $this->deleteAnnouncement($announcement->id);
 
         $response->assertStatus(200);
 
-        //Check if entry got deleted from DB
+        // Check if entry got deleted from DB
         $this->assertDatabaseMissing('announcements', [
             'id' => $announcement->id,
         ]);
@@ -107,10 +101,8 @@ class ManageAnnouncementTest extends TestCase
 
     /**
      * Test if an announcement cannot be managed from role other than super-admin & developer
-     *
-     * @return void
      */
-    public function test_announcement_can_be_managed_only_by_admins()
+    public function test_announcement_can_be_managed_only_by_admins(): void
     {
         $this->seed(RolesAndPermissionsSeeder::class);
 
@@ -137,20 +129,20 @@ class ManageAnnouncementTest extends TestCase
                 'user_id' => $announcement->user_id,
             ];
 
-            //Create Announcement
+            // Create Announcement
             $response = $this->createAnnouncement($body);
             $response->assertStatus(403);
 
-            //Edit Announcement
+            // Edit Announcement
             $reponse = $this->editAnnouncement($body, $announcement->id);
             $response->assertStatus(403);
 
-            //Delete Announcement
+            // Delete Announcement
             $reponse = $this->deleteAnnouncement($announcement->id);
             $response->assertStatus(403);
         }
 
-        //Check if the entry is not affected
+        // Check if the entry is not affected
         $this->assertDatabaseHas('announcements', [
             'title' => $announcement->title,
         ]);

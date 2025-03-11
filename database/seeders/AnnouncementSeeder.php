@@ -13,10 +13,8 @@ class AnnouncementSeeder extends Seeder
 {
     /**
      * Run the database seeds.
-     *
-     * @return void
      */
-    public function run()
+    public function run(): void
     {
         // Get the first super admin account
         $admin = User::role('super-admin')->first();
@@ -41,7 +39,7 @@ class AnnouncementSeeder extends Seeder
             $admin->assignRole('super-admin');
         }
 
-        //Creating seeder for the announcement table
+        // Creating seeder for the announcement table
         $announcement = Announcement::create([
             'title' => 'Scheduled-Maintenace',
             'status' => 'active',

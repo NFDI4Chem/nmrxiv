@@ -56,7 +56,7 @@ class AnnouncementController extends Controller
         } else {
             $input['status'] = 'inactive';
         }
-        //Validating the entries
+        // Validating the entries
         Validator::make($request->all(), [
             'title' => ['required', 'string', 'max:255'],
             'message' => ['required'],
@@ -64,7 +64,7 @@ class AnnouncementController extends Controller
             'end_time' => ['required'],
         ])->validate();
 
-        //DB transaction
+        // DB transaction
         $announcement = DB::transaction(function () use ($input, $user) {
             return tap(Announcement::create([
                 'title' => $input['title'],

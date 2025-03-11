@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class FileSystemObject extends Model
 {
@@ -63,27 +65,27 @@ class FileSystemObject extends Model
         }
     }
 
-    public function children()
+    public function children(): HasMany
     {
         return $this->hasMany(FileSystemObject::class, 'parent_id', 'id');
     }
 
-    public function parent()
+    public function parent(): BelongsTo
     {
         return $this->belongsTo(FileSystemObject::class, 'parent_id');
     }
 
-    public function project()
+    public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class, 'project_id');
     }
 
-    public function draft()
+    public function draft(): BelongsTo
     {
         return $this->belongsTo(Draft::class, 'draft_id');
     }
 
-    public function study()
+    public function study(): BelongsTo
     {
         return $this->belongsTo(Study::class, 'study_id');
     }

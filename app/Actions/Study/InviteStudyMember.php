@@ -29,7 +29,7 @@ class InviteStudyMember
 
         $this->validate($study, $email, $role, $message);
 
-        //InvitingStudyMember::dispatch($study, $email, $role, $message);
+        // InvitingStudyMember::dispatch($study, $email, $role, $message);
 
         $invitation = $study->studyInvitations()->create([
             'email' => $email,
@@ -43,7 +43,7 @@ class InviteStudyMember
         $invitedUser = User::where('email', $invitation->email)->first();
 
         if ($invitedUser) {
-            //$invitedUser->notify(new StudyInviteNotification($invitation));
+            // $invitedUser->notify(new StudyInviteNotification($invitation));
             event(new StudyInvite($invitedUser, $invitation));
         }
     }
