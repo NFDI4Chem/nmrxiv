@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use OwenIt\Auditing\Contracts\Auditable;
 use Storage;
@@ -82,32 +84,32 @@ class Dataset extends Model implements Auditable
         return env('APP_URL', null).'/datasets/'.urlencode($this->url);
     }
 
-    public function study()
+    public function study(): BelongsTo
     {
         return $this->belongsTo(Study::class, 'study_id');
     }
 
-    public function project()
+    public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class, 'project_id');
     }
 
-    public function owner()
+    public function owner(): BelongsTo
     {
         return $this->belongsTo(User::class, 'owner_id');
     }
 
-    public function validation()
+    public function validation(): BelongsTo
     {
         return $this->belongsTo(Validation::class, 'validation_id');
     }
 
-    public function draft()
+    public function draft(): BelongsTo
     {
         return $this->belongsTo(Draft::class, 'draft_id');
     }
 
-    public function team()
+    public function team(): BelongsTo
     {
         return $this->belongsTo(Team::class, 'Team_id');
     }
@@ -117,17 +119,15 @@ class Dataset extends Model implements Auditable
         return $this->morphOne(NMRium::class, 'nmriumable');
     }
 
-    public function fsObject()
+    public function fsObject(): HasOne
     {
         return $this->hasOne(FileSystemObject::class);
     }
 
     /**
      * Get the license of the dataset.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function license()
+    public function license(): BelongsTo
     {
         return $this->belongsTo(License::class, 'license_id');
     }

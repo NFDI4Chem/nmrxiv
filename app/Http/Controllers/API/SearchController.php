@@ -57,7 +57,7 @@ class SearchController extends Controller
             $queryType = 'text';
             $results = [];
 
-            //dd($request);
+            // dd($request);
 
             $limit = $request->query('limit');
             $sort = $request->query('sort');
@@ -79,7 +79,7 @@ class SearchController extends Controller
             if ($type) {
                 $queryType = $type;
             } else {
-                //inchi
+                // inchi
                 $re =
                     '/^((InChI=)?[^J][0-9BCOHNSOPrIFla+\-\(\)\\\\\/,pqbtmsih]{6,})$/i';
                 preg_match_all($re, $query, $imatches, PREG_SET_ORDER, 0);
@@ -88,7 +88,7 @@ class SearchController extends Controller
                     $queryType = 'inchi';
                 }
 
-                //inchikey
+                // inchikey
                 $re = '/^([0-9A-Z\-]+)$/i';
                 preg_match_all($re, $query, $ikmatches, PREG_SET_ORDER, 0);
                 if (
@@ -322,7 +322,7 @@ class SearchController extends Controller
                 $page
             );
 
-            //dd($pagination);
+            // dd($pagination);
             return $pagination;
         } catch (QueryException $exception) {
             return response()->json(

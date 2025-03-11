@@ -63,7 +63,7 @@ class DownloadController extends Controller
                 }
             }
 
-            $fsObj = new FileSystemObject();
+            $fsObj = new FileSystemObject;
             $fsObj->type = 'directory';
             $fsObj->name = $project->slug;
             $environment = env('APP_ENV', 'local');
