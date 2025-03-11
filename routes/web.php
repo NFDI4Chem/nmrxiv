@@ -113,7 +113,7 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::post('authors/{project}/updateRole', [AuthorController::class, 'updateRole'])
         ->name('author.updateRole');
 
-    //Citation
+    // Citation
     Route::post('citations/{project}', [CitationController::class, 'save'])
         ->name('citation.save');
 

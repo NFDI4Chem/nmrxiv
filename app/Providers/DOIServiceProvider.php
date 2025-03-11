@@ -17,7 +17,7 @@ class DOIServiceProvider extends ServiceProvider
     {
         $this->app->bind(DOIService::class, function ($app) {
             return match (config('doi.default')) {
-                'datacite' => new DataCite()
+                'datacite' => new DataCite
             };
         });
     }

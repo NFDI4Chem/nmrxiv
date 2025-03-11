@@ -28,7 +28,7 @@ class InviteProjectMember
 
         $this->validate($project, $email, $role, $message);
 
-        //InvitingProjectMember::dispatch($project, $email, $role, $message);
+        // InvitingProjectMember::dispatch($project, $email, $role, $message);
 
         $invitation = $project->projectInvitations()->create([
             'email' => $email,

@@ -41,7 +41,7 @@ class ProjectSeeder extends Seeder
                 'project_id' => $project->id,
             ]);
 
-            //todo: add molecules to the sample
+            // todo: add molecules to the sample
 
             $datasets = Dataset::factory(5)->create([
                 'team_id' => $team->id,

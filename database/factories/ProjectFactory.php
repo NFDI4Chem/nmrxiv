@@ -36,11 +36,11 @@ class ProjectFactory extends Factory
             'is_archived' => false,
             'status' => null,
             'process_logs' => null,
-            'location' => null, //todo: Adjust when location field is provided in nmrXiv
+            'location' => null, // todo: Adjust when location field is provided in nmrXiv
             'obfuscationcode' => Str::random(40),
             'description' => $this->faker->text(),
             'sort_order' => 0,
-            'type' => null,  //todo: Adjust when type field is provided in nmrXiv
+            'type' => null,  // todo: Adjust when type field is provided in nmrXiv
             'uuid' => Str::uuid(),
             'access' => 'restricted',
             'access_type' => 'viewer',
@@ -58,8 +58,8 @@ class ProjectFactory extends Factory
             'identifier' => null,
             'validation_id' => 1,
             'validation_status' => false,
-            'schema_version' => 'beta', //todo: provide varying values
-            'internal_status' => null, //todo: provide varying values
+            'schema_version' => 'beta', // todo: provide varying values
+            'internal_status' => null, // todo: provide varying values
         ];
     }
 }
