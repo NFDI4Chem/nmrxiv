@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use App\Providers\RouteServiceProvider;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
@@ -20,7 +21,9 @@ class EmailVerificationTest extends TestCase
             $this->markTestSkipped('Email verification not enabled.');
         }
 
-        $user = User::factory()->withPersonalTeam()->unverified()->create();
+        $user = User::factory()->withPersonalTeam()->create([
+            'email_verified_at' => null,
+        ]);
 
         $response = $this->actingAs($user)->get('/email/verify');
 
@@ -35,7 +38,9 @@ class EmailVerificationTest extends TestCase
 
         Event::fake();
 
-        $user = User::factory()->unverified()->create();
+        $user = User::factory()->create([
+            'email_verified_at' => null,
+        ]);
 
         $verificationUrl = URL::temporarySignedRoute(
             'verification.verify',
@@ -48,7 +53,7 @@ class EmailVerificationTest extends TestCase
         Event::assertDispatched(Verified::class);
 
         $this->assertTrue($user->fresh()->hasVerifiedEmail());
-        $response->assertRedirect(route('dashboard', absolute: false).'?verified=1');
+        $response->assertRedirect(RouteServiceProvider::LANDING);
     }
 
     public function test_email_can_not_verified_with_invalid_hash(): void
@@ -57,7 +62,9 @@ class EmailVerificationTest extends TestCase
             $this->markTestSkipped('Email verification not enabled.');
         }
 
-        $user = User::factory()->unverified()->create();
+        $user = User::factory()->create([
+            'email_verified_at' => null,
+        ]);
 
         $verificationUrl = URL::temporarySignedRoute(
             'verification.verify',
