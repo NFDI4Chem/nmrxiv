@@ -29,7 +29,7 @@ class ManageFiles extends Command
      */
     public function handle(): void
     {
-        return DB::transaction(function () {
+        DB::transaction(function () {
             $drafts = Draft::where([
                 ['is_deleted', false],
             ])->get();

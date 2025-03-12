@@ -29,7 +29,7 @@ class ArchiveData extends Command
      */
     public function handle(): void
     {
-        return DB::transaction(function () {
+        DB::transaction(function () {
             $projects = Project::where([
                 ['is_public', true],
                 ['download_url', null],
