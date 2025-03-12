@@ -3,18 +3,22 @@ version: "3"
 services:
     laravel.test:
         build:
-            context: ./docker/8.2
+            context: ./docker/8.3
             dockerfile: Dockerfile
             args:
                 WWWGROUP: "${WWWGROUP}"
-        image: sail-8.1/app
+        image: sail-8.3/app
+        extra_hosts:
+            - 'host.docker.internal:host-gateway'
         ports:
-            - "${APP_PORT:-80}:80"
+            - '${APP_PORT:-80}:80'
+            - '${VITE_PORT:-5173}:${VITE_PORT:-5173}'
         environment:
-            WWWUSER: "${WWWUSER}"
+            WWWUSER: '${WWWUSER}'
             LARAVEL_SAIL: 1
-            XDEBUG_MODE: "${SAIL_XDEBUG_MODE:-off}"
-            XDEBUG_CONFIG: "${SAIL_XDEBUG_CONFIG:-client_host=host.docker.internal}"
+            XDEBUG_MODE: '${SAIL_XDEBUG_MODE:-off}'
+            XDEBUG_CONFIG: '${SAIL_XDEBUG_CONFIG:-client_host=host.docker.internal}'
+            IGNITION_LOCAL_SITES_PATH: '${PWD}'
         volumes:
             - ".:/var/www/html"
         networks:
@@ -22,9 +26,10 @@ services:
         depends_on:
             - pgsql
             - redis
-            - meilisearch
-            - selenium
-        #   - minio
+            - mailpit
+            # - meilisearch
+            # - selenium
+            # - minio
     pgsql:
         image: "informaticsmatters/rdkit-cartridge-debian:latest"
         ports:
@@ -35,7 +40,7 @@ services:
             POSTGRES_USER: "${DB_USERNAME}"
             POSTGRES_PASSWORD: "${DB_PASSWORD:-secret}"
         volumes:
-            - "sailpgsql:/var/lib/postgresql/data"
+            - "sail-pgsql:/var/lib/postgresql/data"
         networks:
             - sail
         healthcheck:
@@ -70,51 +75,54 @@ services:
     #       retries: 3
     #       timeout: 5s
     redis:
-        image: "redis:alpine"
+        image: 'redis:alpine'
         ports:
-            - "${FORWARD_REDIS_PORT:-6379}:6379"
+            - '${FORWARD_REDIS_PORT:-6379}:6379'
         volumes:
-            - "sailredis:/data"
+            - 'sail-redis:/data'
         networks:
             - sail
-        healthcheck:
-            test: ["CMD", "redis-cli", "ping"]
-            retries: 3
-            timeout: 5s
-    meilisearch:
-        image: "getmeili/meilisearch:latest"
-        ports:
-            - "${FORWARD_MEILISEARCH_PORT:-7700}:7700"
-        volumes:
-            - "sailmeilisearch:/data.ms"
-        networks:
-            - sail
-        environment:
-            MEILI_MASTER_KEY: "${MEILISEARCH_PRIVATEKEY}"
         healthcheck:
             test:
-                [
-                    "CMD",
-                    "wget",
-                    "--no-verbose",
-                    "--spider",
-                    "http://localhost:7700/health",
-                ]
+                - CMD
+                - redis-cli
+                - ping
             retries: 3
             timeout: 5s
-    mailhog:
-        image: "mailhog/mailhog:latest"
+    # meilisearch:
+    #     image: "getmeili/meilisearch:latest"
+    #     ports:
+    #         - "${FORWARD_MEILISEARCH_PORT:-7700}:7700"
+    #     volumes:
+    #         - "sailmeilisearch:/data.ms"
+    #     networks:
+    #         - sail
+    #     environment:
+    #         MEILI_MASTER_KEY: "${MEILISEARCH_PRIVATEKEY}"
+    #     healthcheck:
+    #         test:
+    #             [
+    #                 "CMD",
+    #                 "wget",
+    #                 "--no-verbose",
+    #                 "--spider",
+    #                 "http://localhost:7700/health",
+    #             ]
+    #         retries: 3
+    #         timeout: 5s
+    mailpit:
+        image: 'axllent/mailpit:latest'
         ports:
-            - "${FORWARD_MAILHOG_PORT:-1025}:1025"
-            - "${FORWARD_MAILHOG_DASHBOARD_PORT:-8025}:8025"
+            - '${FORWARD_MAILPIT_PORT:-1025}:1025'
+            - '${FORWARD_MAILPIT_DASHBOARD_PORT:-8025}:8025'
         networks:
             - sail
-    selenium:
-        image: "selenium/standalone-chrome"
-        volumes:
-            - "/dev/shm:/dev/shm"
-        networks:
-            - sail
+    # selenium:
+    #     image: "selenium/standalone-chrome"
+    #     volumes:
+    #         - "/dev/shm:/dev/shm"
+    #     networks:
+    #         - sail
     # minio:
     #     image: 'minio/minio:latest'
     #     ports:
@@ -136,11 +144,11 @@ networks:
     sail:
         driver: bridge
 volumes:
-    sailpgsql:
+    sail-pgsql:
         driver: local
-    sailredis:
+    sail-redis:
         driver: local
-    sailmeilisearch:
-        driver: local
-    sail-minio:
-        driver: local
+    # sailmeilisearch:
+    #     driver: local
+    # sail-minio:
+    #     driver: local
