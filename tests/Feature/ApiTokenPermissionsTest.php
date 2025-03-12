@@ -18,24 +18,27 @@ class ApiTokenPermissionsTest extends TestCase
             $this->markTestSkipped('API support is not enabled.');
         }
 
-        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+        if (Features::hasTeamFeatures()) {
+            $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+        } else {
+            $this->actingAs($user = User::factory()->create());
+        }
 
         $token = $user->tokens()->create([
             'name' => 'Test Token',
             'token' => Str::random(40),
-            'abilities' => ['create', 'read'],
+            'abilities' => ['project:create', 'project:read'],
         ]);
 
-        $this->put('/user/api-tokens/'.$token->id, [
+        $response = $this->put('/user/api-tokens/'.$token->id, [
             'name' => $token->name,
             'permissions' => [
-                'delete',
-                'missing-permission',
+                'project:update',
             ],
         ]);
 
-        $this->assertTrue($user->fresh()->tokens->first()->can('delete'));
-        $this->assertFalse($user->fresh()->tokens->first()->can('read'));
-        $this->assertFalse($user->fresh()->tokens->first()->can('missing-permission'));
+        $this->assertTrue($user->fresh()->tokens->first()->can('project:update'));
+        $this->assertFalse($user->fresh()->tokens->first()->can('project:read'));
+        $this->assertFalse($user->fresh()->tokens->first()->can('project:missing-permission'));
     }
 }

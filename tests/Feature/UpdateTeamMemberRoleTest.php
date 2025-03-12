@@ -15,15 +15,15 @@ class UpdateTeamMemberRoleTest extends TestCase
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 
         $user->currentTeam->users()->attach(
-            $otherUser = User::factory()->create(), ['role' => 'admin']
+            $otherUser = User::factory()->create(), ['role' => 'owner']
         );
 
-        $this->put('/teams/'.$user->currentTeam->id.'/members/'.$otherUser->id, [
-            'role' => 'editor',
+        $response = $this->put('/teams/'.$user->currentTeam->id.'/members/'.$otherUser->id, [
+            'role' => 'collaborator',
         ]);
 
         $this->assertTrue($otherUser->fresh()->hasTeamRole(
-            $user->currentTeam->fresh(), 'editor'
+            $user->currentTeam->fresh(), 'collaborator'
         ));
     }
 
@@ -32,17 +32,17 @@ class UpdateTeamMemberRoleTest extends TestCase
         $user = User::factory()->withPersonalTeam()->create();
 
         $user->currentTeam->users()->attach(
-            $otherUser = User::factory()->create(), ['role' => 'admin']
+            $otherUser = User::factory()->create(), ['role' => 'owner']
         );
 
         $this->actingAs($otherUser);
 
-        $this->put('/teams/'.$user->currentTeam->id.'/members/'.$otherUser->id, [
-            'role' => 'editor',
+        $response = $this->put('/teams/'.$user->currentTeam->id.'/members/'.$otherUser->id, [
+            'role' => 'reviewer',
         ]);
 
         $this->assertTrue($otherUser->fresh()->hasTeamRole(
-            $user->currentTeam->fresh(), 'admin'
+            $user->currentTeam->fresh(), 'owner'
         ));
     }
 }
