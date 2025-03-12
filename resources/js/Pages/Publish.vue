@@ -914,7 +914,7 @@ export default {
             }
         },
         primed() {
-            return this.$page.props.user.primed;
+            return this.$page.props.auth.user.primed;
         },
         currentTab() {
             return this.tabs.find((t) => t.current);

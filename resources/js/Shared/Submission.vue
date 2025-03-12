@@ -1894,7 +1894,7 @@ export default {
     },
     computed: {
         primed() {
-            return this.$page.props.user.primed;
+            return this.$page.props.auth.user.primed;
         },
 
         currentStep() {
@@ -2359,7 +2359,7 @@ export default {
                 this.studiesExist
             ) {
                 this.loadingStep = true;
-                this.draftForm.owner_id = this.$page.props.user.id;
+                this.draftForm.owner_id = this.$page.props.auth.user.id;
                 this.draftForm.tags_array = this.draftForm.tags.map(
                     (a) => a.text
                 );

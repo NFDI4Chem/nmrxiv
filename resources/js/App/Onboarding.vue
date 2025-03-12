@@ -595,7 +595,7 @@ export default {
         },
     },
     mounted() {
-        if (!this.$page.props.user.onboarded) {
+        if (!this.$page.props.auth.user.onboarded) {
             this.open = true;
         }
     },
