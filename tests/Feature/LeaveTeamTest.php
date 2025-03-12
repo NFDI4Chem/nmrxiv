@@ -15,12 +15,12 @@ class LeaveTeamTest extends TestCase
         $user = User::factory()->withPersonalTeam()->create();
 
         $user->currentTeam->users()->attach(
-            $otherUser = User::factory()->withPersonalTeam()->create(), ['role' => 'admin']
+            $otherUser = User::factory()->create(), ['role' => 'admin']
         );
 
         $this->actingAs($otherUser);
 
-        $response = $this->delete('/teams/'.$user->currentTeam->id.'/members/'.$otherUser->id);
+        $this->delete('/teams/'.$user->currentTeam->id.'/members/'.$otherUser->id);
 
         $this->assertCount(0, $user->currentTeam->fresh()->users);
     }

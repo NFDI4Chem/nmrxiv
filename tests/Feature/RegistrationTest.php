@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Providers\AppServiceProvider;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Fortify\Features;
 use Laravel\Jetstream\Jetstream;
@@ -15,7 +14,7 @@ class RegistrationTest extends TestCase
     public function test_registration_screen_can_be_rendered(): void
     {
         if (! Features::enabled(Features::registration())) {
-            return $this->markTestSkipped('Registration support is not enabled.');
+            $this->markTestSkipped('Registration support is not enabled.');
         }
 
         $response = $this->get('/register');
@@ -26,7 +25,7 @@ class RegistrationTest extends TestCase
     public function test_registration_screen_cannot_be_rendered_if_support_is_disabled(): void
     {
         if (Features::enabled(Features::registration())) {
-            return $this->markTestSkipped('Registration support is enabled.');
+            $this->markTestSkipped('Registration support is enabled.');
         }
 
         $response = $this->get('/register');
@@ -37,23 +36,18 @@ class RegistrationTest extends TestCase
     public function test_new_users_can_register(): void
     {
         if (! Features::enabled(Features::registration())) {
-            return $this->markTestSkipped('Registration support is not enabled.');
+            $this->markTestSkipped('Registration support is not enabled.');
         }
 
         $response = $this->post('/register', [
             'name' => 'Test User',
-            'first_name' => 'Test',
-            'last_name' => 'User',
-            'username' => 'test',
             'email' => 'test@example.com',
             'password' => 'password',
             'password_confirmation' => 'password',
-            'orcid_id' => 'test',
-            'affiliation' => 'affiliation',
             'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature(),
         ]);
 
         $this->assertAuthenticated();
-        $response->assertRedirect(AppServiceProvider::HOME);
+        $response->assertRedirect(route('dashboard', absolute: false));
     }
 }
