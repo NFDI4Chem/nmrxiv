@@ -53,7 +53,10 @@ export default {
             return this.checkIfValueExists(permissions, "permissions");
         },
         checkIfValueExists(queryArray, type) {
-            if (this.$page.props.auth.user && this.$page.props.auth.user[type]) {
+            if (
+                this.$page.props.auth.user &&
+                this.$page.props.auth.user[type]
+            ) {
                 let allValues = Array.from(this.$page.props.auth.user[type]);
                 return queryArray.some((r) => allValues.indexOf(r) >= 0);
             }
@@ -234,7 +237,10 @@ export default {
             return this.checkIfValueExists(permissions, "permissions");
         },
         checkIfValueExists(queryArray, type) {
-            if (this.$page.props.auth.user && this.$page.props.auth.user[type]) {
+            if (
+                this.$page.props.auth.user &&
+                this.$page.props.auth.user[type]
+            ) {
                 let allValues = Array.from(this.$page.props.auth.user[type]);
                 return queryArray.some((r) => allValues.indexOf(r) >= 0);
             }
