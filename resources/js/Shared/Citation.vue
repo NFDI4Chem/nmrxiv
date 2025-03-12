@@ -18,8 +18,9 @@
                     </svg>
                 </div>
                 <div class="ml-3 w-full">
-                    <p class="text-md text-blue-700">
-                        Cite this {{ model }}
+                    <div class="text-md text-blue-700">
+                        <div v-if="model == 'study'">Cite this sample</div>
+                        <div v-else>Cite this {{ model }}</div>
                         <select
                             v-model="selectedFormat"
                             class="-mt-2 -mr-2 block rounded-md border-gray-300 py-1 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm float-right"
@@ -44,7 +45,7 @@
                                 Springer Nature
                             </option>
                         </select>
-                    </p>
+                    </div>
                     <p
                         class="text-md font-bold mt-1 text-gray-900"
                         v-html="citationText"

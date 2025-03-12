@@ -338,7 +338,9 @@
                                     </jet-secondary-button>
                                     <jet-secondary-button
                                         class="ml-2 float-right"
-                                        :disabled="!$page.props.user.orcid_id"
+                                        :disabled="
+                                            !$page.props.auth.user.orcid_id
+                                        "
                                         @click="addCurrentUser"
                                     >
                                         Add me
@@ -1271,18 +1273,19 @@ export default {
         },
         /*Add current user as Author*/
         addCurrentUser() {
-            if (this.$page.props.user && this.$page.props.user.orcid_id) {
+            if (this.$page.props.auth.user && this.$page.props.auth.user) {
                 let user = {};
                 let affiliation = {};
                 this.fetchedAuthors = [];
-                user.firstName = this.$page.props.user.first_name;
-                user.lastName = this.$page.props.user.last_name;
+                user.firstName = this.$page.props.auth.user;
+                user.lastName = this.$page.props.auth.user.last_name;
                 user.authorId = {};
                 user.authorId.type = "ORCID";
-                user.authorId.value = this.$page.props.user.orcid_id;
+                user.authorId.value = this.$page.props.auth.user.orcid_id;
                 user.authorAffiliationDetailsList = {};
                 user.authorAffiliationDetailsList.authorAffiliation = [];
-                affiliation.affiliation = this.$page.props.user.affiliation;
+                affiliation.affiliation =
+                    this.$page.props.auth.user.affiliation;
                 user.authorAffiliationDetailsList.authorAffiliation.push(
                     affiliation
                 );

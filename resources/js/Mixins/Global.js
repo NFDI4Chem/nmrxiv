@@ -53,8 +53,11 @@ export default {
             return this.checkIfValueExists(permissions, "permissions");
         },
         checkIfValueExists(queryArray, type) {
-            if (this.$page.props.user && this.$page.props.user[type]) {
-                let allValues = Array.from(this.$page.props.user[type]);
+            if (
+                this.$page.props.auth.user &&
+                this.$page.props.auth.user[type]
+            ) {
+                let allValues = Array.from(this.$page.props.auth.user[type]);
                 return queryArray.some((r) => allValues.indexOf(r) >= 0);
             }
         },
@@ -234,8 +237,11 @@ export default {
             return this.checkIfValueExists(permissions, "permissions");
         },
         checkIfValueExists(queryArray, type) {
-            if (this.$page.props.user && this.$page.props.user[type]) {
-                let allValues = Array.from(this.$page.props.user[type]);
+            if (
+                this.$page.props.auth.user &&
+                this.$page.props.auth.user[type]
+            ) {
+                let allValues = Array.from(this.$page.props.auth.user[type]);
                 return queryArray.some((r) => allValues.indexOf(r) >= 0);
             }
         },
@@ -335,6 +341,15 @@ export default {
                 }
             }
             return query.trim();
+        },
+        customDateFormat(date) {
+            if (!date) return "";
+            const day = String(date.getDate()).padStart(2, "0");
+            const month = String(date.getMonth() + 1).padStart(2, "0");
+            const year = date.getFullYear();
+            const hours = String(date.getHours()).padStart(2, "0");
+            const minutes = String(date.getMinutes()).padStart(2, "0");
+            return `${day}/${month}/${year}, ${hours}:${minutes}`;
         },
     },
 

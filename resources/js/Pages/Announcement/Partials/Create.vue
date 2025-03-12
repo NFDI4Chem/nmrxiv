@@ -75,6 +75,8 @@
                         <Datepicker
                             v-model="createAnnouncementForm.start_time"
                             :min-date="new Date()"
+                            :format="customDateFormat"
+                            :preview-format="customDateFormat"
                         ></Datepicker>
                         <jet-input-error
                             :message="createAnnouncementForm.errors.start_time"
@@ -90,6 +92,8 @@
                         </label>
                         <Datepicker
                             v-model="createAnnouncementForm.end_time"
+                            :format="customDateFormat"
+                            :preview-format="customDateFormat"
                         ></Datepicker>
                         <jet-input-error
                             :message="createAnnouncementForm.errors.end_time"
@@ -186,7 +190,8 @@ export default {
             return end_time;
         },
         createAnnouncement() {
-            this.createAnnouncementForm.creator_id = this.$page.props.user.id;
+            this.createAnnouncementForm.creator_id =
+                this.$page.props.auth.user.id;
             this.createAnnouncementForm.post(
                 route("console.announcements.create"),
                 {

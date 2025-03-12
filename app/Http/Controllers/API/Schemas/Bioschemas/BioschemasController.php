@@ -76,46 +76,46 @@ class BioschemasController extends Controller
      * )
      * )
      */
-    public function modelSchemaByName(Request $request, $username, $projectName, $studyName = null, $datasetName = null)
-    {
-        $user = User::where('username', $username)->firstOrFail();
-        if ($user) {
-            $project = Project::where([['slug', $projectName], ['owner_id', $user->id]])->firstOrFail();
-        }
-        if ($project) {
-            if ($project->is_public) {
-                $projectSchema = $this->project($project);
-                if ($studyName) {
-                    $study = Study::where([['slug', $studyName], ['owner_id', $user->id], ['project_id', $project->id]])->firstOrFail();
-                    if ($study) {
-                        if ($study->is_public) {
-                            $studySchema = $this->study($study);
-                            if ($datasetName) {
-                                $dataset = Dataset::where([['slug', $datasetName], ['owner_id', $user->id], ['project_id', $project->id], ['study_id', $study->id]])->firstOrFail();
-                                if ($dataset) {
-                                    if ($dataset->is_public) {
-                                        $datasetSchema = $this->dataset($dataset);
-                                    } else {
-                                        throw new AuthorizationException;
-                                    }
+    // public function modelSchemaByName(Request $request, $username, $projectName, $studyName = null, $datasetName = null)
+    // {
+    //     $user = User::where('username', $username)->firstOrFail();
+    //     if ($user) {
+    //         $project = Project::where([['slug', $projectName], ['owner_id', $user->id]])->firstOrFail();
+    //     }
+    //     if ($project) {
+    //         if ($project->is_public) {
+    //             $projectSchema = $this->project($project);
+    //             if ($studyName) {
+    //                 $study = Study::where([['slug', $studyName], ['owner_id', $user->id], ['project_id', $project->id]])->firstOrFail();
+    //                 if ($study) {
+    //                     if ($study->is_public) {
+    //                         $studySchema = $this->study($study);
+    //                         if ($datasetName) {
+    //                             $dataset = Dataset::where([['slug', $datasetName], ['owner_id', $user->id], ['project_id', $project->id], ['study_id', $study->id]])->firstOrFail();
+    //                             if ($dataset) {
+    //                                 if ($dataset->is_public) {
+    //                                     $datasetSchema = $this->dataset($dataset);
+    //                                 } else {
+    //                                     throw new AuthorizationException;
+    //                                 }
 
-                                    return $datasetSchema;
-                                }
-                            }
+    //                                 return $datasetSchema;
+    //                             }
+    //                         }
 
-                            return $studySchema;
-                        } else {
-                            throw new AuthorizationException;
-                        }
-                    }
-                }
+    //                         return $studySchema;
+    //                     } else {
+    //                         throw new AuthorizationException;
+    //                     }
+    //                 }
+    //             }
 
-                return $projectSchema;
-            } else {
-                throw new AuthorizationException;
-            }
-        }
-    }
+    //             return $projectSchema;
+    //         } else {
+    //             throw new AuthorizationException;
+    //         }
+    //     }
+    // }
 
     /**
      * Implement Bioschemas upon request by model's id to generate a project, study, or dataset schema.
@@ -238,17 +238,13 @@ class BioschemasController extends Controller
      */
     public function getSample($study)
     {
-        $prefix = '';
-        if (property_exists($study, 'project')) {
-            $prefix = $study->project->name.'.';
-        }
         $sample = $study->sample;
         $molecules = $this->prepareMoleculesSchemas($sample);
 
         $sampleSchema = Schema::ChemicalSubstance();
         $sampleSchema['@id'] = $study->doi;
         $sampleSchema['dct:conformsTo'] = BioschemasHelper::conformsTo(['https://bioschemas.org/types/ChemicalSubstance/0.3-RELEASE-2019_09_02']);
-        $sampleSchema->name($prefix.$sample->name);
+        $sampleSchema->name($sample->name);
         $sampleSchema->description($sample->description);
         $sampleSchema->url(env('APP_URL').'/'.explode(':', $study->identifier ? $study->identifier : ':')[1]);
         $sampleSchema->hasBioChemEntityPart($this->prepareMoleculesSchemas($sample));
@@ -377,7 +373,7 @@ class BioschemasController extends Controller
             $nucleusProperty = BioschemasHelper::preparePropertyValue('acquisition nucleus', 'NMR:1400083', $nucleus, null);
             $dimensionProperty = BioschemasHelper::preparePropertyValue('NMR spectrum by dimensionality', 'NMR:1000117', $dimension, null);
             $probeNameProperty = BioschemasHelper::preparePropertyValue('NMR probe', 'OBI:0000516', $probeName, null);
-            //$experimentProperty = BioschemasHelper::preparePropertyValue('pulsed nuclear magnetic resonance spectroscopy', 'CHMO:0000613', $experiment, null);
+            // $experimentProperty = BioschemasHelper::preparePropertyValue('pulsed nuclear magnetic resonance spectroscopy', 'CHMO:0000613', $experiment, null);
             $temperatureProperty = BioschemasHelper::preparePropertyValue('Temperature', 'NCIT:C25206', $temperature, 'http://purl.obolibrary.org/obo/UO_0000012');
             $baseFrequencyProperty = BioschemasHelper::preparePropertyValue('irradiation frequency', 'NMR:1400026', $baseFrequency, 'http://purl.obolibrary.org/obo/UO_0000325');
             $fieldStrengthProperty = BioschemasHelper::preparePropertyValue('magnetic field strength', 'MR:1400253', $fieldStrength, 'http://purl.obolibrary.org/obo/UO_0000228');
@@ -455,14 +451,12 @@ class BioschemasController extends Controller
         $nmriumInfo = $this->prepareNMRiumInfo($dataset);
         if ($nmriumInfo) {
             $study = $dataset->study;
-            $prefix = $dataset->study->name.'.';
-            if (property_exists($study, 'project')) {
-                $prefix = $study->project->name.':'.$prefix;
-            }
+            $prefix = $dataset->study->name;
+
             $datasetSchema = Schema::Dataset();
             $datasetSchema['@id'] = $dataset->doi;
             $datasetSchema['dct:conformsTo'] = BioschemasHelper::conformsTo(['https://schema.org/Dataset', 'https://isa-specs.readthedocs.io/en/latest/isamodel.html#assay']);
-            $datasetSchema->name($prefix.$nmriumInfo[2]);
+            $datasetSchema->name($prefix.'['.$dataset->name.']');
             $datasetSchema->description($dataset->description);
             $datasetSchema->keywords($nmriumInfo[0]);
             $datasetSchema->license($dataset->study->license->url);
@@ -491,11 +485,13 @@ class BioschemasController extends Controller
      */
     public function dataset($dataset)
     {
-        $projectSchema = $this->projectLite($dataset->project);
-        $studySchema = $this->studyLite($dataset->study);
         $datasetSchema = $this->datasetLite($dataset);
+        $studySchema = $this->studyLite($dataset->study);
 
-        $studySchema->isPartOf($projectSchema);
+        if ($dataset->project) {
+            $projectSchema = $this->projectLite($dataset->project);
+            $studySchema->isPartOf($projectSchema);
+        }
         $datasetSchema->isPartOf($studySchema);
 
         return $datasetSchema;
@@ -511,14 +507,11 @@ class BioschemasController extends Controller
      */
     public function studyLite($study)
     {
-        $prefix = '';
-        if (property_exists($study, 'project')) {
-            $prefix = $study->project->name.':';
-        }
+
         $studySchema = Bioschemas::Study();
         $studySchema['@id'] = $study->doi;
         $studySchema['dct:conformsTo'] = BioschemasHelper::conformsTo(['https://bioschemas.org/types/Study/0.3-DRAFT', 'https://isa-specs.readthedocs.io/en/latest/isamodel.html#study']);
-        $studySchema->name($prefix.$study->name);
+        $studySchema->name($study->name);
         $studySchema->description($study->description);
         $studySchema->keywords(BioschemasHelper::getTags($study));
         $studySchema->license($study->license->url);

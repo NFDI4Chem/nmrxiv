@@ -27,7 +27,7 @@ class CitationController extends Controller
 
         $user = $request->user();
         $citations = $request->get('citations');
-        //dd($citations);
+        // dd($citations);
         if (count($citations) > 0) {
             $processedCitations = [];
 
@@ -44,7 +44,7 @@ class CitationController extends Controller
                     $_citation = $project->citations->filter(function ($a) use ($doi) {
                         return $doi === $a->doi;
                     })->first();
-                    //dd($_author);
+                    // dd($_author);
                     if ($_citation) {
                         $_citation->update([
                             'doi' => array_key_exists('doi', $citation) ? $citation['doi'] : null,

@@ -75,6 +75,8 @@
                         <Datepicker
                             v-model="editAnnouncementForm.start_time"
                             :min-date="new Date()"
+                            :format="customDateFormat"
+                            :preview-format="customDateFormat"
                         ></Datepicker>
                         <jet-input-error
                             :message="editAnnouncementForm.errors.start_time"
@@ -87,6 +89,8 @@
                         </label>
                         <Datepicker
                             v-model="editAnnouncementForm.end_time"
+                            :format="customDateFormat"
+                            :preview-format="customDateFormat"
                         ></Datepicker>
                         <jet-input-error
                             :message="editAnnouncementForm.errors.end_time"
@@ -178,7 +182,7 @@ export default {
 
     methods: {
         editAnnouncement() {
-            //this.editAnnouncementForm.creator_id = this.$page.props.user.id;
+            //this.editAnnouncementForm.creator_id = this.$page.props.auth.user.id;
             this.editAnnouncementForm.put(
                 route(
                     "console.announcements.edit",

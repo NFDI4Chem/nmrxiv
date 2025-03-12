@@ -107,7 +107,7 @@ class UpdateProject
             $validation = $project->validation;
 
             if (! $validation) {
-                $validation = new Validation();
+                $validation = new Validation;
                 $validation->save();
                 $project->validation()->associate($validation);
                 $project->save();
@@ -145,7 +145,7 @@ class UpdateProject
      */
     public function attachAuthor(Project $project, $authors)
     {
-        //dd($authors);
+        // dd($authors);
         $authors_map = [];
         $index = 0;
         foreach ($authors as $author) {

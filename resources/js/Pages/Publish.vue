@@ -431,6 +431,8 @@
                                 v-model="publishForm.release_date"
                                 @update:modelValue="updateProject"
                                 :min-date="new Date()"
+                                :format="customDateFormat"
+                                :preview-format="customDateFormat"
                             ></Datepicker>
                             <p class="mt-1 text-sm text-gray-500">
                                 Publish your data now immediately or set a
@@ -912,7 +914,7 @@ export default {
             }
         },
         primed() {
-            return this.$page.props.user.primed;
+            return this.$page.props.auth.user.primed;
         },
         currentTab() {
             return this.tabs.find((t) => t.current);
