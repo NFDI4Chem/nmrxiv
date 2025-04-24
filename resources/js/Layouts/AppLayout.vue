@@ -133,7 +133,7 @@
                         >
                             <div v-for="item in filteredNavigation">
                                 <div
-                                    v-if="!$page.props.auth.user || !$page.props.auth.user.first_name"
+                                    v-if="!$page.props.auth.user || !$page.props.auth.user?.first_name"
                                     class="border-t"
                                 >
                                     &nbsp;
@@ -314,7 +314,7 @@
                     </div>
                     <flash-messages />
                     <div class="ml-4 flex items-center md:ml-6">
-                        <span v-if="$page.props.auth.user && $page.props.auth.user.first_name != null">
+                        <span v-if="$page.props.auth.user && $page.props.auth.user?.first_name != null">
                             <div class="ml-5 mt-2 tooltip">
                                 <a
                                     class="cursor-pointer"
@@ -338,7 +338,7 @@
                             <notification
                                 ref="notificationElement"
                                 :notification="
-                                    $page.props.auth.user.notifications
+                                    $page.props.auth.user?.notifications
                                 "
                             />
                         </span>
@@ -368,7 +368,7 @@
                             >
                         </div>
                         <!-- <div
-                            v-if="$page.props.auth.user.first_name != null"
+                            v-if="$page.props.auth.user?.first_name != null"
                             class="ml-5 tooltip"
                         >
                             <a
@@ -400,8 +400,8 @@
                         >
                             <div
                                 v-if="
-                                    $page.props.auth.user.current_team &&
-                                    $page.props.auth.user.current_team
+                                    $page.props.auth.user?.current_team &&
+                                    $page.props.auth.user?.current_team
                                         .personal_team
                                 "
                                 id="tour-step-account-management"
@@ -419,7 +419,7 @@
                                             $page.props.auth.user
                                                 .profile_photo_url
                                         "
-                                        :alt="$page.props.auth.user.first_name"
+                                        :alt="$page.props.auth.user?.first_name"
                                     />
                                 </MenuButton>
                                 <span v-else class="inline-flex rounded-md">
@@ -434,11 +434,11 @@
                                                     .profile_photo_url
                                             "
                                             :alt="
-                                                $page.props.auth.user.first_name
+                                                $page.props.auth.user?.first_name
                                             "
                                         />
                                         <span class="flex md:block hidden">{{
-                                            $page.props.auth.user.first_name
+                                            $page.props.auth.user?.first_name
                                         }}</span>
 
                                         <svg
@@ -460,7 +460,7 @@
                                 <MenuButton
                                     v-if="
                                         $page.props.auth.user &&
-                                        $page.props.auth.user.current_team
+                                        $page.props.auth.user?.current_team
                                     "
                                     type="button"
                                     class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition"
@@ -468,16 +468,16 @@
                                     <img
                                         class="h-8 w-8 rounded-full object-cover mr-2"
                                         :src="
-                                            $page.props.auth.user.current_team
+                                            $page.props.auth.user?.current_team
                                                 .profile_photo_url
                                         "
                                         :alt="
-                                            $page.props.auth.user.current_team
+                                            $page.props.auth.user?.current_team
                                                 .name
                                         "
                                     />
                                     <span class="flex md:block hidden">{{
-                                        $page.props.auth.user.current_team.name
+                                        $page.props.auth.user?.current_team.name
                                     }}</span>
 
                                     <svg
@@ -705,7 +705,7 @@
                             </transition>
                         </Menu>
                         <Menu
-                            v-if="!$page.props.auth.user || !$page.props.auth.user.first_name"
+                            v-if="!$page.props.auth.user || !$page.props.auth.user?.first_name"
                             as="div"
                             class="ml-3 relative"
                         >
@@ -944,14 +944,14 @@ export default {
             }
         },
         filteredNavigation() {
-            if (this.$page.props.auth.user.first_name) {
+            if (this.$page.props.auth.user?.first_name) {
                 return this.navigation;
             } else {
                 return this.navigation.filter((i) => !i.auth);
             }
         },
         personalTeam() {
-            return this.$page.props.auth.user.all_teams.filter(
+            return this.$page.props.auth.user?.all_teams.filter(
                 (t) => t.personal_team
             )[0];
         },
@@ -989,13 +989,13 @@ export default {
             this.notificationElement.toggleShowNotificationDialog(notification);
         },
         hasUnreadNotification() {
-            return this.$page.props.auth.user.notifications
-                ? this.$page.props.auth.user.notifications.length > 0
+            return this.$page.props.auth.user?.notifications
+                ? this.$page.props.auth.user?.notifications.length > 0
                 : false;
         },
         countNotification() {
-            return this.$page.props.auth.user.notifications
-                ? this.$page.props.auth.user.notifications.length
+            return this.$page.props.auth.user?.notifications
+                ? this.$page.props.auth.user?.notifications.length
                 : 0;
         },
     },

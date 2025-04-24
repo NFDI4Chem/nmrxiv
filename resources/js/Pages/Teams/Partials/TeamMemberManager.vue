@@ -232,7 +232,7 @@
 
                                 <!-- Leave Team -->
                                 <button
-                                    v-if="$page.props.auth.user.id === user.id"
+                                    v-if="$page.props.auth.user?.id === user.id"
                                     class="cursor-pointer ml-6 text-sm text-red-500"
                                     @click="confirmLeavingTeam"
                                 >

@@ -140,7 +140,7 @@ export default {
     computed: {
         twoFactorEnabled() {
             return (
-                !this.enabling && this.$page.props.auth.user.two_factor_enabled
+                !this.enabling && this.$page.props.auth.user?.two_factor_enabled
             );
         },
     },
