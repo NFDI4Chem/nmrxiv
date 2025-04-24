@@ -1,0 +1,52 @@
+#!/bin/bash
+
+# Exit on error
+set -e
+
+# Set project root directory
+PROJECT_ROOT=$(dirname "$(dirname "$(realpath "$0")")")
+cd $PROJECT_ROOT
+
+echo "Project root: $PROJECT_ROOT"
+
+# Check if .env.production exists
+if [ ! -f .env.production ]; then
+  echo "Error: .env.production file not found. Please create it based on the instructions in deployment/README.md"
+  exit 1
+fi
+
+# Copy production env file
+# cp .env.production .env
+
+# Export environment variables from .env
+set -a
+source .env
+set +a
+
+# Print each command before executing (after loading env vars)
+set -x
+
+# Call docker-compose with explicit env file parameter
+export COMPOSE_PROJECT_NAME=nmrxiv
+docker-compose -f deployment/docker-compose.prod.yml down --remove-orphans
+docker-compose -f deployment/docker-compose.prod.yml build --no-cache
+docker-compose -f deployment/docker-compose.prod.yml up -d
+
+# Wait for database to be ready
+echo "Waiting for database to be ready..."
+sleep 10
+
+# Run migrations
+docker-compose -f deployment/docker-compose.prod.yml exec -T app php artisan migrate --force
+
+# Clear and optimize cache
+docker-compose -f deployment/docker-compose.prod.yml exec -T app php artisan optimize:clear
+docker-compose -f deployment/docker-compose.prod.yml exec -T app php artisan optimize
+
+# Set up MeiliSearch indexes
+# docker-compose -f deployment/docker-compose.prod.yml exec -T app php artisan scout:sync-index-settings
+
+# Show running services
+docker-compose -f deployment/docker-compose.prod.yml ps
+
+echo "Deployment completed successfully!" 
