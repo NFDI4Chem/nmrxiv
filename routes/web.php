@@ -225,8 +225,8 @@ Route::middleware('auth', 'verified')->group(function () {
 
         Route::get('studies/{study}/nmriumVersions', [StudyController::class, 'nmriumVersions'])
             ->name('dashboard.studies.nmriumVersions');
-        // Route::get('studies/{study}/nmriumInfo', [StudyController::class, 'fetchNMRium'])
-        //     ->name('dashboard.studies.nmrium');
+        Route::get('studies/{study}/nmriumInfo', [StudyController::class, 'fetchNMRium'])
+            ->name('dashboard.studies.nmrium');
         Route::post('studies/{study}/nmriumInfo', [StudyController::class, 'nmriumInfo'])
             ->name('dashboard.studies.nmriumInfo');
         Route::post('studies/{study}/snapshot', [StudyController::class, 'snapshot'])
