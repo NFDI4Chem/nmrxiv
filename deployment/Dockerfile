@@ -52,7 +52,8 @@ RUN mkdir -p /var/www/html/config/caddy && \
 RUN composer install --no-dev --optimize-autoloader --no-interaction --no-progress
 
 # Set file permissions
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/config
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/config /var/www/html/public && \
+    chmod -R 775 /var/www/html/public
 
 # Build frontend assets
 RUN npm ci && npm run build
