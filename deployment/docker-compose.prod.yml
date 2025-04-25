@@ -3,6 +3,10 @@ services:
     build:
       context: ..
       dockerfile: deployment/Dockerfile
+      args:
+        - HTTP_PROXY=${HTTP_PROXY}
+        - HTTPS_PROXY=${HTTPS_PROXY}
+        - NO_PROXY=${NO_PROXY}
     image: nmrxiv/app:latest
     env_file:
       - ../.env
@@ -20,6 +24,9 @@ services:
       - REDIS_HOST=redis
       - MEILISEARCH_HOST=http://meilisearch:7700
       - SUPERVISOR_PHP_COMMAND="/usr/local/bin/php -d variables_order=EGPCS /var/www/html/artisan octane:start --server=frankenphp --host=0.0.0.0 --admin-port=2019 --port=80"
+      - HTTP_PROXY=${HTTP_PROXY}
+      - HTTPS_PROXY=${HTTPS_PROXY}
+      - NO_PROXY=${NO_PROXY}
     ports:
       - "${APP_PORT:-80}:80"
     volumes:
@@ -43,6 +50,10 @@ services:
     build:
       context: ..
       dockerfile: deployment/Dockerfile.worker
+      args:
+        - HTTP_PROXY=${HTTP_PROXY}
+        - HTTPS_PROXY=${HTTPS_PROXY}
+        - NO_PROXY=${NO_PROXY}
     image: nmrxiv/worker:latest
     env_file:
       - ../.env
@@ -62,6 +73,9 @@ services:
       - QUEUE_CONNECTION=redis
       - HORIZON_PREFIX=nmrxiv_horizon
       - HORIZON_BALANCE=auto
+      - HTTP_PROXY=${HTTP_PROXY}
+      - HTTPS_PROXY=${HTTPS_PROXY}
+      - NO_PROXY=${NO_PROXY}
     volumes:
       - app_storage:/var/www/html/storage
     networks:

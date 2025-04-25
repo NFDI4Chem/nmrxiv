@@ -23,6 +23,11 @@ set -a
 source .env
 set +a
 
+# Setup proxy environment variables from .env or use defaults
+export HTTP_PROXY="${HTTP_PROXY:-$http_proxy}"
+export HTTPS_PROXY="${HTTPS_PROXY:-$https_proxy}"
+export NO_PROXY="${NO_PROXY:-$no_proxy}"
+
 # Print each command before executing (after loading env vars)
 set -x
 
