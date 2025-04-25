@@ -1,5 +1,13 @@
 FROM dunglas/frankenphp:latest-alpine
 
+# Setup proxy settings using build arguments
+ARG HTTP_PROXY
+ARG HTTPS_PROXY
+ARG NO_PROXY
+ENV http_proxy=$HTTP_PROXY
+ENV https_proxy=$HTTPS_PROXY
+ENV no_proxy=$NO_PROXY
+
 # Setup working directory
 WORKDIR /var/www/html
 
@@ -25,8 +33,32 @@ RUN apk --update add postgresql15-client --repository=https://dl-cdn.alpinelinux
 
 # Install PHP extensions
 RUN docker-php-ext-install pdo pdo_pgsql mbstring exif pcntl bcmath gd intl zip
-RUN pecl install apcu redis
-RUN docker-php-ext-enable apcu redis
+
+# Install APCu and Redis PHP extensions from source
+RUN cd /tmp && \
+    # Download APCu from GitHub
+    curl -L -o apcu.tar.gz https://github.com/krakjoe/apcu/archive/refs/tags/v5.1.22.tar.gz && \
+    mkdir -p /tmp/apcu && \
+    tar -xf apcu.tar.gz -C /tmp/apcu --strip-components=1 && \
+    cd /tmp/apcu && \
+    phpize && \
+    ./configure && \
+    make && \
+    make install && \
+    # Download Redis from GitHub
+    cd /tmp && \
+    curl -L -o redis.tar.gz https://github.com/phpredis/phpredis/archive/refs/tags/5.3.7.tar.gz && \
+    mkdir -p /tmp/redis && \
+    tar -xf redis.tar.gz -C /tmp/redis --strip-components=1 && \
+    cd /tmp/redis && \
+    phpize && \
+    ./configure && \
+    make && \
+    make install && \
+    # Enable extensions
+    docker-php-ext-enable apcu redis && \
+    # Clean up
+    rm -rf /tmp/apcu /tmp/redis /tmp/apcu.tar.gz /tmp/redis.tar.gz
 
 # Configure PHP
 COPY docker/8.3/php.ini /usr/local/etc/php/conf.d/custom.ini
