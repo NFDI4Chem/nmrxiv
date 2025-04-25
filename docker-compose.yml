@@ -70,6 +70,57 @@ services:
                 - ping
             retries: 3
             timeout: 5s
+    # meilisearch:
+    #     image: "getmeili/meilisearch:latest"
+    #     ports:
+    #         - "${FORWARD_MEILISEARCH_PORT:-7700}:7700"
+    #     volumes:
+    #         - "sailmeilisearch:/data.ms"
+    #     networks:
+    #         - sail
+    #     environment:
+    #         MEILI_MASTER_KEY: "${MEILISEARCH_PRIVATEKEY}"
+    #     healthcheck:
+    #         test:
+    #             [
+    #                 "CMD",
+    #                 "wget",
+    #                 "--no-verbose",
+    #                 "--spider",
+    #                 "http://localhost:7700/health",
+    #             ]
+    #         retries: 3
+    #         timeout: 5s
+    mailpit:
+        image: 'axllent/mailpit:latest'
+        ports:
+            - '${FORWARD_MAILPIT_PORT:-1025}:1025'
+            - '${FORWARD_MAILPIT_DASHBOARD_PORT:-8025}:8025'
+        networks:
+            - sail
+    # selenium:
+    #     image: "selenium/standalone-chrome"
+    #     volumes:
+    #         - "/dev/shm:/dev/shm"
+    #     networks:
+    #         - sail
+    # minio:
+    #     image: 'minio/minio:latest'
+    #     ports:
+    #         - '${FORWARD_MINIO_PORT:-9000}:9000'
+    #         - '${FORWARD_MINIO_CONSOLE_PORT:-8900}:8900'
+    #     environment:
+    #         MINIO_ROOT_USER: 'sail'
+    #         MINIO_ROOT_PASSWORD: 'password'
+    #     volumes:
+    #         - 'sail-minio:/data/minio'
+    #     networks:
+    #         - sail
+    #     command: minio server /data/minio --console-address ":8900"
+    #     healthcheck:
+    #         test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+    #         retries: 3
+    #         timeout: 5s
 networks:
     sail:
         driver: bridge
@@ -78,3 +129,7 @@ volumes:
         driver: local
     sail-redis:
         driver: local
+    # sailmeilisearch:
+    #     driver: local
+    # sail-minio:
+    #     driver: local
