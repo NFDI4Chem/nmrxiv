@@ -366,7 +366,7 @@ Route::get('studies/{study}/toggleStarred', [StudyController::class, 'toggleStar
     ->name('study.toggle-starred');
 
 Route::get('studies/{study}/nmriumInfo', [StudyController::class, 'fetchNMRium'])
-    ->name('dashboard.studies.nmrium');
+    ->name('public.studies.nmrium');
 
 Route::get('projects/{project}/studies', [ProjectController::class, 'publicStudies'])
     ->name('project.studies');
