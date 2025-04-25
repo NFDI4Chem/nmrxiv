@@ -28,25 +28,25 @@ set -x
 
 # Call docker-compose with explicit env file parameter
 export COMPOSE_PROJECT_NAME=nmrxiv
-docker-compose -f deployment/docker-compose.prod.yml down --remove-orphans
-docker-compose -f deployment/docker-compose.prod.yml build --no-cache
-docker-compose -f deployment/docker-compose.prod.yml up -d
+docker compose -f deployment/docker-compose.prod.yml down --remove-orphans
+docker compose -f deployment/docker-compose.prod.yml build --no-cache
+docker compose -f deployment/docker-compose.prod.yml up -d
 
 # Wait for database to be ready
 echo "Waiting for database to be ready..."
 sleep 10
 
 # Run migrations
-docker-compose -f deployment/docker-compose.prod.yml exec -T app php artisan migrate --force
+docker compose -f deployment/docker-compose.prod.yml exec -T app php artisan migrate --force
 
 # Clear and optimize cache
-docker-compose -f deployment/docker-compose.prod.yml exec -T app php artisan optimize:clear
-docker-compose -f deployment/docker-compose.prod.yml exec -T app php artisan optimize
+docker compose -f deployment/docker-compose.prod.yml exec -T app php artisan optimize:clear
+docker compose -f deployment/docker-compose.prod.yml exec -T app php artisan optimize
 
 # Set up MeiliSearch indexes
 # docker-compose -f deployment/docker-compose.prod.yml exec -T app php artisan scout:sync-index-settings
 
 # Show running services
-docker-compose -f deployment/docker-compose.prod.yml ps
+docker compose -f deployment/docker-compose.prod.yml ps
 
 echo "Deployment completed successfully!" 
