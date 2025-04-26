@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('datasets', function (Blueprint $table) {
-            $table->renameColumn('url', 'obfuscationCode');
+            $table->renameColumn('obfuscationCode', 'url');
         });
     }
 };

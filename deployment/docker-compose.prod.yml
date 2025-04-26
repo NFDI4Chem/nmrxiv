@@ -14,7 +14,7 @@ services:
       - APP_ENV=production
       - APP_DEBUG=false
       - APP_KEY=${APP_KEY}
-      - ASSET_URL=http://${APP_URL:-localhost}
+      - ASSET_URL=https://${APP_URL:-localhost}
       - DB_CONNECTION=pgsql
       - DB_HOST=pgsql
       - DB_PORT=5432
@@ -32,6 +32,7 @@ services:
     volumes:
       - app_storage:/var/www/html/storage
       - caddy_data:/data/caddy
+      - ../.env:/var/www/html/.env
     networks:
       - nmrxiv_net
     depends_on:
@@ -61,7 +62,7 @@ services:
       - APP_ENV=production
       - APP_DEBUG=false
       - APP_KEY=${APP_KEY}
-      - ASSET_URL=http://${APP_URL:-localhost}
+      - ASSET_URL=https://${APP_URL:-localhost}
       - DB_CONNECTION=pgsql
       - DB_HOST=pgsql
       - DB_PORT=5432
@@ -78,6 +79,7 @@ services:
       - NO_PROXY=${NO_PROXY}
     volumes:
       - app_storage:/var/www/html/storage
+      - ../.env:/var/www/html/.env
     networks:
       - nmrxiv_net
     depends_on:
@@ -95,6 +97,8 @@ services:
       - POSTGRES_DB=${DB_DATABASE:-nmrxiv}
       - POSTGRES_USER=${DB_USERNAME:-nmrxiv}
       - POSTGRES_PASSWORD=${DB_PASSWORD:-password}
+    ports:
+      - "${DB_PORT:-5432}:5432"
     volumes:
       - pgsql_data:/var/lib/postgresql/data
     networks:
