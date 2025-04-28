@@ -103,7 +103,7 @@ return new class extends Migration
             $table->integer('SSSR')->nullable();
             $table->integer('SAR')->nullable();
             $table->json('COMMENT')->nullable();
-            $table->longText('MOL')->nullable();
+            // $table->longText('MOL')->nullable();
             $table->integer('MULTIPLICITY_0')->nullable();
             $table->integer('MULTIPLICITY_1')->nullable();
             $table->integer('MULTIPLICITY_2')->nullable();
