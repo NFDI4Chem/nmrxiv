@@ -64,7 +64,7 @@ class ArchiveStudy implements ShouldBeUnique, ShouldQueue
                         $environment = env('APP_ENV', 'local');
                         $relative_URL = $fsObject->relative_url;
                         if ($fsObject->type == 'file') {
-                            if (Storage::has($path)) {
+                            if (Storage::disk(env('FILESYSTEM_DRIVER'))->has($path)) {
                                 array_push($s3keys, substr($fsObject->path, 1));
                             }
                         } else {
@@ -91,9 +91,7 @@ class ArchiveStudy implements ShouldBeUnique, ShouldQueue
                         $s3Client->registerStreamWrapper();
 
                         $zipFilePath = $environment.'/archive/'.$study->uuid.'/'.$fsObject->name.'.zip';
-
                         $archiveDestination = fopen('s3://'.$bucket.'/'.$zipFilePath, 'w');
-
                         $zip = new ZipStream\ZipStream(
                             outputStream: $archiveDestination,
                             defaultEnableZeroHeader: true,
@@ -110,17 +108,39 @@ class ArchiveStudy implements ShouldBeUnique, ShouldQueue
                                     $sPath = $fsObject->key;
                                 }
                                 $sPath = preg_replace('#/+#', '/', $sPath);
-                                $zip->addFileFromStream($sPath, $streamRead);
+                                
+                                // Get file size
+                                $fileSize = $s3Client->headObject([
+                                    'Bucket' => $bucket,
+                                    'Key' => $key
+                                ])->get('ContentLength');
+                                
+                                // If file is larger than 100MB, process in chunks
+                                if ($fileSize > 100 * 1024 * 1024) {
+                                    $chunkSize = 10 * 1024 * 1024; // 10MB chunks
+                                    $zip->addFileFromStream($sPath, $streamRead, $fileSize, $chunkSize);
+                                } else {
+                                    $zip->addFileFromStream($sPath, $streamRead);
+                                }
                             } else {
-                                exit('Could not open stream for reading');
+                                throw new \Exception("Could not open stream for reading: {$s3path}");
                             }
                         }
-                        $zip->finish();
-                        fclose($archiveDestination);
+                        
+                        try {
+                            $zip->finish();
+                            fclose($archiveDestination);
 
-                        Storage::setVisibility($zipFilePath, 'public');
-                        $url = Storage::url($zipFilePath);
-                        $study->download_url = $url;
+                            Storage::disk(env('FILESYSTEM_DRIVER'))->setVisibility($zipFilePath, 'public');
+                            $url = Storage::disk(env('FILESYSTEM_DRIVER'))->url($zipFilePath);
+                            $study->download_url = $url;
+                        } catch (\Exception $e) {
+                            // Clean up the partial file if it exists
+                            if (Storage::disk(env('FILESYSTEM_DRIVER'))->exists($zipFilePath)) {
+                                Storage::disk(env('FILESYSTEM_DRIVER'))->delete($zipFilePath);
+                            }
+                            throw $e;
+                        }
 
                         // $nmrium = $study->nmrium;
                         // if (!$nmrium) {
@@ -202,7 +222,7 @@ class ArchiveStudy implements ShouldBeUnique, ShouldQueue
 
     // protected function processSpectra($url)
     // {
-    //     $response = Http::post('https://nodejsdev.nmrxiv.org/spectra-parser', '{
+    //     $response = Http::post('https://nodejs.nmrxiv.org/spectra-parser', '{
     //         "urls": [
     //           '. $url .'
     //         ],

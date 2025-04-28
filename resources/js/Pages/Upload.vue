@@ -2646,7 +2646,7 @@ export default {
                     " <br/> Spectra URL: " +
                     url;
                 axios
-                    .post("https://nodejsdev.nmrxiv.org/spectra-parser", {
+                    .post("https://nodejs.nmrxiv.org/spectra-parser", {
                         urls: [url],
                         snapshot: false,
                     })
