@@ -2528,7 +2528,7 @@ export default {
                     ? this.$page.props.team.owner.username
                     : this.project.owner.username;
                 axios
-                    .post("https://nodejsdev.nmrxiv.org/spectra-parser", {
+                    .post("https://nodejs.nmrxiv.org/spectra-parser", {
                         urls: [
                             this.url +
                                 "/" +
