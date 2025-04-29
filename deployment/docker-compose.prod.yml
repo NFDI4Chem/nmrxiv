@@ -11,18 +11,7 @@ services:
     env_file:
       - ../.env
     environment:
-      - APP_ENV=production
-      - APP_DEBUG=false
-      - APP_KEY=${APP_KEY}
       - ASSET_URL=https://${APP_URL:-localhost}
-      - DB_CONNECTION=pgsql
-      - DB_HOST=pgsql
-      - DB_PORT=5432
-      - DB_DATABASE=${DB_DATABASE:-nmrxiv}
-      - DB_USERNAME=${DB_USERNAME:-nmrxiv}
-      - DB_PASSWORD=${DB_PASSWORD:-secret}
-      - REDIS_HOST=redis
-      - MEILISEARCH_HOST=http://meilisearch:7700
       - SUPERVISOR_PHP_COMMAND="/usr/local/bin/php -d variables_order=EGPCS /var/www/html/artisan octane:start --server=frankenphp --host=0.0.0.0 --admin-port=2019 --port=80"
       - HTTP_PROXY=${HTTP_PROXY}
       - HTTPS_PROXY=${HTTPS_PROXY}
@@ -59,21 +48,7 @@ services:
     env_file:
       - ../.env
     environment:
-      - APP_ENV=production
-      - APP_DEBUG=false
-      - APP_KEY=${APP_KEY}
       - ASSET_URL=https://${APP_URL:-localhost}
-      - DB_CONNECTION=pgsql
-      - DB_HOST=pgsql
-      - DB_PORT=5432
-      - DB_DATABASE=${DB_DATABASE:-nmrxiv}
-      - DB_USERNAME=${DB_USERNAME:-nmrxiv}
-      - DB_PASSWORD=${DB_PASSWORD:-secret}
-      - REDIS_HOST=redis
-      - MEILISEARCH_HOST=http://meilisearch:7700
-      - QUEUE_CONNECTION=redis
-      - HORIZON_PREFIX=nmrxiv_horizon
-      - HORIZON_BALANCE=auto
       - HTTP_PROXY=${HTTP_PROXY}
       - HTTPS_PROXY=${HTTPS_PROXY}
       - NO_PROXY=${NO_PROXY}
