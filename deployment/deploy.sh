@@ -9,11 +9,20 @@ cd $PROJECT_ROOT
 
 echo "Project root: $PROJECT_ROOT"
 
-# Check if .env.production exists
-if [ ! -f .env.production ]; then
-  echo "Error: .env.production file not found. Please create it based on the instructions in deployment/README.md"
-  exit 1
-fi
+# Parse command line arguments
+BUILD=true
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --no-build)
+            BUILD=false
+            shift
+            ;;
+        *)
+            echo "Unknown option: $1"
+            exit 1
+            ;;
+    esac
+done
 
 # Copy production env file
 # cp .env.production .env
@@ -34,7 +43,15 @@ set -x
 # Call docker-compose with explicit env file parameter
 export COMPOSE_PROJECT_NAME=nmrxiv
 docker compose -f deployment/docker-compose.prod.yml down --remove-orphans
-docker compose -f deployment/docker-compose.prod.yml build --no-cache
+
+# Build only if BUILD is true
+if [ "$BUILD" = true ]; then
+    echo "Building containers..."
+    docker compose -f deployment/docker-compose.prod.yml build --no-cache
+else
+    echo "Skipping build step..."
+fi
+
 docker compose -f deployment/docker-compose.prod.yml up -d
 
 # Wait for database to be ready
