@@ -28,7 +28,7 @@
         "league/flysystem-ziparchive": "^3.0",
         "maennchen/zipstream-php": "^3.1",
         "maize-tech/laravel-markable": "^2.3",
-        "meilisearch/meilisearch-php": "^1.0",
+        "meilisearch/meilisearch-php": "^1.14",
         "mpociot/versionable": "^4.4",
         "owen-it/laravel-auditing": "^14.0",
         "phpunit/php-code-coverage": "^11.0.9",
