@@ -107,7 +107,7 @@ services:
     ports:
       - "${MEILISEARCH_PORT:-7700}:7700"
     environment:
-      - MEILI_MASTER_KEY=${MEILI_MASTER_KEY:-ThisIsALongSecureKeyWith32Chars}
+      - MEILI_MASTER_KEY=${MEILISEARCH_KEY:-ThisIsALongSecureKeyWith32Chars}
       - MEILI_NO_ANALYTICS=true
       - MEILI_ENV=production
     networks:
