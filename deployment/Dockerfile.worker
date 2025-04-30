@@ -63,7 +63,7 @@ COPY docker/8.3/php.ini /usr/local/etc/php/conf.d/custom.ini
 
 # Set PHP configuration values
 RUN echo 'max_execution_time = 3600' >> /usr/local/etc/php/conf.d/docker-php-maxexectime.ini && \
-    echo 'memory_limit = 512M' >> /usr/local/etc/php/conf.d/docker-php-memlimit.ini && \
+    echo 'memory_limit = 4G' >> /usr/local/etc/php/conf.d/docker-php-memlimit.ini && \
     echo 'upload_max_filesize = 100M' >> /usr/local/etc/php/conf.d/docker-php-uploadmaxfilesize.ini && \
     echo 'post_max_size = 250M' >> /usr/local/etc/php/conf.d/docker-php-postmaxsize.ini && \
     echo 'max_input_time = 3600' >> /usr/local/etc/php/conf.d/docker-php-maxinputtime.ini
