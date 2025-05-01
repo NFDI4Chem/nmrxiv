@@ -29,7 +29,7 @@ RUN apk add --no-cache \
     $PHPIZE_DEPS
 
 # Install PostgreSQL client
-RUN apk --update add postgresql15-client --repository=https://dl-cdn.alpinelinux.org/alpine/edge/main
+RUN apk --update add postgresql17-client --repository=https://dl-cdn.alpinelinux.org/alpine/edge/main
 
 # Install PHP extensions
 RUN docker-php-ext-install pdo pdo_pgsql mbstring exif pcntl bcmath gd intl zip
