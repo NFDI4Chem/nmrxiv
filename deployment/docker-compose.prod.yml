@@ -3,15 +3,14 @@ services:
   traefik:
     image: traefik:v2.10
     command:
-      - "--api.insecure=true"  # Enable the dashboard for debugging
-      - "--api.dashboard=true"
+      - "--api.insecure=false"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
-      - "--log.level=DEBUG"  # Enable debug logging temporarily
+      - "--entrypoints.websecure.address=:443"
     ports:
       - "${APP_PORT:-80}:80"
-      - "8080:8080"  # Traefik dashboard port
+      - "443:443"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - traefik_data:/etc/traefik
@@ -40,8 +39,7 @@ services:
     #  - "${APP_PORT:-80}:80"
     labels:
       - "traefik.enable=true"
-      # Use a catch-all rule to route all traffic to this container
-      - "traefik.http.routers.app.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.app.rule=Host(`${APP_DOMAIN:-localhost}`)"
       - "traefik.http.routers.app.entrypoints=web"
       - "traefik.http.services.app.loadbalancer.server.port=80"
       # Enable sticky sessions to maintain user sessions during deployment
