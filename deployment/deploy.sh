@@ -42,6 +42,7 @@ set -x
 
 # Call docker-compose with explicit env file parameter
 export COMPOSE_PROJECT_NAME=nmrxiv
+docker compose -f deployment/docker-compose.prod.yml down --remove-orphans
 
 # Build only if BUILD is true
 if [ "$BUILD" = true ]; then
@@ -51,58 +52,11 @@ else
     echo "Skipping build step..."
 fi
 
-# Perform zero-downtime deploy with Traefik
-echo "Performing zero-downtime deployment with Traefik..."
+docker compose -f deployment/docker-compose.prod.yml up -d
 
-# First time deployment - just start everything
-if ! docker compose -f deployment/docker-compose.prod.yml ps --services | grep -q "traefik"; then
-    echo "First time deployment, starting all services..."
-    docker compose -f deployment/docker-compose.prod.yml up -d
-else
-    # For subsequent deployments, implement blue-green strategy
-
-    # 1. Ensure Traefik is running
-    echo "Ensuring Traefik is running..."
-    docker compose -f deployment/docker-compose.prod.yml up -d traefik
-
-    # 2. Start new app container with a unique label to distinguish it
-    echo "Starting new app containers..."
-    DEPLOY_ID=$(date +%s)
-    SCALE=2 # Number of app instances to run during transition
-    
-    # Scale up the app service
-    APP_LABEL="traefik.http.services.app.loadbalancer.server.port=80"
-    NEW_APP_LABEL="${APP_LABEL},v=${DEPLOY_ID}"
-    
-    # Use a temporary docker-compose override file to add the version label
-    cat > deployment/docker-compose.override.yml <<EOF
-version: '3'
-services:
-  app:
-    labels:
-      - "traefik.http.services.app.loadbalancer.server.port=80"
-      - "traefik.deploy.replicas=${SCALE}"
-      - "traefik.deploy.label=v${DEPLOY_ID}"
-EOF
-    
-    # Start new containers with scaled instances
-    docker compose -f deployment/docker-compose.prod.yml -f deployment/docker-compose.override.yml up -d
-
-    # 3. Wait for new containers to be healthy
-    echo "Waiting for new containers to be ready..."
-    sleep 10
-
-    # 4. Now remove the temporary override file and scale back down
-    rm deployment/docker-compose.override.yml
-    
-    # 5. Recreate worker containers 
-    echo "Recreating worker containers..."
-    docker compose -f deployment/docker-compose.prod.yml up -d --force-recreate worker
-fi
-
-# Wait for all services to be ready
-echo "Waiting for services to be ready..."
-sleep 5
+# Wait for database to be ready
+echo "Waiting for database to be ready..."
+sleep 10
 
 # Run migrations
 docker compose -f deployment/docker-compose.prod.yml exec -T app php artisan migrate --force

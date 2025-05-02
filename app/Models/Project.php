@@ -269,7 +269,7 @@ class Project extends Model implements Auditable
 
     protected function getPrivateUrlAttribute()
     {
-        return env('APP_URL', null).'/projects/'.urlencode($this->url ?? '');
+        return env('APP_URL', null).'/projects/'.urlencode($this->url);
     }
 
     /**

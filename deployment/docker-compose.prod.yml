@@ -1,23 +1,4 @@
 services:
-  # Add Traefik as a load balancer
-  traefik:
-    image: traefik:v2.10
-    command:
-      - "--api.insecure=false"
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
-    ports:
-      - "${APP_PORT:-80}:80"
-      - "443:443"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - traefik_data:/etc/traefik
-    networks:
-      - nmrxiv_net
-    restart: unless-stopped
-
   app:
     build:
       context: ..
@@ -34,17 +15,8 @@ services:
       - HTTP_PROXY=${HTTP_PROXY}
       - HTTPS_PROXY=${HTTPS_PROXY}
       - NO_PROXY=${NO_PROXY}
-    # Remove direct port mapping - traffic will go through Traefik
-    # ports:
-    #  - "${APP_PORT:-80}:80"
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.app.rule=Host(`${APP_DOMAIN:-localhost}`)"
-      - "traefik.http.routers.app.entrypoints=web"
-      - "traefik.http.services.app.loadbalancer.server.port=80"
-      # Enable sticky sessions to maintain user sessions during deployment
-      - "traefik.http.services.app.loadbalancer.sticky=true"
-      - "traefik.http.services.app.loadbalancer.sticky.cookie.name=nmrxiv_session"
+    ports:
+      - "${APP_PORT:-80}:80"
     volumes:
       - app_storage:/var/www/html/storage
       - caddy_data:/data/caddy
@@ -162,6 +134,4 @@ volumes:
   meilisearch_data:
     driver: local
   caddy_data:
-    driver: local
-  traefik_data:
     driver: local 
