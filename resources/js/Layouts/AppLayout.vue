@@ -623,6 +623,7 @@
                                                                 v-if="
                                                                     team.id ==
                                                                     $page.props
+                                                                        .auth
                                                                         .user
                                                                         .current_team_id
                                                                 "
