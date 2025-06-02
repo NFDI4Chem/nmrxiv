@@ -26,8 +26,7 @@ RUN apk update  \
     zlib-dev \
     supervisor \
     nodejs \
-    npm \
-    $PHPIZE_DEPS
+    npm
 
 # Install PostgreSQL client
 RUN apk --update add postgresql17-client --repository=https://dl-cdn.alpinelinux.org/alpine/edge/main
