@@ -12,21 +12,13 @@ ENV no_proxy=$NO_PROXY
 WORKDIR /var/www/html
 
 # Install system dependencies
-RUN apk update  \
-    && apk add --no-cache \
-    zip \
-    unzip \
-    git \
-    curl \
-    libpng-dev \
-    libzip-dev \
-    icu-dev \
-    oniguruma-dev \
-    postgresql-dev \
-    zlib-dev \
-    supervisor \
-    nodejs \
-    npm
+RUN apk update
+
+# Try installing groups of 3–4 at a time to see which group fails
+RUN apk add --no-cache zip unzip git curl
+RUN apk add --no-cache libpng-dev libzip-dev icu-dev oniguruma-dev
+RUN apk add --no-cache postgresql-dev zlib-dev supervisor
+RUN apk add --no-cache nodejs npm
 
 # Install PostgreSQL client
 RUN apk --update add postgresql17-client --repository=https://dl-cdn.alpinelinux.org/alpine/edge/main
