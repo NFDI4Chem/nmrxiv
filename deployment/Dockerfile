@@ -12,7 +12,8 @@ ENV no_proxy=$NO_PROXY
 WORKDIR /var/www/html
 
 # Install system dependencies
-RUN apk add --no-cache \
+RUN apk update  \
+    && apk add --no-cache \
     zip \
     unzip \
     git \
