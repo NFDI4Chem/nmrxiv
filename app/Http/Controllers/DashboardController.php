@@ -39,6 +39,7 @@ class DashboardController extends Controller
             'projects' => $projects->load('tags', 'draft'),
             'samples' => $samples->load('sample.molecules'),
             'teamRole' => $user->teamRole($team),
+            'user' => $user
         ]);
     }
 
