@@ -20,37 +20,21 @@ RUN apk add --no-cache libpng-dev libzip-dev icu-dev oniguruma-dev
 RUN apk add --no-cache postgresql-dev zlib-dev supervisor
 RUN apk add --no-cache nodejs npm
 
+# Add build tools for PECL
+RUN apk add --no-cache autoconf gcc g++ make
+
 # Install PostgreSQL client
 RUN apk --update add postgresql17-client --repository=https://dl-cdn.alpinelinux.org/alpine/edge/main
 
 # Install PHP extensions
 RUN docker-php-ext-install pdo pdo_pgsql mbstring exif pcntl bcmath gd intl zip
 
-# Install APCu and Redis PHP extensions from source
-RUN cd /tmp && \
-    # Download APCu from GitHub
-    curl -L -o apcu.tar.gz https://github.com/krakjoe/apcu/archive/refs/tags/v5.1.22.tar.gz && \
-    mkdir -p /tmp/apcu && \
-    tar -xf apcu.tar.gz -C /tmp/apcu --strip-components=1 && \
-    cd /tmp/apcu && \
-    phpize && \
-    ./configure && \
-    make && \
-    make install && \
-    # Download Redis from GitHub
-    cd /tmp && \
-    curl -L -o redis.tar.gz https://github.com/phpredis/phpredis/archive/refs/tags/5.3.7.tar.gz && \
-    mkdir -p /tmp/redis && \
-    tar -xf redis.tar.gz -C /tmp/redis --strip-components=1 && \
-    cd /tmp/redis && \
-    phpize && \
-    ./configure && \
-    make && \
-    make install && \
-    # Enable extensions
-    docker-php-ext-enable apcu redis && \
-    # Clean up
-    rm -rf /tmp/apcu /tmp/redis /tmp/apcu.tar.gz /tmp/redis.tar.gz
+# Install APCu and Redis via PECL (more reliable than manual compilation)
+RUN pecl install apcu redis && \
+    docker-php-ext-enable apcu redis
+
+# Clean up build dependencies to reduce image size
+RUN apk del autoconf gcc g++ make
 
 # Configure PHP
 COPY docker/8.3/php.ini /usr/local/etc/php/conf.d/custom.ini
