@@ -11,14 +11,16 @@ ENV no_proxy=$NO_PROXY
 # Setup working directory
 WORKDIR /var/www/html
 
-# Always configure for proxy environment to be safe
-RUN echo "nameserver 8.8.8.8" > /etc/resolv.conf && \
-    echo "nameserver 1.1.1.1" >> /etc/resolv.conf && \
-    echo "http://dl-cdn.alpinelinux.org/alpine/v3.19/main" > /etc/apk/repositories && \
-    echo "http://dl-cdn.alpinelinux.org/alpine/v3.19/community" >> /etc/apk/repositories
+# Configure DNS and repositories when behind proxy
+RUN if [ -n "$HTTP_PROXY" ]; then \
+        echo "nameserver 8.8.8.8" > /etc/resolv.conf && \
+        echo "nameserver 8.8.4.4" >> /etc/resolv.conf && \
+        echo "http://dl-cdn.alpinelinux.org/alpine/v3.19/main" > /etc/apk/repositories && \
+        echo "http://dl-cdn.alpinelinux.org/alpine/v3.19/community" >> /etc/apk/repositories; \
+    fi
 
-# Install system dependencies
-RUN apk update
+# Install system dependencies with error handling
+RUN apk update || (echo "First update failed, trying with --force-refresh" && apk update --force-refresh)
 
 # Try installing groups of 3–4 at a time to see which group fails
 RUN apk add --no-cache zip unzip git curl
