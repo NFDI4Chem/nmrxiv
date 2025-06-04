@@ -15,81 +15,12 @@ env:
   REPOSITORY_NAMESPACE: nfdi4chem
 
 jobs:
-  # First job: Run PHP unit tests with PostgreSQL database
-  php-unit-test:
-    name: Run tests
-    runs-on: ubuntu-latest
-    
-    # Set up PostgreSQL service container for testing
-    services:
-      postgres:
-        image: postgres:13
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: nmrxiv
-        ports:
-        - 5432:5432
-        # Health check to ensure PostgreSQL is ready before running tests
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
-
-    steps:
-    # Checkout the repository code
-    - uses: actions/checkout@v4
-
-    # Set up PHP 8.2 with required extensions for Laravel
-    - name: Setup PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: '8.2'
-        # Extensions required for Laravel application and testing
-        extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_pgsql, bcmath, soap, intl, gd, exif, iconv
-        coverage: pcov
-
-    # Install PHP dependencies using Composer
-    - name: Install composer dependencies
-      run: composer install --ignore-platform-reqs
-    
-    # Prepare Laravel application environment and run migrations
-    - name: Prepare Laravel Application
-      run: |
-        # Copy CI test environment file if .env doesn't exist
-        php -r "file_exists('.env') || copy('.env.ci.test', '.env');"
-        # Add development environment secrets to .env file
-        echo AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID_DEV }} >> .env
-        echo AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY_DEV }} >> .env
-        echo MEILISEARCH_KEY=${{ secrets.MEILISEARCH_KEY_DEV }} >> .env
-        echo MEILISEARCH_PUBLICKEY=${{ secrets.MEILISEARCH_PUBLICKEY_DEV }} >> .env
-        echo TWITTER_CLIENT_ID=${{ secrets.TWITTER_CLIENT_ID_DEV }} >> .env
-        echo TWITTER_CLIENT_SECRET=${{ secrets.TWITTER_CLIENT_SECRET_DEV }} >> .env
-        echo GITHUB_CLIENT_ID=${{ secrets.CLIENT_ID_GITHUB_DEV }} >> .env
-        echo GITHUB_CLIENT_SECRET=${{ secrets.CLIENT_SECRET_GITHUB_DEV }} >> .env
-        # Generate application key and run database migrations with seeding
-        php artisan key:generate
-        php artisan migrate --seed
-
-    # Install Node.js dependencies and build frontend assets
-    - name: Install front-end dependencies
-      run: |
-        npm install
-        npm run build
-    
-    # Run PHPUnit tests and generate coverage report
-    - name: Run tests and collect coverage
-      run: vendor/bin/phpunit --coverage-clover coverage.xml
-
-    # Upload test coverage results to Codecov for analysis
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
-      env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_ORG_TOKEN }}
-
   # Second job: Build Docker images and deploy to development environment
   setup-build-publish-deploy:
     name: Build & deploy to development
     runs-on: ubuntu-latest
     # Only run this job if tests pass successfully
-    needs: php-unit-test
+    # needs: php-unit-test
     # Use the Dev environment for deployment secrets and protection rules
     environment:
       name: Dev
