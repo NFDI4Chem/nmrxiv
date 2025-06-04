@@ -11,9 +11,9 @@ ENV no_proxy=$NO_PROXY
 # Setup working directory
 WORKDIR /var/www/html
 
-# Always use HTTP repositories for better proxy compatibility
-RUN echo "http://dl-cdn.alpinelinux.org/alpine/v3.19/main" > /etc/apk/repositories && \
-    echo "http://dl-cdn.alpinelinux.org/alpine/v3.19/community" >> /etc/apk/repositories
+# Use alternative Alpine mirrors that work better with proxies
+RUN echo "http://mirror.leaseweb.com/alpine/v3.19/main" > /etc/apk/repositories && \
+    echo "http://mirror.leaseweb.com/alpine/v3.19/community" >> /etc/apk/repositories
 
 # Install system dependencies with error handling
 RUN apk update 
