@@ -11,12 +11,12 @@ ENV no_proxy=$NO_PROXY
 # Setup working directory
 WORKDIR /var/www/html
 
-# Configure repositories to use HTTP instead of HTTPS when behind proxy
-RUN if [ -n "$HTTP_PROXY" ]; then \
-        echo "http://dl-cdn.alpinelinux.org/alpine/v3.19/main" > /etc/apk/repositories && \
-        echo "http://dl-cdn.alpinelinux.org/alpine/v3.19/community" >> /etc/apk/repositories; \
-    fi
-    
+# Always configure for proxy environment to be safe
+RUN echo "nameserver 8.8.8.8" > /etc/resolv.conf && \
+    echo "nameserver 1.1.1.1" >> /etc/resolv.conf && \
+    echo "http://dl-cdn.alpinelinux.org/alpine/v3.19/main" > /etc/apk/repositories && \
+    echo "http://dl-cdn.alpinelinux.org/alpine/v3.19/community" >> /etc/apk/repositories
+
 # Install system dependencies
 RUN apk update
 
