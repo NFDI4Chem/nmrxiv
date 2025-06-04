@@ -47,7 +47,7 @@ jobs:
         build-args: |
           RELEASE_VERSION=fsu-app
           HTTP_PROXY=""
-          HTTPS_PROXY="
+          HTTPS_PROXY=""
           NO_PROXY=""
         # Tag the image for development environment
         tags: ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:fsu-app-dev
@@ -63,7 +63,7 @@ jobs:
         build-args: |
           RELEASE_VERSION=fsu-worker
           HTTP_PROXY=""
-          HTTPS_PROXY="
+          HTTPS_PROXY=""
           NO_PROXY=""
         # Tag the worker image for development environment
         tags: ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:fsu-worker-dev
