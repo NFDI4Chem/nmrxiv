@@ -1,3 +1,17 @@
+# Use a more recent Alpine version that might have better proxy support
+FROM alpine:3.19 as dependencies
+
+# Install all system dependencies in a separate stage
+RUN apk update && \
+    apk add --no-cache \
+    zip unzip git curl \
+    libpng-dev libzip-dev icu-dev oniguruma-dev \
+    postgresql-dev zlib-dev supervisor \
+    nodejs npm \
+    autoconf gcc g++ make \
+    postgresql-client
+
+# Main application stage
 FROM dunglas/frankenphp:latest-alpine
 
 # Setup proxy settings using build arguments
@@ -11,34 +25,18 @@ ENV no_proxy=$NO_PROXY
 # Setup working directory
 WORKDIR /var/www/html
 
-# Use alternative Alpine mirrors that work better with proxies
-RUN echo "http://mirror.leaseweb.com/alpine/v3.19/main" > /etc/apk/repositories && \
-    echo "http://mirror.leaseweb.com/alpine/v3.19/community" >> /etc/apk/repositories
+# Copy pre-installed dependencies from the first stage
+COPY --from=dependencies /usr/lib /usr/lib
+COPY --from=dependencies /usr/bin /usr/bin
+COPY --from=dependencies /usr/share /usr/share
+COPY --from=dependencies /usr/include /usr/include
 
-# Install system dependencies with error handling
-RUN apk update 
-
-# Try installing groups of 3–4 at a time to see which group fails
-RUN apk add --no-cache zip unzip git curl
-RUN apk add --no-cache libpng-dev libzip-dev icu-dev oniguruma-dev
-RUN apk add --no-cache postgresql-dev zlib-dev supervisor
-RUN apk add --no-cache nodejs npm
-
-# Add build tools for PECL
-RUN apk add --no-cache autoconf gcc g++ make
-
-# Install PostgreSQL client
-RUN apk --update add postgresql17-client --repository=https://dl-cdn.alpinelinux.org/alpine/edge/main
-
-# Install PHP extensions
+# Install PHP extensions (this shouldn't require network access)
 RUN docker-php-ext-install pdo pdo_pgsql mbstring exif pcntl bcmath gd intl zip
 
-# Install APCu and Redis via PECL (more reliable than manual compilation)
+# Install APCu and Redis via PECL
 RUN pecl install apcu redis && \
     docker-php-ext-enable apcu redis
-
-# Clean up build dependencies to reduce image size
-RUN apk del autoconf gcc g++ make
 
 # Configure PHP
 COPY docker/8.3/php.ini /usr/local/etc/php/conf.d/custom.ini
@@ -88,4 +86,4 @@ RUN mkdir -p /data/caddy/data /data/caddy/config && \
     chown -R www-data:www-data /data/caddy
 
 # Start FrankenPHP and supervisord
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"] 
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
