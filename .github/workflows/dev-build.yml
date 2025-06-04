@@ -36,6 +36,14 @@ jobs:
         username: ${{ env.DOCKER_HUB_USERNAME  }}
         password: ${{ env.DOCKER_HUB_PASSWORD  }}
 
+    # Set up Docker Buildx with DNS configuration
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      with:
+        config-inline: |
+          [worker.oci]
+            dns = ["8.8.8.8", "1.1.1.1"]
+
     # Build and push the main application Docker image for FSU deployment
     - name: Build and push App Docker image dedicated to FSU deployment.
       uses: docker/build-push-action@v5
