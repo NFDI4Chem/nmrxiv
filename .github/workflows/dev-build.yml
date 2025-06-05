@@ -50,9 +50,6 @@ jobs:
         # Pass proxy settings and release version as build arguments
         build-args: |
           RELEASE_VERSION=fsu-app
-          HTTP_PROXY=${{ secrets.HTTP_PROXY }}
-          HTTPS_PROXY=${{ secrets.HTTPS_PROXY }}
-          NO_PROXY=${{ secrets.NO_PROXY }}
         # Tag the image for development environment
         tags: ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:fsu-app-dev
 
@@ -66,8 +63,5 @@ jobs:
         # Pass proxy settings and release version as build arguments
         build-args: |
           RELEASE_VERSION=fsu-worker
-          HTTP_PROXY=${{ secrets.HTTP_PROXY }}
-          HTTPS_PROXY=${{ secrets.HTTPS_PROXY }}
-          NO_PROXY=${{ secrets.NO_PROXY }}
         # Tag the worker image for development environment
         tags: ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:fsu-worker-dev
