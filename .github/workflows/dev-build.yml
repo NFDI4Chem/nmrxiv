@@ -51,7 +51,7 @@ jobs:
         build-args: |
           RELEASE_VERSION=fsu-app
         # Tag the image for development environment
-        tags: ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:fsu-app-dev
+        tags: ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:app-dev-latest
 
     # Build and push the worker Docker image for background job processing
     - name:  Build and push Worker Docker image dedicated to FSU deployment.
@@ -64,4 +64,4 @@ jobs:
         build-args: |
           RELEASE_VERSION=fsu-worker
         # Tag the worker image for development environment
-        tags: ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:fsu-worker-dev
+        tags: ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:worker-dev-latest
