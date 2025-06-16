@@ -108,7 +108,7 @@ deploy_service() {
 if [ "$DEPLOY" = true ]; then
     echo "Deployment in progress..."
     deploy_service app "$APP_IMAGE" true
-    deploy_service worker "$WORKER_IMAGE" false
+    deploy_service worker "$WORKER_IMAGE" true
     
 elif [ "$BUILD" = true ]; then
     docker compose -f "$COMPOSE_FILE" down --remove-orphans

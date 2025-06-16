@@ -72,12 +72,11 @@ services:
     - HTTP_PROXY=${HTTP_PROXY}
     - HTTPS_PROXY=${HTTPS_PROXY}
     - NO_PROXY=${NO_PROXY}
-    # skipping healthcheck for now
-    # healthcheck:
-    #   test: ["CMD", "pgrep", "-f", "queue:work"]
-    #   interval: 10s
-    #   timeout: 3s
-    #   retries: 3
+    healthcheck:
+      test: ["CMD", "pgrep", "-f", "artisan horizon"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
     networks:
     - nmrxiv_net
     restart: unless-stopped
