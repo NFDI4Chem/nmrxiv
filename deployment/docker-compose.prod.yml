@@ -1,137 +1,176 @@
 services:
-  app:
-    build:
-      context: ..
-      dockerfile: deployment/Dockerfile
-      args:
-        - HTTP_PROXY=${HTTP_PROXY}
-        - HTTPS_PROXY=${HTTPS_PROXY}
-        - NO_PROXY=${NO_PROXY}
-    image: nmrxiv/app:latest
-    env_file:
-      - ../.env
-    environment:
-      - SUPERVISOR_PHP_COMMAND="/usr/local/bin/php -d variables_order=EGPCS /var/www/html/artisan octane:start --server=frankenphp --host=0.0.0.0 --admin-port=2019 --port=80"
-      - HTTP_PROXY=${HTTP_PROXY}
-      - HTTPS_PROXY=${HTTPS_PROXY}
-      - NO_PROXY=${NO_PROXY}
-    ports:
-      - "${APP_PORT:-80}:80"
-    volumes:
-      - app_storage:/var/www/html/storage
-      - caddy_data:/data/caddy
-      - ../.env:/var/www/html/.env
+  traefik:
+    container_name: traefik
+    image: traefik:v3.0
+    command:
+    - --entrypoints.web.address=:80
+    - --entrypoints.websecure.address=:443
+    - --providers.docker=true
+    - --providers.docker.exposedbydefault=false
+    - --providers.file.filename=/etc/traefik/dynamic.yml
     networks:
-      - nmrxiv_net
-    depends_on:
-      - pgsql
-      - redis
-      - meilisearch
+    - nmrxiv_net
+    ports:
+    - 80:80
+    - 443:443
     restart: unless-stopped
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock:ro
+    - /etc/ssl/dev.nmrxiv.org/:/certs:ro
+    - /etc/traefik/dynamic.yml:/etc/traefik/dynamic.yml:ro
+
+  app:
+    image: nfdi4chem/nmrxiv:app-dev-latest
+    depends_on:
+    - pgsql
+    - redis
+    - meilisearch
+    env_file:
+    - ../.env
+    environment:
+    - SUPERVISOR_PHP_COMMAND="/usr/local/bin/php -d variables_order=EGPCS /var/www/html/artisan
+      octane:start --server=frankenphp --host=0.0.0.0 --admin-port=2019 --port=80"
+    - HTTP_PROXY=${HTTP_PROXY}
+    - HTTPS_PROXY=${HTTPS_PROXY}
+    - NO_PROXY=${NO_PROXY}
+    - APP_URL=https://dev.nmrxiv.org
+    - TRUSTED_PROXIES="*"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/octane-test"]
       interval: 30s
-      timeout: 10s
       retries: 3
       start_period: 30s
+      test:
+      - CMD
+      - curl
+      - -f
+      - http://localhost/octane-test
+      timeout: 10s
+    labels:
+    - traefik.enable=true
+    - traefik.http.routers.laravel.rule=Host(`dev.nmrxiv.org`)
+    - traefik.http.routers.laravel.entrypoints=websecure
+    - traefik.http.routers.laravel.tls=true
+    - traefik.http.services.laravel.loadbalancer.server.port=80
+    networks:
+    - nmrxiv_net
+    restart: unless-stopped
+    volumes:
+    - app_storage:/var/www/html/storage
+    - caddy_data:/data/caddy
+    - ../.env:/var/www/html/.env
+
 
   worker:
-    build:
-      context: ..
-      dockerfile: deployment/Dockerfile.worker
-      args:
-        - HTTP_PROXY=${HTTP_PROXY}
-        - HTTPS_PROXY=${HTTPS_PROXY}
-        - NO_PROXY=${NO_PROXY}
-    image: nmrxiv/worker:latest
-    env_file:
-      - ../.env
-    environment:
-      - HTTP_PROXY=${HTTP_PROXY}
-      - HTTPS_PROXY=${HTTPS_PROXY}
-      - NO_PROXY=${NO_PROXY}
-    volumes:
-      - app_storage:/var/www/html/storage
-      - ../.env:/var/www/html/.env
-    networks:
-      - nmrxiv_net
+    image: nfdi4chem/nmrxiv:worker-dev-latest
     depends_on:
-      - app
-      - pgsql
-      - redis
-    restart: unless-stopped
-
-  pgsql:
-    image: "informaticsmatters/rdkit-cartridge-debian:latest"
+    - app
+    - pgsql
+    - redis
     env_file:
-      - ../.env
+    - ../.env
     environment:
-      - PG_VERSION=${DB_VERSION:-15.4}
-      - POSTGRES_DB=${DB_DATABASE:-nmrxiv}
-      - POSTGRES_USER=${DB_USERNAME:-nmrxiv}
-      - POSTGRES_PASSWORD=${DB_PASSWORD:-password}
-    ports:
-      - "${DB_PORT:-5432}:5432"
-    volumes:
-      - pgsql_data:/var/lib/postgresql/data
+    - HTTP_PROXY=${HTTP_PROXY}
+    - HTTPS_PROXY=${HTTPS_PROXY}
+    - NO_PROXY=${NO_PROXY}
+    # skipping healthcheck for now
+    # healthcheck:
+    #   test: ["CMD", "pgrep", "-f", "queue:work"]
+    #   interval: 10s
+    #   timeout: 3s
+    #   retries: 3
     networks:
-      - nmrxiv_net
+    - nmrxiv_net
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "pg_isready", "-q", "-d", "${DB_DATABASE:-nmrxiv}", "-U", "${DB_USERNAME:-nmrxiv}"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
-
-  redis:
-    image: 'redis:alpine'
     volumes:
-      - redis_data:/data
-    networks:
-      - nmrxiv_net
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
+    - app_storage:/var/www/html/storage
+    - ../.env:/var/www/html/.env
 
   meilisearch:
-    image: 'getmeili/meilisearch:latest'
+    image: getmeili/meilisearch:latest
     env_file:
-      - ../.env
-    volumes:
-      - meilisearch_data:/meili_data
-    ports:
-      - "${MEILISEARCH_PORT:-7700}:7700"
+    - ../.env
     environment:
-      - MEILI_MASTER_KEY=${MEILISEARCH_KEY:-ThisIsALongSecureKeyWith32Chars}
-      - MEILI_NO_ANALYTICS=true
-      - MEILI_ENV=production
-    networks:
-      - nmrxiv_net
-    restart: unless-stopped
+    - MEILI_MASTER_KEY=${MEILISEARCH_KEY:-ThisIsALongSecureKeyWith32Chars}
+    - MEILI_NO_ANALYTICS=true
+    - MEILI_ENV=production
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--spider", "http://localhost:7700/health"]
       interval: 30s
-      timeout: 10s
       retries: 3
       start_period: 30s
+      test:
+      - CMD
+      - wget
+      - --no-verbose
+      - --spider
+      - http://localhost:7700/health
+      timeout: 10s
+    networks:
+    - nmrxiv_net
+    ports:
+    - ${MEILISEARCH_PORT:-7700}:7700
+    restart: unless-stopped
+    volumes:
+    - meilisearch_data:/meili_data
 
-networks:
-  nmrxiv_net:
-    driver: bridge
+  pgsql:
+    image: informaticsmatters/rdkit-cartridge-debian:latest
+    env_file:
+    - ../.env
+    environment:
+    - PG_VERSION=${DB_VERSION:-15.4}
+    - POSTGRES_DB=${DB_DATABASE:-nmrxiv}
+    - POSTGRES_USER=${DB_USERNAME:-nmrxiv}
+    - POSTGRES_PASSWORD=${DB_PASSWORD:-password}
+    healthcheck:
+      interval: 30s
+      retries: 3
+      start_period: 10s
+      test:
+      - CMD
+      - pg_isready
+      - -q
+      - -d
+      - ${DB_DATABASE:-nmrxiv}
+      - -U
+      - ${DB_USERNAME:-nmrxiv}
+      timeout: 10s
+    networks:
+    - nmrxiv_net
+    ports:
+    - ${DB_PORT:-5432}:5432
+    restart: unless-stopped
+    volumes:
+    - pgsql_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:alpine
+    healthcheck:
+      interval: 30s
+      retries: 3
+      start_period: 10s
+      test:
+      - CMD
+      - redis-cli
+      - ping
+      timeout: 10s
+    networks:
+    - nmrxiv_net
+    restart: unless-stopped
+    volumes:
+    - redis_data:/data
 
 volumes:
   app_storage:
+    driver: local
+  caddy_data:
+    driver: local
+  meilisearch_data:
     driver: local
   pgsql_data:
     driver: local
   redis_data:
     driver: local
-  meilisearch_data:
-    driver: local
-  caddy_data:
-    driver: local 
+
+networks:
+  nmrxiv_net:
+    driver: bridge
