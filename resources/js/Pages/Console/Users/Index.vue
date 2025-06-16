@@ -159,7 +159,7 @@
                                 >
                                     <Link
                                         v-if="
-                                            $page.props.auth.user.id != user.id
+                                            $page.props.auth.user?.id != user.id
                                         "
                                         :href="
                                             route(

@@ -142,4 +142,14 @@ return [
         ]),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Disable Authentication
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify if the authentication should be disabled.
+    |
+    */
+    'auth_disabled' => env('AUTH_DISABLED', false),
+
 ];

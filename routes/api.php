@@ -40,10 +40,10 @@ Route::prefix('v1')->group(function () {
     });
 
     Route::get('/list/{model}', [DataController::class, 'all'])
-        ->name('public.projects');
+        ->name('public.api.projects');
 
     Route::get('/{id}', [DataController::class, 'id'])
-        ->name('public.project');
+        ->name('public.api.project');
 
     Route::prefix('schemas')->group(function () {
         Route::prefix('bioschemas')->group(function () {
