@@ -4,8 +4,8 @@ name : Setup, Build and Publish to Production
 
 # Workflow triggers
 on:
-  release:
-    types: [published]
+  push:
+    branches: [production]
 
 # Environment variables used throughout the workflow
 env:
@@ -98,22 +98,8 @@ jobs:
         username: ${{ env.DOCKER_HUB_USERNAME  }}
         password: ${{ env.DOCKER_HUB_PASSWORD  }}
 
-    # Build and push app Docker image for FSU-specific deployment
-    - name: Build and push App Docker image dedicated to FSU deployment.
-      uses: docker/build-push-action@v5
-      with:
-        context: .
-        file: ./deployment/Dockerfile
-        push: true
-        build-args: |
-          RELEASE_VERSION=fsu-app-prod
-          HTTP_PROXY=${{ secrets.HTTP_PROXY }}
-          HTTPS_PROXY=${{ secrets.HTTPS_PROXY }}
-          NO_PROXY=${{ secrets.NO_PROXY }}
-        tags: ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:fsu-app-prod
-
     # Build and push app Docker image for general public deployment
-    - name: Build and push App Docker image for public deployment.
+    - name: Build and push App Docker image
       uses: docker/build-push-action@v5
       with:
         context: .
@@ -124,23 +110,9 @@ jobs:
         tags: |
          ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:app-latest
          ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:app-${{ github.event.release.tag_name }}
-    
-    # Build and push worker Docker image for FSU-specific deployment
-    - name: Build and push Worker Docker image dedicated to FSU deployment.
-      uses: docker/build-push-action@v5
-      with:
-        context: .
-        file: ./deployment/Dockerfile.worker
-        push: true
-        build-args: |
-          RELEASE_VERSION=fsu-worker-prod
-          HTTP_PROXY=${{ secrets.HTTP_PROXY }}
-          HTTPS_PROXY=${{ secrets.HTTPS_PROXY }}
-          NO_PROXY=${{ secrets.NO_PROXY }}
-        tags: ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:fsu-worker-prod
 
     # Build and push worker Docker image for general public deployment
-    - name: Build and push Worker Docker image for public deployment.
+    - name: Build and push Worker Docker image
       uses: docker/build-push-action@v5
       with:
         context: .

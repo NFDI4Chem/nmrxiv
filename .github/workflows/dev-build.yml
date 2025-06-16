@@ -1,21 +1,21 @@
 # GitHub Actions workflow for building and deploying NMRXiv to development environment
 # This workflow runs tests, builds Docker images, and deploys to the FSU development environment
-name : Setup, Build and Publish to Dev
+name: Setup, Build and Publish to Dev
 
-# Trigger the workflow on pushes to the prod-deployment-update branch
+# Trigger the workflow on pushes to the development branch
 on:
   push:
-    branches: [prod-deployment-update]
+    branches: [development]
 
 # Environment variables used across all jobs
 env:
-  DOCKER_HUB_USERNAME : ${{ secrets.DOCKER_HUB_USERNAME  }}
-  DOCKER_HUB_PASSWORD : ${{ secrets.DOCKER_HUB_PASSWORD  }}
+  DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+  DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
   REPOSITORY_NAME: nmrxiv
   REPOSITORY_NAMESPACE: nfdi4chem
 
 jobs:
-  # Second job: Build Docker images and deploy to development environment
+  # Build Docker images and deploy to development environment
   setup-build-publish-deploy:
     name: Build & deploy to development
     runs-on: ubuntu-latest
@@ -25,43 +25,55 @@ jobs:
     environment:
       name: Dev
     steps:
-    # Checkout the repository code for building Docker images
-    - name: Checkout
-      uses: actions/checkout@v4
+      # Checkout the repository code for building Docker images
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    # Authenticate with Docker Hub for pushing images
-    - name: Log in to Docker Hub
-      uses: docker/login-action@v3
-      with:
-        username: ${{ env.DOCKER_HUB_USERNAME  }}
-        password: ${{ env.DOCKER_HUB_PASSWORD  }}
+      # Authenticate with Docker Hub for pushing images
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ env.DOCKER_HUB_USERNAME }}
+          password: ${{ env.DOCKER_HUB_PASSWORD }}
 
-    # Set up Docker Buildx with DNS configuration
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
+      # Set up Docker Buildx for multi-platform builds
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-    # Build and push the main application Docker image for FSU deployment
-    - name: Build and push App Docker image dedicated to FSU deployment.
-      uses: docker/build-push-action@v5
-      with:
-        context: .
-        file: ./deployment/Dockerfile
-        push: true
-        # Pass proxy settings and release version as build arguments
-        build-args: |
-          RELEASE_VERSION=fsu-app
-        # Tag the image for development environment
-        tags: ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:app-dev-latest
+      # Build and push the main application Docker image for FSU deployment
+      - name: Build and push App Docker image 
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./deployment/Dockerfile
+          push: true
+          # Pass proxy settings and release version as build arguments
+          build-args: |
+            RELEASE_VERSION=fsu-app
+          # Tag the image for development environment
+          tags: ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:app-dev-latest
+          # Enable build cache for faster builds
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
-    # Build and push the worker Docker image for background job processing
-    - name:  Build and push Worker Docker image dedicated to FSU deployment.
-      uses: docker/build-push-action@v5
-      with:
-        context: .
-        file: ./deployment/Dockerfile.worker
-        push: true
-        # Pass proxy settings and release version as build arguments
-        build-args: |
-          RELEASE_VERSION=fsu-worker
-        # Tag the worker image for development environment
-        tags: ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:worker-dev-latest
+      # Build and push the worker Docker image for background job processing
+      - name: Build and push Worker Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./deployment/Dockerfile.worker
+          push: true
+          # Pass proxy settings and release version as build arguments
+          build-args: |
+            RELEASE_VERSION=fsu-worker
+          # Tag the worker image for development environment
+          tags: ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:worker-dev-latest
+          # Enable build cache for faster builds
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # Optional: Add deployment step if needed
+      # - name: Deploy to development environment
+      #   run: |
+      #     echo "Add your deployment commands here"
+      #     # Example: kubectl apply -f k8s/ or docker-compose up -d
