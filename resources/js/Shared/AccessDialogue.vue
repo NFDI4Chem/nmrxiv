@@ -183,7 +183,7 @@
                                                             }}
                                                             <span
                                                                 v-if="
-                                                                    $page.props
+                                                                    $page.props.auth
                                                                         .user
                                                                         .email ==
                                                                     person.email

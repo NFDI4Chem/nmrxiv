@@ -45,7 +45,7 @@ class HandleInertiaRequests extends Middleware
             'flash' => [
                 'message' => fn () => $request->session()->get('message'),
             ],
-            'user.permissions' => fn () => $user ?
+            'auth.user.permissions' => fn () => $user ?
                 $user->getPermissionsViaRoles()->pluck('name')
                 : null,
             'flash' => function () use ($request) {
@@ -54,11 +54,11 @@ class HandleInertiaRequests extends Middleware
                     'error' => $request->session()->get('error'),
                 ];
             },
-            'user.roles' => fn () => $user ?
+            'auth.user.roles' => fn () => $user ?
                 $user->getRoleNames()
                 : null,
-            'teamRole' => fn () => $user ? $user->teamRole($user->currentTeam) : null,
-            'user.notifications' => fn () => $user ?
+            'auth.user.teamRole' => fn () => $user ? $user->teamRole($user->currentTeam) : null,
+            'auth.user.notifications' => fn () => $user ?
                 $user->unreadNotifications : null,
             'twitter' => (env('TWITTER_CLIENT_ID') !== null && env('TWITTER_CLIENT_ID') !== ''),
             'github' => (env('GITHUB_CLIENT_ID') !== null && env('GITHUB_CLIENT_ID') !== ''),

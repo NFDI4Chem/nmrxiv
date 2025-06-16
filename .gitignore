@@ -6,6 +6,8 @@
 /storage/pail
 /vendor
 .env
+.env.production
+.env.*
 .env.backup
 .phpunit.result.cache
 docker-compose.override.yml
@@ -19,3 +21,6 @@ yarn-error.log
 /resources/ops/kubernetes/secret.yml
 docs/.vitepress/dist
 docs/.vitepress/cache
+**/caddy
+frankenphp
+frankenphp-worker.php

@@ -366,7 +366,7 @@ Route::get('studies/{study}/toggleStarred', [StudyController::class, 'toggleStar
     ->name('study.toggle-starred');
 
 Route::get('studies/{study}/nmriumInfo', [StudyController::class, 'fetchNMRium'])
-    ->name('dashboard.studies.nmrium');
+    ->name('public.studies.nmrium');
 
 Route::get('projects/{project}/studies', [ProjectController::class, 'publicStudies'])
     ->name('project.studies');
@@ -378,7 +378,7 @@ Route::get('projects', [ProjectController::class, 'publicProjectsView'])
     ->name('public.projects');
 
 Route::get('datasets/{dataset}/nmriumInfo', [DatasetController::class, 'fetchNMRium'])
-    ->name('dashboard.datasets.nmrium');
+    ->name('public.datasets.nmrium');
 
 Route::get('datasets/{owner}/{slug}', [DatasetController::class, 'publicDatasetView'])
     ->name('public.dataset');
@@ -389,3 +389,12 @@ Route::get('spectra', [StudyController::class, 'publicStudiesView'])
 Route::get('services/oembed', [OEmbedController::class, 'spectra']);
 
 Route::get('embed/{id}', [OEmbedController::class, 'embed'])->name('embed');
+
+// Test route for Octane
+Route::get('/octane-test', function () {
+    return [
+        'status' => 'Octane is working!', 
+        'server' => 'frankenphp',
+        'php_version' => PHP_VERSION
+    ];
+});

@@ -63,7 +63,7 @@
                             
                         </div> -->
                             <div
-                                v-if="$page.props.auth.user && $page.props.auth.user.first_name != null"
+                                v-if="$page.props.auth.user && $page.props.auth.user?.first_name != null"
                                 class="hidden md:flex items-center justify-end md:flex-1 lg:w-0"
                             >
                                 <Link
@@ -1146,10 +1146,10 @@ export default {
     },
 
     props: {
-        spectra: Number,
-        projects: Number,
-        compounds: Number,
-        techniques: Number,
+        spectra: String,
+        projects: String,
+        compounds: String,
+        techniques: String,
     },
 
     setup() {
