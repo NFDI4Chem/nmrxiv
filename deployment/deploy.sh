@@ -80,7 +80,7 @@ cleanup() {
         find "$BACKUP_DIR" -name "*.sql" -type f | sort -r | tail -n +6 | xargs -r rm -f
     fi
     
-    success "Cleanup completed"
+    echo "Cleanup completed"
 }
 
 deploy_service() {
@@ -142,7 +142,7 @@ run_migration_and_clear_cache() {
 
     docker compose -f "$COMPOSE_FILE" ps
 
-    success "Database migration completed successfully"
+    echo "Database migration completed successfully"
 }
 
 # === Parse arguments ===
@@ -176,7 +176,7 @@ elif [ "$BUILD" = true ]; then
     run_migration_and_clear_cache
     
     cleanup 
-    success "🎉 Build completed successfully!"
+    echo "🎉 Build completed successfully!"
     echo "Application is available at: https://dev.nmrxiv.org"
 
 elif [ "$BACKUP" = true ]; then
