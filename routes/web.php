@@ -393,8 +393,8 @@ Route::get('embed/{id}', [OEmbedController::class, 'embed'])->name('embed');
 // Test route for Octane
 Route::get('/octane-test', function () {
     return [
-        'status' => 'Octane is working!', 
+        'status' => 'Octane is working!',
         'server' => 'frankenphp',
-        'php_version' => PHP_VERSION
+        'php_version' => PHP_VERSION,
     ];
 });

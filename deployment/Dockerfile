@@ -84,6 +84,8 @@ RUN npm run build && \
 COPY deployment/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY deployment/Caddyfile /etc/caddy/Caddyfile
 
+RUN php artisan l5-swagger:generate
+
 # Expose port
 EXPOSE 80 443
 
