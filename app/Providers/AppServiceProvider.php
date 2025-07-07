@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Lab404\Impersonate\Events\LeaveImpersonation;
 use Lab404\Impersonate\Events\TakeImpersonation;
@@ -24,7 +26,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        if (App::environment('local')) {
+        // Only register Telescope when the package is available (development environment)
+        if (class_exists(\Laravel\Telescope\TelescopeApplicationServiceProvider::class)) {
             $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
             $this->app->register(TelescopeServiceProvider::class);
         }
@@ -36,7 +39,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         if (App::environment('production')) {
-            \URL::forceScheme('https');
+            URL::forceScheme('https');
         }
 
         $this->bootEvent();
