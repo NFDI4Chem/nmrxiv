@@ -263,42 +263,396 @@
                 }
             }
         },
-        "/api/v1/schemas/bioschemas/{username}/{project}": {
-            "get": {
+        "/api/v1/{eln}/upload": {
+            "post": {
                 "tags": [
-                    "schemas"
+                    "ELN Submission"
                 ],
-                "summary": "Fetch bioschema for public model based on user id and slug",
-                "description": "Fetch bioschema for public model based on user id and slug",
-                "operationId": "bioschemaModelByName",
+                "summary": "Upload and process data from Electronic Lab Notebook (ELN) systems",
+                "description": "Creates or updates a draft with data from external ELN systems. Currently supports Chemotion. Processes ZIP files containing experimental data and extracts them to organized folder structure.",
+                "operationId": "uploadELNData",
                 "parameters": [
                     {
-                        "name": "username",
+                        "name": "eln",
                         "in": "path",
-                        "description": "nmrXiv username",
+                        "description": "ELN system identifier",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "type": "string",
+                            "enum": [
+                                "chemotion"
+                            ],
+                            "example": "chemotion"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "ELN upload data",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "external_id",
+                                    "callback_url",
+                                    "zip_url"
+                                ],
+                                "properties": {
+                                    "external_id": {
+                                        "description": "Unique identifier from the external ELN system",
+                                        "type": "string",
+                                        "example": "CHEM-EXP-2024-001"
+                                    },
+                                    "callback_url": {
+                                        "description": "URL to callback after processing is complete",
+                                        "type": "string",
+                                        "format": "url",
+                                        "example": "https://chemotion.example.com/api/callback"
+                                    },
+                                    "zip_url": {
+                                        "description": "URL to download the ZIP file containing experimental data",
+                                        "type": "string",
+                                        "format": "url",
+                                        "example": "https://chemotion.example.com/exports/experiment-data.zip"
+                                    },
+                                    "release_date": {
+                                        "description": "Optional future release date for the data (ISO 8601 format)",
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2026-12-31"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "ELN data successfully queued for processing",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "ELN upload endpoint ready"
+                                        },
+                                        "eln_system": {
+                                            "type": "string",
+                                            "example": "chemotion"
+                                        },
+                                        "draft_id": {
+                                            "type": "integer",
+                                            "example": 123
+                                        },
+                                        "draft_key": {
+                                            "type": "string",
+                                            "example": "550e8400-e29b-41d4-a716-446655440000"
+                                        },
+                                        "external_id": {
+                                            "type": "string",
+                                            "example": "CHEM-EXP-2024-001"
+                                        },
+                                        "callback_url": {
+                                            "type": "string",
+                                            "example": "https://chemotion.example.com/api/callback"
+                                        },
+                                        "zip_url": {
+                                            "type": "string",
+                                            "example": "https://chemotion.example.com/exports/experiment-data.zip"
+                                        },
+                                        "release_date": {
+                                            "type": "string",
+                                            "format": "date",
+                                            "example": "2026-12-31",
+                                            "nullable": true
+                                        },
+                                        "created_new": {
+                                            "description": "Whether a new draft was created or existing one was updated",
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "user_id": {
+                                            "type": "integer",
+                                            "example": 456
+                                        },
+                                        "team_id": {
+                                            "type": "integer",
+                                            "example": 789
+                                        },
+                                        "processing_status": {
+                                            "type": "string",
+                                            "example": "job_dispatched"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - validation errors",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "External ID is required"
+                                        },
+                                        "supported_elns": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            },
+                                            "example": [
+                                                "chemotion"
+                                            ]
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - authentication required",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Authentication required"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found - unsupported ELN system",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The route api/v1/invalid-eln/upload could not be found."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/{eln}/status/{external_id}": {
+            "get": {
+                "tags": [
+                    "ELN Submission"
+                ],
+                "summary": "Get processing status of ELN submission",
+                "description": "Retrieves the current processing status and details of a draft submission identified by external_id from the specified ELN system.",
+                "operationId": "getELNStatus",
+                "parameters": [
+                    {
+                        "name": "eln",
+                        "in": "path",
+                        "description": "ELN system identifier",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "chemotion"
+                            ],
+                            "example": "chemotion"
                         }
                     },
                     {
-                        "name": "project",
+                        "name": "external_id",
                         "in": "path",
-                        "description": "nmrXiv project slug e.g. cheminfo-nmr-dataset-1",
+                        "description": "External ID from the ELN system",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "type": "string",
+                            "example": "CHEM-EXP-2024-001"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Success"
+                        "description": "Draft status retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "draft_id": {
+                                                    "type": "integer",
+                                                    "example": 123
+                                                },
+                                                "draft_key": {
+                                                    "type": "string",
+                                                    "example": "550e8400-e29b-41d4-a716-446655440000"
+                                                },
+                                                "external_id": {
+                                                    "type": "string",
+                                                    "example": "CHEM-EXP-2024-001"
+                                                },
+                                                "eln_system": {
+                                                    "type": "string",
+                                                    "example": "chemotion"
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "ELN Import (CHEMOTION: 550e8400)"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "Draft created from ELN system: chemotion"
+                                                },
+                                                "status": {
+                                                    "description": "Processing status of the submission",
+                                                    "type": "string",
+                                                    "example": "zip_processed",
+                                                    "nullable": true
+                                                },
+                                                "current_step": {
+                                                    "description": "Current processing step",
+                                                    "type": "string",
+                                                    "example": "zip_processed",
+                                                    "nullable": true
+                                                },
+                                                "callback_url": {
+                                                    "type": "string",
+                                                    "example": "https://chemotion.example.com/api/callback",
+                                                    "nullable": true
+                                                },
+                                                "zip_url": {
+                                                    "type": "string",
+                                                    "example": "https://chemotion.example.com/exports/experiment-data.zip",
+                                                    "nullable": true
+                                                },
+                                                "release_date": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2026-12-31",
+                                                    "nullable": true
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2024-07-07T09:30:00Z"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2024-07-07T09:35:00Z"
+                                                },
+                                                "owner_id": {
+                                                    "type": "integer",
+                                                    "example": 456
+                                                },
+                                                "team_id": {
+                                                    "type": "integer",
+                                                    "example": 789
+                                                },
+                                                "files_count": {
+                                                    "description": "Number of files associated with this draft",
+                                                    "type": "integer",
+                                                    "example": 5
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
-                    "500": {
-                        "description": "Internal Server Error"
+                    "400": {
+                        "description": "Bad request - unsupported ELN system",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Unsupported ELN system"
+                                        },
+                                        "supported_elns": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            },
+                                            "example": [
+                                                "chemotion"
+                                            ]
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - authentication required",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Authentication required"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Draft not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Draft not found with the provided external ID"
+                                        },
+                                        "external_id": {
+                                            "type": "string",
+                                            "example": "CHEM-EXP-2024-001"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
             }
         },
         "/api/v1/schemas/bioschemas/{id}": {
@@ -337,44 +691,6 @@
                 ],
                 "summary": "Bioschema",
                 "operationId": "62c4756fdea25126d74d16746907c7c9",
-                "responses": {
-                    "200": {
-                        "description": "Success"
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
-                    }
-                }
-            }
-        },
-        "/api/v1/schemas/datacite/{username}/{project}": {
-            "get": {
-                "tags": [
-                    "schemas"
-                ],
-                "summary": "Fetch datacite schema for public model based on user id and slug",
-                "description": "Fetch datacite schema for public model based on user id and slug",
-                "operationId": "dataciteModelByName",
-                "parameters": [
-                    {
-                        "name": "username",
-                        "in": "path",
-                        "description": "nmrXiv username",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "project",
-                        "in": "path",
-                        "description": "nmrXiv project slug e.g. cheminfo-nmr-dataset-1",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "Success"
@@ -474,5 +790,27 @@
                 "in": "header"
             }
         }
-    }
+    },
+    "tags": [
+        {
+            "name": "auth",
+            "description": "auth"
+        },
+        {
+            "name": "public",
+            "description": "public"
+        },
+        {
+            "name": "ELN Submission",
+            "description": "ELN Submission"
+        },
+        {
+            "name": "schemas",
+            "description": "schemas"
+        },
+        {
+            "name": "search",
+            "description": "search"
+        }
+    ]
 }

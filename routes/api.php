@@ -5,6 +5,7 @@ use App\Http\Controllers\API\Auth\RegisterController;
 use App\Http\Controllers\API\Auth\UserController;
 use App\Http\Controllers\API\Auth\VerificationController;
 use App\Http\Controllers\API\DataController;
+use App\Http\Controllers\API\ELNController;
 use App\Http\Controllers\API\FileSystemController;
 use App\Http\Controllers\API\Schemas\Bioschemas\BioschemasController;
 use App\Http\Controllers\API\Schemas\Bioschemas\DataCatalogController;
@@ -38,6 +39,16 @@ Route::prefix('v1')->group(function () {
     Route::prefix('files')->group(function () {
         Route::get('/children/{file}', [FileSystemController::class, 'children']);
     });
+
+    // ELN Upload Route - Protected and constrained
+    Route::post('{eln}/upload', [ELNController::class, 'upload'])
+        ->middleware('auth:sanctum')
+        ->name('eln.upload');
+
+    // ELN Status Route - Protected and constrained
+    Route::get('{eln}/status/{external_id}', [ELNController::class, 'status'])
+        ->middleware('auth:sanctum')
+        ->name('eln.status');
 
     Route::get('/list/{model}', [DataController::class, 'all'])
         ->name('public.api.projects');
