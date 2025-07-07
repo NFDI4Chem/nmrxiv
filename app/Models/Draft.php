@@ -27,6 +27,12 @@ class Draft extends Model
         'info',
         'project_enabled',
         'current_step',
+        'eln',
+        'external_id',
+        'callback_url',
+        'zip_url',
+        'release_date',
+        'status',
     ];
 
     public function files(): HasMany

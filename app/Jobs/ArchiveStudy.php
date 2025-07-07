@@ -108,13 +108,13 @@ class ArchiveStudy implements ShouldBeUnique, ShouldQueue
                                     $sPath = $fsObject->key;
                                 }
                                 $sPath = preg_replace('#/+#', '/', $sPath);
-                                
+
                                 // Get file size
                                 $fileSize = $s3Client->headObject([
                                     'Bucket' => $bucket,
-                                    'Key' => $key
+                                    'Key' => $key,
                                 ])->get('ContentLength');
-                                
+
                                 // If file is larger than 100MB, process in chunks
                                 if ($fileSize > 100 * 1024 * 1024) {
                                     $chunkSize = 10 * 1024 * 1024; // 10MB chunks
@@ -126,7 +126,7 @@ class ArchiveStudy implements ShouldBeUnique, ShouldQueue
                                 throw new \Exception("Could not open stream for reading: {$s3path}");
                             }
                         }
-                        
+
                         try {
                             $zip->finish();
                             fclose($archiveDestination);
