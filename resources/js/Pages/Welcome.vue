@@ -226,7 +226,7 @@
                             >
                                 We archive raw and processed NMR data, providing
                                 support for browsing, search, analysis, and
-                                dissemination of NMR data worldwide.Test
+                                dissemination of NMR data worldwide.
                             </p>
                             <div
                                 class="mt-10 max-w-sm mx-auto sm:max-w-none sm:flex sm:justify-center"
