@@ -18,11 +18,14 @@ class SearchController extends Controller
      *     tags={"Chemical Search"},
      *     summary="Search chemical compounds by structure and properties",
      *     description="Advanced chemical search supporting multiple query types including SMILES, InChI, InChiKey, substructure matching, similarity search, and text-based name searches. Supports filtering by molecular properties and chemical classifications. Returns paginated results with comprehensive molecular data including calculated properties, classifications, and database references.",
+     *
      *     @OA\RequestBody(
      *         required=true,
      *         description="Chemical search query with type specification and optional filters",
+     *
      *         @OA\JsonContent(
      *             required={"query"},
+     *
      *             @OA\Property(
      *                 property="query",
      *                 type="string",
@@ -38,40 +41,53 @@ class SearchController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Parameter(
      *         name="limit",
      *         in="query",
      *         description="Number of results per page (default: 24, max: 100)",
+     *
      *         @OA\Schema(type="integer", minimum=1, maximum=100, default=24)
      *     ),
+     *
      *     @OA\Parameter(
      *         name="page",
      *         in="query",
      *         description="Page number for pagination (default: 1)",
+     *
      *         @OA\Schema(type="integer", minimum=1, default=1)
      *     ),
+     *
      *     @OA\Parameter(
      *         name="sort",
      *         in="query",
      *         description="Sort order for results",
+     *
      *         @OA\Schema(type="string", enum={"recent", "relevance"}, default="relevance")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="tagType",
      *         in="query",
      *         description="Tag type for tag-based searches",
+     *
      *         @OA\Schema(type="string", example="chemical_class")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Chemical search results with pagination",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(
      *                 property="data",
      *                 type="array",
      *                 description="Array of molecular structures and properties",
+     *
      *                 @OA\Items(
      *                     type="object",
+     *
      *                     @OA\Property(property="id", type="integer", description="Molecule database ID", example=12345),
      *                     @OA\Property(property="identifier", type="string", description="NMRXIV molecule identifier", example="M001234"),
      *                     @OA\Property(property="name", type="string", description="Chemical name", example="Aspirin"),
@@ -108,9 +124,11 @@ class SearchController extends Controller
      *                         property="database_links",
      *                         type="array",
      *                         description="External database identifiers",
+     *
      *                         @OA\Items(type="string"),
      *                         example={"ChEBI:15365", "PubChem:2244", "DrugBank:DB00945"}
      *                     ),
+     *
      *                     @OA\Property(property="created_at", type="string", format="date-time", description="Entry creation timestamp"),
      *                     @OA\Property(property="updated_at", type="string", format="date-time", description="Last update timestamp")
      *                 )
@@ -131,46 +149,61 @@ class SearchController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=400,
      *         description="Bad request - Invalid query parameters",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="Invalid search query format"),
-     *             @OA\Property(property="errors", type="object", 
+     *             @OA\Property(property="errors", type="object",
      *                 @OA\Property(property="query", type="array", @OA\Items(type="string"), example={"The query field is required when type is specified."}),
      *                 @OA\Property(property="type", type="array", @OA\Items(type="string"), example={"The selected type is invalid."})
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=404,
      *         description="No results found for the given query",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="No chemical compounds found matching the search criteria"),
      *             @OA\Property(property="suggestions", type="array", @OA\Items(type="string"), example={"Check spelling of chemical names", "Try using SMILES notation", "Use broader search terms"})
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=422,
      *         description="Unprocessable entity - Invalid chemical structure",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="Invalid SMILES notation provided"),
      *             @OA\Property(property="error_code", type="string", example="INVALID_CHEMICAL_STRUCTURE"),
      *             @OA\Property(property="details", type="string", example="Unable to parse SMILES string: invalid character 'X' at position 5")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=429,
      *         description="Rate limit exceeded",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="Too many search requests. Please try again later."),
      *             @OA\Property(property="retry_after", type="integer", description="Seconds until next request allowed", example=60)
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=500,
      *         description="Internal server error - Database or search engine failure",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="Chemical database search engine is temporarily unavailable"),
      *             @OA\Property(property="error_code", type="string", example="SEARCH_ENGINE_ERROR"),
      *             @OA\Property(property="support_reference", type="string", example="REF-2024-001234")
@@ -183,14 +216,13 @@ class SearchController extends Controller
      * Supports multiple search types:
      * - **Text**: Chemical names and synonyms
      * - **SMILES**: Simplified molecular-input line-entry system
-     * - **InChI/InChIKey**: International Chemical Identifier  
+     * - **InChI/InChIKey**: International Chemical Identifier
      * - **Substructure**: Molecular substructure matching
      * - **Similarity**: Molecular fingerprint similarity
      * - **Exact**: Exact structure matching
      * - **Tags**: Classification-based search
      * - **Filters**: Property-based filtering
      *
-     * @param Request $request
      * @return \Illuminate\Pagination\LengthAwarePaginator|\Illuminate\Http\JsonResponse
      */
     public function search(Request $request)

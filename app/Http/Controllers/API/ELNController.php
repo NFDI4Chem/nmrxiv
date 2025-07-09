@@ -27,22 +27,27 @@ class ELNController extends Controller
      *     summary="Upload and process data from Electronic Lab Notebook (ELN) systems",
      *     description="Creates or updates a draft with data from external ELN systems. Currently supports Chemotion. Processes ZIP files containing experimental data and extracts them to organized folder structure.",
      *     security={{"sanctum": {}}},
+     *
      *     @OA\Parameter(
      *         name="eln",
      *         in="path",
      *         required=true,
      *         description="ELN system identifier",
+     *
      *         @OA\Schema(
      *             type="string",
      *             enum={"chemotion"},
      *             example="chemotion"
      *         )
      *     ),
+     *
      *     @OA\RequestBody(
      *         required=true,
      *         description="ELN upload data",
+     *
      *         @OA\JsonContent(
      *             required={"external_id", "callback_url", "zip_url"},
+     *
      *             @OA\Property(
      *                 property="external_id",
      *                 type="string",
@@ -72,10 +77,13 @@ class ELNController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="ELN data successfully queued for processing",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(
      *                 property="message",
      *                 type="string",
@@ -141,10 +149,13 @@ class ELNController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=400,
      *         description="Bad request - validation errors",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(
      *                 property="error",
      *                 type="string",
@@ -153,15 +164,19 @@ class ELNController extends Controller
      *             @OA\Property(
      *                 property="supported_elns",
      *                 type="array",
+     *
      *                 @OA\Items(type="string"),
      *                 example={"chemotion"}
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=401,
      *         description="Unauthorized - authentication required",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(
      *                 property="error",
      *                 type="string",
@@ -169,10 +184,13 @@ class ELNController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=404,
      *         description="Not found - unsupported ELN system",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(
      *                 property="message",
      *                 type="string",
@@ -321,31 +339,38 @@ class ELNController extends Controller
      *     summary="Get processing status of ELN submission",
      *     description="Retrieves the current processing status and details of a draft submission identified by external_id from the specified ELN system.",
      *     security={{"sanctum": {}}},
+     *
      *     @OA\Parameter(
      *         name="eln",
      *         in="path",
      *         required=true,
      *         description="ELN system identifier",
+     *
      *         @OA\Schema(
      *             type="string",
      *             enum={"chemotion"},
      *             example="chemotion"
      *         )
      *     ),
+     *
      *     @OA\Parameter(
      *         name="external_id",
      *         in="path",
      *         required=true,
      *         description="External ID from the ELN system",
+     *
      *         @OA\Schema(
      *             type="string",
      *             example="CHEM-EXP-2024-001"
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Draft status retrieved successfully",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(
      *                 property="success",
      *                 type="boolean",
@@ -448,10 +473,13 @@ class ELNController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=400,
      *         description="Bad request - unsupported ELN system",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(
      *                 property="error",
      *                 type="string",
@@ -460,15 +488,19 @@ class ELNController extends Controller
      *             @OA\Property(
      *                 property="supported_elns",
      *                 type="array",
+     *
      *                 @OA\Items(type="string"),
      *                 example={"chemotion"}
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=401,
      *         description="Unauthorized - authentication required",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(
      *                 property="error",
      *                 type="string",
@@ -476,10 +508,13 @@ class ELNController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=404,
      *         description="Draft not found",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(
      *                 property="error",
      *                 type="string",

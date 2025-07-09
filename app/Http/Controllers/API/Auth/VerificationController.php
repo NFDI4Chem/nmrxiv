@@ -18,47 +18,61 @@ class VerificationController extends Controller
      *     tags={"Authentication"},
      *     summary="Verify user email address",
      *     description="Verifies a user's email address using a signed URL sent via email. This endpoint processes the verification link and marks the user's email as verified. Users must click the verification link sent to their email inbox during registration.",
+     *
      *     @OA\Parameter(
      *         name="user_id",
      *         in="path",
      *         required=true,
      *         description="ID of the user to verify",
+     *
      *         @OA\Schema(type="integer", example=123)
      *     ),
+     *
      *     @OA\Parameter(
      *         name="hash",
      *         in="path",
      *         required=true,
      *         description="Verification hash for security validation",
+     *
      *         @OA\Schema(type="string", example="abc123def456ghi789")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="expires",
      *         in="query",
      *         required=true,
      *         description="Expiration timestamp for the verification link",
+     *
      *         @OA\Schema(type="integer", example=1705123456)
      *     ),
+     *
      *     @OA\Parameter(
      *         name="signature",
      *         in="query",
      *         required=true,
      *         description="Security signature for URL validation",
+     *
      *         @OA\Schema(type="string", example="def456ghi789abc123")
      *     ),
+     *
      *     @OA\Response(
      *         response=302,
      *         description="Email verification successful - Redirect to landing page",
+     *
      *         @OA\Header(
      *             header="Location",
      *             description="Redirect URL to landing page with success message",
+     *
      *             @OA\Schema(type="string", example="https://nmrxiv.org?verified=1")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=401,
      *         description="Invalid or expired verification URL",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(
      *                 property="msg",
      *                 type="string",
@@ -67,10 +81,13 @@ class VerificationController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=403,
      *         description="Authorization failed - Hash mismatch or user mismatch",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(
      *                 property="message",
      *                 type="string",
@@ -79,10 +96,13 @@ class VerificationController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=404,
      *         description="User not found",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(
      *                 property="message",
      *                 type="string",
@@ -90,10 +110,13 @@ class VerificationController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=500,
      *         description="Internal server error during verification",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(
      *                 property="message",
      *                 type="string",
@@ -105,8 +128,7 @@ class VerificationController extends Controller
      *
      * Verify user email address using signed URL
      *
-     * @param int $user_id
-     * @param Request $request
+     * @param  int  $user_id
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
      */
     public function verify($user_id, Request $request)
@@ -143,10 +165,13 @@ class VerificationController extends Controller
      *     summary="Resend email verification link",
      *     description="Sends a new email verification link to the authenticated user's email address. This endpoint can be used when the original verification email was not received or has expired. The user must be authenticated but not yet verified.",
      *     security={{"sanctum": {}}},
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Verification email sent successfully",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(
      *                 property="msg",
      *                 type="string",
@@ -168,10 +193,13 @@ class VerificationController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=400,
      *         description="Email already verified or resend not needed",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(
      *                 property="msg",
      *                 type="string",
@@ -187,10 +215,13 @@ class VerificationController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=401,
      *         description="Unauthorized - Authentication required",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(
      *                 property="message",
      *                 type="string",
@@ -199,10 +230,13 @@ class VerificationController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=429,
      *         description="Too many verification attempts - Rate limit exceeded",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(
      *                 property="message",
      *                 type="string",
@@ -216,10 +250,13 @@ class VerificationController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=500,
      *         description="Internal server error - Email sending failed",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(
      *                 property="message",
      *                 type="string",

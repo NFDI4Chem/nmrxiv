@@ -20,11 +20,14 @@ class RegisterController extends Controller
      *     tags={"Authentication"},
      *     summary="Register new user account",
      *     description="Creates a new user account in the NMRXIV platform. Supports both regular user registration and ELN (Electronic Lab Notebook) user registration with different verification flows. Regular users receive email verification, while ELN users are auto-verified with a 3-day welcome period.",
+     *
      *     @OA\RequestBody(
      *         required=true,
      *         description="User registration data including personal information and credentials",
+     *
      *         @OA\JsonContent(
      *             required={"first_name", "last_name", "email", "password", "username"},
+     *
      *             @OA\Property(
      *                 property="first_name",
      *                 type="string",
@@ -83,10 +86,13 @@ class RegisterController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=201,
      *         description="User registration successful - Account created",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(
      *                 property="success",
      *                 type="boolean",
@@ -125,10 +131,13 @@ class RegisterController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=401,
      *         description="Validation failed - Invalid input data",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(
      *                 property="status",
      *                 type="boolean",
@@ -148,40 +157,52 @@ class RegisterController extends Controller
      *                 @OA\Property(
      *                     property="email",
      *                     type="array",
+     *
      *                     @OA\Items(type="string"),
      *                     example={"The email has already been taken.", "The email must be a valid email address."}
      *                 ),
+     *
      *                 @OA\Property(
      *                     property="username",
      *                     type="array",
+     *
      *                     @OA\Items(type="string"),
      *                     example={"The username has already been taken."}
      *                 ),
+     *
      *                 @OA\Property(
      *                     property="password",
      *                     type="array",
+     *
      *                     @OA\Items(type="string"),
      *                     example={"The password must be at least 8 characters."}
      *                 ),
+     *
      *                 @OA\Property(
      *                     property="first_name",
      *                     type="array",
+     *
      *                     @OA\Items(type="string"),
      *                     example={"The first name field is required."}
      *                 ),
+     *
      *                 @OA\Property(
      *                     property="last_name",
      *                     type="array",
+     *
      *                     @OA\Items(type="string"),
      *                     example={"The last name field is required."}
      *                 )
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=422,
      *         description="Unprocessable entity - Business logic validation failed",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(
      *                 property="message",
      *                 type="string",
@@ -194,10 +215,13 @@ class RegisterController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=429,
      *         description="Too many registration attempts - Rate limit exceeded",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(
      *                 property="message",
      *                 type="string",
@@ -211,10 +235,13 @@ class RegisterController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=500,
      *         description="Internal server error during registration",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(
      *                 property="message",
      *                 type="string",
@@ -231,7 +258,6 @@ class RegisterController extends Controller
      *
      * Register new user account
      *
-     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function register(Request $request)

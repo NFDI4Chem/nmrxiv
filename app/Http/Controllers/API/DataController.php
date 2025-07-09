@@ -21,75 +21,98 @@ class DataController extends Controller
      *     tags={"Public Data Access"},
      *     summary="Retrieve public scientific data collections",
      *     description="Fetches paginated collections of publicly available scientific data models from the NMRXIV repository. Supports projects (research investigations), samples (chemical specimens), and datasets (NMR spectroscopy data). All returned data complies with FAIR data principles and Bioschemas.org standards for scientific data discovery.",
+     *
      *     @OA\Parameter(
      *         name="model",
      *         in="path",
      *         required=true,
      *         description="Type of scientific data model to retrieve",
+     *
      *         @OA\Schema(
      *             type="string",
      *             enum={"projects", "samples", "datasets"},
      *             example="projects"
      *         )
      *     ),
+     *
      *     @OA\Parameter(
      *         name="per_page",
      *         in="query",
      *         description="Number of results per page (default: 100, max: 500)",
+     *
      *         @OA\Schema(type="integer", minimum=1, maximum=500, default=100)
      *     ),
+     *
      *     @OA\Parameter(
      *         name="page",
      *         in="query",
      *         description="Page number for pagination",
+     *
      *         @OA\Schema(type="integer", minimum=1, default=1)
      *     ),
+     *
      *     @OA\Parameter(
      *         name="sort",
      *         in="query",
      *         description="Sort field with optional direction prefix (-created_at for descending)",
+     *
      *         @OA\Schema(type="string", enum={"created_at", "-created_at", "identifier", "-identifier", "owner.email", "-owner.email"}, default="-created_at")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="filter[name]",
      *         in="query",
      *         description="Filter by name or title (case-insensitive partial match)",
+     *
      *         @OA\Schema(type="string", example="NMR analysis")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="filter[identifier]",
      *         in="query",
      *         description="Filter by NMRXIV identifier (exact match)",
+     *
      *         @OA\Schema(type="string", example="P123")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="filter[owner.email]",
      *         in="query",
      *         description="Filter by data owner email",
+     *
      *         @OA\Schema(type="string", format="email", example="researcher@university.edu")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="filter[doi]",
      *         in="query",
      *         description="Filter by Digital Object Identifier",
+     *
      *         @OA\Schema(type="string", example="10.1000/xyz123")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="filter[created_at]",
      *         in="query",
      *         description="Filter by creation date (ISO 8601 format or date range)",
+     *
      *         @OA\Schema(type="string", example="2024-01-01,2024-12-31")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Public scientific data collection retrieved successfully",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(
      *                 property="data",
      *                 type="array",
      *                 description="Array of scientific data models",
+     *
      *                 @OA\Items(
      *                     type="object",
+     *
      *                     @OA\Property(property="id", type="integer", description="Internal database ID", example=123),
      *                     @OA\Property(property="identifier", type="string", description="Public NMRXIV identifier", example="P001234"),
      *                     @OA\Property(property="name", type="string", description="Title of the scientific investigation", example="Metabolomic Analysis of Plant Extracts"),
@@ -118,9 +141,11 @@ class DataController extends Controller
      *                         property="keywords",
      *                         type="array",
      *                         description="Research topic keywords",
+     *
      *                         @OA\Items(type="string"),
      *                         example={"NMR spectroscopy", "metabolomics", "natural products", "plant chemistry"}
      *                     ),
+     *
      *                     @OA\Property(
      *                         property="bioschemas",
      *                         type="object",
@@ -166,10 +191,13 @@ class DataController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=400,
      *         description="Bad request - Invalid model type or parameters",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="Invalid model type specified"),
      *             @OA\Property(property="errors", type="object",
      *                 @OA\Property(property="model", type="array", @OA\Items(type="string"), example={"The selected model is invalid. Must be one of: projects, samples, datasets"}),
@@ -177,26 +205,35 @@ class DataController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=404,
      *         description="No public data found matching the criteria",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="No public data available for the specified criteria"),
      *             @OA\Property(property="suggestions", type="array", @OA\Items(type="string"), example={"Try broadening your search filters", "Check if data exists in other model types", "Contact repository administrators"})
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=429,
      *         description="Rate limit exceeded",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="Too many API requests. Please try again later."),
      *             @OA\Property(property="retry_after", type="integer", example=60)
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=500,
      *         description="Internal server error",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="Database connection error"),
      *             @OA\Property(property="error_code", type="string", example="DATABASE_UNAVAILABLE")
      *         )
@@ -206,16 +243,15 @@ class DataController extends Controller
      * Retrieve public scientific data collections
      *
      * This endpoint provides access to publicly available scientific data from the NMRXIV repository:
-     * 
+     *
      * - **Projects**: Research investigations with multiple samples and datasets
-     * - **Samples**: Individual chemical specimens or biological materials  
+     * - **Samples**: Individual chemical specimens or biological materials
      * - **Datasets**: Collections of NMR spectra and analytical data
      *
      * All data follows FAIR principles (Findable, Accessible, Interoperable, Reusable)
      * and includes Bioschemas.org metadata for enhanced discoverability.
      *
-     * @param Request $request
-     * @param string $model The data model type (projects|samples|datasets)
+     * @param  string  $model  The data model type (projects|samples|datasets)
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
     public function all(Request $request, $model)
@@ -262,24 +298,30 @@ class DataController extends Controller
      *     tags={"Public Data Access"},
      *     summary="Retrieve specific public scientific data by identifier",
      *     description="Fetches detailed information for a specific publicly available scientific data entry using its NMRXIV identifier. Returns comprehensive metadata, associated files, measurement details, and structured data compliant with scientific data standards. Supports projects (P prefix), samples (S prefix), and datasets (D prefix).",
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
      *         description="NMRXIV public identifier for the scientific data entry",
+     *
      *         @OA\Schema(
      *             type="string",
      *             pattern="^[PSD][0-9]+$",
      *             example="P1234"
      *         ),
+     *
      *         @OA\Examples(example="project", value="P1234", summary="Project identifier"),
      *         @OA\Examples(example="sample", value="S5678", summary="Sample identifier"),
      *         @OA\Examples(example="dataset", value="D9012", summary="Dataset identifier")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Scientific data entry retrieved successfully",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="id", type="integer", description="Internal database ID", example=1234),
      *             @OA\Property(property="identifier", type="string", description="Public NMRXIV identifier", example="P1234"),
      *             @OA\Property(property="name", type="string", description="Title of the scientific entry", example="Comprehensive NMR Analysis of Natural Product Library"),
@@ -305,8 +347,10 @@ class DataController extends Controller
      *                 @OA\Property(
      *                     property="members",
      *                     type="array",
+     *
      *                     @OA\Items(
      *                         type="object",
+     *
      *                         @OA\Property(property="name", type="string", example="Dr. John Smith"),
      *                         @OA\Property(property="role", type="string", example="Co-investigator"),
      *                         @OA\Property(property="orcid_id", type="string", example="0000-0004-5678-9012")
@@ -334,8 +378,10 @@ class DataController extends Controller
      *                 property="files",
      *                 type="array",
      *                 description="Associated data files and downloads",
+     *
      *                 @OA\Items(
      *                     type="object",
+     *
      *                     @OA\Property(property="id", type="integer", example=567),
      *                     @OA\Property(property="filename", type="string", example="compound_001_1H_NMR.fid"),
      *                     @OA\Property(property="size", type="integer", description="File size in bytes", example=1048576),
@@ -379,35 +425,47 @@ class DataController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=400,
      *         description="Bad request - Invalid identifier format",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="Invalid identifier format. Expected format: [P|S|D]followed by numbers"),
      *             @OA\Property(property="examples", type="array", @OA\Items(type="string"), example={"P1234", "S5678", "D9012"})
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=403,
      *         description="Forbidden - Data is not publicly available",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="This data entry is not publicly available"),
      *             @OA\Property(property="contact", type="string", example="Contact the data owner for access requests"),
      *             @OA\Property(property="owner_email", type="string", format="email", example="researcher@university.edu")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=404,
      *         description="Not found - Invalid identifier or data does not exist",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="No data found for identifier: P9999"),
      *             @OA\Property(property="suggestions", type="array", @OA\Items(type="string"), example={"Verify the identifier is correct", "Check if the data has been moved or deleted", "Use the search endpoint to find similar data"})
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=500,
      *         description="Internal server error",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="Internal server error occurred while retrieving data"),
      *             @OA\Property(property="error_code", type="string", example="DATA_RETRIEVAL_ERROR")
      *         )
@@ -418,13 +476,12 @@ class DataController extends Controller
      *
      * Returns comprehensive information for a single scientific data entry including:
      * - Complete metadata and experimental details
-     * - Associated files and download links  
+     * - Associated files and download links
      * - Related data entries and publications
      * - Bioschemas.org structured metadata
      * - Usage statistics and engagement metrics
      *
-     * @param Request $request
-     * @param string $id NMRXIV identifier (P123, S456, D789)
+     * @param  string  $id  NMRXIV identifier (P123, S456, D789)
      * @return \App\Http\Resources\ProjectResource|\App\Http\Resources\StudyResource|\App\Http\Resources\DatasetResource|\Illuminate\Http\JsonResponse
      */
     public function id(Request $request, $id)

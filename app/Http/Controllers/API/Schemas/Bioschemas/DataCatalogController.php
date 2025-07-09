@@ -19,10 +19,13 @@ class DataCatalogController extends Controller
      *     tags={"Scientific Metadata Schemas"},
      *     summary="Retrieve Schema.org DataCatalog metadata for NMRXIV repository",
      *     description="Generates comprehensive Schema.org DataCatalog metadata representing NMRXIV as a scientific data repository. This endpoint provides structured metadata that enhances repository discoverability in search engines, enables integration with scientific data aggregators, and supports FAIR data principles. The DataCatalog schema includes detailed information about the repository's scope, contributors, measurement techniques, and scientific ontology mappings for NMR spectroscopy data.",
+     *
      *     @OA\Response(
      *         response=200,
      *         description="DataCatalog schema generated successfully",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="@context", type="string", description="JSON-LD context", example="https://schema.org"),
      *             @OA\Property(property="@type", type="string", description="Schema.org type", example="DataCatalog"),
      *             @OA\Property(property="@id", type="string", description="Repository identifier", example="https://nmrxiv.org"),
@@ -30,9 +33,11 @@ class DataCatalogController extends Controller
      *                 property="dct:conformsTo",
      *                 type="array",
      *                 description="Schema compliance references",
+     *
      *                 @OA\Items(type="string"),
      *                 example={"https://schema.org/DataCatalog"}
      *             ),
+     *
      *             @OA\Property(
      *                 property="name",
      *                 type="string",
@@ -83,16 +88,20 @@ class DataCatalogController extends Controller
      *                 property="keywords",
      *                 type="array",
      *                 description="Scientific domain keywords with ontology mappings",
+     *
      *                 @OA\Items(
      *                     type="object",
+     *
      *                     @OA\Property(property="@type", type="string", example="DefinedTerm"),
      *                     @OA\Property(property="name", type="string", example="nuclear magnetic resonance spectroscopy"),
      *                     @OA\Property(
      *                         property="alternateName",
      *                         type="array",
+     *
      *                         @OA\Items(type="string"),
      *                         example={"NMR", "NMR spectroscopy", "nuclear magnetic resonance (NMR) spectroscopy"}
      *                     ),
+     *
      *                     @OA\Property(property="termCode", type="string", example="CHMO:0000591"),
      *                     @OA\Property(property="url", type="string", example="http://purl.obolibrary.org/obo/CHMO_0000591"),
      *                     @OA\Property(
@@ -108,8 +117,10 @@ class DataCatalogController extends Controller
      *                 property="measurementTechnique",
      *                 type="array",
      *                 description="Supported analytical measurement techniques",
+     *
      *                 @OA\Items(
      *                     type="object",
+     *
      *                     @OA\Property(property="@type", type="string", example="DefinedTerm"),
      *                     @OA\Property(property="name", type="string", example="pulsed nuclear magnetic resonance spectroscopy"),
      *                     @OA\Property(property="termCode", type="string", example="CHMO:0000613"),
@@ -120,8 +131,10 @@ class DataCatalogController extends Controller
      *                 property="contributor",
      *                 type="array",
      *                 description="Repository contributors and development team",
+     *
      *                 @OA\Items(
      *                     type="object",
+     *
      *                     @OA\Property(property="@type", type="string", example="Person"),
      *                     @OA\Property(property="givenName", type="string", example="Christoph"),
      *                     @OA\Property(property="familyName", type="string", example="Steinbeck"),
@@ -145,8 +158,10 @@ class DataCatalogController extends Controller
      *                 property="includedInDataCatalog",
      *                 type="array",
      *                 description="Parent data catalogs and aggregators",
+     *
      *                 @OA\Items(
      *                     type="object",
+     *
      *                     @OA\Property(property="@type", type="string", example="DataCatalog"),
      *                     @OA\Property(property="name", type="string", example="re3data - Registry of Research Data Repositories"),
      *                     @OA\Property(property="url", type="string", example="https://www.re3data.org")
@@ -175,19 +190,25 @@ class DataCatalogController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=500,
      *         description="Internal server error - DataCatalog schema generation failed",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="Failed to generate DataCatalog schema"),
      *             @OA\Property(property="error_code", type="string", example="DATACATALOG_GENERATION_ERROR"),
      *             @OA\Property(property="details", type="string", example="Error accessing repository configuration or contributor data")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=503,
      *         description="Service unavailable - Repository temporarily offline",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="Repository metadata service temporarily unavailable"),
      *             @OA\Property(property="retry_after", type="integer", example=300, description="Seconds to wait before retrying"),
      *             @OA\Property(property="status_page", type="string", example="https://status.nmrxiv.org")
@@ -225,7 +246,6 @@ class DataCatalogController extends Controller
      * - Compliance with funding agency data sharing requirements
      * - Support for systematic reviews and meta-analyses in chemistry
      *
-     * @param Request $request
      * @return \Illuminate\Http\JsonResponse DataCatalog schema representing NMRXIV repository
      */
     public function dataCatalogSchema(Request $request)
