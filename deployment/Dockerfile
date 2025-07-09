@@ -1,4 +1,4 @@
-FROM dunglas/frankenphp:latest-alpine
+FROM dunglas/frankenphp:latest
 
 # Setup proxy settings using build arguments
 ARG HTTP_PROXY
