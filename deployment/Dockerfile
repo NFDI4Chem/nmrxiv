@@ -1,4 +1,4 @@
-FROM dunglas/frankenphp:latest
+FROM dunglas/frankenphp:1.7.0-alpine
 
 # Setup proxy settings using build arguments
 ARG HTTP_PROXY
@@ -12,8 +12,8 @@ ENV http_proxy=$HTTP_PROXY \
 WORKDIR /var/www/html
 
 # Install system dependencies and build tools in fewer layers
-RUN apk update && \
-    apk add --no-cache \
+RUN /sbin/apk update && \
+    /sbin/apk add --no-cache \
         zip unzip git curl \
         libpng-dev libzip-dev icu-dev oniguruma-dev \
         postgresql-dev zlib-dev supervisor \
@@ -22,7 +22,7 @@ RUN apk update && \
     rm -rf /var/cache/apk/*
 
 # Install PostgreSQL client
-RUN apk --update add postgresql17-client --repository=https://dl-cdn.alpinelinux.org/alpine/edge/main && \
+RUN /sbin/apk --update add postgresql17-client --repository=https://dl-cdn.alpinelinux.org/alpine/edge/main && \
     rm -rf /var/cache/apk/*
 
 # Install PHP extensions
@@ -31,7 +31,7 @@ RUN docker-php-ext-install pdo pdo_pgsql mbstring exif pcntl bcmath gd intl zip
 # Install APCu and Redis via PECL and clean up build dependencies in same layer
 RUN pecl install apcu redis && \
     docker-php-ext-enable apcu redis && \
-    apk del autoconf gcc g++ make && \
+    /sbin/apk del autoconf gcc g++ make && \
     rm -rf /tmp/pear
 
 # Configure PHP - combine echo commands
