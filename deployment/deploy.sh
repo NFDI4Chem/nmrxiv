@@ -9,6 +9,7 @@ NEW_CONTAINER_ID=""
 BACKUP_DIR="./backups"
 BUILD=false
 DEPLOY=false
+MULTI_PLATFORM=false
 
 LOG_FILE="$HOME/nmrxiv-deploy.log"
 
@@ -152,18 +153,52 @@ run_migration_and_clear_cache() {
     log_message "Database migration completed successfully"
 }
 
+build_multi_platform() {
+    log_message "🔨 Building multi-platform Docker images..."
+    
+    # Create and use a new builder instance for multi-platform builds
+    docker buildx create --name multi-platform-builder --use --driver docker-container || true
+    
+    # Build app image for multiple platforms
+    log_message "Building app image for multiple platforms..."
+    docker buildx build \
+        --platform linux/amd64,linux/arm64 \
+        --tag nfdi4chem/nmrxiv:app-dev-latest \
+        --tag nfdi4chem/nmrxiv:app-dev-$(date +%Y%m%d-%H%M%S) \
+        --file deployment/Dockerfile \
+        --push \
+        .
+    
+    # Build worker image for multiple platforms
+    log_message "Building worker image for multiple platforms..."
+    docker buildx build \
+        --platform linux/amd64,linux/arm64 \
+        --tag nfdi4chem/nmrxiv:worker-dev-latest \
+        --tag nfdi4chem/nmrxiv:worker-dev-$(date +%Y%m%d-%H%M%S) \
+        --file deployment/Dockerfile.worker \
+        --push \
+        .
+    
+    log_message "✅ Multi-platform builds completed successfully!"
+}
+
 # === Parse arguments ===
 while [[ $# -gt 0 ]]; do
     case $1 in
         --build) BUILD=true; shift ;;
         --deploy) DEPLOY=true; shift ;;
         --backup) BACKUP=true; shift ;;
+        --multi-platform) MULTI_PLATFORM=true; shift ;;
         *) log_message "Unknown option: $1"; exit 1 ;;
     esac
 done
 
 # === Deployment Flow ===
-if [ "$DEPLOY" = true ]; then
+if [ "$MULTI_PLATFORM" = true ]; then
+    build_multi_platform
+    log_message "🎉 Multi-platform build completed successfully!"
+
+elif [ "$DEPLOY" = true ]; then
     log_message "Starting zero-downtime deployment..."
 
     deploy_service app "$APP_IMAGE" true
@@ -188,7 +223,7 @@ elif [ "$BUILD" = true ]; then
 elif [ "$BACKUP" = true ]; then
     backup_database
 else
-    log_message "Skipping build and deploy step — please pass at least one argument (--build or --deploy)..."
+    log_message "Skipping build and deploy step — please pass at least one argument (--build, --deploy, or --multi-platform)..."
 fi
 
 # === End of script ===
