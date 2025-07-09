@@ -15,10 +15,13 @@ class UserController extends Controller
      *     summary="Get current authenticated user information",
      *     description="Retrieves detailed information about the currently authenticated user including profile data, team memberships, roles, and account status. Requires valid Bearer token authentication.",
      *     security={{"sanctum": {}}},
+     *
      *     @OA\Response(
      *         response=200,
      *         description="User information retrieved successfully",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(
      *                 property="id",
      *                 type="integer",
@@ -118,8 +121,10 @@ class UserController extends Controller
      *                 property="teams",
      *                 type="array",
      *                 description="Teams the user belongs to",
+     *
      *                 @OA\Items(
      *                     type="object",
+     *
      *                     @OA\Property(property="id", type="integer", example=456),
      *                     @OA\Property(property="name", type="string", example="Chemistry Research Team"),
      *                     @OA\Property(property="personal_team", type="boolean", example=false),
@@ -130,8 +135,10 @@ class UserController extends Controller
      *                 property="all_teams",
      *                 type="array",
      *                 description="All teams including owned and member teams",
+     *
      *                 @OA\Items(
      *                     type="object",
+     *
      *                     @OA\Property(property="id", type="integer", example=789),
      *                     @OA\Property(property="name", type="string", example="NMR Spectroscopy Lab"),
      *                     @OA\Property(property="role", type="string", example="admin")
@@ -139,10 +146,13 @@ class UserController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=401,
      *         description="Unauthorized - Invalid or missing authentication token",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(
      *                 property="message",
      *                 type="string",
@@ -151,10 +161,13 @@ class UserController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=403,
      *         description="Forbidden - Token valid but user access restricted",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(
      *                 property="message",
      *                 type="string",
@@ -163,10 +176,13 @@ class UserController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=429,
      *         description="Too many requests - Rate limit exceeded",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(
      *                 property="message",
      *                 type="string",
@@ -180,10 +196,13 @@ class UserController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=500,
      *         description="Internal server error",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(
      *                 property="message",
      *                 type="string",
@@ -195,7 +214,6 @@ class UserController extends Controller
      *
      * Get current authenticated user information
      *
-     * @param Request $request
      * @return \App\Models\User
      */
     public function info(Request $request)

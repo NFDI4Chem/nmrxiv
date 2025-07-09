@@ -28,32 +28,39 @@ class BioschemasController extends Controller
      *     tags={"Scientific Metadata Schemas"},
      *     summary="Retrieve Bioschemas.org metadata by username and project slug",
      *     description="Generates structured scientific metadata compliant with Bioschemas.org standards for a specific project, study, or dataset. Bioschemas extends Schema.org with life sciences and chemistry-specific properties, enabling enhanced discoverability in scientific search engines and knowledge graphs. Returns comprehensive molecular entity representations, experimental methodologies, and research context.",
+     *
      *     @OA\Parameter(
      *         name="username",
      *         in="path",
      *         required=true,
      *         description="NMRXIV username of the data owner/principal investigator",
+     *
      *         @OA\Schema(
      *             type="string",
      *             pattern="^[a-zA-Z0-9_-]+$",
      *             example="sarah_johnson_chem"
      *         )
      *     ),
+     *
      *     @OA\Parameter(
      *         name="project",
      *         in="path",
      *         required=true,
      *         description="Project slug identifier (URL-friendly project name)",
+     *
      *         @OA\Schema(
      *             type="string",
      *             pattern="^[a-z0-9-]+$",
      *             example="marine-alkaloids-nmr-study-2024"
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Bioschemas.org structured metadata retrieved successfully",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="@context", type="string", description="JSON-LD context", example="https://schema.org"),
      *             @OA\Property(property="@type", type="string", description="Bioschemas type", example="Study"),
      *             @OA\Property(property="@id", type="string", description="Unique identifier (DOI or URL)", example="https://doi.org/10.1000/nmrxiv.123456"),
@@ -61,18 +68,22 @@ class BioschemasController extends Controller
      *                 property="dct:conformsTo",
      *                 type="array",
      *                 description="Bioschemas profile compliance",
+     *
      *                 @OA\Items(type="string"),
      *                 example={"https://bioschemas.org/types/Study/0.3-DRAFT", "https://isa-specs.readthedocs.io/en/latest/isamodel.html#investigation"}
      *             ),
+     *
      *             @OA\Property(property="name", type="string", description="Scientific investigation title", example="Comprehensive NMR Analysis of Marine-Derived Alkaloids"),
      *             @OA\Property(property="description", type="string", description="Detailed research description", example="Systematic structural elucidation of bioactive alkaloids isolated from marine sponges using multidimensional NMR spectroscopy"),
      *             @OA\Property(
      *                 property="keywords",
      *                 type="array",
      *                 description="Research keywords and tags",
+     *
      *                 @OA\Items(type="string"),
      *                 example={"marine natural products", "alkaloids", "NMR spectroscopy", "structure elucidation", "bioactivity"}
      *             ),
+     *
      *             @OA\Property(property="license", type="string", format="uri", description="Data usage license", example="https://creativecommons.org/licenses/by/4.0/"),
      *             @OA\Property(property="url", type="string", format="uri", description="Public access URL", example="https://nmrxiv.org/P123"),
      *             @OA\Property(property="dateCreated", type="string", format="date-time", description="Creation timestamp"),
@@ -82,8 +93,10 @@ class BioschemasController extends Controller
      *                 property="author",
      *                 type="array",
      *                 description="Research authors and contributors",
+     *
      *                 @OA\Items(
      *                     type="object",
+     *
      *                     @OA\Property(property="@type", type="string", example="Person"),
      *                     @OA\Property(property="name", type="string", example="Dr. Sarah Johnson"),
      *                     @OA\Property(property="identifier", type="string", description="ORCID ID", example="https://orcid.org/0000-0002-1825-0097"),
@@ -114,8 +127,10 @@ class BioschemasController extends Controller
      *                 property="hasPart",
      *                 type="array",
      *                 description="Component studies and datasets",
+     *
      *                 @OA\Items(
      *                     type="object",
+     *
      *                     @OA\Property(property="@type", type="string", example="Study"),
      *                     @OA\Property(property="name", type="string", example="Compound 1 - Structural Analysis"),
      *                     @OA\Property(property="about", type="object", description="Chemical substance being studied"),
@@ -123,8 +138,10 @@ class BioschemasController extends Controller
      *                         property="hasPart",
      *                         type="array",
      *                         description="NMR datasets and experiments",
+     *
      *                         @OA\Items(
      *                             type="object",
+     *
      *                             @OA\Property(property="@type", type="string", example="Dataset"),
      *                             @OA\Property(property="name", type="string", example="1H NMR Spectrum - CDCl3"),
      *                             @OA\Property(
@@ -140,8 +157,10 @@ class BioschemasController extends Controller
      *                                 property="variableMeasured",
      *                                 type="array",
      *                                 description="Experimental parameters and conditions",
+     *
      *                                 @OA\Items(
      *                                     type="object",
+     *
      *                                     @OA\Property(property="@type", type="string", example="PropertyValue"),
      *                                     @OA\Property(property="name", type="string", example="NMR solvent"),
      *                                     @OA\Property(property="value", type="string", example="CDCl3"),
@@ -154,10 +173,13 @@ class BioschemasController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=400,
      *         description="Bad request - Invalid parameters",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="Invalid username or project slug format"),
      *             @OA\Property(property="errors", type="object",
      *                 @OA\Property(property="username", type="array", @OA\Items(type="string"), example={"Username contains invalid characters"}),
@@ -165,26 +187,35 @@ class BioschemasController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=403,
      *         description="Forbidden - Private data or insufficient permissions",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="This project is not publicly available"),
      *             @OA\Property(property="access_info", type="string", example="Contact the project owner for access permissions")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=404,
      *         description="Not found - User or project does not exist",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="Project not found for the specified user"),
      *             @OA\Property(property="suggestions", type="array", @OA\Items(type="string"), example={"Verify the username and project slug", "Check if the project has been archived", "Use the search endpoint to find similar projects"})
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=500,
      *         description="Internal server error",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="Error generating Bioschemas metadata"),
      *             @OA\Property(property="error_code", type="string", example="SCHEMA_GENERATION_ERROR")
      *         )
@@ -206,9 +237,8 @@ class BioschemasController extends Controller
      * - Dataset schemas with NMR experimental parameters
      * - Measurement techniques with CHMO ontology mapping
      *
-     * @param Request $request
-     * @param string $username NMRXIV username
-     * @param string $projectName Project slug identifier
+     * @param  string  $username  NMRXIV username
+     * @param  string  $projectName  Project slug identifier
      * @return \Illuminate\Http\JsonResponse
      */
     // public function modelSchemaByName(Request $request, $username, $projectName, $studyName = null, $datasetName = null)
@@ -220,36 +250,45 @@ class BioschemasController extends Controller
      *     tags={"Scientific Metadata Schemas"},
      *     summary="Retrieve Bioschemas.org metadata by NMRXIV identifier",
      *     description="Generates comprehensive Bioschemas.org compliant metadata for a specific scientific data entry identified by its public NMRXIV identifier. Returns structured metadata that enhances discoverability in scientific search engines, enables integration with knowledge graphs, and supports FAIR data principles. Includes detailed molecular representations, experimental methodologies, and semantic annotations using established scientific ontologies.",
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
      *         description="NMRXIV public identifier for scientific data entry",
+     *
      *         @OA\Schema(
      *             type="string",
      *             pattern="^[PSD][0-9]+$",
      *             example="P123"
      *         ),
+     *
      *         @OA\Examples(example="project", value="P123", summary="Project identifier"),
      *         @OA\Examples(example="study", value="S456", summary="Study/Sample identifier"),
      *         @OA\Examples(example="dataset", value="D789", summary="Dataset identifier")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Bioschemas.org structured metadata generated successfully",
+     *
      *         @OA\JsonContent(
      *             oneOf={
+     *
      *                 @OA\Schema(
      *                     description="Project-level Bioschemas Study schema",
+     *
      *                     @OA\Property(property="@context", type="string", example="https://schema.org"),
      *                     @OA\Property(property="@type", type="string", example="Study"),
      *                     @OA\Property(property="@id", type="string", example="https://doi.org/10.1000/nmrxiv.123456"),
      *                     @OA\Property(
      *                         property="dct:conformsTo",
      *                         type="array",
+     *
      *                         @OA\Items(type="string"),
      *                         example={"https://bioschemas.org/types/Study/0.3-DRAFT", "https://isa-specs.readthedocs.io/en/latest/isamodel.html#investigation"}
      *                     ),
+     *
      *                     @OA\Property(property="name", type="string", example="Marine Natural Products Chemical Space Exploration"),
      *                     @OA\Property(property="studyDomain", type="string", example="Chemistry"),
      *                     @OA\Property(property="studySubject", type="string", example="Small molecules"),
@@ -257,8 +296,10 @@ class BioschemasController extends Controller
      *                         property="hasPart",
      *                         type="array",
      *                         description="Component studies with their datasets",
+     *
      *                         @OA\Items(
      *                             type="object",
+     *
      *                             @OA\Property(property="@type", type="string", example="Study"),
      *                             @OA\Property(property="name", type="string", example="Alkaloid Compound Library Analysis"),
      *                             @OA\Property(
@@ -271,8 +312,10 @@ class BioschemasController extends Controller
      *                                     property="hasBioChemEntityPart",
      *                                     type="array",
      *                                     description="Individual molecular entities",
+     *
      *                                     @OA\Items(
      *                                         type="object",
+     *
      *                                         @OA\Property(property="@type", type="string", example="MolecularEntity"),
      *                                         @OA\Property(property="@id", type="string", example="BSYNRYMUTXBXSQ-UHFFFAOYSA-N"),
      *                                         @OA\Property(property="name", type="string", example="Aspirin"),
@@ -287,8 +330,10 @@ class BioschemasController extends Controller
      *                         )
      *                     )
      *                 ),
+     *
      *                 @OA\Schema(
      *                     description="Study-level Bioschemas Study schema",
+     *
      *                     @OA\Property(property="@type", type="string", example="Study"),
      *                     @OA\Property(
      *                         property="about",
@@ -301,22 +346,28 @@ class BioschemasController extends Controller
      *                         property="hasPart",
      *                         type="array",
      *                         description="NMR datasets and experiments",
+     *
      *                         @OA\Items(
      *                             type="object",
+     *
      *                             @OA\Property(property="@type", type="string", example="Dataset"),
      *                             @OA\Property(property="name", type="string", example="1H NMR - DMSO-d6 - 600 MHz")
      *                         )
      *                     )
      *                 ),
+     *
      *                 @OA\Schema(
      *                     description="Dataset-level Schema.org Dataset schema",
+     *
      *                     @OA\Property(property="@type", type="string", example="Dataset"),
      *                     @OA\Property(
      *                         property="dct:conformsTo",
      *                         type="array",
+     *
      *                         @OA\Items(type="string"),
      *                         example={"https://schema.org/Dataset", "https://isa-specs.readthedocs.io/en/latest/isamodel.html#assay"}
      *                     ),
+     *
      *                     @OA\Property(
      *                         property="measurementTechnique",
      *                         type="object",
@@ -338,8 +389,10 @@ class BioschemasController extends Controller
      *                         property="variableMeasured",
      *                         type="array",
      *                         description="Experimental parameters and NMR conditions",
+     *
      *                         @OA\Items(
      *                             type="object",
+     *
      *                             @OA\Property(property="@type", type="string", example="PropertyValue"),
      *                             @OA\Property(property="name", type="string", example="magnetic field strength"),
      *                             @OA\Property(property="value", type="number", example=14.1),
@@ -359,36 +412,48 @@ class BioschemasController extends Controller
      *             }
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=400,
      *         description="Bad request - Invalid identifier format",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="Invalid NMRXIV identifier format"),
      *             @OA\Property(property="expected_format", type="string", example="[P|S|D] followed by numbers (e.g., P123, S456, D789)"),
      *             @OA\Property(property="provided", type="string", example="XYZ123")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=403,
      *         description="Forbidden - Data not publicly accessible",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="This data entry is not publicly available"),
      *             @OA\Property(property="identifier", type="string", example="P123"),
      *             @OA\Property(property="contact_info", type="string", example="Contact the data owner for access permissions")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=404,
      *         description="Not found - Data entry does not exist",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="No data found for identifier: P999"),
      *             @OA\Property(property="suggestions", type="array", @OA\Items(type="string"), example={"Verify the identifier is correct", "Check if the data has been archived", "Use the search endpoint to find similar data"})
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=500,
      *         description="Internal server error - Schema generation failed",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="Failed to generate Bioschemas metadata"),
      *             @OA\Property(property="error_code", type="string", example="BIOSCHEMAS_GENERATION_ERROR"),
      *             @OA\Property(property="details", type="string", example="Error processing molecular entity data")
@@ -403,7 +468,7 @@ class BioschemasController extends Controller
      * Schema.org with life sciences and chemistry-specific properties:
      *
      * - **Study Profile**: Research investigations and experimental designs
-     * - **ChemicalSubstance Profile**: Sample and specimen representations  
+     * - **ChemicalSubstance Profile**: Sample and specimen representations
      * - **MolecularEntity Profile**: Individual chemical compounds with identifiers
      * - **Dataset Profile**: Experimental data with measurement techniques
      *
@@ -420,8 +485,7 @@ class BioschemasController extends Controller
      * - FAIR data principles compliance
      * - Scientific workflow interoperability
      *
-     * @param Request $request
-     * @param string $identifier NMRXIV public identifier (P123, S456, D789)
+     * @param  string  $identifier  NMRXIV public identifier (P123, S456, D789)
      * @return \Illuminate\Http\JsonResponse
      */
     public function modelSchemaByID(Request $request, $identifier)

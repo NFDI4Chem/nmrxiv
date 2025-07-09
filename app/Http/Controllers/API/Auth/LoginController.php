@@ -17,11 +17,14 @@ class LoginController extends Controller
      *     tags={"Authentication"},
      *     summary="Authenticate user and generate access token",
      *     description="Authenticates a user with email and password credentials, returns a Bearer token for API access. Email verification is required for successful authentication.",
+     *
      *     @OA\RequestBody(
      *         required=true,
      *         description="User authentication credentials",
+     *
      *         @OA\JsonContent(
      *             required={"email", "password"},
+     *
      *             @OA\Property(
      *                 property="email",
      *                 type="string",
@@ -40,10 +43,13 @@ class LoginController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Authentication successful - Bearer token generated",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(
      *                 property="access_token",
      *                 type="string",
@@ -65,10 +71,13 @@ class LoginController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=401,
      *         description="Authentication failed - Invalid credentials",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(
      *                 property="message",
      *                 type="string",
@@ -77,10 +86,13 @@ class LoginController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=403,
      *         description="Account not verified - Email verification required",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(
      *                 property="message",
      *                 type="string",
@@ -89,10 +101,13 @@ class LoginController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=422,
      *         description="Validation error - Invalid input data",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(
      *                 property="message",
      *                 type="string",
@@ -104,22 +119,28 @@ class LoginController extends Controller
      *                 @OA\Property(
      *                     property="email",
      *                     type="array",
+     *
      *                     @OA\Items(type="string"),
      *                     example={"The email field is required.", "The email must be a valid email address."}
      *                 ),
+     *
      *                 @OA\Property(
      *                     property="password",
      *                     type="array",
+     *
      *                     @OA\Items(type="string"),
      *                     example={"The password field is required.", "The password must be at least 8 characters."}
      *                 )
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=429,
      *         description="Too many login attempts - Rate limit exceeded",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(
      *                 property="message",
      *                 type="string",
@@ -133,10 +154,13 @@ class LoginController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=500,
      *         description="Internal server error",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(
      *                 property="message",
      *                 type="string",
@@ -147,9 +171,6 @@ class LoginController extends Controller
      * )
      *
      * Authenticate user and generate access token
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function login(Request $request): JsonResponse
     {
@@ -184,10 +205,13 @@ class LoginController extends Controller
      *     summary="Revoke current access token and logout user",
      *     description="Invalidates the current Bearer token used for authentication. The user will need to login again to obtain a new token for API access.",
      *     security={{"sanctum": {}}},
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Logout successful - Token revoked",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(
      *                 property="logout",
      *                 type="string",
@@ -202,10 +226,13 @@ class LoginController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=401,
      *         description="Unauthorized - Invalid or missing token",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(
      *                 property="message",
      *                 type="string",
@@ -213,10 +240,13 @@ class LoginController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=500,
      *         description="Internal server error during logout",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(
      *                 property="message",
      *                 type="string",
@@ -227,9 +257,6 @@ class LoginController extends Controller
      * )
      *
      * Revoke current access token and logout user
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function logout(Request $request): JsonResponse
     {
