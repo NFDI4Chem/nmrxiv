@@ -11,7 +11,7 @@ BUILD=false
 DEPLOY=false
 MULTI_PLATFORM=false
 
-LOG_FILE="$HOME/nmrxiv-deploy.log"
+LOG_FILE="/var/log/nmrxiv-deploy.log"
 
 # Create log file if it doesn't exist
 if [ ! -f "$LOG_FILE" ]; then
