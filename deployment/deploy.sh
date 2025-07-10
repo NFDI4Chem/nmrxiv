@@ -143,6 +143,12 @@ deploy_service() {
         NEW_CONTAINER_ID=$(docker ps -q -l)
         log_message "🔍 New container ID: $NEW_CONTAINER_ID"
 
+        sleep 10
+        remove_old_containers "$service"
+        run_migration_and_clear_cache
+        log_message "✅ Deployment of $service done successfully.."
+        log_message "Application is available at: https://dev.nmrxiv.org"
+
         # Skipping health check for dev because we want the service to be down if there is an error in the container
         # if wait_for_health; then
         #     remove_old_containers "$service"
