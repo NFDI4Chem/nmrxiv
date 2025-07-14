@@ -265,7 +265,7 @@ class ELNController extends Controller
             ->where('owner_id', $user_id)
             ->where('team_id', $team_id)
             ->first();
-
+    
         $isNewDraft = false;
 
         if (! $draft) {
@@ -279,7 +279,7 @@ class ELNController extends Controller
                 $environment.'/'.$user_id.'/drafts/'.$id
             );
 
-            $name = 'ELN Import ('.strtoupper($eln).': '.explode('-', $id)[0].')';
+            $name = strtoupper($eln).': '.explode('-', $id)[0];
 
             $draft = Draft::create([
                 'name' => $name,
@@ -296,6 +296,7 @@ class ELNController extends Controller
                 'eln' => $eln,
                 'external_id' => $externalId,
                 'callback_url' => $callbackUrl,
+                'eln_status' => 'RECEIVED',
                 'zip_url' => $zipUrl,
             ]);
         } else {
@@ -316,8 +317,6 @@ class ELNController extends Controller
         ProcessDraftELNSubmission::dispatch($draft->id);
 
         return response()->json([
-            'message' => 'ELN upload endpoint ready',
-            'eln_system' => strtolower($eln),
             'draft_id' => $draft->id,
             'draft_key' => $draft->key,
             'external_id' => $draft->external_id,
@@ -327,7 +326,7 @@ class ELNController extends Controller
             'created_new' => $isNewDraft,
             'user_id' => $user_id,
             'team_id' => $team_id,
-            'processing_status' => 'job_dispatched',
+            'eln_status' => $draft->eln_status
         ]);
     }
 

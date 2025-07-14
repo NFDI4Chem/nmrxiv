@@ -17,7 +17,9 @@ return new class extends Migration
             $table->string('callback_url')->nullable()->comment('URL to callback after processing');
             $table->string('zip_url')->nullable()->comment('URL to ZIP file for download');
             $table->date('release_date')->nullable()->comment('Date when the draft should be released');
-            $table->string('status')->nullable()->comment('Processing status of the ELN submission');
+            $table->string('eln_status')->nullable()->comment('Processing status of the ELN submission');
+            $table->string('token')->nullable()->comment('Token for the ELN system');
+            $table->json('eln_logs')->nullable()->comment('Data from the ELN system')->default('[]');
         });
     }
 
@@ -27,7 +29,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('drafts', function (Blueprint $table) {
-            $table->dropColumn(['eln', 'external_id', 'callback_url', 'zip_url', 'release_date', 'status']);
+            $table->dropColumn(['eln', 'external_id', 'callback_url', 'zip_url', 'release_date', 'eln_status', 'token', 'eln_logs']);
         });
-    }
+}
 };

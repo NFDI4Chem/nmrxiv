@@ -32,7 +32,9 @@ class Draft extends Model
         'callback_url',
         'zip_url',
         'release_date',
-        'status',
+        'eln_status',
+        'eln_logs',
+        'token',
     ];
 
     public function files(): HasMany
