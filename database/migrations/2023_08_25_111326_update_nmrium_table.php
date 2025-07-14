@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('nmrium', function (Blueprint $table) {
             $table->renameColumn('dataset_id', 'nmriumable_id');
-            $table->string('nmriumable_type')->default('App\Models\Dataset');
+            $table->string('nmriumable_type')->default(\App\Models\Dataset::class);
         });
 
         Schema::table('studies', function (Blueprint $table) {

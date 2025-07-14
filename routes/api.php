@@ -5,6 +5,7 @@ use App\Http\Controllers\API\Auth\RegisterController;
 use App\Http\Controllers\API\Auth\UserController;
 use App\Http\Controllers\API\Auth\VerificationController;
 use App\Http\Controllers\API\DataController;
+use App\Http\Controllers\API\ELNController;
 use App\Http\Controllers\API\FileSystemController;
 use App\Http\Controllers\API\Schemas\Bioschemas\BioschemasController;
 use App\Http\Controllers\API\Schemas\Bioschemas\DataCatalogController;
@@ -39,21 +40,31 @@ Route::prefix('v1')->group(function () {
         Route::get('/children/{file}', [FileSystemController::class, 'children']);
     });
 
+    // ELN Upload Route - Protected and constrained
+    Route::post('{eln}/upload', [ELNController::class, 'upload'])
+        ->middleware('auth:sanctum')
+        ->name('eln.upload');
+
+    // ELN Status Route - Protected and constrained
+    Route::get('{eln}/status/{external_id}', [ELNController::class, 'status'])
+        ->middleware('auth:sanctum')
+        ->name('eln.status');
+
     Route::get('/list/{model}', [DataController::class, 'all'])
-        ->name('public.projects');
+        ->name('public.api.projects');
 
     Route::get('/{id}', [DataController::class, 'id'])
-        ->name('public.project');
+        ->name('public.api.project');
 
     Route::prefix('schemas')->group(function () {
         Route::prefix('bioschemas')->group(function () {
             Route::get('/', [DataCatalogController::class, 'dataCatalogSchema'])->name('bioschemas.datacatalog');
-            Route::get('/{username}/{project}/{study?}/{dataset?}', [BioschemasController::class, 'modelSchemaByName'])->name('bioschemas.model');
+            // Route::get('/{username}/{project}/{study?}/{dataset?}', [BioschemasController::class, 'modelSchemaByName'])->name('bioschemas.model');
             Route::get('/{id}', [BioschemasController::class, 'modelSchemaByID'])->name('bioschemas.id');
         });
 
         Route::prefix('datacite')->group(function () {
-            Route::get('/{username}/{project}/{study?}/{dataset?}', [DataCiteController::class, 'modelSchemaByName']);
+            // Route::get('/{username}/{project}/{study?}/{dataset?}', [DataCiteController::class, 'modelSchemaByName']);
             Route::get('/{id}', [DataCiteController::class, 'modelSchemaByID']);
             Route::put('/{id}', [DOIController::class, 'update']);
         });

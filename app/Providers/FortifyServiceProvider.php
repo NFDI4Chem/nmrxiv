@@ -9,6 +9,7 @@ use App\Actions\Fortify\UpdateUserProfileInformation;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Fortify\Fortify;
 
@@ -16,21 +17,25 @@ class FortifyServiceProvider extends ServiceProvider
 {
     /**
      * Register any application services.
-     *
-     * @return void
      */
-    public function register()
+    public function register(): void
     {
         //
     }
 
     /**
      * Bootstrap any application services.
-     *
-     * @return void
      */
-    public function boot()
+    public function boot(): void
     {
+        if (config('fortify.auth_disabled')) {
+            Fortify::loginView(fn () => abort(403, 'Login is temporarily disabled.'));
+            Fortify::registerView(fn () => abort(403, 'Registration is temporarily disabled.'));
+
+            Route::post('/login', fn () => abort(403))->name('login');
+            Route::post('/register', fn () => abort(403))->name('register');
+        }
+
         Fortify::createUsersUsing(CreateNewUser::class);
         Fortify::updateUserProfileInformationUsing(UpdateUserProfileInformation::class);
         Fortify::updateUserPasswordsUsing(UpdateUserPassword::class);

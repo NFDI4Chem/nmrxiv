@@ -24,9 +24,9 @@ class IndexMolecules extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): void
     {
-        return DB::transaction(function () {
+        DB::transaction(function () {
             DB::statement('DROP TABLE IF EXISTS mols, fps');
             DB::statement('create extension if not exists rdkit');
             DB::statement('select * into mols from (select id,mol_from_smiles(canonical_smiles::cstring) m  from molecules) tmp where m is not null');

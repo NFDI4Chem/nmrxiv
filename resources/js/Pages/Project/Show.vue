@@ -311,13 +311,9 @@
                             class="flex-nowrap right ml-auto"
                         >
                             <img
-                                :src="
-                                    project.project_photo_url
-                                        ? project.project_photo_url
-                                        : 'https://via.placeholder.com/400x200'
-                                "
-                                :alt="project.name"
-                                class="h-24 w-72 rounded-md object-cover"
+                                v-if="project.project_photo_url"
+                                :src="project.project_photo_url"
+                                class="h-24 w-72 -ml-4 rounded-md object-cover"
                             />
                         </div>
                         <div class="flex-nowrap">
@@ -574,6 +570,10 @@
                                                 <Datepicker
                                                     v-model="
                                                         project.release_date
+                                                    "
+                                                    :format="customDateFormat"
+                                                    :preview-format="
+                                                        customDateFormat
                                                     "
                                                 ></Datepicker>
                                                 <p
@@ -1118,6 +1118,7 @@ export default {
         const projectDetailsElement = ref(null);
         const manageAuthorElement = ref(null);
         const manageCitationElement = ref(null);
+
         return {
             projectDetailsElement,
             manageAuthorElement,

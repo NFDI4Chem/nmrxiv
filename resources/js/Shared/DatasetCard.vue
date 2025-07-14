@@ -320,8 +320,8 @@ export default {
     methods: {
         toggleUpVote() {
             if (
-                this.$page.props.user.username &&
-                this.$page.props.user.username != ""
+                this.$page.props.auth.user &&
+                this.$page.props.auth.username != ""
             ) {
                 const url = "/projects/" + this.dataset.id + "/toggleUpVote";
                 axios

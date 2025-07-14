@@ -1,0 +1,11 @@
+{
+    auto_https off
+    admin 0.0.0.0:2019
+    persist_config off
+    storage_clean_interval 0
+}
+
+:80 {
+    root * /var/www/html/public
+    php_server
+} 
