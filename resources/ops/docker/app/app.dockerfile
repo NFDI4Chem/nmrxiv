@@ -52,7 +52,7 @@ RUN composer install
 
 RUN composer dump-autoload -o
 
-FROM node:15.5-alpine AS assets-build
+FROM node:22-alpine AS assets-build
 
 WORKDIR /var/www/html
 

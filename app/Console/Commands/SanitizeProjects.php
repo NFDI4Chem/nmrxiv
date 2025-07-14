@@ -28,10 +28,8 @@ class SanitizeProjects extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return int
      */
-    public function handle()
+    public function handle(): int
     {
         $name = $this->argument('name');
 

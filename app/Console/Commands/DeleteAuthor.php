@@ -24,10 +24,8 @@ class DeleteAuthor extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return int
      */
-    public function handle()
+    public function handle(): int
     {
         $ids = $this->argument('ids') ? explode(',', $this->argument('ids')) : null;
         if ($ids) {

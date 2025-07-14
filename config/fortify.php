@@ -1,6 +1,6 @@
 <?php
 
-use App\Providers\RouteServiceProvider;
+use App\Providers\AppServiceProvider;
 use Laravel\Fortify\Features;
 
 return [
@@ -61,7 +61,7 @@ return [
     |
     */
 
-    'home' => RouteServiceProvider::HOME,
+    'home' => AppServiceProvider::HOME,
 
     /*
     |--------------------------------------------------------------------------
@@ -141,5 +141,15 @@ return [
             'confirmPassword' => true,
         ]),
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Disable Authentication
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify if the authentication should be disabled.
+    |
+    */
+    'auth_disabled' => env('AUTH_DISABLED', false),
 
 ];

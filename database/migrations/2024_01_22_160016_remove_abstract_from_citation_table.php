@@ -21,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('citation', function (Blueprint $table) {
+        Schema::table('citations', function (Blueprint $table) {
             $table->string('abstract')->nullable();
         });
     }

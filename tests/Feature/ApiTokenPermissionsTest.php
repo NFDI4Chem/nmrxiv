@@ -12,10 +12,10 @@ class ApiTokenPermissionsTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_api_token_permissions_can_be_updated()
+    public function test_api_token_permissions_can_be_updated(): void
     {
         if (! Features::hasApiFeatures()) {
-            return $this->markTestSkipped('API support is not enabled.');
+            $this->markTestSkipped('API support is not enabled.');
         }
 
         if (Features::hasTeamFeatures()) {
@@ -33,12 +33,12 @@ class ApiTokenPermissionsTest extends TestCase
         $response = $this->put('/user/api-tokens/'.$token->id, [
             'name' => $token->name,
             'permissions' => [
-                'project:delete',
+                'project:update',
             ],
         ]);
 
-        // $this->assertTrue($user->fresh()->tokens->first()->can('project:delete'));
-        // $this->assertFalse($user->fresh()->tokens->first()->can('project:read'));
-        // $this->assertFalse($user->fresh()->tokens->first()->can('project:missing-permission'));
+        $this->assertTrue($user->fresh()->tokens->first()->can('project:update'));
+        $this->assertFalse($user->fresh()->tokens->first()->can('project:read'));
+        $this->assertFalse($user->fresh()->tokens->first()->can('project:missing-permission'));
     }
 }

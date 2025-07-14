@@ -2,7 +2,6 @@
 
 namespace Database\Factories;
 
-use App\Models\NMRium;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -11,18 +10,9 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class NMRiumFactory extends Factory
 {
     /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
-    protected $model = NMRium::class;
-
-    /**
      * Define the model's default state.
-     *
-     * @return array
      */
-    public function definition()
+    public function definition(): array
     {
         return [
             'nmrium_info' => '{}',

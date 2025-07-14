@@ -59,7 +59,7 @@ class ArchiveProject implements ShouldBeUnique, ShouldQueue
                     $fsObject = $project->fsObject;
 
                     if (! $fsObject) {
-                        $fsObject = new FileSystemObject();
+                        $fsObject = new FileSystemObject;
                         $fsObject->type = 'directory';
                         $fsObject->name = $project->slug;
                         $environment = env('APP_ENV', 'local');
@@ -76,7 +76,7 @@ class ArchiveProject implements ShouldBeUnique, ShouldQueue
                         $s3keys = [];
                         $environment = env('APP_ENV', 'local');
                         if ($fsObject->type == 'file') {
-                            if (Storage::has($path)) {
+                            if (Storage::disk(env('FILESYSTEM_DRIVER'))->has($path)) {
                                 array_push($s3keys, substr($fsObject->path, 1));
                             }
                         } else {
@@ -128,8 +128,8 @@ class ArchiveProject implements ShouldBeUnique, ShouldQueue
                         $zip->finish();
                         fclose($archiveDestination);
 
-                        Storage::setVisibility($zipFilePath, 'public');
-                        $url = Storage::url($zipFilePath);
+                        Storage::disk(env('FILESYSTEM_DRIVER'))->setVisibility($zipFilePath, 'public');
+                        $url = Storage::disk(env('FILESYSTEM_DRIVER'))->url($zipFilePath);
                         $project->download_url = $url;
                         $project->internal_status = 'complete';
                         $project->save();

@@ -47,7 +47,7 @@ class UpdateDOI extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): void
     {
         // $operator takes values from
         // {'>' : after a certain update date,
