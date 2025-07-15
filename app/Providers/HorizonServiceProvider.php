@@ -14,8 +14,8 @@ use Laravel\Horizon\HorizonApplicationServiceProvider;
  * UI customization for the Horizon dashboard used to monitor job queues
  * in the NMRXIV application.
  *
- * @package App\Providers
  * @author NMRXIV Development Team
+ *
  * @since 1.0.0
  */
 class HorizonServiceProvider extends HorizonApplicationServiceProvider
@@ -26,8 +26,6 @@ class HorizonServiceProvider extends HorizonApplicationServiceProvider
      * Initializes the parent Horizon service provider and sets up
      * any additional configuration specific to the NMRXIV application.
      * Commented examples show available notification routing options.
-     *
-     * @return void
      */
     public function boot(): void
     {
@@ -46,8 +44,6 @@ class HorizonServiceProvider extends HorizonApplicationServiceProvider
      * This gate determines who can access Horizon in non-local environments.
      * Access is restricted to users with 'super-admin' or 'developer' roles
      * to ensure only authorized personnel can monitor and manage job queues.
-     *
-     * @return void
      */
     protected function gate(): void
     {

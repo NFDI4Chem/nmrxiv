@@ -14,8 +14,8 @@ use Illuminate\Support\ServiceProvider;
  * allows switching between different DOI providers (e.g., DataCite) based on
  * configuration settings.
  *
- * @package App\Providers
  * @author NMRXIV Development Team
+ *
  * @since 1.0.0
  */
 class DOIServiceProvider extends ServiceProvider
@@ -26,8 +26,6 @@ class DOIServiceProvider extends ServiceProvider
      * Binds the DOIService interface to concrete implementations based on
      * the configured DOI provider. This allows the application to switch
      * between different DOI services without changing the consuming code.
-     *
-     * @return void
      */
     public function register(): void
     {

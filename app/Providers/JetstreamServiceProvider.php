@@ -20,8 +20,8 @@ use Laravel\Jetstream\Jetstream;
  * and permissions for collaborative research projects, enabling users to
  * work together on NMR data analysis and sharing.
  *
- * @package App\Providers
  * @author NMRXIV Development Team
+ *
  * @since 1.0.0
  */
 class JetstreamServiceProvider extends ServiceProvider
@@ -32,8 +32,6 @@ class JetstreamServiceProvider extends ServiceProvider
      * This method is intentionally empty as Jetstream services are
      * configured in the boot method after the application has
      * been fully initialized.
-     *
-     * @return void
      */
     public function register(): void
     {
@@ -46,8 +44,6 @@ class JetstreamServiceProvider extends ServiceProvider
      * Configures Jetstream team management features by registering custom
      * action classes for team operations and setting up the permission
      * system for collaborative research projects.
-     *
-     * @return void
      */
     public function boot(): void
     {
@@ -69,8 +65,6 @@ class JetstreamServiceProvider extends ServiceProvider
      * establishing three distinct roles (owner, collaborator, reviewer) with
      * specific permissions for project, study, and dataset operations.
      * This enables fine-grained access control for NMR data sharing.
-     *
-     * @return void
      */
     protected function configurePermissions(): void
     {

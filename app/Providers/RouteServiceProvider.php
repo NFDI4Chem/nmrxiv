@@ -16,8 +16,8 @@ use Illuminate\Support\Facades\Route;
  * for both web and API endpoints, and establishes security policies
  * through rate limiting configurations.
  *
- * @package App\Providers
  * @author NMRXIV Development Team
+ *
  * @since 1.0.0
  */
 class RouteServiceProvider extends ServiceProvider
@@ -46,8 +46,6 @@ class RouteServiceProvider extends ServiceProvider
      * This method is called during the application bootstrap process to
      * configure routing behavior, load route files, and establish
      * security policies through rate limiting.
-     *
-     * @return void
      */
     public function boot(): void
     {
@@ -69,8 +67,6 @@ class RouteServiceProvider extends ServiceProvider
      * Defines rate limiting policies for different types of requests
      * to protect the application from abuse and ensure fair usage.
      * API requests are limited based on user ID or IP address.
-     *
-     * @return void
      */
     protected function configureRateLimiting(): void
     {
