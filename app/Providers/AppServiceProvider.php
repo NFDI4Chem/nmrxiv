@@ -29,6 +29,7 @@ class AppServiceProvider extends ServiceProvider
         // Register filesystem services
         $this->app->singleton(\App\Services\PathGeneratorService::class);
         $this->app->singleton(\App\Services\StorageSignedUrlService::class);
+        $this->app->singleton(\App\Services\FileIntegrityService::class);
         $this->app->bind(\App\Services\FileSystemObjectService::class);
     }
 

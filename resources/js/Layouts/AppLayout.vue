@@ -133,7 +133,10 @@
                         >
                             <div v-for="item in filteredNavigation">
                                 <div
-                                    v-if="!$page.props.auth.user || !$page.props.auth.user?.first_name"
+                                    v-if="
+                                        !$page.props.auth.user ||
+                                        !$page.props.auth.user?.first_name
+                                    "
                                     class="border-t"
                                 >
                                     &nbsp;
@@ -314,7 +317,12 @@
                     </div>
                     <flash-messages />
                     <div class="ml-4 flex items-center md:ml-6">
-                        <span v-if="$page.props.auth.user && $page.props.auth.user?.first_name != null">
+                        <span
+                            v-if="
+                                $page.props.auth.user &&
+                                $page.props.auth.user?.first_name != null
+                            "
+                        >
                             <div class="ml-5 mt-2 tooltip">
                                 <a
                                     class="cursor-pointer"
@@ -434,7 +442,8 @@
                                                     .profile_photo_url
                                             "
                                             :alt="
-                                                $page.props.auth.user?.first_name
+                                                $page.props.auth.user
+                                                    ?.first_name
                                             "
                                         />
                                         <span class="flex md:block hidden">{{
@@ -706,7 +715,10 @@
                             </transition>
                         </Menu>
                         <Menu
-                            v-if="!$page.props.auth.user || !$page.props.auth.user?.first_name"
+                            v-if="
+                                !$page.props.auth.user ||
+                                !$page.props.auth.user?.first_name
+                            "
                             as="div"
                             class="ml-3 relative"
                         >

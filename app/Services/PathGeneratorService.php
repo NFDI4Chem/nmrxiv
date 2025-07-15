@@ -18,7 +18,7 @@ class PathGeneratorService
      */
     public function generateDraftFilePath(Draft $draft, string $relativeFilePath): string
     {
-        return $this->normalizeSlashes('/' . $draft->path . '/' . $relativeFilePath);
+        return $this->normalizeSlashes('/'.$draft->path.'/'.$relativeFilePath);
     }
 
     /**
@@ -27,7 +27,8 @@ class PathGeneratorService
     public function generateProjectFilePath(Project $project, string $relativeFilePath): string
     {
         $environment = config('app.env', 'local');
-        return $this->normalizeSlashes($environment . '/' . $project->uuid . '/' . $relativeFilePath);
+
+        return $this->normalizeSlashes($environment.'/'.$project->uuid.'/'.$relativeFilePath);
     }
 
     /**
@@ -35,11 +36,19 @@ class PathGeneratorService
      */
     public function generateRelativeFilePath(array $file, string $destination): string
     {
-        $filename = '/' . $file['upload']['filename'];
+        $filename = $file['upload']['filename'];
         $path = $file['fullPath'] ?? null;
-        
+
+        // Use the full path if available, otherwise just the filename
         $relativeFilePath = $path ? $path : $filename;
-        return $destination . '/' . $relativeFilePath;
+
+        // If we have a destination and the relative path doesn't already start with it
+        if (! empty($destination) && ! str_starts_with($relativeFilePath, $destination)) {
+            return $this->normalizeSlashes($destination.'/'.$relativeFilePath);
+        }
+
+        // Ensure the path starts with a single slash and normalize
+        return $this->normalizeSlashes('/'.$relativeFilePath);
     }
 
     /**
@@ -65,7 +74,7 @@ class PathGeneratorService
     /**
      * Normalize multiple consecutive slashes in a path.
      */
-    private function normalizeSlashes(string $path): string
+    public function normalizeSlashes(string $path): string
     {
         return preg_replace('~//+~', '/', $path);
     }

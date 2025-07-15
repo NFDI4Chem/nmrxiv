@@ -2,24 +2,26 @@
 
 namespace App\Services;
 
+use App\Jobs\VerifyFileIntegrityJob;
 use App\Models\Draft;
 use App\Models\FileSystemObject;
 use App\Models\Project;
 use App\Models\Study;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 /**
  * Handle filesystem object creation, management, and deletion operations.
- * 
+ *
  * This service manages the complete lifecycle of filesystem objects including
  * proper tree structure creation, parent-child relationships, and cleanup.
  */
 class FileSystemObjectService
 {
     public function __construct(
-        private PathGeneratorService $pathGenerator
+        private PathGeneratorService $pathGenerator,
+        private FileIntegrityService $integrityService
     ) {}
 
     /**
@@ -34,7 +36,7 @@ class FileSystemObjectService
     ): string {
         $relativeFilePath = $this->pathGenerator->generateRelativeFilePath($file, $destination);
         $filePath = $this->pathGenerator->generateDraftFilePath($draft, $relativeFilePath);
-        
+
         $this->createFileSystemObjectTree(
             $file,
             $relativeFilePath,
@@ -58,7 +60,7 @@ class FileSystemObjectService
     ): string {
         $relativeFilePath = $this->pathGenerator->generateRelativeFilePath($file, $destination);
         $filePath = $this->pathGenerator->generateProjectFilePath($project, $relativeFilePath);
-        
+
         $this->createFileSystemObjectTree(
             $file,
             $relativeFilePath,
@@ -80,14 +82,14 @@ class FileSystemObjectService
     ): void {
         // Parse the full path to build the correct tree
         $pathParts = $this->parseFilePathParts($file, $relativeFilePath);
-        
+
         // Build directory hierarchy first
         $parentDirectory = $this->ensureDirectoryTree(
-            $pathParts['directories'], 
+            $pathParts['directories'],
             $filePath,
             $contextRelations
         );
-        
+
         // Create the file object
         $this->createFileObject(
             $pathParts['filename'],
@@ -106,19 +108,19 @@ class FileSystemObjectService
     {
         $filename = $file['upload']['filename'];
         $fullPath = $file['fullPath'] ?? null;
-        
+
         // Split the path into directories and filename
         $pathInfo = pathinfo($relativeFilePath);
         $directories = [];
-        
-        if (!empty($pathInfo['dirname']) && $pathInfo['dirname'] !== '.') {
+
+        if (! empty($pathInfo['dirname']) && $pathInfo['dirname'] !== '.') {
             $directories = array_filter(explode('/', trim($pathInfo['dirname'], '/')));
         }
-        
+
         return [
             'directories' => $directories,
             'filename' => $filename,
-            'full_path' => $fullPath
+            'full_path' => $fullPath,
         ];
     }
 
@@ -135,15 +137,15 @@ class FileSystemObjectService
         $currentPath = '';
 
         foreach ($directories as $index => $directoryName) {
-            $currentPath .= ($index > 0 ? '/' : '') . $directoryName;
+            $currentPath .= ($index > 0 ? '/' : '').$directoryName;
             $level = $index;
-            
+
             // Calculate the storage path for this directory
-            $directoryStoragePath = dirname($filePath) . '/' . $currentPath;
-            
+            $directoryStoragePath = dirname($filePath).'/'.$currentPath;
+
             $parentObject = $this->findOrCreateDirectory(
                 $directoryName,
-                '/' . $currentPath,
+                $this->pathGenerator->normalizeSlashes('/'.$currentPath),
                 $directoryStoragePath,
                 $level,
                 $parentObject?->id,
@@ -195,7 +197,7 @@ class FileSystemObjectService
     }
 
     /**
-     * Create file object with proper tree position.
+     * Create file object with proper tree position and handle checksums.
      */
     private function createFileObject(
         string $filename,
@@ -206,7 +208,7 @@ class FileSystemObjectService
         array $contextRelations
     ): FileSystemObject {
         $level = $parentDirectory ? $parentDirectory->level + 1 : 0;
-        
+
         // Search criteria: Match the new tree-friendly unique constraint
         $searchCriteria = array_merge([
             'name' => $filename,
@@ -226,14 +228,26 @@ class FileSystemObjectService
             'is_root' => 0,
             'info' => json_encode(['size' => $file['upload']['total']]),
         ];
-        
+
         $fileObject = FileSystemObject::firstOrCreate($searchCriteria, $creationDefaults);
+
+        // Handle checksums if provided
+        if ($fileObject->wasRecentlyCreated && isset($file['checksums']) && ! empty($file['checksums'])) {
+            $this->integrityService->storeChecksums(
+                $fileObject,
+                $file['checksums'],
+                $file['upload']['total']
+            );
+
+            // Queue integrity verification job with delay to allow S3 upload to complete
+            VerifyFileIntegrityJob::dispatch($fileObject, 30); // 30 second delay
+        }
 
         // Update parent's has_children flag if needed (fix for missing files in directories)
         if ($parentDirectory && $fileObject->wasRecentlyCreated) {
             FileSystemObject::where('id', $parentDirectory->id)->update(['has_children' => 1]);
         }
-        
+
         return $fileObject;
     }
 
@@ -268,7 +282,7 @@ class FileSystemObjectService
                             $filesDeleted++;
                         }
                     } catch (\Exception $e) {
-                        $storageErrors[] = "Failed to delete file {$obj->path}: " . $e->getMessage();
+                        $storageErrors[] = "Failed to delete file {$obj->path}: ".$e->getMessage();
                     }
                 } elseif ($obj->type === 'directory') {
                     $directoriesDeleted++;
@@ -291,7 +305,7 @@ class FileSystemObjectService
                 'files_deleted' => $filesDeleted,
                 'directories_deleted' => $directoriesDeleted,
                 'storage_errors' => $storageErrors,
-                'total_deleted' => $deletedCount
+                'total_deleted' => $deletedCount,
             ];
 
         } catch (\Exception $e) {

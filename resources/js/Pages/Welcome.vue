@@ -63,7 +63,10 @@
                             
                         </div> -->
                             <div
-                                v-if="$page.props.auth.user && $page.props.auth.user?.first_name != null"
+                                v-if="
+                                    $page.props.auth.user &&
+                                    $page.props.auth.user?.first_name != null
+                                "
                                 class="hidden md:flex items-center justify-end md:flex-1 lg:w-0"
                             >
                                 <Link
@@ -249,7 +252,7 @@
                                         mode="button"
                                         ref="structure-search"
                                     ></StructureSearch>
-                                     <Link
+                                    <Link
                                         href="/register"
                                         class="group inline-flex ring-1 items-center justify-center rounded-full py-2 px-4 focus:outline-none ring-slate-200 text-slate-700 hover:text-slate-900 hover:ring-slate-300 active:bg-slate-100 active:text-slate-600 focus-visible:outline-blue-600 focus-visible:ring-slate-300 bg-white"
                                         variant="outline"

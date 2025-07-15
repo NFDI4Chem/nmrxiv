@@ -135,16 +135,11 @@
                     </span>
                     <span v-else>
                         <span
-                            v-if="
-                                molecules[0] &&
-                                molecules[0].canonical_smiles
-                            "
+                            v-if="molecules[0] && molecules[0].canonical_smiles"
                         >
                             <Depictor2D
                                 class="py-2"
-                                :molecule="
-                                    molecules[0].canonical_smiles
-                                "
+                                :molecule="molecules[0].canonical_smiles"
                                 :show-download="false"
                             ></Depictor2D>
                         </span>
