@@ -9,15 +9,31 @@ use League\Flysystem\AwsS3V3\AwsS3V3Adapter;
 use League\Flysystem\Filesystem;
 
 /**
- * Register Ceph S3-compatible storage driver for Laravel Storage.
+ * Ceph Storage Service Provider
  *
- * This provider extends Laravel's Storage facade to support Ceph object storage
- * as an S3-compatible filesystem driver, enabling seamless file operations.
+ * This service provider extends Laravel's Storage facade to support Ceph object storage
+ * as an S3-compatible filesystem driver. Ceph is used as the primary storage backend
+ * for NMRXIV, providing scalable and reliable object storage for NMR research data,
+ * spectra files, and related scientific assets.
+ *
+ * The provider configures an S3-compatible client to communicate with Ceph clusters,
+ * enabling seamless file operations through Laravel's unified Storage interface.
+ *
+ * @package App\Providers
+ * @author NMRXIV Development Team
+ * @since 1.0.0
  */
 class CephStorageServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap the application services.
+     *
+     * Registers the 'ceph' storage driver with Laravel's Storage facade,
+     * configuring it as an S3-compatible filesystem using the AWS SDK.
+     * This allows the application to store and retrieve files from Ceph
+     * object storage using standard Laravel Storage methods.
+     *
+     * @return void
      */
     public function boot(): void
     {
@@ -49,6 +65,12 @@ class CephStorageServiceProvider extends ServiceProvider
 
     /**
      * Register the application services.
+     *
+     * This method is intentionally empty as the Ceph storage driver
+     * is configured during the boot phase when all configuration
+     * values are available.
+     *
+     * @return void
      */
     public function register(): void
     {
