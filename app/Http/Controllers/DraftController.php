@@ -11,10 +11,9 @@ use App\Models\Project;
 use App\Models\Sample;
 use App\Models\Study;
 use App\Models\Validation;
-use Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
@@ -129,31 +128,6 @@ class DraftController extends Controller
         $draft->save();
 
         return $draft;
-    }
-
-    public function deleteFSO(Request $request, Draft $draft, FileSystemObject $filesystemobject)
-    {
-        $fsoIds = $this->getChildrenIds($filesystemobject, []);
-        if (Storage::has($filesystemobject->path)) {
-            if ($filesystemobject->type == 'directory') {
-                Storage::disk(env('FILESYSTEM_DRIVER'))->deleteDirectory($filesystemobject->path);
-            } else {
-                Storage::disk(env('FILESYSTEM_DRIVER'))->delete($filesystemobject->path);
-            }
-            FileSystemObject::whereIn('id', $fsoIds)->delete();
-        }
-    }
-
-    public function getChildrenIds($filesystemobject, $fsoIds)
-    {
-        array_push($fsoIds, $filesystemobject->id);
-        if ($filesystemobject->has_children) {
-            foreach ($filesystemobject->children as $child) {
-                $fsoIds = array_merge($fsoIds, $this->getChildrenIds($child, []));
-            }
-        }
-
-        return $fsoIds;
     }
 
     public function complete(Request $request, Draft $draft)

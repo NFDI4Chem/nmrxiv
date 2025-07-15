@@ -763,6 +763,7 @@ export default {
                 this.fsoBeingDeleted = null;
                 this.updateBusyStatus(true);
                 this.$emit("loading", true);
+                
                 axios
                     .delete(
                         "/dashboard/drafts/" +
@@ -771,8 +772,41 @@ export default {
                             this.$page.props.selectedFileSystemObject.id
                     )
                     .then((response) => {
-                        this.annotate();
-                        this.$emit("loading", true);
+                        this.updateBusyStatus(false);
+                        this.$emit("loading", false);
+                        
+                        if (response.data.success) {
+                            // Show success message with details
+                            let message = response.data.message;
+                            if (response.data.has_storage_errors) {
+                                message += ` Note: ${response.data.storage_errors.length} storage operation(s) had issues.`;
+                            }
+                            
+                            // You can add a toast notification here if available
+                            console.log('Deletion successful:', message);
+                            
+                            // Refresh the file tree
+                            this.annotate();
+                            
+                            // Clear the selected object since it's been deleted
+                            this.$page.props.selectedFileSystemObject = null;
+                        } else {
+                            console.error('Deletion failed:', response.data.message);
+                            // You can add error toast notification here
+                        }
+                    })
+                    .catch((error) => {
+                        this.updateBusyStatus(false);
+                        this.$emit("loading", false);
+                        
+                        console.error('Deletion request failed:', error);
+                        
+                        if (error.response && error.response.data && error.response.data.message) {
+                            console.error('Server error:', error.response.data.message);
+                            // You can add error toast notification here
+                        } else {
+                            console.error('Network or unknown error occurred');
+                        }
                     });
             }
         },

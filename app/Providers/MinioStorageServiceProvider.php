@@ -3,11 +3,17 @@
 namespace App\Providers;
 
 use Aws\S3\S3Client;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\ServiceProvider;
-use League\Flysystem\AwsS3v3\AwsS3Adapter;
+use League\Flysystem\AwsS3V3\AwsS3V3Adapter;
 use League\Flysystem\Filesystem;
-use Storage;
 
+/**
+ * Register MinIO S3-compatible storage driver for Laravel Storage.
+ *
+ * This provider extends Laravel's Storage facade to support MinIO object storage
+ * as an S3-compatible filesystem driver, enabling seamless file operations.
+ */
 class MinioStorageServiceProvider extends ServiceProvider
 {
     /**
@@ -16,11 +22,10 @@ class MinioStorageServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Storage::extend('minio', function ($app, $config) {
-            $config = [
+            $clientConfig = [
                 'region' => config('filesystems.disks.minio.region'),
                 'version' => 'latest',
                 'use_path_style_endpoint' => true,
-                'url' => config('filesystems.disks.minio.endpoint'),
                 'endpoint' => config('filesystems.disks.minio.endpoint'),
                 'credentials' => [
                     'key' => config('filesystems.disks.minio.key'),
@@ -28,19 +33,25 @@ class MinioStorageServiceProvider extends ServiceProvider
                 ],
             ];
 
-            $client = new S3Client($config);
-            $options = [
-                'override_visibility_on_copy' => true,
-            ];
-
-            return new Filesystem(
-                new AwsS3Adapter($client, $config['bucket'], '', $options)
+            $client = new S3Client($clientConfig);
+            $adapter = new AwsS3V3Adapter(
+                $client,
+                config('filesystems.disks.minio.bucket'),
+                '',
+                null,
+                null,
+                ['override_visibility_on_copy' => true]
             );
+
+            return new Filesystem($adapter);
         });
     }
 
     /**
      * Register the application services.
      */
-    public function register(): void {}
+    public function register(): void
+    {
+        //
+    }
 }
