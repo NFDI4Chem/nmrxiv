@@ -10,6 +10,17 @@ use Illuminate\Support\ServiceProvider;
 use Lab404\Impersonate\Events\LeaveImpersonation;
 use Lab404\Impersonate\Events\TakeImpersonation;
 
+/**
+ * Application Service Provider
+ *
+ * This service provider is responsible for registering application-wide services,
+ * configuring core functionality, and bootstrapping essential application features
+ * including filesystem services, URL configuration, and user impersonation events.
+ *
+ * @package App\Providers
+ * @author NMRXIV Development Team
+ * @since 1.0.0
+ */
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -23,6 +34,12 @@ class AppServiceProvider extends ServiceProvider
 
     /**
      * Register any application services.
+     *
+     * This method is called by Laravel during the application bootstrap process
+     * to register services into the container. All custom services and bindings
+     * should be registered here.
+     *
+     * @return void
      */
     public function register(): void
     {
@@ -35,17 +52,32 @@ class AppServiceProvider extends ServiceProvider
 
     /**
      * Bootstrap any application services.
+     *
+     * This method is called after all services have been registered and
+     * the application is ready to handle requests. Environment-specific
+     * configurations and event listeners are set up here.
+     *
+     * @return void
      */
     public function boot(): void
     {
-        if (App::environment('production')) {
+        if (App::environment('production') || App::environment('development')) {
             URL::forceScheme('https');
         }
 
         $this->bootEvent();
     }
 
-    public function bootEvent()
+    /**
+     * Bootstrap event listeners for the application.
+     *
+     * Registers event listeners for user impersonation functionality,
+     * managing session state during impersonation events to maintain
+     * proper authentication context.
+     *
+     * @return void
+     */
+    public function bootEvent(): void
     {
         Event::listen(function (TakeImpersonation $event) {
             session()->put([

@@ -8,6 +8,18 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
 
+/**
+ * Route Service Provider
+ *
+ * This service provider is responsible for configuring application routes,
+ * rate limiting, and route model bindings. It defines the route structure
+ * for both web and API endpoints, and establishes security policies
+ * through rate limiting configurations.
+ *
+ * @package App\Providers
+ * @author NMRXIV Development Team
+ * @since 1.0.0
+ */
 class RouteServiceProvider extends ServiceProvider
 {
     /**
@@ -29,7 +41,13 @@ class RouteServiceProvider extends ServiceProvider
     public const LANDING = '/';
 
     /**
-     * Define your route model bindings, pattern filters, etc.
+     * Define your route model bindings, pattern filters, and rate limiting.
+     *
+     * This method is called during the application bootstrap process to
+     * configure routing behavior, load route files, and establish
+     * security policies through rate limiting.
+     *
+     * @return void
      */
     public function boot(): void
     {
@@ -47,6 +65,12 @@ class RouteServiceProvider extends ServiceProvider
 
     /**
      * Configure the rate limiters for the application.
+     *
+     * Defines rate limiting policies for different types of requests
+     * to protect the application from abuse and ensure fair usage.
+     * API requests are limited based on user ID or IP address.
+     *
+     * @return void
      */
     protected function configureRateLimiting(): void
     {
