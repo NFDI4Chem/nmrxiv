@@ -21,8 +21,8 @@ use Laravel\Fortify\Fortify;
  * authentication. It also handles authentication disabling and rate limiting
  * for security purposes.
  *
- * @package App\Providers
  * @author NMRXIV Development Team
+ *
  * @since 1.0.0
  */
 class FortifyServiceProvider extends ServiceProvider
@@ -33,8 +33,6 @@ class FortifyServiceProvider extends ServiceProvider
      * This method is intentionally empty as Fortify services are
      * configured in the boot method after the application has
      * been fully initialized.
-     *
-     * @return void
      */
     public function register(): void
     {
@@ -47,8 +45,6 @@ class FortifyServiceProvider extends ServiceProvider
      * Configures Fortify authentication features, including custom action
      * classes for user management, conditional authentication disabling,
      * and rate limiting for login and two-factor authentication attempts.
-     *
-     * @return void
      */
     public function boot(): void
     {

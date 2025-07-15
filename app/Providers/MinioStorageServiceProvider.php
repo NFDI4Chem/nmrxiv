@@ -19,8 +19,8 @@ use League\Flysystem\Filesystem;
  * The provider configures an S3-compatible client to communicate with MinIO instances,
  * enabling seamless file operations through Laravel's unified Storage interface.
  *
- * @package App\Providers
  * @author NMRXIV Development Team
+ *
  * @since 1.0.0
  */
 class MinioStorageServiceProvider extends ServiceProvider
@@ -32,8 +32,6 @@ class MinioStorageServiceProvider extends ServiceProvider
      * configuring it as an S3-compatible filesystem using the AWS SDK.
      * This allows the application to store and retrieve files from MinIO
      * object storage using standard Laravel Storage methods.
-     *
-     * @return void
      */
     public function boot(): void
     {
@@ -69,8 +67,6 @@ class MinioStorageServiceProvider extends ServiceProvider
      * This method is intentionally empty as the MinIO storage driver
      * is configured during the boot phase when all configuration
      * values are available.
-     *
-     * @return void
      */
     public function register(): void
     {
