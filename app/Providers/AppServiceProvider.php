@@ -24,7 +24,13 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Register any application services.
      */
-    public function register(): void {}
+    public function register(): void
+    {
+        // Register filesystem services
+        $this->app->singleton(\App\Services\PathGeneratorService::class);
+        $this->app->singleton(\App\Services\StorageSignedUrlService::class);
+        $this->app->bind(\App\Services\FileSystemObjectService::class);
+    }
 
     /**
      * Bootstrap any application services.
