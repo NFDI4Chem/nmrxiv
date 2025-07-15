@@ -59,7 +59,7 @@ class FileSystemController extends Controller
 
             $signedUrl = $this->storageService->generateSignedUploadUrl($filePath, $bucket);
             $signedUrl['fullPath'] = $file['fullPath'] ?? $signedUrl['key'];
-            
+
             $fileUrls[] = $signedUrl;
         }
 
@@ -99,7 +99,7 @@ class FileSystemController extends Controller
         }, 5);
 
         $signedUrl = $this->storageService->generateSignedUploadUrl($filePath, $bucket);
-        
+
         return response()->json($signedUrl, 201);
     }
 
@@ -114,16 +114,16 @@ class FileSystemController extends Controller
         if ($filesystemobject->draft_id !== $draft->id) {
             return response()->json([
                 'success' => false,
-                'message' => 'Filesystem object does not belong to this draft'
+                'message' => 'Filesystem object does not belong to this draft',
             ], 403);
         }
 
         try {
             $deletionResult = $this->fileSystemObjectService->deleteFileSystemObject($filesystemobject);
-            
-            $hasErrors = !empty($deletionResult['storage_errors']);
+
+            $hasErrors = ! empty($deletionResult['storage_errors']);
             $message = $this->buildDeletionMessage($deletionResult);
-            
+
             return response()->json([
                 'success' => true,
                 'message' => $message,
@@ -131,13 +131,13 @@ class FileSystemController extends Controller
                 'files_deleted' => $deletionResult['files_deleted'],
                 'directories_deleted' => $deletionResult['directories_deleted'],
                 'storage_errors' => $deletionResult['storage_errors'],
-                'has_storage_errors' => $hasErrors
+                'has_storage_errors' => $hasErrors,
             ], $hasErrors ? 207 : 200); // 207 = Multi-Status for partial success
-            
+
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to delete filesystem object: ' . $e->getMessage()
+                'message' => 'Failed to delete filesystem object: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -149,7 +149,7 @@ class FileSystemController extends Controller
     {
         $totalDeleted = count($deletionResult['database_ids_deleted']);
         $storageErrors = count($deletionResult['storage_errors']);
-        
+
         if ($storageErrors === 0) {
             return "Successfully deleted {$totalDeleted} items from database and storage.";
         } else {

@@ -651,6 +651,7 @@ import {
     TrashIcon,
     ArrowDownTrayIcon,
 } from "@heroicons/vue/24/solid";
+import ChecksumCalculator from "@/Utils/ChecksumCalculator.js";
 
 export default {
     components: {
@@ -755,6 +756,135 @@ export default {
         }
     },
     methods: {
+        /**
+         * Calculate checksums for uploaded files before processing
+         */
+        async calculateChecksumsForFiles(files) {
+            this.status = "CALCULATING CHECKSUMS";
+
+            // Filter out directories and unreadable files
+
+            // First pass: basic filtering
+            const potentialFiles = files.filter((file) => {
+                const fileName = file.fullPath || file.name;
+
+                // Skip directories and invalid files
+                if (file.size === 0 && file.type === "") return false;
+                if (fileName.endsWith("/") || fileName.endsWith("\\"))
+                    return false;
+                if (typeof file.slice !== "function") return false;
+                if (
+                    file.size === 0 &&
+                    fileName.includes("/") &&
+                    !fileName.includes(".")
+                )
+                    return false;
+
+                return true;
+            });
+
+            // Second pass: test file readability to catch pseudo-files
+            const actualFiles = [];
+            for (const file of potentialFiles) {
+                const fileName = file.fullPath || file.name;
+                try {
+                    // Test if we can actually read from this file
+                    const testChunk = file.slice(0, Math.min(1, file.size));
+
+                    await new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve();
+                        reader.onerror = () => reject(reader.error);
+                        reader.readAsArrayBuffer(testChunk);
+                    });
+
+                    actualFiles.push(file);
+                } catch (error) {
+                    // Skip this file silently
+                }
+            }
+
+            if (actualFiles.length === 0) {
+                this.status = "READY";
+                return;
+            }
+
+            const progressTracker =
+                ChecksumCalculator.createMultiFileProgressTracker(
+                    actualFiles,
+                    (progress) => {
+                        this.status = `CALCULATING CHECKSUMS (${progress}%)`;
+                    }
+                );
+
+            const checksumPromises = actualFiles.map(async (file) => {
+                try {
+                    const fileName = file.fullPath || file.name;
+
+                    // Update log status
+                    if (this.logs[fileName]) {
+                        this.logs[fileName].status = "Calculating checksum";
+                        this.logs[fileName].messages.push(
+                            "Starting checksum calculation"
+                        );
+                    }
+
+                    // Calculate both MD5 and SHA-256 for maximum compatibility
+                    const checksums =
+                        await ChecksumCalculator.calculateBothChecksums(
+                            file,
+                            (progress) => {
+                                if (this.logs[fileName]) {
+                                    this.logs[fileName].messages[
+                                        this.logs[fileName].messages.length - 1
+                                    ] = `Calculating checksum: ${progress}%`;
+                                }
+                                progressTracker(fileName, progress);
+                            }
+                        );
+
+                    // Store checksums in file object for later use
+                    file.checksums = checksums;
+
+                    // Update log with success
+                    if (this.logs[fileName]) {
+                        this.logs[fileName].messages.push(
+                            `Checksums calculated - MD5: ${checksums.md5.substring(
+                                0,
+                                8
+                            )}..., SHA256: ${checksums.sha256.substring(
+                                0,
+                                8
+                            )}...`
+                        );
+                    }
+                } catch (error) {
+                    console.error(
+                        `Error calculating checksums for ${file.name}:`,
+                        error
+                    );
+
+                    const fileName = file.fullPath || file.name;
+                    if (this.logs[fileName]) {
+                        this.logs[fileName].status = "Error";
+                        this.logs[fileName].messages.push(
+                            `Checksum calculation failed: ${error.message}`
+                        );
+                    }
+
+                    // Don't fail the entire upload for checksum errors
+                    file.checksums = null;
+                }
+            });
+
+            await Promise.all(checksumPromises);
+
+            this.status = "CHECKSUMS CALCULATED";
+            console.log(
+                "All checksums calculated, proceeding with upload preparation"
+            );
+        },
+
         confirmFSODeletion() {
             this.fsoBeingDeleted = this.$page.props.selectedFileSystemObject.id;
         },
@@ -763,7 +893,7 @@ export default {
                 this.fsoBeingDeleted = null;
                 this.updateBusyStatus(true);
                 this.$emit("loading", true);
-                
+
                 axios
                     .delete(
                         "/dashboard/drafts/" +
@@ -774,38 +904,48 @@ export default {
                     .then((response) => {
                         this.updateBusyStatus(false);
                         this.$emit("loading", false);
-                        
+
                         if (response.data.success) {
                             // Show success message with details
                             let message = response.data.message;
                             if (response.data.has_storage_errors) {
                                 message += ` Note: ${response.data.storage_errors.length} storage operation(s) had issues.`;
                             }
-                            
+
                             // You can add a toast notification here if available
-                            console.log('Deletion successful:', message);
-                            
+                            console.log("Deletion successful:", message);
+
                             // Refresh the file tree
                             this.annotate();
-                            
+
                             // Clear the selected object since it's been deleted
                             this.$page.props.selectedFileSystemObject = null;
                         } else {
-                            console.error('Deletion failed:', response.data.message);
+                            console.error(
+                                "Deletion failed:",
+                                response.data.message
+                            );
                             // You can add error toast notification here
                         }
                     })
                     .catch((error) => {
                         this.updateBusyStatus(false);
                         this.$emit("loading", false);
-                        
-                        console.error('Deletion request failed:', error);
-                        
-                        if (error.response && error.response.data && error.response.data.message) {
-                            console.error('Server error:', error.response.data.message);
+
+                        console.error("Deletion request failed:", error);
+
+                        if (
+                            error.response &&
+                            error.response.data &&
+                            error.response.data.message
+                        ) {
+                            console.error(
+                                "Server error:",
+                                error.response.data.message
+                            );
                             // You can add error toast notification here
                         } else {
-                            console.error('Network or unknown error occurred');
+                            console.error("Network or unknown error occurred");
                         }
                     });
             }
@@ -866,6 +1006,17 @@ export default {
             const url = "/dashboard/storage/signed-draft-storage-url";
             const client = axios.create({ baseURL: window.location.origin });
             vm.currentLog = "Fetching temporary storage url";
+
+            // Ensure checksums are included in the file data
+            const filesWithChecksums = filesBatch.map((file) => ({
+                upload: file.upload || {
+                    filename: file.name,
+                    total: file.size,
+                },
+                fullPath: file.fullPath || file.webkitRelativePath || file.name,
+                checksums: file.checksums || null, // Include calculated checksums
+            }));
+
             axiosRetry(client, {
                 retries: 3,
                 retryCondition: (error) => {
@@ -880,7 +1031,7 @@ export default {
             });
             client
                 .post(url, {
-                    draft_files: filesBatch,
+                    draft_files: filesWithChecksums,
                     destination: vm.$page.props.selectedFolder,
                     draft_id: vm.draft.id,
                 })
@@ -1018,6 +1169,7 @@ export default {
                     "webkitdirectory",
                     true
                 );
+
                 vm.dropzone.on("processing", (file) => {
                     vm.dropzone.options.url = file.uploadURL;
                     vm.status = "UPLOAD IN PROGRESS";
@@ -1069,32 +1221,74 @@ export default {
                 vm.dropzone.on("addedfiles", (files) => {
                     if (files.length > 0) {
                         this.updateBusyStatus(true);
-                        setTimeout(() => {
-                            var timer = setInterval(function () {
-                                if (
-                                    vm.totalFilesCount === vm.selectedFSO.length
-                                ) {
-                                    clearInterval(timer);
-                                    vm.status = "BATCH UPLOAD STARTED";
-                                    for (
-                                        let i = 0;
-                                        i < vm.totalFilesCount;
-                                        i += vm.batchCount
-                                    ) {
-                                        let filesBatch =
-                                            vm.dropzone.files.slice(
-                                                i,
-                                                i + vm.batchCount
-                                            );
-                                        vm.batches += 1;
-                                        vm.processFilesDZL(vm, filesBatch);
+
+                        // Convert FileList to array for processing
+                        let filesArray = [];
+                        for (let i = 0; i < files.length; i++) {
+                            filesArray.push(files[i]);
+                        }
+
+                        // Extract real File objects from Dropzone wrappers if needed
+                        const realFilesArray = filesArray.map((file) => {
+                            // If it's a Dropzone wrapper object, try to extract the real File
+                            if (
+                                "upload" in file &&
+                                file.upload &&
+                                file.upload.file
+                            ) {
+                                return file.upload.file;
+                            }
+                            // If it doesn't have slice method but has other properties, it might be wrapped
+                            if (
+                                typeof file.slice !== "function" &&
+                                file instanceof File === false
+                            ) {
+                                // Try to find the original file object in the wrapper
+                                for (const key in file) {
+                                    if (file[key] instanceof File) {
+                                        return file[key];
                                     }
-                                } else {
-                                    vm.totalFilesCount = vm.selectedFSO.length;
-                                    vm.status = "PROCESSING FILES";
                                 }
-                            }, 500);
+                            }
+                            return file; // Return as-is if it seems to be a real File object
                         });
+
+                        // Calculate checksums for all files before processing
+                        vm.calculateChecksumsForFiles(realFilesArray).then(
+                            () => {
+                                setTimeout(() => {
+                                    var timer = setInterval(function () {
+                                        if (
+                                            vm.totalFilesCount ===
+                                            vm.selectedFSO.length
+                                        ) {
+                                            clearInterval(timer);
+                                            vm.status = "BATCH UPLOAD STARTED";
+                                            for (
+                                                let i = 0;
+                                                i < vm.totalFilesCount;
+                                                i += vm.batchCount
+                                            ) {
+                                                let filesBatch =
+                                                    vm.dropzone.files.slice(
+                                                        i,
+                                                        i + vm.batchCount
+                                                    );
+                                                vm.batches += 1;
+                                                vm.processFilesDZL(
+                                                    vm,
+                                                    filesBatch
+                                                );
+                                            }
+                                        } else {
+                                            vm.totalFilesCount =
+                                                vm.selectedFSO.length;
+                                            vm.status = "CALCULATING CHECKSUMS";
+                                        }
+                                    }, 500);
+                                });
+                            }
+                        );
                     }
                 });
                 vm.dropzone.on("queuecomplete", () => {

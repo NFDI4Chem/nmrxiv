@@ -15,6 +15,7 @@ use Illuminate\Support\Str;
 class StorageSignedUrlService
 {
     private S3Client $client;
+
     private string $bucket;
 
     public function __construct()
@@ -53,7 +54,7 @@ class StorageSignedUrlService
     public function generateMultipleSignedUrls(array $filePaths, ?string $bucket = null): array
     {
         $urls = [];
-        
+
         foreach ($filePaths as $path => $metadata) {
             $signedUrl = $this->generateSignedUploadUrl($path, $bucket);
             $signedUrl = array_merge($signedUrl, $metadata);
@@ -69,7 +70,7 @@ class StorageSignedUrlService
     private function createStorageClient(): S3Client
     {
         $driver = config('filesystems.default');
-        
+
         $config = [
             'region' => config("filesystems.disks.{$driver}.region"),
             'version' => 'latest',
@@ -91,6 +92,7 @@ class StorageSignedUrlService
     private function getDefaultBucket(): string
     {
         $driver = config('filesystems.default');
+
         return config("filesystems.disks.{$driver}.bucket");
     }
 
