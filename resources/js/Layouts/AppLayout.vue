@@ -83,12 +83,24 @@
                             </div>
                             <nav
                                 v-for="item in filteredNavigation"
-                                :key="item.name"
+                                :key="item.name || item.prefix"
                                 class="flex-1 px-2 bg-white space-y-1"
                             >
+                                <div
+                                    v-if="item.prefix && !item.name"
+                                    class="p-2 bg-gray-100 text-gray-500 text-sm"
+                                >
+                                    {{ item.prefix }}
+                                </div>
                                 <Link
+                                    v-if="item.href && item.name"
                                     :href="item.href"
-                                    class="my-6 text-gray-900 group flex items-center px-2 text-sm font-medium rounded-md"
+                                    :class="[
+                                        $page.url === item.href
+                                            ? 'bg-gray-200 text-gray-900 border-l-4 border-gray-900'
+                                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
+                                        'my-6 group flex items-center px-2 text-sm font-medium rounded-md py-2'
+                                    ]"
                                 >
                                     <div class="pl-2 pr-4">
                                         <component
@@ -99,6 +111,24 @@
                                     </div>
                                     {{ item.name }}
                                 </Link>
+                                <div v-for="child in item.children" :key="child.name" class="ml-4">
+                                    <Link
+                                        :href="child.href"
+                                        :class="[
+                                            $page.url === child.href
+                                                ? 'bg-gray-200 text-gray-900 border-l-4 border-gray-900'
+                                                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
+                                            'group flex items-center px-2 py-2 text-sm font-medium rounded-md'
+                                        ]"
+                                    >
+                                        <component
+                                            :is="child.icon"
+                                            class="mr-3 h-5 w-5"
+                                            aria-hidden="true"
+                                        />
+                                        {{ child.name }}
+                                    </Link>
+                                </div>
                             </nav>
                         </div>
                     </div>
@@ -148,9 +178,9 @@
                                     :class="[
                                         $page.url === item.href
                                             ? 'bg-gray-900 border-y text-white'
-                                            : 'bg-gray-200 border-y',
-                                        'w-full px-10 hover:bg-gray-700 hover:text-white group flex items-center py-4 text-md font-small ' +
-                                            item.bg,
+                                            : 'bg-gray-200 border-y text-gray-700',
+                                        'w-full px-10 hover:bg-gray-700 hover:text-white group flex items-center py-4 text-md font-small',
+                                        $page.url !== item.href ? item.bg : ''
                                     ]"
                                 >
                                     <component
@@ -170,9 +200,9 @@
                                     :class="[
                                         $page.url === child.href
                                             ? 'bg-gray-900 text-white'
-                                            : '',
-                                        'w-full px-10 hover:bg-gray-700 hover:text-white group flex items-center py-3 text-md font-small ' +
-                                            child.bg,
+                                            : 'text-gray-700',
+                                        'w-full px-10 hover:bg-gray-700 hover:text-white group flex items-center py-3 text-md font-small',
+                                        $page.url !== child.href ? child.bg : ''
                                     ]"
                                 >
                                     <component
@@ -195,19 +225,12 @@
         </div>
         <div
             v-if="!collapseSidebar"
-            class="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 z-20"
+            class="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 z-10"
         >
             <div
                 class="flex flex-col flex-grow border-r border-gray-200 bg-white overflow-y-auto"
             >
                 <div class="flex py-3 pb-4 items-center flex-shrink-0 px-4">
-                    <!-- <button
-          type="button"
-          class="rounded px-1 mx-1 mr-3 border-gray-200 text-gray-500"
-          @click="toggleCollapseSidebar()"
-        >
-          <Bars3Icon class="h-6 w-6" aria-hidden="true" />
-        </button> -->
                     <Link class="ml-2" :href="route('landing')">
                         <jet-application-logo class="block h-10 w-auto" />
                     </Link>
@@ -246,10 +269,10 @@
                                 v-if="item.name"
                                 :class="[
                                     $page.url === item.href
-                                        ? ' border-r-4 bg-gray-200 border-r-black'
-                                        : '',
-                                    'w-full px-7 hover:bg-gray-700 hover:text-white group flex items-center py-3 text-md font-medium ' +
-                                        item.bg,
+                                        ? 'border-r-4 bg-gray-200 border-r-black text-gray-900'
+                                        : 'text-gray-700',
+                                    'w-full px-7 hover:bg-gray-700 hover:text-white group flex items-center py-3 text-md font-medium',
+                                    $page.url !== item.href ? item.bg : ''
                                 ]"
                             >
                                 <component
@@ -266,10 +289,10 @@
                                 :href="child.href"
                                 :class="[
                                     $page.url === child.href
-                                        ? ' border-r-4 bg-gray-200 border-r-black'
-                                        : '',
-                                    'w-full px-10 hover:bg-gray-700 hover:text-white group flex items-center py-1.5 text-md font-small ' +
-                                        child.bg,
+                                        ? 'border-r-4 bg-gray-200 border-r-black text-gray-900'
+                                        : 'text-gray-600',
+                                    'w-full px-10 hover:bg-gray-700 hover:text-white group flex items-center py-1.5 text-md font-small',
+                                    $page.url !== child.href ? child.bg : ''
                                 ]"
                             >
                                 <component
