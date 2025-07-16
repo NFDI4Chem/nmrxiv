@@ -191,25 +191,12 @@ export default {
         },
         groupedItems() {
             if (!this.items || !Array.isArray(this.items)) {
-                console.log("SelectRich: No items or not array", this.items);
                 return null;
             }
 
-            // Debug: Log first few items to see structure
-            console.log("SelectRich: First 3 items:", this.items.slice(0, 3));
-
             // Check if items have category field, if not return null to use ungrouped view
             const hasCategories = this.items.some((item) => item.category);
-            console.log("SelectRich: Has categories?", hasCategories);
-            console.log(
-                "SelectRich: Categories found:",
-                this.items.map((item) => item.category).filter(Boolean)
-            );
-
             if (!hasCategories) {
-                console.log(
-                    "SelectRich: No categories found, using ungrouped view"
-                );
                 return null;
             }
 
@@ -223,8 +210,6 @@ export default {
                 return groups;
             }, {});
 
-            console.log("SelectRich: Grouped items:", grouped);
-
             // Sort categories and items within each category
             const sortedGrouped = {};
             Object.keys(grouped)
@@ -235,10 +220,6 @@ export default {
                     );
                 });
 
-            console.log(
-                "SelectRich: Final sorted grouped items:",
-                sortedGrouped
-            );
             return sortedGrouped;
         },
     },

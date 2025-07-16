@@ -154,7 +154,7 @@ class StudyController extends Controller
                     'preview' => $preview,
                     'availableRoles' => array_values(Jetstream::$roles),
                     'studyRole' => $preview ? null : $study->userStudyRole(Auth::user()->email),
-                    'license' => $license ? $license[0] : null,
+                    'license' => $license,
                     'studyPermissions' => [
                         'canDeleteStudy' => Gate::check('deleteStudy', $study),
                         'canUpdateStudy' => Gate::check('updateStudy', $study),
