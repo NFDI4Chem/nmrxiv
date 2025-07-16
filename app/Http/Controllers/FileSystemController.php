@@ -163,6 +163,10 @@ class FileSystemController extends Controller
     public function processFolder($folders): void
     {
         foreach ($folders as $folder) {
+            if ($folder->model_type) {
+                continue;
+            }
+
             if ($folder->type == 'directory') {
                 if ($this->isBruker($folder)) {
                     $this->saveInstrumentType($folder, 'bruker');

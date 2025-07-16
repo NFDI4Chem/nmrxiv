@@ -2,10 +2,11 @@
     <span v-if="file" class="text-sm">
         <nav class="flex-1 space-y-0" aria-label="Sidebar">
             <Disclosure
-                v-slot="{ open = true }"
+                v-slot="{ open }"
                 as="div"
-                :default-open="file.name == '/'"
+                :default-open="file.name == '/' || isExpanded(file.id)"
                 class="space-y-1"
+                @update:open="(isOpen) => handleDisclosureToggle(file.id, isOpen)"
             >
                 <div
                     style="user-select: none"
@@ -17,9 +18,12 @@
                             : 'cursor-pointer text-gray-600',
                         'group w-full flex items-center pr-2 py-1 text-left font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500',
                     ]"
-                    @click.stop="displaySelected(file)"
+                    @click.stop="handleFolderClick(file)"
                 >
-                    <DisclosureButton class="w-full text-left truncate ...">
+                    <DisclosureButton 
+                        class="w-full text-left truncate ..."
+                        @click="() => handleDisclosureButtonClick(file.id)"
+                    >
                         <span v-if="file.loading">
                             <svg
                                 class="animate-spin mr-3 ml-1 h-5 w-5 text-dark inline"
@@ -96,25 +100,26 @@
                                             v-slot="{ open }"
                                             as="div"
                                             class="space-y-1"
+                                            :default-open="isExpanded(sfile.id)"
+                                            @update:open="(isOpen) => handleDisclosureToggle(sfile.id, isOpen)"
                                         >
-                                            <div
-                                                :class="[
-                                                    $page.props
-                                                        .selectedFileSystemObject &&
-                                                    $page.props
-                                                        .selectedFileSystemObject
-                                                        .relative_url ==
-                                                        sfile.relative_url
-                                                        ? 'cursor-pointer bg-gray-100 text-gray-900'
-                                                        : 'cursor-pointer text-gray-600',
-                                                    'group w-full flex pr-1 py-1 text-left font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500',
-                                                ]"
-                                                @click.stop="
-                                                    displaySelected(sfile)
-                                                "
-                                            >
-                                                <DisclosureButton
+                                                                        <div
+                                :class="[
+                                    $page.props
+                                        .selectedFileSystemObject &&
+                                    $page.props
+                                        .selectedFileSystemObject
+                                        .relative_url ==
+                                        sfile.relative_url
+                                        ? 'cursor-pointer bg-gray-100 text-gray-900'
+                                        : 'cursor-pointer text-gray-600',
+                                    'group w-full flex pr-1 py-1 text-left font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500',
+                                ]"
+                                @click.stop="handleFolderClick(sfile)"
+                            >
+                                                                                <DisclosureButton
                                                     class="w-full text-left truncate ..."
+                                                    @click="() => handleDisclosureButtonClick(sfile.id)"
                                                 >
                                                     <span v-if="sfile.loading">
                                                         <svg
@@ -214,6 +219,8 @@
                                                             "
                                                             :study="study"
                                                             :project="project"
+                                                            :expanded-folders="expandedFolders"
+                                                            @toggle-expansion="(fsoId, isOpen) => $emit('toggle-expansion', fsoId, isOpen)"
                                                         ></children>
                                                     </span>
                                                     <span
@@ -298,7 +305,8 @@ export default {
         FolderIcon,
         DocumentTextIcon,
     },
-    props: ["study", "project", "file"],
+    props: ["study", "project", "file", "expandedFolders"],
+    emits: ["toggle-expansion"],
     setup() {
         return {};
     },
@@ -308,6 +316,39 @@ export default {
     computed: {},
     mounted() {},
     methods: {
+        /**
+         * Check if a folder is expanded
+         */
+        isExpanded(fsoId) {
+            return this.expandedFolders && this.expandedFolders.has(fsoId);
+        },
+
+
+
+        /**
+         * Handle folder click - select the folder to show its contents
+         */
+        handleFolderClick(file) {
+            // Select the folder to show its contents in right panel
+            this.displaySelected(file);
+        },
+
+        /**
+         * Handle disclosure toggle events from HeadlessUI
+         */
+        handleDisclosureToggle(fsoId, isOpen) {
+            // Emit to parent component to update expansion tracking
+            this.$emit('toggle-expansion', fsoId, isOpen);
+        },
+
+        /**
+         * Handle disclosure button clicks directly
+         */
+        handleDisclosureButtonClick(fsoId) {
+            // Toggle the current state and emit
+            const isCurrentlyExpanded = this.isExpanded(fsoId);
+            this.$emit('toggle-expansion', fsoId, !isCurrentlyExpanded);
+        },
         optionClicked1(event) {
             window.alert(JSON.stringify(event));
         },
@@ -362,6 +403,9 @@ export default {
 
             this.$page.props.selectedFolder = sFolder;
 
+            // Update URL with selected folder
+            this.updateURLWithSelection(file.id);
+
             if (file.has_children && file.level > 0 && !file.children) {
                 file.loading = true;
                 axios
@@ -371,6 +415,16 @@ export default {
                         file.loading = false;
                     });
             }
+        },
+
+        /**
+         * Update URL with selected folder ID
+         */
+        updateURLWithSelection(selectedId) {
+            const urlParams = new URLSearchParams(window.location.search);
+            urlParams.set('selected', selectedId);
+            const newUrl = `${window.location.pathname}?${urlParams.toString()}`;
+            window.history.replaceState({}, '', newUrl);
         },
     },
 };
