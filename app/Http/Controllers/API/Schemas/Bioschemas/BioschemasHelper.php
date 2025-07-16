@@ -211,7 +211,7 @@ class BioschemasHelper
         if (! $nmrium) {
             $study = $dataset->study;
             if ($study->nmrium) {
-                $NMRiumInfo = json_decode($study->nmrium->nmrium_info);
+                $NMRiumInfo = (object) json_decode(json_encode($study->nmrium->nmrium_info));
                 foreach ($NMRiumInfo->data->spectra as $spectra) {
                     $fileSource = $spectra->sourceSelector->files[0];
                     $fileName = pathinfo($fileSource);
@@ -221,7 +221,7 @@ class BioschemasHelper
                 }
             }
         } else {
-            $NMRiumInfo = json_decode($nmrium->nmrium_info);
+            $NMRiumInfo = (object) json_decode(json_encode($nmrium->nmrium_info));
             $spectra = $NMRiumInfo->data->spectra[0];
             $info = $spectra->info;
         }

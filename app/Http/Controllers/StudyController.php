@@ -239,7 +239,7 @@ class StudyController extends Controller
         if ($study) {
             $nmrium = $study->nmrium;
             if ($nmrium) {
-                return json_decode($nmrium->nmrium_info);
+                return $nmrium->nmrium_info;
             } else {
                 return null;
             }
@@ -276,7 +276,7 @@ class StudyController extends Controller
         if ($study) {
             $user = Auth::user();
             $data = $request->all();
-            $nmriumInfo = $data;
+            $nmriumInfo = sanitizeUnicodeInNMRiumData($data);
             $nmrium = $study->nmrium;
             if ($nmrium) {
                 $nmrium->nmrium_info = $nmriumInfo;
@@ -284,7 +284,7 @@ class StudyController extends Controller
                 $nmrium->save();
             } else {
                 $nmrium = NMRium::create([
-                    'nmrium_info' => json_encode($nmriumInfo),
+                    'nmrium_info' => $nmriumInfo,
                 ]);
                 $study->nmrium()->save($nmrium);
                 $study->has_nmrium = true;
@@ -329,12 +329,12 @@ class StudyController extends Controller
                     $_nmriumJSON['data']['spectra'] = $spectrum;
                     $_nmrium = $dataset->nmrium;
                     if ($_nmrium) {
-                        $_nmrium->nmrium_info = json_encode($_nmriumJSON, JSON_UNESCAPED_UNICODE);
+                        $_nmrium->nmrium_info = $_nmriumJSON;
                         $dataset->has_nmrium = true;
                         $_nmrium->save();
                     } else {
                         $_nmrium = NMRium::create([
-                            'nmrium_info' => json_encode($_nmriumJSON, JSON_UNESCAPED_UNICODE),
+                            'nmrium_info' => $_nmriumJSON,
                         ]);
                         $dataset->nmrium()->save($_nmrium);
                         $dataset->has_nmrium = true;
