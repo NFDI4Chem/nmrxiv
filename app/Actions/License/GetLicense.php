@@ -11,7 +11,7 @@ class GetLicense
      */
     public function getLicenseById(int $id): ?License
     {
-        return License::select('id', 'title', 'description')
+        return License::select('id', 'title', 'description', 'category')
             ->where('id', $id)
             ->first();
     }
