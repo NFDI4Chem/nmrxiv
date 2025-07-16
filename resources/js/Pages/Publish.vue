@@ -361,7 +361,7 @@
                                             :src="
                                                 project.project_photo_url
                                                     ? project.project_photo_url
-                                                    : 'https://via.placeholder.com/400x200'
+                                                    : 'https://placehold.co/400x200'
                                             "
                                             :alt="project.name"
                                             class="h-24 w-72 rounded-md object-cover"
