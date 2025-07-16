@@ -232,8 +232,59 @@ class Validation extends Model
             $project->validation_status = $status;
             $project->save();
 
-            $this->report = $report;
+            $this->report = $this->sanitizeUnicodeInReport($report);
             $this->save();
         }
+    }
+
+    /**
+     * Sanitize Unicode characters in the validation report to prevent database encoding issues.
+     */
+    private function sanitizeUnicodeInReport(array $report): array
+    {
+        return $this->recursiveUnicodeSanitize($report);
+    }
+
+    /**
+     * Recursively sanitize Unicode characters in arrays and objects.
+     */
+    private function recursiveUnicodeSanitize($data)
+    {
+        if (is_array($data)) {
+            return array_map([$this, 'recursiveUnicodeSanitize'], $data);
+        }
+        
+        if (is_string($data)) {
+            // Convert problematic Unicode characters to ASCII equivalents
+            $replacements = [
+                '\uff08' => '(',  // Full-width left parenthesis
+                '\uff09' => ')',  // Full-width right parenthesis
+                '\uff0b' => '+',  // Full-width plus sign
+                '\uff0d' => '-',  // Full-width hyphen-minus
+                '\uff1a' => ':',  // Full-width colon
+                '\uff1b' => ';',  // Full-width semicolon
+                '\uff1c' => '<',  // Full-width less-than sign
+                '\uff1d' => '=',  // Full-width equals sign
+                '\uff1e' => '>',  // Full-width greater-than sign
+                '\uff1f' => '?',  // Full-width question mark
+                '\uff20' => '@',  // Full-width commercial at
+            ];
+            
+            // Apply replacements
+            $data = str_replace(array_keys($replacements), array_values($replacements), $data);
+            
+            // Remove any remaining problematic Unicode sequences
+            $data = preg_replace('/\\\\u[0-9a-fA-F]{4}/', '', $data);
+            
+            // Ensure the string is valid UTF-8 and convert to ASCII-safe characters
+            if (!mb_check_encoding($data, 'UTF-8')) {
+                $data = mb_convert_encoding($data, 'UTF-8', 'UTF-8');
+            }
+            
+            // Convert to ASCII-safe string
+            $data = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $data);
+        }
+        
+        return $data;
     }
 }

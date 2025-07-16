@@ -56,9 +56,9 @@ class CreateNewProject
                         $user, ['role' => 'creator']
                     );
                 }
-                $validaton = new Validation;
-                $validaton->save();
-                $project->associate($validation);
+                $validation = new Validation;
+                $validation->save();
+                $project->validation()->associate($validation);
                 $project->save();
             });
         });

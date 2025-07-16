@@ -147,4 +147,24 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return ! $this->hasAnyRole(['super-admin', 'developer']);
     }
+
+    /**
+     * Get user and team data for draft/project operations.
+     *
+     * @return array [$user_id, $team_id, $team]
+     */
+    public function getUserTeamData(): array
+    {
+        $team = $this->currentTeam;
+
+        if ($team->personal_team) {
+            $user_id = $this->id;
+            $team_id = $team->id;
+        } else {
+            $user_id = $team->user_id;
+            $team_id = $this->current_team_id;
+        }
+
+        return [$user_id, $team_id, $team];
+    }
 }

@@ -156,4 +156,189 @@ class FileSystemController extends Controller
             return "Deleted {$totalDeleted} items from database. {$storageErrors} storage operation(s) had issues (see details).";
         }
     }
+
+    /**
+     * Process folders to identify instrument types and set model types.
+     */
+    public function processFolder($folders): void
+    {
+        foreach ($folders as $folder) {
+            if ($folder->type == 'directory') {
+                if ($this->isBruker($folder)) {
+                    $this->saveInstrumentType($folder, 'bruker');
+                    $this->saveModelType($folder->parent);
+                } elseif ($this->isVarian($folder)) {
+                    $this->saveInstrumentType($folder, 'varian');
+                    $this->saveModelType($folder->parent);
+                } else {
+                    $this->processFolder($folder->children);
+                }
+            } else {
+                if ($this->isJOEL($folder)) {
+                    $this->saveInstrumentType($folder, 'joel');
+                    $this->saveModelType($folder->parent);
+                } elseif ($this->isJcampDX($folder)) {
+                    $this->saveInstrumentType($folder, 'jcamp');
+                    $this->saveModelType($folder->parent);
+                } elseif ($this->isNMReData($folder)) {
+                    $this->saveInstrumentType($folder, 'nmredata');
+                    $this->saveAnnotationsDetected($folder->parent);
+                } elseif ($this->isMolData($folder)) {
+                    $this->saveInstrumentType($folder, 'mol');
+                }
+            }
+        }
+    }
+
+    /**
+     * Mark that NMReData annotations were detected.
+     */
+    public function saveAnnotationsDetected($folder): void
+    {
+        if ($folder) {
+            $study = $folder->study;
+
+            if ($study) {
+                $study->has_nmredata = true;
+                $study->save();
+            }
+        }
+    }
+
+    /**
+     * Set model type for folder.
+     */
+    public function saveModelType($folder): void
+    {
+        if ($folder) {
+            $folder->model_type = 'study';
+            $folder->save();
+        }
+    }
+
+    /**
+     * Set instrument type for folder.
+     */
+    public function saveInstrumentType($folder, $type): void
+    {
+        $folder->instrument_type = $type;
+        $folder->save();
+    }
+
+    /**
+     * Check if folder contains Bruker instrument files.
+     */
+    public function isBruker($folder): bool
+    {
+        $fileTypes = ['acqus', 'acqu', 'pdata'];
+        $children = $folder->children;
+        $names = $children->pluck('name')->toArray();
+        if (array_intersect($fileTypes, $names) == $fileTypes) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if folder contains Varian instrument files.
+     */
+    public function isVarian($folder): bool
+    {
+        $fileTypes = ['fid', 'log', 'text', 'procpar'];
+        $children = $folder->children;
+        $names = $children->pluck('name')->toArray();
+        if (array_intersect($fileTypes, $names) == $fileTypes) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if file is JCAMP-DX format.
+     */
+    public function isJcampDX($folder): bool
+    {
+        $fileTypes = ['jdx'];
+        $names = [$folder->name];
+        $extensions = array_map(fn ($s) => substr("$s", (strrpos($s, '.') + 1)), $names);
+        $isJDX = false;
+        if (array_intersect($fileTypes, $extensions) == $fileTypes) {
+            $isJDX = true;
+        }
+
+        $fileTypes = ['dx'];
+        $isDX = false;
+        if (array_intersect($fileTypes, $extensions) == $fileTypes) {
+            $isDX = true;
+        }
+
+        $fileTypes = ['jcamp'];
+        $isJCAMP = false;
+        if (array_intersect($fileTypes, $extensions) == $fileTypes) {
+            $isJCAMP = true;
+        }
+
+        if ($isJDX || $isDX || $isJCAMP) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if file is NMReData format.
+     */
+    public function isNMReData($folder): bool
+    {
+        $fileTypes = ['sdf'];
+        $names = [$folder->name];
+        $extensions = array_map(fn ($s) => substr("$s", (strrpos($s, '.') + 1)), $names);
+        $isNMReData = false;
+        if (array_intersect($fileTypes, $extensions) == $fileTypes) {
+            $isNMReData = true;
+        }
+
+        if ($isNMReData) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if file is MOL format.
+     */
+    public function isMolData($folder): bool
+    {
+        $fileTypes = ['mol'];
+        $names = [$folder->name];
+        $extensions = array_map(fn ($s) => substr("$s", (strrpos($s, '.') + 1)), $names);
+        $isMolData = false;
+        if (array_intersect($fileTypes, $extensions) == $fileTypes) {
+            $isMolData = true;
+        }
+
+        if ($isMolData) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if file is JOEL format.
+     */
+    public function isJOEL($folder): bool
+    {
+        $fileTypes = ['jdf'];
+        $names = [$folder->name];
+        $extensions = array_map(fn ($s) => substr("$s", (strrpos($s, '.') + 1)), $names);
+        if (array_intersect($fileTypes, $extensions) == $fileTypes) {
+            return true;
+        }
+
+        return false;
+    }
 }

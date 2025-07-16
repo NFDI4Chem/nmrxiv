@@ -260,7 +260,7 @@
                 >
                     <children :file="file"></children>
                     <div
-                        v-if="Object.keys(logs).length > 0 && !readonly"
+                        v-if="Object.keys(logs).length > 0 && !readonly && !isDeletingFiles"
                         class="mt-4 text-sm cursor-pointer text-gray-400"
                         @click="showLogsDialog = true"
                     >
@@ -528,6 +528,51 @@
             </div>
         </div>
     </div>
+    
+    <!-- Deletion Progress Overlay -->
+    <div
+        v-if="isDeletingFiles"
+        class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50"
+    >
+        <div class="bg-white rounded-lg shadow-xl p-8 max-w-md mx-4">
+            <div class="flex items-center justify-center">
+                <div class="flex flex-col items-center">
+                    <!-- Loading Spinner -->
+                    <svg
+                        class="animate-spin h-12 w-12 text-red-600 mb-4"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                    >
+                        <circle
+                            class="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            stroke-width="4"
+                        ></circle>
+                        <path
+                            class="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                    </svg>
+                    <!-- Deletion Message -->
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">
+                        Deleting Files
+                    </h3>
+                    <p class="text-sm text-gray-600 text-center">
+                        {{ deletionMessage }}
+                    </p>
+                    <div class="mt-4 text-xs text-gray-500">
+                        Please wait, this may take a moment...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <div
         v-if="
             (status != 'PROCESSING UPLOADED FILES' &&
@@ -574,7 +619,7 @@
                 >
             </div>
             <button
-                v-if="Object.keys(logs).length > 0"
+                v-if="Object.keys(logs).length > 0 && !isDeletingFiles"
                 class="mt-4 text-sm cursor-pointer bg-white-900"
                 @click="showLogsDialog = true"
             >
@@ -699,6 +744,9 @@ export default {
             showMissingFilesDetails: null,
             missing_files: 0,
             missing_files_list: [],
+            // Deletion progress
+            isDeletingFiles: false,
+            deletionMessage: "",
         };
     },
     computed: {
@@ -891,6 +939,11 @@ export default {
         deleteFSO() {
             if (this.$page.props.selectedFileSystemObject.id) {
                 this.fsoBeingDeleted = null;
+                
+                // Show deletion progress overlay
+                this.isDeletingFiles = true;
+                this.deletionMessage = `Removing "${this.$page.props.selectedFileSystemObject.name}" and all its contents...`;
+                
                 this.updateBusyStatus(true);
                 this.$emit("loading", true);
 
@@ -902,6 +955,10 @@ export default {
                             this.$page.props.selectedFileSystemObject.id
                     )
                     .then((response) => {
+                        // Hide deletion overlay
+                        this.isDeletingFiles = false;
+                        this.deletionMessage = "";
+                        
                         this.updateBusyStatus(false);
                         this.$emit("loading", false);
 
@@ -912,8 +969,10 @@ export default {
                                 message += ` Note: ${response.data.storage_errors.length} storage operation(s) had issues.`;
                             }
 
-                            // You can add a toast notification here if available
                             console.log("Deletion successful:", message);
+
+                            // Clear logs after successful deletion
+                            this.logs = {};
 
                             // Refresh the file tree
                             this.annotate();
@@ -929,6 +988,10 @@ export default {
                         }
                     })
                     .catch((error) => {
+                        // Hide deletion overlay
+                        this.isDeletingFiles = false;
+                        this.deletionMessage = "";
+                        
                         this.updateBusyStatus(false);
                         this.$emit("loading", false);
 
