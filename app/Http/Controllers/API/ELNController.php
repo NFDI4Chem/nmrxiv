@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Actions\Draft\CreateDraft;
 use App\Http\Controllers\Controller;
 use App\Jobs\ProcessDraftELNSubmission;
 use App\Models\Draft;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
 
 class ELNController extends Controller
 {
@@ -260,56 +260,46 @@ class ELNController extends Controller
             ], 400);
         }
 
-        // Fetch the draft from the database where the external id matches and belongs to the user/team
-        $draft = Draft::where('external_id', $externalId)
-            ->where('owner_id', $user_id)
-            ->where('team_id', $team_id)
-            ->first();
-
+        $createDraft = new CreateDraft();
+        
+        // Check if draft already exists
+        $draft = $createDraft->findByExternalId($externalId, $user_id, $team_id);
+        
         $isNewDraft = false;
 
         if (! $draft) {
             $isNewDraft = true;
-            // Create new draft using same logic as DraftController
-            $id = Str::uuid();
-            $environment = env('APP_ENV', 'local');
-            $path = preg_replace(
-                '~//+~',
-                '/',
-                $environment.'/'.$user_id.'/drafts/'.$id
-            );
-
-            $name = 'ELN Import ('.strtoupper($eln).': '.explode('-', $id)[0].')';
-
-            $draft = Draft::create([
-                'name' => $name,
-                'slug' => Str::slug($name),
-                'description' => 'Draft created from ELN system: '.$eln,
-                'relative_url' => rtrim(
-                    preg_replace('~//+~', '/', '/'.$id),
-                    '/'
-                ),
-                'path' => $path,
-                'owner_id' => $user_id,
-                'team_id' => $team_id ? $team_id : null,
-                'key' => $id,
+            
+            // Prepare ELN options for draft creation
+            $elnOptions = [
                 'eln' => $eln,
                 'external_id' => $externalId,
                 'callback_url' => $callbackUrl,
                 'zip_url' => $zipUrl,
-            ]);
-        } else {
-            // Update existing draft with new URLs
-            $draft->callback_url = $callbackUrl;
-            $draft->zip_url = $zipUrl;
-            $draft->save();
-        }
+            ];
 
-        // Fetch release date from the request and validate it to be a valid date and in future using carbon
-        $releaseDate = $request->input('release_date');
-        if ($releaseDate && Carbon::parse($releaseDate)->isFuture()) {
-            $draft->release_date = Carbon::parse($releaseDate)->toDateString();
-            $draft->save();
+            // Add release date if provided and valid
+            $releaseDate = $request->input('release_date');
+            if ($releaseDate && Carbon::parse($releaseDate)->isFuture()) {
+                $elnOptions['release_date'] = Carbon::parse($releaseDate)->toDateString();
+            }
+
+            // Create new draft using the action
+            $draft = $createDraft->execute($user, $elnOptions);
+        } else {
+            // Update existing draft with new URLs using the action
+            $updateData = [
+                'callback_url' => $callbackUrl,
+                'zip_url' => $zipUrl,
+            ];
+
+            // Update release date if provided and valid
+            $releaseDate = $request->input('release_date');
+            if ($releaseDate && Carbon::parse($releaseDate)->isFuture()) {
+                $updateData['release_date'] = Carbon::parse($releaseDate)->toDateString();
+            }
+
+            $draft = $createDraft->update($draft, $updateData);
         }
 
         // Dispatch job to process the zip file
