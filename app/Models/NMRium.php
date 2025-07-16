@@ -23,6 +23,15 @@ class NMRium extends Model
     ];
 
     /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'nmrium_info' => 'array',
+    ];
+
+    /**
      * Get the parent nmriumable model (Dataset or Study).
      */
     public function nmriumable(): MorphTo

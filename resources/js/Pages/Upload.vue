@@ -2582,14 +2582,36 @@ export default {
                 .then((response) => {
                     let nmrium_info = response.data;
                     if (nmrium_info) {
+                        // MIChI-compliant fields mapping
+                        const michiFields = {
+                            solvent: "NMR Solvent",
+                            temperature: "Temperature", 
+                            nucleus: "Nucleus",
+                            experiment: "NMR Pulse Sequence",
+                            pulseSequence: "NMR Pulse Sequence",
+                            numberOfScans: "Number of Scans",
+                            originFrequency: "Observed Frequency",
+                            baseFrequency: "Observed Frequency", 
+                            spectralWidth: "Spectral Width",
+                            numberOfPoints: "Number of Data Points",
+                            relaxationTime: "Relaxation Delay",
+                            relaxationDelay: "Relaxation Delay",
+                            fieldStrength: "Magnetic Field Strength",
+                            probeName: "NMR Probe"
+                        };
+
                         nmrium_info.data.spectra.forEach((spectra) => {
                             Object.keys(spectra.info).forEach((key) => {
-                                desc =
-                                    desc +
-                                    key +
-                                    ": " +
-                                    spectra.info[key] +
-                                    "</br>";
+                                // Only include MIChI-compliant fields
+                                if (michiFields[key]) {
+                                    console.log("MIChI field:", key);
+                                    desc =
+                                        desc +
+                                        michiFields[key] +
+                                        ": " +
+                                        spectra.info[key] +
+                                        "</br>";
+                                }
                             });
                         });
                         this.studyForm.description = desc.replace(

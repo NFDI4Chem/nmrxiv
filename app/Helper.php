@@ -77,3 +77,90 @@ function NMRiumMockData($type = null)
 
     return json_encode('{}');
 }
+
+/**
+ * Sanitize Unicode characters in NMRium data to prevent SQL_ASCII encoding issues
+ */
+function sanitizeUnicodeInNMRiumData(array $data): array
+{
+    // Recursively sanitize array data
+    array_walk_recursive($data, function (&$value, $key) {
+        if (is_string($value)) {
+            // Handle file paths and other strings that might contain Unicode
+            $value = sanitizeUnicodeString($value);
+        }
+    });
+
+    return $data;
+}
+
+/**
+ * Sanitize Unicode characters in array data to prevent SQL_ASCII encoding issues
+ *
+ * @param  array|null  $data
+ * @return array|null
+ */
+function sanitizeUnicodeInArray($data)
+{
+    if ($data === null) {
+        return null;
+    }
+
+    if (! is_array($data)) {
+        return $data;
+    }
+
+    // Recursively sanitize array data
+    array_walk_recursive($data, function (&$value, $key) {
+        if (is_string($value)) {
+            // Handle file paths and other strings that might contain Unicode
+            $value = sanitizeUnicodeString($value);
+        }
+    });
+
+    return $data;
+}
+
+/**
+ * Sanitize Unicode characters in a string to prevent SQL_ASCII encoding issues
+ */
+function sanitizeUnicodeString(string $input): string
+{
+    // Convert Unicode escape sequences to their actual characters, then transliterate
+    $decoded = json_decode('"'.str_replace('"', '\\"', $input).'"');
+
+    if ($decoded === null) {
+        // If JSON decode fails, work with the original string
+        $decoded = $input;
+    }
+
+    // Common Unicode character mappings for file paths
+    $unicodeMap = [
+        // Full-width parentheses to regular parentheses
+        '（' => '(',  // U+FF08
+        '）' => ')',  // U+FF09
+        // Full-width plus to regular plus
+        '＋' => '+',  // U+FF0B
+        // Other common full-width characters
+        '０' => '0', '１' => '1', '２' => '2', '３' => '3', '４' => '4',
+        '５' => '5', '６' => '6', '７' => '7', '８' => '8', '９' => '9',
+        '－' => '-',  // U+FF0D (full-width hyphen)
+        '．' => '.',  // U+FF0E (full-width period)
+    ];
+
+    // Replace known problematic Unicode characters
+    $sanitized = str_replace(array_keys($unicodeMap), array_values($unicodeMap), $decoded);
+
+    // Use transliteration to convert remaining Unicode characters to ASCII
+    if (function_exists('iconv')) {
+        $transliterated = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $sanitized);
+        if ($transliterated !== false) {
+            $sanitized = $transliterated;
+        }
+    }
+
+    // Remove any remaining non-ASCII characters as a fallback
+    $sanitized = preg_replace('/[^\x20-\x7E]/', '', $sanitized);
+
+    return $sanitized;
+}

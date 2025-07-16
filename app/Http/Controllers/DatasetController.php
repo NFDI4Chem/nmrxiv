@@ -6,11 +6,11 @@ use App\Http\Resources\DatasetResource;
 use App\Models\Dataset;
 use App\Models\NMRium;
 use App\Models\User;
-use Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
-use Storage;
 
 class DatasetController extends Controller
 {
@@ -31,7 +31,7 @@ class DatasetController extends Controller
         if ($dataset) {
             $nmrium = $dataset->nmrium;
             if ($nmrium) {
-                return json_decode($nmrium->nmrium_info);
+                return $nmrium->nmrium_info;
             } else {
                 return null;
             }
@@ -47,12 +47,12 @@ class DatasetController extends Controller
             $spectra = $request->get('spectra');
             $molecules = $request->get('molecules');
 
-            $nmriumInfo = $spectra;
-            $molecularInfo = $molecules;
+            $nmriumInfo = sanitizeUnicodeInArray($spectra);
+            $molecularInfo = sanitizeUnicodeInArray($molecules);
 
             $nmrium = $dataset->nmrium;
             if ($nmrium) {
-                $nmriumData = json_decode($nmrium['nmrium_info'], true);
+                $nmriumData = $nmrium->nmrium_info ?: [];
             } else {
                 $nmriumData = [];
             }
@@ -74,7 +74,7 @@ class DatasetController extends Controller
                     $nmrium->save();
                 } else {
                     $nmrium = NMRium::create([
-                        'nmrium_info' => json_encode($nmriumData),
+                        'nmrium_info' => $nmriumData,
                     ]);
                     $dataset->nmrium()->save($nmrium);
                     $dataset->has_nmrium = true;
