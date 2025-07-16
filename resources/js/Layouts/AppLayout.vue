@@ -81,53 +81,61 @@
                                     </a>
                                 </span>
                             </div>
-                            <nav
-                                v-for="item in filteredNavigation"
-                                :key="item.name || item.prefix"
-                                class="flex-1 px-2 bg-white space-y-1"
-                            >
-                                <div
-                                    v-if="item.prefix && !item.name"
-                                    class="p-2 bg-gray-100 text-gray-500 text-sm"
-                                >
-                                    {{ item.prefix }}
-                                </div>
-                                <Link
-                                    v-if="item.href && item.name"
-                                    :href="item.href"
-                                    :class="[
-                                        $page.url === item.href
-                                            ? 'bg-gray-200 text-gray-900 border-l-4 border-gray-900'
-                                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
-                                        'my-6 group flex items-center px-2 text-sm font-medium rounded-md py-2'
-                                    ]"
-                                >
-                                    <div class="pl-2 pr-4">
-                                        <component
-                                            :is="item.icon"
-                                            class="h-6 w-6"
-                                            aria-hidden="true"
-                                        />
+                            <nav class="flex-1 px-4 py-4 space-y-2">
+                                <div v-for="(item, index) in filteredNavigation" :key="item.name || item.prefix || index" class="space-y-2">
+                                    <!-- Section Header -->
+                                    <div v-if="item.prefix && !item.name" class="px-2 py-2">
+                                        <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                            {{ item.prefix }}
+                                        </h3>
                                     </div>
-                                    {{ item.name }}
-                                </Link>
-                                <div v-for="child in item.children" :key="child.name" class="ml-4">
+                                    
+                                    <!-- Main Item -->
                                     <Link
-                                        :href="child.href"
+                                        v-if="item.href && item.name"
+                                        :href="item.href"
                                         :class="[
-                                            $page.url === child.href
-                                                ? 'bg-gray-200 text-gray-900 border-l-4 border-gray-900'
-                                                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
-                                            'group flex items-center px-2 py-2 text-sm font-medium rounded-md'
+                                            $page.url === item.href
+                                                ? 'bg-gray-100 text-gray-900 border-l-4 border-gray-900'
+                                                : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900',
+                                            'group flex items-center px-3 py-2.5 text-sm font-medium rounded-l-lg transition-all duration-200 ease-in-out'
                                         ]"
                                     >
                                         <component
-                                            :is="child.icon"
-                                            class="mr-3 h-5 w-5"
+                                            :is="item.icon"
+                                            :class="[
+                                                $page.url === item.href ? 'text-gray-900' : 'text-gray-500 group-hover:text-gray-700',
+                                                'mr-3 h-5 w-5 transition-colors duration-200'
+                                            ]"
                                             aria-hidden="true"
                                         />
-                                        {{ child.name }}
+                                        <span class="truncate">{{ item.name }}</span>
                                     </Link>
+                                    
+                                    <!-- Child Items -->
+                                    <div v-if="item.children && item.children.length > 0" class="ml-4 space-y-1">
+                                        <Link
+                                            v-for="child in item.children"
+                                            :key="child.name"
+                                            :href="child.href"
+                                            :class="[
+                                                $page.url === child.href
+                                                    ? 'bg-gray-100 text-gray-900 border-l-4 border-gray-900'
+                                                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
+                                                'group flex items-center px-3 py-2 text-sm font-medium rounded-l-lg transition-all duration-200 ease-in-out'
+                                            ]"
+                                        >
+                                            <component
+                                                :is="child.icon"
+                                                :class="[
+                                                    $page.url === child.href ? 'text-gray-900' : 'text-gray-400 group-hover:text-gray-600',
+                                                    'mr-3 h-4 w-4 transition-colors duration-200'
+                                                ]"
+                                                aria-hidden="true"
+                                            />
+                                            <span class="truncate">{{ child.name }}</span>
+                                        </Link>
+                                    </div>
                                 </div>
                             </nav>
                         </div>
@@ -140,86 +148,110 @@
         </TransitionRoot>
         <div
             v-if="collapseSidebar"
-            class="hidden fixed bg-white border-r md:flex md:flex-shrink-0 md:inset-y-0 z-20"
+            class="hidden fixed bg-white border-r border-gray-200 shadow-sm md:flex md:flex-shrink-0 md:inset-y-0 z-20"
         >
-            <div class="flex flex-col w-20">
+            <div class="flex flex-col w-16">
                 <div class="flex-1 flex flex-col min-h-0 overflow-y-auto">
                     <div class="flex-1">
-                        <div
-                            class="bg-white border-b pb-4 pt-4 flex flex-shrink-0 px-4"
-                        >
-                            <Link :href="route('landing')">
-                                <jet-application-mark
-                                    class="block h-8 p-0.5 ml-1.5 w-auto"
-                                />
+                        <!-- Logo Section -->
+                        <div class="bg-white border-b border-gray-100 py-4 flex justify-center">
+                            <Link :href="route('landing')" class="group">
+                                <jet-application-mark class="block h-8 w-8 transition-transform" />
                             </Link>
                         </div>
-                        <div class="px-4 flex flex-col mt-3 mb-1">
-                            <create mode="icon"></create>
-                        </div>
-                        <nav
-                            aria-label="Sidebar"
-                            class="flex flex-col items-center py-4 px-0"
-                        >
-                            <div v-for="item in filteredNavigation">
-                                <div
-                                    v-if="
-                                        !$page.props.auth.user ||
-                                        !$page.props.auth.user?.first_name
-                                    "
-                                    class="border-t"
+                        
+                        <!-- Create Button & Help Section -->
+                        <div v-if="editableTeamRole" class="py-3 border-b border-gray-100 space-y-2">
+                            <!-- Upload/Create Button -->
+                            <div class="flex justify-center">
+                                <create mode="icon"></create>
+                            </div>
+                            
+                            <!-- Need Help Link -->
+                            <div class="relative flex justify-center">
+                                <a
+                                    href="https://docs.nmrxiv.org/submission-guides/submission-process.html"
+                                    target="_blank"
+                                    class="group flex items-center justify-center w-12 h-12 rounded-lg text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition-all duration-200"
+                                    title="Need help?"
                                 >
-                                    &nbsp;
+                                    <svg class="w-5 h-5 transition-colors duration-200" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </a>
+                                <!-- Tooltip -->
+                                <div class="absolute left-full top-1/2 transform -translate-y-1/2 ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
+                                    Need help?
+                                    <div class="absolute top-1/2 left-0 transform -translate-y-1/2 -translate-x-1 border-4 border-transparent border-r-gray-900"></div>
                                 </div>
-                                <Link
-                                    :key="item.name"
-                                    :href="item.href"
-                                    v-if="item.name"
-                                    :class="[
-                                        $page.url === item.href
-                                            ? 'bg-gray-900 border-y text-white'
-                                            : 'bg-gray-200 border-y text-gray-700',
-                                        'w-full px-10 hover:bg-gray-700 hover:text-white group flex items-center py-4 text-md font-small',
-                                        $page.url !== item.href ? item.bg : ''
-                                    ]"
+                            </div>
+                        </div>
+                        
+                        <!-- Navigation -->
+                        <nav aria-label="Sidebar" class="flex flex-col py-2">
+                            <div v-for="(item, index) in filteredNavigation" :key="item.name || item.prefix || index">
+                                <!-- Section Divider -->
+                                <div v-if="index > 0" class="h-px bg-gray-100 mx-2 my-2"></div>
+                                
+                                <!-- Main Item -->
+                                <div
+                                    v-if="item.name && item.href"
+                                    class="relative group px-2 py-1"
                                 >
-                                    <component
-                                        :is="item.icon"
-                                        class="h-6 w-6"
-                                        aria-hidden="true"
-                                    />
-                                    <span class="sr-only">
+                                    <Link
+                                        :href="item.href"
+                                        :class="[
+                                            $page.url === item.href
+                                                ? 'bg-gray-100 text-gray-900 shadow-sm'
+                                                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
+                                            'flex items-center justify-center w-12 h-12 rounded-lg transition-all duration-200 ease-in-out'
+                                        ]"
+                                    >
+                                        <component
+                                            :is="item.icon"
+                                            :class="[
+                                                $page.url === item.href ? 'text-gray-900' : 'text-gray-500 group-hover:text-gray-700',
+                                                'h-6 w-6 transition-colors duration-200'
+                                            ]"
+                                            aria-hidden="true"
+                                        />
+                                    </Link>
+                                    <!-- Tooltip -->
+                                    <div class="absolute left-full top-1/2 transform -translate-y-1/2 ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
                                         {{ item.name }}
-                                    </span>
-                                </Link>
-                                <Link
-                                    v-for="child in item.children"
-                                    :id="child.id"
-                                    :key="child.name"
-                                    :href="child.href"
-                                    :class="[
-                                        $page.url === child.href
-                                            ? 'bg-gray-900 text-white'
-                                            : 'text-gray-700',
-                                        'w-full px-10 hover:bg-gray-700 hover:text-white group flex items-center py-3 text-md font-small',
-                                        $page.url !== child.href ? child.bg : ''
-                                    ]"
-                                >
-                                    <component
-                                        :is="child.icon"
-                                        class="h-6 w-6"
-                                        aria-hidden="true"
-                                    />
-                                    <span class="flex-1 sr-only">
+                                        <div class="absolute top-1/2 left-0 transform -translate-y-1/2 -translate-x-1 border-4 border-transparent border-r-gray-900"></div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Child Items -->
+                                <div v-for="child in item.children" :key="child.name" class="relative group px-2 py-1">
+                                    <Link
+                                        :href="child.href"
+                                        :class="[
+                                            $page.url === child.href
+                                                ? 'bg-gray-100 text-gray-900 shadow-sm'
+                                                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
+                                            'flex items-center justify-center w-12 h-12 rounded-lg transition-all duration-200 ease-in-out'
+                                        ]"
+                                    >
+                                        <component
+                                            :is="child.icon"
+                                            :class="[
+                                                $page.url === child.href ? 'text-gray-900' : 'text-gray-500 group-hover:text-gray-700',
+                                                'h-5 w-5 transition-colors duration-200'
+                                            ]"
+                                            aria-hidden="true"
+                                        />
+                                    </Link>
+                                    <!-- Tooltip -->
+                                    <div class="absolute left-full top-1/2 transform -translate-y-1/2 ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
                                         {{ child.name }}
-                                    </span>
-                                </Link>
-                                <div class="border-b">&nbsp;</div>
-                                <div>&nbsp;</div>
+                                        <div class="absolute top-1/2 left-0 transform -translate-y-1/2 -translate-x-1 border-4 border-transparent border-r-gray-900"></div>
+                                    </div>
+                                </div>
                             </div>
                         </nav>
                     </div>
-                    <div class="flex-shrink-0 flex pb-5"></div>
                 </div>
             </div>
         </div>
@@ -227,81 +259,87 @@
             v-if="!collapseSidebar"
             class="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 z-10"
         >
-            <div
-                class="flex flex-col flex-grow border-r border-gray-200 bg-white overflow-y-auto"
-            >
-                <div class="flex py-3 pb-4 items-center flex-shrink-0 px-4">
-                    <Link class="ml-2" :href="route('landing')">
-                        <jet-application-logo class="block h-10 w-auto" />
+            <div class="flex flex-col flex-grow border-r border-gray-200 bg-white overflow-y-auto shadow-sm">
+                <!-- Logo Section -->
+                <div class="flex py-5 items-center flex-shrink-0 px-6 border-b border-gray-100">
+                    <Link :href="route('landing')" class="group">
+                        <jet-application-logo class="block h-10 w-auto transition-transform" />
                     </Link>
                 </div>
-                <div class="flex-grow flex flex-col -mt-1.5">
-                    <div
-                        v-if="editableTeamRole"
-                        class="px-4 flex flex-col mt-3 mb-1 text-center"
-                    >
+                
+                <div class="flex-grow flex flex-col">
+                    <!-- Create Button Section -->
+                    <div v-if="editableTeamRole" class="px-6 py-4 border-b border-gray-100 text-center">
                         <create mode="button"></create>
-                        <span
-                            class="text-xs cursor-pointer hover:text-blue-700 mt-2"
+                        <a
+                            href="https://docs.nmrxiv.org/submission-guides/submission-process.html"
+                            target="_blank"
+                            class="inline-flex items-center text-xs text-gray-500 hover:text-gray-900 mt-3 transition-colors duration-200"
                         >
-                            <a
-                                href="https://docs.nmrxiv.org/submission-guides/submission-process.html"
-                                target="_blank"
-                                >Need help?
-                            </a>
-                        </span>
+                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                            </svg>
+                            Need help?
+                        </a>
                     </div>
-                    <nav class="py-4 px-0 bg-white">
-                        <div
-                            v-for="item in filteredNavigation"
-                            :key="item.name"
-                            :class="[item.auth ? 'border-t pb-4' : '']"
-                        >
-                            <div
-                                v-if="item.prefix"
-                                class="p-2 bg-gray-100 text-gray-500 text-sm border-y"
-                            >
-                                {{ item.prefix }}
+                    
+                    <!-- Navigation -->
+                    <nav class="flex-1 py-4">
+                        <div v-for="(item, index) in filteredNavigation" :key="item.name || item.prefix || index" class="mb-2">
+                            <!-- Section Header -->
+                            <div v-if="item.prefix" class="px-6 py-2 mb-2">
+                                <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                    {{ item.prefix }}
+                                </h3>
                             </div>
-                            <Link
-                                :id="item.id"
-                                :href="item.href"
-                                v-if="item.name"
-                                :class="[
-                                    $page.url === item.href
-                                        ? 'border-r-4 bg-gray-200 border-r-black text-gray-900'
-                                        : 'text-gray-700',
-                                    'w-full px-7 hover:bg-gray-700 hover:text-white group flex items-center py-3 text-md font-medium',
-                                    $page.url !== item.href ? item.bg : ''
-                                ]"
-                            >
-                                <component
-                                    :is="item.icon"
-                                    class="mr-3 ml-2 h-6 w-6"
-                                    aria-hidden="true"
-                                />
-                                <span class="flex-1"> {{ item.name }} </span>
-                            </Link>
-                            <Link
-                                v-for="child in item.children"
-                                :id="child.id"
-                                :key="child.name"
-                                :href="child.href"
-                                :class="[
-                                    $page.url === child.href
-                                        ? 'border-r-4 bg-gray-200 border-r-black text-gray-900'
-                                        : 'text-gray-600',
-                                    'w-full px-10 hover:bg-gray-700 hover:text-white group flex items-center py-1.5 text-md font-small',
-                                    $page.url !== child.href ? child.bg : ''
-                                ]"
-                            >
-                                <component
-                                    :is="child.icon"
-                                    class="mr-3 ml-2 h-5 w-5"
-                                    aria-hidden="true"
-                                />
-                                <span class="flex-1"> {{ child.name }} </span>
-                            </Link>
+                            
+                            <!-- Main Item -->
+                            <div v-if="item.name && item.href" class="px-3">
+                                <Link
+                                    :href="item.href"
+                                    :class="[
+                                        $page.url === item.href
+                                            ? 'bg-gray-100 text-gray-900 border-r-4 border-gray-900'
+                                            : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900',
+                                        'group flex items-center px-3 py-2.5 text-sm font-medium rounded-l-lg transition-all duration-200 ease-in-out'
+                                    ]"
+                                >
+                                    <component
+                                        :is="item.icon"
+                                        :class="[
+                                            $page.url === item.href ? 'text-gray-900' : 'text-gray-500 group-hover:text-gray-700',
+                                            'mr-3 h-5 w-5 transition-colors duration-200'
+                                        ]"
+                                        aria-hidden="true"
+                                    />
+                                    <span class="truncate">{{ item.name }}</span>
+                                </Link>
+                            </div>
+                            
+                            <!-- Child Items -->
+                            <div v-if="item.children && item.children.length > 0" class="mt-1 ml-3">
+                                <Link
+                                    v-for="child in item.children"
+                                    :key="child.name"
+                                    :href="child.href"
+                                    :class="[
+                                        $page.url === child.href
+                                            ? 'bg-gray-100 text-gray-900 border-r-4 border-gray-900'
+                                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
+                                        'group flex items-center px-3 py-2 text-sm font-medium rounded-l-lg transition-all duration-200 ease-in-out'
+                                    ]"
+                                >
+                                    <component
+                                        :is="child.icon"
+                                        :class="[
+                                            $page.url === child.href ? 'text-gray-900' : 'text-gray-400 group-hover:text-gray-600',
+                                            'mr-3 h-4 w-4 transition-colors duration-200'
+                                        ]"
+                                        aria-hidden="true"
+                                    />
+                                    <span class="truncate">{{ child.name }}</span>
+                                </Link>
+                            </div>
                         </div>
                     </nav>
                 </div>
@@ -309,7 +347,7 @@
         </div>
         <div
             :class="[
-                collapseSidebar ? 'md:pl-40 md:-ml-20' : 'md:pl-64',
+                collapseSidebar ? 'md:pl-16' : 'md:pl-64',
                 'flex flex-col flex-1 z-0',
             ]"
         >
@@ -325,7 +363,7 @@
                 </button>
                 <button
                     type="button"
-                    class="px-4 border-r border-gray-200 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-teal-500 md:hidden"
+                    class="px-4 border-r border-gray-200 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-gray-500 md:hidden"
                     @click="sidebarOpen = true"
                 >
                     <span class="sr-only">Open sidebar</span>
@@ -759,7 +797,7 @@
                                 <Link
                                     href="/register"
                                     type="button"
-                                    class="inline-flex ml-3 items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                    class="inline-flex ml-3 items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-gray-900 hover:bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
                                 >
                                     Register
                                 </Link>
