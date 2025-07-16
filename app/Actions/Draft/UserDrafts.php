@@ -17,6 +17,7 @@ class UserDrafts
 
         return Draft::with('Tags')
             ->whereHas('files')
+            ->orWhereHas('project')
             ->where('owner_id', $user_id)
             ->where('team_id', $team_id)
             ->where('is_deleted', false)

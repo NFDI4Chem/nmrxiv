@@ -25,6 +25,7 @@ class DraftController extends Controller
      * Create a new controller instance.
      */
     public function __construct(
+        private FileSystemController $fileSystemController,
         private UserDrafts $userDrafts,
         private ProcessDraft $processDraft,
         private DraftFiles $draftFiles
@@ -143,6 +144,8 @@ class DraftController extends Controller
             ])
             ->orderBy('type')
             ->get();
+
+        $this->fileSystemController->processFolder($draftFolders);
 
         ProcessFiles::dispatch($draft);
 

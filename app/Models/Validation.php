@@ -253,7 +253,7 @@ class Validation extends Model
         if (is_array($data)) {
             return array_map([$this, 'recursiveUnicodeSanitize'], $data);
         }
-        
+
         if (is_string($data)) {
             // Convert problematic Unicode characters to ASCII equivalents
             $replacements = [
@@ -269,22 +269,22 @@ class Validation extends Model
                 '\uff1f' => '?',  // Full-width question mark
                 '\uff20' => '@',  // Full-width commercial at
             ];
-            
+
             // Apply replacements
             $data = str_replace(array_keys($replacements), array_values($replacements), $data);
-            
+
             // Remove any remaining problematic Unicode sequences
             $data = preg_replace('/\\\\u[0-9a-fA-F]{4}/', '', $data);
-            
+
             // Ensure the string is valid UTF-8 and convert to ASCII-safe characters
-            if (!mb_check_encoding($data, 'UTF-8')) {
+            if (! mb_check_encoding($data, 'UTF-8')) {
                 $data = mb_convert_encoding($data, 'UTF-8', 'UTF-8');
             }
-            
+
             // Convert to ASCII-safe string
             $data = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $data);
         }
-        
+
         return $data;
     }
 }
