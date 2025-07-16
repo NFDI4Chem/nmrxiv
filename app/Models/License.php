@@ -12,6 +12,12 @@ class License extends Model
 
     protected $fillable = [
         'title',
+        'slug',
+        'spdx_id',
+        'url',
+        'description',
+        'body',
+        'category',
     ];
 
     protected function casts(): array
