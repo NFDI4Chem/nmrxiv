@@ -17,8 +17,8 @@ return new class extends Migration
             $table->renameColumn('INCHI_KEY', 'inchi_key');
             $table->renameColumn('STANDARD_INCHI_KEY', 'standard_inchi_key');
 
-            $table->renameColumn('canonical_smiles', 'canonical_smiles');
-            $table->renameColumn('smiles', 'smiles');
+            $table->renameColumn('CANONICAL_SMILES', 'canonical_smiles');
+            $table->renameColumn('SMILES', 'smiles');
             $table->renameColumn('SMILES_CHIRAL', 'absolute_smiles');
 
             $table->renameColumn('CAS_NUMBER', 'cas');

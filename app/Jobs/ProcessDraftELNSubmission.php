@@ -2,107 +2,221 @@
 
 namespace App\Jobs;
 
+use App\Actions\Draft\DraftProcessingLogger;
+use App\Http\Controllers\FileSystemController;
 use App\Models\Draft;
+use App\Models\FileSystemObject;
+use App\Services\FileSystemObjectService;
+use App\Services\PathGeneratorService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 use ZipArchive;
 
 class ProcessDraftELNSubmission implements ShouldQueue
 {
     use Queueable;
 
-    protected $draftId;
-
-    /**
-     * Create a new job instance.
-     */
-    public function __construct($draftId)
-    {
-        $this->draftId = $draftId;
-    }
+    public function __construct(
+        protected int $draftId
+    ) {}
 
     /**
      * Execute the job.
      */
-    public function handle(): void
-    {
+    public function handle(
+        FileSystemObjectService $fileSystemService,
+        PathGeneratorService $pathGenerator,
+        FileSystemController $fileSystemController,
+        DraftProcessingLogger $logger
+    ): void {
+        $draft = Draft::find($this->draftId);
+
+        if (!$draft) {
+            Log::error("Draft not found: {$this->draftId}");
+            return;
+        }
+
         try {
-            // Fetch the draft
-            $draft = Draft::find($this->draftId);
+            $logger->log($draft, 'info', 'Starting ELN submission processing');
 
-            if (! $draft) {
-                Log::error("Draft not found: {$this->draftId}");
-
-                return;
-            }
-
-            // Check if the draft ELN is chemotion
+            // Only process Chemotion ELN
             if (strtolower($draft->eln) !== 'chemotion') {
-                Log::info("Draft {$this->draftId} is not from chemotion ELN system: {$draft->eln}");
-
+                $logger->log($draft, 'info', "Skipping non-Chemotion ELN: {$draft->eln}");
                 return;
             }
 
-            // Validate zip_url exists
-            if (! $draft->zip_url) {
-                Log::error("No zip_url found for draft {$this->draftId}");
-
-                return;
+            if (!$draft->zip_url) {
+                throw new \Exception('No zip_url found for draft');
             }
 
-            Log::info("Processing chemotion zip file for draft {$this->draftId} from {$draft->zip_url}");
+            $draft->update(['status' => 'PROCESSING']);
 
-            // Download the zip file
-            $response = Http::timeout(300)->get($draft->zip_url);
+            // Download and extract files
+            $extractedFiles = $this->processZipFile($draft, $pathGenerator);
 
-            if (! $response->successful()) {
-                Log::error("Failed to download zip file for draft {$this->draftId}: HTTP {$response->status()}");
-
-                return;
+            if (empty($extractedFiles)) {
+                throw new \Exception('No files extracted from zip');
             }
 
-            // Create temporary file for the zip
-            $tempZipPath = tempnam(sys_get_temp_dir(), 'eln_zip_');
-            file_put_contents($tempZipPath, $response->body());
+            // Create file system objects
+            $this->createFileSystemObjects($draft, $extractedFiles, $fileSystemService);
 
-            // Create destination folder using external_id
-            $destinationFolder = $draft->path.'/'.$draft->external_id;
+            // Process folders for instrument detection
+            $this->processFolders($draft, $fileSystemController);
 
-            // Ensure the destination directory exists
-            if (! Storage::exists($destinationFolder)) {
-                Storage::makeDirectory($destinationFolder);
-            }
+            $draft->update([
+                'status' => 'ZIP_PROCESSED',
+                'current_step' => '1',
+            ]);
 
-            // Extract the zip file
-            $zip = new ZipArchive;
-            $result = $zip->open($tempZipPath);
-
-            if ($result === true) {
-                // Extract to the draft folder with external_id as subfolder
-                $extractPath = Storage::path($destinationFolder);
-                $zip->extractTo($extractPath);
-                $zip->close();
-
-                Log::info("Successfully extracted chemotion zip file for draft {$this->draftId} to {$destinationFolder}");
-
-                // Update draft to indicate processing is complete
-                $draft->update([
-                    'status' => 'zip_processed',
-                ]);
-
-            } else {
-                Log::error("Failed to open zip file for draft {$this->draftId}. Error code: {$result}");
-            }
-
-            // Clean up temporary file
-            unlink($tempZipPath);
+            $logger->log($draft, 'info', 'Successfully completed ELN processing', [
+                'files_processed' => count($extractedFiles)
+            ]);
 
         } catch (\Exception $e) {
-            Log::error("Error processing ELN zip file for draft {$this->draftId}: ".$e->getMessage());
+            $logger->log($draft, 'error', 'ELN processing failed: ' . $e->getMessage());
+            $draft->update(['status' => 'FAILED']);
             throw $e;
         }
+    }
+
+    /**
+     * Download and extract zip file.
+     */
+    private function processZipFile(Draft $draft, PathGeneratorService $pathGenerator): array
+    {
+        // Download zip file
+        $response = Http::timeout(300)->get($draft->zip_url);
+
+        if (!$response->successful()) {
+            throw new \Exception("Failed to download zip file. HTTP status: {$response->status()}");
+        }
+
+        // Create temp paths
+        $tempZipPath = tempnam(sys_get_temp_dir(), 'eln_zip_');
+        $tempExtractDir = sys_get_temp_dir() . '/eln_extract_' . $this->draftId . '_' . time();
+
+        try {
+            // Save and extract zip
+            file_put_contents($tempZipPath, $response->body());
+            mkdir($tempExtractDir, 0755, true);
+
+            $zip = new ZipArchive;
+            if ($zip->open($tempZipPath) !== true) {
+                throw new \Exception('Failed to open zip file');
+            }
+
+            $zip->extractTo($tempExtractDir);
+            $zip->close();
+
+            // Move files to storage
+            return $this->moveFilesToStorage($draft, $tempExtractDir, $pathGenerator);
+
+        } finally {
+            // Cleanup
+            if (file_exists($tempZipPath)) {
+                unlink($tempZipPath);
+            }
+            $this->removeDirectory($tempExtractDir);
+        }
+    }
+
+    /**
+     * Move files from temp to storage.
+     */
+    private function moveFilesToStorage(Draft $draft, string $tempDir, PathGeneratorService $pathGenerator): array
+    {
+        $extractedFiles = [];
+        $baseDestination = $draft->external_id;
+
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($tempDir, RecursiveDirectoryIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::LEAVES_ONLY
+        );
+
+        foreach ($iterator as $file) {
+            if ($file->isFile()) {
+                $relativePath = str_replace($tempDir . DIRECTORY_SEPARATOR, '', $file->getPathname());
+                $relativePath = str_replace(DIRECTORY_SEPARATOR, '/', $relativePath);
+                $storageRelativePath = $baseDestination . '/' . $relativePath;
+                $storagePath = $pathGenerator->generateDraftFilePath($draft, $storageRelativePath);
+
+                // Ensure directory exists and move file
+                $storageDir = dirname($storagePath);
+                if (!Storage::exists($storageDir)) {
+                    Storage::makeDirectory($storageDir);
+                }
+
+                Storage::put(ltrim($storagePath, '/'), file_get_contents($file->getPathname()));
+
+                $extractedFiles[] = [
+                    'upload' => [
+                        'filename' => $file->getFilename(),
+                        'total' => $file->getSize(),
+                    ],
+                    'fullPath' => $storageRelativePath,
+                    'relativePath' => $storageRelativePath,
+                    'storagePath' => $storagePath,
+                ];
+            }
+        }
+
+        return $extractedFiles;
+    }
+
+    /**
+     * Create FileSystemObjects for extracted files.
+     */
+    private function createFileSystemObjects(Draft $draft, array $extractedFiles, FileSystemObjectService $fileSystemService): void
+    {
+        foreach ($extractedFiles as $file) {
+            try {
+                $fileSystemService->createDraftFileSystemObject($draft, $file, '');
+            } catch (\Exception $e) {
+                Log::error("Failed to create FileSystemObject for {$file['upload']['filename']}: " . $e->getMessage());
+            }
+        }
+    }
+
+    /**
+     * Process folders for instrument detection.
+     */
+    private function processFolders(Draft $draft, FileSystemController $fileSystemController): void
+    {
+        $draftFolders = FileSystemObject::with('children')
+            ->where([
+                ['level', 0],
+                ['status', '<>', 'missing'],
+                ['draft_id', $draft->id],
+            ])
+            ->orderBy('type')
+            ->orderBy('created_at', 'DESC')
+            ->get();
+
+        if ($draftFolders->isNotEmpty()) {
+            $fileSystemController->processFolder($draftFolders);
+        }
+    }
+
+    /**
+     * Remove directory recursively.
+     */
+    private function removeDirectory(string $dir): void
+    {
+        if (!is_dir($dir)) {
+            return;
+        }
+
+        $files = array_diff(scandir($dir), ['.', '..']);
+        foreach ($files as $file) {
+            $path = $dir . DIRECTORY_SEPARATOR . $file;
+            is_dir($path) ? $this->removeDirectory($path) : unlink($path);
+        }
+        rmdir($dir);
     }
 }

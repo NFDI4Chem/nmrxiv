@@ -128,11 +128,32 @@
                             >
                                 <div class="flex items-center space-x-4">
                                     <div class="flex-1 min-w-0">
-                                        <p
-                                            class="text-lg font-large text-black truncate"
-                                        >
-                                            <b>{{ draft.name }}</b>
-                                        </p>
+                                        <div class="flex items-center gap-2 mb-1">
+                                            <p
+                                                class="text-lg font-large text-black truncate"
+                                            >
+                                                <b>{{ draft.name }}</b>
+                                            </p>
+                                            <span
+                                                v-if="draft.eln"
+                                                class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                                            >
+                                                {{ draft.eln.toUpperCase() }}
+                                            </span>
+                                            <span
+                                                v-if="draft.status"
+                                                class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
+                                                :class="{
+                                                    'bg-blue-100 text-blue-800': ['received'].includes(draft.status.toLowerCase()),
+                                                    'bg-yellow-100 text-yellow-800': ['zip_processed', 'processing', 'pending', 'job_dispatched'].includes(draft.status.toLowerCase()),
+                                                    'bg-green-100 text-green-800': ['validated', 'processed', 'successful', 'published'].includes(draft.status.toLowerCase()),
+                                                    'bg-red-100 text-red-800': ['failed'].includes(draft.status.toLowerCase()),
+                                                    'bg-gray-100 text-gray-800': !['received', 'zip_processed', 'validated', 'processed', 'successful', 'published', 'failed', 'processing', 'pending', 'job_dispatched'].includes(draft.status.toLowerCase())
+                                                }"
+                                            >
+                                                {{ formatStatus(draft.status) }}
+                                            </span>
+                                        </div>
                                         <p
                                             class="text-sm font-medium text-gray-600 truncate pr-10"
                                         >
@@ -142,6 +163,9 @@
                                             class="text-sm font-medium text-gray-500 truncate"
                                         >
                                             ID: {{ draft.key }}
+                                            <span v-if="draft.external_id">
+                                                &middot; External ID: {{ draft.external_id }}
+                                            </span>
                                         </p>
                                         <p
                                             class="text-sm text-gray-500 truncate"
@@ -152,7 +176,18 @@
                                             }}
                                         </p>
                                     </div>
-                                    <div>
+                                    <div class="flex gap-2">
+                                        <button
+                                            v-if="draft.processing_logs && draft.processing_logs.length > 0"
+                                            @click="showProcessingLogs(draft)"
+                                            class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                        >
+                                            <InformationCircleIcon
+                                                class="h-4 w-4 mr-1"
+                                                aria-hidden="true"
+                                            />
+                                            View Logs
+                                        </button>
                                         <Link
                                             :href="
                                                 route('dashboard', {
@@ -160,7 +195,7 @@
                                                     draft_id: draft.id,
                                                 })
                                             "
-                                            class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring focus:ring-gray-300 disabled:opacity-25 transition ml-2"
+                                            class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring focus:ring-gray-300 disabled:opacity-25 transition"
                                         >
                                             Select
                                         </Link>
@@ -1721,6 +1756,95 @@
             </div>
         </template>
     </jet-dialog-modal>
+
+    <!-- Processing Logs Modal -->
+    <jet-dialog-modal
+        :show="showLogsDialog"
+        @close="showLogsDialog = false"
+        :max-width="'4xl'"
+    >
+        <template #title>
+            <div class="block">
+                Processing Logs - {{ selectedDraftForLogs?.name }}
+            </div>
+        </template>
+
+        <template #content>
+            <div
+                class="relative h-[70vh] overflow-y-auto z-0 mt-1 rounded-lg"
+            >
+                <ul
+                    v-if="selectedDraftForLogs?.processing_logs && selectedDraftForLogs.processing_logs.length > 0"
+                    role="list"
+                    class="divide-y divide-gray-200"
+                >
+                    <li
+                        v-for="(log, index) in selectedDraftForLogs.processing_logs"
+                        :key="index"
+                        class="py-4 flex"
+                    >
+                        <CheckIcon
+                            v-if="log.level === 'info'"
+                            class="h-5 w-5 inline text-green-400 flex-shrink-0"
+                            aria-hidden="true"
+                        />
+                        <ExclamationCircleIcon
+                            v-else-if="log.level === 'error'"
+                            class="h-5 w-5 inline text-red-400 flex-shrink-0"
+                            aria-hidden="true"
+                        />
+                        <InformationCircleIcon
+                            v-else-if="log.level === 'warning'"
+                            class="h-5 w-5 inline text-yellow-400 flex-shrink-0"
+                            aria-hidden="true"
+                        />
+                        <InformationCircleIcon
+                            v-else
+                            class="h-5 w-5 inline text-gray-400 flex-shrink-0"
+                            aria-hidden="true"
+                        />
+                        <div class="ml-3 flex-1">
+                            <div class="flex items-center justify-between">
+                                <p class="text-sm font-medium text-gray-900">
+                                    {{ log.message }}
+                                </p>
+                                <p class="text-xs text-gray-500">
+                                    {{ formatDateTime(log.timestamp) }}
+                                </p>
+                            </div>
+                            <p
+                                v-if="log.level"
+                                class="text-xs text-gray-500 capitalize"
+                            >
+                                Level: {{ log.level }}
+                            </p>
+                            <div
+                                v-if="log.context && Object.keys(log.context).length > 0"
+                                class="mt-2 text-xs text-gray-600"
+                            >
+                                <details class="cursor-pointer">
+                                    <summary class="font-medium hover:text-gray-900">Context</summary>
+                                    <pre class="mt-1 p-2 bg-gray-50 rounded text-xs overflow-x-auto">{{ JSON.stringify(log.context, null, 2) }}</pre>
+                                </details>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                <div v-else class="mt-10 text-center">
+                    <i class="text-gray-400">No processing logs available</i>
+                </div>
+            </div>
+        </template>
+
+        <template #footer>
+            <jet-secondary-button
+                class="cursor-pointer"
+                @click="showLogsDialog = false"
+            >
+                Close
+            </jet-secondary-button>
+        </template>
+    </jet-dialog-modal>
 </template>
 <script>
 import JetDialogModal from "@/Jetstream/DialogModal.vue";
@@ -1740,11 +1864,14 @@ import {
     ClipboardDocumentIcon,
     QuestionMarkCircleIcon,
     ExclamationTriangleIcon,
+    ExclamationCircleIcon,
     TrashIcon,
     PlayIcon,
     PauseIcon,
     PencilIcon,
     ArrowDownOnSquareStackIcon,
+    InformationCircleIcon,
+    CheckIcon,
 } from "@heroicons/vue/24/solid";
 import { Link } from "@inertiajs/vue3";
 
@@ -1770,6 +1897,9 @@ export default {
         PauseIcon,
         SpectraEditor,
         Validation,
+        InformationCircleIcon,
+        CheckIcon,
+        ExclamationCircleIcon,
     },
     props: [],
     data() {
@@ -1852,6 +1982,8 @@ export default {
             currentMolecules: [],
 
             showPrimer: false,
+            showLogsDialog: false,
+            selectedDraftForLogs: null,
 
             smiles: "",
             percentage: 1,
@@ -2586,6 +2718,24 @@ export default {
             this.loading = true;
             return axios.get("/dashboard/drafts");
         },
+        formatStatus(status) {
+            if (!status) return '';
+            
+            const statusMap = {
+                'received': 'Received',
+                'zip_processed': 'ZIP Processed',
+                'validated': 'Validated',
+                'processed': 'Processed',
+                'successful': 'Successful',
+                'published': 'Published',
+                'failed': 'Failed',
+                'processing': 'Processing',
+                'pending': 'Pending',
+                'job_dispatched': 'Job Dispatched'
+            };
+            
+            return statusMap[status.toLowerCase()] || status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        },
 
         selectDraft(draft) {
             this.currentDraft = draft;
@@ -2608,6 +2758,11 @@ export default {
         UpdateAndClose() {
             this.updateProject();
             this.toggleOpenCreateDatasetDialog();
+        },
+
+        showProcessingLogs(draft) {
+            this.selectedDraftForLogs = draft;
+            this.showLogsDialog = true;
         },
     },
 };
