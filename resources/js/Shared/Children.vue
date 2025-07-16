@@ -6,7 +6,9 @@
                 as="div"
                 :default-open="file.name == '/' || isExpanded(file.id)"
                 class="space-y-1"
-                @update:open="(isOpen) => handleDisclosureToggle(file.id, isOpen)"
+                @update:open="
+                    (isOpen) => handleDisclosureToggle(file.id, isOpen)
+                "
             >
                 <div
                     style="user-select: none"
@@ -20,7 +22,7 @@
                     ]"
                     @click.stop="handleFolderClick(file)"
                 >
-                    <DisclosureButton 
+                    <DisclosureButton
                         class="w-full text-left truncate ..."
                         @click="() => handleDisclosureButtonClick(file.id)"
                     >
@@ -101,25 +103,38 @@
                                             as="div"
                                             class="space-y-1"
                                             :default-open="isExpanded(sfile.id)"
-                                            @update:open="(isOpen) => handleDisclosureToggle(sfile.id, isOpen)"
+                                            @update:open="
+                                                (isOpen) =>
+                                                    handleDisclosureToggle(
+                                                        sfile.id,
+                                                        isOpen
+                                                    )
+                                            "
                                         >
-                                                                        <div
-                                :class="[
-                                    $page.props
-                                        .selectedFileSystemObject &&
-                                    $page.props
-                                        .selectedFileSystemObject
-                                        .relative_url ==
-                                        sfile.relative_url
-                                        ? 'cursor-pointer bg-gray-100 text-gray-900'
-                                        : 'cursor-pointer text-gray-600',
-                                    'group w-full flex pr-1 py-1 text-left font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500',
-                                ]"
-                                @click.stop="handleFolderClick(sfile)"
-                            >
-                                                                                <DisclosureButton
+                                            <div
+                                                :class="[
+                                                    $page.props
+                                                        .selectedFileSystemObject &&
+                                                    $page.props
+                                                        .selectedFileSystemObject
+                                                        .relative_url ==
+                                                        sfile.relative_url
+                                                        ? 'cursor-pointer bg-gray-100 text-gray-900'
+                                                        : 'cursor-pointer text-gray-600',
+                                                    'group w-full flex pr-1 py-1 text-left font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500',
+                                                ]"
+                                                @click.stop="
+                                                    handleFolderClick(sfile)
+                                                "
+                                            >
+                                                <DisclosureButton
                                                     class="w-full text-left truncate ..."
-                                                    @click="() => handleDisclosureButtonClick(sfile.id)"
+                                                    @click="
+                                                        () =>
+                                                            handleDisclosureButtonClick(
+                                                                sfile.id
+                                                            )
+                                                    "
                                                 >
                                                     <span v-if="sfile.loading">
                                                         <svg
@@ -219,8 +234,20 @@
                                                             "
                                                             :study="study"
                                                             :project="project"
-                                                            :expanded-folders="expandedFolders"
-                                                            @toggle-expansion="(fsoId, isOpen) => $emit('toggle-expansion', fsoId, isOpen)"
+                                                            :expanded-folders="
+                                                                expandedFolders
+                                                            "
+                                                            @toggle-expansion="
+                                                                (
+                                                                    fsoId,
+                                                                    isOpen
+                                                                ) =>
+                                                                    $emit(
+                                                                        'toggle-expansion',
+                                                                        fsoId,
+                                                                        isOpen
+                                                                    )
+                                                            "
                                                         ></children>
                                                     </span>
                                                     <span
@@ -323,8 +350,6 @@ export default {
             return this.expandedFolders && this.expandedFolders.has(fsoId);
         },
 
-
-
         /**
          * Handle folder click - select the folder to show its contents
          */
@@ -338,7 +363,7 @@ export default {
          */
         handleDisclosureToggle(fsoId, isOpen) {
             // Emit to parent component to update expansion tracking
-            this.$emit('toggle-expansion', fsoId, isOpen);
+            this.$emit("toggle-expansion", fsoId, isOpen);
         },
 
         /**
@@ -347,7 +372,7 @@ export default {
         handleDisclosureButtonClick(fsoId) {
             // Toggle the current state and emit
             const isCurrentlyExpanded = this.isExpanded(fsoId);
-            this.$emit('toggle-expansion', fsoId, !isCurrentlyExpanded);
+            this.$emit("toggle-expansion", fsoId, !isCurrentlyExpanded);
         },
         optionClicked1(event) {
             window.alert(JSON.stringify(event));
@@ -422,9 +447,11 @@ export default {
          */
         updateURLWithSelection(selectedId) {
             const urlParams = new URLSearchParams(window.location.search);
-            urlParams.set('selected', selectedId);
-            const newUrl = `${window.location.pathname}?${urlParams.toString()}`;
-            window.history.replaceState({}, '', newUrl);
+            urlParams.set("selected", selectedId);
+            const newUrl = `${
+                window.location.pathname
+            }?${urlParams.toString()}`;
+            window.history.replaceState({}, "", newUrl);
         },
     },
 };
