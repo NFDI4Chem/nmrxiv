@@ -82,14 +82,23 @@
                                 </span>
                             </div>
                             <nav class="flex-1 px-4 py-4 space-y-2">
-                                <div v-for="(item, index) in filteredNavigation" :key="item.name || item.prefix || index" class="space-y-2">
+                                <div
+                                    v-for="(item, index) in filteredNavigation"
+                                    :key="item.name || item.prefix || index"
+                                    class="space-y-2"
+                                >
                                     <!-- Section Header -->
-                                    <div v-if="item.prefix && !item.name" class="px-2 py-2">
-                                        <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                    <div
+                                        v-if="item.prefix && !item.name"
+                                        class="px-2 py-2"
+                                    >
+                                        <h3
+                                            class="text-xs font-semibold text-gray-500 uppercase tracking-wider"
+                                        >
                                             {{ item.prefix }}
                                         </h3>
                                     </div>
-                                    
+
                                     <!-- Main Item -->
                                     <Link
                                         v-if="item.href && item.name"
@@ -98,22 +107,32 @@
                                             $page.url === item.href
                                                 ? 'bg-gray-100 text-gray-900 border-l-4 border-gray-900'
                                                 : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900',
-                                            'group flex items-center px-3 py-2.5 text-sm font-medium rounded-l-lg transition-all duration-200 ease-in-out'
+                                            'group flex items-center px-3 py-2.5 text-sm font-medium rounded-l-lg transition-all duration-200 ease-in-out',
                                         ]"
                                     >
                                         <component
                                             :is="item.icon"
                                             :class="[
-                                                $page.url === item.href ? 'text-gray-900' : 'text-gray-500 group-hover:text-gray-700',
-                                                'mr-3 h-5 w-5 transition-colors duration-200'
+                                                $page.url === item.href
+                                                    ? 'text-gray-900'
+                                                    : 'text-gray-500 group-hover:text-gray-700',
+                                                'mr-3 h-5 w-5 transition-colors duration-200',
                                             ]"
                                             aria-hidden="true"
                                         />
-                                        <span class="truncate">{{ item.name }}</span>
+                                        <span class="truncate">{{
+                                            item.name
+                                        }}</span>
                                     </Link>
-                                    
+
                                     <!-- Child Items -->
-                                    <div v-if="item.children && item.children.length > 0" class="ml-4 space-y-1">
+                                    <div
+                                        v-if="
+                                            item.children &&
+                                            item.children.length > 0
+                                        "
+                                        class="ml-4 space-y-1"
+                                    >
                                         <Link
                                             v-for="child in item.children"
                                             :key="child.name"
@@ -122,18 +141,22 @@
                                                 $page.url === child.href
                                                     ? 'bg-gray-100 text-gray-900 border-l-4 border-gray-900'
                                                     : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
-                                                'group flex items-center px-3 py-2 text-sm font-medium rounded-l-lg transition-all duration-200 ease-in-out'
+                                                'group flex items-center px-3 py-2 text-sm font-medium rounded-l-lg transition-all duration-200 ease-in-out',
                                             ]"
                                         >
                                             <component
                                                 :is="child.icon"
                                                 :class="[
-                                                    $page.url === child.href ? 'text-gray-900' : 'text-gray-400 group-hover:text-gray-600',
-                                                    'mr-3 h-4 w-4 transition-colors duration-200'
+                                                    $page.url === child.href
+                                                        ? 'text-gray-900'
+                                                        : 'text-gray-400 group-hover:text-gray-600',
+                                                    'mr-3 h-4 w-4 transition-colors duration-200',
                                                 ]"
                                                 aria-hidden="true"
                                             />
-                                            <span class="truncate">{{ child.name }}</span>
+                                            <span class="truncate">{{
+                                                child.name
+                                            }}</span>
                                         </Link>
                                     </div>
                                 </div>
@@ -154,19 +177,26 @@
                 <div class="flex-1 flex flex-col min-h-0 overflow-y-auto">
                     <div class="flex-1">
                         <!-- Logo Section -->
-                        <div class="bg-white border-b border-gray-100 py-4 flex justify-center">
+                        <div
+                            class="bg-white border-b border-gray-100 py-4 flex justify-center"
+                        >
                             <Link :href="route('landing')" class="group">
-                                <jet-application-mark class="block h-8 w-8 transition-transform" />
+                                <jet-application-mark
+                                    class="block h-8 w-8 transition-transform"
+                                />
                             </Link>
                         </div>
-                        
+
                         <!-- Create Button & Help Section -->
-                        <div v-if="editableTeamRole" class="py-3 border-b border-gray-100 space-y-2">
+                        <div
+                            v-if="editableTeamRole"
+                            class="py-3 border-b border-gray-100 space-y-2"
+                        >
                             <!-- Upload/Create Button -->
                             <div class="flex justify-center">
                                 <create mode="icon"></create>
                             </div>
-                            
+
                             <!-- Need Help Link -->
                             <div class="relative flex justify-center">
                                 <a
@@ -175,24 +205,42 @@
                                     class="group flex items-center justify-center w-12 h-12 rounded-lg text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition-all duration-200"
                                     title="Need help?"
                                 >
-                                    <svg class="w-5 h-5 transition-colors duration-200" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                                    <svg
+                                        class="w-5 h-5 transition-colors duration-200"
+                                        fill="currentColor"
+                                        viewBox="0 0 20 20"
+                                    >
+                                        <path
+                                            fill-rule="evenodd"
+                                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                                            clip-rule="evenodd"
+                                        ></path>
                                     </svg>
                                 </a>
                                 <!-- Tooltip -->
-                                <div class="absolute left-full top-1/2 transform -translate-y-1/2 ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
+                                <div
+                                    class="absolute left-full top-1/2 transform -translate-y-1/2 ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50"
+                                >
                                     Need help?
-                                    <div class="absolute top-1/2 left-0 transform -translate-y-1/2 -translate-x-1 border-4 border-transparent border-r-gray-900"></div>
+                                    <div
+                                        class="absolute top-1/2 left-0 transform -translate-y-1/2 -translate-x-1 border-4 border-transparent border-r-gray-900"
+                                    ></div>
                                 </div>
                             </div>
                         </div>
-                        
+
                         <!-- Navigation -->
                         <nav aria-label="Sidebar" class="flex flex-col py-2">
-                            <div v-for="(item, index) in filteredNavigation" :key="item.name || item.prefix || index">
+                            <div
+                                v-for="(item, index) in filteredNavigation"
+                                :key="item.name || item.prefix || index"
+                            >
                                 <!-- Section Divider -->
-                                <div v-if="index > 0" class="h-px bg-gray-100 mx-2 my-2"></div>
-                                
+                                <div
+                                    v-if="index > 0"
+                                    class="h-px bg-gray-100 mx-2 my-2"
+                                ></div>
+
                                 <!-- Main Item -->
                                 <div
                                     v-if="item.name && item.href"
@@ -204,49 +252,65 @@
                                             $page.url === item.href
                                                 ? 'bg-gray-100 text-gray-900 shadow-sm'
                                                 : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
-                                            'flex items-center justify-center w-12 h-12 rounded-lg transition-all duration-200 ease-in-out'
+                                            'flex items-center justify-center w-12 h-12 rounded-lg transition-all duration-200 ease-in-out',
                                         ]"
                                     >
                                         <component
                                             :is="item.icon"
                                             :class="[
-                                                $page.url === item.href ? 'text-gray-900' : 'text-gray-500 group-hover:text-gray-700',
-                                                'h-6 w-6 transition-colors duration-200'
+                                                $page.url === item.href
+                                                    ? 'text-gray-900'
+                                                    : 'text-gray-500 group-hover:text-gray-700',
+                                                'h-6 w-6 transition-colors duration-200',
                                             ]"
                                             aria-hidden="true"
                                         />
                                     </Link>
                                     <!-- Tooltip -->
-                                    <div class="absolute left-full top-1/2 transform -translate-y-1/2 ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
+                                    <div
+                                        class="absolute left-full top-1/2 transform -translate-y-1/2 ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50"
+                                    >
                                         {{ item.name }}
-                                        <div class="absolute top-1/2 left-0 transform -translate-y-1/2 -translate-x-1 border-4 border-transparent border-r-gray-900"></div>
+                                        <div
+                                            class="absolute top-1/2 left-0 transform -translate-y-1/2 -translate-x-1 border-4 border-transparent border-r-gray-900"
+                                        ></div>
                                     </div>
                                 </div>
-                                
+
                                 <!-- Child Items -->
-                                <div v-for="child in item.children" :key="child.name" class="relative group px-2 py-1">
+                                <div
+                                    v-for="child in item.children"
+                                    :key="child.name"
+                                    class="relative group px-2 py-1"
+                                >
                                     <Link
                                         :href="child.href"
                                         :class="[
                                             $page.url === child.href
                                                 ? 'bg-gray-100 text-gray-900 shadow-sm'
                                                 : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
-                                            'flex items-center justify-center w-12 h-12 rounded-lg transition-all duration-200 ease-in-out'
+                                            'flex items-center justify-center w-12 h-12 rounded-lg transition-all duration-200 ease-in-out',
                                         ]"
                                     >
                                         <component
                                             :is="child.icon"
                                             :class="[
-                                                $page.url === child.href ? 'text-gray-900' : 'text-gray-500 group-hover:text-gray-700',
-                                                'h-5 w-5 transition-colors duration-200'
+                                                $page.url === child.href
+                                                    ? 'text-gray-900'
+                                                    : 'text-gray-500 group-hover:text-gray-700',
+                                                'h-5 w-5 transition-colors duration-200',
                                             ]"
                                             aria-hidden="true"
                                         />
                                     </Link>
                                     <!-- Tooltip -->
-                                    <div class="absolute left-full top-1/2 transform -translate-y-1/2 ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
+                                    <div
+                                        class="absolute left-full top-1/2 transform -translate-y-1/2 ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50"
+                                    >
                                         {{ child.name }}
-                                        <div class="absolute top-1/2 left-0 transform -translate-y-1/2 -translate-x-1 border-4 border-transparent border-r-gray-900"></div>
+                                        <div
+                                            class="absolute top-1/2 left-0 transform -translate-y-1/2 -translate-x-1 border-4 border-transparent border-r-gray-900"
+                                        ></div>
                                     </div>
                                 </div>
                             </div>
@@ -259,40 +323,63 @@
             v-if="!collapseSidebar"
             class="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 z-10"
         >
-            <div class="flex flex-col flex-grow border-r border-gray-200 bg-white overflow-y-auto shadow-sm">
+            <div
+                class="flex flex-col flex-grow border-r border-gray-200 bg-white overflow-y-auto shadow-sm"
+            >
                 <!-- Logo Section -->
-                <div class="flex py-5 items-center flex-shrink-0 px-6 border-b border-gray-100">
+                <div
+                    class="flex py-5 items-center flex-shrink-0 px-6 border-b border-gray-100"
+                >
                     <Link :href="route('landing')" class="group">
-                        <jet-application-logo class="block h-10 w-auto transition-transform" />
+                        <jet-application-logo
+                            class="block h-10 w-auto transition-transform"
+                        />
                     </Link>
                 </div>
-                
+
                 <div class="flex-grow flex flex-col">
                     <!-- Create Button Section -->
-                    <div v-if="editableTeamRole" class="px-6 py-4 border-b border-gray-100 text-center">
+                    <div
+                        v-if="editableTeamRole"
+                        class="px-6 py-4 border-b border-gray-100 text-center"
+                    >
                         <create mode="button"></create>
                         <a
                             href="https://docs.nmrxiv.org/submission-guides/submission-process.html"
                             target="_blank"
                             class="inline-flex items-center text-xs text-gray-500 hover:text-gray-900 mt-3 transition-colors duration-200"
                         >
-                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                            <svg
+                                class="w-3 h-3 mr-1"
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                            >
+                                <path
+                                    fill-rule="evenodd"
+                                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                                    clip-rule="evenodd"
+                                ></path>
                             </svg>
                             Need help?
                         </a>
                     </div>
-                    
+
                     <!-- Navigation -->
                     <nav class="flex-1 py-4">
-                        <div v-for="(item, index) in filteredNavigation" :key="item.name || item.prefix || index" class="mb-2">
+                        <div
+                            v-for="(item, index) in filteredNavigation"
+                            :key="item.name || item.prefix || index"
+                            class="mb-2"
+                        >
                             <!-- Section Header -->
                             <div v-if="item.prefix" class="px-6 py-2 mb-2">
-                                <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                <h3
+                                    class="text-xs font-semibold text-gray-500 uppercase tracking-wider"
+                                >
                                     {{ item.prefix }}
                                 </h3>
                             </div>
-                            
+
                             <!-- Main Item -->
                             <div v-if="item.name && item.href" class="px-3">
                                 <Link
@@ -301,23 +388,30 @@
                                         $page.url === item.href
                                             ? 'bg-gray-100 text-gray-900 border-r-4 border-gray-900'
                                             : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900',
-                                        'group flex items-center px-3 py-2.5 text-sm font-medium rounded-l-lg transition-all duration-200 ease-in-out'
+                                        'group flex items-center px-3 py-2.5 text-sm font-medium rounded-l-lg transition-all duration-200 ease-in-out',
                                     ]"
                                 >
                                     <component
                                         :is="item.icon"
                                         :class="[
-                                            $page.url === item.href ? 'text-gray-900' : 'text-gray-500 group-hover:text-gray-700',
-                                            'mr-3 h-5 w-5 transition-colors duration-200'
+                                            $page.url === item.href
+                                                ? 'text-gray-900'
+                                                : 'text-gray-500 group-hover:text-gray-700',
+                                            'mr-3 h-5 w-5 transition-colors duration-200',
                                         ]"
                                         aria-hidden="true"
                                     />
-                                    <span class="truncate">{{ item.name }}</span>
+                                    <span class="truncate">{{
+                                        item.name
+                                    }}</span>
                                 </Link>
                             </div>
-                            
+
                             <!-- Child Items -->
-                            <div v-if="item.children && item.children.length > 0" class="mt-1 ml-3">
+                            <div
+                                v-if="item.children && item.children.length > 0"
+                                class="mt-1 ml-3"
+                            >
                                 <Link
                                     v-for="child in item.children"
                                     :key="child.name"
@@ -326,18 +420,22 @@
                                         $page.url === child.href
                                             ? 'bg-gray-100 text-gray-900 border-r-4 border-gray-900'
                                             : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
-                                        'group flex items-center px-3 py-2 text-sm font-medium rounded-l-lg transition-all duration-200 ease-in-out'
+                                        'group flex items-center px-3 py-2 text-sm font-medium rounded-l-lg transition-all duration-200 ease-in-out',
                                     ]"
                                 >
                                     <component
                                         :is="child.icon"
                                         :class="[
-                                            $page.url === child.href ? 'text-gray-900' : 'text-gray-400 group-hover:text-gray-600',
-                                            'mr-3 h-4 w-4 transition-colors duration-200'
+                                            $page.url === child.href
+                                                ? 'text-gray-900'
+                                                : 'text-gray-400 group-hover:text-gray-600',
+                                            'mr-3 h-4 w-4 transition-colors duration-200',
                                         ]"
                                         aria-hidden="true"
                                     />
-                                    <span class="truncate">{{ child.name }}</span>
+                                    <span class="truncate">{{
+                                        child.name
+                                    }}</span>
                                 </Link>
                             </div>
                         </div>
