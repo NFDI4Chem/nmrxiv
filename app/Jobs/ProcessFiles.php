@@ -12,6 +12,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class ProcessFiles implements ShouldBeUnique, ShouldQueue
@@ -22,10 +23,8 @@ class ProcessFiles implements ShouldBeUnique, ShouldQueue
 
     /**
      * The draft instance.
-     *
-     * @var \App\Models\Draft
      */
-    public $draft;
+    public Draft $draft;
 
     /**
      * Create a new job instance.
@@ -48,68 +47,143 @@ class ProcessFiles implements ShouldBeUnique, ShouldQueue
      */
     public function handle(): void
     {
-        $draft = $this->draft;
-
-        DB::transaction(function () use ($draft) {
-            $draftFSObjects = FileSystemObject::with('children')
-                ->where([
-                    ['draft_id', $draft->id],
-                ])
-                ->whereNull('status')
-                ->orWhere('status', 'missing')
-                ->get();
-
-            $missingFileAdded = false;
-            foreach ($draftFSObjects as $fsObject) {
-                if ($fsObject->path) {
-                    $missingFile = false;
-                    if ($fsObject->status == 'missing') {
-                        $missingFile = true;
-                    }
-                    $exists = Storage::disk(env('FILESYSTEM_DRIVER'))->exists($fsObject->path);
-                    if (! $exists) {
-                        $fsObject->status = 'missing';
-                    } else {
-                        $fsObject->status = 'present';
-                        if ($missingFile) {
-                            $missingFileAdded = true;
-                        }
-                    }
-                    $fsObject->save();
-                }
-            }
-
-            if ($missingFileAdded) {
-                $project = Project::where('draft_id', $draft->id)->first();
-                foreach ($project->studies as $study) {
-                    $study->download_url = null;
-                    $study->save();
-                }
-                ArchiveStudy::dispatch($project);
-            }
-
-            // $this->processFiles($draft->path);
-        });
-
+        try {
+            DB::transaction(function () {
+                $this->processFileSystemObjects();
+            });
+        } catch (\Exception $e) {
+            Log::error('Failed to process files for draft '.$this->draft->id, [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            throw $e;
+        }
     }
 
-    public function processFiles($path)
+    /**
+     * Process file system objects for the draft.
+     */
+    private function processFileSystemObjects(): void
     {
-        $listing = Storage::disk(env('FILESYSTEM_DRIVER'))->listContents($path, true);
-        foreach ($listing as $item) {
-            $path = $item->path();
-            if ($item instanceof \League\Flysystem\FileAttributes) {
-                $fsObject = FileSystemObject::where([
-                    ['path', '/'.$path],
-                ])->first();
-                if ($fsObject) {
-                    $metaData = $item->extraMetadata();
-                    $fsInfo = json_decode($fsObject->info, true);
-                    $fsInfo = array_merge($metaData, $fsInfo);
-                    $fsObject->info = $fsInfo;
-                    $fsObject->save();
-                }
+        $draftFSObjects = $this->getDraftFileSystemObjects();
+        $missingFileAdded = false;
+
+        foreach ($draftFSObjects as $fsObject) {
+            if ($this->updateFileSystemObjectStatus($fsObject)) {
+                $missingFileAdded = true;
             }
+        }
+
+        if ($missingFileAdded) {
+            $this->handleMissingFilesRestored();
+        }
+    }
+
+    /**
+     * Get draft file system objects that need processing.
+     */
+    private function getDraftFileSystemObjects()
+    {
+        return FileSystemObject::with('children')
+            ->where('draft_id', $this->draft->id)
+            ->where(function ($query) {
+                $query->whereNull('status')
+                    ->orWhere('status', 'missing');
+            })
+            ->get();
+    }
+
+    /**
+     * Update the status of a file system object.
+     *
+     * @return bool True if a missing file was restored, false otherwise
+     */
+    private function updateFileSystemObjectStatus(FileSystemObject $fsObject): bool
+    {
+        if (! $fsObject->path) {
+            return false;
+        }
+
+        $wasMissing = $fsObject->status === 'missing';
+        $exists = Storage::disk(config('filesystems.default'))->exists($fsObject->path);
+
+        $fsObject->status = $exists ? 'present' : 'missing';
+        $fsObject->save();
+
+        // Return true if a previously missing file is now present
+        return $wasMissing && $exists;
+    }
+
+    /**
+     * Handle the case when missing files have been restored.
+     */
+    private function handleMissingFilesRestored(): void
+    {
+        $project = Project::where('draft_id', $this->draft->id)->first();
+
+        if (! $project) {
+            Log::warning('No project found for draft '.$this->draft->id);
+
+            return;
+        }
+
+        // Clear download URLs for all studies
+        foreach ($project->studies as $study) {
+            $study->update(['download_url' => null]);
+        }
+
+        // Dispatch archive job to regenerate archives
+        ArchiveStudy::dispatch($project);
+    }
+
+    /**
+     * Process files in a directory and update metadata.
+     * Note: This method is currently not used but kept for potential future use.
+     */
+    public function updateFileMetadata(string $path): void
+    {
+        try {
+            $disk = Storage::disk(config('filesystems.default'));
+            $files = $disk->allFiles($path);
+
+            foreach ($files as $filePath) {
+                $this->updateSingleFileMetadata($filePath);
+            }
+        } catch (\Exception $e) {
+            Log::error('Failed to update file metadata for path: '.$path, [
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Update metadata for a single file.
+     */
+    private function updateSingleFileMetadata(string $filePath): void
+    {
+        $fsObject = FileSystemObject::where('path', '/'.$filePath)->first();
+
+        if (! $fsObject) {
+            return;
+        }
+
+        try {
+            $disk = Storage::disk(config('filesystems.default'));
+            $size = $disk->size($filePath);
+            $lastModified = $disk->lastModified($filePath);
+
+            $currentInfo = json_decode($fsObject->info, true) ?? [];
+            $newInfo = array_merge($currentInfo, [
+                'size' => $size,
+                'last_modified' => $lastModified,
+                'updated_at' => now()->toISOString(),
+            ]);
+
+            $fsObject->update(['info' => json_encode($newInfo)]);
+        } catch (\Exception $e) {
+            Log::error('Failed to update metadata for file: '.$filePath, [
+                'error' => $e->getMessage(),
+            ]);
         }
     }
 }
