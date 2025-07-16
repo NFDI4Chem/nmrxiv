@@ -434,14 +434,76 @@
                                 :format="customDateFormat"
                                 :preview-format="customDateFormat"
                             ></Datepicker>
-                            <p class="mt-1 text-sm text-gray-500">
-                                Publish your data now immediately or set a
-                                future release date to automatically make your
-                                project public. If you opt for a future release
-                                date, you have the flexibility to modify the
-                                publication date and choose to publish instantly
-                                from your project's dashboard view.
-                            </p>
+                            <div
+                                class="mt-3 bg-gray-50 border border-gray-200 rounded-lg p-4"
+                            >
+                                <!-- Immediate Publication -->
+                                <div
+                                    v-if="isImmediatePublication"
+                                    class="space-y-3"
+                                >
+                                    <p class="text-sm text-gray-600">
+                                        Your data becomes publicly accessible
+                                        right away with a DOI. Please select a
+                                        future date if you would like to embargo
+                                        your data for peer review. Need help?
+                                        <a
+                                            href="https://docs.nmrxiv.org/submission-guides/embargo"
+                                            target="_blank"
+                                            class="text-blue-600 hover:text-blue-700"
+                                            >Read more</a
+                                        >
+                                    </p>
+                                </div>
+
+                                <!-- Scheduled Release (Embargo) -->
+                                <div v-else class="space-y-3">
+                                    <p class="text-sm text-gray-600">
+                                        <strong
+                                            >Scheduled Release
+                                            (Embargo):</strong
+                                        >
+                                        You have selected a future date for
+                                        publication. Your data remains private
+                                        until then.
+                                    </p>
+                                    <p class="text-sm text-gray-600">
+                                        You can:
+                                    </p>
+                                    <ul
+                                        class="ml-4 text-sm text-gray-500 space-y-1"
+                                    >
+                                        <li class="flex items-start">
+                                            <span
+                                                class="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-2 flex-shrink-0"
+                                            ></span>
+                                            <span
+                                                >Share reviewer access links for
+                                                confidential peer review</span
+                                            >
+                                        </li>
+                                        <li class="flex items-start">
+                                            <span
+                                                class="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-2 flex-shrink-0"
+                                            ></span>
+                                            <span
+                                                >Receive advance notifications
+                                                before publication</span
+                                            >
+                                        </li>
+                                        <li class="flex items-start">
+                                            <span
+                                                class="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-2 flex-shrink-0"
+                                            ></span>
+                                            <span
+                                                >Modify the release date or
+                                                publish instantly from your
+                                                dashboard</span
+                                            >
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
                         <div class="mt-5">
                             <!--License -->
@@ -918,6 +980,15 @@ export default {
         },
         currentTab() {
             return this.tabs.find((t) => t.current);
+        },
+        isImmediatePublication() {
+            if (!this.publishForm.release_date) return true;
+            const today = new Date();
+            const releaseDate = new Date(this.publishForm.release_date);
+            // Reset time to compare only dates
+            today.setHours(0, 0, 0, 0);
+            releaseDate.setHours(0, 0, 0, 0);
+            return releaseDate.getTime() === today.getTime();
         },
     },
 
