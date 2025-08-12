@@ -49,7 +49,7 @@ jobs:
           push: true
           # Pass proxy settings and release version as build arguments
           build-args: |
-            RELEASE_VERSION=fsu-app
+            RELEASE_VERSION=app-dev-latest
           # Tag the image for development environment
           tags: ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:app-dev-latest
           # Enable build cache for faster builds
@@ -65,7 +65,7 @@ jobs:
           push: true
           # Pass proxy settings and release version as build arguments
           build-args: |
-            RELEASE_VERSION=fsu-worker
+            RELEASE_VERSION=worker-dev-latest
           # Tag the worker image for development environment
           tags: ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:worker-dev-latest
           # Enable build cache for faster builds

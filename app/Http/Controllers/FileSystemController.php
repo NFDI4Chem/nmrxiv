@@ -6,560 +6,343 @@ use App\Models\Draft;
 use App\Models\FileSystemObject;
 use App\Models\Project;
 use App\Models\Study;
-use Aws\S3\S3Client;
+use App\Services\FileSystemObjectService;
+use App\Services\StorageSignedUrlService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
+/**
+ * Handle file system operations and signed URL generation for file uploads.
+ */
 class FileSystemController extends Controller
 {
     /**
-     * Create a new draft signed URL.
-     *
-     * @return \Illuminate\Http\Response
+     * Create a new controller instance.
      */
-    public function signedDraftStorageURL(Request $request)
+    public function __construct(
+        private FileSystemObjectService $fileSystemObjectService,
+        private StorageSignedUrlService $storageService
+    ) {}
+
+    /**
+     * Generate signed URLs for draft file uploads.
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     */
+    public function signedDraftStorageURL(Request $request): JsonResponse
     {
-        $filePath = null;
+        $request->validate([
+            'draft_files' => 'required|array',
+            'draft_files.*.upload.filename' => 'required|string',
+            'draft_files.*.upload.total' => 'required|integer',
+            'draft_id' => 'required|exists:drafts,id',
+            'destination' => 'required|string',
+        ]);
 
+        $draft = Draft::findOrFail($request->get('draft_id'));
         $files = $request->get('draft_files');
+        $destination = $request->get('destination');
+        $bucket = $request->input('bucket') ?: $this->storageService->getBucket();
 
-        $filesURLs = [];
+        $fileUrls = [];
 
         foreach ($files as $file) {
-            $relativefilePath = null;
-
-            DB::transaction(function () use ($request, &$filePath, $file, &$relativefilePath) {
-                $destination = $request->get('destination');
-
-                $draft = Draft::find($request->get('draft_id'));
-
-                $path = null;
-
-                if (array_key_exists('fullPath', $file)) {
-                    $path = $file['fullPath'];
-                }
-
-                $hasDirectories = $path || $destination != '/' ? true : false;
-
-                $filename = '/'.$file['upload']['filename'];
-
-                $user = $request->user();
-
-                $level = 0;
-
-                $currentLevel = $level;
-
-                $relativefilePath = $path ? $path : $filename;
-
-                $relativefilePath = $destination.'/'.$relativefilePath;
-
-                $path = $destination.'/'.$path;
-
-                $environment = env('APP_ENV', 'local');
-
-                $filePath = preg_replace(
-                    '~//+~',
-                    '/',
-                    '/'.
-                    $draft->path.
-                    '/'
-                    .
-                    $relativefilePath
+            $filePath = DB::transaction(function () use ($draft, $file, $destination) {
+                return $this->fileSystemObjectService->createDraftFileSystemObject(
+                    $draft,
+                    $file,
+                    $destination
                 );
-
-                if ($hasDirectories) {
-                    $directories = array_values(
-                        array_filter(
-                            explode('/', str_replace($filename, '', $path))
-                        )
-                    );
-                    if ($level + count($directories) - 1 > $level) {
-                        for (
-                            $currentLevel;
-                            $currentLevel < $level + count($directories) - 1;
-                            $currentLevel++
-                        ) {
-                            $dPath = implode(
-                                '/',
-                                array_slice($directories, 0, $currentLevel)
-                            );
-                            $rURL = rtrim(
-                                preg_replace(
-                                    '~//+~',
-                                    '/',
-                                    '/'.
-                                        $dPath.
-                                        '/'.
-                                        $directories[$currentLevel]
-                                ),
-                                '/'
-                            );
-                            $parentFileSystemObject = FileSystemObject::firstOrCreate(
-                                [
-                                    'name' => $directories[$currentLevel],
-                                    'slug' => Str::slug(
-                                        $directories[$currentLevel],
-                                        '-'
-                                    ),
-                                    'description' => $directories[$currentLevel],
-                                    'relative_url' => $rURL,
-                                    'path' => preg_replace(
-                                        '~//+~',
-                                        '/',
-                                        '/'.
-                                        $draft->path.
-                                        '/'
-                                        .
-                                        $rURL
-                                    ),
-                                    'type' => 'directory',
-                                    'key' => $directories[$currentLevel],
-                                    'is_root' => $currentLevel == 0 ? 1 : 0,
-                                    'draft_id' => $draft->id,
-                                    'level' => $currentLevel,
-                                ], [
-                                    'uuid' => Str::uuid(),
-                                ]
-                            );
-
-                            $dPath = implode(
-                                '/',
-                                array_slice($directories, 0, $currentLevel + 1)
-                            );
-                            $rURL = rtrim(
-                                preg_replace(
-                                    '~//+~',
-                                    '/',
-                                    '/'.
-                                        $dPath.
-                                        '/'.
-                                        $directories[$currentLevel + 1]
-                                ),
-                                '/'
-                            );
-                            $childFileSystemObject = FileSystemObject::firstOrCreate(
-                                [
-                                    'name' => $directories[$currentLevel + 1],
-                                    'slug' => Str::slug(
-                                        $directories[$currentLevel + 1],
-                                        '-'
-                                    ),
-                                    'description' => $directories[$currentLevel + 1],
-                                    'relative_url' => $rURL,
-                                    'path' => preg_replace(
-                                        '~//+~',
-                                        '/',
-                                        '/'.
-                                        $draft->path.
-                                        '/'
-                                        .
-                                        $rURL
-                                    ),
-                                    'type' => 'directory',
-                                    'key' => $directories[$currentLevel + 1],
-                                    'is_root' => $currentLevel + 1 == 0 ? 1 : 0,
-                                    'draft_id' => $draft->id,
-                                    'level' => $currentLevel + 1,
-                                ], [
-                                    'uuid' => Str::uuid(),
-                                ]
-                            );
-                            if (! $childFileSystemObject->parent_id) {
-                                $childFileSystemObject->parent_id =
-                                    $parentFileSystemObject->id;
-                                $childFileSystemObject->save();
-                                $parentFileSystemObject->has_children = 1;
-                                $parentFileSystemObject->save();
-                            }
-                        }
-                    } else {
-                        $dPath = implode(
-                            '/',
-                            array_slice($directories, 0, $currentLevel)
-                        );
-                        $rURL = rtrim(
-                            preg_replace(
-                                '~//+~',
-                                '/',
-                                '/'.$dPath.'/'.$directories[$currentLevel]
-                            ),
-                            '/'
-                        );
-                        $childFileSystemObject = FileSystemObject::firstOrCreate([
-                            'name' => $directories[$currentLevel],
-                            'slug' => Str::slug($directories[$currentLevel], '-'),
-                            'description' => $directories[$currentLevel],
-                            'relative_url' => $rURL,
-                            'path' => preg_replace(
-                                '~//+~',
-                                '/',
-                                '/'.
-                                $draft->path.
-                                '/'
-                                .
-                                $rURL
-                            ),
-                            'type' => 'directory',
-                            'key' => $directories[$currentLevel],
-                            'is_root' => $currentLevel == 0 ? 1 : 0,
-                            'draft_id' => $draft->id,
-                            'level' => $currentLevel,
-                        ], [
-                            'uuid' => Str::uuid(),
-                        ]);
-                    }
-                }
-
-                if ($hasDirectories) {
-                    $childFileSystemObject->has_children = 1;
-                    $childFileSystemObject->save();
-                }
-
-                $filename = preg_replace(
-                    '~/~',
-                    '',
-                    $filename
-                );
-
-                $fileFileSystemObject = FileSystemObject::firstOrCreate([
-                    'name' => $filename,
-                    'slug' => Str::slug($filename, '-'),
-                    'description' => $filename,
-                    'relative_url' => rtrim(
-                        preg_replace('~//+~', '/', $relativefilePath),
-                        '/'
-                    ),
-                    'path' => $filePath,
-                    'type' => 'file',
-                    'key' => $filename,
-                    'is_root' => 0,
-                    'draft_id' => $draft->id,
-                    'level' => $hasDirectories ? $currentLevel + 1 : $currentLevel,
-                    'parent_id' => $hasDirectories
-                        ? $childFileSystemObject->id
-                        : null,
-                ], [
-                    'uuid' => Str::uuid(),
-                    'info' => json_encode(
-                        [
-                            'size' => $file['upload']['total'],
-                        ]
-                    ),
-                ]);
             }, 5);
 
-            $bucket =
-                $request->input('bucket') ?:
-                config('filesystems.disks.'.env('FILESYSTEM_DRIVER').'.bucket');
+            $signedUrl = $this->storageService->generateSignedUploadUrl($filePath, $bucket);
+            $signedUrl['fullPath'] = $file['fullPath'] ?? $signedUrl['key'];
 
-            $client = $this->storageClient();
-
-            $uuid = (string) Str::uuid();
-
-            $signedRequest = $client->createPresignedRequest(
-                $this->createCommand($request, $client, $bucket, $key = ltrim($filePath, $filePath[0])),
-                '+90 minutes'
-            );
-
-            array_push($filesURLs, [
-                'uuid' => $uuid,
-                'bucket' => $bucket,
-                'key' => $key,
-                'fullPath' => array_key_exists('fullPath', $file) ? $file['fullPath'] : preg_replace(
-                    '~//+~',
-                    '/', $relativefilePath),
-                'url' => (string) $signedRequest->getUri(),
-                'headers' => $this->headers($request, $signedRequest),
-            ]);
+            $fileUrls[] = $signedUrl;
         }
 
-        return response()->json(
-            $filesURLs,
-            201
-        );
+        return response()->json($fileUrls, 201);
     }
 
     /**
-     * Create a new signed URL.
+     * Generate signed URLs for project file uploads.
      *
-     * @return \Illuminate\Http\Response
+     * @throws \Illuminate\Validation\ValidationException
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
-    public function signedStorageURL(Request $request)
+    public function signedStorageURL(Request $request): JsonResponse
     {
-        $filePath = null;
+        $request->validate([
+            'file' => 'required|array',
+            'file.upload.filename' => 'required|string',
+            'file.upload.total' => 'required|integer',
+            'project_id' => 'required|exists:projects,id',
+            'study_id' => 'required|exists:studies,id',
+            'destination' => 'required|string',
+        ]);
 
-        DB::transaction(function () use ($request, &$filePath) {
-            $file = $request->get('file');
+        $project = Project::findOrFail($request->get('project_id'));
+        $study = Study::findOrFail($request->get('study_id'));
+        $file = $request->get('file');
+        $destination = $request->get('destination');
+        $bucket = $request->input('bucket') ?: $this->storageService->getBucket();
 
-            $destination = $request->get('destination');
-
-            $project = Project::find($request->get('project_id'));
-
-            $study = Study::find($request->get('study_id'));
-
-            $path = null;
-
-            if (array_key_exists('fullPath', $file)) {
-                $path = $file['fullPath'];
-            }
-
-            $hasDirectories = $path || $destination != '/' ? true : false;
-
-            $filename = '/'.$file['upload']['filename'];
-
-            $user = $request->user();
-
-            $level = 0;
-
-            $currentLevel = $level;
-
-            $relativefilePath = $path ? $path : $filename;
-
-            $relativefilePath = $destination.'/'.$relativefilePath;
-            $path = $destination.'/'.$path;
-
-            $environment = env('APP_ENV', 'local');
-
-            $filePath = preg_replace(
-                '~//+~',
-                '/',
-                $environment.
-                    '/'.
-                    $project->uuid.
-                    '/'.
-                    $relativefilePath
+        $filePath = DB::transaction(function () use ($project, $study, $file, $destination) {
+            return $this->fileSystemObjectService->createProjectFileSystemObject(
+                $project,
+                $study,
+                $file,
+                $destination
             );
-
-            if ($hasDirectories) {
-                $directories = array_values(
-                    array_filter(
-                        explode('/', str_replace($filename, '', $path))
-                    )
-                );
-                if ($level + count($directories) - 1 > $level) {
-                    for (
-                        $currentLevel;
-                        $currentLevel < $level + count($directories) - 1;
-                        $currentLevel++
-                    ) {
-                        $dPath = implode(
-                            '/',
-                            array_slice($directories, 0, $currentLevel)
-                        );
-                        $parentFileSystemObject = FileSystemObject::firstOrCreate(
-                            [
-                                'name' => $directories[$currentLevel],
-                                'slug' => Str::slug(
-                                    $directories[$currentLevel],
-                                    '-'
-                                ),
-                                'description' => $directories[$currentLevel],
-                                'relative_url' => rtrim(
-                                    preg_replace(
-                                        '~//+~',
-                                        '/',
-                                        '/'.
-                                            $dPath.
-                                            '/'.
-                                            $directories[$currentLevel]
-                                    ),
-                                    '/'
-                                ),
-                                'type' => 'directory',
-                                'key' => $directories[$currentLevel],
-                                'is_root' => $currentLevel == 0 ? 1 : 0,
-                                'project_id' => $project->id,
-                                'study_id' => $study->id,
-                                'level' => $currentLevel,
-                            ], [
-                                'uuid' => Str::uuid(),
-                            ]
-                        );
-
-                        $dPath = implode(
-                            '/',
-                            array_slice($directories, 0, $currentLevel + 1)
-                        );
-                        $childFileSystemObject = FileSystemObject::firstOrCreate(
-                            [
-                                'name' => $directories[$currentLevel + 1],
-                                'slug' => Str::slug(
-                                    $directories[$currentLevel + 1],
-                                    '-'
-                                ),
-                                'description' => $directories[$currentLevel + 1],
-                                'relative_url' => rtrim(
-                                    preg_replace(
-                                        '~//+~',
-                                        '/',
-                                        '/'.
-                                            $dPath.
-                                            '/'.
-                                            $directories[$currentLevel + 1]
-                                    ),
-                                    '/'
-                                ),
-                                'type' => 'directory',
-                                'key' => $directories[$currentLevel + 1],
-                                'is_root' => $currentLevel + 1 == 0 ? 1 : 0,
-                                'project_id' => $project->id,
-                                'study_id' => $study->id,
-                                'level' => $currentLevel + 1,
-                            ], [
-                                'uuid' => Str::uuid(),
-                            ]
-                        );
-                        if (! $childFileSystemObject->parent_id) {
-                            $childFileSystemObject->parent_id =
-                                $parentFileSystemObject->id;
-                            $childFileSystemObject->save();
-                            $parentFileSystemObject->has_children = 1;
-                            $parentFileSystemObject->save();
-                        }
-                    }
-                } else {
-                    $dPath = implode(
-                        '/',
-                        array_slice($directories, 0, $currentLevel)
-                    );
-                    $childFileSystemObject = FileSystemObject::firstOrCreate([
-                        'name' => $directories[$currentLevel],
-                        'slug' => Str::slug($directories[$currentLevel], '-'),
-                        'description' => $directories[$currentLevel],
-                        'relative_url' => rtrim(
-                            preg_replace(
-                                '~//+~',
-                                '/',
-                                '/'.$dPath.'/'.$directories[$currentLevel]
-                            ),
-                            '/'
-                        ),
-                        'type' => 'directory',
-                        'key' => $directories[$currentLevel],
-                        'is_root' => $currentLevel == 0 ? 1 : 0,
-                        'project_id' => $request->get('project_id'),
-                        'study_id' => $request->get('study_id'),
-                        'level' => $currentLevel,
-                    ], [
-                        'uuid' => Str::uuid(),
-                    ]);
-                }
-            }
-
-            if ($hasDirectories) {
-                $childFileSystemObject->has_children = 1;
-                $childFileSystemObject->save();
-            }
-
-            $filename = preg_replace(
-                '~/~',
-                '',
-                $filename
-            );
-
-            $fileFileSystemObject = FileSystemObject::firstOrCreate([
-                'name' => $filename,
-                'slug' => Str::slug($filename, '-'),
-                'description' => $filename,
-                'relative_url' => rtrim(
-                    preg_replace('~//+~', '/', $relativefilePath),
-                    '/'
-                ),
-                'type' => 'file',
-                'key' => $filename,
-                'is_root' => 0,
-                'project_id' => $request->get('project_id'),
-                'study_id' => $request->get('study_id'),
-                'level' => $hasDirectories ? $currentLevel + 1 : $currentLevel,
-                'parent_id' => $hasDirectories
-                    ? $childFileSystemObject->id
-                    : null,
-            ], [
-                'uuid' => Str::uuid(),
-            ]);
         }, 5);
 
-        $bucket =
-            $request->input('bucket') ?:
-            config('filesystems.disks.'.env('FILESYSTEM_DRIVER').'.bucket');
+        $signedUrl = $this->storageService->generateSignedUploadUrl($filePath, $bucket);
 
-        $client = $this->storageClient();
-
-        $uuid = (string) Str::uuid();
-
-        $signedRequest = $client->createPresignedRequest(
-            $this->createCommand($request, $client, $bucket, $key = $filePath),
-            '+90 minutes'
-        );
-
-        return response()->json(
-            [
-                'uuid' => $uuid,
-                'bucket' => $bucket,
-                'key' => $key,
-                'url' => (string) $signedRequest->getUri(),
-                'headers' => $this->headers($request, $signedRequest),
-            ],
-            201
-        );
+        return response()->json($signedUrl, 201);
     }
 
     /**
-     * Create a command for the PUT operation.
+     * Delete a filesystem object and all its children recursively.
      *
-     * @param  string  $bucket
-     * @param  string  $key
-     * @return \Aws\Command
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
-    protected function createCommand(
-        Request $request,
-        S3Client $client,
-        $bucket,
-        $key
-    ) {
-        return $client->getCommand(
-            'putObject',
-            array_filter([
-                'Bucket' => $bucket,
-                'Key' => $key,
-            ])
-        );
-    }
-
-    /**
-     * Get the headers that should be used when making the signed request.
-     *
-     * @param  \GuzzleHttp\Psr7\Request
-     * @return array
-     */
-    protected function headers(Request $request, $signedRequest)
+    public function deleteFSO(Request $request, Draft $draft, FileSystemObject $filesystemobject): JsonResponse
     {
-        return array_merge($signedRequest->getHeaders(), [
-            'Content-Type' => $request->input('content_type') ?: 'application/octet-stream',
-        ]);
+        // Verify the filesystem object belongs to this draft
+        if ($filesystemobject->draft_id !== $draft->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Filesystem object does not belong to this draft',
+            ], 403);
+        }
+
+        try {
+            $deletionResult = $this->fileSystemObjectService->deleteFileSystemObject($filesystemobject);
+
+            $hasErrors = ! empty($deletionResult['storage_errors']);
+            $message = $this->buildDeletionMessage($deletionResult);
+
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'deleted_count' => count($deletionResult['database_ids_deleted']),
+                'files_deleted' => $deletionResult['files_deleted'],
+                'directories_deleted' => $deletionResult['directories_deleted'],
+                'storage_errors' => $deletionResult['storage_errors'],
+                'has_storage_errors' => $hasErrors,
+            ], $hasErrors ? 207 : 200); // 207 = Multi-Status for partial success
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete filesystem object: '.$e->getMessage(),
+            ], 500);
+        }
     }
 
     /**
-     * Get the S3 storage client instance.
-     *
-     * @return \Aws\S3\S3Client
+     * Build a user-friendly deletion message based on operation results.
      */
-    protected function storageClient()
+    private function buildDeletionMessage(array $deletionResult): string
     {
-        $config = [
-            'region' => config('filesystems.disks.'.env('FILESYSTEM_DRIVER').'.region'),
-            'version' => 'latest',
-            'use_path_style_endpoint' => true,
-            'url' => config('filesystems.disks.'.env('FILESYSTEM_DRIVER').'.endpoint'),
-            'endpoint' => config('filesystems.disks.'.env('FILESYSTEM_DRIVER').'.endpoint'),
-            'credentials' => [
-                'key' => config('filesystems.disks.'.env('FILESYSTEM_DRIVER').'.key'),
-                'secret' => config('filesystems.disks.'.env('FILESYSTEM_DRIVER').'.secret'),
-            ],
-        ];
+        $totalDeleted = count($deletionResult['database_ids_deleted']);
+        $storageErrors = count($deletionResult['storage_errors']);
 
-        return S3Client::factory($config);
+        if ($storageErrors === 0) {
+            return "Successfully deleted {$totalDeleted} items from database and storage.";
+        } else {
+            return "Deleted {$totalDeleted} items from database. {$storageErrors} storage operation(s) had issues (see details).";
+        }
+    }
+
+    /**
+     * Process folders to identify instrument types and set model types.
+     */
+    public function processFolder($folders): void
+    {
+        foreach ($folders as $folder) {
+            if ($folder->model_type) {
+                continue;
+            }
+
+            if ($folder->type == 'directory') {
+                if ($this->isBruker($folder)) {
+                    $this->saveInstrumentType($folder, 'bruker');
+                    $this->saveModelType($folder->parent);
+                } elseif ($this->isVarian($folder)) {
+                    $this->saveInstrumentType($folder, 'varian');
+                    $this->saveModelType($folder->parent);
+                } else {
+                    $this->processFolder($folder->children);
+                }
+            } else {
+                if ($this->isJOEL($folder)) {
+                    $this->saveInstrumentType($folder, 'joel');
+                    $this->saveModelType($folder->parent);
+                } elseif ($this->isJcampDX($folder)) {
+                    $this->saveInstrumentType($folder, 'jcamp');
+                    $this->saveModelType($folder->parent);
+                } elseif ($this->isNMReData($folder)) {
+                    $this->saveInstrumentType($folder, 'nmredata');
+                    $this->saveAnnotationsDetected($folder->parent);
+                } elseif ($this->isMolData($folder)) {
+                    $this->saveInstrumentType($folder, 'mol');
+                }
+            }
+        }
+    }
+
+    /**
+     * Mark that NMReData annotations were detected.
+     */
+    public function saveAnnotationsDetected($folder): void
+    {
+        if ($folder) {
+            $study = $folder->study;
+
+            if ($study) {
+                $study->has_nmredata = true;
+                $study->save();
+            }
+        }
+    }
+
+    /**
+     * Set model type for folder.
+     */
+    public function saveModelType($folder): void
+    {
+        if ($folder) {
+            $folder->model_type = 'study';
+            $folder->save();
+        }
+    }
+
+    /**
+     * Set instrument type for folder.
+     */
+    public function saveInstrumentType($folder, $type): void
+    {
+        $folder->instrument_type = $type;
+        $folder->save();
+    }
+
+    /**
+     * Check if folder contains Bruker instrument files.
+     */
+    public function isBruker($folder): bool
+    {
+        $fileTypes = ['acqus', 'acqu', 'pdata'];
+        $children = $folder->children;
+        $names = $children->pluck('name')->toArray();
+        if (array_intersect($fileTypes, $names) == $fileTypes) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if folder contains Varian instrument files.
+     */
+    public function isVarian($folder): bool
+    {
+        $fileTypes = ['fid', 'log', 'text', 'procpar'];
+        $children = $folder->children;
+        $names = $children->pluck('name')->toArray();
+        if (array_intersect($fileTypes, $names) == $fileTypes) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if file is JCAMP-DX format.
+     */
+    public function isJcampDX($folder): bool
+    {
+        $fileTypes = ['jdx'];
+        $names = [$folder->name];
+        $extensions = array_map(fn ($s) => substr("$s", (strrpos($s, '.') + 1)), $names);
+        $isJDX = false;
+        if (array_intersect($fileTypes, $extensions) == $fileTypes) {
+            $isJDX = true;
+        }
+
+        $fileTypes = ['dx'];
+        $isDX = false;
+        if (array_intersect($fileTypes, $extensions) == $fileTypes) {
+            $isDX = true;
+        }
+
+        $fileTypes = ['jcamp'];
+        $isJCAMP = false;
+        if (array_intersect($fileTypes, $extensions) == $fileTypes) {
+            $isJCAMP = true;
+        }
+
+        if ($isJDX || $isDX || $isJCAMP) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if file is NMReData format.
+     */
+    public function isNMReData($folder): bool
+    {
+        $fileTypes = ['sdf'];
+        $names = [$folder->name];
+        $extensions = array_map(fn ($s) => substr("$s", (strrpos($s, '.') + 1)), $names);
+        $isNMReData = false;
+        if (array_intersect($fileTypes, $extensions) == $fileTypes) {
+            $isNMReData = true;
+        }
+
+        if ($isNMReData) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if file is MOL format.
+     */
+    public function isMolData($folder): bool
+    {
+        $fileTypes = ['mol'];
+        $names = [$folder->name];
+        $extensions = array_map(fn ($s) => substr("$s", (strrpos($s, '.') + 1)), $names);
+        $isMolData = false;
+        if (array_intersect($fileTypes, $extensions) == $fileTypes) {
+            $isMolData = true;
+        }
+
+        if ($isMolData) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if file is JOEL format.
+     */
+    public function isJOEL($folder): bool
+    {
+        $fileTypes = ['jdf'];
+        $names = [$folder->name];
+        $extensions = array_map(fn ($s) => substr("$s", (strrpos($s, '.') + 1)), $names);
+        if (array_intersect($fileTypes, $extensions) == $fileTypes) {
+            return true;
+        }
+
+        return false;
     }
 }

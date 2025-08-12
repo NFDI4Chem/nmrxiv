@@ -12,19 +12,19 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('molecules', function (Blueprint $table) {
-            // $table->renameColumn('INCHI', 'inchi');
-            // $table->renameColumn('STANDARD_INCHI', 'standard_inchi');
-            // $table->renameColumn('INCHI_KEY', 'inchi_key');
-            // $table->renameColumn('STANDARD_INCHI_KEY', 'standard_inchi_key');
+            $table->renameColumn('INCHI', 'inchi');
+            $table->renameColumn('STANDARD_INCHI', 'standard_inchi');
+            $table->renameColumn('INCHI_KEY', 'inchi_key');
+            $table->renameColumn('STANDARD_INCHI_KEY', 'standard_inchi_key');
 
-            // $table->renameColumn('canonical_smiles', 'canonical_smiles');
-            // $table->renameColumn('smiles', 'smiles');
-            // $table->renameColumn('SMILES_CHIRAL', 'absolute_smiles');
+            $table->renameColumn('CANONICAL_SMILES', 'canonical_smiles');
+            $table->renameColumn('SMILES', 'smiles');
+            $table->renameColumn('SMILES_CHIRAL', 'absolute_smiles');
 
-            // $table->renameColumn('CAS_NUMBER', 'cas');
-            // $table->renameColumn('MOLECULAR_WEIGHT', 'molecular_weight');
-            // $table->renameColumn('FORMULA', 'molecular_formula');
-            // $table->renameColumn('MOL', 'sdf');
+            $table->renameColumn('CAS_NUMBER', 'cas');
+            $table->renameColumn('MOLECULAR_WEIGHT', 'molecular_weight');
+            $table->renameColumn('FORMULA', 'molecular_formula');
+            $table->renameColumn('MOL', 'sdf');
 
             $table->longText('name')->nullable();
             $table->integer('name_trust_level')->default(0)->nullable();

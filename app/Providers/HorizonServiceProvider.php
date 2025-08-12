@@ -6,10 +6,26 @@ use Illuminate\Support\Facades\Gate;
 use Laravel\Horizon\Horizon;
 use Laravel\Horizon\HorizonApplicationServiceProvider;
 
+/**
+ * Horizon Service Provider
+ *
+ * This service provider configures Laravel Horizon for queue management
+ * and monitoring. It handles access control, notification routing, and
+ * UI customization for the Horizon dashboard used to monitor job queues
+ * in the NMRXIV application.
+ *
+ * @author NMRXIV Development Team
+ *
+ * @since 1.0.0
+ */
 class HorizonServiceProvider extends HorizonApplicationServiceProvider
 {
     /**
      * Bootstrap any application services.
+     *
+     * Initializes the parent Horizon service provider and sets up
+     * any additional configuration specific to the NMRXIV application.
+     * Commented examples show available notification routing options.
      */
     public function boot(): void
     {
@@ -26,10 +42,10 @@ class HorizonServiceProvider extends HorizonApplicationServiceProvider
      * Register the Horizon gate.
      *
      * This gate determines who can access Horizon in non-local environments.
-     *
-     * @return void
+     * Access is restricted to users with 'super-admin' or 'developer' roles
+     * to ensure only authorized personnel can monitor and manage job queues.
      */
-    protected function gate()
+    protected function gate(): void
     {
         Gate::define('viewHorizon', function ($user) {
             return $user->hasAnyRole(['super-admin', 'developer']);

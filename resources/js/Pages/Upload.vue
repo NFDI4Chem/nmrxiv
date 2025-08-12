@@ -1327,41 +1327,119 @@
                                                                                         class="sm:col-span-4"
                                                                                     >
                                                                                         <label
-                                                                                            for="email"
-                                                                                            class="block text-sm font-medium text-gray-700"
+                                                                                            for="chemical-input"
+                                                                                            class="block text-sm font-medium text-gray-700 mb-2"
                                                                                         >
-                                                                                            SMILES
+                                                                                            Chemical
+                                                                                            Structure
+                                                                                            Input
                                                                                         </label>
+
+                                                                                        <!-- Unified Input with Drag and Drop -->
                                                                                         <div
                                                                                             class="mt-1 mb-2"
                                                                                         >
-                                                                                            <input
-                                                                                                id="smiles"
-                                                                                                v-model="
-                                                                                                    smiles
+                                                                                            <div
+                                                                                                class="border-2 border-dashed border-gray-300 rounded-md p-4 text-center hover:border-teal-400 transition-colors"
+                                                                                                :class="{
+                                                                                                    'border-teal-400 bg-teal-50':
+                                                                                                        isDragging,
+                                                                                                }"
+                                                                                                @dragover.prevent="
+                                                                                                    handleDragOver
                                                                                                 "
-                                                                                                name="smiles"
-                                                                                                type="text"
-                                                                                                class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                                                                                                @blur="
-                                                                                                    loadSmiles
+                                                                                                @dragleave.prevent="
+                                                                                                    handleDragLeave
                                                                                                 "
-                                                                                            />
+                                                                                                @drop.prevent="
+                                                                                                    handleDrop
+                                                                                                "
+                                                                                            >
+                                                                                                <div
+                                                                                                    v-if="
+                                                                                                        !chemicalInput
+                                                                                                    "
+                                                                                                    class="mb-3"
+                                                                                                >
+                                                                                                    <p
+                                                                                                        class="text-sm text-gray-600 mb-1"
+                                                                                                    >
+                                                                                                        Paste
+                                                                                                        SMILES,
+                                                                                                        MOL,
+                                                                                                        or
+                                                                                                        SDF
+                                                                                                        content
+                                                                                                        below
+                                                                                                        or
+                                                                                                        drag
+                                                                                                        and
+                                                                                                        drop
+                                                                                                        .mol/.sdf
+                                                                                                        files
+                                                                                                    </p>
+                                                                                                    <div
+                                                                                                        class="text-xs text-gray-500"
+                                                                                                    >
+                                                                                                        Auto-detects
+                                                                                                        and
+                                                                                                        loads
+                                                                                                        format
+                                                                                                        automatically
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                                <textarea
+                                                                                                    v-model="
+                                                                                                        chemicalInput
+                                                                                                    "
+                                                                                                    placeholder="Paste SMILES (single line) or MOL/SDF content (multi-line) here..."
+                                                                                                    rows="8"
+                                                                                                    class="w-full shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm border-gray-300 rounded-md resize-vertical"
+                                                                                                    @blur="
+                                                                                                        loadStructure
+                                                                                                    "
+                                                                                                    @paste="
+                                                                                                        handlePaste
+                                                                                                    "
+                                                                                                    @input="
+                                                                                                        handleInput
+                                                                                                    "
+                                                                                                ></textarea>
+                                                                                            </div>
+
+                                                                                            <div
+                                                                                                class="flex items-center justify-between mt-2"
+                                                                                            >
+                                                                                                <div
+                                                                                                    class="flex space-x-2"
+                                                                                                >
+                                                                                                    <button
+                                                                                                        v-if="
+                                                                                                            chemicalInput
+                                                                                                        "
+                                                                                                        class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                                                                                        @click="
+                                                                                                            clearInput
+                                                                                                        "
+                                                                                                    >
+                                                                                                        Clear
+                                                                                                    </button>
+                                                                                                </div>
+
+                                                                                                <div
+                                                                                                    v-if="
+                                                                                                        detectedFormat
+                                                                                                    "
+                                                                                                    class="text-xs text-gray-500"
+                                                                                                >
+                                                                                                    Detected:
+                                                                                                    {{
+                                                                                                        detectedFormat
+                                                                                                    }}
+                                                                                                </div>
+                                                                                            </div>
                                                                                         </div>
-                                                                                        <button
-                                                                                            v-if="
-                                                                                                smiles &&
-                                                                                                smiles !=
-                                                                                                    ''
-                                                                                            "
-                                                                                            class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mt-2"
-                                                                                            @click="
-                                                                                                loadSmiles
-                                                                                            "
-                                                                                        >
-                                                                                            Load
-                                                                                            Structure
-                                                                                        </button>
+
                                                                                         <jet-input-error
                                                                                             :message="
                                                                                                 errorMessage
@@ -1834,7 +1912,9 @@ export default {
             validation: null,
             validationStatus: true,
 
-            smiles: "",
+            chemicalInput: "",
+            detectedFormat: "",
+            isDragging: false,
             percentage: 100,
             editor: null,
 
@@ -1921,9 +2001,19 @@ export default {
                             : 0
                     );
                 });
-                return 100 - totalCount;
+                const remaining = 100 - totalCount;
+                // Ensure max is always greater than min (0) to prevent slider errors
+                return Math.max(remaining, 1);
             } else {
                 return 100;
+            }
+        },
+    },
+    watch: {
+        getMax(newMax) {
+            // Ensure percentage doesn't exceed the new maximum
+            if (this.percentage > newMax) {
+                this.percentage = newMax;
             }
         },
     },
@@ -2512,7 +2602,8 @@ export default {
                 })
                 .then((res) => {
                     study.sample.molecules = res.data;
-                    this.smiles = "";
+                    this.chemicalInput = "";
+                    this.detectedFormat = "";
                     this.percentage = this.getMax;
                     this.editor.setSmiles("");
                 });
@@ -2582,14 +2673,36 @@ export default {
                 .then((response) => {
                     let nmrium_info = response.data;
                     if (nmrium_info) {
+                        // MIChI-compliant fields mapping
+                        const michiFields = {
+                            solvent: "NMR Solvent",
+                            temperature: "Temperature",
+                            nucleus: "Nucleus",
+                            experiment: "NMR Pulse Sequence",
+                            pulseSequence: "NMR Pulse Sequence",
+                            numberOfScans: "Number of Scans",
+                            originFrequency: "Observed Frequency",
+                            baseFrequency: "Observed Frequency",
+                            spectralWidth: "Spectral Width",
+                            numberOfPoints: "Number of Data Points",
+                            relaxationTime: "Relaxation Delay",
+                            relaxationDelay: "Relaxation Delay",
+                            fieldStrength: "Magnetic Field Strength",
+                            probeName: "NMR Probe",
+                        };
+
                         nmrium_info.data.spectra.forEach((spectra) => {
                             Object.keys(spectra.info).forEach((key) => {
-                                desc =
-                                    desc +
-                                    key +
-                                    ": " +
-                                    spectra.info[key] +
-                                    "</br>";
+                                // Only include MIChI-compliant fields
+                                if (michiFields[key]) {
+                                    console.log("MIChI field:", key);
+                                    desc =
+                                        desc +
+                                        michiFields[key] +
+                                        ": " +
+                                        spectra.info[key] +
+                                        "</br>";
+                                }
                             });
                         });
                         this.studyForm.description = desc.replace(
@@ -2734,16 +2847,150 @@ export default {
                 this.saveStudyDetails();
             }
         },
-        loadSmiles() {
+        loadStructure() {
             this.errorMessage = "";
-            if (this.smiles && this.smiles != "") {
-                try {
-                    let mol = OCL.Molecule.fromSmiles(this.smiles);
-                    this.editor.setSmiles(this.smiles);
-                } catch (e) {
-                    this.errorMessage = "The entered SMILES is not valid.";
+
+            if (!this.chemicalInput || this.chemicalInput.trim() === "") {
+                return;
+            }
+
+            const format = this.detectFormat(this.chemicalInput);
+
+            try {
+                if (format === "SMILES") {
+                    let mol = OCL.Molecule.fromSmiles(
+                        this.chemicalInput.trim()
+                    );
+                    this.editor.setSmiles(this.chemicalInput.trim());
+                } else if (format === "MOL/SDF") {
+                    let mol = OCL.Molecule.fromMolfile(this.chemicalInput);
+                    this.editor.setMolFile(this.chemicalInput);
+                } else {
+                    this.errorMessage =
+                        "Unable to detect chemical format. Please check your input.";
+                    return;
+                }
+                this.detectedFormat = format;
+            } catch (e) {
+                this.errorMessage = `Invalid ${format} format. Please check your input.`;
+            }
+        },
+
+        detectFormat(input) {
+            if (!input || input.trim() === "") return "";
+
+            const trimmed = input.trim();
+            const lines = trimmed.split("\n");
+
+            // Check for MOL/SDF format indicators
+            if (
+                trimmed.includes("M  END") ||
+                trimmed.includes("$$$$") ||
+                trimmed.includes("V2000") ||
+                trimmed.includes("V3000") ||
+                (lines.length > 3 && lines[3] && lines[3].includes(" 0  0  0"))
+            ) {
+                return "MOL/SDF";
+            }
+
+            // If it's a single line or very short, likely SMILES
+            if (lines.length <= 2 && trimmed.length < 500) {
+                // Additional SMILES validation - common SMILES characters
+                const smilesPattern = /^[A-Za-z0-9@+\-\[\]()=#\\/\\.:]+$/;
+                if (smilesPattern.test(trimmed.replace(/\s/g, ""))) {
+                    return "SMILES";
                 }
             }
+
+            // Default to trying as MOL/SDF for multi-line content
+            if (lines.length > 2) {
+                return "MOL/SDF";
+            }
+
+            // Default to SMILES for single line content
+            return "SMILES";
+        },
+
+        handleInput() {
+            if (this.chemicalInput && this.chemicalInput.trim()) {
+                this.detectedFormat = this.detectFormat(this.chemicalInput);
+            } else {
+                this.detectedFormat = "";
+            }
+        },
+
+        clearInput() {
+            this.chemicalInput = "";
+            this.detectedFormat = "";
+            this.errorMessage = "";
+            if (this.editor) {
+                this.editor.setSmiles("");
+            }
+        },
+
+        handlePaste(event) {
+            // Allow default paste behavior, then auto-load structure
+            this.$nextTick(() => {
+                this.handleInput(); // Update detected format
+                this.loadStructure(); // Auto-load the pasted content
+            });
+        },
+
+        handleDragOver(event) {
+            event.preventDefault();
+            this.isDragging = true;
+        },
+
+        handleDragLeave(event) {
+            event.preventDefault();
+            this.isDragging = false;
+        },
+
+        handleDrop(event) {
+            event.preventDefault();
+            this.isDragging = false;
+
+            const files = Array.from(event.dataTransfer.files);
+            this.processFiles(files);
+        },
+
+        processFiles(files) {
+            if (files.length === 0) return;
+
+            // Filter for mol/sdf files
+            const validFiles = files.filter((file) => {
+                const extension = file.name.toLowerCase().split(".").pop();
+                return ["mol", "sdf"].includes(extension);
+            });
+
+            if (validFiles.length === 0) {
+                this.errorMessage = "Please select valid MOL or SDF files.";
+                return;
+            }
+
+            // Process the first valid file
+            const file = validFiles[0];
+            const reader = new FileReader();
+
+            reader.onload = (e) => {
+                this.chemicalInput = e.target.result;
+                this.loadStructure();
+            };
+
+            reader.onerror = () => {
+                this.errorMessage = "Error reading file. Please try again.";
+            };
+
+            reader.readAsText(file);
+
+            if (validFiles.length > 1) {
+                this.errorMessage = `Only the first file (${file.name}) was loaded. Multiple file support coming soon.`;
+            }
+        },
+
+        // Legacy method name for backward compatibility
+        loadSmiles() {
+            this.loadStructure();
         },
         toggleSummaryBar() {
             this.showSummary = !this.showSummary;
