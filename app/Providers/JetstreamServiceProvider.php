@@ -12,10 +12,26 @@ use App\Actions\Jetstream\UpdateTeamName;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Jetstream\Jetstream;
 
+/**
+ * Jetstream Service Provider
+ *
+ * This service provider configures Laravel Jetstream for team management
+ * functionality in the NMRXIV application. It defines team actions, roles,
+ * and permissions for collaborative research projects, enabling users to
+ * work together on NMR data analysis and sharing.
+ *
+ * @author NMRXIV Development Team
+ *
+ * @since 1.0.0
+ */
 class JetstreamServiceProvider extends ServiceProvider
 {
     /**
      * Register any application services.
+     *
+     * This method is intentionally empty as Jetstream services are
+     * configured in the boot method after the application has
+     * been fully initialized.
      */
     public function register(): void
     {
@@ -24,6 +40,10 @@ class JetstreamServiceProvider extends ServiceProvider
 
     /**
      * Bootstrap any application services.
+     *
+     * Configures Jetstream team management features by registering custom
+     * action classes for team operations and setting up the permission
+     * system for collaborative research projects.
      */
     public function boot(): void
     {
@@ -41,9 +61,12 @@ class JetstreamServiceProvider extends ServiceProvider
     /**
      * Configure the roles and permissions that are available within the application.
      *
-     * @return void
+     * Defines the permission system for collaborative research projects,
+     * establishing three distinct roles (owner, collaborator, reviewer) with
+     * specific permissions for project, study, and dataset operations.
+     * This enables fine-grained access control for NMR data sharing.
      */
-    protected function configurePermissions()
+    protected function configurePermissions(): void
     {
         Jetstream::defaultApiTokenPermissions(['project:read']);
 

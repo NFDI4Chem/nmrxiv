@@ -1,5 +1,5 @@
 <template>
-    <app-layout title="Spectra">
+    <app-layout :title="pageTitle">
         <template #header>
             <div class="relative border-b border-zinc-900/5">
                 <div
@@ -527,6 +527,18 @@ export default {
         molecule: {
             default: [],
             type: Object,
+        },
+    },
+    computed: {
+        pageTitle() {
+            if (this.molecule && this.molecule.identifier) {
+                let title = `${this.molecule.identifier}`;
+                if (this.molecule.name) {
+                    title += ` (${this.molecule.name})`;
+                }
+                return title;
+            }
+            return "Spectra";
         },
     },
     data() {

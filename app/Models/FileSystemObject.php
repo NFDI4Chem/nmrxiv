@@ -44,6 +44,16 @@ class FileSystemObject extends Model
         'info',
         'level',
         'has_children',
+        // File integrity fields
+        'checksum_md5',
+        'checksum_sha256',
+        'checksum_algorithm',
+        'file_size',
+        'integrity_status',
+        'integrity_verified_at',
+        'integrity_error',
+        'verification_attempts',
+        'last_verification_attempt',
     ];
 
     /**
@@ -52,6 +62,18 @@ class FileSystemObject extends Model
      * @var array
      */
     protected $appends = ['download_url'];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'integrity_verified_at' => 'datetime',
+        'last_verification_attempt' => 'datetime',
+        'verification_attempts' => 'integer',
+        'file_size' => 'integer',
+    ];
 
     /**
      * Get the download URL to the file system object.
@@ -63,6 +85,69 @@ class FileSystemObject extends Model
         if ($this->model_type == 'study') {
             return $this->study ? $this->study->download_url : null;
         }
+    }
+
+    /**
+     * Check if the file has integrity verification pending.
+     */
+    public function hasIntegrityPending(): bool
+    {
+        return $this->type === 'file' && $this->integrity_status === 'pending';
+    }
+
+    /**
+     * Check if the file integrity is verified.
+     */
+    public function isIntegrityVerified(): bool
+    {
+        return $this->type === 'file' && $this->integrity_status === 'verified';
+    }
+
+    /**
+     * Check if the file integrity verification failed.
+     */
+    public function hasIntegrityFailed(): bool
+    {
+        return $this->type === 'file' && $this->integrity_status === 'failed';
+    }
+
+    /**
+     * Get the primary checksum based on the algorithm.
+     */
+    public function getPrimaryChecksum(): ?string
+    {
+        return match ($this->checksum_algorithm) {
+            'md5' => $this->checksum_md5,
+            'sha256' => $this->checksum_sha256,
+            default => $this->checksum_sha256,
+        };
+    }
+
+    /**
+     * Set integrity verification as failed with error message.
+     */
+    public function markIntegrityFailed(string $error): void
+    {
+        $this->update([
+            'integrity_status' => 'failed',
+            'integrity_error' => $error,
+            'last_verification_attempt' => now(),
+            'verification_attempts' => $this->verification_attempts + 1,
+        ]);
+    }
+
+    /**
+     * Set integrity verification as successful.
+     */
+    public function markIntegrityVerified(): void
+    {
+        $this->update([
+            'integrity_status' => 'verified',
+            'integrity_verified_at' => now(),
+            'integrity_error' => null,
+            'last_verification_attempt' => now(),
+            'verification_attempts' => $this->verification_attempts + 1,
+        ]);
     }
 
     public function children(): HasMany

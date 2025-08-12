@@ -258,9 +258,20 @@
                         'py-2 lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col overflow-y-scroll overflow-x-scroll border-r',
                     ]"
                 >
-                    <children :file="file"></children>
+                    <children
+                        :file="file"
+                        :expanded-folders="expandedFolders"
+                        @toggle-expansion="
+                            (fsoId, isExpanded) =>
+                                toggleFolderExpansion(fsoId, isExpanded)
+                        "
+                    ></children>
                     <div
-                        v-if="Object.keys(logs).length > 0 && !readonly"
+                        v-if="
+                            Object.keys(logs).length > 0 &&
+                            !readonly &&
+                            !isDeletingFiles
+                        "
                         class="mt-4 text-sm cursor-pointer text-gray-400"
                         @click="showLogsDialog = true"
                     >
@@ -528,6 +539,51 @@
             </div>
         </div>
     </div>
+
+    <!-- Deletion Progress Overlay -->
+    <div
+        v-if="isDeletingFiles"
+        class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50"
+    >
+        <div class="bg-white rounded-lg shadow-xl p-8 max-w-md mx-4">
+            <div class="flex items-center justify-center">
+                <div class="flex flex-col items-center">
+                    <!-- Loading Spinner -->
+                    <svg
+                        class="animate-spin h-12 w-12 text-red-600 mb-4"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                    >
+                        <circle
+                            class="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            stroke-width="4"
+                        ></circle>
+                        <path
+                            class="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                    </svg>
+                    <!-- Deletion Message -->
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">
+                        Deleting Files
+                    </h3>
+                    <p class="text-sm text-gray-600 text-center">
+                        {{ deletionMessage }}
+                    </p>
+                    <div class="mt-4 text-xs text-gray-500">
+                        Please wait, this may take a moment...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div
         v-if="
             (status != 'PROCESSING UPLOADED FILES' &&
@@ -574,7 +630,7 @@
                 >
             </div>
             <button
-                v-if="Object.keys(logs).length > 0"
+                v-if="Object.keys(logs).length > 0 && !isDeletingFiles"
                 class="mt-4 text-sm cursor-pointer bg-white-900"
                 @click="showLogsDialog = true"
             >
@@ -651,6 +707,7 @@ import {
     TrashIcon,
     ArrowDownTrayIcon,
 } from "@heroicons/vue/24/solid";
+import ChecksumCalculator from "@/Utils/ChecksumCalculator.js";
 
 export default {
     components: {
@@ -675,7 +732,7 @@ export default {
     },
     props: ["draft", "readonly", "height", "project"],
 
-    emits: ["loading"],
+    emits: ["loading", "proceed"],
 
     data() {
         return {
@@ -698,6 +755,13 @@ export default {
             showMissingFilesDetails: null,
             missing_files: 0,
             missing_files_list: [],
+            // Deletion progress
+            isDeletingFiles: false,
+            deletionMessage: "",
+            // Tree expansion state
+            expandedFolders: new Set(),
+            // Step tracking for clearing state on step changes
+            currentStep: null,
         };
     },
     computed: {
@@ -746,33 +810,365 @@ export default {
                 }
             }
         },
+
+        // Watch for URL changes to detect step changes
+        currentUrl() {
+            return window.location.search;
+        },
     },
+
+    watch: {
+        // Watch for URL parameter changes
+        currentUrl: {
+            handler() {
+                this.handleURLChange();
+            },
+            immediate: false,
+        },
+    },
+
     mounted() {
         if (this.draft) {
             this.url =
                 this.baseURL + "/dashboard/drafts/" + this.draft.id + "/files";
             this.loadDropZone();
         }
+
+        // Initialize current step and set up step change detection
+        this.initializeStepTracking();
+
+        // Restore expanded state from URL
+        this.restoreExpandedStateFromURL();
+
+        // Listen for popstate events (browser back/forward) to detect URL changes
+        window.addEventListener("popstate", this.handleURLChange);
+
+        // Listen for global proceed events
+        window.addEventListener("file-browser-proceed", this.handleProceed);
+    },
+
+    beforeUnmount() {
+        // Clear file tree state before component unmounts
+        this.clearURLParameters();
+
+        // Clean up event listeners
+        window.removeEventListener("popstate", this.handleURLChange);
+        window.removeEventListener("file-browser-proceed", this.handleProceed);
     },
     methods: {
+        /**
+         * Initialize step tracking from current URL
+         */
+        initializeStepTracking() {
+            const urlParams = new URLSearchParams(window.location.search);
+            this.currentStep = urlParams.get("step");
+        },
+
+        /**
+         * Handle URL changes to detect step changes
+         */
+        handleURLChange() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const newStep = urlParams.get("step");
+
+            // If step has changed, clear expanded and selected state
+            if (newStep !== this.currentStep) {
+                this.clearFileTreeState();
+                this.currentStep = newStep;
+            }
+        },
+
+        /**
+         * Clear file tree state when step changes
+         */
+        clearFileTreeState() {
+            // Clear expanded folders
+            this.expandedFolders.clear();
+
+            // Reset selection to root
+            if (this.file) {
+                this.$page.props.selectedFileSystemObject = this.file;
+                this.$page.props.selectedFolder = "/";
+            }
+
+            // Remove expanded and selected parameters from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            urlParams.delete("expanded");
+            urlParams.delete("selected");
+
+            // Update URL without the file tree state parameters
+            const newUrl = `${
+                window.location.pathname
+            }?${urlParams.toString()}`;
+            window.history.replaceState({}, "", newUrl);
+
+            // Force UI refresh to reflect the cleared state
+            this.$nextTick(() => {
+                this.forceRefreshExpandedState();
+            });
+        },
+
+        /**
+         * Check for step changes (can be called externally)
+         */
+        checkForStepChange() {
+            this.handleURLChange();
+        },
+
+        /**
+         * Manually clear file tree state (can be called from parent components)
+         */
+        clearState() {
+            this.clearFileTreeState();
+        },
+
+        /**
+         * Handle proceed button click - clear file tree state
+         */
+        handleProceed() {
+            this.clearFileTreeState();
+            this.$emit("proceed");
+        },
+
+        /**
+         * Clear expanded and selected parameters from URL (lightweight version)
+         */
+        clearURLParameters() {
+            const urlParams = new URLSearchParams(window.location.search);
+            urlParams.delete("expanded");
+            urlParams.delete("selected");
+
+            const newUrl = `${
+                window.location.pathname
+            }?${urlParams.toString()}`;
+            window.history.replaceState({}, "", newUrl);
+        },
+
+        /**
+         * Helper to trigger proceed event globally (for external use)
+         * Usage from anywhere: window.dispatchEvent(new Event('file-browser-proceed'))
+         */
+
+        /**
+         * Calculate checksums for uploaded files before processing
+         */
+        async calculateChecksumsForFiles(files) {
+            this.status = "CALCULATING CHECKSUMS";
+
+            // Filter out directories and unreadable files
+
+            // First pass: basic filtering
+            const potentialFiles = files.filter((file) => {
+                const fileName = file.fullPath || file.name;
+
+                // Skip directories and invalid files
+                if (file.size === 0 && file.type === "") return false;
+                if (fileName.endsWith("/") || fileName.endsWith("\\"))
+                    return false;
+                if (typeof file.slice !== "function") return false;
+                if (
+                    file.size === 0 &&
+                    fileName.includes("/") &&
+                    !fileName.includes(".")
+                )
+                    return false;
+
+                return true;
+            });
+
+            // Second pass: test file readability to catch pseudo-files
+            const actualFiles = [];
+            for (const file of potentialFiles) {
+                const fileName = file.fullPath || file.name;
+                try {
+                    // Test if we can actually read from this file
+                    const testChunk = file.slice(0, Math.min(1, file.size));
+
+                    await new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve();
+                        reader.onerror = () => reject(reader.error);
+                        reader.readAsArrayBuffer(testChunk);
+                    });
+
+                    actualFiles.push(file);
+                } catch (error) {
+                    // Skip this file silently
+                }
+            }
+
+            if (actualFiles.length === 0) {
+                this.status = "READY";
+                return;
+            }
+
+            const progressTracker =
+                ChecksumCalculator.createMultiFileProgressTracker(
+                    actualFiles,
+                    (progress) => {
+                        this.status = `CALCULATING CHECKSUMS (${progress}%)`;
+                    }
+                );
+
+            const checksumPromises = actualFiles.map(async (file) => {
+                try {
+                    const fileName = file.fullPath || file.name;
+
+                    // Update log status
+                    if (this.logs[fileName]) {
+                        this.logs[fileName].status = "Calculating checksum";
+                        this.logs[fileName].messages.push(
+                            "Starting checksum calculation"
+                        );
+                    }
+
+                    // Calculate both MD5 and SHA-256 for maximum compatibility
+                    const checksums =
+                        await ChecksumCalculator.calculateBothChecksums(
+                            file,
+                            (progress) => {
+                                if (this.logs[fileName]) {
+                                    this.logs[fileName].messages[
+                                        this.logs[fileName].messages.length - 1
+                                    ] = `Calculating checksum: ${progress}%`;
+                                }
+                                progressTracker(fileName, progress);
+                            }
+                        );
+
+                    // Store checksums in file object for later use
+                    file.checksums = checksums;
+
+                    // Update log with success
+                    if (this.logs[fileName]) {
+                        this.logs[fileName].messages.push(
+                            `Checksums calculated - MD5: ${checksums.md5.substring(
+                                0,
+                                8
+                            )}..., SHA256: ${checksums.sha256.substring(
+                                0,
+                                8
+                            )}...`
+                        );
+                    }
+                } catch (error) {
+                    console.error(
+                        `Error calculating checksums for ${file.name}:`,
+                        error
+                    );
+
+                    const fileName = file.fullPath || file.name;
+                    if (this.logs[fileName]) {
+                        this.logs[fileName].status = "Error";
+                        this.logs[fileName].messages.push(
+                            `Checksum calculation failed: ${error.message}`
+                        );
+                    }
+
+                    // Don't fail the entire upload for checksum errors
+                    file.checksums = null;
+                }
+            });
+
+            await Promise.all(checksumPromises);
+
+            this.status = "CHECKSUMS CALCULATED";
+            console.log(
+                "All checksums calculated, proceeding with upload preparation"
+            );
+        },
+
         confirmFSODeletion() {
             this.fsoBeingDeleted = this.$page.props.selectedFileSystemObject.id;
         },
         deleteFSO() {
             if (this.$page.props.selectedFileSystemObject.id) {
                 this.fsoBeingDeleted = null;
+
+                // Store the deleted object and its parent for reverting selection
+                const deletedObject = this.$page.props.selectedFileSystemObject;
+                const parentFolder = this.findParentFolder(
+                    this.file,
+                    deletedObject
+                );
+
+                // Show deletion progress overlay
+                this.isDeletingFiles = true;
+                this.deletionMessage = `Removing "${deletedObject.name}" and all its contents...`;
+
                 this.updateBusyStatus(true);
                 this.$emit("loading", true);
+
                 axios
                     .delete(
                         "/dashboard/drafts/" +
                             this.draft.id +
                             "/files/" +
-                            this.$page.props.selectedFileSystemObject.id
+                            deletedObject.id
                     )
-                    .then((response) => {
-                        this.annotate();
-                        this.$emit("loading", true);
+                    .then(async (response) => {
+                        // Hide deletion overlay
+                        this.isDeletingFiles = false;
+                        this.deletionMessage = "";
+
+                        this.updateBusyStatus(false);
+                        this.$emit("loading", false);
+
+                        if (response.data.success) {
+                            // Show success message with details
+                            let message = response.data.message;
+                            if (response.data.has_storage_errors) {
+                                message += ` Note: ${response.data.storage_errors.length} storage operation(s) had issues.`;
+                            }
+
+                            // Clear logs after successful deletion
+                            this.logs = {};
+
+                            // Store parent info for reversion after tree refresh
+                            const parentInfo = parentFolder
+                                ? {
+                                      id: parentFolder.id,
+                                      name: parentFolder.name,
+                                      relative_url: parentFolder.relative_url,
+                                  }
+                                : null;
+
+                            // Refresh the file tree and then revert selection
+                            this.annotateAndRevertToParent(
+                                deletedObject,
+                                parentInfo
+                            );
+                        } else {
+                            console.error(
+                                "Deletion failed:",
+                                response.data.message
+                            );
+                            // You can add error toast notification here
+                        }
+                    })
+                    .catch((error) => {
+                        // Hide deletion overlay
+                        this.isDeletingFiles = false;
+                        this.deletionMessage = "";
+
+                        this.updateBusyStatus(false);
+                        this.$emit("loading", false);
+
+                        console.error("Deletion request failed:", error);
+
+                        if (
+                            error.response &&
+                            error.response.data &&
+                            error.response.data.message
+                        ) {
+                            console.error(
+                                "Server error:",
+                                error.response.data.message
+                            );
+                            // You can add error toast notification here
+                        } else {
+                            console.error("Network or unknown error occurred");
+                        }
                     });
             }
         },
@@ -803,12 +1199,30 @@ export default {
                 axios.get(this.url).then((response) => {
                     this.file = response.data.file;
                     this.file.has_children = true;
-                    this.$page.props.selectedFileSystemObject = this.file;
-                    this.$page.props.selectedFolder = "/";
                     this.updateBusyStatus(true);
                     this.$emit("loading", false);
                     this.loading = false;
                     this.missing_files = response.data.missing_files;
+
+                    // Apply expanded state and select last expanded folder
+                    this.$nextTick(async () => {
+                        this.applyExpandedState(this.file);
+
+                        // Fetch any missing folder contents for expanded folders
+                        await this.fetchMissingFolderContents();
+
+                        // Now that all folder contents are loaded, select the target object
+                        if (this.expandedFolders.size > 0) {
+                            await this.selectLastExpandedFolder();
+                        } else {
+                            this.$page.props.selectedFileSystemObject =
+                                this.file;
+                            this.$page.props.selectedFolder = "/";
+                        }
+
+                        // Force refresh to ensure UI updates
+                        this.forceRefreshExpandedState();
+                    });
                 });
             } else {
                 this.file = this.$page.props.selectedFileSystemObject;
@@ -827,11 +1241,72 @@ export default {
                     this.loadFiles();
                 });
         },
+
+        /**
+         * Annotate files and then revert to parent folder after deletion
+         */
+        async annotateAndRevertToParent(deletedObject, parentInfo) {
+            this.updateBusyStatus(true);
+            this.$emit("loading", true);
+            this.loading = true;
+            this.status = "PROCESSING UPLOADED FILES";
+
+            try {
+                await axios.get(
+                    "/dashboard/drafts/" + this.draft.id + "/annotate"
+                );
+                this.updateBusyStatus(false);
+                this.status = null;
+
+                // Load files and then revert to parent
+                await new Promise((resolve) => {
+                    const originalLoadFiles = this.loadFiles;
+                    this.loadFiles = () => {
+                        originalLoadFiles.call(this);
+
+                        // Wait for the next tick to ensure file tree is loaded, then revert
+                        this.$nextTick(async () => {
+                            await this.revertToParentAfterDeletion(
+                                deletedObject,
+                                parentInfo
+                            );
+                            resolve();
+                        });
+                    };
+                    this.loadFiles();
+                    // Restore original loadFiles method
+                    this.loadFiles = originalLoadFiles;
+                });
+            } catch (error) {
+                console.error("Error during annotation:", error);
+                this.updateBusyStatus(false);
+                this.status = null;
+                this.loading = false;
+                this.$emit("loading", false);
+
+                // Still try to revert to parent even if annotation fails
+                await this.revertToParentAfterDeletion(
+                    deletedObject,
+                    parentInfo
+                );
+            }
+        },
         processFilesDZL(vm, filesBatch) {
             vm.batchesCount += 1;
             const url = "/dashboard/storage/signed-draft-storage-url";
             const client = axios.create({ baseURL: window.location.origin });
             vm.currentLog = "Fetching temporary storage url";
+
+            // Ensure checksums are included in the file data
+            const filesWithChecksums = filesBatch.map((file) => ({
+                upload: file.upload || {
+                    filename: file.name,
+                    total: file.size,
+                },
+                fullPath: file.fullPath || file.webkitRelativePath || file.name,
+                checksums: file.checksums || null, // Include calculated checksums
+            }));
+
             axiosRetry(client, {
                 retries: 3,
                 retryCondition: (error) => {
@@ -846,7 +1321,7 @@ export default {
             });
             client
                 .post(url, {
-                    draft_files: filesBatch,
+                    draft_files: filesWithChecksums,
                     destination: vm.$page.props.selectedFolder,
                     draft_id: vm.draft.id,
                 })
@@ -984,6 +1459,7 @@ export default {
                     "webkitdirectory",
                     true
                 );
+
                 vm.dropzone.on("processing", (file) => {
                     vm.dropzone.options.url = file.uploadURL;
                     vm.status = "UPLOAD IN PROGRESS";
@@ -1035,32 +1511,74 @@ export default {
                 vm.dropzone.on("addedfiles", (files) => {
                     if (files.length > 0) {
                         this.updateBusyStatus(true);
-                        setTimeout(() => {
-                            var timer = setInterval(function () {
-                                if (
-                                    vm.totalFilesCount === vm.selectedFSO.length
-                                ) {
-                                    clearInterval(timer);
-                                    vm.status = "BATCH UPLOAD STARTED";
-                                    for (
-                                        let i = 0;
-                                        i < vm.totalFilesCount;
-                                        i += vm.batchCount
-                                    ) {
-                                        let filesBatch =
-                                            vm.dropzone.files.slice(
-                                                i,
-                                                i + vm.batchCount
-                                            );
-                                        vm.batches += 1;
-                                        vm.processFilesDZL(vm, filesBatch);
+
+                        // Convert FileList to array for processing
+                        let filesArray = [];
+                        for (let i = 0; i < files.length; i++) {
+                            filesArray.push(files[i]);
+                        }
+
+                        // Extract real File objects from Dropzone wrappers if needed
+                        const realFilesArray = filesArray.map((file) => {
+                            // If it's a Dropzone wrapper object, try to extract the real File
+                            if (
+                                "upload" in file &&
+                                file.upload &&
+                                file.upload.file
+                            ) {
+                                return file.upload.file;
+                            }
+                            // If it doesn't have slice method but has other properties, it might be wrapped
+                            if (
+                                typeof file.slice !== "function" &&
+                                file instanceof File === false
+                            ) {
+                                // Try to find the original file object in the wrapper
+                                for (const key in file) {
+                                    if (file[key] instanceof File) {
+                                        return file[key];
                                     }
-                                } else {
-                                    vm.totalFilesCount = vm.selectedFSO.length;
-                                    vm.status = "PROCESSING FILES";
                                 }
-                            }, 500);
+                            }
+                            return file; // Return as-is if it seems to be a real File object
                         });
+
+                        // Calculate checksums for all files before processing
+                        vm.calculateChecksumsForFiles(realFilesArray).then(
+                            () => {
+                                setTimeout(() => {
+                                    var timer = setInterval(function () {
+                                        if (
+                                            vm.totalFilesCount ===
+                                            vm.selectedFSO.length
+                                        ) {
+                                            clearInterval(timer);
+                                            vm.status = "BATCH UPLOAD STARTED";
+                                            for (
+                                                let i = 0;
+                                                i < vm.totalFilesCount;
+                                                i += vm.batchCount
+                                            ) {
+                                                let filesBatch =
+                                                    vm.dropzone.files.slice(
+                                                        i,
+                                                        i + vm.batchCount
+                                                    );
+                                                vm.batches += 1;
+                                                vm.processFilesDZL(
+                                                    vm,
+                                                    filesBatch
+                                                );
+                                            }
+                                        } else {
+                                            vm.totalFilesCount =
+                                                vm.selectedFSO.length;
+                                            vm.status = "CALCULATING CHECKSUMS";
+                                        }
+                                    }, 500);
+                                });
+                            }
+                        );
                     }
                 });
                 vm.dropzone.on("queuecomplete", () => {
@@ -1116,6 +1634,521 @@ export default {
                         file.loading = false;
                     });
             }
+        },
+
+        /**
+         * Track when a folder is expanded/collapsed
+         */
+        toggleFolderExpansion(fsoId, isExpanded) {
+            if (isExpanded) {
+                this.expandedFolders.add(fsoId);
+            } else {
+                this.expandedFolders.delete(fsoId);
+            }
+            this.updateURLWithExpandedState();
+        },
+
+        /**
+         * Update URL with current expanded state
+         */
+        updateURLWithExpandedState() {
+            const urlParams = new URLSearchParams(window.location.search);
+
+            if (this.expandedFolders.size > 0) {
+                urlParams.set(
+                    "expanded",
+                    Array.from(this.expandedFolders).join(",")
+                );
+            } else {
+                urlParams.delete("expanded");
+            }
+
+            // Also save the currently selected folder
+            if (
+                this.$page.props.selectedFileSystemObject &&
+                this.$page.props.selectedFileSystemObject.id
+            ) {
+                urlParams.set(
+                    "selected",
+                    this.$page.props.selectedFileSystemObject.id
+                );
+            }
+
+            const newUrl = `${
+                window.location.pathname
+            }?${urlParams.toString()}`;
+            window.history.replaceState({}, "", newUrl);
+        },
+
+        /**
+         * Restore expanded state from URL parameters
+         */
+        restoreExpandedStateFromURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const expandedParam = urlParams.get("expanded");
+
+            if (expandedParam) {
+                this.expandedFolders = new Set(
+                    expandedParam
+                        .split(",")
+                        .filter((id) => id)
+                        .map((id) => parseInt(id))
+                );
+            }
+        },
+
+        /**
+         * Fetch missing folder contents for expanded folders that don't have children loaded
+         */
+        async fetchMissingFolderContents() {
+            if (!this.file || this.expandedFolders.size === 0) return;
+
+            let iterationCount = 0;
+            const maxIterations = 10; // Prevent infinite loops
+
+            // Keep checking for missing folders until all are loaded
+            while (iterationCount < maxIterations) {
+                // Find folders that are marked as expanded but don't have children loaded
+                const missingFolders = [];
+                this.findMissingExpandedFolders(this.file, missingFolders);
+
+                if (missingFolders.length === 0) {
+                    break;
+                }
+
+                // Fetch children for all missing folders in parallel
+                const fetchPromises = missingFolders.map((folder) =>
+                    this.fetchFolderChildren(folder)
+                );
+
+                try {
+                    await Promise.all(fetchPromises);
+
+                    // Re-apply expanded state after loading
+                    this.applyExpandedState(this.file);
+                } catch (error) {
+                    console.error(
+                        "Error loading missing folder contents:",
+                        error
+                    );
+                    break; // Exit on error to prevent infinite loop
+                }
+
+                iterationCount++;
+            }
+
+            // Final UI refresh after all loading is complete
+            this.$nextTick(() => {
+                this.forceRefreshExpandedState();
+            });
+        },
+
+        /**
+         * Recursively find folders that should be expanded but don't have children loaded
+         */
+        findMissingExpandedFolders(fileObject, missingFolders) {
+            if (!fileObject) return;
+
+            // Check if this folder should be expanded but doesn't have children loaded
+            if (fileObject.id && this.expandedFolders.has(fileObject.id)) {
+                if (
+                    fileObject.has_children &&
+                    (!fileObject.children || fileObject.children.length === 0)
+                ) {
+                    // Avoid duplicate entries
+                    if (!missingFolders.find((f) => f.id === fileObject.id)) {
+                        missingFolders.push(fileObject);
+                    }
+                }
+            }
+
+            // Also check if the currently selected folder needs its children loaded
+            if (
+                fileObject.id &&
+                this.$page.props.selectedFileSystemObject &&
+                this.$page.props.selectedFileSystemObject.id ===
+                    fileObject.id &&
+                fileObject.has_children &&
+                (!fileObject.children || fileObject.children.length === 0)
+            ) {
+                // Avoid duplicate entries
+                if (!missingFolders.find((f) => f.id === fileObject.id)) {
+                    missingFolders.push(fileObject);
+                }
+            }
+
+            // Recursively check children (even if current folder is missing children,
+            // we might have partial data for some subfolders)
+            if (fileObject.children && Array.isArray(fileObject.children)) {
+                fileObject.children.forEach((child) => {
+                    if (child.type === "directory") {
+                        this.findMissingExpandedFolders(child, missingFolders);
+                    }
+                });
+            }
+        },
+
+        /**
+         * Fetch children for a specific folder
+         */
+        async fetchFolderChildren(folder) {
+            if (folder.loading) return; // Already loading
+
+            folder.loading = true;
+
+            try {
+                const response = await axios.get(
+                    `/api/v1/files/children/${folder.id}`
+                );
+
+                // Validate response structure
+                if (
+                    response.data &&
+                    response.data.files &&
+                    response.data.files[0] &&
+                    response.data.files[0].children
+                ) {
+                    folder.children = response.data.files[0].children;
+                } else {
+                    folder.children = []; // Set empty array to prevent repeated requests
+                }
+            } catch (error) {
+                console.error(
+                    `Failed to load children for ${folder.name}:`,
+                    error
+                );
+
+                // Set empty array to prevent repeated requests for this folder
+                folder.children = [];
+
+                // If this is a 404 or similar, the folder might not exist anymore
+                if (error.response && error.response.status === 404) {
+                    this.expandedFolders.delete(folder.id);
+                    this.updateURLWithExpandedState();
+                }
+            } finally {
+                folder.loading = false;
+            }
+        },
+
+        /**
+         * Check if a folder should be expanded
+         */
+        isFolderExpanded(fsoId) {
+            return this.expandedFolders.has(fsoId);
+        },
+
+        /**
+         * Apply expanded state to file tree after refresh
+         */
+        applyExpandedState(fileObject) {
+            if (!fileObject) return;
+
+            // Check if this folder should be expanded
+            if (fileObject.id && this.expandedFolders.has(fileObject.id)) {
+                fileObject.isExpanded = true;
+            }
+
+            // Recursively apply to children
+            if (fileObject.children && Array.isArray(fileObject.children)) {
+                fileObject.children.forEach((child) => {
+                    this.applyExpandedState(child);
+                });
+            }
+        },
+
+        /**
+         * Force refresh expanded folders in the UI
+         */
+        forceRefreshExpandedState() {
+            // Force re-render by updating a reactive property
+            this.$nextTick(() => {
+                this.applyExpandedState(this.file);
+                this.$forceUpdate();
+            });
+        },
+
+        /**
+         * Find and select the last expanded folder for right panel
+         */
+        async selectLastExpandedFolder() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const selectedParam = urlParams.get("selected");
+
+            let targetId = null;
+
+            // First try to use the selected parameter from URL
+            if (selectedParam) {
+                targetId = parseInt(selectedParam);
+            } else {
+                // Fall back to last expanded folder
+                const expandedIds = Array.from(this.expandedFolders);
+                if (expandedIds.length === 0) return;
+                targetId = expandedIds[expandedIds.length - 1];
+            }
+
+            // Find the object (file or folder) in the file tree
+            const selectedObject = this.findObjectById(this.file, targetId);
+            if (selectedObject) {
+                this.$page.props.selectedFileSystemObject = selectedObject;
+                this.updateSelectedFolder(selectedObject);
+
+                // Handle based on object type
+                if (selectedObject.type === "directory") {
+                    // If this folder has children flag but no children loaded, fetch them
+                    if (
+                        selectedObject.has_children &&
+                        (!selectedObject.children ||
+                            selectedObject.children.length === 0)
+                    ) {
+                        await this.fetchFolderChildren(selectedObject);
+
+                        // Update the selected object with the newly loaded children
+                        this.$page.props.selectedFileSystemObject =
+                            selectedObject;
+                    }
+                } else {
+                    // File selected - expand all parent folders leading to this file
+                    await this.expandPathToObject(selectedObject);
+
+                    // Re-find the file object after all parents' children are loaded (reference might have changed)
+                    const updatedFileObject = this.findObjectById(
+                        this.file,
+                        targetId
+                    );
+                    if (updatedFileObject) {
+                        this.$page.props.selectedFileSystemObject =
+                            updatedFileObject;
+                        this.updateSelectedFolder(updatedFileObject);
+                    }
+                }
+            }
+        },
+
+        /**
+         * Recursively find an object (file or folder) by ID in the file tree
+         */
+        findObjectById(fileObject, targetId) {
+            if (!fileObject) return null;
+
+            if (fileObject.id === targetId) {
+                return fileObject;
+            }
+
+            if (fileObject.children && Array.isArray(fileObject.children)) {
+                for (const child of fileObject.children) {
+                    const found = this.findObjectById(child, targetId);
+                    if (found) return found;
+                }
+            }
+
+            return null;
+        },
+
+        /**
+         * Find the parent folder of a given file or folder object
+         */
+        findParentFolder(fileObject, targetObject, parent = null) {
+            if (!fileObject) return null;
+
+            // If we find the target object, return its parent
+            if (fileObject.id === targetObject.id) {
+                return parent;
+            }
+
+            if (fileObject.children && Array.isArray(fileObject.children)) {
+                for (const child of fileObject.children) {
+                    const found = this.findParentFolder(
+                        child,
+                        targetObject,
+                        fileObject
+                    );
+                    if (found) return found;
+                }
+            }
+
+            return null;
+        },
+
+        /**
+         * Expand all parent folders leading to a specific object
+         */
+        async expandPathToObject(targetObject) {
+            const pathFolders = [];
+            this.buildPathToObject(this.file, targetObject, [], pathFolders);
+
+            // Add all path folders to expanded folders and load their children if needed
+            for (const folder of pathFolders) {
+                if (folder.has_children && folder.id) {
+                    this.expandedFolders.add(folder.id);
+
+                    // Load children if not already loaded
+                    if (!folder.children || folder.children.length === 0) {
+                        await this.fetchFolderChildren(folder);
+                    }
+                }
+            }
+
+            this.updateURLWithExpandedState();
+        },
+
+        /**
+         * Build array of all folders in path to target object
+         */
+        buildPathToObject(currentObject, targetObject, currentPath, result) {
+            if (!currentObject) return false;
+
+            // Add current object to path if it's a directory
+            if (
+                currentObject.type === "directory" ||
+                currentObject.name === "/"
+            ) {
+                currentPath = [...currentPath, currentObject];
+            }
+
+            // If we found the target, save the path
+            if (currentObject.id === targetObject.id) {
+                result.push(...currentPath);
+                return true;
+            }
+
+            // Search in children
+            if (
+                currentObject.children &&
+                Array.isArray(currentObject.children)
+            ) {
+                for (const child of currentObject.children) {
+                    if (
+                        this.buildPathToObject(
+                            child,
+                            targetObject,
+                            currentPath,
+                            result
+                        )
+                    ) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        },
+
+        /**
+         * Update selected folder for right panel
+         */
+        updateSelectedFolder(folder) {
+            let sFolder = "/";
+            if (folder.name == "/") {
+                sFolder = "/";
+            } else {
+                if (folder.type != "file") {
+                    sFolder = folder.relative_url;
+                } else {
+                    if (folder.parent_id == null) {
+                        sFolder = "/";
+                    } else {
+                        sFolder = folder.relative_url.replace(
+                            "/" + folder.name,
+                            ""
+                        );
+                    }
+                }
+            }
+            this.$page.props.selectedFolder = sFolder;
+        },
+
+        /**
+         * Revert selection to parent folder after a file/folder is deleted
+         */
+        async revertToParentAfterDeletion(deletedObject, parentInfo) {
+            // Remove the deleted object from expanded folders if it was a folder
+            if (deletedObject.type === "directory" && deletedObject.id) {
+                this.expandedFolders.delete(deletedObject.id);
+            }
+
+            if (parentInfo && parentInfo.id) {
+                // Find the parent folder in the refreshed tree
+                const parentFolder = this.findObjectById(
+                    this.file,
+                    parentInfo.id
+                );
+
+                if (parentFolder) {
+                    // Select the parent folder
+                    this.$page.props.selectedFileSystemObject = parentFolder;
+                    this.updateSelectedFolder(parentFolder);
+
+                    // Ensure parent folder is in expanded folders if it has children
+                    if (parentFolder.has_children) {
+                        this.expandedFolders.add(parentFolder.id);
+                    }
+
+                    // Load parent folder's children if needed
+                    if (
+                        parentFolder.has_children &&
+                        (!parentFolder.children ||
+                            parentFolder.children.length === 0)
+                    ) {
+                        await this.fetchFolderChildren(parentFolder);
+                    }
+
+                    // Update URL with new selection and expanded state
+                    const urlParams = new URLSearchParams(
+                        window.location.search
+                    );
+                    urlParams.set("selected", parentFolder.id);
+
+                    if (this.expandedFolders.size > 0) {
+                        urlParams.set(
+                            "expanded",
+                            Array.from(this.expandedFolders).join(",")
+                        );
+                    } else {
+                        urlParams.delete("expanded");
+                    }
+
+                    const newUrl = `${
+                        window.location.pathname
+                    }?${urlParams.toString()}`;
+                    window.history.replaceState({}, "", newUrl);
+                } else {
+                    this.revertToRoot(deletedObject);
+                }
+            } else {
+                this.revertToRoot(deletedObject);
+            }
+
+            // Refresh UI to reflect changes
+            this.$nextTick(() => {
+                this.forceRefreshExpandedState();
+            });
+        },
+
+        /**
+         * Helper method to revert to root folder
+         */
+        revertToRoot(deletedObject) {
+            this.$page.props.selectedFileSystemObject = this.file;
+            this.$page.props.selectedFolder = "/";
+
+            // Update URL to remove selection and update expanded state
+            const urlParams = new URLSearchParams(window.location.search);
+            urlParams.delete("selected");
+
+            if (this.expandedFolders.size > 0) {
+                urlParams.set(
+                    "expanded",
+                    Array.from(this.expandedFolders).join(",")
+                );
+            } else {
+                urlParams.delete("expanded");
+            }
+
+            const newUrl = `${
+                window.location.pathname
+            }?${urlParams.toString()}`;
+            window.history.replaceState({}, "", newUrl);
         },
     },
 };

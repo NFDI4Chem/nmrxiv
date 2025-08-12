@@ -7,12 +7,12 @@ use App\Models\License;
 class GetLicense
 {
     /**
-     * Return License object by Id.
+     * Return License object by ID.
      */
-    public function getLicensebyId($id)
+    public function getLicenseById(int $id): ?License
     {
-        $license = License::select('id', 'title', 'description')->where('id', $id)->get();
-
-        return $license;
+        return License::select('id', 'title', 'description', 'category')
+            ->where('id', $id)
+            ->first();
     }
 }

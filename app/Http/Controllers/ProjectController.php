@@ -133,7 +133,7 @@ class ProjectController extends Controller
             'availableRoles' => array_values(Jetstream::$roles),
             'role' => $project->userProjectRole($user->email),
             'teamRole' => $user->belongsToTeam($team) ? $user->teamRole($team) : null,
-            'license' => $license ? $license[0] : null,
+            'license' => $license,
             'projectPermissions' => [
                 'canDeleteProject' => Gate::check('deleteProject', $project),
                 'canUpdateProject' => Gate::check('updateProject', $project),
@@ -159,7 +159,7 @@ class ProjectController extends Controller
                 'availableRoles' => array_values(Jetstream::$roles),
                 'role' => 'reviewer',
                 'teamRole' => null,
-                'license' => $license ? $license[0] : null,
+                'license' => $license,
                 'projectPermissions' => [
                     'canDeleteProject' => false,
                     'canUpdateProject' => false,
