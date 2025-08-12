@@ -2,7 +2,7 @@
 
 set -e
 
-COMPOSE_FILE="/mnt/docker/nmrxiv/deployment/docker-compose.prod.yml"
+COMPOSE_FILE="/mnt/docker/nmrxiv/deployment/docker-compose.dev.yml"
 APP_IMAGE="nfdi4chem/nmrxiv:app-dev-latest"
 WORKER_IMAGE="nfdi4chem/nmrxiv:worker-dev-latest"
 NEW_CONTAINER_ID=""
