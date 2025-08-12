@@ -16,11 +16,11 @@ services:
     restart: unless-stopped
     volumes:
     - /var/run/docker.sock:/var/run/docker.sock:ro
-    - /etc/ssl/nmrxiv.org/:/certs:ro
+    - /etc/ssl/dev.nmrxiv.org/:/certs:ro
     - /etc/traefik/dynamic.yml:/etc/traefik/dynamic.yml:ro
 
   app:
-    image: nfdi4chem/nmrxiv:app-latest
+    image: nfdi4chem/nmrxiv:app-dev-latest
     depends_on:
     - pgsql
     - redis
@@ -33,7 +33,7 @@ services:
     - HTTP_PROXY=${HTTP_PROXY}
     - HTTPS_PROXY=${HTTPS_PROXY}
     - NO_PROXY=${NO_PROXY}
-    - APP_URL=https://nmrxiv.org
+    - APP_URL=https://dev.nmrxiv.org
     - TRUSTED_PROXIES="*"
     healthcheck:
       interval: 30s
@@ -47,7 +47,7 @@ services:
       timeout: 10s
     labels:
     - traefik.enable=true
-    - traefik.http.routers.laravel.rule=Host(`nmrxiv.org`)
+    - traefik.http.routers.laravel.rule=Host(`dev.nmrxiv.org`)
     - traefik.http.routers.laravel.entrypoints=websecure
     - traefik.http.routers.laravel.tls=true
     - traefik.http.services.laravel.loadbalancer.server.port=80
@@ -61,7 +61,7 @@ services:
 
 
   worker:
-    image: nfdi4chem/nmrxiv:worker-latest
+    image: nfdi4chem/nmrxiv:worker-dev-latest
     depends_on:
     - app
     - pgsql
