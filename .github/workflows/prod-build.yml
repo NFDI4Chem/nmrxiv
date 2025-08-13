@@ -5,7 +5,7 @@ name: Setup, Build and Publish to Prod
 # Trigger the workflow on pushes to the production branch
 on:
   push:
-    branches: [production]
+    branches: [main]
 
 # Environment variables used across all jobs
 env:
