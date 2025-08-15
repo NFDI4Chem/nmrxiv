@@ -36,8 +36,9 @@ class ProcessDraftELNSubmission implements ShouldQueue
     ): void {
         $draft = Draft::find($this->draftId);
 
-        if (!$draft) {
+        if (! $draft) {
             Log::error("Draft not found: {$this->draftId}");
+
             return;
         }
 
@@ -47,10 +48,11 @@ class ProcessDraftELNSubmission implements ShouldQueue
             // Only process Chemotion ELN
             if (strtolower($draft->eln) !== 'chemotion') {
                 $logger->log($draft, 'info', "Skipping non-Chemotion ELN: {$draft->eln}");
+
                 return;
             }
 
-            if (!$draft->zip_url) {
+            if (! $draft->zip_url) {
                 throw new \Exception('No zip_url found for draft');
             }
 
@@ -75,11 +77,11 @@ class ProcessDraftELNSubmission implements ShouldQueue
             ]);
 
             $logger->log($draft, 'info', 'Successfully completed ELN processing', [
-                'files_processed' => count($extractedFiles)
+                'files_processed' => count($extractedFiles),
             ]);
 
         } catch (\Exception $e) {
-            $logger->log($draft, 'error', 'ELN processing failed: ' . $e->getMessage());
+            $logger->log($draft, 'error', 'ELN processing failed: '.$e->getMessage());
             $draft->update(['status' => 'FAILED']);
             throw $e;
         }
@@ -93,13 +95,13 @@ class ProcessDraftELNSubmission implements ShouldQueue
         // Download zip file
         $response = Http::timeout(300)->get($draft->zip_url);
 
-        if (!$response->successful()) {
+        if (! $response->successful()) {
             throw new \Exception("Failed to download zip file. HTTP status: {$response->status()}");
         }
 
         // Create temp paths
         $tempZipPath = tempnam(sys_get_temp_dir(), 'eln_zip_');
-        $tempExtractDir = sys_get_temp_dir() . '/eln_extract_' . $this->draftId . '_' . time();
+        $tempExtractDir = sys_get_temp_dir().'/eln_extract_'.$this->draftId.'_'.time();
 
         try {
             // Save and extract zip
@@ -141,14 +143,14 @@ class ProcessDraftELNSubmission implements ShouldQueue
 
         foreach ($iterator as $file) {
             if ($file->isFile()) {
-                $relativePath = str_replace($tempDir . DIRECTORY_SEPARATOR, '', $file->getPathname());
+                $relativePath = str_replace($tempDir.DIRECTORY_SEPARATOR, '', $file->getPathname());
                 $relativePath = str_replace(DIRECTORY_SEPARATOR, '/', $relativePath);
-                $storageRelativePath = $baseDestination . '/' . $relativePath;
+                $storageRelativePath = $baseDestination.'/'.$relativePath;
                 $storagePath = $pathGenerator->generateDraftFilePath($draft, $storageRelativePath);
 
                 // Ensure directory exists and move file
                 $storageDir = dirname($storagePath);
-                if (!Storage::exists($storageDir)) {
+                if (! Storage::exists($storageDir)) {
                     Storage::makeDirectory($storageDir);
                 }
 
@@ -178,7 +180,7 @@ class ProcessDraftELNSubmission implements ShouldQueue
             try {
                 $fileSystemService->createDraftFileSystemObject($draft, $file, '');
             } catch (\Exception $e) {
-                Log::error("Failed to create FileSystemObject for {$file['upload']['filename']}: " . $e->getMessage());
+                Log::error("Failed to create FileSystemObject for {$file['upload']['filename']}: ".$e->getMessage());
             }
         }
     }
@@ -208,13 +210,13 @@ class ProcessDraftELNSubmission implements ShouldQueue
      */
     private function removeDirectory(string $dir): void
     {
-        if (!is_dir($dir)) {
+        if (! is_dir($dir)) {
             return;
         }
 
         $files = array_diff(scandir($dir), ['.', '..']);
         foreach ($files as $file) {
-            $path = $dir . DIRECTORY_SEPARATOR . $file;
+            $path = $dir.DIRECTORY_SEPARATOR.$file;
             is_dir($path) ? $this->removeDirectory($path) : unlink($path);
         }
         rmdir($dir);

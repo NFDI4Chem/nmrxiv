@@ -4,7 +4,6 @@ namespace App\Actions\Draft;
 
 use App\Models\Draft;
 use App\Models\User;
-use Carbon\Carbon;
 use Illuminate\Support\Str;
 
 class CreateDraft
@@ -70,6 +69,7 @@ class CreateDraft
     public function update(Draft $draft, array $updateData): Draft
     {
         $draft->update($updateData);
+
         return $draft->fresh();
     }
 
@@ -93,7 +93,7 @@ class CreateDraft
         if (isset($options['eln'])) {
             return 'ELN Import ('.strtoupper($options['eln']).': '.explode('-', $id)[0].')';
         }
-        
+
         return 'Untitled Project (Draft: '.explode('-', $id)[0].')';
     }
 
@@ -105,7 +105,7 @@ class CreateDraft
         if (isset($options['eln'])) {
             return 'Draft created from ELN system: '.$options['eln'];
         }
-        
+
         return '';
     }
 
