@@ -24,7 +24,7 @@ class DatasetFactory extends Factory
             'is_public' => false,
             'is_deleted' => false,
             'is_archived' => false,
-            'status' => null,
+            'status' => 'draft',
             'process_logs' => null,
             'location' => null, // todo: Adjust when location field is provided in nmrXiv
             'obfuscationcode' => Str::random(40),
