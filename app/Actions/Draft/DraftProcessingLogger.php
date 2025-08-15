@@ -21,10 +21,10 @@ class DraftProcessingLogger
 
         // Get existing logs or initialize empty array
         $existingLogs = $draft->processing_logs ?? [];
-        
+
         // Append new log to existing logs
         $existingLogs[] = $logEntry;
-        
+
         // Update draft with new logs
         $draft->update(['processing_logs' => $existingLogs]);
 
@@ -38,7 +38,7 @@ class DraftProcessingLogger
     public function logBatch(Draft $draft, array $logs): void
     {
         $logEntries = [];
-        
+
         foreach ($logs as $log) {
             $logEntry = [
                 'timestamp' => now()->toISOString(),
@@ -46,19 +46,19 @@ class DraftProcessingLogger
                 'message' => $log['message'],
                 'context' => $log['context'] ?? [],
             ];
-            
+
             $logEntries[] = $logEntry;
-            
+
             // Also log to Laravel logs
             Log::{$log['level']}($log['message'], array_merge(['draft_id' => $draft->id], $log['context'] ?? []));
         }
 
         // Get existing logs or initialize empty array
         $existingLogs = $draft->processing_logs ?? [];
-        
+
         // Append new logs to existing logs
         $allLogs = array_merge($existingLogs, $logEntries);
-        
+
         // Update draft with combined logs
         $draft->update(['processing_logs' => $allLogs]);
     }
@@ -78,4 +78,4 @@ class DraftProcessingLogger
     {
         return $draft->processing_logs ?? [];
     }
-} 
+}

@@ -260,16 +260,16 @@ class ELNController extends Controller
             ], 400);
         }
 
-        $createDraft = new CreateDraft();
-        
+        $createDraft = new CreateDraft;
+
         // Check if draft already exists
         $draft = $createDraft->findByExternalId($externalId, $user_id, $team_id);
-        
+
         $isNewDraft = false;
 
         if (! $draft) {
             $isNewDraft = true;
-            
+
             // Prepare ELN options for draft creation
             $elnOptions = [
                 'eln' => $eln,
