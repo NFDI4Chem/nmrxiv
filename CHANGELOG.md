@@ -1,5 +1,30 @@
 # Changelog
 
+## [1.4.1](https://github.com/NFDI4Chem/nmrxiv/compare/v1.4.0...v1.4.1) (2025-08-18)
+
+
+### Bug Fixes
+
+* add additional release-please configuration ([52540fc](https://github.com/NFDI4Chem/nmrxiv/commit/52540fc0f7d4499014263f3fd10e3c306a97b244))
+* add additional release-please configuration ([384ada2](https://github.com/NFDI4Chem/nmrxiv/commit/384ada2f83795e6669fc045aff5125db28b1b8fb))
+* add workflow dispatch to release-please.yml ([79afeb3](https://github.com/NFDI4Chem/nmrxiv/commit/79afeb30c084f06127f83b7ea67767bd3344d034))
+* add workflow dispatch to release-please.yml ([ae7eb63](https://github.com/NFDI4Chem/nmrxiv/commit/ae7eb6306ad04300865831ec6e02962225998605))
+* concurrency race condition fix ([7ed7858](https://github.com/NFDI4Chem/nmrxiv/commit/7ed78587dd4bf84d536454dbcbf8cac1c96c889f))
+* deadlock bug fix ([c55af08](https://github.com/NFDI4Chem/nmrxiv/commit/c55af08bfd964a748e43bbd6195ffd7a8c8a4859))
+* draft retrieval logic updated ([31d7c36](https://github.com/NFDI4Chem/nmrxiv/commit/31d7c361a2af1ebf72c889ff5d6bc16fee5af2b3))
+* frontend sequential uploads ([a48d4ee](https://github.com/NFDI4Chem/nmrxiv/commit/a48d4ee74e02de36e70c53cbf868e258af1a14de))
+* pint formatting updates, added boost config for vibe coding and other minor updates ([a14d783](https://github.com/NFDI4Chem/nmrxiv/commit/a14d783dace185e8d0fa4e5e787506c98b68ad61))
+* refactored oembed fucntionality ([58116d6](https://github.com/NFDI4Chem/nmrxiv/commit/58116d6738340eb90af16ad6cc1cdca127e97e03))
+* remove test job from release-please.yml ([00647f5](https://github.com/NFDI4Chem/nmrxiv/commit/00647f585e364cf5fa2febeed1dd3113b8ce2607))
+* remove test job from release-please.yml ([90521c1](https://github.com/NFDI4Chem/nmrxiv/commit/90521c1cdd999ccc1715fc551c2669192010c2e7))
+* remove unused labels in release please ([1896899](https://github.com/NFDI4Chem/nmrxiv/commit/18968998bfd9c61fa38ad75a8c1f649c57264fd3))
+* remove unused labels in release please ([fd9092b](https://github.com/NFDI4Chem/nmrxiv/commit/fd9092b3fca36ae8c71b8a073f92f208ba45caa7))
+* trigger prod build when a release is published ([7b69b69](https://github.com/NFDI4Chem/nmrxiv/commit/7b69b69e6965961f7188da529a3810293c5343c7))
+* trigger prod build when a release is published ([4820b5a](https://github.com/NFDI4Chem/nmrxiv/commit/4820b5af40a1b47c5bfd18a9c80ce191c638f2f3))
+* update branch name in workflow ([b2d848c](https://github.com/NFDI4Chem/nmrxiv/commit/b2d848cb699a8960b4fb4d74c2d6eec4ba09756b))
+* update branch names in GitHub Actions workflow ([74df02f](https://github.com/NFDI4Chem/nmrxiv/commit/74df02fecc0703a3c467fa8a9b0436d24312ec1e))
+* update docker compose file path in dev ([30739db](https://github.com/NFDI4Chem/nmrxiv/commit/30739db226ab8cd95852271e7de9859baf4b5bd2))
+
 ## [1.4.0](https://github.com/NFDI4Chem/nmrxiv/compare/v1.3.2...v1.4.0) (2024-08-02)
 
 
