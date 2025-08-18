@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+class AddChecksumFieldsToFileSystemObjectsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -12,24 +12,19 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('file_system_objects', function (Blueprint $table) {
-            // Checksum fields for file integrity verification
             $table->string('checksum_md5', 32)->nullable()->after('info')->comment('MD5 checksum for file integrity');
             $table->string('checksum_sha256', 64)->nullable()->after('checksum_md5')->comment('SHA-256 checksum for file integrity');
             $table->string('checksum_algorithm', 20)->default('sha256')->after('checksum_sha256')->comment('Primary checksum algorithm used');
 
-            // File size for integrity checks
             $table->bigInteger('file_size')->nullable()->after('checksum_algorithm')->comment('Original file size in bytes');
 
-            // Integrity verification status
             $table->enum('integrity_status', ['pending', 'verified', 'failed', 'skipped'])->default('pending')->after('file_size')->comment('File integrity verification status');
             $table->timestamp('integrity_verified_at')->nullable()->after('integrity_status')->comment('When integrity was last verified');
             $table->text('integrity_error')->nullable()->after('integrity_verified_at')->comment('Error message if integrity verification failed');
 
-            // Verification metadata
             $table->integer('verification_attempts')->default(0)->after('integrity_error')->comment('Number of verification attempts');
             $table->timestamp('last_verification_attempt')->nullable()->after('verification_attempts')->comment('Last verification attempt timestamp');
 
-            // Add index for integrity queries
             $table->index(['integrity_status', 'type'], 'idx_integrity_status_type');
             $table->index(['integrity_verified_at'], 'idx_integrity_verified_at');
         });
@@ -41,11 +36,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('file_system_objects', function (Blueprint $table) {
-            // Drop indexes first
             $table->dropIndex('idx_integrity_status_type');
             $table->dropIndex('idx_integrity_verified_at');
 
-            // Drop checksum and integrity fields
             $table->dropColumn([
                 'checksum_md5',
                 'checksum_sha256',
@@ -59,4 +52,4 @@ return new class extends Migration
             ]);
         });
     }
-};
+}

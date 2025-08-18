@@ -751,6 +751,7 @@ export default {
             showErrorBatchLogs: false,
             showLogsDialog: false,
             currentLog: null,
+            sequentialProcessing: true, // Enable sequential processing to avoid race conditions
             fsoBeingDeleted: null,
             showMissingFilesDetails: null,
             missing_files: 0,
@@ -1291,7 +1292,7 @@ export default {
                 );
             }
         },
-        processFilesDZL(vm, filesBatch) {
+        async processFilesDZL(vm, filesBatch) {
             vm.batchesCount += 1;
             const url = "/dashboard/storage/signed-draft-storage-url";
             const client = axios.create({ baseURL: window.location.origin });
@@ -1319,60 +1320,45 @@ export default {
                     );
                 },
             });
-            client
+            
+            return client
                 .post(url, {
                     draft_files: filesWithChecksums,
                     destination: vm.$page.props.selectedFolder,
                     draft_id: vm.draft.id,
                 })
                 .catch((err) => {
-                    this.processedBatches += 1;
-                    if (this.processedBatches == this.batches) {
-                        if (this.dropzone.files.length > 0) {
-                            this.status = "ERROR UPLOADING FILES";
-                            this.updateBusyStatus(false);
-                            this.dropzone.files.forEach((file) => {
-                                let message = "Upload failed";
-                                if (file.fullPath) {
-                                    vm.logs[file.fullPath].status = "Error";
-                                    vm.logs[file.fullPath].messages.push(
-                                        message +
-                                            " (API call failed with status code:" +
-                                            err.response.status +
-                                            ") "
-                                    );
-                                } else {
-                                    vm.logs[file.name].status = "Error";
-                                    vm.logs[file.name].messages.push(
-                                        message +
-                                            "(API call failed with status code:" +
-                                            err.response.status +
-                                            ")"
-                                    );
-                                }
-                            });
+                    // Log errors for the current batch
+                    filesBatch.forEach((file) => {
+                        let message = "Upload failed";
+                        if (file.fullPath) {
+                            vm.logs[file.fullPath].status = "Error";
+                            vm.logs[file.fullPath].messages.push(
+                                message +
+                                    " (API call failed with status code:" +
+                                    (err.response?.status || 'unknown') +
+                                    ") "
+                            );
+                        } else {
+                            vm.logs[file.name].status = "Error";
+                            vm.logs[file.name].messages.push(
+                                message +
+                                    "(API call failed with status code:" +
+                                    (err.response?.status || 'unknown') +
+                                    ")"
+                            );
                         }
-                    }
-                    this.uploadBatchErrors.push(err.response.data);
-                    // console.log(
-                    //     "Error retrieving signed storage URLS",
-                    //     err.response
-                    // );
-                    // if (
-                    //     err.response.status !== 200 ||
-                    //     err.response.status !== 201
-                    // ) {
-                    //     throw new Error(
-                    //         `API call failed with status code: ${err.response.status}`
-                    //     );
-                    // }
+                    });
+                    
+                    this.uploadBatchErrors.push(err.response?.data || err.message);
+                    throw err; // Re-throw to be caught by sequential processor
                 })
                 .then((response) => {
                     if (response) {
                         vm.currentLog =
                             "Uploading files to temporary storage url";
                         let data = response.data;
-                        this.processedBatches += 1;
+                        
                         data.forEach((u) => {
                             let cFile = vm.dropzone.files.find((f) => {
                                 if (f.fullPath) {
@@ -1411,15 +1397,40 @@ export default {
                                 );
                             }
                         });
+                        
+                        return response;
                     }
                 });
+        },
+        async processFilesSequentially(vm) {
+            try {
+                // Process files in sequential batches to avoid race conditions
+                for (let i = 0; i < vm.totalFilesCount; i += vm.batchCount) {
+                    let filesBatch = vm.dropzone.files.slice(i, i + vm.batchCount);
+                    vm.batches += 1;
+                    
+                    vm.status = `PROCESSING BATCH ${vm.batches} OF ${Math.ceil(vm.totalFilesCount / vm.batchCount)}`;
+                    
+                    // Wait for each batch to complete before processing the next
+                    await vm.processFilesDZL(vm, filesBatch);
+                    
+                    // Small delay between batches to prevent overwhelming the server
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
+                
+                vm.status = "ALL BATCHES PROCESSED";
+            } catch (error) {
+                console.error("Error in sequential file processing:", error);
+                vm.status = "ERROR IN BATCH PROCESSING";
+                vm.updateBusyStatus(false);
+            }
         },
         loadDropZone() {
             this.$nextTick(() => {
                 const vm = this;
                 vm.totalFilesCount = 0;
                 vm.uploadedFilesCount = 0;
-                vm.batchCount = 100;
+                vm.batchCount = 10; // Reduced batch size for sequential processing
                 vm.count = 0;
                 vm.batches = 0;
                 vm.processedBatches = 0;
@@ -1554,22 +1565,7 @@ export default {
                                         ) {
                                             clearInterval(timer);
                                             vm.status = "BATCH UPLOAD STARTED";
-                                            for (
-                                                let i = 0;
-                                                i < vm.totalFilesCount;
-                                                i += vm.batchCount
-                                            ) {
-                                                let filesBatch =
-                                                    vm.dropzone.files.slice(
-                                                        i,
-                                                        i + vm.batchCount
-                                                    );
-                                                vm.batches += 1;
-                                                vm.processFilesDZL(
-                                                    vm,
-                                                    filesBatch
-                                                );
-                                            }
+                                            vm.processFilesSequentially(vm);
                                         } else {
                                             vm.totalFilesCount =
                                                 vm.selectedFSO.length;

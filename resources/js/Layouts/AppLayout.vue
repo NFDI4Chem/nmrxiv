@@ -381,7 +381,7 @@
                             </div>
 
                             <!-- Main Item -->
-                            <div v-if="item.name && item.href" class="px-3">
+                            <div v-if="item.name && item.href" class="pl-3">
                                 <Link
                                     :href="item.href"
                                     :class="[

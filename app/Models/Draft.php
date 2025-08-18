@@ -34,6 +34,12 @@ class Draft extends Model
         'zip_url',
         'release_date',
         'status',
+        'processing_logs',
+    ];
+
+    protected $casts = [
+        'processing_logs' => 'array',
+        'release_date' => 'date',
     ];
 
     public function files(): HasMany
