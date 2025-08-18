@@ -386,9 +386,13 @@ Route::get('datasets/{owner}/{slug}', [DatasetController::class, 'publicDatasetV
 Route::get('spectra', [StudyController::class, 'publicStudiesView'])
     ->name('public.spectra');
 
-Route::get('services/oembed', [OEmbedController::class, 'spectra']);
-
-Route::get('embed/{id}', [OEmbedController::class, 'embed'])->name('embed');
+// oEmbed service endpoint - returns oEmbed JSON response for external embedding
+// Supports oEmbed 1.0 specification for rich content embedding
+// Rate limited to prevent abuse and enumeration attacks
+Route::middleware(['throttle:60,1'])->group(function () {
+    Route::get('services/oembed', [OEmbedController::class, 'spectra']);
+    Route::get('embed/{id}', [OEmbedController::class, 'embed'])->name('embed');
+});
 
 // Test route for Octane
 Route::get('/octane-test', function () {

@@ -334,59 +334,84 @@
                                     <li
                                         v-for="draft in drafts"
                                         :key="draft.id"
-                                        class="hover:cursor-pointer border-b hover:bg-gray-50 px-5 py-4"
+                                        class="border-b px-5 py-4"
                                     >
-                                        <Link
-                                            :href="
-                                                route('upload', {
-                                                    draft_id: draft.id,
-                                                })
-                                            "
-                                        >
-                                            <div
-                                                class="flex items-center space-x-4"
+                                        <div class="flex items-center justify-between">
+                                            <Link
+                                                :href="
+                                                    route('upload', {
+                                                        draft_id: draft.id,
+                                                    })
+                                                "
+                                                class="flex-1 hover:cursor-pointer hover:bg-gray-50 -mx-5 -my-4 px-5 py-4"
                                             >
-                                                <div
-                                                    class="flex-1 min-w-0 mr-auto max-w-2xl"
+                                                <div class="flex items-center space-x-4">
+                                                    <div class="flex-1 min-w-0 mr-auto max-w-2xl">
+                                                        <div class="flex items-center gap-2 mb-1">
+                                                            <p class="text-lg font-large text-black truncate">
+                                                                <b>{{ draft.name }}</b>
+                                                            </p>
+                                                            <span
+                                                                v-if="draft.eln"
+                                                                class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                                                            >
+                                                                {{ draft.external_id }}
+                                                            </span>
+                                                            <span
+                                                                v-if="draft.status"
+                                                                class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
+                                                                :class="{
+                                                                    'bg-blue-100 text-blue-800': ['received'].includes(draft.status.toLowerCase()),
+                                                                    'bg-yellow-100 text-yellow-800': ['zip_processed', 'processing', 'pending', 'job_dispatched'].includes(draft.status.toLowerCase()),
+                                                                    'bg-green-100 text-green-800': ['validated', 'processed', 'successful', 'published'].includes(draft.status.toLowerCase()),
+                                                                    'bg-red-100 text-red-800': ['failed'].includes(draft.status.toLowerCase()),
+                                                                    'bg-gray-100 text-gray-800': !['received', 'zip_processed', 'validated', 'processed', 'successful', 'published', 'failed', 'processing', 'pending', 'job_dispatched'].includes(draft.status.toLowerCase())
+                                                                }"
+                                                            >
+                                                                {{ formatStatus(draft.status) }}
+                                                            </span>
+                                                        </div>
+                                                        <p class="text-sm font-medium text-gray-700 truncate pr-10">
+                                                            {{ draft.description }}
+                                                        </p>
+                                                        <p class="text-sm font-medium text-gray-500 truncate">
+                                                            ID: {{ draft.key }}
+                                                            &middot; Created at:
+                                                            {{ formatDateTime(draft.created_at) }}
+                                                            <span v-if="draft.external_id">
+                                                                &middot; External ID: {{ draft.external_id }}
+                                                            </span>
+                                                        </p>
+                                                    </div>
+                                                    <div>
+                                                        <svg
+                                                            class="h-5 w-5 flex-none text-gray-400"
+                                                            viewBox="0 0 20 20"
+                                                            fill="currentColor"
+                                                            aria-hidden="true"
+                                                        >
+                                                            <path
+                                                                fill-rule="evenodd"
+                                                                d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
+                                                                clip-rule="evenodd"
+                                                            ></path>
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                            </Link>
+                                            <div
+                                                v-if="draft.processing_logs && draft.processing_logs.length > 0"
+                                                class="ml-4 flex-shrink-0"
+                                            >
+                                                <button
+                                                    @click="showProcessingLogs(draft)"
+                                                    class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                                                 >
-                                                    <p
-                                                        class="text-lg font-large text-black truncate"
-                                                    >
-                                                        <b>{{ draft.name }}</b>
-                                                    </p>
-                                                    <p
-                                                        class="text-sm font-medium text-gray-700 truncate pr-10"
-                                                    >
-                                                        {{ draft.description }}
-                                                    </p>
-                                                    <p
-                                                        class="text-sm font-medium text-gray-500 truncate"
-                                                    >
-                                                        ID: {{ draft.key }}
-                                                        &middot; Created at:
-                                                        {{
-                                                            formatDateTime(
-                                                                draft.created_at
-                                                            )
-                                                        }}
-                                                    </p>
-                                                </div>
-                                                <div>
-                                                    <svg
-                                                        class="h-5 w-5 flex-none text-gray-400"
-                                                        viewBox="0 0 20 20"
-                                                        fill="currentColor"
-                                                        aria-hidden="true"
-                                                    >
-                                                        <path
-                                                            fill-rule="evenodd"
-                                                            d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
-                                                            clip-rule="evenodd"
-                                                        ></path>
-                                                    </svg>
-                                                </div>
+                                                    <InformationCircleIcon class="w-4 h-4 mr-1" />
+                                                    View Logs
+                                                </button>
                                             </div>
-                                        </Link>
+                                        </div>
                                     </li>
                                 </ul>
                             </div>
@@ -1807,6 +1832,95 @@
                 Loading...
             </div>
         </div>
+
+        <!-- Processing Logs Modal -->
+        <jet-dialog-modal
+            :show="showLogsDialog"
+            @close="showLogsDialog = false"
+            :max-width="'4xl'"
+        >
+            <template #title>
+                <div class="block">
+                    Processing Logs - {{ selectedDraftForLogs?.name }}
+                </div>
+            </template>
+
+            <template #content>
+                <div class="relative h-[70vh] overflow-y-auto z-0 mt-1 rounded-lg">
+                    <ul
+                        v-if="selectedDraftForLogs?.processing_logs && selectedDraftForLogs.processing_logs.length > 0"
+                        role="list"
+                        class="divide-y divide-gray-200"
+                    >
+                        <li
+                            v-for="(log, index) in selectedDraftForLogs.processing_logs"
+                            :key="index"
+                            class="px-4 py-4"
+                        >
+                            <div class="flex space-x-3">
+                                <div class="flex-shrink-0">
+                                    <CheckIcon
+                                        v-if="log.level === 'info'"
+                                        class="h-5 w-5 text-green-400"
+                                        aria-hidden="true"
+                                    />
+                                    <ExclamationCircleIcon
+                                        v-else-if="log.level === 'error'"
+                                        class="h-5 w-5 text-red-400"
+                                        aria-hidden="true"
+                                    />
+                                    <InformationCircleIcon
+                                        v-else
+                                        class="h-5 w-5 text-yellow-400"
+                                        aria-hidden="true"
+                                    />
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <div class="text-sm text-gray-500">
+                                        <time :datetime="log.timestamp">
+                                            {{ formatDateTime(log.timestamp) }}
+                                        </time>
+                                        <span class="ml-2 font-medium">
+                                            {{ log.level.toUpperCase() }}
+                                        </span>
+                                    </div>
+                                    <div class="mt-1 text-sm text-gray-900">
+                                        {{ log.message }}
+                                    </div>
+                                    <div
+                                        v-if="log.context && Object.keys(log.context).length > 0"
+                                        class="mt-2"
+                                    >
+                                        <details class="text-xs text-gray-600">
+                                            <summary class="cursor-pointer hover:text-gray-800">
+                                                Show Details
+                                            </summary>
+                                            <pre class="mt-2 whitespace-pre-wrap bg-gray-50 p-2 rounded">{{ JSON.stringify(log.context, null, 2) }}</pre>
+                                        </details>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                    <div
+                        v-else
+                        class="text-center py-12"
+                    >
+                        <InformationCircleIcon class="mx-auto h-12 w-12 text-gray-400" />
+                        <h3 class="mt-2 text-sm font-medium text-gray-900">No logs available</h3>
+                        <p class="mt-1 text-sm text-gray-500">
+                            Processing logs will appear here when available.
+                        </p>
+                    </div>
+                </div>
+            </template>
+
+            <template #footer>
+                <jet-secondary-button @click="showLogsDialog = false">
+                    Close
+                </jet-secondary-button>
+            </template>
+        </jet-dialog-modal>
     </app-layout>
 </template>
 
@@ -1816,6 +1930,7 @@ import { router, Link } from "@inertiajs/vue3";
 import JetInputError from "@/Jetstream/InputError.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import JetButton from "@/Jetstream/Button.vue";
+import JetDialogModal from "@/Jetstream/DialogModal.vue";
 import { ref } from "vue";
 import Primer from "@/Shared/Primer.vue";
 import FileSystemBrowser from "./../Shared/FileSystemBrowser.vue";
@@ -1828,6 +1943,9 @@ import {
     EyeSlashIcon,
     ChevronDoubleLeftIcon,
     ChevronDoubleRightIcon,
+    InformationCircleIcon,
+    CheckIcon,
+    ExclamationCircleIcon,
 } from "@heroicons/vue/24/solid";
 import SpectraEditor from "@/Shared/SpectraEditor.vue";
 import Depictor from "@/Shared/Depictor.vue";
@@ -1835,6 +1953,7 @@ import Depictor2D from "@/Shared/Depictor2D.vue";
 import slider from "vue3-slider";
 import VueTagsInput from "@sipec/vue3-tags-input";
 import "ontology-elements/dist/index.js";
+import Global from "@/Mixins/Global.js";
 
 export default {
     components: {
@@ -1843,6 +1962,7 @@ export default {
         JetInputError,
         JetSecondaryButton,
         JetButton,
+        JetDialogModal,
         Primer,
         FileSystemBrowser,
         TrashIcon,
@@ -1858,7 +1978,11 @@ export default {
         VueTagsInput,
         ChevronDoubleLeftIcon,
         ChevronDoubleRightIcon,
+        InformationCircleIcon,
+        CheckIcon,
+        ExclamationCircleIcon,
     },
+    mixins: [Global],
     props: ["draft_id"],
     setup() {
         return {};
@@ -1965,6 +2089,8 @@ export default {
                 is_public: ref(false),
             }),
             showSummary: true,
+            showLogsDialog: false,
+            selectedDraftForLogs: null,
         };
     },
     computed: {
@@ -2071,6 +2197,10 @@ export default {
         onScroll() {
             this.hideDownArrow = true;
         },
+        showProcessingLogs(draft) {
+            this.selectedDraftForLogs = draft;
+            this.showLogsDialog = true;
+        },
         toggleCompoundDetails() {
             this.showCompoundDetails = !this.showCompoundDetails;
             localStorage.setItem(
@@ -2087,6 +2217,24 @@ export default {
         fetchDrafts() {
             this.loading = true;
             return axios.get("/dashboard/drafts");
+        },
+        formatStatus(status) {
+            if (!status) return '';
+            
+            const statusMap = {
+                'received': 'Received',
+                'zip_processed': 'ZIP Processed',
+                'validated': 'Validated',
+                'processed': 'Processed',
+                'successful': 'Successful',
+                'published': 'Published',
+                'failed': 'Failed',
+                'processing': 'Processing',
+                'pending': 'Pending',
+                'job_dispatched': 'Job Dispatched'
+            };
+            
+            return statusMap[status.toLowerCase()] || status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
         },
         selectDraft(draft) {
             this.currentDraft = draft;
