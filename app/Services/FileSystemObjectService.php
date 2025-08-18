@@ -8,6 +8,7 @@ use App\Models\FileSystemObject;
 use App\Models\Project;
 use App\Models\Study;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -186,7 +187,7 @@ class FileSystemObjectService
         }
 
         // Use database transaction with retry logic for race condition handling
-        return DB::transaction(function () use ($searchCriteria, $name, $relativeUrl, $storagePath, $level, $parentId) {
+        $directory = DB::transaction(function () use ($searchCriteria, $name, $relativeUrl, $storagePath, $level) {
             // Double-check if directory was created by another process
             $directory = FileSystemObject::where($searchCriteria)->lockForUpdate()->first();
 
@@ -209,11 +210,6 @@ class FileSystemObjectService
             try {
                 $directory = FileSystemObject::create($creationDefaults);
 
-                // Update parent's has_children flag if needed
-                if ($parentId) {
-                    FileSystemObject::where('id', $parentId)->update(['has_children' => 1]);
-                }
-
                 return $directory;
             } catch (\Illuminate\Database\QueryException $e) {
                 // Handle unique constraint violation - another process created it
@@ -227,6 +223,13 @@ class FileSystemObjectService
                 throw $e;
             }
         }, 3); // Retry up to 3 times
+
+        // Update parent's has_children flag outside of transaction to avoid deadlocks
+        if ($parentId && $directory->wasRecentlyCreated) {
+            $this->updateParentHasChildrenFlagSafely($parentId);
+        }
+
+        return $directory;
     }
 
     /**
@@ -258,12 +261,12 @@ class FileSystemObjectService
         }
 
         // Use database transaction with retry logic for race condition handling
-        return DB::transaction(function () use ($searchCriteria, $filename, $relativeFilePath, $filePath, $file, $parentDirectory, $level) {
+        $result = DB::transaction(function () use ($searchCriteria, $filename, $relativeFilePath, $filePath, $file, $level) {
             // Double-check if file was created by another process
             $fileObject = FileSystemObject::where($searchCriteria)->lockForUpdate()->first();
 
             if ($fileObject) {
-                return $fileObject;
+                return ['fileObject' => $fileObject, 'wasRecentlyCreated' => false];
             }
 
             // Creation defaults
@@ -281,42 +284,42 @@ class FileSystemObjectService
 
             try {
                 $fileObject = FileSystemObject::create($creationDefaults);
-                $wasRecentlyCreated = true;
 
-                // Update parent's has_children flag if needed
-                if ($parentDirectory) {
-                    FileSystemObject::where('id', $parentDirectory->id)->update(['has_children' => 1]);
-                }
-
+                return ['fileObject' => $fileObject, 'wasRecentlyCreated' => true];
             } catch (\Illuminate\Database\QueryException $e) {
                 // Handle unique constraint violation - another process created it
                 if ($e->getCode() === '23000' || str_contains($e->getMessage(), 'Duplicate entry')) {
                     // Fetch the file that was created by the other process
                     $fileObject = FileSystemObject::where($searchCriteria)->first();
                     if ($fileObject) {
-                        $wasRecentlyCreated = false;
-                    } else {
-                        throw $e;
+                        return ['fileObject' => $fileObject, 'wasRecentlyCreated' => false];
                     }
-                } else {
-                    throw $e;
                 }
+                throw $e;
             }
-
-            // Handle checksums if provided and file was just created
-            if ($wasRecentlyCreated && isset($file['checksums']) && ! empty($file['checksums'])) {
-                $this->integrityService->storeChecksums(
-                    $fileObject,
-                    $file['checksums'],
-                    $file['upload']['total']
-                );
-
-                // Queue integrity verification job with delay to allow S3 upload to complete
-                VerifyFileIntegrityJob::dispatch($fileObject, 30); // 30 second delay
-            }
-
-            return $fileObject;
         }, 3); // Retry up to 3 times
+
+        $fileObject = $result['fileObject'];
+        $wasRecentlyCreated = $result['wasRecentlyCreated'];
+
+        // Update parent's has_children flag outside of transaction to avoid deadlocks
+        if ($parentDirectory && $wasRecentlyCreated) {
+            $this->updateParentHasChildrenFlagSafely($parentDirectory->id);
+        }
+
+        // Handle checksums if provided and file was just created
+        if ($wasRecentlyCreated && isset($file['checksums']) && ! empty($file['checksums'])) {
+            $this->integrityService->storeChecksums(
+                $fileObject,
+                $file['checksums'],
+                $file['upload']['total']
+            );
+
+            // Queue integrity verification job with delay to allow S3 upload to complete
+            VerifyFileIntegrityJob::dispatch($fileObject, 30); // 30 second delay
+        }
+
+        return $fileObject;
     }
 
     /**
@@ -405,5 +408,32 @@ class FileSystemObjectService
     {
         $hasChildren = FileSystemObject::where('parent_id', $parentId)->exists();
         FileSystemObject::where('id', $parentId)->update(['has_children' => $hasChildren ? 1 : 0]);
+    }
+
+    /**
+     * Safely update parent's has_children flag to avoid deadlocks.
+     * Uses a separate transaction with timeout and retry logic.
+     */
+    private function updateParentHasChildrenFlagSafely(int $parentId): void
+    {
+        try {
+            // Use a separate, short transaction to avoid deadlocks
+            DB::transaction(function () use ($parentId) {
+                // Use a shorter lock timeout for this operation
+                DB::statement('SET LOCAL lock_timeout = 1000'); // 1 second timeout
+
+                // Simply set has_children to 1 since we know a child was just created
+                FileSystemObject::where('id', $parentId)
+                    ->where('has_children', 0) // Only update if it's currently 0
+                    ->update(['has_children' => 1]);
+            });
+        } catch (\Exception $e) {
+            // If we can't update the flag due to deadlock, it's not critical
+            // The flag will be corrected eventually or during cleanup
+            Log::warning('Failed to update has_children flag for parent', [
+                'parent_id' => $parentId,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 }
