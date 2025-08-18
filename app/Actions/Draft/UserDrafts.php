@@ -16,11 +16,13 @@ class UserDrafts
         [$user_id, $team_id] = $user->getUserTeamData();
 
         return Draft::with('Tags')
-            ->whereHas('files')
-            ->orWhereHas('project')
             ->where('owner_id', $user_id)
             ->where('team_id', $team_id)
             ->where('is_deleted', false)
+            ->where(function ($query) {
+                $query->whereHas('files')
+                      ->orWhereHas('project');
+            })
             ->orderBy('updated_at', 'DESC')
             ->get();
     }
