@@ -42,9 +42,15 @@ class PathGeneratorService
         // Use the full path if available, otherwise just the filename
         $relativeFilePath = $path ? $path : $filename;
 
-        // If we have a destination and the relative path doesn't already start with it
-        if (! empty($destination) && ! str_starts_with($relativeFilePath, $destination)) {
-            return $this->normalizeSlashes($destination.'/'.$relativeFilePath);
+        // Clean up the destination path
+        $destination = trim($destination, '/');
+
+        // If we have a destination and it's not empty or root
+        if (! empty($destination) && $destination !== '/') {
+            // Check if the relative path already contains the destination
+            if (! str_starts_with($relativeFilePath, $destination)) {
+                return $this->normalizeSlashes($destination.'/'.$relativeFilePath);
+            }
         }
 
         // Ensure the path starts with a single slash and normalize
