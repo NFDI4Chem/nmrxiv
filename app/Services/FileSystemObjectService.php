@@ -73,6 +73,7 @@ class FileSystemObjectService
 
     /**
      * Create the complete file system object tree with proper hierarchy.
+     * Wraps the entire operation in a transaction for consistency.
      */
     private function createFileSystemObjectTree(
         array $file,
@@ -80,25 +81,27 @@ class FileSystemObjectService
         string $filePath,
         array $contextRelations
     ): void {
-        // Parse the full path to build the correct tree
-        $pathParts = $this->parseFilePathParts($file, $relativeFilePath);
+        DB::transaction(function () use ($file, $relativeFilePath, $filePath, $contextRelations) {
+            // Parse the full path to build the correct tree
+            $pathParts = $this->parseFilePathParts($file, $relativeFilePath);
 
-        // Build directory hierarchy first
-        $parentDirectory = $this->ensureDirectoryTree(
-            $pathParts['directories'],
-            $filePath,
-            $contextRelations
-        );
+            // Build directory hierarchy first
+            $parentDirectory = $this->ensureDirectoryTree(
+                $pathParts['directories'],
+                $filePath,
+                $contextRelations
+            );
 
-        // Create the file object
-        $this->createFileObject(
-            $pathParts['filename'],
-            $relativeFilePath,
-            $filePath,
-            $file,
-            $parentDirectory,
-            $contextRelations
-        );
+            // Create the file object
+            $this->createFileObject(
+                $pathParts['filename'],
+                $relativeFilePath,
+                $filePath,
+                $file,
+                $parentDirectory,
+                $contextRelations
+            );
+        }, 3); // Retry up to 3 times
     }
 
     /**
@@ -158,6 +161,7 @@ class FileSystemObjectService
 
     /**
      * Find or create a single directory with proper tree positioning.
+     * Uses database locking to prevent race conditions during concurrent uploads.
      */
     private function findOrCreateDirectory(
         string $name,
@@ -174,30 +178,60 @@ class FileSystemObjectService
             'type' => 'directory',
         ], $contextRelations);
 
-        // Creation defaults: Fields set only when creating new records
-        $creationDefaults = [
-            'uuid' => Str::uuid(),
-            'slug' => Str::slug($name, '-'),
-            'description' => $name,
-            'key' => $name,
-            'relative_url' => $relativeUrl,
-            'path' => $storagePath,
-            'level' => $level,
-            'is_root' => $level === 0 ? 1 : 0,
-        ];
+        // Try to find existing directory first with shared lock
+        $directory = FileSystemObject::where($searchCriteria)->sharedLock()->first();
 
-        $directory = FileSystemObject::firstOrCreate($searchCriteria, $creationDefaults);
-
-        // Update parent's has_children flag if needed
-        if ($parentId && $directory->wasRecentlyCreated) {
-            FileSystemObject::where('id', $parentId)->update(['has_children' => 1]);
+        if ($directory) {
+            return $directory;
         }
 
-        return $directory;
+        // Use database transaction with retry logic for race condition handling
+        return DB::transaction(function () use ($searchCriteria, $name, $relativeUrl, $storagePath, $level, $parentId) {
+            // Double-check if directory was created by another process
+            $directory = FileSystemObject::where($searchCriteria)->lockForUpdate()->first();
+
+            if ($directory) {
+                return $directory;
+            }
+
+            // Creation defaults: Fields set only when creating new records
+            $creationDefaults = array_merge($searchCriteria, [
+                'uuid' => Str::uuid(),
+                'slug' => Str::slug($name, '-'),
+                'description' => $name,
+                'key' => $name,
+                'relative_url' => $relativeUrl,
+                'path' => $storagePath,
+                'level' => $level,
+                'is_root' => $level === 0 ? 1 : 0,
+            ]);
+
+            try {
+                $directory = FileSystemObject::create($creationDefaults);
+
+                // Update parent's has_children flag if needed
+                if ($parentId) {
+                    FileSystemObject::where('id', $parentId)->update(['has_children' => 1]);
+                }
+
+                return $directory;
+            } catch (\Illuminate\Database\QueryException $e) {
+                // Handle unique constraint violation - another process created it
+                if ($e->getCode() === '23000' || str_contains($e->getMessage(), 'Duplicate entry')) {
+                    // Fetch the directory that was created by the other process
+                    $directory = FileSystemObject::where($searchCriteria)->first();
+                    if ($directory) {
+                        return $directory;
+                    }
+                }
+                throw $e;
+            }
+        }, 3); // Retry up to 3 times
     }
 
     /**
      * Create file object with proper tree position and handle checksums.
+     * Uses database locking to prevent race conditions during concurrent uploads.
      */
     private function createFileObject(
         string $filename,
@@ -216,39 +250,73 @@ class FileSystemObjectService
             'type' => 'file',
         ], $contextRelations);
 
-        // Creation defaults
-        $creationDefaults = [
-            'uuid' => Str::uuid(),
-            'slug' => Str::slug($filename, '-'),
-            'description' => $filename,
-            'key' => $filename,
-            'relative_url' => $relativeFilePath,
-            'path' => $filePath,
-            'level' => $level,
-            'is_root' => 0,
-            'info' => json_encode(['size' => $file['upload']['total']]),
-        ];
+        // Try to find existing file first with shared lock
+        $fileObject = FileSystemObject::where($searchCriteria)->sharedLock()->first();
 
-        $fileObject = FileSystemObject::firstOrCreate($searchCriteria, $creationDefaults);
-
-        // Handle checksums if provided
-        if ($fileObject->wasRecentlyCreated && isset($file['checksums']) && ! empty($file['checksums'])) {
-            $this->integrityService->storeChecksums(
-                $fileObject,
-                $file['checksums'],
-                $file['upload']['total']
-            );
-
-            // Queue integrity verification job with delay to allow S3 upload to complete
-            VerifyFileIntegrityJob::dispatch($fileObject, 30); // 30 second delay
+        if ($fileObject) {
+            return $fileObject;
         }
 
-        // Update parent's has_children flag if needed (fix for missing files in directories)
-        if ($parentDirectory && $fileObject->wasRecentlyCreated) {
-            FileSystemObject::where('id', $parentDirectory->id)->update(['has_children' => 1]);
-        }
+        // Use database transaction with retry logic for race condition handling
+        return DB::transaction(function () use ($searchCriteria, $filename, $relativeFilePath, $filePath, $file, $parentDirectory, $level) {
+            // Double-check if file was created by another process
+            $fileObject = FileSystemObject::where($searchCriteria)->lockForUpdate()->first();
 
-        return $fileObject;
+            if ($fileObject) {
+                return $fileObject;
+            }
+
+            // Creation defaults
+            $creationDefaults = array_merge($searchCriteria, [
+                'uuid' => Str::uuid(),
+                'slug' => Str::slug($filename, '-'),
+                'description' => $filename,
+                'key' => $filename,
+                'relative_url' => $relativeFilePath,
+                'path' => $filePath,
+                'level' => $level,
+                'is_root' => 0,
+                'info' => json_encode(['size' => $file['upload']['total']]),
+            ]);
+
+            try {
+                $fileObject = FileSystemObject::create($creationDefaults);
+                $wasRecentlyCreated = true;
+
+                // Update parent's has_children flag if needed
+                if ($parentDirectory) {
+                    FileSystemObject::where('id', $parentDirectory->id)->update(['has_children' => 1]);
+                }
+
+            } catch (\Illuminate\Database\QueryException $e) {
+                // Handle unique constraint violation - another process created it
+                if ($e->getCode() === '23000' || str_contains($e->getMessage(), 'Duplicate entry')) {
+                    // Fetch the file that was created by the other process
+                    $fileObject = FileSystemObject::where($searchCriteria)->first();
+                    if ($fileObject) {
+                        $wasRecentlyCreated = false;
+                    } else {
+                        throw $e;
+                    }
+                } else {
+                    throw $e;
+                }
+            }
+
+            // Handle checksums if provided and file was just created
+            if ($wasRecentlyCreated && isset($file['checksums']) && ! empty($file['checksums'])) {
+                $this->integrityService->storeChecksums(
+                    $fileObject,
+                    $file['checksums'],
+                    $file['upload']['total']
+                );
+
+                // Queue integrity verification job with delay to allow S3 upload to complete
+                VerifyFileIntegrityJob::dispatch($fileObject, 30); // 30 second delay
+            }
+
+            return $fileObject;
+        }, 3); // Retry up to 3 times
     }
 
     /**
