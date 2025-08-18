@@ -17,3 +17,7 @@ jobs:
           release-type: php
           target-branch: main
           token: ${{ secrets.GITHUB_TOKEN }}
+          include-component-in-tag: false
+          skip-github-release: false
+          draft: false
+          prerelease: false
