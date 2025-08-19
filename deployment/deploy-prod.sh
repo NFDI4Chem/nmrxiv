@@ -143,7 +143,7 @@ deploy_service() {
     if [ "$(docker pull "$image" | grep -c "Status: Image is up to date")" -eq 0 ]; then
         log_message "📦 New ${service^^} image available."
 
-        #backup_database
+        backup_database
         
         docker compose -f "$COMPOSE_FILE" up -d "$service" --scale "$service"=2 --no-deps --no-recreate
         NEW_CONTAINER_ID=$(docker ps -q -l)
