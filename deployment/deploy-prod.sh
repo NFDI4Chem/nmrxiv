@@ -6,12 +6,12 @@ COMPOSE_FILE="/mnt/docker/nmrxiv/deployment/docker-compose.prod.yml"
 APP_IMAGE="nfdi4chem/nmrxiv:app-latest"
 WORKER_IMAGE="nfdi4chem/nmrxiv:worker-latest"
 NEW_CONTAINER_ID=""
-BACKUP_DIR="/var/backups/nmrxiv"
+BACKUP_DIR="/mnt/docker/nmrxiv-db-backups"
 BUILD=false
 DEPLOY=false
 MULTI_PLATFORM=false
 
-LOG_FILE="/var/log/nmrxiv-deploy.log"
+LOG_FILE="/mnt/docker/nmrxiv-deploy.log"
 
 # Ensure backup directory exists and is secure
 if [ ! -d "$BACKUP_DIR" ]; then
@@ -186,12 +186,11 @@ backup_database() {
 }
 
 run_migration_and_clear_cache() {
-    log_message "Running database migration..."
+    log_message "Running database migration and clearing cache..."
 
-    #docker compose -f "$COMPOSE_FILE" exec -T app php artisan migrate
-    docker compose -f "$COMPOSE_FILE" exec -T app php artisan cache:clear
-    docker compose -f "$COMPOSE_FILE" exec -T app php artisan optimize:clear
+    docker compose -f "$COMPOSE_FILE" exec -T app php artisan migrate --force
     docker compose -f "$COMPOSE_FILE" exec -T app php artisan optimize
+    docker compose -f "$COMPOSE_FILE" exec -T app php artisan optimize:clear
     
     log_message "Database migration completed successfully"
 }
