@@ -289,6 +289,7 @@ class ArchiveStudy implements ShouldBeUnique, ShouldQueue
 
     // protected function processSpectra($url)
     // {
+    //     $url = urlencode($url);
     //     $response = Http::post('https://nodejs.nmrxiv.org/spectra-parser', '{
     //         "urls": [
     //           '. $url .'
