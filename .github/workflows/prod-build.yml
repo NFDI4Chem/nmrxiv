@@ -2,10 +2,10 @@
 # This workflow runs tests, builds Docker images, and deploys to the FSU production environment
 name: Setup, Build and Publish to Prod
 
-# Trigger the workflow on pushes to the production branch
+# Trigger the workflow only when a release is created
 on:
-  push:
-    branches: [main]
+  release:
+    types: [published]
 
 # Environment variables used across all jobs
 env:
@@ -49,9 +49,11 @@ jobs:
           push: true
           # Pass proxy settings and release version as build arguments
           build-args: |
-            RELEASE_VERSION=app-latest
-          # Tag the image for production environment
-          tags: ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:app-latest
+            RELEASE_VERSION=${{ github.event.release.tag_name }}
+          # Tag the image with both the release version and latest
+          tags: |
+            ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:app-${{ github.event.release.tag_name }}
+            ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:app-latest
           # Enable build cache for faster builds
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -65,9 +67,11 @@ jobs:
           push: true
           # Pass proxy settings and release version as build arguments
           build-args: |
-            RELEASE_VERSION=worker-latest
-          # Tag the worker image for production environment
-          tags: ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:worker-latest
+            RELEASE_VERSION=${{ github.event.release.tag_name }}
+          # Tag the worker image with both the release version and latest
+          tags: |
+            ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:worker-${{ github.event.release.tag_name }}
+            ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:worker-latest
           # Enable build cache for faster builds
           cache-from: type=gha
           cache-to: type=gha,mode=max
