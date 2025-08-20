@@ -29,12 +29,12 @@ class ManageAuthorsTest extends TestCase
 
         $body = $this->prepareBody(null);
 
-        //Add author to project
+        // Add author to project
         $response = $this->addAuthor($body, $project->id);
 
         $response->assertStatus(200);
 
-        //Check if entry got created in DB
+        // Check if entry got created in DB
         $project = $project->fresh();
         $authors = $project->authors->toArray();
         $this->assertDatabaseHas('author_project', $authors[0]['pivot']);
@@ -55,20 +55,20 @@ class ManageAuthorsTest extends TestCase
 
         $body = $this->prepareBody(null);
 
-        //Add author to project
+        // Add author to project
         $response = $this->addAuthor($body, $project->id);
 
         $response->assertStatus(200);
 
-        //Fetch authors details
+        // Fetch authors details
         $project = $project->fresh();
         $authors = $project->authors->toArray();
 
-        //Update existing author
+        // Update existing author
         $response = $this->updateAuthor($authors[0], $project->id);
         $response->assertStatus(200);
 
-        //Check if entry got updated in DB
+        // Check if entry got updated in DB
         $project = $project->fresh();
         $authors = $project->authors->toArray();
         $this->assertDatabaseHas('author_project', $authors[0]['pivot']);
@@ -95,11 +95,11 @@ class ManageAuthorsTest extends TestCase
 
         $body = $this->prepareBody($author);
 
-        //Detach author
+        // Detach author
         $response = $this->detachAuthor($body, $project->id);
         $response->assertStatus(200);
 
-        //Check if entry got deleted from DB
+        // Check if entry got deleted from DB
         $this->assertDatabaseMissing('author_project', $authors[0]['pivot']);
     }
 
@@ -125,11 +125,11 @@ class ManageAuthorsTest extends TestCase
 
         $body = $this->prepareBody($author);
 
-        //Update author
+        // Update author
         $response = $this->addAuthor($body, $project->id);
         $response->assertStatus(403);
 
-        //Detach author
+        // Detach author
         $response = $response = $this->detachAuthor($body, $project->id);
         $response->assertStatus(403);
     }
@@ -152,11 +152,11 @@ class ManageAuthorsTest extends TestCase
 
         $body = $this->prepareBody($author);
 
-        //Update author
+        // Update author
         $response = $this->addAuthor($body, $project->id);
         $response->assertStatus(403);
 
-        //Detach author
+        // Detach author
         $response = $response = $this->detachAuthor($body, $project->id);
         $response->assertStatus(403);
     }
@@ -183,7 +183,7 @@ class ManageAuthorsTest extends TestCase
             'role' => 'DataCurator',
         ];
 
-        //Update author's role
+        // Update author's role
         $response = $this->withHeaders([
             'Accept' => 'application/json',
         ])->post('authors/'.$project->id.'/updateRole', $body);
@@ -193,7 +193,7 @@ class ManageAuthorsTest extends TestCase
         $project = $project->refresh();
         $authors = $project->authors->toArray();
 
-        //Check if entry got updated in DB
+        // Check if entry got updated in DB
         $this->assertDatabaseHas('author_project', $authors[0]['pivot']);
     }
 
@@ -223,7 +223,7 @@ class ManageAuthorsTest extends TestCase
             'role' => 'DataCurator',
         ];
 
-        //Update author's role
+        // Update author's role
         $response = $this->withHeaders([
             'Accept' => 'application/json',
         ])->post('authors/'.$project->id.'/updateRole', $body);
@@ -253,7 +253,7 @@ class ManageAuthorsTest extends TestCase
             'role' => $this->faker->text(),
         ];
 
-        //Update author's role
+        // Update author's role
         $response = $this->withHeaders([
             'Accept' => 'application/json',
         ])->post('authors/'.$project->id.'/updateRole', $body);
