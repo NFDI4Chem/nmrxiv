@@ -15,8 +15,11 @@ class OEmbedTest extends TestCase
     use RefreshDatabase;
 
     private User $user;
+
     private Project $project;
+
     private Study $study;
+
     private Dataset $dataset;
 
     protected function setUp(): void
@@ -63,9 +66,9 @@ class OEmbedTest extends TestCase
 
     public function test_it_can_generate_oembed_response_for_study(): void
     {
-        $url = config('app.url') . '/S456';
+        $url = config('app.url').'/S456';
 
-        $response = $this->get('/services/oembed?url=' . urlencode($url));
+        $response = $this->get('/services/oembed?url='.urlencode($url));
 
         $response->assertStatus(200)
             ->assertJson([
@@ -76,7 +79,7 @@ class OEmbedTest extends TestCase
                 'provider_url' => config('app.url'),
                 'title' => 'Test Study',
                 'author_name' => 'Test Author',
-                'author_url' => config('app.url') . '/author/testauthor',
+                'author_url' => config('app.url').'/author/testauthor',
                 'height' => '300',
                 'width' => '320',
                 'thumbnail_width' => '300',
@@ -107,12 +110,11 @@ class OEmbedTest extends TestCase
         $this->assertStringContainsString('/embed/NMRXIV:S456', $data['html']);
     }
 
-
     public function test_it_can_generate_oembed_response_for_dataset(): void
     {
-        $url = config('app.url') . '/D789';
+        $url = config('app.url').'/D789';
 
-        $response = $this->get('/services/oembed?url=' . urlencode($url));
+        $response = $this->get('/services/oembed?url='.urlencode($url));
 
         $response->assertStatus(200)
             ->assertJson([
@@ -123,16 +125,15 @@ class OEmbedTest extends TestCase
                 'provider_url' => config('app.url'),
                 'title' => 'Test Dataset',
                 'author_name' => 'Test Author',
-                'author_url' => config('app.url') . '/author/testauthor',
+                'author_url' => config('app.url').'/author/testauthor',
             ]);
     }
 
-
     public function test_it_accepts_custom_width_and_height_parameters(): void
     {
-        $url = config('app.url') . '/S456';
+        $url = config('app.url').'/S456';
 
-        $response = $this->get('/services/oembed?url=' . urlencode($url) . '&width=500&height=400');
+        $response = $this->get('/services/oembed?url='.urlencode($url).'&width=500&height=400');
 
         $response->assertStatus(200)
             ->assertJson([
@@ -140,7 +141,6 @@ class OEmbedTest extends TestCase
                 'height' => '400',
             ]);
     }
-
 
     public function test_it_handles_study_without_thumbnail(): void
     {
@@ -152,16 +152,15 @@ class OEmbedTest extends TestCase
             'is_public' => true,
         ]);
 
-        $url = config('app.url') . '/S999';
+        $url = config('app.url').'/S999';
 
-        $response = $this->get('/services/oembed?url=' . urlencode($url));
+        $response = $this->get('/services/oembed?url='.urlencode($url));
 
         $response->assertStatus(200)
             ->assertJson([
                 'thumbnail_url' => null,
             ]);
     }
-
 
     public function test_it_returns_400_when_url_parameter_is_missing(): void
     {
@@ -173,7 +172,6 @@ class OEmbedTest extends TestCase
             ]);
     }
 
-
     public function test_it_returns_400_when_url_format_is_invalid(): void
     {
         $response = $this->get('/services/oembed?url=invalid-url');
@@ -184,12 +182,11 @@ class OEmbedTest extends TestCase
             ]);
     }
 
-
     public function test_it_returns_400_when_identifier_is_missing_from_url(): void
     {
-        $url = config('app.url') . '/';
+        $url = config('app.url').'/';
 
-        $response = $this->get('/services/oembed?url=' . urlencode($url));
+        $response = $this->get('/services/oembed?url='.urlencode($url));
 
         $response->assertStatus(400)
             ->assertJson([
@@ -197,12 +194,11 @@ class OEmbedTest extends TestCase
             ]);
     }
 
-
     public function test_it_returns_404_when_identifier_cannot_be_resolved(): void
     {
-        $url = config('app.url') . '/S99999';
+        $url = config('app.url').'/S99999';
 
-        $response = $this->get('/services/oembed?url=' . urlencode($url));
+        $response = $this->get('/services/oembed?url='.urlencode($url));
 
         $response->assertStatus(404)
             ->assertJson([
@@ -210,19 +206,17 @@ class OEmbedTest extends TestCase
             ]);
     }
 
-
     public function test_it_returns_500_when_identifier_format_is_invalid(): void
     {
-        $url = config('app.url') . '/INVALID123';
+        $url = config('app.url').'/INVALID123';
 
-        $response = $this->get('/services/oembed?url=' . urlencode($url));
+        $response = $this->get('/services/oembed?url='.urlencode($url));
 
         $response->assertStatus(500)
             ->assertJson([
                 'error' => 'An error occurred while processing the request',
             ]);
     }
-
 
     public function test_it_can_render_embedded_study_content(): void
     {
@@ -233,7 +227,6 @@ class OEmbedTest extends TestCase
         // Just verify it's a successful HTML response (the Inertia component is embedded in complex JSON/HTML)
     }
 
-
     public function test_it_can_render_embedded_dataset_content(): void
     {
         $response = $this->get('/embed/D789');
@@ -243,14 +236,12 @@ class OEmbedTest extends TestCase
         // Just verify it's a successful HTML response (the Inertia component is embedded in complex JSON/HTML)
     }
 
-
     public function test_it_returns_400_when_embed_identifier_is_empty(): void
     {
         $response = $this->get('/embed/');
 
         $response->assertStatus(404); // This will be a 404 from Laravel routing, not our controller
     }
-
 
     public function test_it_returns_404_when_embed_identifier_cannot_be_resolved(): void
     {
@@ -262,7 +253,6 @@ class OEmbedTest extends TestCase
             ]);
     }
 
-
     public function test_it_returns_500_when_embed_identifier_format_is_invalid(): void
     {
         $response = $this->get('/embed/INVALID123');
@@ -272,7 +262,6 @@ class OEmbedTest extends TestCase
                 'error' => 'An error occurred while processing the request',
             ]);
     }
-
 
     public function test_it_returns_404_for_unsupported_content_type_in_embed(): void
     {
@@ -284,7 +273,6 @@ class OEmbedTest extends TestCase
                 'error' => 'Content not found',
             ]);
     }
-
 
     public function test_it_handles_dataset_without_associated_study(): void
     {
@@ -306,25 +294,23 @@ class OEmbedTest extends TestCase
             ]);
     }
 
-
     public function test_it_handles_nmrxiv_prefix_in_identifier(): void
     {
-        $url = config('app.url') . '/NMRXIV:S456';
+        $url = config('app.url').'/NMRXIV:S456';
 
-        $response = $this->get('/services/oembed?url=' . urlencode($url));
+        $response = $this->get('/services/oembed?url='.urlencode($url));
 
         $response->assertStatus(200)
             ->assertJson([
                 'title' => 'Test Study',
             ]);
     }
-
 
     public function test_it_handles_case_insensitive_identifiers(): void
     {
-        $url = config('app.url') . '/s456'; // lowercase
+        $url = config('app.url').'/s456'; // lowercase
 
-        $response = $this->get('/services/oembed?url=' . urlencode($url));
+        $response = $this->get('/services/oembed?url='.urlencode($url));
 
         $response->assertStatus(200)
             ->assertJson([
@@ -332,12 +318,11 @@ class OEmbedTest extends TestCase
             ]);
     }
 
-
     public function test_it_supports_json_format_parameter(): void
     {
-        $url = config('app.url') . '/S456';
+        $url = config('app.url').'/S456';
 
-        $response = $this->get('/services/oembed?url=' . urlencode($url) . '&format=json');
+        $response = $this->get('/services/oembed?url='.urlencode($url).'&format=json');
 
         $response->assertStatus(200)
             ->assertJson([
@@ -346,16 +331,15 @@ class OEmbedTest extends TestCase
             ]);
     }
 
-
     public function test_it_handles_server_errors_gracefully(): void
     {
         // Mock a scenario that would cause an exception
         // This test ensures our try-catch blocks work properly
-        $url = config('app.url') . '/S456';
+        $url = config('app.url').'/S456';
 
-        // We can't easily mock an exception in this context, 
+        // We can't easily mock an exception in this context,
         // but this test documents the expected behavior
-        $response = $this->get('/services/oembed?url=' . urlencode($url));
+        $response = $this->get('/services/oembed?url='.urlencode($url));
 
         // Should not return 500 error for valid input
         $response->assertStatus(200);
@@ -372,9 +356,9 @@ class OEmbedTest extends TestCase
             'is_public' => false, // This is private
         ]);
 
-        $url = config('app.url') . '/S777';
+        $url = config('app.url').'/S777';
 
-        $response = $this->get('/services/oembed?url=' . urlencode($url));
+        $response = $this->get('/services/oembed?url='.urlencode($url));
 
         $response->assertStatus(404)
             ->assertJson([
@@ -405,7 +389,7 @@ class OEmbedTest extends TestCase
     {
         $externalUrl = 'https://evil.com/S456';
 
-        $response = $this->get('/services/oembed?url=' . urlencode($externalUrl));
+        $response = $this->get('/services/oembed?url='.urlencode($externalUrl));
 
         $response->assertStatus(400)
             ->assertJson([
@@ -415,10 +399,10 @@ class OEmbedTest extends TestCase
 
     public function test_it_validates_width_and_height_parameters(): void
     {
-        $url = config('app.url') . '/S456';
+        $url = config('app.url').'/S456';
 
         // Test with malicious width/height values - should be blocked by validation
-        $response = $this->get('/services/oembed?url=' . urlencode($url) . '&width=<script>alert(1)</script>&height=999999');
+        $response = $this->get('/services/oembed?url='.urlencode($url).'&width=<script>alert(1)</script>&height=999999');
 
         // Should return validation error for invalid parameters
         $response->assertStatus(400)
@@ -427,28 +411,28 @@ class OEmbedTest extends TestCase
             ]);
 
         // Test with valid numeric values
-        $response2 = $this->get('/services/oembed?url=' . urlencode($url) . '&width=500&height=400');
-        
+        $response2 = $this->get('/services/oembed?url='.urlencode($url).'&width=500&height=400');
+
         $response2->assertStatus(200);
         $data = $response2->json();
-        
+
         $this->assertEquals('500', $data['width']);
         $this->assertEquals('400', $data['height']);
     }
 
     public function test_iframe_html_is_properly_sanitized(): void
     {
-        $url = config('app.url') . '/S456';
+        $url = config('app.url').'/S456';
 
-        $response = $this->get('/services/oembed?url=' . urlencode($url));
+        $response = $this->get('/services/oembed?url='.urlencode($url));
 
         $response->assertStatus(200);
 
         $data = $response->json();
-        
+
         // Verify iframe includes sandbox attribute for security
         $this->assertStringContainsString('sandbox="allow-scripts allow-same-origin"', $data['html']);
-        
+
         // Verify all content is properly HTML escaped
         $this->assertStringNotContainsString('<script>', $data['html']);
         $this->assertStringNotContainsString('javascript:', $data['html']);
