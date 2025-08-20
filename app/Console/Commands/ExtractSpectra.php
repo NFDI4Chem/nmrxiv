@@ -170,6 +170,7 @@ class ExtractSpectra extends Command
 
     public function processSpectra($url)
     {
+        $url = urlencode($url);
         $response = Http::timeout(300)->post('https://nodejs.nmrxiv.org/spectra-parser', [
             'urls' => [$url],
             'snapshot' => false,
