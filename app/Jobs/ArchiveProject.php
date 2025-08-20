@@ -11,6 +11,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use ZipStream;
 
@@ -76,7 +77,7 @@ class ArchiveProject implements ShouldBeUnique, ShouldQueue
                         $s3keys = [];
                         $environment = env('APP_ENV', 'local');
                         if ($fsObject->type == 'file') {
-                            if (Storage::disk(env('FILESYSTEM_DRIVER'))->has($path)) {
+                            if (Storage::disk(env('FILESYSTEM_DRIVER'))->exists($path)) {
                                 array_push($s3keys, substr($fsObject->path, 1));
                             }
                         } else {
@@ -120,9 +121,43 @@ class ArchiveProject implements ShouldBeUnique, ShouldQueue
                                 } else {
                                     $sPath = $fsObject->key;
                                 }
-                                $zip->addFileFromStream($sPath, $streamRead);
+
+                                // Get file size to handle empty files properly
+                                try {
+                                    $fileSize = $s3Client->headObject([
+                                        'Bucket' => $bucket,
+                                        'Key' => $key,
+                                    ])->get('ContentLength');
+
+                                    Log::info("Project {$project->id}: Processing file {$key}, size: {$fileSize} bytes");
+
+                                    // Handle empty files specially to avoid corruption
+                                    if ($fileSize == 0) {
+                                        Log::info("Project {$project->id}: Adding empty file: {$key}");
+                                        fclose($streamRead);
+
+                                        // Add empty file using addFile method instead of stream
+                                        try {
+                                            $zip->addFile($sPath, '');
+                                            Log::info("Project {$project->id}: Successfully added empty file: {$key}");
+                                        } catch (\Exception $e) {
+                                            Log::error("Project {$project->id}: Failed to add empty file {$key}: ".$e->getMessage());
+                                        }
+                                    } else {
+                                        // Add non-empty file using stream
+                                        $zip->addFileFromStream($sPath, $streamRead);
+                                        fclose($streamRead);
+                                    }
+                                } catch (\Exception $e) {
+                                    Log::error("Project {$project->id}: Error processing file {$key}: ".$e->getMessage());
+                                    fclose($streamRead);
+
+                                    continue;
+                                }
                             } else {
-                                exit('Could not open stream for reading');
+                                Log::error("Project {$project->id}: Could not open stream for reading: {$s3path}");
+
+                                continue;
                             }
                         }
                         $zip->finish();
