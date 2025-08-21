@@ -29,7 +29,7 @@ class SanitizeProjects extends Command
     /**
      * Execute the console command.
      */
-    public function handle(): int
+    public function handle()
     {
         $name = $this->argument('name');
 
@@ -353,7 +353,14 @@ class SanitizeProjects extends Command
         $fsObjects = FileSystemObject::whereNull('status')->get();
         foreach ($fsObjects as $fsObject) {
             DB::transaction(function () use ($fsObject) {
-                if ($fsObject->path) {
+                // check if not directory
+                if ($fsObject->type == 'directory') {
+                    $fsObject->status = 'present';
+                    $fsObject->save();
+                    return;
+                }
+
+                if ($fsObject->path && $fsObject->type == 'file') {
                     $exists = Storage::disk(env('FILESYSTEM_DRIVER'))->exists($fsObject->path);
                     if (! $exists) {
                         $fsObject->status = 'missing';
