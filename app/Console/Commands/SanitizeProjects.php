@@ -357,7 +357,6 @@ class SanitizeProjects extends Command
                 if ($fsObject->type == 'directory') {
                     $fsObject->status = 'present';
                     $fsObject->save();
-
                     return;
                 }
 
