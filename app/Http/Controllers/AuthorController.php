@@ -2,121 +2,183 @@
 
 namespace App\Http\Controllers;
 
-use App\Actions\Project\UpdateProject;
-use App\Models\Author;
+use App\Http\Resources\AuthorResource;
 use App\Models\Project;
-use Illuminate\Auth\Access\AuthorizationException;
+use App\Services\AuthorService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpFoundation\Response;
 
 class AuthorController extends Controller
 {
     /**
-     * Save and sync updated author details for a project.
+     * Create a new AuthorController instance.
      *
-     * @param  \Actions\Project\UpdateProject  $updater
-     * @return \Illuminate\Http\RedirectResponse
+     * @return void
      */
-    public function save(Request $request, UpdateProject $updater, Project $project)
+    public function __construct(
+        private AuthorService $authorService
+    ) {}
+
+    /**
+     * Save and sync updated author details for a project.
+     */
+    public function save(Request $request, Project $project): JsonResponse|RedirectResponse
     {
         if (! Gate::forUser($request->user())->check('updateProject', $project)) {
-            throw new AuthorizationException;
+            return $this->unauthorizedResponse($request, 'You are not authorized to update authors for this project.');
         }
 
-        $authors = $request->get('authors');
-        if (count($authors) > 0) {
-            $processedAuthors = [];
+        try {
+            // Validate the request structure first
+            $request->validate([
+                'authors' => ['required', 'array', 'max:50'],
+                'authors.*' => ['required', 'array'],
+                'authors.*.given_name' => ['required', 'string'],
+                'authors.*.family_name' => ['required', 'string'],
+            ]);
 
-            foreach ($authors as $author) {
-                $family_name = $author['family_name'];
-                $given_name = $author['given_name'];
+            $authors = $request->get('authors', []);
+            $processedAuthors = $this->authorService->syncAuthors($project, $authors);
 
-                Validator::make($author, [
-                    'given_name' => ['required', 'string', 'max:255'],
-                    'family_name' => ['required', 'string', 'max:255'],
-                ])->validate();
-
-                if (! is_null($family_name) && ! is_null($given_name)) {
-                    $_author = $project->authors->filter(function ($a) use ($family_name, $given_name) {
-                        return $family_name.$given_name === $a->family_name.$a->given_name;
-                    })->first();
-                    // dd($_author);
-                    if ($_author) {
-                        $_author->update([
-                            'title' => array_key_exists('title', $author) ? $author['title'] : null,
-                            'given_name' => $given_name,
-                            'family_name' => $family_name,
-                            'orcid_id' => array_key_exists('orcid_id', $author) ? $author['orcid_id'] : null,
-                            'email_id' => array_key_exists('email_id', $author) ? $author['email_id'] : null,
-                            'affiliation' => array_key_exists('affiliation', $author) ? $author['affiliation'] : null,
-                        ]);
-                    } else {
-                        $_author = Author::create([
-                            'title' => array_key_exists('title', $author) ? $author['title'] : null,
-                            'given_name' => $given_name,
-                            'family_name' => $family_name,
-                            'orcid_id' => array_key_exists('orcid_id', $author) ? $author['orcid_id'] : null,
-                            'email_id' => array_key_exists('email_id', $author) ? $author['email_id'] : null,
-                            'affiliation' => array_key_exists('affiliation', $author) ? $author['affiliation'] : null,
-                        ]);
-                    }
-                    $_author->contributor_type = array_key_exists('contributor_type', $author) ? $author['contributor_type'] : 'Researcher';
-                    array_push($processedAuthors, $_author);
-                }
-            }
-            $updater->attachAuthor($project, $processedAuthors);
+            return $this->successResponse($request, 'Authors updated successfully', $processedAuthors);
+        } catch (ValidationException $e) {
+            return $this->validationErrorResponse($request, $e);
+        } catch (\Exception $e) {
+            return $this->errorResponse($request, 'An error occurred while updating authors.', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-
-        return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('success', 'Authors updated successfully');
     }
 
     /**
      * Delete author for a project.
-     *
-     * @param  \Actions\Project\UpdateProject  $updater
-     * @return \Illuminate\Http\RedirectResponse
      */
-    public function destroy(Request $request, UpdateProject $updater, Project $project)
+    public function destroy(Request $request, Project $project): JsonResponse|RedirectResponse
     {
         if (! Gate::forUser($request->user())->check('updateProject', $project)) {
-            throw new AuthorizationException;
+            return $this->unauthorizedResponse($request, 'You are not authorized to remove authors from this project.');
         }
 
-        $authors = $request->get('authors');
+        try {
+            // Validate request structure
+            $request->validate([
+                'authors' => ['required', 'array', 'min:1'],
+                'authors.*.id' => ['required', 'integer', 'min:1'],
+            ]);
 
-        if (count($authors) > 0) {
-            $updater->detachAuthor($project, $authors[0]['id']);
+            $authors = $request->get('authors');
+            $this->authorService->removeAuthorFromProject($project, $authors[0]['id']);
 
-            // #todo: check if the author is already associated with any other project and if not delete the author
+            return $this->successResponse($request, 'Author deleted successfully');
+        } catch (ValidationException $e) {
+            return $this->validationErrorResponse($request, $e);
+        } catch (\Exception $e) {
+            return $this->errorResponse($request, 'An error occurred while deleting the author.', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-
-        return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('success', 'Author deleted successfully');
     }
 
     /**
-     * Update existing Contributor type for a given author in a project.
-     *
-     * @param  \Actions\Project\UpdateProject  $updater
-     * @return \Illuminate\Http\RedirectResponse
+     * Update existing contributor type for a given author in a project.
      */
-    public function updateRole(Request $request, UpdateProject $updater, Project $project)
+    public function updateRole(Request $request, Project $project): JsonResponse|RedirectResponse
     {
         if (! Gate::forUser($request->user())->check('updateProject', $project)) {
-            throw new AuthorizationException;
+            return $this->unauthorizedResponse($request, 'You are not authorized to update author roles for this project.');
         }
 
-        $contributorTypes = Config::get('doi.'.Config::get('doi.default').'.contributor_types');
-        $roleExist = in_array($request->role, $contributorTypes);
+        try {
+            // Validate request structure
+            $request->validate([
+                'author_id' => ['required', 'integer', 'min:1'],
+                'role' => ['required', 'string', 'max:50', 'regex:/^[a-zA-Z\s]+$/'],
+            ]);
 
-        if ($roleExist && $request->author_id && $request->role) {
-            $updater->updateContributorType($project, $request->author_id, $request->role);
+            $success = $this->authorService->updateContributorType(
+                $project,
+                $request->author_id,
+                $request->role
+            );
 
-            return $request->wantsJson() ? new JsonResponse('', 200) : back()->with('success', 'Author updated successfully');
-        } else {
-            return $request->wantsJson() ? new JsonResponse('', 500) : back()->with('error', 'Error occurred while updating Author role');
+            if (! $success) {
+                return $this->errorResponse($request, 'Invalid contributor type or missing author information.', Response::HTTP_BAD_REQUEST);
+            }
+
+            return $this->successResponse($request, 'Author role updated successfully');
+        } catch (ValidationException $e) {
+            return $this->validationErrorResponse($request, $e);
+        } catch (\Exception $e) {
+            return $this->errorResponse($request, 'An error occurred while updating the author role.', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    /**
+     * Return unauthorized response for failed authorization checks.
+     */
+    private function unauthorizedResponse(Request $request, string $message): JsonResponse|RedirectResponse
+    {
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => $message,
+                'error' => 'Unauthorized',
+            ], Response::HTTP_FORBIDDEN);
+        }
+
+        return back()->with('error', $message);
+    }
+
+    /**
+     * Return success response with optional data payload.
+     */
+    private function successResponse(Request $request, string $message, array $data = []): JsonResponse|RedirectResponse
+    {
+        if ($request->wantsJson()) {
+            $response = [
+                'message' => $message,
+                'success' => true,
+            ];
+
+            // Add structured data using AuthorResource if authors are provided
+            if (! empty($data)) {
+                $response['data'] = [
+                    'authors' => AuthorResource::collection($data),
+                ];
+            }
+
+            return response()->json($response, Response::HTTP_OK);
+        }
+
+        return back()->with('success', $message);
+    }
+
+    /**
+     * Return validation error response with detailed error messages.
+     */
+    private function validationErrorResponse(Request $request, ValidationException $exception): JsonResponse|RedirectResponse
+    {
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $exception->errors(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        return back()->withErrors($exception->errors())->withInput();
+    }
+
+    /**
+     * Return generic error response with custom message and status code.
+     */
+    private function errorResponse(Request $request, string $message, int $statusCode = Response::HTTP_INTERNAL_SERVER_ERROR): JsonResponse|RedirectResponse
+    {
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => $message,
+                'error' => true,
+            ], $statusCode);
+        }
+
+        return back()->with('error', $message);
     }
 }
