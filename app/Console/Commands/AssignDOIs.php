@@ -27,7 +27,7 @@ class AssignDOIs extends Command
     /**
      * Execute the console command.
      */
-    public function handle(AssignIdentifier $assigner): int
+    public function handle(AssignIdentifier $assigner)
     {
         return DB::transaction(function () use ($assigner) {
             $projects = Project::where([
