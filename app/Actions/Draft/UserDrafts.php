@@ -21,7 +21,7 @@ class UserDrafts
             ->where('is_deleted', false)
             ->where(function ($query) {
                 $query->whereHas('files')
-                      ->orWhereHas('project');
+                    ->orWhereHas('project');
             })
             ->orderBy('updated_at', 'DESC')
             ->get();
