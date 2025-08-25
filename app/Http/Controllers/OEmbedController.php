@@ -22,7 +22,6 @@ class OEmbedController extends Controller
      * Validate that the content is publicly accessible.
      *
      * @param  mixed  $model  The model to check
-     * @return bool
      */
     private function validatePublicAccess($model): bool
     {
@@ -51,7 +50,6 @@ class OEmbedController extends Controller
      * Validate that the URL belongs to this application.
      *
      * @param  string  $url  The URL to validate
-     * @return bool
      */
     private function validateOEmbedUrl(string $url): bool
     {
@@ -63,9 +61,6 @@ class OEmbedController extends Controller
 
     /**
      * Sanitize text content to prevent XSS.
-     *
-     * @param  string|null  $text
-     * @return string
      */
     private function sanitizeText(?string $text): string
     {
@@ -78,12 +73,6 @@ class OEmbedController extends Controller
 
     /**
      * Validate numeric parameters.
-     *
-     * @param  string  $value
-     * @param  int  $min
-     * @param  int  $max
-     * @param  int  $default
-     * @return int
      */
     private function validateNumericParameter(string $value, int $min = 100, int $max = 1000, int $default = 300): int
     {
@@ -94,6 +83,7 @@ class OEmbedController extends Controller
 
         return $numeric;
     }
+
     /**
      * Generate oEmbed response for spectra content.
      *
