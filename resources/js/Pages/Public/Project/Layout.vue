@@ -1,55 +1,49 @@
 <template>
     <app-layout :title="project.name">
         <template #header>
-            <div class="bg-white border-b">
+            <div class="bg-white">
                 <div class="border-b">
-                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
-                        <img
-                            v-if="project && project.data.owner"
-                            class="inline h-7 w-7 rounded-full"
-                            :src="project.data.owner.profile_photo_url"
-                        />
-                        <p
-                            class="inline ml-3 text-xs font-bold text-gray-500 uppercase"
-                        >
-                            <a class="text-gray-900">{{
-                                project.data.owner.first_name +
-                                " " +
-                                project.data.owner.last_name
-                            }}</a>
-                            <span class="block md:inline ml-10 md:ml-0">
-                                updated on
-                                <time>{{
-                                    formatDate(project.data.updated_at)
-                                }}</time>
-                            </span>
-                        </p>
-                        <div class="flex mt-2 md:inline">
-                            <div
-                                v-if="project.data.download_url"
-                                class="float-left md:float-right"
-                            >
-                                <a
-                                    class="md:ml-4 cursor-pointer relative inline-flex items-center px-4 py-1 rounded-full border border-gray-300 bg-white text-sm font-black text-dark hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
-                                    :href="project.data.download_url"
-                                >
-                                    Download
-                                </a>
+                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+                        <!-- Mobile-first responsive layout -->
+                        <div class="flex flex-col space-y-3 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
+                            <!-- Owner info section -->
+                            <div class="flex items-center space-x-3">
+                                <img
+                                    v-if="project && project.data.owner"
+                                    class="h-8 w-8 rounded-full flex-shrink-0"
+                                    :src="project.data.owner.profile_photo_url"
+                                    :alt="project.data.owner.first_name + ' ' + project.data.owner.last_name"
+                                />
+                                <div class="min-w-0 flex-1">
+                                    <p class="text-sm font-semibold text-gray-900 truncate">
+                                        {{
+                                            project.data.owner.first_name +
+                                            " " +
+                                            project.data.owner.last_name
+                                        }}
+                                    </p>
+                                    <p class="text-xs text-gray-500">
+                                        Updated on
+                                        <time class="font-medium">{{
+                                            formatDate(project.data.updated_at)
+                                        }}</time>
+                                    </p>
+                                </div>
                             </div>
-                            <div class="float-left md:float-right">
-                                <div class="flex-shrink-0">
-                                    <span
-                                        v-if="project.data.stats"
-                                        class="relative z-0 inline-flex shadow-sm rounded-full"
-                                    >
+                            
+                            <!-- Action buttons section -->
+                            <div class="flex items-center space-x-2 flex-shrink-0">
+                                <!-- Like button -->
+                                <div v-if="project.data.stats" class="flex-shrink-0">
+                                    <div class="inline-flex shadow-sm rounded-full">
                                         <button
                                             type="button"
-                                            class="relative inline-flex items-center px-1 py-1 rounded-l-full border border-gray-300 bg-white text-sm font-medium text-gray-900 hover:bg-gray-50"
+                                            class="relative inline-flex items-center px-2 py-1.5 rounded-l-full border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors"
                                             @click="toggleUpVote()"
                                         >
                                             <svg
                                                 xmlns="http://www.w3.org/2000/svg"
-                                                class="h-5 w-5"
+                                                class="h-4 w-4"
                                                 viewBox="0 0 20 20"
                                                 fill="currentColor"
                                             >
@@ -60,69 +54,75 @@
                                                 />
                                             </svg>
                                         </button>
-                                        <a
-                                            class="-ml-px relative inline-flex items-center px-4 py-1 rounded-r-full border border-gray-300 bg-white text-sm font-black text-dark hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                                        <span
+                                            class="-ml-px relative inline-flex items-center px-3 py-1.5 rounded-r-full border border-gray-300 bg-white text-sm font-semibold text-gray-900"
                                         >
                                             {{ project.data.stats.likes }}
-                                        </a>
-                                    </span>
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Download button -->
+                                <div v-if="project.data.download_url" class="flex-shrink-0">
+                                    <a
+                                        class="inline-flex items-center px-4 py-1.5 rounded-full border border-gray-300 bg-white text-sm font-semibold text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors"
+                                        :href="project.data.download_url"
+                                    >
+                                        <svg class="-ml-1 mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                        Download
+                                    </a>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div>
-                    <div class="pb-5">
-                        <div>
-                            <div>
-                                <img
-                                    class="h-32 w-full object-cover lg:h-48"
-                                    src="https://images.unsplash.com/photo-1637625854255-d893202554f4?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80"
-                                    alt=""
-                                />
-                            </div>
-                            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                                <div
-                                    class="-mt-12 sm:-mt-16 sm:flex sm:items-end sm:space-x-5"
-                                >
-                                    <div class="flex mb-12 h-24 w-72">
-                                        <img
-                                            v-if="
-                                                project.data.photo_url &&
-                                                project.data.photo_url != ''
-                                            "
-                                            class="h-24 w-72 object-cover border rounded ring-4 ring-white sm:h-32 sm:w-96"
-                                            :src="project.data.photo_url"
-                                            alt=""
-                                        />
-                                    </div>
+                    <div class="pb-6">
+                        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <div class="relative z-10 pt-5">
+                                <div v-if="project.data.photo_url && project.data.photo_url != ''" class="flex justify-center sm:justify-start mb-6">
+                                    <img
+                                        class="h-20 w-20 sm:h-24 sm:w-24 lg:h-32 lg:w-32 object-cover rounded-lg border-4 border-white shadow-lg"
+                                        :src="project.data.photo_url"
+                                        :alt="project.data.name"
+                                    />
                                 </div>
-                                <div class="min-w-0 flex-1">
-                                    <h1
-                                        class="text-2xl pl-1 font-bold text-gray-900 break-words"
-                                    >
-                                        {{ project.data.name }}
-                                        <a
-                                            class="float-right font-light hover:text-blue-600 hover:cursor-pointer text-gray-200"
-                                            >#{{ project.data.identifier }}</a
-                                        >
-                                    </h1>
-                                    <p class="text-gray-700 pl-1 pt-2">
-                                        <DOIBadge
-                                            :doi="project.data.doi"
-                                        ></DOIBadge>
-                                    </p>
-                                    <div class="sm:col-span-12 pt-4">
-                                        <span
-                                            v-for="tag in project.data.tags"
-                                            :key="tag.id"
-                                            class="mt-1 mr-1 inline-flex items-center rounded-full bg-gray-50 px-2 py-1 text-sm font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10"
-                                            target="_blank"
-                                            :href="
-                                                '/projects?tag=' + tag.name.en
-                                            "
-                                            >{{ tag.name.en }}</span
-                                        >
+                                
+                                <!-- Project info -->
+                                <div class="text-center sm:text-left bg-white rounded-lg py-4 sm:py-6">
+                                    <!-- Project title and identifier -->
+                                    <div v-if="project" class="flex flex-col sm:flex-row sm:items-start sm:justify-between sm:space-x-4">
+                                        <div class="min-w-0 flex-1">
+                                            <h1 class="text-xl sm:text-2xl lg:text-3xl font-semibold text-gray-900 break-words leading-tight">
+                                                {{ toTitleCase((project.data && project.data.name) || project.name || 'Project Name') }}
+                                            </h1>
+                                        </div>
+                                        <div v-if="(project.data && project.data.identifier) || project.identifier" class="mt-2 sm:mt-0 flex-shrink-0">
+                                            <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-gray-100 text-gray-700 border border-gray-200">
+                                                #{{ (project.data && project.data.identifier) || project.identifier }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- DOI Badge -->
+                                    <div v-if="(project.data && project.data.doi) || project.doi" class="mt-3">
+                                        <DOIBadge :doi="(project.data && project.data.doi) || project.doi"></DOIBadge>
+                                    </div>
+                                    
+                                    <!-- Tags -->
+                                    <div v-if="((project.data && project.data.tags) || project.tags) && ((project.data && project.data.tags && project.data.tags.length > 0) || (project.tags && project.tags.length > 0))" class="mt-4">
+                                        <div class="flex flex-wrap justify-center sm:justify-start gap-2">
+                                            <a
+                                                v-for="tag in (project.data && project.data.tags) || project.tags"
+                                                :key="tag.id"
+                                                class="inline-flex items-center rounded-full bg-teal-50 px-3 py-1 text-sm font-medium text-teal-700 hover:bg-teal-100 transition-colors cursor-pointer"
+                                                :href="'/projects?tag=' + tag.name.en"
+                                            >
+                                                {{ tag.name.en }}
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -244,6 +244,30 @@ export default {
             } else {
                 this.$inertia.visit(route("login"));
             }
+        },
+        navigateToTab(tabName) {
+            router.visit(this.project.data.public_url + '?tab=' + tabName);
+        },
+        toTitleCase(str) {
+            if (!str) return '';
+            
+            // Words that should remain lowercase (articles, prepositions, conjunctions)
+            const lowercaseWords = ['a', 'an', 'and', 'as', 'at', 'but', 'by', 'for', 'if', 'in', 'nor', 'of', 'on', 'or', 'so', 'the', 'to', 'up', 'yet'];
+            
+            return str.toLowerCase().split(' ').map((word, index) => {
+                // Always capitalize the first and last word
+                if (index === 0 || index === str.split(' ').length - 1) {
+                    return word.charAt(0).toUpperCase() + word.slice(1);
+                }
+                
+                // Keep certain words lowercase unless they're the first or last word
+                if (lowercaseWords.includes(word)) {
+                    return word;
+                }
+                
+                // Capitalize other words
+                return word.charAt(0).toUpperCase() + word.slice(1);
+            }).join(' ');
         },
     },
 };

@@ -1,5 +1,5 @@
 <template>
-    <div class="mx-auto w-100">
+    <div class="mx-auto w-100 p-6">
         <iframe
             width="100%"
             :height="height - 65"
