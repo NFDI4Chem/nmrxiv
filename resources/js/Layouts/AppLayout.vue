@@ -881,10 +881,6 @@
                             as="div"
                             class="ml-3 relative"
                         >
-                            <MenuButton
-                                class="inline-flex text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition"
-                            >
-                            </MenuButton>
                             <div class="inline-flex">
                                 <Link
                                     href="/login"
