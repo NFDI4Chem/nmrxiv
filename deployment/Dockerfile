@@ -34,20 +34,11 @@ RUN pecl install apcu redis && \
     /sbin/apk del autoconf gcc g++ make && \
     rm -rf /tmp/pear
 
-# Configure PHP - combine echo commands
-RUN { \
-        echo 'max_execution_time = 3600'; \
-        echo 'memory_limit = 4G'; \
-        echo 'upload_max_filesize = 100M'; \
-        echo 'post_max_size = 250M'; \
-        echo 'max_input_time = 3600'; \
-    } > /usr/local/etc/php/conf.d/docker-php-custom.ini
-
 # Install composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Configure PHP from custom file
-COPY docker/8.3/php.ini /usr/local/etc/php/conf.d/custom.ini
+# Configure PHP with production settings
+COPY deployment/php.production.ini /usr/local/etc/php/conf.d/production.ini
 
 # Copy package files first for better caching
 COPY composer.json composer.lock package*.json ./
