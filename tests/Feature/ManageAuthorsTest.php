@@ -250,7 +250,7 @@ class ManageAuthorsTest extends TestCase
 
         $body = [
             'author_id' => $author->id,
-            'role' => $this->faker->text(),
+            'role' => 'InvalidRole', // Valid format but not in configured contributor types
         ];
 
         // Update author's role
@@ -258,7 +258,497 @@ class ManageAuthorsTest extends TestCase
             'Accept' => 'application/json',
         ])->post('authors/'.$project->id.'/updateRole', $body);
 
-        $response->assertStatus(500);
+        $response->assertStatus(400);
+    }
+
+    /**
+     * Test validation errors for invalid author data
+     *
+     * @return void
+     */
+    public function test_author_creation_with_invalid_data_returns_validation_errors()
+    {
+        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+
+        $project = Project::factory()->create([
+            'owner_id' => $user->id,
+        ]);
+
+        // Test missing required fields
+        $invalidBody = [
+            'authors' => [[
+                'title' => 'Dr.',
+                // Missing given_name and family_name
+                'email_id' => 'invalid-email', // Invalid email format
+                'orcid_id' => str_repeat('a', 20), // Too long ORCID
+                'affiliation' => str_repeat('a', 501), // Too long affiliation
+            ]],
+        ];
+
+        $response = $this->withHeaders([
+            'Accept' => 'application/json',
+        ])->post('authors/'.$project->id, $invalidBody);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['authors.0.given_name', 'authors.0.family_name']);
+    }
+
+    /**
+     * Test author creation with empty authors array
+     *
+     * @return void
+     */
+    public function test_author_creation_with_empty_authors_array()
+    {
+        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+
+        $project = Project::factory()->create([
+            'owner_id' => $user->id,
+        ]);
+
+        $body = ['authors' => []];
+
+        $response = $this->withHeaders([
+            'Accept' => 'application/json',
+        ])->post('authors/'.$project->id, $body);
+
+        // Empty authors array should fail validation as 'authors' is required and must have content
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['authors']);
+    }
+
+    /**
+     * Test author creation with too many authors (over limit)
+     *
+     * @return void
+     */
+    public function test_author_creation_with_too_many_authors()
+    {
+        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+
+        $project = Project::factory()->create([
+            'owner_id' => $user->id,
+        ]);
+
+        // Create 51 authors (over the limit of 50)
+        $authors = [];
+        for ($i = 0; $i < 51; $i++) {
+            $authors[] = [
+                'given_name' => "Author{$i}",
+                'family_name' => "Surname{$i}",
+                'email_id' => "author{$i}@example.com",
+            ];
+        }
+
+        $body = ['authors' => $authors];
+
+        $response = $this->withHeaders([
+            'Accept' => 'application/json',
+        ])->post('authors/'.$project->id, $body);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['authors']);
+    }
+
+    /**
+     * Test multiple authors can be added at once
+     *
+     * @return void
+     */
+    public function test_multiple_authors_can_be_added_at_once()
+    {
+        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+
+        $project = Project::factory()->create([
+            'owner_id' => $user->id,
+        ]);
+
+        $body = [
+            'authors' => [
+                [
+                    'given_name' => 'John',
+                    'family_name' => 'Doe',
+                    'email_id' => 'john@example.com',
+                    'contributor_type' => 'Researcher',
+                ],
+                [
+                    'given_name' => 'Jane',
+                    'family_name' => 'Smith',
+                    'email_id' => 'jane@example.com',
+                    'contributor_type' => 'DataCurator',
+                ],
+            ],
+        ];
+
+        $response = $this->withHeaders([
+            'Accept' => 'application/json',
+        ])->post('authors/'.$project->id, $body);
+
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'success',
+            'message',
+            'data' => [
+                'authors' => [
+                    '*' => [
+                        'id',
+                        'given_name',
+                        'family_name',
+                        'email_id',
+                        'full_name',
+                        'title',
+                        'orcid_id',
+                        'affiliation',
+                        'created_at',
+                        'updated_at',
+                    ],
+                ],
+            ],
+        ]);
+
+        // Verify both authors were created
+        $project->refresh();
+        $this->assertCount(2, $project->authors);
+    }
+
+    /**
+     * Test existing author is updated instead of creating duplicate
+     *
+     * @return void
+     */
+    public function test_existing_author_is_updated_instead_of_duplicated()
+    {
+        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+
+        $project = Project::factory()->create([
+            'owner_id' => $user->id,
+        ]);
+
+        $existingAuthor = Author::factory()->create([
+            'given_name' => 'John',
+            'family_name' => 'Doe',
+            'email_id' => 'old@example.com',
+        ]);
+
+        // Attach author to project first
+        $project->authors()->attach($existingAuthor->id, [
+            'contributor_type' => 'Researcher',
+            'sort_order' => 0,
+        ]);
+
+        // Now try to "add" the same author with updated info
+        $body = [
+            'authors' => [[
+                'given_name' => 'John',
+                'family_name' => 'Doe',
+                'email_id' => 'updated@example.com',
+                'affiliation' => 'New University',
+            ]],
+        ];
+
+        $response = $this->withHeaders([
+            'Accept' => 'application/json',
+        ])->post('authors/'.$project->id, $body);
+
+        $response->assertStatus(200);
+
+        // Verify author was updated, not duplicated
+        $project->refresh();
+        $this->assertCount(1, $project->authors);
+
+        $updatedAuthor = $project->authors->first();
+        $this->assertEquals('updated@example.com', $updatedAuthor->email_id);
+        $this->assertEquals('New University', $updatedAuthor->affiliation);
+    }
+
+    /**
+     * Test author deletion with invalid author ID
+     *
+     * @return void
+     */
+    public function test_author_deletion_with_invalid_author_id()
+    {
+        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+
+        $project = Project::factory()->create([
+            'owner_id' => $user->id,
+        ]);
+
+        $body = [
+            'authors' => [[
+                'id' => 999999, // Non-existent author ID
+            ]],
+        ];
+
+        $response = $this->withHeaders([
+            'Accept' => 'application/json',
+        ])->delete('authors/'.$project->id.'/delete', $body);
+
+        $response->assertStatus(200); // Should still succeed (no-op)
+    }
+
+    /**
+     * Test author deletion with invalid request structure
+     *
+     * @return void
+     */
+    public function test_author_deletion_with_invalid_request_structure()
+    {
+        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+
+        $project = Project::factory()->create([
+            'owner_id' => $user->id,
+        ]);
+
+        // Test with missing authors array
+        $response = $this->withHeaders([
+            'Accept' => 'application/json',
+        ])->delete('authors/'.$project->id.'/delete', []);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['authors']);
+
+        // Test with empty authors array
+        $body = ['authors' => []];
+
+        $response = $this->withHeaders([
+            'Accept' => 'application/json',
+        ])->delete('authors/'.$project->id.'/delete', $body);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['authors']);
+    }
+
+    /**
+     * Test role update with invalid author ID succeeds but doesn't update anything
+     *
+     * @return void
+     */
+    public function test_role_update_with_invalid_author_id()
+    {
+        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+
+        $project = Project::factory()->create([
+            'owner_id' => $user->id,
+        ]);
+
+        $body = [
+            'author_id' => 999999, // Non-existent author ID
+            'role' => 'DataCurator',
+        ];
+
+        $response = $this->withHeaders([
+            'Accept' => 'application/json',
+        ])->post('authors/'.$project->id.'/updateRole', $body);
+
+        // The current implementation will succeed even with invalid author IDs
+        // because updateExistingPivot doesn't fail, it just doesn't update anything
+        $response->assertStatus(200);
+        $response->assertJson([
+            'message' => 'Author role updated successfully',
+            'success' => true,
+        ]);
+    }
+
+    /**
+     * Test role update with validation errors
+     *
+     * @return void
+     */
+    public function test_role_update_with_validation_errors()
+    {
+        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+
+        $project = Project::factory()->create([
+            'owner_id' => $user->id,
+        ]);
+
+        $author = Author::factory()->create();
+        $project->authors()->attach($author->id, [
+            'contributor_type' => 'Researcher',
+            'sort_order' => 0,
+        ]);
+
+        // Test with invalid role format (contains numbers and special chars)
+        $body = [
+            'author_id' => $author->id,
+            'role' => 'Invalid123@Role',
+        ];
+
+        $response = $this->withHeaders([
+            'Accept' => 'application/json',
+        ])->post('authors/'.$project->id.'/updateRole', $body);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['role']);
+
+        // Test with too long role
+        $body = [
+            'author_id' => $author->id,
+            'role' => str_repeat('a', 51),
+        ];
+
+        $response = $this->withHeaders([
+            'Accept' => 'application/json',
+        ])->post('authors/'.$project->id.'/updateRole', $body);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['role']);
+
+        // Test with missing author_id
+        $body = ['role' => 'DataCurator'];
+
+        $response = $this->withHeaders([
+            'Accept' => 'application/json',
+        ])->post('authors/'.$project->id.'/updateRole', $body);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['author_id']);
+    }
+
+    /**
+     * Test role update for public project
+     *
+     * @return void
+     */
+    public function test_role_update_cannot_be_done_for_public_project()
+    {
+        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+
+        $project = Project::factory()->create([
+            'owner_id' => $user->id,
+            'is_public' => true,
+        ]);
+
+        $author = Author::factory()->create();
+        $project->authors()->attach($author->id, [
+            'contributor_type' => 'Researcher',
+            'sort_order' => 0,
+        ]);
+
+        $body = [
+            'author_id' => $author->id,
+            'role' => 'DataCurator',
+        ];
+
+        $response = $this->withHeaders([
+            'Accept' => 'application/json',
+        ])->post('authors/'.$project->id.'/updateRole', $body);
+
+        $response->assertStatus(403);
+    }
+
+    /**
+     * Test successful role update with valid contributor type
+     *
+     * @return void
+     */
+    public function test_role_update_with_all_valid_contributor_types()
+    {
+        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+
+        $project = Project::factory()->create([
+            'owner_id' => $user->id,
+        ]);
+
+        $author = Author::factory()->create();
+        $project->authors()->attach($author->id, [
+            'contributor_type' => 'Researcher',
+            'sort_order' => 0,
+        ]);
+
+        $validTypes = [
+            'ContactPerson', 'DataCollector', 'DataCurator', 'DataManager',
+            'Distributor', 'Editor', 'HostingInstitution', 'Producer',
+            'ProjectLeader', 'ProjectManager', 'ProjectMember', 'RegistrationAgency',
+            'RegistrationAuthority', 'RelatedPerson', 'Researcher', 'ResearchGroup',
+            'RightsHolder', 'Sponsor', 'Supervisor', 'WorkPackageLeader', 'Other',
+        ];
+
+        foreach ($validTypes as $type) {
+            $body = [
+                'author_id' => $author->id,
+                'role' => $type,
+            ];
+
+            $response = $this->withHeaders([
+                'Accept' => 'application/json',
+            ])->post('authors/'.$project->id.'/updateRole', $body);
+
+            $response->assertStatus(200);
+            $response->assertJson([
+                'message' => 'Author role updated successfully',
+                'success' => true,
+            ]);
+
+            // Verify the role was actually updated
+            $project->refresh();
+            $authorWithPivot = $project->authors()->where('authors.id', $author->id)->first();
+            $this->assertEquals($type, $authorWithPivot->pivot->contributor_type);
+        }
+    }
+
+    /**
+     * Test author operations return proper JSON responses
+     *
+     * @return void
+     */
+    public function test_author_operations_return_proper_json_responses()
+    {
+        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+
+        $project = Project::factory()->create([
+            'owner_id' => $user->id,
+        ]);
+
+        // Test successful author creation response structure
+        $body = $this->prepareBody(null);
+
+        $response = $this->withHeaders([
+            'Accept' => 'application/json',
+        ])->post('authors/'.$project->id, $body);
+
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'message',
+            'success',
+            'data' => [
+                'authors' => [
+                    '*' => [
+                        'id',
+                        'title',
+                        'given_name',
+                        'family_name',
+                        'full_name',
+                        'email_id',
+                        'orcid_id',
+                        'affiliation',
+                        'created_at',
+                        'updated_at',
+                    ],
+                ],
+            ],
+        ]);
+
+        // Test successful deletion response
+        $project->refresh();
+        $author = $project->authors->first();
+
+        $deleteBody = [
+            'authors' => [[
+                'id' => $author->id,
+            ]],
+        ];
+
+        $response = $this->withHeaders([
+            'Accept' => 'application/json',
+        ])->delete('authors/'.$project->id.'/delete', $deleteBody);
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'message' => 'Author deleted successfully',
+            'success' => true,
+        ]);
     }
 
     /**
