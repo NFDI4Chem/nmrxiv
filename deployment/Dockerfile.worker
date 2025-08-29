@@ -59,14 +59,7 @@ RUN cd /tmp && \
     rm -rf /tmp/apcu /tmp/redis /tmp/apcu.tar.gz /tmp/redis.tar.gz
 
 # Configure PHP
-COPY docker/8.3/php.ini /usr/local/etc/php/conf.d/custom.ini
-
-# Set PHP configuration values
-RUN echo 'max_execution_time = 3600' >> /usr/local/etc/php/conf.d/docker-php-maxexectime.ini && \
-    echo 'memory_limit = 4G' >> /usr/local/etc/php/conf.d/docker-php-memlimit.ini && \
-    echo 'upload_max_filesize = 100M' >> /usr/local/etc/php/conf.d/docker-php-uploadmaxfilesize.ini && \
-    echo 'post_max_size = 250M' >> /usr/local/etc/php/conf.d/docker-php-postmaxsize.ini && \
-    echo 'max_input_time = 3600' >> /usr/local/etc/php/conf.d/docker-php-maxinputtime.ini
+COPY deployment/php.production.ini /usr/local/etc/php/conf.d/production.ini
 
 # Install composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
