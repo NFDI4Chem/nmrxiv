@@ -159,8 +159,8 @@ function sanitizeUnicodeString(string $input): string
         }
     }
 
-    // Remove any remaining non-ASCII characters as a fallback
-    $sanitized = preg_replace('/[^\x20-\x7E]/', '', $sanitized);
+    // Remove any remaining non-ASCII characters as a fallback, but preserve newlines and tabs
+    $sanitized = preg_replace('/[^\x09\x0A\x0D\x20-\x7E]/', '', $sanitized);
 
     return $sanitized;
 }
