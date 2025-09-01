@@ -1,5 +1,47 @@
 # Changelog
 
+## [1.5.0](https://github.com/NFDI4Chem/nmrxiv/compare/v1.4.1...v1.5.0) (2025-09-01)
+
+
+### Features
+
+* **refactoring:** author code refactoring and improvements. ([f020c4a](https://github.com/NFDI4Chem/nmrxiv/commit/f020c4ade5c4f75f0b27af8194fb8253f2d1dacf))
+
+
+### Bug Fixes
+
+* add additional release-please configuration ([2b45f20](https://github.com/NFDI4Chem/nmrxiv/commit/2b45f20e6b3f258c05eb611a678738feb7e6d8f2))
+* author button styling issue ([1a6c19b](https://github.com/NFDI4Chem/nmrxiv/commit/1a6c19bf90d588bb261e1ef838289a0498233cc8))
+* author button styling issue ([a7229ff](https://github.com/NFDI4Chem/nmrxiv/commit/a7229ffcd520760cb09eb26fe8d552dc2633be4d))
+* comment db backup from deploy script ([b899158](https://github.com/NFDI4Chem/nmrxiv/commit/b8991584322c1eebac90bac35f597a7e3df7a9ee))
+* directory missing or present flag default set ([edf9396](https://github.com/NFDI4Chem/nmrxiv/commit/edf9396abccc49b91f111df01de719b1206701fd))
+* directory missing or present flag default set ([401dee2](https://github.com/NFDI4Chem/nmrxiv/commit/401dee26bb69fc1a2b6391b2abd8ff5715b658ee))
+* enabled proxy for chemotion eln integration ([b5ff924](https://github.com/NFDI4Chem/nmrxiv/commit/b5ff924d573f3e9b43a3a56b1b4104153efc527b))
+* keep the database backup ([ad28c3f](https://github.com/NFDI4Chem/nmrxiv/commit/ad28c3ff5ebde229e5d882df08a1432e5407622f))
+* landing page mobile view issues fix ([f8527a2](https://github.com/NFDI4Chem/nmrxiv/commit/f8527a2916bcde9a72ab1646897aa5f332197b9a))
+* new line character being stripped off in nmrium save request ([1572137](https://github.com/NFDI4Chem/nmrxiv/commit/15721374e218313fce057530386d30111fb4cf76))
+* nmrium info bug fix ([4b8e3d9](https://github.com/NFDI4Chem/nmrxiv/commit/4b8e3d98312970f19ce21bc5b51af782c4fe5876))
+* remove duplicate php.ini settings ([0aca1e2](https://github.com/NFDI4Chem/nmrxiv/commit/0aca1e2bb7dfba5ce0be59ece79428d142cb9d73))
+* remove duplicate php.ini settings ([cba3b24](https://github.com/NFDI4Chem/nmrxiv/commit/cba3b24bcc5a5c1da5bdbee71c38f56cec17c225))
+* remove unused labels in release please ([8646960](https://github.com/NFDI4Chem/nmrxiv/commit/8646960e689c5a14f40c22f8ee3e829e941ba73d))
+* removing molecule data from nmrium info ([32511fa](https://github.com/NFDI4Chem/nmrxiv/commit/32511fa368c9036f6373e67b6d3f96b0822d2771))
+* return type mismatch issue fix ([4f6cdb3](https://github.com/NFDI4Chem/nmrxiv/commit/4f6cdb3117b27c5dc4206fc7722e036f1f475099))
+* switch default sort ([c4b37b9](https://github.com/NFDI4Chem/nmrxiv/commit/c4b37b9237934b1aae6fa9760b9c3a9d8c8aa6f3))
+* update deployment script for new backup and log paths ([23fa3d9](https://github.com/NFDI4Chem/nmrxiv/commit/23fa3d9c9f287ecac5c9b55f0dab911c62fd0c4d))
+* update max_execution_time in Octane configuration ([bf13475](https://github.com/NFDI4Chem/nmrxiv/commit/bf13475042a45dbf421b4e7450767e0d8b33c433))
+* update max_execution_time in Octane configuration ([73bd32d](https://github.com/NFDI4Chem/nmrxiv/commit/73bd32deb82333493758a844abd4e6f43b4f8b00))
+* url encoding enabled ([5e8ca03](https://github.com/NFDI4Chem/nmrxiv/commit/5e8ca0310e464280d94823c07c8a1f79b75d8e23))
+* ux/ui updates ([7a4e51e](https://github.com/NFDI4Chem/nmrxiv/commit/7a4e51e6109e2bf52550b55af37d226e962cff06))
+* various fixes ([08d45ba](https://github.com/NFDI4Chem/nmrxiv/commit/08d45badcca3656febfaf01435b68a2ceb5d5e84))
+* zero byte files graceful handling ([0e8d680](https://github.com/NFDI4Chem/nmrxiv/commit/0e8d680369de9be87f66a1233b4b9f6f0dc097d1))
+
+
+### Miscellaneous Chores
+
+* linting updates ([7b64870](https://github.com/NFDI4Chem/nmrxiv/commit/7b64870d9125d5e76056db7ee801a6d35197bd37))
+* linting updates ([d23701e](https://github.com/NFDI4Chem/nmrxiv/commit/d23701eed8bda8c463decdfa4d8d55192e1fc730))
+* pint formatting updates ([2c93a57](https://github.com/NFDI4Chem/nmrxiv/commit/2c93a576db8c03722a4a47a0b978427cfa81da36))
+
 ## [1.4.1](https://github.com/NFDI4Chem/nmrxiv/compare/v1.4.0...v1.4.1) (2025-08-18)
 
 
