@@ -98,7 +98,7 @@
                 </section>
             </div>
         </div>
-        <div class="min-h-[calc(100vh-500px)] px-12 mb-24 mx-auto">
+        <div class="min-h-[calc(100vh-500px)] px-6 px-md-12 mb-24 mx-auto">
             <div class="relative border-gray-200 pt-4">
                 <div class="mx-auto flex items-center justify-between">
                     <Menu as="div" class="relative inline-block text-left">
@@ -338,7 +338,7 @@ export default {
         filters: {
             default: {
                 search: "",
-                sort: "newest",
+                sort: "creation",
                 mode: "grid",
             },
             type: Object,
@@ -353,7 +353,7 @@ export default {
             open: ref(false),
             form: {
                 search: this.filters.search,
-                sort: "newest",
+                sort: "creation",
                 mode: "grid",
             },
         };
@@ -367,7 +367,7 @@ export default {
                 this.filters.mode = "grid";
             }
             if (this.filters.sort == null) {
-                this.filters.sort = "newest";
+                this.filters.sort = "creation";
             }
         }
     },

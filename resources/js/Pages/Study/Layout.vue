@@ -61,7 +61,7 @@
                                                 />
                                                 <Link
                                                     :href="
-                                                        preview
+                                                        preview && project.obfuscationcode
                                                             ? route(
                                                                   'project.preview',
                                                                   [

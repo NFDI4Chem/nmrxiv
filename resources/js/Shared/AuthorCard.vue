@@ -2,49 +2,46 @@
     <div
         v-for="author in authors"
         :key="author.id"
-        class="select-text relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm flex items-top space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-teal-500"
+        class="select-text relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm hover:border-gray-400 hover:shadow-lg transition-all duration-200 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-teal-500"
     >
         <div class="flex-1 min-w-0">
-            <div>
-                <a
-                    class="focus:outline-none cursor-pointer select-text"
-                    :href="getOrcidLink(author.orcid_id)"
-                    :target="getTarget(author.orcid_id)"
-                >
-                    <div class="mb-1 flex items-center justify-between">
-                        <span class="text-sm font-medium text-teal-900">
-                            {{ author.title }}
-                            {{ author.given_name }}
-                            {{ author.family_name }}
-                        </span>
-                        <button
-                            v-if="author.pivot && author.pivot.contributor_type"
-                            class="text-sm text-gray-400"
-                        >
-                            <span
-                                class="px-2 inline-flex text-xs leading-5 font-semibold capitalize rounded-full bg-green-100 text-green-800"
-                            >
-                                {{
-                                    author.pivot.contributor_type
-                                        ? author.pivot.contributor_type
-                                        : "Researcher"
-                                }}
-                            </span>
-                        </button>
-                    </div>
-                    <p v-if="author.affiliation" class="text-xs text-gray-500">
+            <a
+                class="focus:outline-none cursor-pointer select-text block"
+                :href="getOrcidLink(author.orcid_id)"
+                :target="getTarget(author.orcid_id)"
+            >
+                <div class="flex items-start justify-between mb-1">
+                    <h3 class="text-md font-bold text-gray-900">
+                        {{ author.title }}
+                        {{ author.given_name }}
+                        {{ author.family_name }}
+                    </h3>
+                    <span
+                        v-if="author.pivot && author.pivot.contributor_type"
+                        class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-teal-100 text-teal-800 flex-shrink-0"
+                    >
+                        {{
+                            author.pivot.contributor_type
+                                ? author.pivot.contributor_type
+                                : "Researcher"
+                        }}
+                    </span>
+                </div>
+                
+                <div class="space-y-1">
+                    <p v-if="author.affiliation" class="text-sm text-gray-500">
                         {{ author.affiliation }}
                     </p>
-                    <p v-if="author.orcid_id" class="text-xs text-teal-900">
-                        <b class="text-gray-500">ORCID iD:</b>
+                    <p v-if="author.orcid_id" class="text-sm text-teal-600">
+                        <span class="font-medium text-gray-500">ORCID iD:</span>
                         {{ author.orcid_id }}
                     </p>
-                    <p v-if="author.email_id" class="text-xs text-gray-500">
-                        <b class="text-gray-500">Email-Id:</b>
+                    <p v-if="author.email_id" class="text-sm text-gray-500">
+                        <span class="font-medium">Email:</span>
                         {{ author.email_id }}
                     </p>
-                </a>
-            </div>
+                </div>
+            </a>
         </div>
     </div>
 </template>

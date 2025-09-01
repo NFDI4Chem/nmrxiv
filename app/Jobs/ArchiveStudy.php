@@ -177,15 +177,30 @@ class ArchiveStudy implements ShouldBeUnique, ShouldQueue
 
                                         Log::info("Study {$study->id}: File size: {$fileSize} bytes");
 
-                                        // If file is larger than 100MB, process in chunks
-                                        if ($fileSize > 100 * 1024 * 1024) {
-                                            $chunkSize = 10 * 1024 * 1024; // 10MB chunks
-                                            $zip->addFileFromStream($sPath, $streamRead, $fileSize);
+                                        // Handle empty files specially to avoid corruption
+                                        if ($fileSize == 0) {
+                                            Log::info("Study {$study->id}: Adding empty file: {$key}");
+                                            fclose($streamRead);
+
+                                            // Add empty file using addFile method instead of stream
+                                            try {
+                                                $zip->addFile($sPath, '');
+                                                $addedFiles++;
+                                                Log::info("Study {$study->id}: Successfully added empty file: {$key}");
+                                            } catch (\Exception $e) {
+                                                Log::error("Study {$study->id}: Failed to add empty file {$key}: ".$e->getMessage());
+                                            }
                                         } else {
-                                            $zip->addFileFromStream($sPath, $streamRead);
+                                            // If file is larger than 100MB, process in chunks
+                                            if ($fileSize > 100 * 1024 * 1024) {
+                                                $chunkSize = 10 * 1024 * 1024; // 10MB chunks
+                                                $zip->addFileFromStream($sPath, $streamRead, $fileSize);
+                                            } else {
+                                                $zip->addFileFromStream($sPath, $streamRead);
+                                            }
+                                            $addedFiles++;
+                                            fclose($streamRead);
                                         }
-                                        $addedFiles++;
-                                        fclose($streamRead);
                                     } catch (\Exception $e) {
                                         Log::error("Study {$study->id}: Error getting file size for {$key}: ".$e->getMessage());
                                         fclose($streamRead);
@@ -289,6 +304,7 @@ class ArchiveStudy implements ShouldBeUnique, ShouldQueue
 
     // protected function processSpectra($url)
     // {
+    //     $url = urlencode($url);
     //     $response = Http::post('https://nodejs.nmrxiv.org/spectra-parser', '{
     //         "urls": [
     //           '. $url .'

@@ -7,7 +7,7 @@
         ></div>
         <div v-else class="flex">
             <img
-                class="mx-auto w-100"
+                class="mx-auto w-100 p-6"
                 :src="
                     $page.props.CM_API +
                     'depict/2D?smiles=' +
