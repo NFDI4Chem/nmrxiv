@@ -338,7 +338,7 @@ export default {
         filters: {
             default: {
                 search: "",
-                sort: "newest",
+                sort: "creation",
                 mode: "grid",
             },
             type: Object,
@@ -353,7 +353,7 @@ export default {
             open: ref(false),
             form: {
                 search: this.filters.search,
-                sort: "newest",
+                sort: "creation",
                 mode: "grid",
             },
         };
@@ -367,7 +367,7 @@ export default {
                 this.filters.mode = "grid";
             }
             if (this.filters.sort == null) {
-                this.filters.sort = "newest";
+                this.filters.sort = "creation";
             }
         }
     },
