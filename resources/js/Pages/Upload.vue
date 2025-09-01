@@ -2843,7 +2843,6 @@ export default {
                             Object.keys(spectra.info).forEach((key) => {
                                 // Only include MIChI-compliant fields
                                 if (michiFields[key]) {
-                                    console.log("MIChI field:", key);
                                     desc =
                                         desc +
                                         michiFields[key] +
