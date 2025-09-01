@@ -1,22 +1,38 @@
+<!--
+  File System Browser Component
+  
+  A comprehensive file browser interface that supports drag-and-drop uploads,
+  file tree navigation, and file management operations. Features include:
+  - Dropzone for file/folder uploads with progress tracking
+  - Hierarchical file tree with expandable folders
+  - File details panel with metadata display
+  - Missing file detection and reporting
+  - Checksum calculation for uploaded files
+  - Sequential batch processing for large uploads
+-->
 <template>
+    <!-- Main dropzone container with responsive fullscreen support -->
     <div
         id="fs-dropzone"
         :class="[
             fullScreen
                 ? 'fixed w-screen h-screen -ml-4 -mt-6 sm:ml-0 md:-ml-0 md:w-auto inset-0'
-                : '',
-            'mt-3 bg-white',
+                : 'h-screen',
+            'bg-white rounded-lg',
         ]"
     >
         <div>
+            <!-- Header section with help links and missing files indicator -->
             <div :class="[fullScreen ? 'px-6 py-4' : '', 'flex']">
                 <div class="w-full px-5">
+                    <!-- Help and documentation section (only shown in edit mode) -->
                     <div
                         v-if="!readonly"
                         class="text-sm cursor-pointer hover:text-blue-700 mt-2 mr-10"
                     >
-                        <i
-                            ><a
+                        <!-- Documentation link with tooltip -->
+                        <i>
+                            <a
                                 href="https://docs.nmrxiv.org/submission-guides/folder-structure.html"
                                 target="_blank"
                                 class="mb-4"
@@ -24,17 +40,20 @@
                                 <ToolTip
                                     class="w-3.5 h-3.5"
                                     text="To submit data you will need an account with nmrXiv, so you will be redirected to our register page and once registered you can then go ahead and submit data. For more information please checkout our <a target='_blank' href='//docs.nmrxiv.org' class='text-gray-400' target='_blank'>documentation</a>."
-                                ></ToolTip>
+                                />
                                 <span class="ml-4">
                                     Learn more about folder structuring
                                 </span>
                             </a>
                         </i>
+
+                        <!-- Missing files warning (shown when files are missing) -->
                         <a
-                            @click="showMissingFilesDetailsModal()"
                             v-if="missing_files > 0"
                             class="text-red-900 text-strong float-right"
+                            @click="showMissingFilesDetailsModal()"
                         >
+                            <!-- Warning triangle icon -->
                             <svg
                                 class="h-5 w-5 text-red-400 inline"
                                 viewBox="0 0 20 20"
@@ -45,7 +64,7 @@
                                     fill-rule="evenodd"
                                     d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z"
                                     clip-rule="evenodd"
-                                ></path>
+                                />
                             </svg>
                             {{ missing_files }} files missing
                         </a>
@@ -108,16 +127,20 @@
                     </button> -->
                 </div>
             </div>
+            <!-- File upload dropzone section (only shown in edit mode) -->
             <div
                 v-if="!readonly"
                 :class="[fullScreen ? 'px-6 py-4' : 'px-5', '']"
             >
                 <div class="py-2 mb-3">
+                    <!-- Dropzone message container -->
                     <div id="fs-dropzone-message" class="text-center">
+                        <!-- Main dropzone area with dashed border -->
                         <div
                             type="button"
                             class="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-4 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                         >
+                            <!-- Database/storage icon for dropzone -->
                             <svg
                                 class="mx-auto h-12 w-12 text-gray-400"
                                 xmlns="http://www.w3.org/2000/svg"
@@ -133,10 +156,13 @@
                                     d="M8 14v20c0 4.418 7.163 8 16 8 1.381 0 2.721-.087 4-.252M8 14c0 4.418 7.163 8 16 8s16-3.582 16-8M8 14c0-4.418 7.163-8 16-8s16 3.582 16 8m0 0v14m0-4c0 4.418-7.163 8-16 8S8 28.418 8 24m32 10v6m0 0v6m0-6h6m-6 0h-6"
                                 />
                             </svg>
+
+                            <!-- Dropzone instructions and controls -->
                             <span
                                 class="mt-2 block text-lg font-bold text-blue-600"
                             >
                                 Drop Files or Folders
+                                <!-- Dynamic destination folder indicator -->
                                 <span
                                     v-if="
                                         $page.props.selectedFolder &&
@@ -145,11 +171,14 @@
                                 >
                                     to "{{ $page.props.selectedFolder }}" folder
                                 </span>
+
+                                <!-- File selection form -->
                                 <form
                                     class="inline"
                                     enctype="multipart/form-data"
                                 >
                                     or
+                                    <!-- Folder selection button -->
                                     <button
                                         type="button"
                                         class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white px-2 border border-blue-500 hover:border-transparent rounded"
@@ -158,21 +187,28 @@
                                         Select folders
                                     </button>
                                     to upload
+                                    <!-- Hidden input container for Dropzone.js -->
                                     <div
                                         id="fs-dropzone-hidden-input-container"
-                                    ></div>
+                                    />
                                 </form>
+
+                                <!-- Help link to submission guides -->
                                 <div class="text-sm text-gray-400">
                                     Need help? Check out our
                                     <a
                                         class="text-blue-800 hover:underline"
                                         href="https://docs.nmrxiv.org/submission-guides/submission-process.html#step-1-files-upload"
                                         target="_blank"
-                                        >submission guides
+                                    >
+                                        submission guides
                                     </a>
                                 </div>
                             </span>
+
+                            <!-- Upload progress section (shown during upload) -->
                             <div v-if="dropzone" class="relative mt-5">
+                                <!-- Progress bar -->
                                 <div
                                     class="overflow-hidden h-2 text-xs flex rounded bg-gray-200"
                                 >
@@ -181,13 +217,16 @@
                                             'width: ' + precentageUpload + '%'
                                         "
                                         class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-green-500"
-                                    ></div>
+                                    />
                                 </div>
+
+                                <!-- Status message and error logs -->
                                 <span
                                     v-if="status"
                                     class="mt-2 block text-sm font-medium text-gray-900"
                                 >
                                     {{ status }}
+                                    <!-- Error logs toggle (shown when there are batch errors) -->
                                     <div v-if="uploadBatchErrors.length > 0">
                                         -
                                         <a
@@ -196,10 +235,13 @@
                                                 showErrorBatchLogs =
                                                     !showErrorBatchLogs
                                             "
-                                            >View logs</a
                                         >
+                                            View logs
+                                        </a>
                                     </div>
                                 </span>
+
+                                <!-- Error batch logs display -->
                                 <div
                                     v-if="showErrorBatchLogs"
                                     class="mt-2 block text-sm font-medium text-gray-900"
@@ -211,15 +253,17 @@
                                         :key="$index"
                                         class="rounded-md"
                                         v-html="error"
-                                    ></div>
+                                    />
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+            <!-- Loading state display -->
             <div v-if="loading">
                 <div class="h-[calc(100vh-260px)] text-center py-12">
+                    <!-- Loading spinner -->
                     <svg
                         class="animate-spin -ml-1 mr-3 h-5 w-5 text-dark flex-inline inline"
                         xmlns="http://www.w3.org/2000/svg"
@@ -233,31 +277,35 @@
                             r="10"
                             stroke="currentColor"
                             stroke-width="4"
-                        ></circle>
+                        />
                         <path
                             class="opacity-75"
                             fill="currentColor"
                             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        ></path>
+                        />
                     </svg>
                     Loading Files...
                 </div>
             </div>
+
+            <!-- Main content area with file tree and details panel -->
             <div
                 v-else
                 :class="[
                     fullScreen
-                        ? 'overflow-scroll h-full relative px-6 py-4'
+                        ? 'overflow-scroll h-full relative px-6'
                         : 'px-1',
-                    'min-w-0 flex-1 bg-white border-t border-gray-200 lg:flex',
+                    'min-w-0 flex-1 lg:flex max-xs-full',
                 ]"
             >
+                <!-- Left sidebar with file tree -->
                 <aside
                     :class="[
                         height ? height : '',
-                        'py-2 lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col overflow-y-scroll overflow-x-scroll border-r',
+                        'py-2 lg:inset-y-0 lg:z-50 lg:flex md:w-96 lg:flex-col h-screen overflow-y-scroll overflow-x-scroll md:border-r md:border-gray-200 p-2',
                     ]"
                 >
+                    <!-- Recursive file tree component -->
                     <children
                         :file="file"
                         :expanded-folders="expandedFolders"
@@ -265,7 +313,7 @@
                             (fsoId, isExpanded) =>
                                 toggleFolderExpansion(fsoId, isExpanded)
                         "
-                    ></children>
+                    />
                     <div
                         v-if="
                             Object.keys(logs).length > 0 &&
@@ -388,7 +436,7 @@
                 <section
                     :class="[
                         height ? height : '',
-                        'p-6 flex-1 flex flex-col lg:order-last overflow-y-scroll',
+                        'h-screen p-6 flex-1 flex flex-col lg:order-last overflow-y-scroll hidden md:flex',
                     ]"
                 >
                     <div
@@ -401,8 +449,11 @@
                         <div class="py-2 mb-2 block border-b pb-4">
                             <p class="font-bold text-xl">
                                 {{
-                                    $page.props.selectedFileSystemObject
-                                        .relative_url
+                                    truncateMiddle(
+                                        $page.props.selectedFileSystemObject
+                                            .relative_url,
+                                        50
+                                    )
                                 }}
                                 <a
                                     v-if="
@@ -490,7 +541,7 @@
                                         class="mt-2 px-2 py-1 block text-sm font-medium truncate text-gray-900 pointer-events-none"
                                     >
                                         <span class="float-left">
-                                            {{ file.name }}
+                                            {{ truncateMiddle(file.name, 25) }}
                                         </span>
                                     </p>
                                 </div>
@@ -498,28 +549,43 @@
                         </ul>
                     </div>
                     <div v-else>
-                        <div
+                        <p
                             v-if="$page.props.selectedFileSystemObject"
-                            class="py-2 mb-2 block border-b pb-4"
+                            class="font-bold text-xl"
                         >
-                            <p class="font-bold text-xl">
-                                {{
+                            {{
+                                truncateMiddle(
                                     $page.props.selectedFileSystemObject
-                                        .relative_url
-                                }}
-                                <a
-                                    v-if="!readonly"
-                                    class="ml-4 cursor-pointer relative inline-flex items-center px-4 py-1 rounded-full border border-gray-300 bg-white text-sm font-black text-dark hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 float-right"
-                                    @click="confirmFSODeletion"
-                                >
-                                    <TrashIcon
-                                        class="cursor-pointer h-4 w-4 text-gray-900 mr-2"
-                                        aria-hidden="true"
-                                    />
-                                    Delete
-                                </a>
-                            </p>
-                        </div>
+                                        .relative_url,
+                                    50
+                                )
+                            }}
+                            <a
+                                v-if="
+                                    $page.props.selectedFileSystemObject.id &&
+                                    !readonly
+                                "
+                                class="ml-4 cursor-pointer relative inline-flex items-center px-4 py-1 rounded-full border border-gray-300 bg-white text-sm font-black text-dark hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 float-right"
+                                @click="confirmFSODeletion"
+                            >
+                                <TrashIcon
+                                    class="cursor-pointer h-4 w-4 text-gray-900 mr-2"
+                                    aria-hidden="true"
+                                />
+                                Delete
+                            </a>
+                            <a
+                                v-if="
+                                    $page.props.selectedFileSystemObject.id &&
+                                    readonly &&
+                                    downloadURL
+                                "
+                                :href="downloadURL"
+                                class="ml-4 cursor-pointer relative inline-flex items-center px-4 py-1 rounded-full border border-gray-300 bg-white text-sm font-black text-dark hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 float-right"
+                            >
+                                Download
+                            </a>
+                        </p>
                         <div class="pt-5">
                             <span
                                 v-if="
@@ -684,16 +750,46 @@
         </template>
     </jet-confirmation-modal>
 </template>
+
 <script>
+/**
+ * File System Browser Component
+ *
+ * A comprehensive file management interface that provides:
+ * - Drag-and-drop file/folder uploads with Dropzone.js integration
+ * - Hierarchical file tree navigation with expansion state management
+ * - File details panel with metadata display and download functionality
+ * - Batch upload processing with checksum calculation for integrity
+ * - Missing file detection and reporting
+ * - File/folder deletion with progress tracking
+ * - URL-based state persistence for navigation and expansion
+ * - Sequential processing to prevent race conditions during uploads
+ *
+ * Key Features:
+ * - Supports both read-only and edit modes
+ * - Calculates MD5 and SHA-256 checksums for uploaded files
+ * - Maintains expansion state across page reloads via URL parameters
+ * - Provides detailed upload logs with error tracking
+ * - Handles large file uploads with progress indication
+ * - Integrates with scientific data formats (Bruker, Varian, JOEL, JCAMP)
+ */
+
+// UI Component imports
 import JetDialogModal from "@/Jetstream/DialogModal.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
+import JetConfirmationModal from "@/Jetstream/ConfirmationModal.vue";
+import JetDangerButton from "@/Jetstream/DangerButton.vue";
+
+// Third-party library imports
 import { Dropzone } from "dropzone";
 import axiosRetry from "axios-retry";
+
+// Shared component imports
 import FileDetails from "@/Shared/FileDetails.vue";
 import SelectInput from "@/Shared/SelectInput.vue";
 import ToolTip from "@/Shared/ToolTip.vue";
-import JetConfirmationModal from "@/Jetstream/ConfirmationModal.vue";
-import JetDangerButton from "@/Jetstream/DangerButton.vue";
+
+// Icon imports from Heroicons
 import {
     FolderIcon,
     DocumentTextIcon,
@@ -707,68 +803,117 @@ import {
     TrashIcon,
     ArrowDownTrayIcon,
 } from "@heroicons/vue/24/solid";
+
+// Utility imports
 import ChecksumCalculator from "@/Utils/ChecksumCalculator.js";
 
 export default {
+    name: "FileSystemBrowser",
+
+    /**
+     * Component dependencies
+     */
     components: {
-        FolderIcon,
-        DocumentTextIcon,
-        ArrowDownTrayIcon,
-        ChevronRightIcon,
-        InformationCircleIcon,
-        HomeIcon,
-        FileDetails,
-        JetDialogModal,
-        JetSecondaryButton,
-        EllipsisVerticalIcon,
-        ExclamationCircleIcon,
-        ArrowUpTrayIcon,
-        CheckIcon,
-        SelectInput,
-        TrashIcon,
-        ToolTip,
-        JetConfirmationModal,
-        JetDangerButton,
+        FolderIcon, // Folder icon for directories
+        DocumentTextIcon, // Document icon for files
+        ArrowDownTrayIcon, // Download icon
+        ChevronRightIcon, // Navigation chevron
+        InformationCircleIcon, // Information icon for logs
+        HomeIcon, // Home icon for root navigation
+        FileDetails, // File details display component
+        JetDialogModal, // Modal dialog component
+        JetSecondaryButton, // Secondary button component
+        EllipsisVerticalIcon, // More options icon
+        ExclamationCircleIcon, // Error/warning icon
+        ArrowUpTrayIcon, // Upload icon
+        CheckIcon, // Success checkmark icon
+        SelectInput, // Select dropdown component
+        TrashIcon, // Delete icon
+        ToolTip, // Tooltip component
+        JetConfirmationModal, // Confirmation dialog component
+        JetDangerButton, // Danger button component
     },
+
+    /**
+     * Component props
+     * @prop {Object} draft - Draft object for file uploads (optional)
+     * @prop {Boolean} readonly - Whether the browser is in read-only mode
+     * @prop {String} height - Custom height class for the component (optional)
+     * @prop {Object} project - Project object for public file access (optional)
+     */
     props: ["draft", "readonly", "height", "project"],
 
+    /**
+     * Events emitted by this component
+     */
     emits: ["loading", "proceed"],
 
+    /**
+     * Component reactive data
+     */
     data() {
         return {
-            status: "",
-            dropzone: null,
-            fullScreen: false,
-            precentageUpload: 0,
-            busy: false,
-            loading: false,
-            file: null,
-            url: null,
-            logs: {},
-            logFilter: "Error",
-            logFilters: ["Error", "Success", "Queued", "Inprogress"],
-            uploadBatchErrors: [],
-            showErrorBatchLogs: false,
-            showLogsDialog: false,
-            currentLog: null,
+            // Upload status and progress
+            status: "", // Current upload/processing status message
+            dropzone: null, // Dropzone.js instance
+            fullScreen: false, // Fullscreen mode toggle (unused)
+            precentageUpload: 0, // Upload progress percentage
+            busy: false, // General busy state indicator
+            loading: false, // File loading state
+
+            // File system data
+            file: null, // Root file system object
+            url: null, // Base URL for API calls
+
+            // Logging and error tracking
+            logs: {}, // Upload logs by filename
+            logFilter: "Error", // Current log filter selection
+            logFilters: ["Error", "Success", "Queued", "Inprogress"], // Available log filters
+            uploadBatchErrors: [], // Batch upload error messages
+            showErrorBatchLogs: false, // Toggle for error log display
+            showLogsDialog: false, // Modal dialog for detailed logs
+            currentLog: null, // Currently processing file log
+
+            // Upload configuration
             sequentialProcessing: true, // Enable sequential processing to avoid race conditions
-            fsoBeingDeleted: null,
-            showMissingFilesDetails: null,
-            missing_files: 0,
-            missing_files_list: [],
-            // Deletion progress
-            isDeletingFiles: false,
-            deletionMessage: "",
-            // Tree expansion state
-            expandedFolders: new Set(),
-            // Step tracking for clearing state on step changes
-            currentStep: null,
+
+            // File operations
+            fsoBeingDeleted: null, // File system object being deleted
+            showMissingFilesDetails: null, // Modal for missing files details
+            missing_files: 0, // Count of missing files
+            missing_files_list: [], // List of missing file objects
+
+            // Deletion progress tracking
+            isDeletingFiles: false, // Deletion operation in progress
+            deletionMessage: "", // Current deletion status message
+
+            // Tree expansion state management
+            expandedFolders: new Set(), // Set of expanded folder IDs
+
+            // Navigation state tracking
+            currentStep: null, // Current step for state clearing
         };
     },
+    /**
+     * Computed properties
+     */
     computed: {
+        /**
+         * Get the base URL from page props
+         * @returns {String} Base application URL
+         */
         baseURL() {
             return String(this.$page.props.url);
         },
+
+        /**
+         * Filter logs based on current log filter selection
+         *
+         * Creates a filtered copy of the logs object containing only
+         * entries that match the current logFilter status.
+         *
+         * @returns {Object} Filtered logs object
+         */
         filteredLogs() {
             let logsClone = JSON.parse(JSON.stringify(this.logs));
             Object.keys(logsClone).forEach((key) => {
@@ -777,16 +922,35 @@ export default {
             });
             return logsClone;
         },
+
+        /**
+         * Get NMRium URL for spectral data visualization
+         * @returns {String} NMRium application URL
+         */
         nmriumURL() {
             return this.$page.props.nmriumURL
                 ? String(this.$page.props.nmriumURL)
                 : "//nmriumdev.nmrxiv.org";
         },
+
+        /**
+         * Generate download URL for the currently selected file or folder
+         *
+         * Creates appropriate download URLs based on context:
+         * - Uses direct download_url if available on the file object
+         * - For project files, constructs URL with owner/slug/file parameters
+         * - Returns null if no download context is available
+         *
+         * @returns {String|null} Complete download URL or null
+         */
         downloadURL() {
+            // Use direct download URL if available
             if (this.$page.props.selectedFileSystemObject.download_url) {
                 return this.$page.props.selectedFileSystemObject.download_url;
             } else {
+                // Construct download URL for project files
                 if (this.project) {
+                    // Root folder download
                     if (
                         this.$page.props.selectedFileSystemObject &&
                         this.$page.props.selectedFileSystemObject
@@ -794,6 +958,7 @@ export default {
                     ) {
                         return this.project.download_url;
                     } else {
+                        // Individual file/folder download
                         return (
                             this.baseURL +
                             "/" +
@@ -812,7 +977,14 @@ export default {
             }
         },
 
-        // Watch for URL changes to detect step changes
+        /**
+         * Watch for URL changes to detect step changes
+         *
+         * Used by watchers to detect when the user navigates to different
+         * steps in the submission process, triggering state cleanup.
+         *
+         * @returns {String} Current URL search parameters
+         */
         currentUrl() {
             return window.location.search;
         },
@@ -856,9 +1028,44 @@ export default {
         window.removeEventListener("popstate", this.handleURLChange);
         window.removeEventListener("file-browser-proceed", this.handleProceed);
     },
+    /**
+     * Component methods
+     */
     methods: {
         /**
+         * Truncate text in the middle with ellipsis for long file/folder names
+         *
+         * This method prevents UI overflow by shortening long names while
+         * preserving both the beginning and end of the filename, which is
+         * often more useful than simple truncation.
+         *
+         * @param {String} text - The text to truncate
+         * @param {Number} maxLength - Maximum allowed length including ellipsis
+         * @returns {String} Truncated text with ellipsis in the middle
+         *
+         * @example
+         * truncateMiddle("very-long-filename.txt", 15)
+         * // Returns: "very-l...me.txt"
+         */
+        truncateMiddle(text, maxLength) {
+            if (!text || text.length <= maxLength) {
+                return text;
+            }
+
+            const start = Math.ceil((maxLength - 3) / 2);
+            const end = Math.floor((maxLength - 3) / 2);
+
+            return (
+                text.substring(0, start) +
+                "..." +
+                text.substring(text.length - end)
+            );
+        },
+        /**
          * Initialize step tracking from current URL
+         *
+         * Extracts the current step parameter from the URL to track
+         * navigation state changes in multi-step processes.
          */
         initializeStepTracking() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -867,6 +1074,10 @@ export default {
 
         /**
          * Handle URL changes to detect step changes
+         *
+         * Monitors URL changes to detect when users navigate between
+         * different steps in the submission process. When a step change
+         * is detected, clears the file tree state to prevent confusion.
          */
         handleURLChange() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -1079,9 +1290,33 @@ export default {
             );
         },
 
+        /**
+         * Confirm file system object deletion
+         * 
+         * Sets up the confirmation dialog for deleting a file or folder.
+         * Stores the ID of the object to be deleted for the confirmation modal.
+         */
         confirmFSODeletion() {
             this.fsoBeingDeleted = this.$page.props.selectedFileSystemObject.id;
         },
+
+        /**
+         * Delete file system object (file or folder)
+         * 
+         * Performs the actual deletion of a file or folder after confirmation.
+         * Handles the complete deletion workflow including:
+         * - Progress indication with overlay
+         * - Parent folder identification for navigation reversion
+         * - API call to delete the object
+         * - Error handling and user feedback
+         * - File tree refresh and state management
+         * 
+         * The method ensures proper cleanup and user experience by:
+         * - Showing deletion progress to the user
+         * - Reverting selection to parent folder after deletion
+         * - Clearing related logs and state
+         * - Handling both success and error scenarios
+         */
         deleteFSO() {
             if (this.$page.props.selectedFileSystemObject.id) {
                 this.fsoBeingDeleted = null;
@@ -1173,10 +1408,26 @@ export default {
                     });
             }
         },
+
+        /**
+         * Show missing files details modal
+         * 
+         * Displays a modal dialog containing details about files that are
+         * missing from the file system. Fetches the latest missing files
+         * data before showing the modal.
+         */
         showMissingFilesDetailsModal() {
             this.fetchMissingFiles();
             this.showMissingFilesDetails = true;
         },
+
+        /**
+         * Fetch missing files from the server
+         * 
+         * Retrieves the list of files that are referenced in the database
+         * but missing from the actual file system. This helps users identify
+         * and resolve file integrity issues.
+         */
         fetchMissingFiles() {
             axios
                 .get("/dashboard/drafts/" + this.draft.id + "/missing-files")
@@ -1185,15 +1436,55 @@ export default {
                     this.missing_files_list = response.data.missing_files;
                 });
         },
+
+        /**
+         * Toggle fullscreen mode
+         * 
+         * Switches the file browser between normal and fullscreen display modes.
+         * Currently unused but available for future implementation.
+         */
         toggleFullScreen() {
             this.fullScreen = !this.fullScreen;
         },
+
+        /**
+         * Toggle the logs dialog visibility
+         * 
+         * Shows or hides the detailed upload logs modal dialog.
+         * Used to display comprehensive information about file upload
+         * status, errors, and processing details.
+         */
         toggleShowLogsDialog() {
             this.showLogsDialog = !this.showLogsDialog;
         },
+
+        /**
+         * Update the busy status of the component
+         * 
+         * Sets the busy state to indicate when the component is performing
+         * operations like file uploads, deletions, or API calls. This helps
+         * prevent user interactions during critical operations.
+         * 
+         * @param {Boolean} status - True if component is busy, false otherwise
+         */
         updateBusyStatus(status) {
             this.busy = status;
         },
+
+        /**
+         * Load files from the server
+         * 
+         * Fetches the file tree structure from the server and initializes
+         * the file browser interface. This method handles:
+         * - Loading the root file system object
+         * - Restoring expanded folder states from URL parameters
+         * - Selecting the appropriate folder based on navigation state
+         * - Fetching missing folder contents for expanded folders
+         * - Updating the UI to reflect the loaded state
+         * 
+         * The method supports both draft mode (with server data) and
+         * read-only mode (with pre-loaded data from page props).
+         */
         loadFiles() {
             this.updateBusyStatus(true);
             if (this.draft) {
@@ -1229,6 +1520,21 @@ export default {
                 this.file = this.$page.props.selectedFileSystemObject;
             }
         },
+
+        /**
+         * Annotate uploaded files
+         * 
+         * Triggers the server-side annotation process for uploaded files.
+         * This process analyzes uploaded files to:
+         * - Detect file types and formats
+         * - Extract metadata from scientific data files
+         * - Identify instrument-specific data structures
+         * - Generate thumbnails and previews where applicable
+         * - Update the file tree with processed information
+         * 
+         * After annotation completes, the file tree is reloaded to show
+         * the updated file structure and metadata.
+         */
         annotate() {
             this.updateBusyStatus(true);
             this.$emit("loading", true);
@@ -1320,7 +1626,7 @@ export default {
                     );
                 },
             });
-            
+
             return client
                 .post(url, {
                     draft_files: filesWithChecksums,
@@ -1336,7 +1642,7 @@ export default {
                             vm.logs[file.fullPath].messages.push(
                                 message +
                                     " (API call failed with status code:" +
-                                    (err.response?.status || 'unknown') +
+                                    (err.response?.status || "unknown") +
                                     ") "
                             );
                         } else {
@@ -1344,13 +1650,15 @@ export default {
                             vm.logs[file.name].messages.push(
                                 message +
                                     "(API call failed with status code:" +
-                                    (err.response?.status || 'unknown') +
+                                    (err.response?.status || "unknown") +
                                     ")"
                             );
                         }
                     });
-                    
-                    this.uploadBatchErrors.push(err.response?.data || err.message);
+
+                    this.uploadBatchErrors.push(
+                        err.response?.data || err.message
+                    );
                     throw err; // Re-throw to be caught by sequential processor
                 })
                 .then((response) => {
@@ -1358,7 +1666,7 @@ export default {
                         vm.currentLog =
                             "Uploading files to temporary storage url";
                         let data = response.data;
-                        
+
                         data.forEach((u) => {
                             let cFile = vm.dropzone.files.find((f) => {
                                 if (f.fullPath) {
@@ -1397,7 +1705,7 @@ export default {
                                 );
                             }
                         });
-                        
+
                         return response;
                     }
                 });
@@ -1406,18 +1714,23 @@ export default {
             try {
                 // Process files in sequential batches to avoid race conditions
                 for (let i = 0; i < vm.totalFilesCount; i += vm.batchCount) {
-                    let filesBatch = vm.dropzone.files.slice(i, i + vm.batchCount);
+                    let filesBatch = vm.dropzone.files.slice(
+                        i,
+                        i + vm.batchCount
+                    );
                     vm.batches += 1;
-                    
-                    vm.status = `PROCESSING BATCH ${vm.batches} OF ${Math.ceil(vm.totalFilesCount / vm.batchCount)}`;
-                    
+
+                    vm.status = `PROCESSING BATCH ${vm.batches} OF ${Math.ceil(
+                        vm.totalFilesCount / vm.batchCount
+                    )}`;
+
                     // Wait for each batch to complete before processing the next
                     await vm.processFilesDZL(vm, filesBatch);
-                    
+
                     // Small delay between batches to prevent overwhelming the server
-                    await new Promise(resolve => setTimeout(resolve, 100));
+                    await new Promise((resolve) => setTimeout(resolve, 100));
                 }
-                
+
                 vm.status = "ALL BATCHES PROCESSED";
             } catch (error) {
                 console.error("Error in sequential file processing:", error);
@@ -1425,9 +1738,29 @@ export default {
                 vm.updateBusyStatus(false);
             }
         },
+        /**
+         * Initialize Dropzone.js for file uploads
+         * 
+         * Sets up the drag-and-drop file upload interface using Dropzone.js.
+         * This method configures:
+         * - Upload batch processing with sequential handling
+         * - File selection and folder upload support
+         * - Progress tracking and status updates
+         * - Event handlers for upload lifecycle
+         * - Checksum calculation integration
+         * - Error handling and logging
+         * 
+         * The dropzone is configured for:
+         * - Large file uploads (up to 20,000 files)
+         * - Folder structure preservation
+         * - Sequential batch processing to prevent server overload
+         * - Comprehensive upload logging and error tracking
+         */
         loadDropZone() {
             this.$nextTick(() => {
                 const vm = this;
+                
+                // Initialize upload counters and batch configuration
                 vm.totalFilesCount = 0;
                 vm.uploadedFilesCount = 0;
                 vm.batchCount = 10; // Reduced batch size for sequential processing
@@ -1435,41 +1768,43 @@ export default {
                 vm.batches = 0;
                 vm.processedBatches = 0;
 
+                // Set initial file system state
                 vm.$page.props.selectedFileSystemObject = vm.file;
                 vm.$page.props.selectedFolder = "/";
 
                 vm.selectedFSO = [];
 
+                // Configure Dropzone.js options
                 let options = {
-                    url: "/",
-                    method: "put",
+                    url: "/",                    // Placeholder URL (will be updated per file)
+                    method: "put",               // HTTP method for uploads
                     sending(file, xhr) {
+                        // Custom sending logic to use file object directly
                         let _send = xhr.send;
                         xhr.send = () => {
                             _send.call(xhr, file);
                         };
                     },
-                    autoProcessQueue: false,
-                    uploadMultiple: true,
-                    disablePreviews: true,
-                    parallelUploads: 100,
-                    useFsAccessApi: false,
-                    autoQueue: false,
-                    maxFiles: 20000,
-                    clickable: "#fs-dropzone-click-target",
-                    hiddenInputContainer: "#fs-dropzone-hidden-input-container",
-                    dictDefaultMessage: document.querySelector(
-                        "#fs-dropzone-message"
-                    ).innerHTML,
+                    autoProcessQueue: false,     // Manual queue processing for batch control
+                    uploadMultiple: true,        // Support multiple file uploads
+                    disablePreviews: true,       // Disable image previews for performance
+                    parallelUploads: 100,        // Allow many parallel uploads
+                    useFsAccessApi: false,       // Disable File System Access API
+                    autoQueue: false,            // Manual queue management
+                    maxFiles: 20000,             // Support large numbers of files
+                    clickable: "#fs-dropzone-click-target",              // Click target element
+                    hiddenInputContainer: "#fs-dropzone-hidden-input-container", // Hidden input container
+                    dictDefaultMessage: document.querySelector("#fs-dropzone-message").innerHTML, // Default message
                     totaluploadprogress: function (progress) {
                         vm.progress = Math.ceil(progress);
                     },
                 };
+                
+                // Initialize Dropzone instance
                 vm.dropzone = new Dropzone("#fs-dropzone", options);
-                vm.dropzone.hiddenFileInput.setAttribute(
-                    "webkitdirectory",
-                    true
-                );
+                
+                // Enable folder selection by setting webkitdirectory attribute
+                vm.dropzone.hiddenFileInput.setAttribute("webkitdirectory", true);
 
                 vm.dropzone.on("processing", (file) => {
                     vm.dropzone.options.url = file.uploadURL;
@@ -1592,22 +1927,44 @@ export default {
                 });
             });
         },
+        /**
+         * Display selected file or folder in the details panel
+         * 
+         * Updates the application state to show the selected file or folder
+         * in the right panel. This method handles:
+         * - Setting the selected file system object globally
+         * - Calculating the correct folder path for breadcrumb navigation
+         * - Lazy loading folder contents if needed
+         * - Updating the selected folder state for UI consistency
+         * 
+         * The method determines the correct folder path based on:
+         * - Root folder ("/") for the root directory
+         * - Full relative URL for directories
+         * - Parent directory path for individual files
+         * 
+         * @param {Object} file - The file or folder object to display
+         */
         displaySelected(file) {
             this.$page.props.selectedFileSystemObject = file;
             let sFolder = "/";
+            
+            // Calculate the appropriate folder path for breadcrumb navigation
             if (this.$page.props.selectedFileSystemObject.name == "/") {
                 sFolder = "/";
             } else {
                 if (this.$page.props.selectedFileSystemObject.type != "file") {
+                    // For directories, use the full relative URL
                     sFolder =
                         this.$page.props.selectedFileSystemObject.relative_url;
                 } else {
+                    // For files, extract the parent directory path
                     if (
                         this.$page.props.selectedFileSystemObject.parent_id ==
                         null
                     ) {
                         sFolder = "/";
                     } else {
+                        // Remove filename from path to get parent directory
                         sFolder =
                             this.$page.props.selectedFileSystemObject.relative_url.replace(
                                 "/" +
@@ -1619,8 +1976,10 @@ export default {
                 }
             }
 
+            // Update the selected folder for breadcrumb display
             this.$page.props.selectedFolder = sFolder;
 
+            // Lazy load folder contents if this is an unexpanded folder with children
             if (file.has_children && file.level > 0 && !file.children) {
                 file.loading = true;
                 axios

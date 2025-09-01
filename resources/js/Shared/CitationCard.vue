@@ -2,26 +2,30 @@
     <div
         v-for="citation in citations"
         :key="citation.id"
-        class="relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm flex items-top space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-teal-500"
+        class="relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm hover:border-gray-400 hover:shadow-lg transition-all duration-200 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-teal-500"
     >
         <div class="flex-1 min-w-0">
             <a
-                class="focus:outline-none cursor-pointer select-text"
+                class="focus:outline-none cursor-pointer select-text block"
                 :href="getCitationLink(citation.doi)"
                 :target="getTarget(citation.doi)"
             >
-                <p class="text-sm font-medium text-gray-900">
+                <h3 class="text-md font-bold text-gray-900 mb-1 leading-5">
                     {{ citation.title }}
-                </p>
-                <p class="text-sm text-teal-500">
-                    {{ citation.authors }}
-                </p>
-                <p class="text-sm text-gray-500">
-                    {{ citation.citation_text }}
-                </p>
-                <p v-if="citation.doi" class="text-sm font-sm text-teal-500">
-                    DOI - {{ citation.doi }}
-                </p>
+                </h3>
+                
+                <div>
+                    <p class="text-sm text-gray-700 font-medium">
+                        {{ citation.authors }}
+                    </p>
+                    <p class="text-sm text-gray-700 leading-5">
+                        {{ citation.citation_text }}
+                    </p>
+                    <p v-if="citation.doi" class="text-sm text-teal-600">
+                        <span class="font-medium text-gray-500">DOI:</span>
+                        {{ citation.doi }}
+                    </p>
+                </div>
             </a>
         </div>
     </div>

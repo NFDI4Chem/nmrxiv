@@ -2906,6 +2906,8 @@ export default {
                     studyDetails.study.slug +
                     " <br/> Spectra URL: " +
                     url;
+
+                url = encodeURIComponent(url);
                 axios
                     .post("https://nodejs.nmrxiv.org/spectra-parser", {
                         urls: [url],

@@ -18,7 +18,7 @@
             <button
                 v-else
                 type="button"
-                class="inline-flex float-right items-center rounded-md border border-transparent bg-gray-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                :class="backButtonClasses"
                 @click="onBack"
             >
                 <ArrowSmallRightIcon class="w-5 h-5 mr-1 text-white" />
@@ -40,7 +40,7 @@
                                     class="text-sm leading-6 font-bold text-gray-900"
                                 >
                                     <span v-if="!isEdit">Add</span
-                                    ><span v-else></span> Author
+                                    ><span v-else>Edit</span> Author
                                 </p>
                                 <div
                                     class="mt-1 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2"
@@ -59,12 +59,7 @@
                                                 type="text"
                                                 name="title"
                                                 autocomplete="title"
-                                                :class="[
-                                                    isEdit
-                                                        ? 'shadow-sm focus:ring-red-500 focus:border-red-500 block w-full sm:text-sm border-red-500 rounded-md bg-gray-100'
-                                                        : '',
-                                                    'shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md',
-                                                ]"
+                                                :class="inputClasses"
                                             />
                                         </div>
                                     </div>
@@ -82,12 +77,7 @@
                                                 v-model="form.given_name"
                                                 type="text"
                                                 name="given-name"
-                                                :class="[
-                                                    isEdit
-                                                        ? 'shadow-sm focus:ring-red-500 focus:border-red-500 block w-full sm:text-sm border-red-500 rounded-md bg-gray-100'
-                                                        : '',
-                                                    'shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md',
-                                                ]"
+                                                :class="inputClasses"
                                             />
                                         </div>
                                         <jet-input-error
@@ -111,12 +101,7 @@
                                                 type="text"
                                                 name="family-name"
                                                 autocomplete="family-name"
-                                                :class="[
-                                                    isEdit
-                                                        ? 'shadow-sm focus:ring-red-500 focus:border-red-500 block w-full sm:text-sm border-red-500 rounded-md bg-gray-100'
-                                                        : '',
-                                                    'shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md',
-                                                ]"
+                                                :class="inputClasses"
                                             />
                                         </div>
                                         <jet-input-error
@@ -141,12 +126,7 @@
                                                 name="email"
                                                 type="email"
                                                 autocomplete="email"
-                                                :class="[
-                                                    isEdit
-                                                        ? 'shadow-sm focus:ring-red-500 focus:border-red-500 block w-full sm:text-sm border-red-500 rounded-md bg-gray-100'
-                                                        : '',
-                                                    'shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md',
-                                                ]"
+                                                :class="inputClasses"
                                             />
                                             <jet-input-error
                                                 :message="form.errors.email_id"
@@ -168,12 +148,11 @@
                                                 name="orcid"
                                                 autocomplete="orcid"
                                                 type="text"
-                                                :class="[
-                                                    isEdit
-                                                        ? 'shadow-sm focus:ring-red-500 focus:border-red-500 block w-full sm:text-sm border-red-500 rounded-md bg-gray-100'
-                                                        : '',
-                                                    'shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md',
-                                                ]"
+                                                :class="inputClasses"
+                                            />
+                                            <jet-input-error
+                                                :message="form.errors.orcid_id"
+                                                class="mt-2"
                                             />
                                         </div>
                                     </div>
@@ -184,6 +163,12 @@
                                             "
                                             label="Role"
                                             :items="contributorType"
+                                        />
+                                        <jet-input-error
+                                            :message="
+                                                form.errors.contributor_type
+                                            "
+                                            class="mt-2"
                                         />
                                     </div>
                                     <div class="sm:col-span-6">
@@ -199,12 +184,7 @@
                                                 v-model="form.affiliation"
                                                 name="affiliation"
                                                 rows="3"
-                                                :class="[
-                                                    isEdit
-                                                        ? 'shadow-sm focus:ring-red-500 focus:border-red-500 block w-full sm:text-sm border-red-500 rounded-md bg-gray-100'
-                                                        : '',
-                                                    'shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border border-gray-300 rounded-md',
-                                                ]"
+                                                :class="textareaClasses"
                                                 placeholder="Name and address of affiliated University and Department. e.g. Institut für Anorganische und Analytische Chemie, Friedrich-Schiller-Universität, Schloßgasse 10, 07743 Jena"
                                             />
                                         </div>
@@ -221,13 +201,7 @@
                                     >
                                         <jet-secondary-button
                                             class="float-right"
-                                            :disabled="
-                                                !(
-                                                    form &&
-                                                    form.given_name &&
-                                                    form.family_name
-                                                )
-                                            "
+                                            :disabled="!isFormValid"
                                             @click="save('addManually')"
                                         >
                                             Add
@@ -255,13 +229,7 @@
                                     >
                                         <jet-secondary-button
                                             class="float-right"
-                                            :disabled="
-                                                !(
-                                                    form &&
-                                                    form.given_name &&
-                                                    form.family_name
-                                                )
-                                            "
+                                            :disabled="!isFormValid"
                                             @click="save('addManually')"
                                         >
                                             Update
@@ -321,14 +289,21 @@
                                 </div>
                                 <div class="sm:col-span-2 mt-4">
                                     <jet-secondary-button
-                                        :disabled="query == '' || !query"
+                                        :disabled="query == '' || !query || loading"
                                         @click="fetchAuthors"
                                     >
-                                        Import
+                                        <span v-if="loading" class="flex items-center">
+                                            <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24">
+                                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                            </svg>
+                                            Importing...
+                                        </span>
+                                        <span v-else>Import</span>
                                     </jet-secondary-button>
                                     <jet-secondary-button
                                         class="ml-2"
-                                        :disabled="!(fetchedAuthors.length > 0)"
+                                        :disabled="!hasFetchedAuthors"
                                         @click="
                                             (fetchedAuthors = []),
                                                 (query = null)
@@ -405,25 +380,15 @@
                                         </div>
                                     </div>
                                     <div
-                                        v-if="fetchedAuthors.length > 0"
+                                        v-if="hasFetchedAuthors"
                                         class="sm:col-span-6 mt-4"
                                     >
                                         <jet-secondary-button
-                                            :disabled="
-                                                !(
-                                                    selectedFetchedAuthorsList(
-                                                        false
-                                                    ).length > 0
-                                                )
-                                            "
+                                            :disabled="!hasSelectedAuthors"
                                             class="float-right ml-2"
                                             @click="save('addSelected')"
                                         >
-                                            Add Selected ({{
-                                                selectedFetchedAuthorsList(
-                                                    false
-                                                ).length
-                                            }})
+                                            Add Selected ({{ selectedAuthorsCount }})
                                         </jet-secondary-button>
                                         <jet-secondary-button
                                             class="float-right"
@@ -657,7 +622,7 @@
                             <b>{{ item.title }}</b> <br />
                             <p
                                 class="text-xs align-top"
-                                v-html="item.description"
+                                v-text="item.description.replace(/<br\s*\/?>/gi, ' ')"
                             ></p>
                         </div>
                     </div>
@@ -689,6 +654,7 @@ import JetDangerButton from "@/Jetstream/DangerButton.vue";
 import { router } from "@inertiajs/vue3";
 import SelectRich from "@/Shared/SelectRich.vue";
 import Draggable from "vuedraggable";
+import Global from "@/Mixins/Global.js";
 
 export default {
     components: {
@@ -706,6 +672,8 @@ export default {
         SelectRich,
         Draggable,
     },
+
+    mixins: [Global],
 
     props: ["project"],
 
@@ -840,11 +808,102 @@ export default {
             ],
         };
     },
+
+    computed: {
+        /**
+         * Returns CSS classes for input fields based on edit state
+         * @returns {string} CSS class string for input styling
+         */
+        inputClasses() {
+            const baseClasses = 'shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md';
+            const editClasses = 'shadow-sm focus:ring-red-500 focus:border-red-500 block w-full sm:text-sm border-red-500 rounded-md bg-gray-100';
+            
+            return this.isEdit ? editClasses : baseClasses;
+        },
+        
+        /**
+         * Returns CSS classes for textarea fields based on edit state
+         * @returns {string} CSS class string for textarea styling
+         */
+        textareaClasses() {
+            const baseClasses = 'shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border border-gray-300 rounded-md';
+            const editClasses = 'shadow-sm focus:ring-red-500 focus:border-red-500 block w-full sm:text-sm border-red-500 rounded-md bg-gray-100';
+            
+            return this.isEdit ? editClasses : baseClasses;
+        },
+
+        /**
+         * Returns CSS classes for add button styling
+         * @returns {string} CSS class string for add button
+         */
+        addButtonClasses() {
+            return 'inline-flex float-right items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2';
+        },
+
+        /**
+         * Returns CSS classes for back button styling
+         * @returns {string} CSS class string for back button
+         */
+        backButtonClasses() {
+            return 'inline-flex float-right items-center rounded-md border border-transparent bg-gray-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2';
+        },
+
+        /**
+         * Counts the number of selected authors from fetched results
+         * @returns {number} Number of selected authors
+         */
+        selectedAuthorsCount() {
+            return this.fetchedAuthors.filter(a => a.selected).length;
+        },
+
+        /**
+         * Checks if any authors are currently selected
+         * @returns {boolean} True if at least one author is selected
+         */
+        hasSelectedAuthors() {
+            return this.selectedAuthorsCount > 0;
+        },
+
+        /**
+         * Checks if there are any fetched authors available
+         * @returns {boolean} True if authors have been fetched from APIs
+         */
+        hasFetchedAuthors() {
+            return this.fetchedAuthors.length > 0;
+        },
+
+        /**
+         * Validates if the current form has all required fields filled
+         * @returns {boolean} True if form is valid for submission
+         */
+        isFormValid() {
+            return this.form.given_name && this.form.given_name.trim() && 
+                   this.form.family_name && this.form.family_name.trim();
+        },
+
+        /**
+         * Checks if the form has any validation errors
+         * @returns {boolean} True if form has validation errors
+         */
+        hasFormErrors() {
+            return Object.keys(this.form.errors || {}).length > 0;
+        },
+    },
+
+    /**
+     * Component lifecycle hook - called after component is mounted
+     * Initializes component with default values
+     */
+
     mounted() {
         this.loadInitial();
     },
     methods: {
-        /*Return filtered fetched authors list on the basis of selection*/
+        /**
+         * Returns filtered list of fetched authors based on selection criteria
+         * @param {boolean} all - If true, returns all authors; if false, returns only selected authors
+         * @returns {Array} Filtered array of authors
+         */
         selectedFetchedAuthorsList(all = false) {
             if (all) {
                 return this.fetchedAuthors;
@@ -852,7 +911,11 @@ export default {
                 return this.fetchedAuthors.filter((a) => a.selected);
             }
         },
-        /*Add imported authors to selected list*/
+
+        /**
+         * Toggles the selection state of an imported author
+         * @param {Object} author - The author object to toggle selection for
+         */
         addAuthorToSelectedList(author) {
             if (author.selected) {
                 author.selected = false;
@@ -860,7 +923,11 @@ export default {
                 author.selected = true;
             }
         },
-        /*Fetch and populate initial & default values*/
+
+        /**
+         * Initializes component with default values and loads existing authors
+         * Sets up the initial state for the component
+         */
         loadInitial() {
             if (this.project && this.project.authors) {
                 this.authors = this.project.authors.sort(
@@ -870,14 +937,23 @@ export default {
             this.form.contributor_type = {};
             this.form.contributor_type = this.contributorType[0];
         },
-        /*Control the display toggling*/
+
+        /**
+         * Toggles the visibility state of the main dialog
+         */
         toggleDialog() {
             this.showDialog = !this.showDialog;
         },
-        /*Reset variables on close of dialog*/
+
+        /**
+         * Resets all component variables and closes the dialog
+         * Clears form data, errors, and temporary state
+         */
         onClose() {
             this.showDialog = false;
             this.form.reset();
+            this.form.errors = {};
+            this.form.hasErrors = false;
             this.fetchedAuthors = [];
             this.query = "";
             this.form.contributor_type = {};
@@ -886,7 +962,11 @@ export default {
             this.error = "";
             this.formattedAuthors = [];
         },
-        /*Edit author*/
+        /**
+         * Prepares an existing author for editing
+         * Removes author from list temporarily and populates form with their data
+         * @param {Object} author - The author object to edit
+         */
         edit(author) {
             this.selectedAuthor = author;
             this.authors = this.authors.filter((author) => {
@@ -910,156 +990,200 @@ export default {
             this.displayAddAuthorForms = true;
             this.isEdit = true;
         },
-        /*Fetch author from DOI or ORCID id*/
+
+        /**
+         * Fetches author data from external APIs using DOI or ORCID ID
+         * Implements promise chain to try multiple APIs in sequence
+         */
         fetchAuthors() {
             this.loading = true;
             this.error = "";
+            this.formattedAuthors = []; // Reset previous results
+            
             this.query = this.extractQueryParam(this.query);
-            let isDOI = new RegExp(/\b(10[.][0-9]{4,}(?:[.][0-9]+)*)\b/g).test(
-                this.query
-            );
-            axios
-                .get(this.$page.props.europemcWSApi, {
-                    params: {
-                        query: isDOI ? "DOI:" + this.query : this.query,
-                        format: "json",
-                        pageSize: "1",
-                        resulttype: "core",
-                        synonym: "true",
-                    },
-                })
-                .then((res) => {
-                    if (
-                        res &&
-                        res.data &&
-                        res.data.resultList.result.length > 0
-                    ) {
-                        var authors = isDOI
-                            ? res.data.resultList.result[0].authorList.author
-                            : res.data.resultList.result[0].authorList.author.filter(
-                                  (a) =>
-                                      a.authorId &&
-                                      a.authorId.type == "ORCID" &&
-                                      a.authorId.value == this.query
-                              );
-                        this.fetchedAuthors = this.formatAuthorResponse(
-                            authors,
-                            "europemc"
-                        );
-                    } else {
-                        this.fetchDataFromCrossref(this.query);
-                    }
-                })
-                .catch((err) => {
-                    console.log(err);
-                    this.fetchDataFromCrossref(this.query);
-                });
-        },
-        /*Make REST Call to Crossref API */
-        fetchDataFromCrossref(query) {
-            axios
-                .get(this.$page.props.CROSSREF_API + this.query)
-                .then((res) => {
-                    if (res.data && res.data.message) {
-                        this.fetchedAuthors = this.formatAuthorResponse(
-                            res.data.message.author,
-                            "crossref"
-                        );
-                    } else {
-                        this.fetchDataFromDatacite(this.query);
-                    }
-                })
-                .catch((err) => {
-                    console.log(err);
-                    this.fetchDataFromDatacite(this.query);
-                });
-        },
-        /*Make REST call to Datacite API */
-        fetchDataFromDatacite(query) {
-            axios
-                .get(this.$page.props.DATACITE_API + this.query)
-                .then((res) => {
-                    if (res && res.data && res.data.data) {
-                        this.fetchedAuthors = this.formatAuthorResponse(
-                            res.data.data.attributes.creators,
-                            "datacite"
-                        );
-                    }
-                })
-                .catch((err) => {
-                    console.log(err);
-                })
+            if (!this.query.trim()) {
+                this.handleFetchError("Please enter a valid DOI or ORCID ID.");
+                return;
+            }
+            
+            let isDOI = new RegExp(/\b(10[.][0-9]{4,}(?:[.][0-9]+)*)\b/g).test(this.query);
+            
+            this.fetchFromEuropePMC(isDOI)
+                .catch(() => this.fetchFromCrossref())
+                .catch(() => this.fetchFromDatacite())
+                .catch(() => this.handleFetchError("No author data found for the provided identifier. Please enter details manually."))
                 .finally(() => {
-                    if (
-                        this.fetchedAuthors &&
-                        this.fetchedAuthors.length == 0
-                    ) {
-                        this.error =
-                            "No data found. Please enter the details manually.";
-                    }
                     this.loading = false;
                 });
         },
-        /*Format authors response*/
+
+        /**
+         * Fetches author data from EuropePMC API
+         * @param {boolean} isDOI - Whether the query is a DOI or ORCID ID
+         * @returns {Promise} Promise that resolves on successful data fetch
+         */
+        fetchFromEuropePMC(isDOI) {
+            return axios.get(this.$page.props.europemcWSApi, {
+                params: {
+                    query: isDOI ? "DOI:" + this.query : this.query,
+                    format: "json",
+                    pageSize: "1",
+                    resulttype: "core",
+                    synonym: "true",
+                },
+            }).then((res) => {
+                if (res && res.data && res.data.resultList.result.length > 0) {
+                    const authors = isDOI
+                        ? res.data.resultList.result[0].authorList.author
+                        : res.data.resultList.result[0].authorList.author.filter(
+                              (a) => a.authorId && a.authorId.type == "ORCID" && 
+                                     a.authorId.value == this.query
+                          );
+                    
+                    if (authors && authors.length > 0) {
+                        this.fetchedAuthors = this.formatAuthorResponse(authors, "europemc");
+                        return Promise.resolve();
+                    }
+                }
+                return Promise.reject();
+            });
+        },
+
+        /**
+         * Fetches author data from Crossref API
+         * @returns {Promise} Promise that resolves on successful data fetch or rejects on failure
+         */
+        fetchFromCrossref() {
+            // Properly encode query parameter to prevent URL injection
+            const encodedQuery = encodeURIComponent(this.query.trim());
+            const safeUrl = `${this.$page.props.CROSSREF_API}${encodedQuery}`;
+            
+            return axios.get(safeUrl)
+                .then((res) => {
+                    if (res.data && res.data.message && res.data.message.author) {
+                        this.fetchedAuthors = this.formatAuthorResponse(res.data.message.author, "crossref");
+                        return Promise.resolve();
+                    }
+                    return Promise.reject();
+                });
+        },
+
+        /**
+         * Fetches author data from DataCite API
+         * @returns {Promise} Promise that resolves on successful data fetch or rejects on failure
+         */
+        fetchFromDatacite() {
+            // Properly encode query parameter to prevent URL injection
+            const encodedQuery = encodeURIComponent(this.query.trim());
+            const safeUrl = `${this.$page.props.DATACITE_API}${encodedQuery}`;
+            
+            return axios.get(safeUrl)
+                .then((res) => {
+                    if (res && res.data && res.data.data && res.data.data.attributes.creators) {
+                        this.fetchedAuthors = this.formatAuthorResponse(res.data.data.attributes.creators, "datacite");
+                        return Promise.resolve();
+                    }
+                    return Promise.reject();
+                });
+        },
+
+        /**
+         * Handles fetch errors with user-friendly messages
+         * @param {string} message - Error message to display to user
+         */
+        handleFetchError(message) {
+            this.error = message;
+            this.fetchedAuthors = [];
+            this.loading = false;
+        },
+
+        /**
+         * Formats raw author data from different APIs into a consistent structure
+         * @param {Array} authors - Raw author data from API
+         * @param {string} apiType - Type of API ('europemc', 'crossref', 'datacite')
+         * @returns {Array} Formatted author data
+         */
         formatAuthorResponse(authors, apiType) {
             if (authors && authors.length > 0) {
                 switch (apiType) {
                     case "europemc":
-                        authors.forEach((author) => {
-                            var a = {};
-                            a.firstName = author.firstName;
-                            a.lastName = author.lastName;
-                            a.fullName = author.fullName;
-                            a.orcidId =
-                                author.authorId &&
-                                author.authorId.type == "ORCID"
-                                    ? author.authorId.value
-                                    : "";
-                            a.affiliation =
-                                author.authorAffiliationDetailsList &&
-                                author.authorAffiliationDetailsList
-                                    .authorAffiliation[0]
-                                    ? author.authorAffiliationDetailsList
-                                          .authorAffiliation[0].affiliation
-                                    : "";
-                            this.formattedAuthors.push(a);
-                        });
+                        this.formatEuropemcAuthors(authors);
                         break;
                     case "crossref":
-                        authors.forEach((author) => {
-                            var a = {};
-                            a.firstName = author.given;
-                            a.lastName = author.family;
-                            a.orcidId = ""; //as we are not recieving ORCID ID from Cross ref response;
-                            a.affiliation = author.affiliation[0]
-                                ? author.affiliation[0].name
-                                : "";
-                            this.formattedAuthors.push(a);
-                        });
+                        this.formatCrossrefAuthors(authors);
                         break;
                     case "datacite":
-                        authors.forEach((author) => {
-                            var a = {};
-                            a.firstName = author.givenName;
-                            a.lastName = author.familyName;
-                            if (
-                                author.nameIdentifiers &&
-                                author.nameIdentifiers[0] &&
-                                author.nameIdentifiers[0]
-                                    .nameIdentifierScheme == "ORCID"
-                            ) {
-                                a.orcidId = this.extractQueryParam(
-                                    author.nameIdentifiers[0].nameIdentifier
-                                );
-                            }
-                            a.affiliation = author.affiliation
-                                ? author.affiliation[0]
-                                : "";
-                            this.formattedAuthors.push(a);
-                        });
+                        this.formatDataciteAuthors(authors);
                         break;
                 }
             }
+            this.deduplicateFormattedAuthors();
+            this.loading = false;
+            return this.formattedAuthors;
+        },
+
+        /**
+         * Formats authors from EuropePMC API response
+         * @param {Array} authors - Raw author data from EuropePMC
+         */
+        formatEuropemcAuthors(authors) {
+            authors.forEach((author) => {
+                const a = {
+                    firstName: author.firstName,
+                    lastName: author.lastName,
+                    fullName: author.fullName,
+                    orcidId: author.authorId && author.authorId.type == "ORCID"
+                        ? author.authorId.value : "",
+                    affiliation: author.authorAffiliationDetailsList &&
+                        author.authorAffiliationDetailsList.authorAffiliation[0]
+                        ? author.authorAffiliationDetailsList.authorAffiliation[0].affiliation : ""
+                };
+                this.formattedAuthors.push(a);
+            });
+        },
+
+        /**
+         * Formats authors from Crossref API response
+         * @param {Array} authors - Raw author data from Crossref
+         */
+        formatCrossrefAuthors(authors) {
+            authors.forEach((author) => {
+                const a = {
+                    firstName: author.given,
+                    lastName: author.family,
+                    orcidId: "", // Crossref doesn't provide ORCID ID in response
+                    affiliation: author.affiliation[0] ? author.affiliation[0].name : ""
+                };
+                this.formattedAuthors.push(a);
+            });
+        },
+
+        /**
+         * Formats authors from DataCite API response
+         * @param {Array} authors - Raw author data from DataCite
+         */
+        formatDataciteAuthors(authors) {
+            authors.forEach((author) => {
+                const a = {
+                    firstName: author.givenName,
+                    lastName: author.familyName,
+                    orcidId: "",
+                    affiliation: author.affiliation ? author.affiliation[0] : ""
+                };
+
+                if (author.nameIdentifiers && author.nameIdentifiers[0] &&
+                    author.nameIdentifiers[0].nameIdentifierScheme == "ORCID") {
+                    a.orcidId = this.extractQueryParam(author.nameIdentifiers[0].nameIdentifier);
+                }
+
+                this.formattedAuthors.push(a);
+            });
+        },
+
+        /**
+         * Removes duplicate authors from formatted authors array based on key fields
+         */
+        deduplicateFormattedAuthors() {
             const keys = ["firstName", "lastName", "orcidId"];
             this.formattedAuthors = this.formattedAuthors.filter(
                 (value, index, self) =>
@@ -1067,10 +1191,13 @@ export default {
                         keys.every((k) => v[k] === value[k])
                     ) === index
             );
-            this.loading = false;
-            return this.formattedAuthors;
         },
-        /*Format the response*/
+
+        /**
+         * Converts formatted author objects to the structure expected by the backend
+         * @param {Array} authors - Array of formatted author objects
+         * @returns {Array} Array of author objects in backend format
+         */
         formatAuthors(authors) {
             let authorsList = [];
             authors.forEach((author) => {
@@ -1083,7 +1210,10 @@ export default {
             });
             return authorsList;
         },
-        /*Make the call to save API on the basis of selection*/
+        /**
+         * Routes save operations based on input type
+         * @param {string} input - Type of save operation ('addSelected', 'addAll', 'addManually')
+         */
         save(input) {
             switch (input) {
                 case "addSelected":
@@ -1097,7 +1227,11 @@ export default {
                     break;
             }
         },
-        /*Prepare request form and execute save query for imported authors*/
+
+        /**
+         * Adds imported authors from API results to the authors list
+         * @param {boolean} addAll - If true, adds all authors; if false, adds only selected
+         */
         addImportedAuthor(addAll) {
             this.authorsForm.reset();
             if (this.authors.length > 0) {
@@ -1111,77 +1245,99 @@ export default {
             }
             this.executeQuery();
         },
-        /*Prepare request form and execute save query for authors added manually*/
+
+        /**
+         * Adds a manually entered author to the authors list
+         * Validates form data before adding
+         */
         addManually() {
             this.validateForm();
+            if (this.form.hasErrors) return;
+            
             this.authorsForm.reset();
-            if (!this.form.hasErrors) {
-                let newAuthor = {
-                    title: this.form.title ? this.form.title.trim() : null,
-                    given_name: this.form.given_name
-                        ? this.form.given_name.trim()
-                        : null,
-                    family_name: this.form.family_name
-                        ? this.form.family_name.trim()
-                        : null,
+            const newAuthor = this.buildNewAuthorObject();
+            this.addAuthorToList(newAuthor);
+            this.executeQuery();
+        },
 
-                    email_id: this.form.email_id
-                        ? this.form.email_id.trim()
-                        : null,
-                    orcid_id: this.form.orcid_id
-                        ? this.form.orcid_id.trim()
-                        : null,
-                    affiliation: this.form.affiliation
-                        ? this.form.affiliation.trim()
-                        : null,
-                    contributor_type: this.form.contributor_type
-                        ? this.form.contributor_type.title.trim()
-                        : "Researcher",
-                };
-                if (this.authors.length > 0) {
-                    if (this.selectedAuthor) {
-                        this.authors.splice(
-                            this.selectedAuthor.pivot.sort_order,
-                            0,
-                            newAuthor
-                        );
-                    } else {
-                        this.authors.push(newAuthor);
-                    }
+        /**
+         * Creates a new author object from current form data
+         * @returns {Object} New author object with form data
+         */
+        buildNewAuthorObject() {
+            return {
+                title: this.form.title ? this.form.title.trim() : null,
+                given_name: this.form.given_name ? this.form.given_name.trim() : null,
+                family_name: this.form.family_name ? this.form.family_name.trim() : null,
+                email_id: this.form.email_id ? this.form.email_id.trim() : null,
+                orcid_id: this.form.orcid_id ? this.form.orcid_id.trim() : null,
+                affiliation: this.form.affiliation ? this.form.affiliation.trim() : null,
+                contributor_type: this.form.contributor_type
+                    ? this.form.contributor_type.title.trim() : "Researcher",
+            };
+        },
+
+        /**
+         * Adds a new author to the authors list at the appropriate position
+         * @param {Object} newAuthor - The author object to add
+         */
+        addAuthorToList(newAuthor) {
+            if (this.authors.length > 0) {
+                if (this.selectedAuthor) {
+                    this.authors.splice(this.selectedAuthor.pivot.sort_order, 0, newAuthor);
                 } else {
-                    this.authors = [newAuthor];
+                    this.authors.push(newAuthor);
                 }
-                this.executeQuery();
+            } else {
+                this.authors = [newAuthor];
             }
         },
-        /*Make request to save API*/
+
+        /**
+         * Executes the API call to save authors to the backend
+         * Handles deduplication and API communication
+         */
         executeQuery() {
-            console.log("execute query method called..");
-            this.authorsForm.authors = this.authors;
-            const keys = ["given_name", "family_name"];
-            this.authorsForm.authors = this.authorsForm.authors.filter(
-                (value, index, self) =>
-                    self.findIndex((v) =>
-                        keys.every((k) => v[k] === value[k])
-                    ) === index
-            );
+            this.authorsForm.authors = this.deduplicateAuthorsList(this.authors);
+            
             this.authorsForm.post(route("author.save", this.project.id), {
                 preserveScroll: true,
-                onSuccess: () => {
-                    this.loadInitial();
-                    this.form.reset();
-                    this.form.contributor_type = {};
-                    this.form.contributor_type = this.contributorType[0];
-                    this.displayAddAuthorForms = false;
-                    this.formattedAuthors = [];
-                    this.fetchedAuthors = [];
-                    this.isEdit = false;
-                    this.query = "";
-                },
+                onSuccess: () => this.onSaveSuccess(),
                 onError: (err) => console.error(err),
             });
         },
-        /*Confirm delete and prepare request*/
+
+        /**
+         * Handles successful save operation by resetting component state
+         * Reloads initial data and cleans up temporary variables
+         */
+        onSaveSuccess() {
+            this.loadInitial();
+            this.form.reset();
+            this.form.contributor_type = this.contributorType[0];
+            this.displayAddAuthorForms = false;
+            this.formattedAuthors = [];
+            this.fetchedAuthors = [];
+            this.isEdit = false;
+            this.query = "";
+        },
+
+        /**
+         * Removes duplicate authors from the authors list based on name matching
+         * @param {Array} authorsList - List of authors to deduplicate
+         * @returns {Array} Deduplicated authors list
+         */
+        deduplicateAuthorsList(authorsList) {
+            const keys = ["given_name", "family_name"];
+            return authorsList.filter((value, index, self) =>
+                self.findIndex((v) => keys.every((k) => v[k] === value[k])) === index
+            );
+        },
+
+        /**
+         * Prepares deletion confirmation dialog and sets up author for deletion
+         * @param {Object} author - The author object to delete
+         */
         confirmDeletion(author) {
             this.confirmDelete = true;
             this.authorsForm.reset();
@@ -1195,7 +1351,11 @@ export default {
                 },
             ];
         },
-        /*Make request to delete API*/
+
+        /**
+         * Executes author deletion via API call
+         * Handles success/error states and UI updates
+         */
         deleteAuthor() {
             this.authorsForm.delete(route("author.delete", this.project.id), {
                 preserveScroll: true,
@@ -1208,22 +1368,64 @@ export default {
                 onError: (err) => console.error(err),
             });
         },
-        /*Check form for validation errors*/
+
+        /**
+         * Validates all form fields and sets error states
+         * Checks required fields, email format, ORCID format, and contributor type
+         */
         validateForm() {
             this.form.errors = {};
             this.form.hasErrors = false;
-            let _hasErrors = false;
-            if (this.form.email_id) {
-                if (!this.isValidEmail(this.form.email_id)) {
-                    this.form.errors.email_id = "Valid email required.";
-                    _hasErrors = true;
+            
+            // Validate required fields
+            if (!this.form.given_name || !this.form.given_name.trim()) {
+                this.form.errors.given_name = "First name is required.";
+                this.form.hasErrors = true;
+            }
+            
+            if (!this.form.family_name || !this.form.family_name.trim()) {
+                this.form.errors.family_name = "Family name is required.";
+                this.form.hasErrors = true;
+            }
+            
+            // Validate email format if provided
+            if (this.form.email_id && this.form.email_id.trim()) {
+                if (!this.isValidEmail(this.form.email_id.trim())) {
+                    this.form.errors.email_id = "Please enter a valid email address.";
+                    this.form.hasErrors = true;
                 }
             }
-            if (_hasErrors) {
+            
+            // Validate ORCID format if provided
+            if (this.form.orcid_id && this.form.orcid_id.trim()) {
+                if (!this.isValidOrcid(this.form.orcid_id.trim())) {
+                    this.form.errors.orcid_id = "Please enter a valid ORCID ID.";
+                    this.form.hasErrors = true;
+                }
+            }
+            
+            // Validate contributor type is selected
+            if (!this.form.contributor_type || !this.form.contributor_type.title) {
+                this.form.errors.contributor_type = "Please select a contributor type.";
                 this.form.hasErrors = true;
             }
         },
-        /*Make request to update role API*/
+
+        /**
+         * Validates ORCID ID format against standard pattern
+         * @param {string} orcidId - ORCID ID string to validate
+         * @returns {boolean} True if ORCID ID format is valid
+         */
+        isValidOrcid(orcidId) {
+            // ORCID format: 0000-0000-0000-000X (where X can be 0-9 or X)
+            const orcidRegex = /^\d{4}-\d{4}-\d{4}-\d{3}[\dX]$/;
+            return orcidRegex.test(orcidId);
+        },
+
+        /**
+         * Updates an author's role/contributor type via API
+         * @param {Object} role - The new role object containing title and description
+         */
         updateRole(role) {
             this.updateRoleForm.role = role.title;
             this.updateRoleForm.post(
@@ -1241,11 +1443,19 @@ export default {
                 }
             );
         },
-        /*Execute query on sorting of authors*/
+
+        /**
+         * Handles author list reordering by executing save query
+         * Called when drag-and-drop sorting is completed
+         */
         onSort() {
             this.executeQuery();
         },
-        /*Reset variables on cancel editing*/
+
+        /**
+         * Cancels edit operation and restores component to initial state
+         * Restores previously selected author back to the list if applicable
+         */
         onCancelEdit() {
             if (this.selectedAuthor) {
                 this.authors.splice(
@@ -1254,12 +1464,16 @@ export default {
                     this.selectedAuthor
                 );
             }
-            (this.displayAddAuthorForms = false),
-                (this.isEdit = false),
-                this.form.reset(),
-                (this.form.contributor_type = {});
+            this.displayAddAuthorForms = false;
+            this.isEdit = false;
+            this.form.reset();
             this.form.contributor_type = this.contributorType[0];
         },
+
+        /**
+         * Handles back navigation from add/edit form to main view
+         * Restores previously selected author if in edit mode
+         */
         onBack() {
             if (this.selectedAuthor) {
                 this.authors.splice(
@@ -1271,21 +1485,24 @@ export default {
             this.displayAddAuthorForms = false;
             this.isEdit = false;
         },
-        /*Add current user as Author*/
+
+        /**
+         * Adds the currently logged-in user as an author
+         * Uses user's profile data including ORCID ID and affiliation
+         */
         addCurrentUser() {
             if (this.$page.props.auth.user && this.$page.props.auth.user) {
                 let user = {};
                 let affiliation = {};
                 this.fetchedAuthors = [];
-                user.firstName = this.$page.props.auth.user;
-                user.lastName = this.$page.props.auth.user?.last_name;
+                user.firstName = this.$page.props.auth.user.first_name;
+                user.lastName = this.$page.props.auth.user.last_name;
                 user.authorId = {};
                 user.authorId.type = "ORCID";
-                user.authorId.value = this.$page.props.auth.user?.orcid_id;
+                user.authorId.value = this.$page.props.auth.user.orcid_id;
                 user.authorAffiliationDetailsList = {};
                 user.authorAffiliationDetailsList.authorAffiliation = [];
-                affiliation.affiliation =
-                    this.$page.props.auth.user?.affiliation;
+                affiliation.affiliation = this.$page.props.auth.user.affiliation;
                 user.authorAffiliationDetailsList.authorAffiliation.push(
                     affiliation
                 );
