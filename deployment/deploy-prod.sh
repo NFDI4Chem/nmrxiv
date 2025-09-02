@@ -143,7 +143,10 @@ deploy_service() {
     if [ "$(docker pull "$image" | grep -c "Status: Image is up to date")" -eq 0 ]; then
         log_message "📦 New ${service^^} image available."
 
-        backup_database
+        # Only back up the database when deploying the app service to avoid duplicate backups
+        if [[ "$service" == "app" ]]; then
+            backup_database
+        fi
         
         docker compose -f "$COMPOSE_FILE" up -d "$service" --scale "$service"=2 --no-deps --no-recreate
         NEW_CONTAINER_ID=$(docker ps -q -l)
