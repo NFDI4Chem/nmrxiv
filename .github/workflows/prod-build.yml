@@ -29,23 +29,22 @@ jobs:
         shell: bash
         run: |
           echo "Actor: ${GITHUB_ACTOR}"
-          # Confirm input
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            if [[ "${{ github.event.inputs.confirm }}" != "DEPLOY" ]]; then
-              echo "Confirmation token mismatch. Expected 'DEPLOY'."
-              exit 1
-            fi
+          # Confirm input (workflow_dispatch)
+          if [[ "${{ github.event.inputs.confirm }}" != "DEPLOY" ]]; then
+            echo "Confirmation token mismatch. Expected 'DEPLOY'."
+            exit 1
           fi
 
-          # Authorized actors (from PROD_DEPLOY_AUTHORIZED_ACTORS secret)
-          AUTHORIZED_ACTORS=" ${{ secrets.PROD_DEPLOY_AUTHORIZED_ACTORS }} "
-
-          # Normalize and lowercase for match
-          AUTHORIZED_ACTORS_NORMALIZED="${AUTHORIZED_ACTORS//,/ }"
-          AUTHORIZED_ACTORS_LOWER=" ${AUTHORIZED_ACTORS_NORMALIZED,,} "
-          ACTOR_LOWER="${GITHUB_ACTOR,,}"
-
-          if [[ "${AUTHORIZED_ACTORS_LOWER}" != *" ${ACTOR_LOWER} "* ]]; then
+          # Authorize actor (comma/space separated list in secret)
+          AUTHORIZED_ACTORS="${{ secrets.PROD_DEPLOY_AUTHORIZED_ACTORS }}"
+          allowed=0
+          for u in ${AUTHORIZED_ACTORS//,/ }; do
+            if [[ "${u,,}" == "${GITHUB_ACTOR,,}" ]]; then
+              allowed=1
+              break
+            fi
+          done
+          if [[ $allowed -ne 1 ]]; then
             echo "User '${GITHUB_ACTOR}' is not authorized to trigger this workflow."
             exit 1
           fi
@@ -73,7 +72,7 @@ jobs:
           tag=$(gh release view --repo "$GITHUB_REPOSITORY" --json tagName -q .tagName 2>/dev/null || echo "")
           if [[ -z "$tag" ]]; then
             echo "No published release found; falling back to short SHA."
-            tag="${GITHUB_SHA::7}"
+            tag="${GITHUB_SHA::12}"
           fi
           echo "tag_name=$tag" >> "$GITHUB_OUTPUT"
           # Expose short commit SHA for tags
