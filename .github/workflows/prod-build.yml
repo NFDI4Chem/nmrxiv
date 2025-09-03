@@ -1,10 +1,7 @@
-# GitHub Actions workflow for building and deploying NMRXiv to production environment
-# This workflow runs tests, builds Docker images, and deploys to the FSU production environment
+# Build and push NMRXiv Docker images to production
 name: Build and Deploy to Prod
 
-# Triggers
-# - Manually via workflow dispatch (with confirmation and guard)
-# - When a release is published
+# Trigger: manual workflow_dispatch with confirmation and guard
 on:
   workflow_dispatch:
     inputs:
@@ -12,8 +9,6 @@ on:
         description: "Type 'DEPLOY' to confirm production deployment"
         required: true
         type: string
-  release:
-    types: [published]
 
 # Environment variables used across all jobs
 env:
@@ -30,7 +25,7 @@ jobs:
         run: |
           echo "Actor: ${GITHUB_ACTOR}"
 
-          # If triggered manually, require explicit confirmation to avoid accidental triggers
+          # Confirm manual run
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             if [[ "${{ github.event.inputs.confirm }}" != "DEPLOY" ]]; then
               echo "Confirmation token mismatch. Expected 'DEPLOY'."
@@ -38,91 +33,83 @@ jobs:
             fi
           fi
 
-          # Allowed users who can trigger production deploys
-          # Add more GitHub usernames separated by spaces
-          ALLOWED_USERS=" vcnainala NishaSharma14 "
+          # Authorized usernames from secret 'PROD_DEPLOY_AUTHORIZED_ACTORS' (comma/space-separated)
+          AUTHORIZED_ACTORS=" ${{ secrets.PROD_DEPLOY_AUTHORIZED_ACTORS }} "
 
-          # Case-insensitive membership check
-          ALLOWED_USERS_LOWER=" ${ALLOWED_USERS,,} "
+          # Normalize commas; case-insensitive match
+          AUTHORIZED_ACTORS_NORMALIZED="${AUTHORIZED_ACTORS//,/ }"
+          AUTHORIZED_ACTORS_LOWER=" ${AUTHORIZED_ACTORS_NORMALIZED,,} "
           ACTOR_LOWER="${GITHUB_ACTOR,,}"
 
-          if [[ "${ALLOWED_USERS_LOWER}" != *" ${ACTOR_LOWER} "* ]]; then
+          if [[ "${AUTHORIZED_ACTORS_LOWER}" != *" ${ACTOR_LOWER} "* ]]; then
             echo "User '${GITHUB_ACTOR}' is not authorized to trigger this workflow."
             exit 1
           fi
           echo "Authorization check passed."
-
-  e2etest:
-    needs: guard
-    if: ${{ needs.guard.result == 'success' }}
-    uses: NFDI4Chem/nmrxiv-nodejs-microservice/.github/workflows/e2e.yml@development
 
   # Build Docker images and deploy to production environment
   setup-build-publish-deploy-prod:
     name: Deploy to prod
     runs-on: ubuntu-latest
     needs: [guard]
-    if: ${{ needs.guard.result == 'success' }}
-    # Use the Dev environment for deployment secrets and protection rules
     environment:
       name: Prod
     steps:
-      # Checkout the repository code for building Docker images
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Fetch latest GitHub release (used for tagging images when not triggered by a release)
-      - name: Fetch latest release
+      - name: Fetch latest release (gh)
         id: fetch-latest-release
-        uses: InsonusK/get-latest-release@v1.1.0
-        with:
-          myToken: ${{ github.token }}
-          exclude_types: "draft"
-          view_top: 10
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          # Get latest published release tag
+          tag=$(gh release view --repo "$GITHUB_REPOSITORY" --json tagName -q .tagName 2>/dev/null || echo "")
+          if [[ -z "$tag" ]]; then
+            echo "No published release found; falling back to short SHA."
+            tag="${GITHUB_SHA::7}"
+          fi
+          echo "tag_name=$tag" >> "$GITHUB_OUTPUT"
 
-      # Authenticate with Docker Hub for pushing images
+          # Also expose a short commit SHA for image tagging
+          sha_short="${GITHUB_SHA::12}"
+          echo "sha_short=$sha_short" >> "$GITHUB_OUTPUT"
+
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
 
-      # Set up Docker Buildx for multi-platform builds
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # Build and push the main application Docker image for FSU deployment
       - name: Build and push App Docker image 
         uses: docker/build-push-action@v6
         with:
           context: .
           file: ./deployment/Dockerfile
           push: true
-          # Pass proxy settings and release version as build arguments
           build-args: |
             RELEASE_VERSION=${{ steps.fetch-latest-release.outputs.tag_name }}
-          # Tag the image with both the release version and latest
           tags: |
+            ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:app-sha-${{ steps.fetch-latest-release.outputs.sha_short }}
             ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:app-${{ steps.fetch-latest-release.outputs.tag_name }}
             ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:app-latest
-          # Enable build cache for faster builds
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      # Build and push the worker Docker image for background job processing
       - name: Build and push Worker Docker image
         uses: docker/build-push-action@v6
         with:
           context: .
           file: ./deployment/Dockerfile.worker
           push: true
-          # Pass proxy settings and release version as build arguments
           build-args: |
             RELEASE_VERSION=${{ steps.fetch-latest-release.outputs.tag_name }}
-          # Tag the worker image with both the release version and latest
           tags: |
+            ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:worker-sha-${{ steps.fetch-latest-release.outputs.sha_short }}
             ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:worker-${{ steps.fetch-latest-release.outputs.tag_name }}
             ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:worker-latest
-          # Enable build cache for faster builds
           cache-from: type=gha
           cache-to: type=gha,mode=max
