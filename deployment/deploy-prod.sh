@@ -3,17 +3,23 @@
 set -e
 
 COMPOSE_FILE="/mnt/docker/nmrxiv/deployment/docker-compose.prod.yml"
-APP_IMAGE="nfdi4chem/nmrxiv:app-dev-latest"
-WORKER_IMAGE="nfdi4chem/nmrxiv:worker-dev-latest"
+APP_IMAGE="nfdi4chem/nmrxiv:app-latest"
+WORKER_IMAGE="nfdi4chem/nmrxiv:worker-latest"
 NEW_CONTAINER_ID=""
-BACKUP_DIR="./backups"
+BACKUP_DIR="/mnt/docker/nmrxiv-db-backups"
 BUILD=false
 DEPLOY=false
 MULTI_PLATFORM=false
 
-LOG_FILE="/var/log/nmrxiv-deploy.log"
+LOG_FILE="/mnt/docker/nmrxiv-deploy.log"
 
-# Create log file if it doesn't exist
+# Ensure backup directory exists and is secure
+if [ ! -d "$BACKUP_DIR" ]; then
+    mkdir -p "$BACKUP_DIR"
+    chmod 700 "$BACKUP_DIR"
+fi
+
+# Create log file if it doesn't exist and ensure permissions
 if [ ! -f "$LOG_FILE" ]; then
     touch "$LOG_FILE"
     chmod 644 "$LOG_FILE"
@@ -40,7 +46,7 @@ set +a
 export HTTP_PROXY="${HTTP_PROXY:-$http_proxy}"
 export HTTPS_PROXY="${HTTPS_PROXY:-$https_proxy}"
 export NO_PROXY="${NO_PROXY:-$no_proxy}"
-export COMPOSE_PROJECT_NAME=nmrxiv-dev
+export COMPOSE_PROJECT_NAME=nmrxiv
 
 # === Validate Environment Variables ===
 validate_env_vars() {
@@ -137,7 +143,10 @@ deploy_service() {
     if [ "$(docker pull "$image" | grep -c "Status: Image is up to date")" -eq 0 ]; then
         log_message "📦 New ${service^^} image available."
 
-        backup_database
+        # Only back up the database when deploying the app service to avoid duplicate backups
+        if [[ "$service" == "app" ]]; then
+            backup_database
+        fi
         
         docker compose -f "$COMPOSE_FILE" up -d "$service" --scale "$service"=2 --no-deps --no-recreate
         NEW_CONTAINER_ID=$(docker ps -q -l)
@@ -147,14 +156,14 @@ deploy_service() {
         remove_old_containers "$service"
         run_migration_and_clear_cache
         log_message "✅ Deployment of $service done successfully.."
-        log_message "Application is available at: https://dev.nmrxiv.org"
+        log_message "Application is available at: https://nmrxiv.org"
 
         # Skipping health check for dev because we want the service to be down if there is an error in the container
         # if wait_for_health; then
         #     remove_old_containers "$service"
         #     log_message "✅ Deployment of $service done successfully.."
         #     run_migration_and_clear_cache
-        #     log_message "Application is available at: https://dev.nmrxiv.org"
+        #     log_message "Application is available at: https://nmrxiv.org"
         # else
         #     log_message "❌ Deployment aborted: new $service container is unhealthy."
         #     docker stop "$NEW_CONTAINER_ID"
@@ -180,12 +189,11 @@ backup_database() {
 }
 
 run_migration_and_clear_cache() {
-    log_message "Running database migration..."
+    log_message "Running database migration and clearing cache..."
 
     docker compose -f "$COMPOSE_FILE" exec -T app php artisan migrate --force
-    docker compose -f "$COMPOSE_FILE" exec -T app php artisan cache:clear
-    docker compose -f "$COMPOSE_FILE" exec -T app php artisan optimize:clear
     docker compose -f "$COMPOSE_FILE" exec -T app php artisan optimize
+    docker compose -f "$COMPOSE_FILE" exec -T app php artisan optimize:clear
     
     log_message "Database migration completed successfully"
 }
@@ -200,8 +208,8 @@ build_multi_platform() {
     log_message "Building app image for multiple platforms..."
     docker buildx build \
         --platform linux/amd64,linux/arm64 \
-        --tag nfdi4chem/nmrxiv:app-dev-latest \
-        --tag nfdi4chem/nmrxiv:app-dev-$(date +%Y%m%d-%H%M%S) \
+        --tag nfdi4chem/nmrxiv:app-latest \
+        --tag nfdi4chem/nmrxiv:app-latest-$(date +%Y%m%d-%H%M%S) \
         --file deployment/Dockerfile \
         --push \
         .
@@ -210,8 +218,8 @@ build_multi_platform() {
     log_message "Building worker image for multiple platforms..."
     docker buildx build \
         --platform linux/amd64,linux/arm64 \
-        --tag nfdi4chem/nmrxiv:worker-dev-latest \
-        --tag nfdi4chem/nmrxiv:worker-dev-$(date +%Y%m%d-%H%M%S) \
+        --tag nfdi4chem/nmrxiv:worker-latest \
+        --tag nfdi4chem/nmrxiv:worker-latest-$(date +%Y%m%d-%H%M%S) \
         --file deployment/Dockerfile.worker \
         --push \
         .
@@ -254,7 +262,7 @@ build_or_restart_services() {
 
     cleanup
     log_message "Services restarted successfully!"
-    log_message "Application is available at: https://dev.nmrxiv.org/"
+    log_message "Application is available at: https://nmrxiv.org"
 }
 
 # === Display Help ===

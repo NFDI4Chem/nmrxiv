@@ -173,7 +173,6 @@ export default {
                     let state = data.state;
                     this.version = state.version;
                     let actionType = state.data.actionType;
-
                     if (type == "nmr-wrapper:data-change") {
                         if (state.data.spectra.length > 0) {
                             this.selectedSpectraData = state.data;
@@ -285,6 +284,7 @@ export default {
                         });
                 } else {
                     if (this.study.datasets.length > 0) {
+                        console.log("Loading Spectra from URL..");
                         let urls = [];
                         let url = null;
                         if (this.study.download_url) {
@@ -306,6 +306,7 @@ export default {
             }
         },
         loadFromURLs(urls) {
+            console.log("Loading Spectra from URL..");
             this.infoLog("Loading Spectra from URL..");
             const iframe = window.frames.submissionNMRiumIframe;
             if (!urls) {

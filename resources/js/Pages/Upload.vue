@@ -334,59 +334,84 @@
                                     <li
                                         v-for="draft in drafts"
                                         :key="draft.id"
-                                        class="hover:cursor-pointer border-b hover:bg-gray-50 px-5 py-4"
+                                        class="border-b px-5 py-4"
                                     >
-                                        <Link
-                                            :href="
-                                                route('upload', {
-                                                    draft_id: draft.id,
-                                                })
-                                            "
-                                        >
-                                            <div
-                                                class="flex items-center space-x-4"
+                                        <div class="flex items-center justify-between">
+                                            <Link
+                                                :href="
+                                                    route('upload', {
+                                                        draft_id: draft.id,
+                                                    })
+                                                "
+                                                class="flex-1 hover:cursor-pointer hover:bg-gray-50 -mx-5 -my-4 px-5 py-4"
                                             >
-                                                <div
-                                                    class="flex-1 min-w-0 mr-auto max-w-2xl"
+                                                <div class="flex items-center space-x-4">
+                                                    <div class="flex-1 min-w-0 mr-auto max-w-2xl">
+                                                        <div class="flex items-center gap-2 mb-1">
+                                                            <p class="text-lg font-large text-black truncate">
+                                                                <b>{{ draft.name }}</b>
+                                                            </p>
+                                                            <span
+                                                                v-if="draft.eln"
+                                                                class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                                                            >
+                                                                {{ draft.external_id }}
+                                                            </span>
+                                                            <span
+                                                                v-if="draft.status"
+                                                                class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
+                                                                :class="{
+                                                                    'bg-blue-100 text-blue-800': ['received'].includes(draft.status.toLowerCase()),
+                                                                    'bg-yellow-100 text-yellow-800': ['zip_processed', 'processing', 'pending', 'job_dispatched'].includes(draft.status.toLowerCase()),
+                                                                    'bg-green-100 text-green-800': ['validated', 'processed', 'successful', 'published'].includes(draft.status.toLowerCase()),
+                                                                    'bg-red-100 text-red-800': ['failed'].includes(draft.status.toLowerCase()),
+                                                                    'bg-gray-100 text-gray-800': !['received', 'zip_processed', 'validated', 'processed', 'successful', 'published', 'failed', 'processing', 'pending', 'job_dispatched'].includes(draft.status.toLowerCase())
+                                                                }"
+                                                            >
+                                                                {{ formatStatus(draft.status) }}
+                                                            </span>
+                                                        </div>
+                                                        <p class="text-sm font-medium text-gray-700 truncate pr-10">
+                                                            {{ draft.description }}
+                                                        </p>
+                                                        <p class="text-sm font-medium text-gray-500 truncate">
+                                                            ID: {{ draft.key }}
+                                                            &middot; Created at:
+                                                            {{ formatDateTime(draft.created_at) }}
+                                                            <span v-if="draft.external_id">
+                                                                &middot; External ID: {{ draft.external_id }}
+                                                            </span>
+                                                        </p>
+                                                    </div>
+                                                    <div>
+                                                        <svg
+                                                            class="h-5 w-5 flex-none text-gray-400"
+                                                            viewBox="0 0 20 20"
+                                                            fill="currentColor"
+                                                            aria-hidden="true"
+                                                        >
+                                                            <path
+                                                                fill-rule="evenodd"
+                                                                d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
+                                                                clip-rule="evenodd"
+                                                            ></path>
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                            </Link>
+                                            <div
+                                                v-if="draft.processing_logs && draft.processing_logs.length > 0"
+                                                class="ml-4 flex-shrink-0"
+                                            >
+                                                <button
+                                                    @click="showProcessingLogs(draft)"
+                                                    class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                                                 >
-                                                    <p
-                                                        class="text-lg font-large text-black truncate"
-                                                    >
-                                                        <b>{{ draft.name }}</b>
-                                                    </p>
-                                                    <p
-                                                        class="text-sm font-medium text-gray-700 truncate pr-10"
-                                                    >
-                                                        {{ draft.description }}
-                                                    </p>
-                                                    <p
-                                                        class="text-sm font-medium text-gray-500 truncate"
-                                                    >
-                                                        ID: {{ draft.key }}
-                                                        &middot; Created at:
-                                                        {{
-                                                            formatDateTime(
-                                                                draft.created_at
-                                                            )
-                                                        }}
-                                                    </p>
-                                                </div>
-                                                <div>
-                                                    <svg
-                                                        class="h-5 w-5 flex-none text-gray-400"
-                                                        viewBox="0 0 20 20"
-                                                        fill="currentColor"
-                                                        aria-hidden="true"
-                                                    >
-                                                        <path
-                                                            fill-rule="evenodd"
-                                                            d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
-                                                            clip-rule="evenodd"
-                                                        ></path>
-                                                    </svg>
-                                                </div>
+                                                    <InformationCircleIcon class="w-4 h-4 mr-1" />
+                                                    View Logs
+                                                </button>
                                             </div>
-                                        </Link>
+                                        </div>
                                     </li>
                                 </ul>
                             </div>
@@ -1013,7 +1038,7 @@
                                                         <div>
                                                             <div>
                                                                 <div
-                                                                    class="px-4 py-1.5 -mx-2 bg-gray-50 border-b px-4 py-3 flex items-center font-semibold text-sm text-slate-900 dark:text-slate-200 bg-slate-50/90 dark:bg-slate-700/90 backdrop-blur-sm ring-1 ring-slate-900/10 dark:ring-black/10"
+                                                                    class="px-4 py-1.5 -mx-2 bg-gray-50 border-b px-4 py-3 flex items-center font-semibold text-sm text-slate-900 dark:text-slate-200 bg-slate-50/90 dark:bg-slate-700/90 backdrop-blur-sm ring-1 ring-slate-900/10 dark:ring-black/10 break-all"
                                                                 >
                                                                     <div
                                                                         class="cursor-pointer tooltip m-3 text-gray-500 hover:text-gray-700"
@@ -1327,41 +1352,119 @@
                                                                                         class="sm:col-span-4"
                                                                                     >
                                                                                         <label
-                                                                                            for="email"
-                                                                                            class="block text-sm font-medium text-gray-700"
+                                                                                            for="chemical-input"
+                                                                                            class="block text-sm font-medium text-gray-700 mb-2"
                                                                                         >
-                                                                                            SMILES
+                                                                                            Chemical
+                                                                                            Structure
+                                                                                            Input
                                                                                         </label>
+
+                                                                                        <!-- Unified Input with Drag and Drop -->
                                                                                         <div
                                                                                             class="mt-1 mb-2"
                                                                                         >
-                                                                                            <input
-                                                                                                id="smiles"
-                                                                                                v-model="
-                                                                                                    smiles
+                                                                                            <div
+                                                                                                class="border-2 border-dashed border-gray-300 rounded-md p-4 text-center hover:border-teal-400 transition-colors"
+                                                                                                :class="{
+                                                                                                    'border-teal-400 bg-teal-50':
+                                                                                                        isDragging,
+                                                                                                }"
+                                                                                                @dragover.prevent="
+                                                                                                    handleDragOver
                                                                                                 "
-                                                                                                name="smiles"
-                                                                                                type="text"
-                                                                                                class="shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                                                                                                @blur="
-                                                                                                    loadSmiles
+                                                                                                @dragleave.prevent="
+                                                                                                    handleDragLeave
                                                                                                 "
-                                                                                            />
+                                                                                                @drop.prevent="
+                                                                                                    handleDrop
+                                                                                                "
+                                                                                            >
+                                                                                                <div
+                                                                                                    v-if="
+                                                                                                        !chemicalInput
+                                                                                                    "
+                                                                                                    class="mb-3"
+                                                                                                >
+                                                                                                    <p
+                                                                                                        class="text-sm text-gray-600 mb-1"
+                                                                                                    >
+                                                                                                        Paste
+                                                                                                        SMILES,
+                                                                                                        MOL,
+                                                                                                        or
+                                                                                                        SDF
+                                                                                                        content
+                                                                                                        below
+                                                                                                        or
+                                                                                                        drag
+                                                                                                        and
+                                                                                                        drop
+                                                                                                        .mol/.sdf
+                                                                                                        files
+                                                                                                    </p>
+                                                                                                    <div
+                                                                                                        class="text-xs text-gray-500"
+                                                                                                    >
+                                                                                                        Auto-detects
+                                                                                                        and
+                                                                                                        loads
+                                                                                                        format
+                                                                                                        automatically
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                                <textarea
+                                                                                                    v-model="
+                                                                                                        chemicalInput
+                                                                                                    "
+                                                                                                    placeholder="Paste SMILES (single line) or MOL/SDF content (multi-line) here..."
+                                                                                                    rows="8"
+                                                                                                    class="w-full shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm border-gray-300 rounded-md resize-vertical"
+                                                                                                    @blur="
+                                                                                                        loadStructure
+                                                                                                    "
+                                                                                                    @paste="
+                                                                                                        handlePaste
+                                                                                                    "
+                                                                                                    @input="
+                                                                                                        handleInput
+                                                                                                    "
+                                                                                                ></textarea>
+                                                                                            </div>
+
+                                                                                            <div
+                                                                                                class="flex items-center justify-between mt-2"
+                                                                                            >
+                                                                                                <div
+                                                                                                    class="flex space-x-2"
+                                                                                                >
+                                                                                                    <button
+                                                                                                        v-if="
+                                                                                                            chemicalInput
+                                                                                                        "
+                                                                                                        class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                                                                                        @click="
+                                                                                                            clearInput
+                                                                                                        "
+                                                                                                    >
+                                                                                                        Clear
+                                                                                                    </button>
+                                                                                                </div>
+
+                                                                                                <div
+                                                                                                    v-if="
+                                                                                                        detectedFormat
+                                                                                                    "
+                                                                                                    class="text-xs text-gray-500"
+                                                                                                >
+                                                                                                    Detected:
+                                                                                                    {{
+                                                                                                        detectedFormat
+                                                                                                    }}
+                                                                                                </div>
+                                                                                            </div>
                                                                                         </div>
-                                                                                        <button
-                                                                                            v-if="
-                                                                                                smiles &&
-                                                                                                smiles !=
-                                                                                                    ''
-                                                                                            "
-                                                                                            class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mt-2"
-                                                                                            @click="
-                                                                                                loadSmiles
-                                                                                            "
-                                                                                        >
-                                                                                            Load
-                                                                                            Structure
-                                                                                        </button>
+
                                                                                         <jet-input-error
                                                                                             :message="
                                                                                                 errorMessage
@@ -1729,6 +1832,95 @@
                 Loading...
             </div>
         </div>
+
+        <!-- Processing Logs Modal -->
+        <jet-dialog-modal
+            :show="showLogsDialog"
+            @close="showLogsDialog = false"
+            :max-width="'4xl'"
+        >
+            <template #title>
+                <div class="block">
+                    Processing Logs - {{ selectedDraftForLogs?.name }}
+                </div>
+            </template>
+
+            <template #content>
+                <div class="relative h-[70vh] overflow-y-auto z-0 mt-1 rounded-lg">
+                    <ul
+                        v-if="selectedDraftForLogs?.processing_logs && selectedDraftForLogs.processing_logs.length > 0"
+                        role="list"
+                        class="divide-y divide-gray-200"
+                    >
+                        <li
+                            v-for="(log, index) in selectedDraftForLogs.processing_logs"
+                            :key="index"
+                            class="px-4 py-4"
+                        >
+                            <div class="flex space-x-3">
+                                <div class="flex-shrink-0">
+                                    <CheckIcon
+                                        v-if="log.level === 'info'"
+                                        class="h-5 w-5 text-green-400"
+                                        aria-hidden="true"
+                                    />
+                                    <ExclamationCircleIcon
+                                        v-else-if="log.level === 'error'"
+                                        class="h-5 w-5 text-red-400"
+                                        aria-hidden="true"
+                                    />
+                                    <InformationCircleIcon
+                                        v-else
+                                        class="h-5 w-5 text-yellow-400"
+                                        aria-hidden="true"
+                                    />
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <div class="text-sm text-gray-500">
+                                        <time :datetime="log.timestamp">
+                                            {{ formatDateTime(log.timestamp) }}
+                                        </time>
+                                        <span class="ml-2 font-medium">
+                                            {{ log.level.toUpperCase() }}
+                                        </span>
+                                    </div>
+                                    <div class="mt-1 text-sm text-gray-900">
+                                        {{ log.message }}
+                                    </div>
+                                    <div
+                                        v-if="log.context && Object.keys(log.context).length > 0"
+                                        class="mt-2"
+                                    >
+                                        <details class="text-xs text-gray-600">
+                                            <summary class="cursor-pointer hover:text-gray-800">
+                                                Show Details
+                                            </summary>
+                                            <pre class="mt-2 whitespace-pre-wrap bg-gray-50 p-2 rounded">{{ JSON.stringify(log.context, null, 2) }}</pre>
+                                        </details>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                    <div
+                        v-else
+                        class="text-center py-12"
+                    >
+                        <InformationCircleIcon class="mx-auto h-12 w-12 text-gray-400" />
+                        <h3 class="mt-2 text-sm font-medium text-gray-900">No logs available</h3>
+                        <p class="mt-1 text-sm text-gray-500">
+                            Processing logs will appear here when available.
+                        </p>
+                    </div>
+                </div>
+            </template>
+
+            <template #footer>
+                <jet-secondary-button @click="showLogsDialog = false">
+                    Close
+                </jet-secondary-button>
+            </template>
+        </jet-dialog-modal>
     </app-layout>
 </template>
 
@@ -1738,6 +1930,7 @@ import { router, Link } from "@inertiajs/vue3";
 import JetInputError from "@/Jetstream/InputError.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import JetButton from "@/Jetstream/Button.vue";
+import JetDialogModal from "@/Jetstream/DialogModal.vue";
 import { ref } from "vue";
 import Primer from "@/Shared/Primer.vue";
 import FileSystemBrowser from "./../Shared/FileSystemBrowser.vue";
@@ -1750,6 +1943,9 @@ import {
     EyeSlashIcon,
     ChevronDoubleLeftIcon,
     ChevronDoubleRightIcon,
+    InformationCircleIcon,
+    CheckIcon,
+    ExclamationCircleIcon,
 } from "@heroicons/vue/24/solid";
 import SpectraEditor from "@/Shared/SpectraEditor.vue";
 import Depictor from "@/Shared/Depictor.vue";
@@ -1757,6 +1953,7 @@ import Depictor2D from "@/Shared/Depictor2D.vue";
 import slider from "vue3-slider";
 import VueTagsInput from "@sipec/vue3-tags-input";
 import "ontology-elements/dist/index.js";
+import Global from "@/Mixins/Global.js";
 
 export default {
     components: {
@@ -1765,6 +1962,7 @@ export default {
         JetInputError,
         JetSecondaryButton,
         JetButton,
+        JetDialogModal,
         Primer,
         FileSystemBrowser,
         TrashIcon,
@@ -1780,7 +1978,11 @@ export default {
         VueTagsInput,
         ChevronDoubleLeftIcon,
         ChevronDoubleRightIcon,
+        InformationCircleIcon,
+        CheckIcon,
+        ExclamationCircleIcon,
     },
+    mixins: [Global],
     props: ["draft_id"],
     setup() {
         return {};
@@ -1834,7 +2036,9 @@ export default {
             validation: null,
             validationStatus: true,
 
-            smiles: "",
+            chemicalInput: "",
+            detectedFormat: "",
+            isDragging: false,
             percentage: 100,
             editor: null,
 
@@ -1885,6 +2089,8 @@ export default {
                 is_public: ref(false),
             }),
             showSummary: true,
+            showLogsDialog: false,
+            selectedDraftForLogs: null,
         };
     },
     computed: {
@@ -1921,9 +2127,19 @@ export default {
                             : 0
                     );
                 });
-                return 100 - totalCount;
+                const remaining = 100 - totalCount;
+                // Ensure max is always greater than min (0) to prevent slider errors
+                return Math.max(remaining, 1);
             } else {
                 return 100;
+            }
+        },
+    },
+    watch: {
+        getMax(newMax) {
+            // Ensure percentage doesn't exceed the new maximum
+            if (this.percentage > newMax) {
+                this.percentage = newMax;
             }
         },
     },
@@ -1981,6 +2197,10 @@ export default {
         onScroll() {
             this.hideDownArrow = true;
         },
+        showProcessingLogs(draft) {
+            this.selectedDraftForLogs = draft;
+            this.showLogsDialog = true;
+        },
         toggleCompoundDetails() {
             this.showCompoundDetails = !this.showCompoundDetails;
             localStorage.setItem(
@@ -1997,6 +2217,24 @@ export default {
         fetchDrafts() {
             this.loading = true;
             return axios.get("/dashboard/drafts");
+        },
+        formatStatus(status) {
+            if (!status) return '';
+            
+            const statusMap = {
+                'received': 'Received',
+                'zip_processed': 'ZIP Processed',
+                'validated': 'Validated',
+                'processed': 'Processed',
+                'successful': 'Successful',
+                'published': 'Published',
+                'failed': 'Failed',
+                'processing': 'Processing',
+                'pending': 'Pending',
+                'job_dispatched': 'Job Dispatched'
+            };
+            
+            return statusMap[status.toLowerCase()] || status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
         },
         selectDraft(draft) {
             this.currentDraft = draft;
@@ -2512,7 +2750,8 @@ export default {
                 })
                 .then((res) => {
                     study.sample.molecules = res.data;
-                    this.smiles = "";
+                    this.chemicalInput = "";
+                    this.detectedFormat = "";
                     this.percentage = this.getMax;
                     this.editor.setSmiles("");
                 });
@@ -2582,14 +2821,35 @@ export default {
                 .then((response) => {
                     let nmrium_info = response.data;
                     if (nmrium_info) {
+                        // MIChI-compliant fields mapping
+                        const michiFields = {
+                            solvent: "NMR Solvent",
+                            temperature: "Temperature",
+                            nucleus: "Nucleus",
+                            experiment: "NMR Pulse Sequence",
+                            pulseSequence: "NMR Pulse Sequence",
+                            numberOfScans: "Number of Scans",
+                            originFrequency: "Observed Frequency",
+                            baseFrequency: "Observed Frequency",
+                            spectralWidth: "Spectral Width",
+                            numberOfPoints: "Number of Data Points",
+                            relaxationTime: "Relaxation Delay",
+                            relaxationDelay: "Relaxation Delay",
+                            fieldStrength: "Magnetic Field Strength",
+                            probeName: "NMR Probe",
+                        };
+
                         nmrium_info.data.spectra.forEach((spectra) => {
                             Object.keys(spectra.info).forEach((key) => {
-                                desc =
-                                    desc +
-                                    key +
-                                    ": " +
-                                    spectra.info[key] +
-                                    "</br>";
+                                // Only include MIChI-compliant fields
+                                if (michiFields[key]) {
+                                    desc =
+                                        desc +
+                                        michiFields[key] +
+                                        ": " +
+                                        spectra.info[key] +
+                                        "</br>";
+                                }
                             });
                         });
                         this.studyForm.description = desc.replace(
@@ -2645,6 +2905,8 @@ export default {
                     studyDetails.study.slug +
                     " <br/> Spectra URL: " +
                     url;
+
+                url = encodeURIComponent(url);
                 axios
                     .post("https://nodejs.nmrxiv.org/spectra-parser", {
                         urls: [url],
@@ -2734,16 +2996,150 @@ export default {
                 this.saveStudyDetails();
             }
         },
-        loadSmiles() {
+        loadStructure() {
             this.errorMessage = "";
-            if (this.smiles && this.smiles != "") {
-                try {
-                    let mol = OCL.Molecule.fromSmiles(this.smiles);
-                    this.editor.setSmiles(this.smiles);
-                } catch (e) {
-                    this.errorMessage = "The entered SMILES is not valid.";
+
+            if (!this.chemicalInput || this.chemicalInput.trim() === "") {
+                return;
+            }
+
+            const format = this.detectFormat(this.chemicalInput);
+
+            try {
+                if (format === "SMILES") {
+                    let mol = OCL.Molecule.fromSmiles(
+                        this.chemicalInput.trim()
+                    );
+                    this.editor.setSmiles(this.chemicalInput.trim());
+                } else if (format === "MOL/SDF") {
+                    let mol = OCL.Molecule.fromMolfile(this.chemicalInput);
+                    this.editor.setMolFile(this.chemicalInput);
+                } else {
+                    this.errorMessage =
+                        "Unable to detect chemical format. Please check your input.";
+                    return;
+                }
+                this.detectedFormat = format;
+            } catch (e) {
+                this.errorMessage = `Invalid ${format} format. Please check your input.`;
+            }
+        },
+
+        detectFormat(input) {
+            if (!input || input.trim() === "") return "";
+
+            const trimmed = input.trim();
+            const lines = trimmed.split("\n");
+
+            // Check for MOL/SDF format indicators
+            if (
+                trimmed.includes("M  END") ||
+                trimmed.includes("$$$$") ||
+                trimmed.includes("V2000") ||
+                trimmed.includes("V3000") ||
+                (lines.length > 3 && lines[3] && lines[3].includes(" 0  0  0"))
+            ) {
+                return "MOL/SDF";
+            }
+
+            // If it's a single line or very short, likely SMILES
+            if (lines.length <= 2 && trimmed.length < 500) {
+                // Additional SMILES validation - common SMILES characters
+                const smilesPattern = /^[A-Za-z0-9@+\-\[\]()=#\\/\\.:]+$/;
+                if (smilesPattern.test(trimmed.replace(/\s/g, ""))) {
+                    return "SMILES";
                 }
             }
+
+            // Default to trying as MOL/SDF for multi-line content
+            if (lines.length > 2) {
+                return "MOL/SDF";
+            }
+
+            // Default to SMILES for single line content
+            return "SMILES";
+        },
+
+        handleInput() {
+            if (this.chemicalInput && this.chemicalInput.trim()) {
+                this.detectedFormat = this.detectFormat(this.chemicalInput);
+            } else {
+                this.detectedFormat = "";
+            }
+        },
+
+        clearInput() {
+            this.chemicalInput = "";
+            this.detectedFormat = "";
+            this.errorMessage = "";
+            if (this.editor) {
+                this.editor.setSmiles("");
+            }
+        },
+
+        handlePaste(event) {
+            // Allow default paste behavior, then auto-load structure
+            this.$nextTick(() => {
+                this.handleInput(); // Update detected format
+                this.loadStructure(); // Auto-load the pasted content
+            });
+        },
+
+        handleDragOver(event) {
+            event.preventDefault();
+            this.isDragging = true;
+        },
+
+        handleDragLeave(event) {
+            event.preventDefault();
+            this.isDragging = false;
+        },
+
+        handleDrop(event) {
+            event.preventDefault();
+            this.isDragging = false;
+
+            const files = Array.from(event.dataTransfer.files);
+            this.processFiles(files);
+        },
+
+        processFiles(files) {
+            if (files.length === 0) return;
+
+            // Filter for mol/sdf files
+            const validFiles = files.filter((file) => {
+                const extension = file.name.toLowerCase().split(".").pop();
+                return ["mol", "sdf"].includes(extension);
+            });
+
+            if (validFiles.length === 0) {
+                this.errorMessage = "Please select valid MOL or SDF files.";
+                return;
+            }
+
+            // Process the first valid file
+            const file = validFiles[0];
+            const reader = new FileReader();
+
+            reader.onload = (e) => {
+                this.chemicalInput = e.target.result;
+                this.loadStructure();
+            };
+
+            reader.onerror = () => {
+                this.errorMessage = "Error reading file. Please try again.";
+            };
+
+            reader.readAsText(file);
+
+            if (validFiles.length > 1) {
+                this.errorMessage = `Only the first file (${file.name}) was loaded. Multiple file support coming soon.`;
+            }
+        },
+
+        // Legacy method name for backward compatibility
+        loadSmiles() {
+            this.loadStructure();
         },
         toggleSummaryBar() {
             this.showSummary = !this.showSummary;

@@ -28,48 +28,127 @@
                 leave-to-class="opacity-0"
             >
                 <ListboxOptions
-                    class="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm"
+                    class="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm"
                 >
-                    <ListboxOption
-                        v-for="item in items"
-                        :key="item.id"
-                        v-slot="{ active, selected }"
-                        as="template"
-                        :value="item"
-                    >
-                        <li
-                            :class="[
-                                active
-                                    ? 'text-white bg-teal-600'
-                                    : 'text-gray-900',
-                                'cursor-default border-b select-none relative py-2 pl-8 pr-4',
-                            ]"
+                    <template v-if="groupedItems">
+                        <div
+                            v-for="(group, categoryName) in groupedItems"
+                            :key="categoryName"
                         >
-                            <span
-                                :class="[
-                                    selected ? 'font-semibold' : 'font-normal',
-                                    'block truncate',
-                                ]"
+                            <!-- Category Header -->
+                            <div
+                                class="sticky top-0 z-10 px-4 py-3 text-sm font-bold text-gray-700 uppercase tracking-wider bg-gray-100 border-b border-gray-300 shadow-sm"
                             >
-                                <b>{{ item.title }}</b> <br />
-                                <small
-                                    v-if="item.description"
-                                    v-html="item.description"
+                                <span class="flex items-center">
+                                    <svg
+                                        class="w-4 h-4 mr-2 text-gray-500"
+                                        fill="currentColor"
+                                        viewBox="0 0 20 20"
+                                    >
+                                        <path
+                                            fill-rule="evenodd"
+                                            d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
+                                            clip-rule="evenodd"
+                                        ></path>
+                                    </svg>
+                                    {{ categoryName }}
+                                </span>
+                            </div>
+                            <!-- Category Items -->
+                            <ListboxOption
+                                v-for="item in group"
+                                :key="item.id"
+                                v-slot="{ active, selected }"
+                                as="template"
+                                :value="item"
+                            >
+                                <li
+                                    :class="[
+                                        active
+                                            ? 'text-white bg-gray-600'
+                                            : 'text-gray-900',
+                                        'cursor-default border-b select-none relative py-2 pl-8 pr-4',
+                                    ]"
                                 >
-                                </small>
-                                <!-- ToolTip class="inline ml-3 float-right overflow-visible" :text="item.description"></ToolTip -->
-                            </span>
-                            <span
-                                v-if="selected"
+                                    <span
+                                        :class="[
+                                            selected
+                                                ? 'font-semibold'
+                                                : 'font-normal',
+                                            'block truncate',
+                                        ]"
+                                    >
+                                        <b>{{ item.title }}</b> <br />
+                                        <small
+                                            v-if="item.description"
+                                            v-html="item.description"
+                                        >
+                                        </small>
+                                    </span>
+                                    <span
+                                        v-if="selected"
+                                        :class="[
+                                            active
+                                                ? 'text-white'
+                                                : 'text-gray-600',
+                                            'absolute inset-y-0 left-0 flex items-center pl-1.5',
+                                        ]"
+                                    >
+                                        <CheckIcon
+                                            class="h-5 w-5"
+                                            aria-hidden="true"
+                                        />
+                                    </span>
+                                </li>
+                            </ListboxOption>
+                        </div>
+                    </template>
+                    <template v-else>
+                        <ListboxOption
+                            v-for="item in items"
+                            :key="item.id"
+                            v-slot="{ active, selected }"
+                            as="template"
+                            :value="item"
+                        >
+                            <li
                                 :class="[
-                                    active ? 'text-white' : 'text-teal-600',
-                                    'absolute inset-y-0 left-0 flex items-center pl-1.5',
+                                    active
+                                        ? 'text-white bg-gray-600'
+                                        : 'text-gray-900',
+                                    'cursor-default border-b select-none relative py-2 pl-8 pr-4',
                                 ]"
                             >
-                                <CheckIcon class="h-5 w-5" aria-hidden="true" />
-                            </span>
-                        </li>
-                    </ListboxOption>
+                                <span
+                                    :class="[
+                                        selected
+                                            ? 'font-semibold'
+                                            : 'font-normal',
+                                        'block truncate',
+                                    ]"
+                                >
+                                    <b>{{ item.title }}</b> <br />
+                                    <small
+                                        v-if="item.description"
+                                        v-html="item.description"
+                                    >
+                                    </small>
+                                </span>
+                                <span
+                                    v-if="selected"
+                                    :class="[
+                                        active ? 'text-white' : 'text-gray-600',
+                                        'absolute inset-y-0 left-0 flex items-center pl-1.5',
+                                    ]"
+                                >
+                                    <CheckIcon
+                                        class="h-5 w-5"
+                                        aria-hidden="true"
+                                    />
+                                </span>
+                            </li>
+                        </ListboxOption>
+                    </template>
                 </ListboxOptions>
             </transition>
         </div>
@@ -109,6 +188,39 @@ export default {
             set(val) {
                 this.$emit("update:selected", val);
             },
+        },
+        groupedItems() {
+            if (!this.items || !Array.isArray(this.items)) {
+                return null;
+            }
+
+            // Check if items have category field, if not return null to use ungrouped view
+            const hasCategories = this.items.some((item) => item.category);
+            if (!hasCategories) {
+                return null;
+            }
+
+            // Group items by category
+            const grouped = this.items.reduce((groups, item) => {
+                const category = item.category || "Other";
+                if (!groups[category]) {
+                    groups[category] = [];
+                }
+                groups[category].push(item);
+                return groups;
+            }, {});
+
+            // Sort categories and items within each category
+            const sortedGrouped = {};
+            Object.keys(grouped)
+                .sort()
+                .forEach((category) => {
+                    sortedGrouped[category] = grouped[category].sort((a, b) =>
+                        a.title.localeCompare(b.title)
+                    );
+                });
+
+            return sortedGrouped;
         },
     },
 };

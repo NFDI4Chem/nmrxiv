@@ -18,9 +18,11 @@ class XFrameOptions
         $response = $next($request);
 
         if ($request->route()->getName() == 'embed') {
-            return $response->header('Content-Security-Policy', 'frame-src data: blob: *');
-        } else {
+            // Enhanced CSP for embed routes - more restrictive for security
+            $csp = "frame-ancestors *; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:";
 
+            return $response->header('Content-Security-Policy', $csp);
+        } else {
             if ($response instanceof \Illuminate\Http\Response) {
                 $xframeOptions = 'SAMEORIGIN';
 
@@ -28,7 +30,6 @@ class XFrameOptions
             } else {
                 return $response;
             }
-
         }
     }
 }

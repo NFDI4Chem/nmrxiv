@@ -260,7 +260,7 @@ Route::middleware('auth', 'verified')->group(function () {
             ->name('dashboard.draft.missing-files');
         Route::put('drafts/{draft}', [DraftController::class, 'update'])
             ->name('dashboard.draft.update');
-        Route::delete('drafts/{draft}/files/{filesystemobject}', [DraftController::class, 'deleteFSO'])
+        Route::delete('drafts/{draft}/files/{filesystemobject}', [FileSystemController::class, 'deleteFSO'])
             ->name('dashboard.draft.files.delete');
         Route::get('drafts/{draft}/annotate', [DraftController::class, 'annotate'])
             ->name('dashboard.draft.annotate');
@@ -386,9 +386,13 @@ Route::get('datasets/{owner}/{slug}', [DatasetController::class, 'publicDatasetV
 Route::get('spectra', [StudyController::class, 'publicStudiesView'])
     ->name('public.spectra');
 
-Route::get('services/oembed', [OEmbedController::class, 'spectra']);
-
-Route::get('embed/{id}', [OEmbedController::class, 'embed'])->name('embed');
+// oEmbed service endpoint - returns oEmbed JSON response for external embedding
+// Supports oEmbed 1.0 specification for rich content embedding
+// Rate limited to prevent abuse and enumeration attacks
+Route::middleware(['throttle:60,1'])->group(function () {
+    Route::get('services/oembed', [OEmbedController::class, 'spectra']);
+    Route::get('embed/{id}', [OEmbedController::class, 'embed'])->name('embed');
+});
 
 // Test route for Octane
 Route::get('/octane-test', function () {

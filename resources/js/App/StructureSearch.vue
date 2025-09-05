@@ -17,7 +17,7 @@
         </button>
         <button
             @click="openDialog(true)"
-            class="flex items-center justify-center px-4 py-3 border border-1 text-base font-medium rounded-full shadow-sm text-white bg-teal-500 sm:px-8"
+            class="w-full flex items-center justify-center px-4 py-3 border border-1 text-base font-medium rounded-full shadow-sm text-white bg-teal-500 sm:px-8"
             v-if="mode == 'button'"
         >
             <MagnifyingGlassIcon class="h-5 w-5" aria-hidden="true" />&nbsp;

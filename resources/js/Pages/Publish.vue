@@ -105,6 +105,13 @@
                                         :message="publishForm.errors.name"
                                         class="mt-2"
                                     />
+                                    <!-- Draft Warning Error Message -->
+                                    <div v-if="hasDraftInName && !draftWarningConfirmed" class="mt-2 flex items-center text-red-600 text-sm">
+                                        <svg class="w-4 h-4 mr-1.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                        </svg>
+                                        <span>Invalid project name - contains "DRAFT" - please update the project name to publish</span>
+                                    </div>
                                 </div>
                                 <div id="project-desc" class="mb-3">
                                     <label
@@ -361,7 +368,7 @@
                                             :src="
                                                 project.project_photo_url
                                                     ? project.project_photo_url
-                                                    : 'https://via.placeholder.com/400x200'
+                                                    : 'https://placehold.co/400x200'
                                             "
                                             :alt="project.name"
                                             class="h-24 w-72 rounded-md object-cover"
@@ -434,14 +441,76 @@
                                 :format="customDateFormat"
                                 :preview-format="customDateFormat"
                             ></Datepicker>
-                            <p class="mt-1 text-sm text-gray-500">
-                                Publish your data now immediately or set a
-                                future release date to automatically make your
-                                project public. If you opt for a future release
-                                date, you have the flexibility to modify the
-                                publication date and choose to publish instantly
-                                from your project's dashboard view.
-                            </p>
+                            <div
+                                class="mt-3 bg-gray-50 border border-gray-200 rounded-lg p-4"
+                            >
+                                <!-- Immediate Publication -->
+                                <div
+                                    v-if="isImmediatePublication"
+                                    class="space-y-3"
+                                >
+                                    <p class="text-sm text-gray-600">
+                                        Your data becomes publicly accessible
+                                        right away with a DOI. Please select a
+                                        future date if you would like to embargo
+                                        your data for peer review. Need help?
+                                        <a
+                                            href="https://docs.nmrxiv.org/submission-guides/embargo"
+                                            target="_blank"
+                                            class="text-blue-600 hover:text-blue-700"
+                                            >Read more</a
+                                        >
+                                    </p>
+                                </div>
+
+                                <!-- Scheduled Release (Embargo) -->
+                                <div v-else class="space-y-3">
+                                    <p class="text-sm text-gray-600">
+                                        <strong
+                                            >Scheduled Release
+                                            (Embargo):</strong
+                                        >
+                                        You have selected a future date for
+                                        publication. Your data remains private
+                                        until then.
+                                    </p>
+                                    <p class="text-sm text-gray-600">
+                                        You can:
+                                    </p>
+                                    <ul
+                                        class="ml-4 text-sm text-gray-500 space-y-1"
+                                    >
+                                        <li class="flex items-start">
+                                            <span
+                                                class="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-2 flex-shrink-0"
+                                            ></span>
+                                            <span
+                                                >Share reviewer access links for
+                                                confidential peer review</span
+                                            >
+                                        </li>
+                                        <li class="flex items-start">
+                                            <span
+                                                class="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-2 flex-shrink-0"
+                                            ></span>
+                                            <span
+                                                >Receive advance notifications
+                                                before publication</span
+                                            >
+                                        </li>
+                                        <li class="flex items-start">
+                                            <span
+                                                class="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-2 flex-shrink-0"
+                                            ></span>
+                                            <span
+                                                >Modify the release date or
+                                                publish instantly from your
+                                                dashboard</span
+                                            >
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
                         <div class="mt-5">
                             <!--License -->
@@ -554,18 +623,13 @@
                                 v-if="isReleasedToday()"
                                 type="button"
                                 :class="[
-                                    !publishForm.terms ||
-                                    !publishForm.conditions ||
-                                    publishForm.processing
+                                    !canPublish
                                         ? 'bg-gray-200 cursor-not-allowed'
                                         : 'bg-green-600 hover:bg-green-700',
                                     'ml-2',
                                 ]"
-                                :disabled="
-                                    !publishForm.terms &&
-                                    !publishForm.conditions
-                                "
-                                @click="showPublishConfirmationModal = true"
+                                :disabled="!canPublish"
+                                @click="handlePublishClick"
                             >
                                 Publish Now
                             </jet-success-button>
@@ -573,18 +637,13 @@
                                 v-else
                                 type="button"
                                 :class="[
-                                    !publishForm.terms ||
-                                    !publishForm.conditions ||
-                                    publishForm.processing
+                                    !canPublish
                                         ? 'bg-gray-200 cursor-not-allowed'
                                         : 'bg-green-600 hover:bg-green-700',
                                     'inline-flex w-full justify-center rounded-md border border-transparent px-4 py-2 text-base font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 sm:w-auto sm:text-sm',
                                 ]"
-                                :disabled="
-                                    !publishForm.terms &&
-                                    !publishForm.conditions
-                                "
-                                @click="showPublishConfirmationModal = true"
+                                :disabled="!canPublish"
+                                @click="handlePublishClick"
                             >
                                 Publish with Embargo
                             </jet-success-button>
@@ -726,6 +785,45 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- Draft Warning Modal -->
+            <jet-confirmation-modal
+                :show="showDraftWarningModal"
+                @close="showDraftWarningModal = false"
+            >
+                <template #title>
+                    <div class="flex items-center">
+                        <svg class="w-6 h-6 text-amber-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                        </svg>
+                        Project Name Contains "DRAFT"
+                    </div>
+                </template>
+                <template #content>
+                    <div class="space-y-3">
+                        <p class="text-sm text-gray-600">
+                            Your project name contains the word "DRAFT", which suggests this might be a work-in-progress version.
+                        </p>
+                        <div class="bg-amber-50 border border-amber-200 rounded-md p-3">
+                            <p class="text-sm text-amber-800">
+                                <strong>Current name:</strong> {{ publishForm.name }}
+                            </p>
+                        </div>
+                        <p class="text-sm text-gray-600">
+                            Are you sure you want to proceed with publishing this project with the current name?
+                        </p>
+                    </div>
+                </template>
+                <template #footer>
+                    <jet-secondary-button @click="showDraftWarningModal = false">
+                        Cancel
+                    </jet-secondary-button>
+                    <jet-success-button class="ml-2" @click="confirmDraftWarning">
+                        Yes, Proceed
+                    </jet-success-button>
+                </template>
+            </jet-confirmation-modal>
+
             <jet-confirmation-modal
                 :show="showPublishConfirmationModal"
                 @close="showPublishConfirmationModal = false"
@@ -895,6 +993,8 @@ export default {
             status: "draft",
             validation: null,
             showPublishConfirmationModal: false,
+            showDraftWarningModal: false,
+            draftWarningConfirmed: false,
             photoPreview: null,
         };
     },
@@ -918,6 +1018,24 @@ export default {
         },
         currentTab() {
             return this.tabs.find((t) => t.current);
+        },
+        isImmediatePublication() {
+            if (!this.publishForm.release_date) return true;
+            const today = new Date();
+            const releaseDate = new Date(this.publishForm.release_date);
+            // Reset time to compare only dates
+            today.setHours(0, 0, 0, 0);
+            releaseDate.setHours(0, 0, 0, 0);
+            return releaseDate.getTime() === today.getTime();
+        },
+        hasDraftInName() {
+            return this.publishForm.name && this.publishForm.name.toLowerCase().includes('draft');
+        },
+        canPublish() {
+            return this.publishForm.terms && 
+                   this.publishForm.conditions && 
+                   !this.publishForm.processing &&
+                   (!this.hasDraftInName || this.draftWarningConfirmed);
         },
     },
 
@@ -1002,6 +1120,9 @@ export default {
             });
         },
         updateProject() {
+            // Reset draft warning when name changes
+            this.draftWarningConfirmed = false;
+            
             // if (this.publishForm.enableProjectMode) {
             if (this.$refs.photo) {
                 this.publishForm.photo = this.$refs.photo.files[0];
@@ -1120,6 +1241,20 @@ export default {
         },
         toggleManageCitation() {
             this.manageCitationElement.toggleDialog();
+        },
+        handlePublishClick() {
+            // Check if name contains "DRAFT" and hasn't been confirmed yet
+            if (this.hasDraftInName && !this.draftWarningConfirmed) {
+                this.showDraftWarningModal = true;
+                return;
+            }
+            // Proceed to normal publish confirmation
+            this.showPublishConfirmationModal = true;
+        },
+        confirmDraftWarning() {
+            this.draftWarningConfirmed = true;
+            this.showDraftWarningModal = false;
+            this.showPublishConfirmationModal = true;
         },
         publish() {
             this.showPublishConfirmationModal = false;

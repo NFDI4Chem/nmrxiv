@@ -63,7 +63,10 @@
                             
                         </div> -->
                             <div
-                                v-if="$page.props.auth.user && $page.props.auth.user?.first_name != null"
+                                v-if="
+                                    $page.props.auth.user &&
+                                    $page.props.auth.user?.first_name != null
+                                "
                                 class="hidden md:flex items-center justify-end md:flex-1 lg:w-0"
                             >
                                 <Link
@@ -229,14 +232,14 @@
                                 dissemination of NMR data worldwide.
                             </p>
                             <div
-                                class="mt-10 max-w-sm mx-auto sm:max-w-none sm:flex sm:justify-center"
+                                class="mt-10 mx-auto sm:max-w-none sm:flex sm:justify-center"
                             >
                                 <div
                                     class="space-y-4 sm:space-y-0 sm:mx-auto sm:inline-grid sm:grid-cols-3 sm:gap-5"
                                 >
                                     <Link
                                         href="/projects"
-                                        class="flex items-center justify-center px-4 py-3 border border-1 text-base font-medium rounded-full shadow-sm bg-slate-900 text-white hover:bg-slate-700 sm:px-8"
+                                        class="w-full flex items-center justify-center px-4 py-3 border border-1 text-base font-medium rounded-full shadow-sm bg-slate-900 text-white hover:bg-slate-700 sm:px-8"
                                     >
                                         Browse data&nbsp;
                                         <span
@@ -249,9 +252,9 @@
                                         mode="button"
                                         ref="structure-search"
                                     ></StructureSearch>
-                                     <Link
+                                    <Link
                                         href="/register"
-                                        class="group inline-flex ring-1 items-center justify-center rounded-full py-2 px-4 focus:outline-none ring-slate-200 text-slate-700 hover:text-slate-900 hover:ring-slate-300 active:bg-slate-100 active:text-slate-600 focus-visible:outline-blue-600 focus-visible:ring-slate-300 bg-white"
+                                        class="w-full group inline-flex ring-1 items-center justify-center rounded-full py-2 px-4 focus:outline-none ring-slate-200 text-slate-700 hover:text-slate-900 hover:ring-slate-300 active:bg-slate-100 active:text-slate-600 focus-visible:outline-blue-600 focus-visible:ring-slate-300 bg-white"
                                         variant="outline"
                                         color="slate"
                                         ><span class="ml-3">Submit data</span>
@@ -400,7 +403,7 @@
                             models.
                         </p> -->
                         <div
-                            class="mt-4 grid grid-cols-1 gap-y-12 gap-x-6 sm:grid-cols-3"
+                            class="my-4 grid grid-cols-1 gap-y-12 gap-x-6 sm:grid-cols-3"
                         >
                             <p class="text-center">
                                 <a
@@ -841,7 +844,7 @@
             >
                 <div class="md:grid md:grid-cols-3 md:gap-8">
                     <div class="mt-12 xl:mt-0 items center content-center">
-                        <jet-application-logo class="p-0.5 ml-1.5" />
+                        <jet-application-logo class="p-0.5 ml-1.5 mb-16" />
                     </div>
                     <div class="grid grid-cols-2 gap-8 md:col-span-2">
                         <div class="md:grid md:grid-cols-2 md:gap-8">

@@ -82,7 +82,7 @@ class ExtractSpectra extends Command
                     }
                     $study = $study->fresh();
                     if ($study->has_nmrium) {
-                        $nmriumInfo = json_decode($study->nmrium['nmrium_info'], true);
+                        $nmriumInfo = $study->nmrium->nmrium_info;
                         if (count($nmriumInfo['data']['spectra']) == 0) {
                             echo '--MISSING SPECTRA INFO (NMRIUM JSON)--';
                             echo "\r\n";
@@ -93,7 +93,7 @@ class ExtractSpectra extends Command
                                 // echo $dataset->type;
                                 // echo "\r\n";
                                 if (! $dataset->has_nmrium) {
-                                    $nmriumInfo = json_decode($study->nmrium['nmrium_info'], true);
+                                    $nmriumInfo = $study->nmrium->nmrium_info;
                                     $_nmriumJSON = $nmriumInfo;
                                     $fsObject = $dataset->fsObject;
 
@@ -170,6 +170,7 @@ class ExtractSpectra extends Command
 
     public function processSpectra($url)
     {
+        $url = urlencode($url);
         $response = Http::timeout(300)->post('https://nodejs.nmrxiv.org/spectra-parser', [
             'urls' => [$url],
             'snapshot' => false,

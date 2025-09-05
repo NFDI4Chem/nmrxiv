@@ -1,5 +1,5 @@
 <template>
-    <app-layout title="Spectra">
+    <app-layout :title="pageTitle">
         <template #header>
             <div class="relative border-b border-zinc-900/5">
                 <div
@@ -288,7 +288,7 @@
             </div>
         </div>
 
-        <div class="min-h-[calc(100vh-500px)] px-12 mb-24 mx-auto">
+        <div class="min-h-[calc(100vh-500px)] px-6 px-md-12 mb-24 mx-auto">
             <div class="relative border-gray-200 pt-4">
                 <div class="mx-auto flex items-center justify-between">
                     <Menu as="div" class="relative inline-block text-left z-10">
@@ -527,6 +527,18 @@ export default {
         molecule: {
             default: [],
             type: Object,
+        },
+    },
+    computed: {
+        pageTitle() {
+            if (this.molecule && this.molecule.identifier) {
+                let title = `${this.molecule.identifier}`;
+                if (this.molecule.name) {
+                    title += ` (${this.molecule.name})`;
+                }
+                return title;
+            }
+            return "Spectra";
         },
     },
     data() {

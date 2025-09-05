@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\FileSystemObject;
 use App\Models\Project;
 use Aws\S3\S3Client;
 use Illuminate\Bus\Queueable;
@@ -10,7 +11,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use ZipStream;
 
@@ -48,26 +49,53 @@ class ArchiveStudy implements ShouldBeUnique, ShouldQueue
      */
     public function handle(): void
     {
+        // Debug logging - immediate write to log file
+        Log::info('=== ArchiveStudy job STARTED for project: '.$this->project->id.' ===');
+        Log::info('Project ID: '.$this->project->id);
+        Log::info('Current timestamp: '.now()->toString());
+
+        Log::info('Archiving study for projects '.$this->project->id);
         $project = $this->project;
         if ($project) {
+            Log::info("Project {$project->id} studies count: ".$project->studies->count());
             foreach ($project->studies as $study) {
+                Log::info("Processing study {$study->id}");
                 $study->internal_status = 'processing';
                 $study->save();
                 $archiveDownloadURL = $study->download_url;
+                Log::info("Study {$study->id} download URL: ".($archiveDownloadURL ?? 'null'));
                 if (! $archiveDownloadURL) {
                     $fsObject = $study->fsObject;
+                    Log::info("Study {$study->id} fsObject: ".($fsObject ? 'EXISTS' : 'NULL'));
                     if ($fsObject) {
-                        $path = $fsObject->path;
+                        Log::info("Study {$study->id}: Starting archive creation");
+                        Log::info("Study {$study->id}: fsObject path: {$fsObject->path}");
+                        Log::info("Study {$study->id}: fsObject type: {$fsObject->type}");
+                        Log::info("Study {$study->id}: fsObject relative_url: {$fsObject->relative_url}");
+                        Log::info("Study {$study->id}: fsObject key: {$fsObject->key}");
+
+                        // Fix path duplication issue
+                        $path = $this->validateAndCorrectPath($fsObject, $study->id);
+                        Log::info("Study {$study->id}: Corrected path: {$path}");
+
                         $s3Client = $this->storageClient();
-                        $bucket = config('filesystems.disks.'.env('FILESYSTEM_DRIVER').'.bucket');
+                        $filesystemDriver = config('filesystems.default');
+                        $bucket = config("filesystems.disks.{$filesystemDriver}.bucket");
+                        Log::info("Study {$study->id}: Using filesystem driver: {$filesystemDriver}, bucket: {$bucket}");
+
                         $s3keys = [];
                         $environment = env('APP_ENV', 'local');
                         $relative_URL = $fsObject->relative_url;
                         if ($fsObject->type == 'file') {
-                            if (Storage::disk(env('FILESYSTEM_DRIVER'))->has($path)) {
+                            Log::info("Study {$study->id}: Processing single file");
+                            if (Storage::disk($filesystemDriver)->exists($path)) {
                                 array_push($s3keys, substr($fsObject->path, 1));
+                                Log::info("Study {$study->id}: File exists, added to s3keys: ".substr($fsObject->path, 1));
+                            } else {
+                                Log::warning("Study {$study->id}: File does not exist at path: {$path}");
                             }
                         } else {
+                            Log::info("Study {$study->id}: Processing directory");
                             $relative_URL = $relative_URL.'/';
                             $command = [
                                 'Bucket' => $bucket,
@@ -77,141 +105,195 @@ class ArchiveStudy implements ShouldBeUnique, ShouldQueue
                             } else {
                                 $command['Prefix'] = $path.'/';
                             }
-                            $results = $s3Client->getPaginator('ListObjects', $command);
-                            foreach ($results as $result) {
-                                $contents = $result->get('Contents');
-                                if ($contents) {
-                                    foreach ($contents as $file) {
-                                        array_push($s3keys, $file['Key']);
+                            Log::info("Study {$study->id}: S3 ListObjects command: ".json_encode($command));
+
+                            try {
+                                $results = $s3Client->getPaginator('ListObjects', $command);
+                                $fileCount = 0;
+                                foreach ($results as $result) {
+                                    $contents = $result->get('Contents');
+                                    if ($contents) {
+                                        foreach ($contents as $file) {
+                                            array_push($s3keys, $file['Key']);
+                                            $fileCount++;
+                                        }
                                     }
                                 }
+                                Log::info("Study {$study->id}: Found {$fileCount} files in directory");
+                            } catch (\Exception $e) {
+                                Log::error("Study {$study->id}: Error listing S3 objects: ".$e->getMessage());
+                                throw $e;
                             }
                         }
 
+                        if (empty($s3keys)) {
+                            Log::warning("Study {$study->id}: No files found to archive");
+                            $study->internal_status = 'complete';
+                            $study->save();
+
+                            continue;
+                        }
+
+                        Log::info("Study {$study->id}: Total files to archive: ".count($s3keys));
                         $s3Client->registerStreamWrapper();
 
                         $zipFilePath = $environment.'/archive/'.$study->uuid.'/'.$fsObject->name.'.zip';
-                        $archiveDestination = fopen('s3://'.$bucket.'/'.$zipFilePath, 'w');
-                        $zip = new ZipStream\ZipStream(
-                            outputStream: $archiveDestination,
-                            defaultEnableZeroHeader: true,
-                            sendHttpHeaders: false,
-                        );
-
-                        foreach ($s3keys as $key) {
-                            $s3path = 's3://'.$bucket.'/'.$key;
-                            if ($streamRead = fopen($s3path, 'r')) {
-                                $sPath = explode($relative_URL, $key)[1];
-                                if ($sPath != '') {
-                                    $sPath = $fsObject->key.'/'.explode($relative_URL, $key)[1];
-                                } else {
-                                    $sPath = $fsObject->key;
-                                }
-                                $sPath = preg_replace('#/+#', '/', $sPath);
-
-                                // Get file size
-                                $fileSize = $s3Client->headObject([
-                                    'Bucket' => $bucket,
-                                    'Key' => $key,
-                                ])->get('ContentLength');
-
-                                // If file is larger than 100MB, process in chunks
-                                if ($fileSize > 100 * 1024 * 1024) {
-                                    $chunkSize = 10 * 1024 * 1024; // 10MB chunks
-                                    $zip->addFileFromStream($sPath, $streamRead, $fileSize, $chunkSize);
-                                } else {
-                                    $zip->addFileFromStream($sPath, $streamRead);
-                                }
-                            } else {
-                                throw new \Exception("Could not open stream for reading: {$s3path}");
-                            }
-                        }
+                        Log::info("Study {$study->id}: Creating archive at: {$zipFilePath}");
 
                         try {
-                            $zip->finish();
-                            fclose($archiveDestination);
-
-                            Storage::disk(env('FILESYSTEM_DRIVER'))->setVisibility($zipFilePath, 'public');
-                            $url = Storage::disk(env('FILESYSTEM_DRIVER'))->url($zipFilePath);
-                            $study->download_url = $url;
-                        } catch (\Exception $e) {
-                            // Clean up the partial file if it exists
-                            if (Storage::disk(env('FILESYSTEM_DRIVER'))->exists($zipFilePath)) {
-                                Storage::disk(env('FILESYSTEM_DRIVER'))->delete($zipFilePath);
+                            $archiveDestination = fopen('s3://'.$bucket.'/'.$zipFilePath, 'w');
+                            if (! $archiveDestination) {
+                                throw new \Exception("Could not open archive destination: s3://{$bucket}/{$zipFilePath}");
                             }
+
+                            $zip = new ZipStream\ZipStream(
+                                outputStream: $archiveDestination,
+                                defaultEnableZeroHeader: true,
+                                sendHttpHeaders: false,
+                            );
+
+                            $addedFiles = 0;
+                            foreach ($s3keys as $key) {
+                                $s3path = 's3://'.$bucket.'/'.$key;
+                                Log::info("Study {$study->id}: Processing file: {$key}");
+
+                                if ($streamRead = fopen($s3path, 'r')) {
+                                    $sPath = explode($relative_URL, $key)[1];
+                                    if ($sPath != '') {
+                                        $sPath = $fsObject->key.'/'.explode($relative_URL, $key)[1];
+                                    } else {
+                                        $sPath = $fsObject->key;
+                                    }
+                                    $sPath = preg_replace('#/+#', '/', $sPath);
+
+                                    Log::info("Study {$study->id}: Adding file to zip as: {$sPath}");
+
+                                    // Get file size
+                                    try {
+                                        $fileSize = $s3Client->headObject([
+                                            'Bucket' => $bucket,
+                                            'Key' => $key,
+                                        ])->get('ContentLength');
+
+                                        Log::info("Study {$study->id}: File size: {$fileSize} bytes");
+
+                                        // Handle empty files specially to avoid corruption
+                                        if ($fileSize == 0) {
+                                            Log::info("Study {$study->id}: Adding empty file: {$key}");
+                                            fclose($streamRead);
+
+                                            // Add empty file using addFile method instead of stream
+                                            try {
+                                                $zip->addFile($sPath, '');
+                                                $addedFiles++;
+                                                Log::info("Study {$study->id}: Successfully added empty file: {$key}");
+                                            } catch (\Exception $e) {
+                                                Log::error("Study {$study->id}: Failed to add empty file {$key}: ".$e->getMessage());
+                                            }
+                                        } else {
+                                            // If file is larger than 100MB, process in chunks
+                                            if ($fileSize > 100 * 1024 * 1024) {
+                                                $chunkSize = 10 * 1024 * 1024; // 10MB chunks
+                                                $zip->addFileFromStream($sPath, $streamRead, $fileSize);
+                                            } else {
+                                                $zip->addFileFromStream($sPath, $streamRead);
+                                            }
+                                            $addedFiles++;
+                                            fclose($streamRead);
+                                        }
+                                    } catch (\Exception $e) {
+                                        Log::error("Study {$study->id}: Error getting file size for {$key}: ".$e->getMessage());
+                                        fclose($streamRead);
+
+                                        continue;
+                                    }
+                                } else {
+                                    Log::error("Study {$study->id}: Could not open stream for reading: {$s3path}");
+                                    throw new \Exception("Could not open stream for reading: {$s3path}");
+                                }
+                            }
+
+                            Log::info("Study {$study->id}: Added {$addedFiles} files to archive");
+
+                            try {
+                                $zip->finish();
+                                fclose($archiveDestination);
+
+                                Storage::disk($filesystemDriver)->setVisibility($zipFilePath, 'public');
+
+                                // Generate proper S3 URL for download
+                                $s3Url = $this->generateS3Url($zipFilePath, $filesystemDriver, $bucket);
+                                $study->download_url = $s3Url;
+                                Log::info("Study {$study->id}: Archive created successfully at: {$s3Url}");
+                            } catch (\Exception $e) {
+                                // Clean up the partial file if it exists
+                                if (Storage::disk($filesystemDriver)->exists($zipFilePath)) {
+                                    Storage::disk($filesystemDriver)->delete($zipFilePath);
+                                }
+                                Log::error("Study {$study->id}: Error finalizing archive: ".$e->getMessage());
+                                throw $e;
+                            }
+                        } catch (\Exception $e) {
+                            Log::error("Study {$study->id}: Error during archive creation: ".$e->getMessage());
                             throw $e;
                         }
 
-                        // $nmrium = $study->nmrium;
-                        // if (!$nmrium) {
-                        //     dd($url);
-                        //     $nmrium_ = $this->processSpectra($url);
-                        //     dd($nmrium_);
-                        //     $parsedSpectra = $nmrium_['data']['data'];
-                        //     foreach ($parsedSpectra['spectra'] as $spectra) {
-                        //         unset($spectra["data"]);
-                        //         unset($spectra["meta"]);
-                        //         unset($spectra["originalData"]);
-                        //         unset($spectra["originalInfo"]);
-                        //     }
-
-                        //     $version = $parsedSpectra['version'];
-                        //     unset($parsedSpectra["version"]);
-
-                        //     // associate
-                        //     $nmriumJSON = array(
-                        //         "data" => $parsedSpectra,
-                        //         "version" => $version,
-                        //     );
-
-                        //     $nmrium = NMRium::create([
-                        //         'nmrium_info' => json_encode($nmriumJSON),
-                        //     ]);
-                        //     $study->nmrium()->save($nmrium);
-                        //     $study->has_nmrium = true;
-                        // }
-
-                        // $sample = $study->sample;
-                        // if (! $sample) {
-                        //     $sample = Sample::create([
-                        //         'name' => $study->name.'_sample',
-                        //         'slug' => Str::slug($study->name.'_sample', '-'),
-                        //         'study_id' => $study->id,
-                        //         'project_id' => $study->project->id,
-                        //     ]);
-                        //     $study->sample()->save($sample);
-                        // }
-
-                        // $molecules = $parsedSpectra['molecules'];
-                        // if (count($molecules) > 0) {
-                        //     foreach ($molecules as $mol) {
-                        //         $standardizedMolecule = $this->standardizeMolecule($mol['molfile']);
-                        //         // associate
-                        //         $inchi = $standardizedMolecule['InChI'];
-                        //         $molecule = $sample->molecules->where('standard_inchi', $inchi)->first();
-                        //         if (is_null($molecule)) {
-                        //             $molecule = Molecule::firstOrCreate([
-                        //                 'standard_inchi' => $inchi,
-                        //             ], [
-                        //                 'molecular_formula' => $standardizedMolecule['formula'] ? $standardizedMolecule['formula']  : '',
-                        //                 'inchi_key' => $standardizedMolecule['InChIKey']  ? $standardizedMolecule['InChIKey']  : '',
-                        //                 'sdf' => $standardizedMolecule['mol']  ? $standardizedMolecule['mol']  : '',
-                        //                 'canonical_smiles' => $standardizedMolecule['canonical_smiles']  ? $standardizedMolecule['canonical_smiles']  : '',
-                        //             ]);
-                        //             $sample->molecules()->syncWithPivotValues([$molecule->id], ['percentage_composition' => 0], false);
-                        //         }
-                        //     }
-                        // }
-                        // // add molecules
+                        $study->internal_status = 'complete';
+                        $study->save();
+                    } else {
+                        Log::info("Study {$study->id}: No fsObject found, marking complete");
                         $study->internal_status = 'complete';
                         $study->save();
                     }
                 } else {
+                    Log::info("Study {$study->id}: Already has download URL, marking complete");
                     $study->internal_status = 'complete';
                     $study->save();
                 }
             }
+        } else {
+            Log::info('No project found');
         }
+
+        Log::info('=== ArchiveStudy job COMPLETED for project: '.$this->project->id.' ===');
+    }
+
+    /**
+     * Validate and correct filesystem object path to fix duplication issues.
+     */
+    private function validateAndCorrectPath(FileSystemObject $fsObject, int $studyId): string
+    {
+        $originalPath = $fsObject->path;
+        $relativeUrl = $fsObject->relative_url;
+
+        // Check if the relative URL appears twice in the path (duplication issue)
+        if ($relativeUrl && substr_count($originalPath, $relativeUrl) > 1) {
+            Log::warning("Study {$studyId}: Detected path duplication, correcting...");
+
+            // Find the first occurrence and keep everything up to and including the first occurrence
+            $firstOccurrence = strpos($originalPath, $relativeUrl);
+
+            if ($firstOccurrence !== false) {
+                $correctedPath = substr($originalPath, 0, $firstOccurrence + strlen($relativeUrl));
+                Log::info("Study {$studyId}: Path corrected from {$originalPath} to {$correctedPath}");
+
+                return $correctedPath;
+            }
+        }
+
+        return $originalPath;
+    }
+
+    /**
+     * Generate proper S3 URL for file download.
+     */
+    private function generateS3Url(string $filePath, string $filesystemDriver, string $bucket): string
+    {
+        $endpoint = config("filesystems.disks.{$filesystemDriver}.endpoint");
+        $key = ltrim($filePath, '/');
+
+        // For path-style S3 endpoints (like Ceph), format is: {endpoint}/{bucket}/{key}
+        return rtrim($endpoint, '/').'/'.$bucket.'/'.$key;
     }
 
     // protected function standardizeMolecule($mol)
@@ -222,6 +304,7 @@ class ArchiveStudy implements ShouldBeUnique, ShouldQueue
 
     // protected function processSpectra($url)
     // {
+    //     $url = urlencode($url);
     //     $response = Http::post('https://nodejs.nmrxiv.org/spectra-parser', '{
     //         "urls": [
     //           '. $url .'

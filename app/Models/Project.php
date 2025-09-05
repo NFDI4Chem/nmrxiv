@@ -313,7 +313,7 @@ class Project extends Model implements Auditable
                 $query->where('name', 'ILIKE', '%'.$search.'%')
                     ->orWhere('description', 'ILIKE', '%'.$search.'%');
             });
-        })->when($filters['sort'] ?? 'newest', function ($query, $sort) {
+        })->when($filters['sort'] ?? 'creation', function ($query, $sort) {
             if ($sort === 'newest') {
                 $query->orderByDesc('updated_at');
             } elseif ($sort === 'rating') {

@@ -13,10 +13,26 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Fortify\Fortify;
 
+/**
+ * Fortify Service Provider
+ *
+ * This service provider configures Laravel Fortify authentication features,
+ * including user registration, login, password management, and two-factor
+ * authentication. It also handles authentication disabling and rate limiting
+ * for security purposes.
+ *
+ * @author NMRXIV Development Team
+ *
+ * @since 1.0.0
+ */
 class FortifyServiceProvider extends ServiceProvider
 {
     /**
      * Register any application services.
+     *
+     * This method is intentionally empty as Fortify services are
+     * configured in the boot method after the application has
+     * been fully initialized.
      */
     public function register(): void
     {
@@ -25,6 +41,10 @@ class FortifyServiceProvider extends ServiceProvider
 
     /**
      * Bootstrap any application services.
+     *
+     * Configures Fortify authentication features, including custom action
+     * classes for user management, conditional authentication disabling,
+     * and rate limiting for login and two-factor authentication attempts.
      */
     public function boot(): void
     {
