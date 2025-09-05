@@ -1,79 +1,67 @@
-# GitHub Actions workflow for building and deploying NMRXiv to development environment
-# This workflow runs tests, builds Docker images, and deploys to the FSU development environment
+# Dev build workflow: builds and pushes Docker images to the Dev environment
+# Note: consider
+# - setting explicit minimal permissions (e.g., permissions: { contents: read })
+# - adding concurrency to cancel superseded runs (group per branch, cancel-in-progress: true)
+# - pinning actions to commit SHAs for supply-chain security
 name: Setup, Build and Publish to Dev
 
-# Trigger the workflow on pushes to the development branch
+# Runs on pushes to the development branch
 on:
   push:
     branches: [development]
 
 # Environment variables used across all jobs
 env:
-  DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
-  DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
   REPOSITORY_NAME: nmrxiv
   REPOSITORY_NAMESPACE: nfdi4chem
 
 jobs:
-  # Build Docker images and deploy to development environment
+  # Build and publish Docker images for the development environment
   setup-build-publish-deploy:
     name: Build & deploy to development
     runs-on: ubuntu-latest
-    # Only run this job if tests pass successfully
-    # needs: php-unit-test
-    # Use the Dev environment for deployment secrets and protection rules
+    # Tip: gate deploys on tests with `needs: php-unit-test` once a tests job exists
+    # Environment provides secrets and protection rules
     environment:
       name: Dev
     steps:
-      # Checkout the repository code for building Docker images
+      # Checkout code
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Authenticate with Docker Hub for pushing images
+      # Docker Hub login (uses repository secrets)
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
-          username: ${{ env.DOCKER_HUB_USERNAME }}
-          password: ${{ env.DOCKER_HUB_PASSWORD }}
+          username: ${{ secrets.DOCKER_HUB_USERNAME  }}
+          password: ${{ secrets.DOCKER_HUB_PASSWORD  }}
 
-      # Set up Docker Buildx for multi-platform builds
+      # Set up Docker Buildx
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # Build and push the main application Docker image for FSU deployment
-      - name: Build and push App Docker image 
+      # Build + push app image (tag: app-dev-latest). Uses GHA cache for speed.
+      - name: Build and push App Docker image
         uses: docker/build-push-action@v6
         with:
           context: .
           file: ./deployment/Dockerfile
           push: true
-          # Pass proxy settings and release version as build arguments
           build-args: |
             RELEASE_VERSION=app-dev-latest
-          # Tag the image for development environment
           tags: ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:app-dev-latest
-          # Enable build cache for faster builds
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      # Build and push the worker Docker image for background job processing
+      # Build + push worker image (tag: worker-dev-latest)
       - name: Build and push Worker Docker image
         uses: docker/build-push-action@v6
         with:
           context: .
           file: ./deployment/Dockerfile.worker
           push: true
-          # Pass proxy settings and release version as build arguments
           build-args: |
             RELEASE_VERSION=worker-dev-latest
-          # Tag the worker image for development environment
           tags: ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:worker-dev-latest
-          # Enable build cache for faster builds
           cache-from: type=gha
           cache-to: type=gha,mode=max
-
-      # Optional: Add deployment step if needed
-      # - name: Deploy to development environment
-      #   run: |
-      #     echo "Add your deployment commands here"
-      #     # Example: kubectl apply -f k8s/ or docker-compose up -d
