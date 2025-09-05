@@ -13,11 +13,12 @@ use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use App\Actions\Draft\ProcessDraft;
 use RecursiveDirectoryIterator;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
 use RecursiveIteratorIterator;
 use ZipArchive;
+use Illuminate\Support\Facades\DB;
+use App\Services\FileIntegrityService;
 
 class ProcessDraftELNSubmission implements ShouldQueue
 {
@@ -34,7 +35,9 @@ class ProcessDraftELNSubmission implements ShouldQueue
         FileSystemObjectService $fileSystemService,
         PathGeneratorService $pathGenerator,
         FileSystemController $fileSystemController,
-        DraftProcessingLogger $logger
+        ProcessDraft $processDraft,
+        DraftProcessingLogger $logger,
+        FileIntegrityService $fileIntegrityService
     ): void {
         $draft = Draft::find($this->draftId);
 
@@ -71,7 +74,26 @@ class ProcessDraftELNSubmission implements ShouldQueue
             $this->createFileSystemObjects($draft, $extractedFiles, $fileSystemService);
 
             // Process folders for instrument detection
-            $this->processFolders($draft, $fileSystemController);
+            $this->processFolders($draft, $fileSystemController, $processDraft);
+
+            // get  publication-metadata.json
+            $publicationMetadataFile = FileSystemObject::where([
+                ['level', 2],
+                ['name', 'publication-metadata.json'],
+                ['draft_id', $draft->id],
+            ])->first();
+
+            if(!$publicationMetadataFile){
+                throw new \Exception('Publication metadata file not found');
+            }
+
+            $publicationMetadataContents = json_decode($fileIntegrityService->downloadFileFromStorage($publicationMetadataFile), true);
+
+            if(!$publicationMetadataContents){
+                throw new \Exception('Publication metadata contents not found');
+            }
+
+            Log::info('Publication metadata contents: ' . json_encode($publicationMetadataContents, JSON_UNESCAPED_UNICODE));
 
             $draft->update([
                 'status' => 'ZIP_PROCESSED',
@@ -209,7 +231,7 @@ class ProcessDraftELNSubmission implements ShouldQueue
     /**
      * Process folders for instrument detection.
      */
-    private function processFolders(Draft $draft, FileSystemController $fileSystemController): void
+    private function processFolders(Draft $draft, FileSystemController $fileSystemController, ProcessDraft $processDraft): void
     {
         $draftFolders = FileSystemObject::with('children')
             ->where([
@@ -222,7 +244,36 @@ class ProcessDraftELNSubmission implements ShouldQueue
             ->get();
 
         if ($draftFolders->isNotEmpty()) {
-            $fileSystemController->processFolder($draftFolders);
+            $fileSystemController->processFolder($draftFolders, $draft, true);
+
+            
+            DB::transaction(function () use ($draft, $processDraft) {
+                // Create or update project (validation is handled by the respective actions)
+                $user_id = $draft->owner_id;
+                $team_id = $draft->team_id;
+                $user = $draft->owner;
+                $team = $draft->team;
+
+                $project = $processDraft->createOrUpdateProject($draft, $user_id, $team_id, $user, $team);
+    
+                // Get validation from project (guaranteed to exist after createOrUpdateProject)
+                $nmrXivValidation = $project->validation;
+    
+                // Clean up orphaned data
+                $processDraft->cleanupOrphanedData($project);
+    
+                // Process studies
+                $processDraft->processStudies($draft, $project, $nmrXivValidation);
+    
+                // Process orphaned files
+                $processDraft->processOrphanedFiles($draft, $project, $nmrXivValidation);
+
+                // Chain jobs to run in sequence: ArchiveStudy → ProcessProjectSpectra
+                ArchiveStudy::dispatch($project)
+                    ->chain([
+                        new ProcessProjectSpectra($project->id)
+                    ]);
+            });
         }
     }
 

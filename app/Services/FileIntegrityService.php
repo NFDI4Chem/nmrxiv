@@ -138,7 +138,7 @@ class FileIntegrityService
     /**
      * Download file content from storage.
      */
-    private function downloadFileFromStorage(FileSystemObject $fileSystemObject): ?string
+    public function downloadFileFromStorage(FileSystemObject $fileSystemObject): ?string
     {
         $storagePath = ltrim($fileSystemObject->path, '/');
         $disk = Storage::disk(config('filesystems.default'));

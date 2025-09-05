@@ -12,7 +12,6 @@ use App\Models\NMRium;
 use App\Models\Project;
 use App\Models\Sample;
 use App\Models\Study;
-use Auth;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Http\JsonResponse;
@@ -25,6 +24,9 @@ use Inertia\Inertia;
 use Laravel\Fortify\Actions\ConfirmPassword;
 use Laravel\Jetstream\Jetstream;
 use Maize\Markable\Models\Bookmark;
+use App\Models\User;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Auth;
 
 class StudyController extends Controller
 {
@@ -240,8 +242,10 @@ class StudyController extends Controller
             $nmrium = $study->nmrium;
             if ($nmrium) {
                 $nmriumInfo = $nmrium->nmrium_info;
+                if (is_string($nmriumInfo)) {
+                    $nmriumInfo = json_decode($nmriumInfo, true);
+                }
                 $nmriumInfo['data']['molecules'] = [];
-
                 return $nmriumInfo;
             } else {
                 return null;
@@ -280,6 +284,7 @@ class StudyController extends Controller
             $user = Auth::user();
             $data = $request->all();
             $nmriumInfo = sanitizeUnicodeInNMRiumData($data);
+            $draft = $study->draft;
             $nmrium = $study->nmrium;
             if ($nmrium) {
                 $nmrium->nmrium_info = $nmriumInfo;
@@ -299,7 +304,13 @@ class StudyController extends Controller
 
                 $studyFSObject = $study->fsObject;
                 $datasetFSObject = $dataset->fsObject;
-                $path = '/'.$studyFSObject->name.'/'.$datasetFSObject->name;
+
+                if($draft && $draft->eln == 'chemotion'){
+                    $path = '/'.$studyFSObject->name.'/' . $datasetFSObject->parent->name . '/' . $datasetFSObject->name;
+                }else{
+                    $path = '/'.$studyFSObject->name.'/'.$datasetFSObject->name;
+                }
+               
                 $fType = $studyFSObject->type;
                 $pathsMatch = false;
                 $spectrum = [];

@@ -90,7 +90,7 @@ class ProcessDraft
     /**
      * Create or update project based on draft.
      */
-    private function createOrUpdateProject(Draft $draft, int $user_id, int $team_id, $user, $team): Project
+    public function createOrUpdateProject(Draft $draft, int $user_id, int $team_id, $user, $team): Project
     {
         $project = Project::where('draft_id', $draft->id)->first();
 
@@ -106,7 +106,7 @@ class ProcessDraft
     /**
      * Create a new project from draft.
      */
-    private function createNewProject(Draft $draft, int $user_id, int $team_id, $user, $team): Project
+    public function createNewProject(Draft $draft, int $user_id, int $team_id, $user, $team): Project
     {
         // Prepare input for CreateNewProject action
         $input = [
@@ -135,7 +135,7 @@ class ProcessDraft
      * Attach users to project with appropriate roles for draft processing.
      * This handles the specific team logic needed for draft conversion.
      */
-    private function attachProjectUsersForDraft(Project $project, $user, $team): void
+    public function attachProjectUsersForDraft(Project $project, $user, $team): void
     {
         // First detach any existing users from CreateNewProject
         $project->users()->detach();
@@ -152,7 +152,7 @@ class ProcessDraft
     /**
      * Update existing project with draft data.
      */
-    private function updateExistingProject(Project $project, Draft $draft): void
+    public function updateExistingProject(Project $project, Draft $draft): void
     {
         $input = [
             'name' => $draft->name,
@@ -165,7 +165,7 @@ class ProcessDraft
     /**
      * Clean up orphaned studies and datasets.
      */
-    private function cleanupOrphanedData(Project $project): void
+    public function cleanupOrphanedData(Project $project): void
     {
         foreach ($project->studies as $study) {
             $fsObject = $study->fsObject;
@@ -188,8 +188,9 @@ class ProcessDraft
     /**
      * Process study folders and create studies/datasets.
      */
-    private function processStudies(Draft $draft, Project $project, Validation $nmrXivValidation): void
+    public function processStudies(Draft $draft, Project $project, Validation $nmrXivValidation): void
     {
+        Log::info('Processing studies for draft: ' . $draft->id);
         $folders = FileSystemObject::with('children')
             ->where([
                 ['draft_id', $draft->id],
@@ -206,7 +207,7 @@ class ProcessDraft
     /**
      * Process individual study folder.
      */
-    private function processStudyFolder(FileSystemObject $folder, Draft $draft, Project $project, Validation $nmrXivValidation): void
+    public function processStudyFolder(FileSystemObject $folder, Draft $draft, Project $project, Validation $nmrXivValidation): void
     {
         $folder->project_id = $project->id;
 
@@ -218,13 +219,17 @@ class ProcessDraft
     /**
      * Process children of study folder.
      */
-    private function processStudyChildren(FileSystemObject $folder, Study $study, Draft $draft, Project $project): void
+    public function processStudyChildren(FileSystemObject $folder, Study $study, Draft $draft, Project $project): void
     {
         $sChildren = $folder->children;
 
         foreach ($sChildren as $sChild) {
             if ($this->shouldCreateDataset($sChild)) {
                 $this->createDatasetFromChild($sChild, $study, $draft, $project);
+            }else{
+                if($sChild->type == 'directory'){
+                    $this->processStudyChildren($sChild, $study, $draft, $project);
+                }
             }
         }
     }
@@ -232,17 +237,17 @@ class ProcessDraft
     /**
      * Check if child should have a dataset created.
      */
-    private function shouldCreateDataset(FileSystemObject $child): bool
+    public function shouldCreateDataset(FileSystemObject $child): bool
     {
-        return $child->instrument_type != null
+        return $child->model_type == 'dataset' || ($child->instrument_type != null
             && $child->instrument_type != 'nmredata'
-            && $child->instrument_type != 'mol';
+            && $child->instrument_type != 'mol');
     }
 
     /**
      * Create dataset from child file system object.
      */
-    private function createDatasetFromChild(FileSystemObject $sChild, Study $study, Draft $draft, Project $project): void
+    public function createDatasetFromChild(FileSystemObject $sChild, Study $study, Draft $draft, Project $project): void
     {
         $ds = Dataset::where([
             ['draft_id', $draft->id],
@@ -277,7 +282,7 @@ class ProcessDraft
     /**
      * Process orphaned instrument files.
      */
-    private function processOrphanedFiles(Draft $draft, Project $project, Validation $nmrXivValidation): void
+    public function processOrphanedFiles(Draft $draft, Project $project, Validation $nmrXivValidation): void
     {
         $folders = FileSystemObject::with('children')
             ->where([
@@ -299,7 +304,7 @@ class ProcessDraft
     /**
      * Create study from orphaned file.
      */
-    private function createStudyFromOrphanedFile(FileSystemObject $folder, Draft $draft, Project $project, Validation $nmrXivValidation): void
+    public function createStudyFromOrphanedFile(FileSystemObject $folder, Draft $draft, Project $project, Validation $nmrXivValidation): void
     {
         $input = [
             'name' => 'Untitled',
@@ -322,7 +327,7 @@ class ProcessDraft
     /**
      * Create dataset from orphaned file.
      */
-    private function createDatasetFromOrphanedFile(FileSystemObject $folder, Study $study, Draft $draft, Project $project): void
+    public function createDatasetFromOrphanedFile(FileSystemObject $folder, Study $study, Draft $draft, Project $project): void
     {
         $ds = Dataset::where([
             ['draft_id', $draft->id],
@@ -354,7 +359,7 @@ class ProcessDraft
     /**
      * Finalize processing and return response.
      */
-    private function finalizeProcessing(Draft $draft, Project $project): Response|JsonResponse|RedirectResponse
+    public function finalizeProcessing(Draft $draft, Project $project): Response|JsonResponse|RedirectResponse
     {
         $draft->save();
 

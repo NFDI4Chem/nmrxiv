@@ -8,10 +8,12 @@ use App\Models\Project;
 use App\Models\Study;
 use App\Services\FileSystemObjectService;
 use App\Services\StorageSignedUrlService;
+use App\Services\FileIntegrityService;
+use App\Services\ELNMetadataServiceFactory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-
+use Illuminate\Support\Facades\Log;
 /**
  * Handle file system operations and signed URL generation for file uploads.
  */
@@ -22,7 +24,8 @@ class FileSystemController extends Controller
      */
     public function __construct(
         private FileSystemObjectService $fileSystemObjectService,
-        private StorageSignedUrlService $storageService
+        private StorageSignedUrlService $storageService,
+        private FileIntegrityService $fileIntegrityService
     ) {}
 
     /**
@@ -158,39 +161,157 @@ class FileSystemController extends Controller
     }
 
     /**
-     * Process folders to identify instrument types and set model types.
+     * Process ELN-specific metadata using the appropriate service.
      */
-    public function processFolder($folders): void
+    private function processELNMetadata(Draft $draft, array $metadata): void
     {
-        foreach ($folders as $folder) {
-            if ($folder->model_type) {
-                continue;
+        try {
+            if (!ELNMetadataServiceFactory::isSupported($draft->eln)) {
+                Log::warning("Unsupported ELN type for metadata processing: {$draft->eln}");
+                return;
             }
 
-            if ($folder->type == 'directory') {
-                if ($this->isBruker($folder)) {
-                    $this->saveInstrumentType($folder, 'bruker');
-                    $this->saveModelType($folder->parent);
-                } elseif ($this->isVarian($folder)) {
-                    $this->saveInstrumentType($folder, 'varian');
-                    $this->saveModelType($folder->parent);
-                } else {
-                    $this->processFolder($folder->children);
-                }
-            } else {
-                if ($this->isJOEL($folder)) {
-                    $this->saveInstrumentType($folder, 'joel');
-                    $this->saveModelType($folder->parent);
-                } elseif ($this->isJcampDX($folder)) {
-                    $this->saveInstrumentType($folder, 'jcamp');
-                    $this->saveModelType($folder->parent);
-                } elseif ($this->isNMReData($folder)) {
-                    $this->saveInstrumentType($folder, 'nmredata');
-                    $this->saveAnnotationsDetected($folder->parent);
-                } elseif ($this->isMolData($folder)) {
-                    $this->saveInstrumentType($folder, 'mol');
+            $metadataService = ELNMetadataServiceFactory::create($draft->eln);
+            
+            if (!$metadataService->validateMetadata($metadata)) {
+                Log::warning("Invalid metadata structure for ELN: {$draft->eln}", [
+                    'draft_id' => $draft->id
+                ]);
+                return;
+            }
+
+            $extractedAnalyses = $metadataService->extractAnalyses($metadata);
+            
+            $analysisIds = array_column($extractedAnalyses, 'analysis_id');
+
+            foreach ($analysisIds as $analysisId) {
+                $analysisFolder = FileSystemObject::where([
+                    ['name', $analysisId],
+                    ['draft_id', $draft->id],
+                ])->first();
+
+                if ($analysisFolder) {
+                    $this->saveModelType($analysisFolder->parent, 'study');
                 }
             }
+
+
+            foreach ($extractedAnalyses as $analysis) {
+                $datasets = $analysis['datasets'];
+                foreach ($datasets as $dataset) {
+                    Log::info('Dataset:' . $dataset);
+                    $datasetFolder = FileSystemObject::where([
+                        ['name', $dataset],
+                        ['draft_id', $draft->id],
+                    ])->first();
+                    if ($datasetFolder) {
+                        $this->saveModelType($datasetFolder, 'dataset');
+                    }
+                }
+            }
+            
+        } catch (\Exception $e) {
+            Log::error("Failed to process ELN metadata", [
+                'draft_id' => $draft->id,
+                'eln_type' => $draft->eln,
+                'error' => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Process folders to identify instrument types and set model types.
+     */
+    public function processFolder($folders, $draft = null, $processELNMetadata = null): void
+    {        
+        Log::info('Processing ELN:' . $processELNMetadata);
+        if ($draft && $draft->eln == 'chemotion') {
+            if ($processELNMetadata) {
+                Log::info('Processing Chemotion:');
+            
+                // get  publication-metadata.json
+                $publicationMetadataFile = FileSystemObject::where([
+                        ['level', 2],
+                        ['name', 'publication-metadata.json'],
+                        ['draft_id', $draft->id],
+                    ])->first();
+
+                if ($publicationMetadataFile) {
+                    $publicationMetadataContents = $this->fileIntegrityService->downloadFileFromStorage($publicationMetadataFile);
+                    
+                    if ($publicationMetadataContents !== null) {
+                        $publicationMetadataContents = json_decode($publicationMetadataContents, true);
+                        
+                        if ($publicationMetadataContents && is_array($publicationMetadataContents)) {
+                            // Process ELN-specific metadata
+                            $this->processELNMetadata($draft, $publicationMetadataContents);
+                        }
+    
+                    } else {
+                        Log::warning('Could not download publication metadata file', [
+                            'file_id' => $publicationMetadataFile->id,
+                            'path' => $publicationMetadataFile->path
+                        ]);
+                    }
+                }
+            }
+
+            foreach ($folders as $folder) {
+                Log::info('Processing folder: '.$folder->name);
+                if ($folder->type == 'directory') {
+                    if ($this->isBruker($folder)) {
+                        $this->saveInstrumentType($folder, 'bruker');
+                    } elseif ($this->isVarian($folder)) {
+                        $this->saveInstrumentType($folder, 'varian');
+                    } else {
+                        $this->processFolder($folder->children, $draft);
+                    }
+                } else {
+                    if ($this->isJOEL($folder)) {
+                        $this->saveInstrumentType($folder, 'joel');
+                    } elseif ($this->isJcampDX($folder)) {
+                        $this->saveInstrumentType($folder, 'jcamp');
+                    } elseif ($this->isNMReData($folder)) {
+                        $this->saveInstrumentType($folder, 'nmredata');
+                        $this->saveAnnotationsDetected($folder->parent);
+                    } elseif ($this->isMolData($folder)) {
+                        $this->saveInstrumentType($folder, 'mol');
+                    }
+                }
+            }   
+
+            
+        }else{
+            foreach ($folders as $folder) {
+                if ($folder->model_type) {
+                    continue;
+                }
+    
+                if ($folder->type == 'directory') {
+                    if ($this->isBruker($folder)) {
+                        $this->saveInstrumentType($folder, 'bruker');
+                        $this->saveModelType($folder->parent, 'study');
+                    } elseif ($this->isVarian($folder)) {
+                        $this->saveInstrumentType($folder, 'varian');
+                        $this->saveModelType($folder->parent, 'study');
+                    } else {
+                        $this->processFolder($folder->children);
+                    }
+                } else {
+                    if ($this->isJOEL($folder)) {
+                        $this->saveInstrumentType($folder, 'joel');
+                        $this->saveModelType($folder->parent, 'study');
+                    } elseif ($this->isJcampDX($folder)) {
+                        $this->saveInstrumentType($folder, 'jcamp');
+                        $this->saveModelType($folder->parent, 'study');
+                    } elseif ($this->isNMReData($folder)) {
+                        $this->saveInstrumentType($folder, 'nmredata');
+                        $this->saveAnnotationsDetected($folder->parent);
+                    } elseif ($this->isMolData($folder)) {
+                        $this->saveInstrumentType($folder, 'mol');
+                    }
+                }
+            }   
         }
     }
 
@@ -212,10 +333,10 @@ class FileSystemController extends Controller
     /**
      * Set model type for folder.
      */
-    public function saveModelType($folder): void
+    public function saveModelType($folder, $type): void
     {
         if ($folder) {
-            $folder->model_type = 'study';
+            $folder->model_type = $type;
             $folder->save();
         }
     }
