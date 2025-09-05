@@ -14,10 +14,10 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
-use ZipArchive;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+use RecursiveIteratorIterator;
+use ZipArchive;
 
 class ProcessDraftELNSubmission implements ShouldQueue
 {

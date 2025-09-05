@@ -31,5 +31,5 @@ return new class extends Migration
         Schema::table('drafts', function (Blueprint $table) {
             $table->dropColumn(['eln', 'external_id', 'callback_url', 'zip_url', 'release_date', 'eln_status', 'token', 'eln_logs']);
         });
-}
+    }
 };

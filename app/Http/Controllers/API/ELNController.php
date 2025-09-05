@@ -316,7 +316,7 @@ class ELNController extends Controller
             'created_new' => $isNewDraft,
             'user_id' => $user_id,
             'team_id' => $team_id,
-            'eln_status' => $draft->eln_status
+            'eln_status' => $draft->eln_status,
         ]);
     }
 
