@@ -725,7 +725,7 @@ class ProcessDraftELNSubmission implements ShouldQueue
                     'molecular_weight' => $moleculeInfo['molecular_weight'] ?? null,
                     'smiles' => $moleculeInfo['smiles'] ?? null,
                     'absolute_smiles' => $moleculeInfo['absolute_smiles'] ?? null,
-                    'canonical_smiles' => $moleculeInfo['canonical_smiles'] ?? null,
+                    'canonical_smiles' => $moleculeInfo['canonical_smiles'] ? $moleculeInfo['canonical_smiles'] : $moleculeInfo['smiles'],
                     'inchi' => $moleculeInfo['inchi'] ?? null,
                     'standard_inchi' => $moleculeInfo['standard_inchi'] ?? $moleculeInfo['inchi'] ?? null,
                     'inchi_key' => $moleculeInfo['inchi_key'] ?? null,
