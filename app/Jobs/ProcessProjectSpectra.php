@@ -26,8 +26,9 @@ class ProcessProjectSpectra implements ShouldQueue
     {
         $project = Project::find($this->projectId);
 
-        if (!$project) {
+        if (! $project) {
             Log::error("Project not found: {$this->projectId}");
+
             return;
         }
 
@@ -39,7 +40,7 @@ class ProcessProjectSpectra implements ShouldQueue
             Log::info("Successfully completed spectra processing for project: {$project->identifier}");
 
         } catch (Exception $e) {
-            Log::error("Failed to process spectra for project {$project->identifier}: " . $e->getMessage());
+            Log::error("Failed to process spectra for project {$project->identifier}: ".$e->getMessage());
             throw $e;
         }
     }
@@ -62,7 +63,8 @@ class ProcessProjectSpectra implements ShouldQueue
                 $this->processStudyDatasets($study->fresh());
 
             } catch (Exception $e) {
-                Log::error("Failed to process study {$study->identifier}: " . $e->getMessage());
+                Log::error("Failed to process study {$study->identifier}: ".$e->getMessage());
+
                 // Continue with other studies instead of failing the entire job
                 continue;
             }
@@ -80,21 +82,23 @@ class ProcessProjectSpectra implements ShouldQueue
 
         DB::transaction(function () use ($study) {
             $downloadUrl = $study->download_url;
-            
-            if (!$downloadUrl) {
+
+            if (! $downloadUrl) {
                 Log::warning("No download URL found for study: {$study->identifier}");
+
                 return;
             }
 
             $nmriumData = $this->processSpectra($downloadUrl);
-            
-            if (!$nmriumData || !isset($nmriumData['data'])) {
+
+            if (! $nmriumData || ! isset($nmriumData['data'])) {
                 Log::warning("No valid spectra data returned for study: {$study->identifier}");
+
                 return;
             }
 
             $parsedSpectra = $nmriumData['data'];
-            
+
             // Clean up spectra data
             foreach ($parsedSpectra['spectra'] as &$spectra) {
                 unset($spectra['data']);
@@ -110,8 +114,6 @@ class ProcessProjectSpectra implements ShouldQueue
                 'data' => $parsedSpectra,
                 'version' => $version,
             ];
-
-            Log::info("NMRium JSON: " . json_encode($nmriumJSON, JSON_UNESCAPED_UNICODE));
 
             // Create or update NMRium record
             $nmrium = $study->nmrium;
@@ -138,17 +140,17 @@ class ProcessProjectSpectra implements ShouldQueue
      */
     private function processStudyDatasets($study): void
     {
-        if (!$study->has_nmrium) {
+        if (! $study->has_nmrium) {
             Log::warning("Study {$study->identifier} has no NMRium data, skipping datasets");
+
             return;
         }
 
         $nmriumInfo = json_decode($study->nmrium->nmrium_info, true);
 
-        Log::info("NMRium test Info: " . json_encode($nmriumInfo, JSON_UNESCAPED_UNICODE));
-        
-        if (!isset($nmriumInfo['data']['spectra']) || count($nmriumInfo['data']['spectra']) == 0) {
+        if (! isset($nmriumInfo['data']['spectra']) || count($nmriumInfo['data']['spectra']) == 0) {
             Log::warning("Study {$study->identifier} has no spectra info, skipping datasets");
+
             return;
         }
 
@@ -160,7 +162,8 @@ class ProcessProjectSpectra implements ShouldQueue
             try {
                 $this->processDatasetSpectra($dataset, $study, $nmriumInfo);
             } catch (Exception $e) {
-                Log::error("Failed to process dataset {$dataset->identifier}: " . $e->getMessage());
+                Log::error("Failed to process dataset {$dataset->identifier}: ".$e->getMessage());
+
                 continue;
             }
         }
@@ -179,9 +182,9 @@ class ProcessProjectSpectra implements ShouldQueue
 
         // Determine path based on ELN type
         if ($draft && $draft->eln == 'chemotion') {
-            $path = '/' . $studyFSObject->name . '/' . $datasetFSObject->parent->name . '/' . $datasetFSObject->name;
+            $path = '/'.$studyFSObject->name.'/'.$datasetFSObject->parent->name.'/'.$datasetFSObject->name;
         } else {
-            $path = '/' . $studyFSObject->name . '/' . $datasetFSObject->name;
+            $path = '/'.$studyFSObject->name.'/'.$datasetFSObject->name;
         }
 
         $fType = $studyFSObject->type;
@@ -203,7 +206,7 @@ class ProcessProjectSpectra implements ShouldQueue
 
             // Create or update NMRium record for dataset
             $nmrium = $dataset->nmrium;
-            
+
             if ($nmrium) {
                 $nmrium->nmrium_info = json_encode($nmriumJSON, JSON_UNESCAPED_UNICODE);
                 $nmrium->save();
@@ -236,13 +239,13 @@ class ProcessProjectSpectra implements ShouldQueue
     private function spectraMatchesDataset($spectra, string $path, string $fType): bool
     {
         $files = $spectra['sourceSelector']['files'] ?? [];
-        
-        if (!$files) {
+
+        if (! $files) {
             return false;
         }
 
         foreach ($files as $file) {
-            $searchPath = $fType == 'file' ? $path : $path . '/';
+            $searchPath = $fType == 'file' ? $path : $path.'/';
             if (str_contains($file, $searchPath)) {
                 return true;
             }
@@ -256,7 +259,7 @@ class ProcessProjectSpectra implements ShouldQueue
      */
     private function extractSpectraType($spectra): ?string
     {
-        if (!isset($spectra['info']['experiment'])) {
+        if (! isset($spectra['info']['experiment'])) {
             return null;
         }
 
@@ -277,21 +280,23 @@ class ProcessProjectSpectra implements ShouldQueue
     {
         try {
             $encodedUrl = urlencode($url);
-            
+
             $response = Http::timeout(300)->post('https://nodejs.nmrxiv.org/spectra-parser', [
                 'urls' => [$encodedUrl],
                 'snapshot' => false,
             ]);
 
-            if (!$response->successful()) {
-                Log::error("Spectra processing service returned error: " . $response->status());
+            if (! $response->successful()) {
+                Log::error('Spectra processing service returned error: '.$response->status());
+
                 return null;
             }
 
             return $response->json();
 
         } catch (Exception $e) {
-            Log::error("Failed to process spectra from URL {$url}: " . $e->getMessage());
+            Log::error("Failed to process spectra from URL {$url}: ".$e->getMessage());
+
             return null;
         }
     }

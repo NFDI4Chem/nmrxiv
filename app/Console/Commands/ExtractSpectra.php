@@ -102,12 +102,12 @@ class ExtractSpectra extends Command
 
                                     $draft = $study->draft;
 
-                                    if($draft && $draft->eln == 'chemotion'){
-                                        $path = '/'.$studyFSObject->name.'/' . $datasetFSObject->parent->name . '/' . $datasetFSObject->name;
-                                    }else{
+                                    if ($draft && $draft->eln == 'chemotion') {
+                                        $path = '/'.$studyFSObject->name.'/'.$datasetFSObject->parent->name.'/'.$datasetFSObject->name;
+                                    } else {
                                         $path = '/'.$studyFSObject->name.'/'.$datasetFSObject->name;
                                     }
-                                    
+
                                     $fType = $studyFSObject->type;
 
                                     $pathsMatch = false;

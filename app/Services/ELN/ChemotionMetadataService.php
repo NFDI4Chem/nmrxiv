@@ -2,18 +2,68 @@
 
 namespace App\Services\ELN;
 
-use App\Services\ELN\ELNMetadataExtractorInterface;
 use App\Models\Draft;
+use App\Models\FileSystemObject;
+use App\Services\FileIntegrityService;
 use Illuminate\Support\Facades\Log;
 
 /**
  * Chemotion ELN metadata extraction service.
- * 
+ *
  * Handles extraction of sample names, folder paths, molecules,
  * and other metadata specific to Chemotion ELN exports.
  */
 class ChemotionMetadataService implements ELNMetadataExtractorInterface
 {
+    public function __construct(
+        private FileIntegrityService $fileIntegrityService
+    ) {}
+
+    /**
+     * Fetch publication metadata from draft.
+     */
+    private function fetchPublicationMetadata(Draft $draft): ?array
+    {
+        $publicationMetadataFile = FileSystemObject::where([
+            ['level', 2],
+            ['name', 'publication-metadata.json'],
+            ['draft_id', $draft->id],
+        ])->first();
+
+        if (! $publicationMetadataFile) {
+            Log::warning('Publication metadata file not found', [
+                'draft_id' => $draft->id,
+            ]);
+
+            return null;
+        }
+
+        $publicationMetadataContents = $this->fileIntegrityService->downloadFileFromStorage($publicationMetadataFile);
+
+        if ($publicationMetadataContents === null) {
+            Log::warning('Could not download publication metadata file', [
+                'file_id' => $publicationMetadataFile->id,
+                'path' => $publicationMetadataFile->path,
+                'draft_id' => $draft->id,
+            ]);
+
+            return null;
+        }
+
+        $decodedMetadata = json_decode($publicationMetadataContents, true);
+
+        if (! $decodedMetadata || ! is_array($decodedMetadata)) {
+            Log::warning('Invalid publication metadata JSON', [
+                'draft_id' => $draft->id,
+                'file_id' => $publicationMetadataFile->id,
+            ]);
+
+            return null;
+        }
+
+        return $decodedMetadata;
+    }
+
     /**
      * Extract project information (root level).
      */
@@ -47,14 +97,14 @@ class ChemotionMetadataService implements ELNMetadataExtractorInterface
         $studies = [];
         $hasPart = $metadata['hasPart'] ?? null;
 
-        if (!$hasPart) {
+        if (! $hasPart) {
             return $studies;
         }
 
         // Handle both single object and array cases
         $studyItems = isset($hasPart['@type']) ? [$hasPart] : $hasPart;
-        
-        if (!is_array($studyItems)) {
+
+        if (! is_array($studyItems)) {
             return $studies;
         }
 
@@ -86,12 +136,12 @@ class ChemotionMetadataService implements ELNMetadataExtractorInterface
      */
     private function extractChemicalSubstance(array $study): ?array
     {
-        if (!isset($study['about']) || $study['about']['@type'] !== 'ChemicalSubstance') {
+        if (! isset($study['about']) || $study['about']['@type'] !== 'ChemicalSubstance') {
             return null;
         }
 
         $substance = $study['about'];
-        
+
         return [
             'id' => $substance['@id'] ?? null,
             'name' => $substance['name'] ?? null,
@@ -109,12 +159,12 @@ class ChemotionMetadataService implements ELNMetadataExtractorInterface
      */
     private function extractMolecule(array $substance): ?array
     {
-        if (!isset($substance['hasBioChemEntityPart'])) {
+        if (! isset($substance['hasBioChemEntityPart'])) {
             return null;
         }
 
         $molecule = $substance['hasBioChemEntityPart'];
-        
+
         return [
             'id' => $molecule['@id'] ?? null,
             'name' => $molecule['name'] ?? null,
@@ -136,14 +186,14 @@ class ChemotionMetadataService implements ELNMetadataExtractorInterface
         $datasets = [];
         $hasPart = $substance['hasPart'] ?? null;
 
-        if (!$hasPart) {
+        if (! $hasPart) {
             return $datasets;
         }
 
         // Handle both single object and array cases
         $datasetItems = isset($hasPart['@type']) ? [$hasPart] : $hasPart;
-        
-        if (!is_array($datasetItems)) {
+
+        if (! is_array($datasetItems)) {
             return $datasets;
         }
 
@@ -251,6 +301,7 @@ class ChemotionMetadataService implements ELNMetadataExtractorInterface
                 ];
             }
         }
+
         return $authors;
     }
 
@@ -283,11 +334,12 @@ class ChemotionMetadataService implements ELNMetadataExtractorInterface
      */
     private function extractMeasurementTechnique(array $dataset): ?array
     {
-        if (!isset($dataset['measurementTechnique'])) {
+        if (! isset($dataset['measurementTechnique'])) {
             return null;
         }
 
         $technique = $dataset['measurementTechnique'];
+
         return [
             'name' => $technique['name'] ?? null,
             'term_code' => $technique['termCode'] ?? null,
@@ -328,23 +380,26 @@ class ChemotionMetadataService implements ELNMetadataExtractorInterface
     {
         // Basic validation for Chemotion JSON-LD structure
         $requiredFields = ['@context', '@type', 'name', 'hasPart'];
-        
+
         foreach ($requiredFields as $field) {
-            if (!isset($metadata[$field])) {
+            if (! isset($metadata[$field])) {
                 Log::warning("Missing required field in Chemotion metadata: {$field}");
+
                 return false;
             }
         }
 
         // Validate that it's a Study type
         if ($metadata['@type'] !== 'Study') {
-            Log::warning("Invalid @type in Chemotion metadata. Expected 'Study', got: " . ($metadata['@type'] ?? 'null'));
+            Log::warning("Invalid @type in Chemotion metadata. Expected 'Study', got: ".($metadata['@type'] ?? 'null'));
+
             return false;
         }
 
         // Validate schema.org context
         if ($metadata['@context'] !== 'https://schema.org') {
             Log::warning("Invalid @context in Chemotion metadata. Expected 'https://schema.org'");
+
             return false;
         }
 
@@ -357,5 +412,47 @@ class ChemotionMetadataService implements ELNMetadataExtractorInterface
     public function getELNType(): string
     {
         return 'chemotion';
+    }
+
+    /**
+     * Extract analyses information from draft (fetches metadata internally).
+     */
+    public function extractAnalysesFromDraft(Draft $draft): array
+    {
+        $metadata = $this->fetchPublicationMetadata($draft);
+
+        if (! $metadata) {
+            return [];
+        }
+
+        return $this->extractAnalyses($metadata);
+    }
+
+    /**
+     * Validate metadata from draft (fetches metadata internally).
+     */
+    public function validateMetadataFromDraft(Draft $draft): bool
+    {
+        $metadata = $this->fetchPublicationMetadata($draft);
+
+        if (! $metadata) {
+            return false;
+        }
+
+        return $this->validateMetadata($metadata);
+    }
+
+    /**
+     * Extract all metadata from draft (fetches metadata internally).
+     */
+    public function extractAllMetadataFromDraft(Draft $draft): ?array
+    {
+        $metadata = $this->fetchPublicationMetadata($draft);
+
+        if (! $metadata) {
+            return null;
+        }
+
+        return $this->extractAllMetadata($metadata);
     }
 }

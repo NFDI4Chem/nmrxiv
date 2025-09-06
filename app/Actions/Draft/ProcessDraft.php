@@ -190,7 +190,7 @@ class ProcessDraft
      */
     public function processStudies(Draft $draft, Project $project, Validation $nmrXivValidation): void
     {
-        Log::info('Processing studies for draft: ' . $draft->id);
+        Log::info('Processing studies for draft: '.$draft->id);
         $folders = FileSystemObject::with('children')
             ->where([
                 ['draft_id', $draft->id],
@@ -226,8 +226,8 @@ class ProcessDraft
         foreach ($sChildren as $sChild) {
             if ($this->shouldCreateDataset($sChild)) {
                 $this->createDatasetFromChild($sChild, $study, $draft, $project);
-            }else{
-                if($sChild->type == 'directory'){
+            } else {
+                if ($sChild->type == 'directory') {
                     $this->processStudyChildren($sChild, $study, $draft, $project);
                 }
             }

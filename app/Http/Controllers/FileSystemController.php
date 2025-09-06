@@ -6,14 +6,14 @@ use App\Models\Draft;
 use App\Models\FileSystemObject;
 use App\Models\Project;
 use App\Models\Study;
+use App\Services\ELNMetadataServiceFactory;
 use App\Services\FileSystemObjectService;
 use App\Services\StorageSignedUrlService;
-use App\Services\FileIntegrityService;
-use App\Services\ELNMetadataServiceFactory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+
 /**
  * Handle file system operations and signed URL generation for file uploads.
  */
@@ -24,8 +24,7 @@ class FileSystemController extends Controller
      */
     public function __construct(
         private FileSystemObjectService $fileSystemObjectService,
-        private StorageSignedUrlService $storageService,
-        private FileIntegrityService $fileIntegrityService
+        private StorageSignedUrlService $storageService
     ) {}
 
     /**
@@ -163,25 +162,27 @@ class FileSystemController extends Controller
     /**
      * Process ELN-specific metadata using the appropriate service.
      */
-    private function processELNMetadata(Draft $draft, array $metadata): void
+    private function processELNMetadata(Draft $draft): void
     {
         try {
-            if (!ELNMetadataServiceFactory::isSupported($draft->eln)) {
+            if (! ELNMetadataServiceFactory::isSupported($draft->eln)) {
                 Log::warning("Unsupported ELN type for metadata processing: {$draft->eln}");
+
                 return;
             }
 
             $metadataService = ELNMetadataServiceFactory::create($draft->eln);
-            
-            if (!$metadataService->validateMetadata($metadata)) {
+
+            if (! $metadataService->validateMetadataFromDraft($draft)) {
                 Log::warning("Invalid metadata structure for ELN: {$draft->eln}", [
-                    'draft_id' => $draft->id
+                    'draft_id' => $draft->id,
                 ]);
+
                 return;
             }
 
-            $extractedAnalyses = $metadataService->extractAnalyses($metadata);
-            
+            $extractedAnalyses = $metadataService->extractAnalysesFromDraft($draft);
+
             $analysisIds = array_column($extractedAnalyses, 'analysis_id');
 
             foreach ($analysisIds as $analysisId) {
@@ -195,11 +196,10 @@ class FileSystemController extends Controller
                 }
             }
 
-
             foreach ($extractedAnalyses as $analysis) {
                 $datasets = $analysis['datasets'];
                 foreach ($datasets as $dataset) {
-                    Log::info('Dataset:' . $dataset);
+                    Log::info('Dataset:'.$dataset);
                     $datasetFolder = FileSystemObject::where([
                         ['name', $dataset],
                         ['draft_id', $draft->id],
@@ -209,12 +209,12 @@ class FileSystemController extends Controller
                     }
                 }
             }
-            
+
         } catch (\Exception $e) {
-            Log::error("Failed to process ELN metadata", [
+            Log::error('Failed to process ELN metadata', [
                 'draft_id' => $draft->id,
                 'eln_type' => $draft->eln,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
         }
     }
@@ -223,37 +223,13 @@ class FileSystemController extends Controller
      * Process folders to identify instrument types and set model types.
      */
     public function processFolder($folders, $draft = null, $processELNMetadata = null): void
-    {        
-        Log::info('Processing ELN:' . $processELNMetadata);
+    {
+        Log::info('Processing ELN:'.$processELNMetadata);
         if ($draft && $draft->eln == 'chemotion') {
             if ($processELNMetadata) {
                 Log::info('Processing Chemotion:');
-            
-                // get  publication-metadata.json
-                $publicationMetadataFile = FileSystemObject::where([
-                        ['level', 2],
-                        ['name', 'publication-metadata.json'],
-                        ['draft_id', $draft->id],
-                    ])->first();
-
-                if ($publicationMetadataFile) {
-                    $publicationMetadataContents = $this->fileIntegrityService->downloadFileFromStorage($publicationMetadataFile);
-                    
-                    if ($publicationMetadataContents !== null) {
-                        $publicationMetadataContents = json_decode($publicationMetadataContents, true);
-                        
-                        if ($publicationMetadataContents && is_array($publicationMetadataContents)) {
-                            // Process ELN-specific metadata
-                            $this->processELNMetadata($draft, $publicationMetadataContents);
-                        }
-    
-                    } else {
-                        Log::warning('Could not download publication metadata file', [
-                            'file_id' => $publicationMetadataFile->id,
-                            'path' => $publicationMetadataFile->path
-                        ]);
-                    }
-                }
+                // Process ELN-specific metadata
+                $this->processELNMetadata($draft);
             }
 
             foreach ($folders as $folder) {
@@ -278,15 +254,14 @@ class FileSystemController extends Controller
                         $this->saveInstrumentType($folder, 'mol');
                     }
                 }
-            }   
+            }
 
-            
-        }else{
+        } else {
             foreach ($folders as $folder) {
                 if ($folder->model_type) {
                     continue;
                 }
-    
+
                 if ($folder->type == 'directory') {
                     if ($this->isBruker($folder)) {
                         $this->saveInstrumentType($folder, 'bruker');
@@ -311,7 +286,7 @@ class FileSystemController extends Controller
                         $this->saveInstrumentType($folder, 'mol');
                     }
                 }
-            }   
+            }
         }
     }
 

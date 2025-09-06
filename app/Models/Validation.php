@@ -188,13 +188,13 @@ class Validation extends Model
 
                     $instrumentType = $dataset->fsObject ? $dataset->fsObject->instrument_type : null;
 
-                    if(!$instrumentType){
+                    if (! $instrumentType) {
                         // check if children have instrument_type
                         $children = $dataset->fsObject ? $dataset->fsObject->children : null;
-                        if($children){
-                            foreach($children as $child){
+                        if ($children) {
+                            foreach ($children as $child) {
                                 $instrumentType = $child->instrument_type;
-                                if($instrumentType){
+                                if ($instrumentType) {
                                     break;
                                 }
                             }
