@@ -325,6 +325,38 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <!-- Submitted Through Information -->
+                    <div v-if="study.data.submitted_through" class="mt-4">
+                        <div class="flex items-center space-x-3 text-sm text-gray-600">
+                            <svg
+                                class="h-4 w-4 text-gray-400"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"
+                                />
+                            </svg>
+                            <span>Submitted via:</span>
+                            <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium text-gray-800 uppercase">
+                                <img :src="`/img/eln/${study.data.submitted_through}.png`" class="h-12" />
+                            </span>
+                            <a :href="study.data.external_url" target="_blank" class="inline-flex items-center py-1 rounded text-md font-bold text-gray-800 uppercase hover:text-blue-600">
+                                <span class="inline-flex items-center py-1 rounded text-md font-bold uppercase">
+                                    {{ study.data.external_id }} 
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 ml-3">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
+                                    </svg>
+                                </span>
+                            </a>
+                        </div>
+                    </div>
+                    
                     <div class="relative">
                         &nbsp;
                     </div>
@@ -509,14 +541,8 @@
                                     :key="dataset.slug"
                                     class="group relative bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 hover:border-gray-300"
                                 >
-                                    <div
-                                        :href="
-                                            '/' +
-                                            dataset.identifier.replace(
-                                                'NMRXIV:',
-                                                ''
-                                            )
-                                        "
+                                    <a
+                                        :href="dataset.external_url"
                                         target="_blank"
                                         class="block p-4 h-full"
                                     >
@@ -525,9 +551,12 @@
                                                 class="flex items-start justify-between mb-1"
                                             >
                                                 <h3
-                                                    class="text-md font-bold text-teal-600 group-hover:text-blue-600 transition-colors duration-200 line-clamp-2 flex-1 pr-2"
+                                                    class="text-md font-bold text-gray-600 group-hover:text-blue-600 transition-colors duration-200 line-clamp-2 flex-1 pr-2 capitalize"
                                                 >
-                                                    {{ dataset.name }}
+                                                    {{ dataset.name }} 
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 ml-2 inline-block">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
+                                                    </svg>
                                                 </h3>
                                             </div>
 
@@ -548,7 +577,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </a>
                                 </div>
                             </div>
                         </div>

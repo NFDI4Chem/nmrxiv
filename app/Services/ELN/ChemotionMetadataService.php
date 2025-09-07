@@ -241,6 +241,7 @@ class ChemotionMetadataService implements ELNMetadataExtractorInterface
                             'datasets' => $dataset['datasets'] ?? [],
                             'measurement_technique' => $dataset['measurement_technique'],
                             'variable_measured' => $dataset['variable_measured'],
+                            'external_url' => $dataset['url'],
                         ];
                     }
                 }

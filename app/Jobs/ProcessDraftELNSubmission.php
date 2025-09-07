@@ -359,8 +359,14 @@ class ProcessDraftELNSubmission implements ShouldQueue
                 return;
             }
 
+            // Get the draft to access processing logs
+            $draft = $project->draft;
+            $processingLogs = $draft ? $draft->process_logs : [];
+
             $study->update([
-                'name' => $studyMetadata['name'].' - '.$studyName,
+                'name' => $studyMetadata['name'].' ('.$studyName.')',
+                'external_url' => $studyMetadata['url'],
+                'processing_logs' => $processingLogs,
             ]);
 
             $logger->log($project->draft, 'info', 'Attaching metadata to study: '.$study->name);
@@ -593,7 +599,16 @@ class ProcessDraftELNSubmission implements ShouldQueue
                     'description' => '',
                     'study_id' => $study->id,
                     'project_id' => $study->project_id,
+                    'submitted_through' => 'ELN',
                 ]);
+
+                $logger->log($study->project->draft, 'info', "Created sample '{$sample->name}' with submitted_through: ELN");
+            } else {
+                // Update existing sample to track ELN submission if not already set
+                if (! $sample->submitted_through) {
+                    $sample->update(['submitted_through' => 'ELN']);
+                    $logger->log($study->project->draft, 'info', "Updated existing sample '{$sample->name}' with submitted_through: ELN");
+                }
             }
 
             $attachedMolecules = [];
@@ -641,7 +656,7 @@ class ProcessDraftELNSubmission implements ShouldQueue
                     'molecular_weight' => $moleculeInfo['molecular_weight'] ?? null,
                     'smiles' => $moleculeInfo['smiles'] ?? null,
                     'absolute_smiles' => $moleculeInfo['absolute_smiles'] ?? null,
-                    'canonical_smiles' => $moleculeInfo['canonical_smiles'] ? $moleculeInfo['canonical_smiles'] : $moleculeInfo['smiles'],
+                    'canonical_smiles' => $moleculeInfo['canonical_smiles'] ?? $moleculeInfo['smiles'] ?? null,
                     'inchi' => $moleculeInfo['inchi'] ?? null,
                     'standard_inchi' => $moleculeInfo['standard_inchi'] ?? $moleculeInfo['inchi'] ?? null,
                     'inchi_key' => $moleculeInfo['inchi_key'] ?? null,

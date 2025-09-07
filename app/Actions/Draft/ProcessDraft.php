@@ -258,6 +258,7 @@ class ProcessDraft
         if (! $ds) {
             $ds = Dataset::create([
                 'name' => $sChild->name,
+                'external_url' => $sChild->parent->external_url,
                 'slug' => Str::slug($sChild->name, '-'),
                 'description' => $sChild->name,
                 'obfuscationcode' => Str::random(40),

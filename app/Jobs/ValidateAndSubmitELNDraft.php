@@ -40,6 +40,14 @@ class ValidateAndSubmitELNDraft implements ShouldQueue
                 return;
             }
 
+            $studies = $project->studies;
+            foreach ($studies as $study) {
+                $study->submitted_through = $draft->eln;
+                $study->external_id = $draft->external_id;
+                $study->processing_logs = $draft->processing_logs;
+                $study->save();
+            }
+
             // Set project properties
             $draft->project_enabled = false;
             $draft->save();

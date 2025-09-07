@@ -55,6 +55,10 @@ class Study extends Model implements Auditable
         'authors',
         'citations',
         'molecules',
+        'submitted_through',
+        'external_id',
+        'external_url',
+        'processing_logs',
     ];
 
     /**
@@ -66,6 +70,7 @@ class Study extends Model implements Auditable
             'authors' => 'array',
             'citations' => 'array',
             'molecules' => 'array',
+            'processing_logs' => 'array',
         ];
     }
 

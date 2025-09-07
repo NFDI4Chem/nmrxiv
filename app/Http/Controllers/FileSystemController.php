@@ -189,13 +189,16 @@ class FileSystemController extends Controller
 
             $analysisIds = array_column($extractedAnalyses, 'analysis_id');
 
-            foreach ($analysisIds as $analysisId) {
+            foreach ($extractedAnalyses as $analysis) {
+                $analysisId = $analysis['analysis_id'];
+                $analysisExternalUrl = $analysis['external_url'];
                 $analysisFolder = FileSystemObject::where([
                     ['name', $analysisId],
                     ['draft_id', $draft->id],
                 ])->first();
 
                 if ($analysisFolder) {
+                    $this->saveModelType($analysisFolder, 'analysis', $analysisExternalUrl);
                     $this->saveModelType($analysisFolder->parent, 'study');
                 }
             }
@@ -305,10 +308,11 @@ class FileSystemController extends Controller
     /**
      * Set model type for folder.
      */
-    public function saveModelType($folder, $type): void
+    public function saveModelType($folder, $type, $external_url = null): void
     {
         if ($folder) {
             $folder->model_type = $type;
+            $folder->external_url = $external_url;
             $folder->save();
         }
     }
