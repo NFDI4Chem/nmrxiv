@@ -53,31 +53,39 @@ class ProcessDraftELNSubmission implements ShouldQueue
         try {
             $logger->log($draft, 'info', 'Starting ELN submission processing');
 
-            // Only process Chemotion ELN
             if (strtolower($draft->eln) !== 'chemotion') {
-                $logger->log($draft, 'info', "Skipping non-Chemotion ELN: {$draft->eln}");
+                $logger->log($draft, 'info', "ELN not supported: {$draft->eln}");
 
                 return;
             }
 
             if (! $draft->zip_url) {
+                $logger->log($draft, 'info', 'No zip_url found for draft');
                 throw new \Exception('No zip_url found for draft');
             }
 
             $draft->update(['status' => 'PROCESSING']);
 
-            // Download and extract files
-            $extractedFiles = $this->processZipFile($draft, $pathGenerator);
+            $extractedFiles = $this->processZipFile($draft, $pathGenerator, $logger);
+
+            $draft->update([
+                'status' => 'ZIP_PROCESSED',
+                'current_step' => '1',
+            ]);
 
             if (empty($extractedFiles)) {
+                $logger->log($draft, 'error', 'No files extracted from zip');
                 throw new \Exception('No files extracted from zip');
             }
 
-            // Create file system objects
-            $this->createFileSystemObjects($draft, $extractedFiles, $fileSystemService);
+            $this->createFileSystemObjects($draft, $extractedFiles, $fileSystemService, $logger);
 
-            // Process folders for instrument detection
-            $this->processFolders($draft, $fileSystemController, $processDraft);
+            $this->processFolders($draft, $fileSystemController, $processDraft, $logger);
+
+            $draft->update([
+                'status' => 'NMRXIV DRAFT CREATED',
+                'current_step' => '1',
+            ]);
 
         } catch (\Exception $e) {
             $logger->log($draft, 'error', 'ELN processing failed: '.$e->getMessage());
@@ -89,7 +97,7 @@ class ProcessDraftELNSubmission implements ShouldQueue
     /**
      * Download and extract zip file.
      */
-    private function processZipFile(Draft $draft, PathGeneratorService $pathGenerator): array
+    private function processZipFile(Draft $draft, PathGeneratorService $pathGenerator, DraftProcessingLogger $logger): array
     {
         // Download zip file with proxy support
         $httpClient = Http::timeout(300);
@@ -114,6 +122,7 @@ class ProcessDraftELNSubmission implements ShouldQueue
         $response = $httpClient->get($draft->zip_url);
 
         if (! $response->successful()) {
+            $logger->log($draft, 'error', "Failed to download zip file. HTTP status: {$response->status()}");
             throw new \Exception("Failed to download zip file. HTTP status: {$response->status()}");
         }
 
@@ -134,6 +143,8 @@ class ProcessDraftELNSubmission implements ShouldQueue
             $zip->extractTo($tempExtractDir);
             $zip->close();
 
+            $logger->log($draft, 'info', 'Zip file extracted successfully');
+
             // Move files to storage
             return $this->moveFilesToStorage($draft, $tempExtractDir, $pathGenerator);
 
@@ -142,7 +153,7 @@ class ProcessDraftELNSubmission implements ShouldQueue
             if (file_exists($tempZipPath)) {
                 unlink($tempZipPath);
             }
-            $this->removeDirectory($tempExtractDir);
+            $this->removeDirectory($tempExtractDir, $logger);
         }
     }
 
@@ -190,14 +201,32 @@ class ProcessDraftELNSubmission implements ShouldQueue
     }
 
     /**
+     * Remove directory recursively.
+     */
+    private function removeDirectory(string $dir, DraftProcessingLogger $logger): void
+    {
+        if (! is_dir($dir)) {
+            return;
+        }
+
+        $files = array_diff(scandir($dir), ['.', '..']);
+        foreach ($files as $file) {
+            $path = $dir.DIRECTORY_SEPARATOR.$file;
+            is_dir($path) ? $this->removeDirectory($path, $logger) : unlink($path);
+        }
+        rmdir($dir);
+    }
+
+    /**
      * Create FileSystemObjects for extracted files.
      */
-    private function createFileSystemObjects(Draft $draft, array $extractedFiles, FileSystemObjectService $fileSystemService): void
+    private function createFileSystemObjects(Draft $draft, array $extractedFiles, FileSystemObjectService $fileSystemService, DraftProcessingLogger $logger): void
     {
         foreach ($extractedFiles as $file) {
             try {
                 $fileSystemService->createDraftFileSystemObject($draft, $file, '');
             } catch (\Exception $e) {
+                $logger->log($draft, 'error', "Failed to create FileSystemObject for {$file['upload']['filename']}: ".$e->getMessage());
                 Log::error("Failed to create FileSystemObject for {$file['upload']['filename']}: ".$e->getMessage());
             }
         }
@@ -206,7 +235,7 @@ class ProcessDraftELNSubmission implements ShouldQueue
     /**
      * Process folders for instrument detection.
      */
-    private function processFolders(Draft $draft, FileSystemController $fileSystemController, ProcessDraft $processDraft): void
+    private function processFolders(Draft $draft, FileSystemController $fileSystemController, ProcessDraft $processDraft, DraftProcessingLogger $logger): void
     {
         $draftFolders = FileSystemObject::with('children')
             ->where([
@@ -219,10 +248,9 @@ class ProcessDraftELNSubmission implements ShouldQueue
             ->get();
 
         if ($draftFolders->isNotEmpty()) {
-            $fileSystemController->processFolder($draftFolders, $draft, true);
+            $fileSystemController->processFolder($draftFolders, $draft, true, $logger);
 
-            DB::transaction(function () use ($draft, $processDraft) {
-                // Create or update project (validation is handled by the respective actions)
+            DB::transaction(function () use ($draft, $processDraft, $logger) {
                 $user_id = $draft->owner_id;
                 $team_id = $draft->team_id;
                 $user = $draft->owner;
@@ -230,149 +258,91 @@ class ProcessDraftELNSubmission implements ShouldQueue
 
                 $project = $processDraft->createOrUpdateProject($draft, $user_id, $team_id, $user, $team);
 
-                // Get validation from project (guaranteed to exist after createOrUpdateProject)
                 $nmrXivValidation = $project->validation;
 
-                // Clean up orphaned data
                 $processDraft->cleanupOrphanedData($project);
-
-                // Process studies
                 $processDraft->processStudies($draft, $project, $nmrXivValidation);
-
-                // Process orphaned files
                 $processDraft->processOrphanedFiles($draft, $project, $nmrXivValidation);
 
-                // Get publication metadata using ELNMetadataServiceFactory
+                $logger->log($draft, 'info', 'Processing metadata from draft');
+
                 $metadataService = ELNMetadataServiceFactory::create($draft->eln);
 
                 // Validate and extract metadata
                 if ($metadataService->validateMetadataFromDraft($draft)) {
                     $allMetadata = $metadataService->extractAllMetadataFromDraft($draft);
-
                     if ($allMetadata) {
-                        Log::info('Publication metadata extracted successfully', [
-                            'draft_id' => $draft->id,
-                            'studies_count' => count($allMetadata['studies'] ?? []),
-                            'molecules_count' => count($allMetadata['molecules'] ?? []),
-                        ]);
-
-                        // Process and attach metadata to studies
-                        $this->processStudyMetadata($draft, $allMetadata, $processDraft);
+                        $logger->log($draft, 'info', 'Metadata extracted from draft');
+                        $this->processStudyMetadata($draft, $allMetadata, $processDraft, $logger);
                     } else {
-                        Log::warning('No metadata extracted from draft', ['draft_id' => $draft->id]);
+                        $logger->log($draft, 'warning', 'No metadata extracted from draft');
                     }
                 } else {
-                    Log::warning('Invalid metadata structure for draft', ['draft_id' => $draft->id]);
+                    $logger->log($draft, 'warning', 'Invalid metadata structure for draft');
                 }
 
-                // Chain jobs to run in sequence: ArchiveStudy → ProcessProjectSpectra → Final Processing
+                $logger->log($draft, 'info', 'Dispatching Archiving Jobs, Auto-Processing ELN Spectra, Validation And Submission Of ELN Draft');
                 ArchiveStudy::dispatch($project)
                     ->chain([
-                        new ProcessProjectSpectra($project->id),
-                        new ProcessDraftELNSubmissionFinalizer($draft->id),
+                        new ProcessELNSpectra($project->id),
+                        new ValidateAndSubmitELNDraft($draft->id),
                     ]);
 
-                $draft->update([
-                    'status' => 'ZIP_PROCESSED',
-                    'current_step' => '1',
-                ]);
-
-                Log::info('ELN processing completed, jobs chained for final processing', [
-                    'draft_id' => $draft->id,
-                    'project_id' => $project->id,
-                ]);
             });
         }
     }
 
     /**
-     * Remove directory recursively.
-     */
-    private function removeDirectory(string $dir): void
-    {
-        if (! is_dir($dir)) {
-            return;
-        }
-
-        $files = array_diff(scandir($dir), ['.', '..']);
-        foreach ($files as $file) {
-            $path = $dir.DIRECTORY_SEPARATOR.$file;
-            is_dir($path) ? $this->removeDirectory($path) : unlink($path);
-        }
-        rmdir($dir);
-    }
-
-    /**
      * Process and attach metadata to studies.
      */
-    private function processStudyMetadata(Draft $draft, array $allMetadata, ProcessDraft $processDraft): void
+    private function processStudyMetadata(Draft $draft, array $allMetadata, ProcessDraft $processDraft, DraftProcessingLogger $logger): void
     {
         try {
-            Log::info('Processing study metadata', [
-                'draft_id' => $draft->id,
-                'studies_count' => count($allMetadata['studies'] ?? []),
-            ]);
+            $logger->log($draft, 'info', 'Processing study metadata');
 
             // Get the project associated with this draft
             $project = $draft->project;
             if (! $project) {
-                Log::warning('No project found for draft', ['draft_id' => $draft->id]);
+                $logger->log($draft, 'error', 'No project found for draft');
 
                 return;
             }
 
             // Process each study from the metadata
             foreach ($allMetadata['studies'] ?? [] as $studyMetadata) {
-                $this->attachMetadataToStudy($project, $studyMetadata, $allMetadata);
+                $this->attachMetadataToStudy($project, $studyMetadata, $logger);
             }
 
-            Log::info('Successfully processed study metadata', [
-                'draft_id' => $draft->id,
-                'project_id' => $project->id,
-            ]);
+            $logger->log($draft, 'info', 'Successfully processed study metadata');
 
         } catch (\Exception $e) {
-            Log::error('Failed to process study metadata', [
-                'draft_id' => $draft->id,
-                'error' => $e->getMessage(),
-            ]);
+            $logger->log($draft, 'error', 'Failed to process study metadata: '.$e->getMessage());
         }
     }
 
     /**
      * Attach metadata (authors, citations, molecules) to a specific study.
      */
-    private function attachMetadataToStudy($project, array $studyMetadata, array $allMetadata): void
+    private function attachMetadataToStudy($project, array $studyMetadata, DraftProcessingLogger $logger): void
     {
         try {
-
-            Log::info('Study metadata', [
-                'study_metadata' => json_encode($studyMetadata, JSON_UNESCAPED_UNICODE),
-            ]);
-
-            // Find the study by tracking item name or name
             $trackingItemName = $studyMetadata['tracking_item_name'] ? $studyMetadata['tracking_item_name'] : null;
 
             $studyName = null;
 
             if ($trackingItemName) {
-                // get last item of the array
                 $studyName = 'sample_'.explode('-', $trackingItemName)[count(explode('-', $trackingItemName)) - 1];
             } else {
                 $studyName = $studyMetadata['name'];
             }
 
             if (! $studyName) {
-                Log::warning('No study identifier found in metadata', [
-                    'study_metadata' => $studyMetadata,
-                ]);
+                $logger->log($project->draft, 'error', 'Study name not found');
 
                 return;
             }
 
-            Log::info('Study name', [
-                'study_name' => $studyName,
-            ]);
+            $logger->log($project->draft, 'info', 'Study name: '.$studyName);
 
             // Find the study in the project
             $study = $project->studies()
@@ -384,76 +354,59 @@ class ProcessDraftELNSubmission implements ShouldQueue
                 ->first();
 
             if (! $study) {
-                Log::info('Study not found, will be created during processing', [
-                    'study_identifier' => $studyName,
-                    'project_id' => $project->id,
-                ]);
+                $logger->log($project->draft, 'error', 'Study not found: '.$studyName);
 
                 return;
             }
 
-            Log::info('Attaching metadata to study', [
-                'study_id' => $study->id,
-                'study_name' => $study->name,
-                'study_identifier' => $studyName,
+            $study->update([
+                'name' => $studyMetadata['name'].' - '.$studyName,
             ]);
 
-            // Update study description if available
-            $this->updateStudyDescription($study, $studyMetadata);
+            $logger->log($project->draft, 'info', 'Attaching metadata to study: '.$study->name);
 
-            // Attach license if available
-            $this->attachLicenseToStudy($study, $studyMetadata);
+            $this->updateStudyDescription($study, $studyMetadata, $logger);
 
-            // Attach keywords/tags if available
-            $this->attachKeywordsToStudy($study, $studyMetadata);
+            $this->attachLicenseToStudy($study, $studyMetadata, $logger);
 
-            // Attach authors from project-level metadata
-            $this->attachAuthorsToStudy($study, $studyMetadata['authors']);
+            $this->attachKeywordsToStudy($study, $studyMetadata, $logger);
 
-            // Attach citations from study-level metadata
-            // $this->attachCitationsToStudy($study, $studyMetadata['citation'] ?? []);
+            $this->attachAuthorsToStudy($study, $studyMetadata['authors'], $logger);
 
-            // Attach molecules using proper relationships
+            // $this->attachCitationsToStudy($study, $studyMetadata['citation'] ?? [], $logger);
+
             if (isset($studyMetadata['chemical_substance']['molecule'])) {
-                $this->attachMoleculesToStudy($study, [$studyMetadata['chemical_substance']['molecule']]);
+                $this->attachMoleculesToStudy($study, [$studyMetadata['chemical_substance']['molecule']], $logger);
             }
 
         } catch (\Exception $e) {
-            Log::error('Failed to attach metadata to study', [
-                'study_identifier' => $studyIdentifier ?? 'unknown',
-                'error' => $e->getMessage(),
-            ]);
+            $logger->log($project->draft, 'error', 'Failed to attach metadata to study: '.$e->getMessage());
         }
     }
 
     /**
      * Attach authors to study using proper relationships.
      */
-    private function attachAuthorsToStudy($study, array $authors): void
+    private function attachAuthorsToStudy($study, array $authors, DraftProcessingLogger $logger): void
     {
         if (empty($authors)) {
+            $logger->log($study->project->draft, 'error', 'No authors found for study: '.$study->name);
+
             return;
         }
 
         try {
-            // Get the project associated with the study
             $project = $study->project;
             if (! $project) {
-                Log::warning('No project found for study, cannot attach authors', [
-                    'study_id' => $study->id,
-                ]);
+                $logger->log($study->project->draft, 'error', 'No project found for study: '.$study->name);
 
                 return;
             }
 
-            // Prepare author data in the format expected by AuthorService
             $authorData = [];
             foreach ($authors as $author) {
-                // Skip if required fields are missing
                 if (empty($author['given_name']) || empty($author['family_name'])) {
-                    Log::warning('Skipping author with missing required fields', [
-                        'author' => $author,
-                    ]);
+                    $logger->log($study->project->draft, 'error', 'Skipping author with missing required fields: '.$author);
 
                     continue;
                 }
@@ -469,17 +422,12 @@ class ProcessDraftELNSubmission implements ShouldQueue
             }
 
             if (! empty($authorData)) {
-                // Use AuthorService to sync authors with the project
                 $authorService = app(AuthorService::class);
                 $authorService->syncAuthors($project, $authorData);
             }
 
         } catch (\Exception $e) {
-            Log::error('Failed to attach authors to study', [
-                'study_id' => $study->id,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
+            $logger->log($study->project->draft, 'error', 'Failed to attach authors to study: '.$e->getMessage());
         }
     }
 
@@ -514,32 +462,29 @@ class ProcessDraftELNSubmission implements ShouldQueue
     /**
      * Update study description.
      */
-    private function updateStudyDescription($study, array $studyMetadata): void
+    private function updateStudyDescription($study, array $studyMetadata, DraftProcessingLogger $logger): void
     {
         try {
             $description = $studyMetadata['description'] ?? $studyMetadata['abstract'] ?? null;
 
-            if ($description) {
+            if ($description && $description !== $study->description) {
                 $study->update([
                     'description' => $description,
                 ]);
 
-                Log::info('Updated study description', [
-                    'study_id' => $study->id,
-                ]);
+                $logger->log($study->project->draft, 'info', 'Updated study description: '.$description);
+            } else {
+                $logger->log($study->project->draft, 'info', 'Study description missing or empty');
             }
         } catch (\Exception $e) {
-            Log::error('Failed to update study description', [
-                'study_id' => $study->id,
-                'error' => $e->getMessage(),
-            ]);
+            $logger->log($study->project->draft, 'error', 'Failed to update study description: '.$e->getMessage());
         }
     }
 
     /**
      * Attach license to study.
      */
-    private function attachLicenseToStudy($study, array $studyMetadata): void
+    private function attachLicenseToStudy($study, array $studyMetadata, DraftProcessingLogger $logger): void
     {
         try {
             $licenseInfo = $studyMetadata['license'] ?? null;
@@ -547,22 +492,18 @@ class ProcessDraftELNSubmission implements ShouldQueue
             if ($licenseInfo) {
                 $license = null;
 
-                // Try to find license by SPDX ID first
                 if (isset($licenseInfo['spdx_id'])) {
                     $license = License::where('spdx_id', $licenseInfo['spdx_id'])->first();
                 }
 
-                // Try to find by URL if SPDX ID not found
                 if (! $license && isset($licenseInfo['url'])) {
                     $license = License::where('url', $licenseInfo['url'])->first();
                 }
 
-                // Try to find by title if SPDX ID and URL not found
                 if (! $license && isset($licenseInfo['title'])) {
                     $license = License::where('title', 'ILIKE', '%'.$licenseInfo['title'].'%')->first();
                 }
 
-                // Use default license if none found (you may want to adjust this)
                 if (! $license) {
                     $license = License::where('spdx_id', 'CC-BY-4.0')->first();
                 }
@@ -582,25 +523,20 @@ class ProcessDraftELNSubmission implements ShouldQueue
                         ]);
                     });
 
-                    Log::info('Attached license to study', [
-                        'study_id' => $study->id,
-                        'license_id' => $license->id,
-                        'license_title' => $license->title,
-                    ]);
+                    $logger->log($study->project->draft, 'info', 'License attached to study: '.$license->title);
+                } else {
+                    $logger->log($study->project->draft, 'info', 'License not found');
                 }
             }
         } catch (\Exception $e) {
-            Log::error('Failed to attach license to study', [
-                'study_id' => $study->id,
-                'error' => $e->getMessage(),
-            ]);
+            $logger->log($study->project->draft, 'error', 'Failed to attach license to study: '.$e->getMessage());
         }
     }
 
     /**
      * Attach keywords/tags to study.
      */
-    private function attachKeywordsToStudy($study, array $studyMetadata): void
+    private function attachKeywordsToStudy($study, array $studyMetadata, DraftProcessingLogger $logger): void
     {
         try {
             $keywordsData = $studyMetadata['keywords'] ?? [];
@@ -608,19 +544,15 @@ class ProcessDraftELNSubmission implements ShouldQueue
             if (! empty($keywordsData)) {
                 $keywords = [];
 
-                // Handle structured keyword format from ELN metadata
                 if (is_array($keywordsData)) {
                     foreach ($keywordsData as $keywordItem) {
                         if (is_array($keywordItem) && isset($keywordItem['name'])) {
-                            // Extract the name from structured keyword
                             $keywords[] = $keywordItem['name'];
                         } elseif (is_string($keywordItem)) {
-                            // Handle simple string keywords
                             $keywords[] = $keywordItem;
                         }
                     }
                 } elseif (is_string($keywordsData)) {
-                    // Convert comma-separated string to array
                     $keywords = array_map('trim', explode(',', $keywordsData));
                 }
 
@@ -630,38 +562,30 @@ class ProcessDraftELNSubmission implements ShouldQueue
                 });
 
                 if (! empty($keywords)) {
-                    // Use Spatie Tags to attach keywords
                     $study->syncTags($keywords);
-
                     $study->project->syncTags($keywords);
-
-                    Log::info('Attached keywords to study', [
-                        'study_id' => $study->id,
-                        'keywords_count' => count($keywords),
-                        'keywords' => $keywords,
-                        'original_keywords_data' => $keywordsData,
-                    ]);
+                    $logger->log($study->project->draft, 'info', 'Keywords attached to study: '.implode(', ', $keywords));
+                } else {
+                    $logger->log($study->project->draft, 'info', 'Keywords not found');
                 }
             }
         } catch (\Exception $e) {
-            Log::error('Failed to attach keywords to study', [
-                'study_id' => $study->id,
-                'error' => $e->getMessage(),
-            ]);
+            $logger->log($study->project->draft, 'error', 'Failed to attach keywords to study: '.$e->getMessage());
         }
     }
 
     /**
      * Attach molecules to study using proper relationships.
      */
-    private function attachMoleculesToStudy($study, array $molecules): void
+    private function attachMoleculesToStudy($study, array $molecules, DraftProcessingLogger $logger): void
     {
         if (empty($molecules)) {
+            $logger->log($study->project->draft, 'error', 'No molecules found for study: '.$study->name);
+
             return;
         }
 
         try {
-            // Get or create the study's sample
             $sample = $study->sample;
             if (! $sample) {
                 $sample = Sample::create([
@@ -673,17 +597,14 @@ class ProcessDraftELNSubmission implements ShouldQueue
             }
 
             $attachedMolecules = [];
-            $moleculeData = []; // For JSON storage as well
+            $moleculeData = [];
 
             foreach ($molecules as $moleculeInfo) {
-                // Create or find molecule
-                $molecule = $this->createOrFindMolecule($moleculeInfo);
+                $molecule = $this->createOrFindMolecule($moleculeInfo, $logger);
 
                 if ($molecule) {
-                    // Attach molecule to sample with composition if available
                     $composition = $moleculeInfo['percentage_composition'] ?? 100.0;
 
-                    // Check if already attached to avoid duplicates
                     if (! $sample->molecules()->where('molecule_id', $molecule->id)->exists()) {
                         $sample->molecules()->attach($molecule->id, [
                             'percentage_composition' => $composition,
@@ -691,34 +612,29 @@ class ProcessDraftELNSubmission implements ShouldQueue
                     }
                 }
             }
+            $logger->log($study->project->draft, 'info', 'Molecules attached to study: '.count($attachedMolecules));
 
         } catch (\Exception $e) {
-            Log::error('Failed to attach molecules to study', [
-                'study_id' => $study->id,
-                'error' => $e->getMessage(),
-            ]);
+            $logger->log($study->project->draft, 'error', 'Failed to attach molecules to study: '.$e->getMessage());
         }
     }
 
     /**
      * Create or find molecule by identifiers.
      */
-    private function createOrFindMolecule(array $moleculeInfo): ?Molecule
+    private function createOrFindMolecule(array $moleculeInfo, DraftProcessingLogger $logger): ?Molecule
     {
         try {
             $molecule = null;
 
-            // Try to find by InChI Key first (most specific)
             if (! empty($moleculeInfo['inchi'])) {
                 $molecule = Molecule::where('inchi', $moleculeInfo['inchi'])->first();
             }
 
-            // Try to find by SMILES if InChI Key not found
             if (! $molecule && ! empty($moleculeInfo['smiles'])) {
                 $molecule = Molecule::where('smiles', $moleculeInfo['smiles'])->first();
             }
 
-            // Create new molecule if not found
             if (! $molecule) {
                 $molecule = Molecule::create([
                     'molecular_formula' => $moleculeInfo['molecular_formula'] ?? null,

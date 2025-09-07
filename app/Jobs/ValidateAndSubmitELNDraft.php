@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
 
-class ProcessDraftELNSubmissionFinalizer implements ShouldQueue
+class ValidateAndSubmitELNDraft implements ShouldQueue
 {
     use Queueable;
 
@@ -16,7 +16,7 @@ class ProcessDraftELNSubmissionFinalizer implements ShouldQueue
     ) {}
 
     /**
-     * Execute the job - Final processing after ProcessProjectSpectra completes.
+     * Execute the job - Final processing after ProcessELNSpectra completes.
      */
     public function handle(): void
     {
@@ -29,7 +29,7 @@ class ProcessDraftELNSubmissionFinalizer implements ShouldQueue
         }
 
         try {
-            Log::info('Starting final processing after ProcessProjectSpectra', [
+            Log::info('Starting final processing after ProcessELNSpectra', [
                 'draft_id' => $draft->id,
             ]);
 

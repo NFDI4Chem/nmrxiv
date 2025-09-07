@@ -162,11 +162,11 @@ class FileSystemController extends Controller
     /**
      * Process ELN-specific metadata using the appropriate service.
      */
-    private function processELNMetadata(Draft $draft): void
+    private function processELNMetadata(Draft $draft, $logger): void
     {
         try {
             if (! ELNMetadataServiceFactory::isSupported($draft->eln)) {
-                Log::warning("Unsupported ELN type for metadata processing: {$draft->eln}");
+                $logger->log($draft, 'warning', "Unsupported ELN type for metadata processing: {$draft->eln}");
 
                 return;
             }
@@ -174,14 +174,18 @@ class FileSystemController extends Controller
             $metadataService = ELNMetadataServiceFactory::create($draft->eln);
 
             if (! $metadataService->validateMetadataFromDraft($draft)) {
-                Log::warning("Invalid metadata structure for ELN: {$draft->eln}", [
-                    'draft_id' => $draft->id,
-                ]);
+                $logger->log($draft, 'warning', "Invalid metadata structure for ELN: {$draft->eln}");
 
                 return;
             }
 
             $extractedAnalyses = $metadataService->extractAnalysesFromDraft($draft);
+
+            if (empty($extractedAnalyses)) {
+                $logger->log($draft, 'warning', 'No analyses extracted from draft');
+
+                return;
+            }
 
             $analysisIds = array_column($extractedAnalyses, 'analysis_id');
 
@@ -211,29 +215,22 @@ class FileSystemController extends Controller
             }
 
         } catch (\Exception $e) {
-            Log::error('Failed to process ELN metadata', [
-                'draft_id' => $draft->id,
-                'eln_type' => $draft->eln,
-                'error' => $e->getMessage(),
-            ]);
+            $logger->log($draft, 'error', 'Failed to process ELN metadata: '.$e->getMessage());
         }
     }
 
     /**
      * Process folders to identify instrument types and set model types.
      */
-    public function processFolder($folders, $draft = null, $processELNMetadata = null): void
+    public function processFolder($folders, $draft = null, $processELNMetadata = null, $logger = null): void
     {
         Log::info('Processing ELN:'.$processELNMetadata);
         if ($draft && $draft->eln == 'chemotion') {
             if ($processELNMetadata) {
-                Log::info('Processing Chemotion:');
-                // Process ELN-specific metadata
-                $this->processELNMetadata($draft);
+                $this->processELNMetadata($draft, $logger);
             }
 
             foreach ($folders as $folder) {
-                Log::info('Processing folder: '.$folder->name);
                 if ($folder->type == 'directory') {
                     if ($this->isBruker($folder)) {
                         $this->saveInstrumentType($folder, 'bruker');
