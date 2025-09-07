@@ -4,8 +4,10 @@ namespace App\Http\Controllers\API;
 
 use App\Actions\Draft\CreateDraft;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\StudyResource;
 use App\Jobs\ProcessDraftELNSubmission;
 use App\Models\Draft;
+use App\Models\Study;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -262,7 +264,17 @@ class ELNController extends Controller
 
         $createDraft = new CreateDraft;
 
-        // Check if draft already exists
+        // check if study already exists
+        $study = Study::where('external_id', $externalId)->first();
+        if ($study && $study->is_public && $study->draft == null) {
+            return response()->json([
+                'error' => 'A submission with this '.$eln.' external ID already exists and is published',
+                'external_id' => $externalId,
+                'external_url' => $study->external_url,
+                'nmrxiv_id' => $study->identifier,
+            ], 400);
+        }
+
         $draft = $createDraft->findByExternalId($externalId, $user_id, $team_id);
 
         $isNewDraft = false;
@@ -560,33 +572,48 @@ class ELNController extends Controller
             ->withCount('files')
             ->first();
 
-        if (! $draft) {
+        if ($draft) {
             return response()->json([
-                'error' => 'Draft not found with the provided external ID',
-                'external_id' => $external_id,
-            ], 404);
-        }
+                'success' => true,
+                'data' => [
+                    'draft_id' => $draft->id,
+                    'draft_key' => $draft->key,
+                    'external_id' => $draft->external_id,
+                    'eln_system' => $draft->eln,
+                    'name' => $draft->name,
+                    'description' => $draft->description,
+                    'status' => $draft->status ?? null,
+                    'current_step' => $draft->current_step ?? null,
+                    'callback_url' => $draft->callback_url,
+                    'zip_url' => $draft->zip_url,
+                    'release_date' => $draft->release_date,
+                    'created_at' => $draft->created_at,
+                    'updated_at' => $draft->updated_at,
+                    'owner_id' => $draft->owner_id,
+                    'team_id' => $draft->team_id,
+                    'files_count' => $draft->files_count,
+                ],
+            ]);
+        } else {
+            $studies = Study::with(['sample.molecules', 'datasets'])
+                ->where('external_id', $external_id)
+                ->get();
 
-        return response()->json([
-            'success' => true,
-            'data' => [
-                'draft_id' => $draft->id,
-                'draft_key' => $draft->key,
-                'external_id' => $draft->external_id,
-                'eln_system' => $draft->eln,
-                'name' => $draft->name,
-                'description' => $draft->description,
-                'status' => $draft->status ?? null,
-                'current_step' => $draft->current_step ?? null,
-                'callback_url' => $draft->callback_url,
-                'zip_url' => $draft->zip_url,
-                'release_date' => $draft->release_date,
-                'created_at' => $draft->created_at,
-                'updated_at' => $draft->updated_at,
-                'owner_id' => $draft->owner_id,
-                'team_id' => $draft->team_id,
-                'files_count' => $draft->files_count,
-            ],
-        ]);
+            if ($studies->count() > 0) {
+                $studyResources = $studies->map(function ($study) {
+                    return (new StudyResource($study))->lite(false, ['sample', 'datasets']);
+                });
+
+                return response()->json([
+                    'success' => true,
+                    'data' => $studyResources,
+                ]);
+            } else {
+                return response()->json([
+                    'error' => 'Submission not found with the provided external ID',
+                    'external_id' => $external_id,
+                ], 404);
+            }
+        }
     }
 }

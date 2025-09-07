@@ -51,6 +51,7 @@ class StudyResource extends JsonResource
             'submitted_through' => $this->submitted_through,
             'external_id' => $this->external_id,
             'external_url' => $this->external_url,
+            'processing_logs' => $this->processing_logs,
             $this->mergeWhen(! $this->lite, function () {
                 return [
                     $this->mergeWhen(
