@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\Draft;
+use App\Services\ChemotionRepositoryTrackerService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
@@ -82,12 +83,18 @@ class ValidateAndSubmitELNDraft implements ShouldQueue
                     'draft_id' => $draft->id,
                 ]);
 
+                // Track submission as validated and ready for publishing
+                $this->trackSubmissionValidated($draft, $project);
+
                 ProcessSubmission::dispatch($project);
             } else {
                 Log::error('Validation failed for project', [
                     'project_id' => $project->id,
                     'draft_id' => $draft->id,
                 ]);
+
+                // Track validation failure
+                $this->trackValidationFailed($draft, $project);
             }
 
         } catch (\Exception $e) {
@@ -97,6 +104,94 @@ class ValidateAndSubmitELNDraft implements ShouldQueue
                 'trace' => $e->getTraceAsString(),
             ]);
             throw $e;
+        }
+    }
+
+    /**
+     * Track submission as validated and ready for publishing
+     */
+    private function trackSubmissionValidated(Draft $draft, $project): void
+    {
+        try {
+            $trackerService = app(ChemotionRepositoryTrackerService::class);
+            
+            // Check if tracking is enabled
+            if (! $trackerService->isEnabled()) {
+                Log::debug('Chemotion tracking is disabled, skipping tracking for validated submission', [
+                    'external_id' => $draft->external_id,
+                    'project_id' => $project->id,
+                ]);
+                return;
+            }
+            
+            $metadata = [
+                'validation_status' => 'passed',
+                'project_id' => $project->id,
+                'studies_count' => $project->studies->count(),
+                'validated_at' => now()->toISOString(),
+                'ready_for_publishing' => true,
+            ];
+
+            $trackerService->updateElnSubmissionStatus(
+                submissionId: $draft->external_id,
+                newStatus: 'validated',
+                additionalMetadata: $metadata
+            );
+
+            Log::info('Chemotion tracking updated for validated submission', [
+                'external_id' => $draft->external_id,
+                'project_id' => $project->id,
+            ]);
+
+        } catch (\Exception $e) {
+            Log::warning('Failed to update Chemotion tracking for validated submission', [
+                'external_id' => $draft->external_id,
+                'project_id' => $project->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Track validation failure
+     */
+    private function trackValidationFailed(Draft $draft, $project): void
+    {
+        try {
+            $trackerService = app(ChemotionRepositoryTrackerService::class);
+            
+            // Check if tracking is enabled
+            if (! $trackerService->isEnabled()) {
+                Log::debug('Chemotion tracking is disabled, skipping tracking for failed validation', [
+                    'external_id' => $draft->external_id,
+                    'project_id' => $project->id,
+                ]);
+                return;
+            }
+            
+            $metadata = [
+                'validation_status' => 'failed',
+                'project_id' => $project->id,
+                'validation_failed_at' => now()->toISOString(),
+            ];
+
+            $trackerService->updateElnSubmissionStatus(
+                submissionId: $draft->external_id,
+                newStatus: 'validation_failed',
+                additionalMetadata: $metadata
+            );
+
+            Log::info('Chemotion tracking updated for failed validation', [
+                'external_id' => $draft->external_id,
+                'project_id' => $project->id,
+            ]);
+
+        } catch (\Exception $e) {
+            Log::warning('Failed to update Chemotion tracking for failed validation', [
+                'external_id' => $draft->external_id,
+                'project_id' => $project->id,
+                'error' => $e->getMessage(),
+            ]);
         }
     }
 }

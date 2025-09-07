@@ -28,4 +28,12 @@ return [
         'redirect' => env('TWITTER_REDIRECT_URL'),
     ],
 
+    'chemotion_tracker' => [
+        'enabled' => env('CHEMOTION_TRACKER_ENABLED', false),
+        'base_url' => env('CHEMOTION_TRACKER_BASE_URL', 'http://193.196.38.117:3000'),
+        'client_id' => env('CHEMOTION_TRACKER_CLIENT_ID', 'S8HbJdAEo--y05h4EUYblZBu-bgWkSDJrEb7kKMCpwc'),
+        'username' => env('CHEMOTION_TRACKER_USERNAME'),
+        'password' => env('CHEMOTION_TRACKER_PASSWORD'),
+    ],
+
 ];

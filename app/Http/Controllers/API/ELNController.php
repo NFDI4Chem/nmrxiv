@@ -8,9 +8,11 @@ use App\Http\Resources\StudyResource;
 use App\Jobs\ProcessDraftELNSubmission;
 use App\Models\Draft;
 use App\Models\Study;
+use App\Services\ChemotionRepositoryTrackerService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class ELNController extends Controller
 {
@@ -315,6 +317,9 @@ class ELNController extends Controller
             $draft = $createDraft->update($draft, $updateData);
         }
 
+        // Track submission received in Chemotion Repository-Tracker
+        $this->trackSubmissionReceived($draft, $user);
+
         // Dispatch job to process the zip file
         ProcessDraftELNSubmission::dispatch($draft->id);
 
@@ -614,6 +619,58 @@ class ELNController extends Controller
                     'external_id' => $external_id,
                 ], 404);
             }
+        }
+    }
+
+    /**
+     * Track submission received in Chemotion Repository-Tracker
+     */
+    private function trackSubmissionReceived(Draft $draft, $user): void
+    {
+        try {
+            $trackerService = app(ChemotionRepositoryTrackerService::class);
+            
+            // Check if tracking is enabled
+            if (! $trackerService->isEnabled()) {
+                Log::debug('Chemotion tracking is disabled, skipping tracking for received submission', [
+                    'external_id' => $draft->external_id,
+                    'draft_id' => $draft->id,
+                ]);
+                return;
+            }
+            
+            $metadata = [
+                'submission_type' => 'eln',
+                'eln_system' => $draft->eln,
+                'draft_id' => $draft->id,
+                'zip_url' => $draft->zip_url,
+                'callback_url' => $draft->callback_url,
+                'release_date' => $draft->release_date,
+                'received_at' => now()->toISOString(),
+            ];
+
+            $trackerService->createElnSubmissionTracking(
+                submissionId: $draft->external_id,
+                status: 'received',
+                metadata: $metadata,
+                ownerName: $user->first_name.' '.$user->last_name,
+                ownerEmail: $user->email,
+                fromSystem: 'nmrxiv',
+                toSystem: 'nmrxiv'
+            );
+
+            Log::info('Chemotion tracking created for received submission', [
+                'external_id' => $draft->external_id,
+                'draft_id' => $draft->id,
+            ]);
+
+        } catch (\Exception $e) {
+            // Don't fail the submission if tracking fails
+            Log::warning('Failed to create Chemotion tracking for received submission', [
+                'external_id' => $draft->external_id,
+                'draft_id' => $draft->id,
+                'error' => $e->getMessage(),
+            ]);
         }
     }
 }
