@@ -16,7 +16,20 @@
                         {{ author.given_name }}
                         {{ author.family_name }}
                     </h3>
+                    <button
+                        v-if="enableRoleClick"
+                        type="button"
+                        class="group inline-flex items-center focus:outline-none"
+                        @click.stop.prevent="onRoleClick(author)"
+                        title="Manage Role"
+                    >
+                        <Tag
+                            :label="(author.pivot && author.pivot.contributor_type) || author.contributor_type || 'Researcher'"
+                            class="cursor-pointer group-hover:shadow group-active:scale-[0.97] transition"
+                        />
+                    </button>
                     <Tag
+                        v-else
                         :label="(author.pivot && author.pivot.contributor_type) || author.contributor_type || 'Researcher'"
                     />
                 </div>
@@ -44,7 +57,11 @@ import Tag from "@/Shared/Tag.vue";
 
 export default {
     components: { Tag },
-    props: ["authors"],
+    props: {
+        authors: { type: Array, required: true },
+        enableRoleClick: { type: Boolean, default: false },
+    },
+    emits: ["role-click"],
     methods: {
         getOrcidLink(orcidId) {
             var link = "#";
@@ -59,6 +76,9 @@ export default {
                 target = "_blank";
             }
             return target;
+        },
+        onRoleClick(author) {
+            this.$emit("role-click", author);
         },
     },
 };

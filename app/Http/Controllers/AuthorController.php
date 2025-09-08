@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\AuthorResource;
 use App\Models\Project;
-use App\Services\AuthorService;
+use App\Actions\Author\SyncProjectAuthors;
+use App\Actions\Author\RemoveProjectAuthor;
+use App\Actions\Author\UpdateProjectAuthorContributorType;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -20,7 +22,9 @@ class AuthorController extends Controller
      * @return void
      */
     public function __construct(
-        private AuthorService $authorService
+        private SyncProjectAuthors $syncProjectAuthors,
+        private RemoveProjectAuthor $removeProjectAuthor,
+        private UpdateProjectAuthorContributorType $updateProjectAuthorContributorType,
     ) {}
 
     /**
@@ -42,7 +46,7 @@ class AuthorController extends Controller
             ]);
 
             $authors = $request->get('authors', []);
-            $processedAuthors = $this->authorService->syncAuthors($project, $authors);
+            $processedAuthors = $this->syncProjectAuthors->handle($project, $authors);
 
             return $this->successResponse($request, 'Authors updated successfully', $processedAuthors);
         } catch (ValidationException $e) {
@@ -69,7 +73,7 @@ class AuthorController extends Controller
             ]);
 
             $authors = $request->get('authors');
-            $this->authorService->removeAuthorFromProject($project, $authors[0]['id']);
+            $this->removeProjectAuthor->handle($project, $authors[0]['id']);
 
             return $this->successResponse($request, 'Author deleted successfully');
         } catch (ValidationException $e) {
@@ -95,11 +99,7 @@ class AuthorController extends Controller
                 'role' => ['required', 'string', 'max:50', 'regex:/^[a-zA-Z\s]+$/'],
             ]);
 
-            $success = $this->authorService->updateContributorType(
-                $project,
-                $request->author_id,
-                $request->role
-            );
+            $success = $this->updateProjectAuthorContributorType->handle($project, $request->author_id, $request->role);
 
             if (! $success) {
                 return $this->errorResponse($request, 'Invalid contributor type or missing author information.', Response::HTTP_BAD_REQUEST);
