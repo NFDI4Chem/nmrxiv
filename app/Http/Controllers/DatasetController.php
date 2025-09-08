@@ -31,7 +31,10 @@ class DatasetController extends Controller
         if ($dataset) {
             $nmrium = $dataset->nmrium;
             if ($nmrium) {
-                return $nmrium->nmrium_info;
+                $nmriumInfo = $nmrium->nmrium_info;
+                $nmriumInfo['data']['molecules'] = [];
+
+                return $nmriumInfo;
             } else {
                 return null;
             }

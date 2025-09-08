@@ -92,8 +92,27 @@ class ProcessDraftELNSubmission implements ShouldQueue
      */
     private function processZipFile(Draft $draft, PathGeneratorService $pathGenerator): array
     {
-        // Download zip file
-        $response = Http::timeout(300)->get($draft->zip_url);
+        // Download zip file with proxy support
+        $httpClient = Http::timeout(300);
+
+        // Configure proxy if environment variables are set
+        $proxyOptions = [];
+
+        if ($httpProxy = config('http.http_proxy')) {
+            $proxyOptions['http'] = $httpProxy;
+        }
+
+        if ($httpsProxy = config('http.https_proxy')) {
+            $proxyOptions['https'] = $httpsProxy;
+        }
+
+        if (! empty($proxyOptions)) {
+            $httpClient = $httpClient->withOptions([
+                'proxy' => $proxyOptions,
+            ]);
+        }
+
+        $response = $httpClient->get($draft->zip_url);
 
         if (! $response->successful()) {
             throw new \Exception("Failed to download zip file. HTTP status: {$response->status()}");

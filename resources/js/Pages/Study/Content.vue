@@ -25,7 +25,7 @@
                                     v-for="tab in subNavigation"
                                     :key="tab.name"
                                     :href="
-                                        preview
+                                        preview && project.obfuscationcode
                                             ? route(tab.preview, [
                                                   project.obfuscationcode,
                                                   study.id,

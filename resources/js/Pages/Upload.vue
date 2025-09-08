@@ -1038,7 +1038,7 @@
                                                         <div>
                                                             <div>
                                                                 <div
-                                                                    class="px-4 py-1.5 -mx-2 bg-gray-50 border-b px-4 py-3 flex items-center font-semibold text-sm text-slate-900 dark:text-slate-200 bg-slate-50/90 dark:bg-slate-700/90 backdrop-blur-sm ring-1 ring-slate-900/10 dark:ring-black/10"
+                                                                    class="px-4 py-1.5 -mx-2 bg-gray-50 border-b px-4 py-3 flex items-center font-semibold text-sm text-slate-900 dark:text-slate-200 bg-slate-50/90 dark:bg-slate-700/90 backdrop-blur-sm ring-1 ring-slate-900/10 dark:ring-black/10 break-all"
                                                                 >
                                                                     <div
                                                                         class="cursor-pointer tooltip m-3 text-gray-500 hover:text-gray-700"
@@ -2843,7 +2843,6 @@ export default {
                             Object.keys(spectra.info).forEach((key) => {
                                 // Only include MIChI-compliant fields
                                 if (michiFields[key]) {
-                                    console.log("MIChI field:", key);
                                     desc =
                                         desc +
                                         michiFields[key] +
