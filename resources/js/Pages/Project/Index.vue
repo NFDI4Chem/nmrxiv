@@ -341,13 +341,7 @@
                         </p>
                     </div>
                     <div class="px-6 pt-1 pb-2">
-                        <span
-                            v-for="tag in project.tags"
-                            :key="tag.id"
-                            class="inline-block bg-gray-100 rounded-full px-3 py-1 text-sm text-gray-600 mr-2 mb-2"
-                        >
-                            # {{ tag.name["en"] }}
-                        </span>
+                        <Tag :tags="project.tags" />
                     </div>
                     <div class="px-6 pt-2 border-t">
                         <ShowProjectDates
@@ -379,12 +373,14 @@
 <script>
 import { Link, router } from "@inertiajs/vue3";
 import { StarIcon } from "@heroicons/vue/24/solid";
+import Tag from "@/Shared/Tag.vue";
 import ShowProjectDates from "@/Shared/ShowProjectDates.vue";
 export default {
     components: {
         Link,
         StarIcon,
         ShowProjectDates,
+    Tag,
     },
     props: ["projects", "mode", "teamRole", "team"],
     setup() {},

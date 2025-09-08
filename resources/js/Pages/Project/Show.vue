@@ -284,26 +284,7 @@
                                     </span>
                                     {{ role }}
                                 </span>
-                                <span
-                                    v-if="project.identifier"
-                                    class="inline-flex pr-4 ml-4 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
-                                >
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        class="h-6 w-6 py-1"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                        stroke-width="2"
-                                    >
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            d="M5.25 8.25h15m-16.5 7.5h15m-1.8-13.5l-3.9 19.5m-2.1-19.5l-3.9 19.5"
-                                        />
-                                    </svg>
-                                    <b>{{ project.identifier }}</b>
-                                </span>
+                                <Tag v-if="project.identifier" :identifier="project.identifier" class="ml-4" />
                             </div>
                         </div>
                         <div
@@ -895,13 +876,7 @@
                     </div>
                     <dd class="mt-1 text-md text-gray-900 space-y-5">
                         <p>
-                            <span
-                                v-for="tag in project.tags"
-                                :key="tag.id"
-                                class="mt-1 inline-flex items-center rounded-full bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10"
-                            >
-                                {{ tag.name["en"] }}
-                            </span>
+                            <Tag :tags="project.tags" />
                         </p>
                     </dd>
                 </div>
@@ -1064,6 +1039,7 @@ import Publish from "@/Shared/Publish.vue";
 import AuthorCard from "@/Shared/AuthorCard.vue";
 import CitationCard from "@/Shared/CitationCard.vue";
 import DOIBadge from "@/Shared/DOIBadge.vue";
+import Tag from "@/Shared/Tag.vue";
 import Datepicker from "@vuepic/vue-datepicker";
 import JetConfirmationModal from "@/Jetstream/ConfirmationModal.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
@@ -1093,6 +1069,7 @@ export default {
         AuthorCard,
         CitationCard,
         DOIBadge,
+    Tag,
         Dialog,
         DialogPanel,
         TransitionChild,
