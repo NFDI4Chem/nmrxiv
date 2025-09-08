@@ -31,7 +31,7 @@
                     <div
                         class="relative grid grid-cols-1 gap-x-4 max-w-7xl mx-auto lg:grid-cols-2"
                     >
-                        <!--Add Manual Section-->
+                        <!-- Add Manual Section -->
                         <div
                             class="px-4 sm:px-6 lg:pb-5 lg:px-0 lg:row-start-1 lg:col-start-1"
                         >
@@ -47,8 +47,8 @@
                                 >
                                     <div class="sm:col-span-1">
                                         <label
-                                            for="title"
-                                            class="block text-sm font-medium text-gray-700"
+                                            for="doi"
+                                            class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
                                         >
                                             DOI
                                         </label>
@@ -58,7 +58,7 @@
                                                 v-model="form.doi"
                                                 type="text"
                                                 name="doi"
-                                                placeholder="DOI ID e.g. 10.1186/s19991-022-00987-0"
+                                                placeholder="Enter DOI (e.g., 10.1000/journal.2023.0001)"
                                                 :class="[
                                                     isEdit
                                                         ? 'shadow-sm focus:ring-red-500 focus:border-red-500 block w-full sm:text-sm border-red-500 rounded-md bg-gray-100'
@@ -74,7 +74,7 @@
                                     </div>
                                     <div class="sm:col-span-4">
                                         <label
-                                            for="family-name"
+                                            for="title"
                                             class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
                                         >
                                             Title
@@ -85,6 +85,7 @@
                                                 v-model="form.title"
                                                 type="text"
                                                 name="title"
+                                                placeholder="Enter publication title"
                                                 autocomplete="title"
                                                 :class="[
                                                     isEdit
@@ -102,7 +103,7 @@
 
                                     <div class="sm:col-span-6">
                                         <label
-                                            for="given-name"
+                                            for="authors"
                                             class="block text-sm font-medium text-gray-700 after:content-['*'] after:ml-0.5 after:text-red-500"
                                         >
                                             Authors
@@ -113,7 +114,7 @@
                                                 v-model="form.authors"
                                                 type="text"
                                                 name="authors"
-                                                placeholder="e.g. Pupier S, Nuzillard MK, Wist P, Schlörer AK."
+                                                placeholder="Enter author names (e.g., Smith J, Johnson A, Brown M)"
                                                 :class="[
                                                     isEdit
                                                         ? 'shadow-sm focus:ring-red-500 focus:border-red-500 block w-full sm:text-sm border-red-500 rounded-md bg-gray-100'
@@ -129,18 +130,18 @@
                                     </div>
                                     <div class="sm:col-span-6">
                                         <label
-                                            for="orcid"
+                                            for="citation_text"
                                             class="block text-sm font-medium text-gray-700"
                                         >
                                             Citation Text
                                         </label>
                                         <div class="mt-1">
                                             <textarea
-                                                id="citation-text"
+                                                id="citation_text"
                                                 v-model="form.citation_text"
-                                                name="citation-text"
-                                                autocomplete="citation-text"
-                                                placeholder="<journal title> <year of publication> <volume> <(issue)> <page info> e.g. - Magnetic resonance in chemistry : MRC 2018 56 ( 8 ) 703-715 or please provide any relevant information."
+                                                name="citation_text"
+                                                autocomplete="citation_text"
+                                                placeholder="Enter complete citation (journal, year, volume, issue, pages) or provide any relevant publication information"
                                                 type="text"
                                                 :class="[
                                                     isEdit
@@ -157,17 +158,17 @@
                                     >
                                         <jet-secondary-button
                                             class="float-right"
-                                            :disabled="!(form && form.title)"
                                             @click="save('addManually')"
                                         >
                                             Add
                                         </jet-secondary-button>
                                         <jet-secondary-button
                                             class="float-right mr-2"
-                                            :disabled="!(form && form.title)"
+                                            :disabled="form.processing"
                                             @click="
                                                 form.reset(),
-                                                    citationsForm.reset()
+                                                    citationsForm.reset(),
+                                                    clearFormErrors()
                                             "
                                         >
                                             Clear
@@ -179,14 +180,14 @@
                                     >
                                         <jet-secondary-button
                                             class="float-right"
-                                            :disabled="!(form && form.title)"
+                                            :disabled="!isFormValid || form.processing"
                                             @click="save('addManually')"
                                         >
                                             Update
                                         </jet-secondary-button>
                                         <jet-secondary-button
                                             class="float-right mr-2"
-                                            :disabled="!(form && form.title)"
+                                            :disabled="form.processing"
                                             @click="onCancelEdit()"
                                         >
                                             Cancel
@@ -196,9 +197,7 @@
                             </div>
                         </div>
                         <!-- Import Section -->
-                        <div
-                            class="lg:px-1 lg:row-start-1 lg:col-start-2 border-l"
-                        >
+                        <div class="lg:px-1 lg:row-start-1 lg:col-start-2 border-l">
                             <div class="pl-2">
                                 <p
                                     class="text-sm leading-6 font-bold text-gray-900"
@@ -210,7 +209,7 @@
                                 >
                                     <div class="sm:col-span-2">
                                         <label
-                                            for="name"
+                                            for="query"
                                             class="block text-sm font-medium text-gray-700"
                                         >
                                             DOI
@@ -223,7 +222,7 @@
                                                 v-model="query"
                                                 type="text"
                                                 name="query"
-                                                placeholder="DOI ID e.g. 10.1186/s19991-022-00987-0"
+                                                placeholder="Enter DOI to import citation automatically"
                                                 autocomplete="off"
                                                 class="flex-1 focus:ring-teal-500 focus:border-teal-500 block w-full min-w-0 rounded sm:text-sm border-gray-300"
                                             />
@@ -233,18 +232,15 @@
                                 </div>
                                 <div class="sm:col-span-2 mt-4">
                                     <jet-secondary-button
-                                        :disabled="query == '' || !query"
+                                        :disabled="!isQueryValid || loading"
                                         @click="fetchCitations"
                                     >
                                         Import
                                     </jet-secondary-button>
                                     <jet-secondary-button
                                         class="ml-2"
-                                        :disabled="isEmpty(fetchedCitations)"
-                                        @click="
-                                            (fetchedCitations = {}),
-                                                (query = null)
-                                        "
+                                        :disabled="isEmpty(fetchedCitations) && !query"
+                                        @click="clearImportData"
                                     >
                                         Reset
                                     </jet-secondary-button>
@@ -269,60 +265,9 @@
                                     "
                                     class="mt-4"
                                 >
-                                    <fieldset
-                                        class="border rounded border-gray-200 overflow-auto"
-                                    >
-                                        <legend class="sr-only">
-                                            Notifications
-                                        </legend>
-                                        <div
-                                            style="height: auto"
-                                            class="divide-y divide-gray-200"
-                                        >
-                                            <div
-                                                class="relative flex items-start p-4"
-                                            >
-                                                <div
-                                                    class="min-w-0 flex-1 text-sm"
-                                                >
-                                                    <label
-                                                        for="citation"
-                                                        class="font-medium text-gray-700"
-                                                    >
-                                                        {{
-                                                            fetchedCitations.title
-                                                        }}
-                                                    </label>
-                                                    <p
-                                                        id="citation-authors"
-                                                        class="text-teal-500"
-                                                    >
-                                                        {{
-                                                            fetchedCitations.authors
-                                                        }}
-                                                    </p>
-                                                    <p
-                                                        id="citation-text"
-                                                        class="text-gray-500"
-                                                    >
-                                                        {{
-                                                            fetchedCitations.citation_text
-                                                        }}
-                                                    </p>
-                                                    <p
-                                                        id="citation-doi"
-                                                        class="text-gray-500 font-bold"
-                                                    >
-                                                        DOI -
-                                                        {{
-                                                            fetchedCitations.doi
-                                                        }}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </fieldset>
-                                    <div>
+                                    <!-- Refactored to reuse CitationCard component -->
+                                    <CitationCard :citations="[fetchedCitations]" />
+                                    <div class="mt-2">
                                         <jet-secondary-button
                                             class="float-right text-md font-bold text-teal-900 mt-4"
                                             @click="save('addFetched')"
@@ -335,7 +280,7 @@
                         </div>
                     </div>
                 </div>
-                <!-- Show existing citation -->
+                <!-- Show existing citations -->
                 <div
                     v-if="citations.length > 0 && !displayAddCitationForms"
                     style="height: 60vh"
@@ -349,80 +294,24 @@
                         @end="drag = false"
                     >
                         <template #item="{ element }">
-                            <div class="overflow-auto">
-                                <ul
-                                    role="list"
-                                    class="divide-y divide-gray-900"
-                                >
-                                    <li>
-                                        <div
-                                            class="px-4 border rounded-md mb-1 py-4 sm:px-6"
-                                        >
-                                            <div
-                                                class="flex items-center cursor justify-between"
-                                            >
-                                                <p
-                                                    class="text-sm font-medium text-teal-900"
-                                                >
-                                                    {{ element.title }}
-                                                </p>
-                                            </div>
-                                            <div
-                                                class="mt-1 sm:flex sm:justify-between"
-                                            >
-                                                <div class="sm:flex">
-                                                    <p
-                                                        class="flex items-center text-xs font-small text-gray-500 break-words"
-                                                    >
-                                                        {{ element.authors }}
-                                                    </p>
-                                                </div>
-                                                <div
-                                                    class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0"
-                                                >
-                                                    <button
-                                                        type="button"
-                                                        class="inline-flex items-center p-1 border border-transparent"
-                                                        @click="edit(element)"
-                                                    >
-                                                        <PencilIcon
-                                                            class="w-3.5 h-3.5 mr-1 text-gray-600"
-                                                        />
-                                                    </button>
-                                                    <button
-                                                        type="button"
-                                                        class="inline-flex items-center p-1 border border-transparent"
-                                                        @click="
-                                                            confirmDeletion(
-                                                                element
-                                                            )
-                                                        "
-                                                    >
-                                                        <TrashIcon
-                                                            class="w-3.5 h-3.5 mr-1 text-gray-600"
-                                                        />
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            <div
-                                                class="sm:flex sm:justify-between"
-                                            >
-                                                <p
-                                                    v-if="element.doi"
-                                                    class="text-xs font-medium text-teal-900"
-                                                >
-                                                    <b class="text-gray-500"
-                                                        >DOI:
-                                                    </b>
-                                                    {{ element.doi }}
-                                                </p>
-                                            </div>
-                                            <div
-                                                class="sm:flex sm:justify-between"
-                                            ></div>
-                                        </div>
-                                    </li>
-                                </ul>
+                            <div class="relative mb-2">
+                                <CitationCard :citations="[element]" />
+                                <div class="absolute top-2 right-2 flex space-x-1">
+                                    <button
+                                        type="button"
+                                        class="inline-flex items-center p-1 border border-transparent bg-white/70 rounded hover:bg-white"
+                                        @click="edit(element)"
+                                    >
+                                        <PencilIcon class="w-3.5 h-3.5 mr-1 text-gray-600" />
+                                    </button>
+                                    <button
+                                        type="button"
+                                        class="inline-flex items-center p-1 border border-transparent bg-white/70 rounded hover:bg-white"
+                                        @click="confirmDeletion(element)"
+                                    >
+                                        <TrashIcon class="w-3.5 h-3.5 mr-1 text-gray-600" />
+                                    </button>
+                                </div>
                             </div>
                         </template>
                     </draggable>
@@ -496,7 +385,6 @@
 <script>
 import JetDialogModal from "@/Jetstream/DialogModal.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
-import JetButton from "@/Jetstream/Button.vue";
 import {
     TrashIcon,
     PencilIcon,
@@ -509,12 +397,14 @@ import LoadingButton from "@/Shared/LoadingButton.vue";
 import JetDangerButton from "@/Jetstream/DangerButton.vue";
 import { router } from "@inertiajs/vue3";
 import Draggable from "vuedraggable";
+import Global from "@/Mixins/Global.js";
+import CitationCard from "@/Shared/CitationCard.vue";
 export default {
+    mixins: [Global],
     components: {
         JetDialogModal,
         JetSecondaryButton,
         JetDangerButton,
-        JetButton,
         PencilIcon,
         TrashIcon,
         PlusIcon,
@@ -523,13 +413,13 @@ export default {
         JetInputError,
         LoadingButton,
         Draggable,
+        CitationCard,
     },
 
     props: ["project"],
     data() {
         return {
             form: this.$inertia.form({
-                title: "",
                 doi: "",
                 title: "",
                 authors: "",
@@ -556,103 +446,185 @@ export default {
         this.loadInitial();
     },
 
+    computed: {
+        /*Check if form has valid required fields*/
+        isFormValid() {
+            return (
+                this.form.doi &&
+                this.form.doi.trim() !== '' &&
+                this.form.title &&
+                this.form.title.trim() !== '' &&
+                this.form.authors &&
+                this.form.authors.trim() !== '' &&
+                !this.form.hasErrors &&
+                Object.keys(this.form.errors || {}).length === 0
+            );
+        },
+
+        /*Check if query is valid for import*/
+        isQueryValid() {
+            if (!this.query || this.query.trim() === '') {
+                return false;
+            }
+            const doiRegex = /^10\.[\d]{4,}(?:\.[\d]+)*\/[^\s]+$/;
+            return doiRegex.test(this.extractQueryParam(this.query));
+        },
+
+        /*Get form error count for display*/
+        formErrorCount() {
+            return Object.keys(this.form.errors || {}).length;
+        },
+
+        /*Check if form has any errors*/
+        hasFormErrors() {
+            return this.formErrorCount > 0 || this.form.hasErrors;
+        }
+    },
+
     methods: {
+        // =============================================================================
+        // INITIALIZATION & STATE MANAGEMENT
+        // =============================================================================
+
+        /**
+         * Load initial citations from project data
+         */
         loadInitial() {
             if (this.project && this.project.citations) {
                 this.citations = this.project.citations;
             }
         },
-        /*Control the display toggling*/
+
+        /**
+         * Toggle dialog visibility
+         */
         toggleDialog() {
             this.showDialog = !this.showDialog;
         },
+
+        /**
+         * Close dialog
+         */
         onClose() {
             this.showDialog = false;
+            this.form.reset();
+            this.form.errors = {};
         },
-        /*Fetch citation from DOI*/
+
+        // =============================================================================
+        // API CALLS & DATA FETCHING
+        // =============================================================================
+
+        /**
+         * Fetch citation from DOI using multiple API sources
+         * Implements promise chain to try multiple APIs in sequence
+         */
         fetchCitations() {
             this.loading = true;
             this.error = "";
+            this.fetchedCitations = {};
+            
+            if (!this.validateQuery()) {
+                this.loading = false;
+                return;
+            }
+            
             this.query = this.extractQueryParam(this.query);
-            let isDOI = new RegExp(/\b(10[.][0-9]{4,}(?:[.][0-9]+)*)\b/g).test(
-                this.query
-            );
-            axios
-                .get(this.$page.props.europemcWSApi, {
-                    params: {
-                        query: "DOI:" + this.query,
-                        format: "json",
-                        pageSize: "1",
-                        resulttype: "core",
-                        synonym: "true",
-                    },
-                })
-                .then((res) => {
-                    if (
-                        res &&
-                        res.data &&
-                        res.data.resultList.result.length > 0
-                    ) {
-                        this.fetchedCitations = this.formatCitationResponse(
-                            res.data.resultList.result[0],
-                            "europemc"
-                        );
-                    } else {
-                        this.fetchDataFromCrossref(this.query);
-                    }
-                })
-                .catch((err) => {
-                    console.log(err);
+            
+            this.fetchFromEuropePMC()
+                .catch(() => this.fetchFromCrossref())
+                .catch(() => this.fetchFromDatacite())
+                .catch(() => this.handleFetchError("No citation data found for the provided DOI. Please enter details manually."))
+                .finally(() => {
+                    this.loading = false;
                 });
         },
-        /*Make REST Call to Crossref API */
-        fetchDataFromCrossref(query) {
-            this.fetchedCitations = [];
-            axios
-                .get(this.$page.props.CROSSREF_API + this.query)
+
+        /**
+         * Fetches citation data from EuropePMC API
+         * @returns {Promise} Promise that resolves on successful data fetch
+         */
+        fetchFromEuropePMC() {
+            return axios.get(this.$page.props.europemcWSApi, {
+                params: {
+                    query: `DOI:${this.query}`,
+                    format: "json",
+                    pageSize: "1",
+                    resulttype: "core",
+                    synonym: "true",
+                },
+            }).then((res) => {
+                if (res && res.data && res.data.resultList.result.length > 0) {
+                    this.fetchedCitations = this.formatCitationResponse(
+                        res.data.resultList.result[0],
+                        "europemc"
+                    );
+                    return Promise.resolve();
+                }
+                return Promise.reject();
+            });
+        },
+
+        /**
+         * Fetches citation data from Crossref API
+         * @returns {Promise} Promise that resolves on successful data fetch or rejects on failure
+         */
+        fetchFromCrossref() {
+            const encodedQuery = encodeURIComponent(this.query);
+            const safeUrl = `${this.$page.props.CROSSREF_API}${encodedQuery}`;
+            
+            return axios.get(safeUrl)
                 .then((res) => {
                     if (res.data && res.data.message) {
                         this.fetchedCitations = this.formatCitationResponse(
                             res.data.message,
                             "crossref"
                         );
-                    } else {
-                        this.fetchDataFromDatacite(this.query);
+                        return Promise.resolve();
                     }
-                })
-                .catch((err) => {
-                    this.fetchDataFromDatacite(this.query);
+                    return Promise.reject();
                 });
         },
-        /*Make REST call to Datacite API */
-        fetchDataFromDatacite(query) {
-            this.fetchedCitations = [];
-            axios
-                .get(this.$page.props.DATACITE_API + this.query)
+
+        /**
+         * Fetches citation data from DataCite API
+         * @returns {Promise} Promise that resolves on successful data fetch or rejects on failure
+         */
+        fetchFromDatacite() {
+            const encodedQuery = encodeURIComponent(this.query);
+            const safeUrl = `${this.$page.props.DATACITE_API}${encodedQuery}`;
+            
+            return axios.get(safeUrl)
                 .then((res) => {
                     if (res && res.data && res.data.data) {
                         this.fetchedCitations = this.formatCitationResponse(
                             res.data.data,
                             "datacite"
                         );
+                        return Promise.resolve();
                     }
-                })
-                .catch((err) => {
-                    console.log(err);
-                })
-                .finally(() => {
-                    if (
-                        this.fetchedCitations &&
-                        this.fetchedCitations.length == 0
-                    ) {
-                        this.error =
-                            "No data found. Please enter the details manually.";
-                    }
-                    this.loading = false;
+                    return Promise.reject();
                 });
         },
 
-        /*Edit Citation */
+        /**
+         * Handles fetch errors with user-friendly messages
+         * @param {string} message - Error message to display to user
+         */
+        handleFetchError(message) {
+            this.error = message;
+            this.fetchedCitations = {};
+            this.loading = false;
+        },
+
+        // =============================================================================
+        // CRUD OPERATIONS
+        // =============================================================================
+
+        /**
+         * Edit existing citation - populate form and switch to edit mode
+         * @param {Object} citation - Citation object to edit
+         */
         edit(citation) {
             this.selectedCitation = citation;
             this.citations = this.citations.filter((citation) => {
@@ -668,7 +640,11 @@ export default {
             this.fetchedCitations = {};
             this.query = "";
         },
-        /*Make the call to save API on the basis of selection*/
+
+        /**
+         * Route save request to appropriate method based on input type
+         * @param {string} input - Type of save operation ('addFetched' or 'addManually')
+         */
         save(input) {
             switch (input) {
                 case "addFetched":
@@ -679,21 +655,29 @@ export default {
                     break;
             }
         },
-        /*Prepare request form and execute save query for citations added manually*/
+
+        /**
+         * Add citation manually from form data
+         */
         addManually() {
-            this.validateForm();
-            if (!this.form.hasErrors) {
-                this.citationsForm.reset();
-                let _citation = {};
-                for (var key in this.form) {
-                    _citation[key] = this.form.hasOwnProperty(key)
-                        ? this.form[key]
-                        : null;
-                }
-                this.citationsForm.citations.push(_citation);
-                this.executeQuery();
+            if (!this.validateForm()) {
+                return;
             }
+            
+            this.citationsForm.reset();
+            let _citation = {};
+            for (var key in this.form) {
+                _citation[key] = this.form.hasOwnProperty(key)
+                    ? this.form[key]
+                    : null;
+            }
+            this.citationsForm.citations.push(_citation);
+            this.executeQuery();
         },
+
+        /**
+         * Add citation from fetched API data
+         */
         addFetchedCitation() {
             this.citationsForm.reset();
             if (this.citations.length > 0) {
@@ -703,20 +687,50 @@ export default {
             }
             this.executeQuery();
         },
-        /*Make request to save API*/
+
+        /**
+         * Execute save request to backend API
+         */
         executeQuery() {
+            try {
+                this.prepareCitationsForSave();
+                this.deduplicateCitations();
+                this.submitCitationsToBackend();
+            } catch (error) {
+                console.error('Execute query error:', error);
+                this.error = "An unexpected error occurred. Please try again.";
+            }
+        },
+
+        /**
+         * Prepare citations data for saving to backend
+         */
+        prepareCitationsForSave() {
             if (this.citations.length > 0) {
-                let _citationObj = {};
                 this.citations.forEach((citation) => {
-                    for (var key in citation) {
-                        _citationObj[key] = citation.hasOwnProperty(key)
-                            ? citation[key]
-                            : null;
-                    }
-                    this.citationsForm.citations.push(_citationObj);
-                    _citationObj = {};
+                    const citationObj = this.buildCitationObject(citation);
+                    this.citationsForm.citations.push(citationObj);
                 });
             }
+        },
+
+        /**
+         * Build citation object from citation data
+         * @param {Object} citation - Citation data
+         * @returns {Object} Formatted citation object for backend
+         */
+        buildCitationObject(citation) {
+            let citationObj = {};
+            for (var key in citation) {
+                citationObj[key] = citation.hasOwnProperty(key) ? citation[key] : null;
+            }
+            return citationObj;
+        },
+
+        /**
+         * Remove duplicate citations based on DOI
+         */
+        deduplicateCitations() {
             const keys = ["doi"];
             this.citationsForm.citations = this.citationsForm.citations.filter(
                 (value, index, self) =>
@@ -724,159 +738,182 @@ export default {
                         keys.every((k) => v[k] === value[k])
                     ) === index
             );
+        },
+
+        /**
+         * Submit citations to backend API
+         */
+        submitCitationsToBackend() {
             this.citationsForm.post(route("citation.save", this.project.id), {
                 preserveScroll: true,
-                onSuccess: () => {
-                    router.reload({ only: ["project"] });
-                    this.citationsForm.reset();
-                    this.loadInitial();
-                    this.form.reset();
-                    this.displayAddCitationForms = false;
-                    this.isEdit = false;
-                },
-                onError: (err) => console.error(err),
+                onSuccess: () => this.handleSaveSuccess(),
+                onError: (err) => this.handleSaveError(err),
             });
         },
-        /*Check for validation error*/
+
+        /**
+         * Handle successful citation save operation
+         */
+        handleSaveSuccess() {
+            router.reload({ only: ["project"] });
+            this.citationsForm.reset();
+            this.loadInitial();
+            this.form.reset();
+            this.displayAddCitationForms = false;
+            this.isEdit = false;
+        },
+
+        /**
+         * Handle citation save error
+         * @param {Object} err - Error object from API
+         */
+        handleSaveError(err) {
+            console.error('Citation save error:', err);
+            this.error = "Failed to save citation. Please try again.";
+        },
+        /**
+         * Comprehensive form validation for manual entry
+         * @returns {boolean} - True if form is valid
+         */
         validateForm() {
             this.form.errors = {};
             this.form.hasErrors = false;
-            var hasErrors = false;
-            if (!this.form.title) {
-                this.form.errors.title = "The title field is required.";
-                hasErrors = true;
-            }
-            if (!this.form.authors) {
-                this.form.errors.authors = "The authors field is required.";
-                hasErrors = true;
-            }
+            let hasErrors = false;
+
+            hasErrors = this.validateTitle() || hasErrors;
+            hasErrors = this.validateAuthors() || hasErrors;
+            hasErrors = this.validateDoi() || hasErrors;
+            hasErrors = this.validateCitationText() || hasErrors;
+
             if (hasErrors) {
                 this.form.hasErrors = true;
             }
+
+            return !hasErrors;
         },
-        /*Format response recived from Europemc API*/
-        formatCitationResponse(obj, apiType) {
-            var journalTitle = "";
-            var yearofPublication = "";
-            var volume = "";
-            var issue = "";
-            var pageInfo = "";
-            this.formattedCitationRes = {};
 
-            if (obj) {
-                switch (apiType) {
-                    case "europemc":
-                        if (obj.journalInfo) {
-                            journalTitle = obj.journalInfo.journal.title
-                                ? obj.journalInfo.journal.title
-                                : "";
-                            yearofPublication = obj.journalInfo
-                                .yearOfPublication
-                                ? obj.journalInfo.yearOfPublication
-                                : "";
-                            volume = obj.journalInfo.volume
-                                ? obj.journalInfo.volume
-                                : "";
-                            issue = obj.journalInfo.issue
-                                ? obj.journalInfo.issue
-                                : "";
-                        }
-                        pageInfo = obj.pageInfo ? obj.pageInfo : "";
-                        this.formattedCitationRes.title = obj.title
-                            ? obj.title
-                            : "";
-                        this.formattedCitationRes.authors = obj.authorString
-                            ? obj.authorString
-                            : "";
-                        this.formattedCitationRes.citation_text =
-                            journalTitle +
-                            " " +
-                            yearofPublication +
-                            " " +
-                            volume +
-                            " ( " +
-                            issue +
-                            " ) " +
-                            pageInfo;
-                        this.formattedCitationRes.doi = obj.doi ? obj.doi : "";
-                        break;
-                    case "datacite":
-                        journalTitle = obj.attributes.titles
-                            ? obj.attributes.titles[0].title
-                            : "";
-                        yearofPublication = obj.attributes.publicationYear
-                            ? obj.attributes.publicationYear
-                            : null;
-                        volume = obj.attributes.volume
-                            ? obj.attributes.volume
-                            : "";
-                        issue = obj.attributes.issue
-                            ? obj.attributes.issue
-                            : "";
-                        pageInfo = obj.attributes.page
-                            ? obj.attributes.page
-                            : "";
+        /**
+         * Validate title field
+         * @returns {boolean} True if validation failed
+         */
+        validateTitle() {
+            if (!this.form.title || this.form.title.trim() === '') {
+                this.form.errors.title = "The title field is required.";
+                return true;
+            } else if (this.form.title.length < 5) {
+                this.form.errors.title = "Title must be at least 5 characters long.";
+                return true;
+            } else if (this.form.title.length > 500) {
+                this.form.errors.title = "Title must not exceed 500 characters.";
+                return true;
+            }
+            return false;
+        },
 
-                        this.formattedCitationRes.title = journalTitle;
-                        if (obj.attributes.creators) {
-                            this.formattedCitationRes.authors =
-                                obj.attributes.creators
-                                    .map((author) => author.name)
-                                    .join(", ");
-                        }
-                        this.formattedCitationRes.citation_text =
-                            journalTitle + " " + yearofPublication;
-                        this.formattedCitationRes.doi = obj.attributes
-                            ? obj.attributes["doi"]
-                            : "";
-                        break;
-                    case "crossref":
-                        journalTitle = obj.title[0];
-                        yearofPublication = obj["published-online"][
-                            "date-parts"
-                        ]
-                            ? obj["published-online"]["date-parts"][0][0]
-                            : "";
-                        volume = obj.volume ? obj.volume : "";
-                        issue = obj.issue ? obj.issue : "";
-                        pageInfo = obj.page ? obj.page : "";
+        /**
+         * Validate authors field
+         * @returns {boolean} True if validation failed
+         */
+        validateAuthors() {
+            if (!this.form.authors || this.form.authors.trim() === '') {
+                this.form.errors.authors = "The authors field is required.";
+                return true;
+            } else if (this.form.authors.length < 3) {
+                this.form.errors.authors = "Authors must be at least 3 characters long.";
+                return true;
+            } else if (this.form.authors.length > 1000) {
+                this.form.errors.authors = "Authors must not exceed 1000 characters.";
+                return true;
+            }
+            return false;
+        },
 
-                        this.formattedCitationRes.title = journalTitle;
-                        if (obj.author) {
-                            this.formattedCitationRes.authors = obj.author
-                                .map(
-                                    (author) =>
-                                        author.given + " " + author.family
-                                )
-                                .join(", ");
-                        }
-                        this.formattedCitationRes.citation_text =
-                            journalTitle +
-                            " " +
-                            yearofPublication +
-                            " " +
-                            volume +
-                            " ( " +
-                            issue +
-                            " ) " +
-                            pageInfo;
-                        this.formattedCitationRes.doi = obj.DOI ? obj.DOI : "";
-                        break;
+        /**
+         * Validate DOI field
+         * @returns {boolean} True if validation failed
+         */
+        validateDoi() {
+            if (!this.form.doi || this.form.doi.trim() === '') {
+                this.form.errors.doi = "The DOI field is required.";
+                return true;
+            } else {
+                const doiRegex = /^10\.[\d]{4,}(?:\.[\d]+)*\/[^\s]+$/;
+                if (!doiRegex.test(this.form.doi.trim())) {
+                    this.form.errors.doi = "Please enter a valid DOI format (e.g., 10.1000/journal.2023.0001).";
+                    return true;
                 }
             }
-            this.loading = false;
-            return this.formattedCitationRes;
+            return false;
         },
-        /*Confirm delete and prepare request*/
+
+        /**
+         * Validate citation text field
+         * @returns {boolean} True if validation failed
+         */
+        validateCitationText() {
+            if (this.form.citation_text && this.form.citation_text.trim() !== '') {
+                if (this.form.citation_text.length > 2000) {
+                    this.form.errors.citation_text = "Citation text must not exceed 2000 characters.";
+                    return true;
+                }
+            }
+            return false;
+        },
+
+        /**
+         * Enhanced query validation for DOI import
+         * @returns {boolean} - True if query is valid
+         */
+        validateQuery() {
+            if (!this.query || this.query.trim() === '') {
+                this.error = "Please enter a DOI to search.";
+                return false;
+            }
+
+            this.query = this.extractQueryParam(this.query);
+            const doiRegex = /^10\.[\d]{4,}(?:\.[\d]+)*\/[^\s]+$/;
+            
+            if (!doiRegex.test(this.query)) {
+                this.error = "Please enter a valid DOI format.";
+                return false;
+            }
+
+            this.error = "";
+            return true;
+        },
+
+        /*Helper methods for clean state management*/
+        clearFormErrors() {
+            this.form.errors = {};
+            this.form.hasErrors = false;
+        },
+
+        clearImportData() {
+            this.fetchedCitations = {};
+            this.query = null;
+            this.error = "";
+        },
+
+        /**
+         * Enhanced form reset with error clearing
+         */
+        resetForm() {
+            this.form.reset();
+            this.clearFormErrors();
+        },
+
+        /**
+         * Prepare citation for deletion
+         * @param {Object} citation - Citation to delete
+         */
         confirmDeletion(citation) {
             this.confirmDelete = true;
             this.citationsForm.reset();
             this.citationsForm.citations = [
                 {
                     id: citation.id ? citation.id : null,
-                    title: citation.tile ? citation.title : null,
-                    doi: citation.doi ? citation.doi : null,
                     title: citation.title ? citation.title : null,
+                    doi: citation.doi ? citation.doi : null,
                     authors: citation.authors ? citation.authors : null,
                     citation_text: citation.citation_text
                         ? citation.citation_text
@@ -884,7 +921,10 @@ export default {
                 },
             ];
         },
-        /*Make request to delete API*/
+
+        /**
+         * Execute delete request to backend API
+         */
         deleteCitation() {
             this.citationsForm.delete(
                 route("citation.delete", this.project.id),
@@ -900,22 +940,207 @@ export default {
                 }
             );
         },
+
+        // =============================================================================
+        // FORM & STATE MANAGEMENT
+        // =============================================================================
+
+        /**
+         * Cancel edit operation and restore previous state
+         */
         onCancelEdit() {
             if (this.selectedCitation) {
                 this.citations.push(this.selectedCitation);
             }
             this.displayAddCitationForms = false;
             this.isEdit = false;
-            this.form.reset();
+            this.resetForm();
         },
+
+        /**
+         * Go back from add/import forms to main view
+         */
         onBack() {
             if (this.selectedCitation) {
                 this.citations.push(this.selectedCitation);
             }
             this.displayAddCitationForms = false;
             this.isEdit = false;
+            this.clearImportData();
+        },
+
+        // =============================================================================
+        // UTILITY & HELPER METHODS
+        // =============================================================================
+
+        /**
+         * Clear import section data
+         */
+        clearImportData() {
             this.fetchedCitations = {};
-            this.query = "";
+            this.query = null;
+            this.error = "";
+        },
+
+        /**
+         * Format API response from different citation sources
+         * @param {Object} obj - Raw API response object
+         * @param {string} apiType - API source type ('europemc', 'crossref', 'datacite')
+         * @returns {Object} - Formatted citation object
+         */
+        formatCitationResponse(obj, apiType) {
+            this.formattedCitationRes = {};
+
+            if (obj) {
+                switch (apiType) {
+                    case "europemc":
+                        this.formatEuropemcCitation(obj);
+                        break;
+                    case "datacite":
+                        this.formatDataciteCitation(obj);
+                        break;
+                    case "crossref":
+                        this.formatCrossrefCitation(obj);
+                        break;
+                }
+            }
+            this.loading = false;
+            return this.formattedCitationRes;
+        },
+
+        /**
+         * Formats citation data from EuropePMC API response
+         * @param {Object} obj - Raw EuropePMC API response object
+         */
+        formatEuropemcCitation(obj) {
+            const journalInfo = this.extractEuropemcJournalInfo(obj);
+            const pageInfo = obj.pageInfo ? obj.pageInfo : "";
+
+            this.formattedCitationRes.title = obj.title ? obj.title : "";
+            this.formattedCitationRes.authors = obj.authorString ? obj.authorString : "";
+            this.formattedCitationRes.citation_text = this.buildCitationText(
+                journalInfo.journalTitle,
+                journalInfo.yearofPublication,
+                journalInfo.volume,
+                journalInfo.issue,
+                pageInfo
+            );
+            this.formattedCitationRes.doi = obj.doi ? obj.doi : "";
+        },
+
+        /**
+         * Extracts journal information from EuropePMC response
+         * @param {Object} obj - EuropePMC response object
+         * @returns {Object} Extracted journal information
+         */
+        extractEuropemcJournalInfo(obj) {
+            const info = {
+                journalTitle: "",
+                yearofPublication: "",
+                volume: "",
+                issue: ""
+            };
+
+            if (obj.journalInfo) {
+                info.journalTitle = obj.journalInfo.journal.title || "";
+                info.yearofPublication = obj.journalInfo.yearOfPublication || "";
+                info.volume = obj.journalInfo.volume || "";
+                info.issue = obj.journalInfo.issue || "";
+            }
+
+            return info;
+        },
+
+        /**
+         * Formats citation data from DataCite API response
+         * @param {Object} obj - Raw DataCite API response object
+         */
+        formatDataciteCitation(obj) {
+            const journalTitle = obj.attributes.titles ? obj.attributes.titles[0].title : "";
+            const yearofPublication = obj.attributes.publicationYear || null;
+            const volume = obj.attributes.volume || "";
+            const issue = obj.attributes.issue || "";
+            const pageInfo = obj.attributes.page || "";
+
+            this.formattedCitationRes.title = journalTitle;
+            this.formattedCitationRes.authors = this.extractDataciteAuthors(obj);
+            this.formattedCitationRes.citation_text = journalTitle + " " + yearofPublication;
+            this.formattedCitationRes.doi = obj.attributes ? obj.attributes["doi"] : "";
+        },
+
+        /**
+         * Extracts author names from DataCite API response
+         * @param {Object} obj - DataCite response object
+         * @returns {string} Formatted authors string
+         */
+        extractDataciteAuthors(obj) {
+            if (obj.attributes.creators) {
+                return obj.attributes.creators
+                    .map((author) => author.name)
+                    .join(", ");
+            }
+            return "";
+        },
+
+        /**
+         * Formats citation data from Crossref API response
+         * @param {Object} obj - Raw Crossref API response object
+         */
+        formatCrossrefCitation(obj) {
+            const journalTitle = obj.title[0];
+            const yearofPublication = this.extractCrossrefPublicationYear(obj);
+            const volume = obj.volume || "";
+            const issue = obj.issue || "";
+            const pageInfo = obj.page || "";
+
+            this.formattedCitationRes.title = journalTitle;
+            this.formattedCitationRes.authors = this.extractCrossrefAuthors(obj);
+            this.formattedCitationRes.citation_text = this.buildCitationText(
+                journalTitle,
+                yearofPublication,
+                volume,
+                issue,
+                pageInfo
+            );
+            this.formattedCitationRes.doi = obj.DOI ? obj.DOI : "";
+        },
+
+        /**
+         * Extracts publication year from Crossref API response
+         * @param {Object} obj - Crossref response object
+         * @returns {string} Publication year or empty string
+         */
+        extractCrossrefPublicationYear(obj) {
+            return obj["published-online"] && obj["published-online"]["date-parts"]
+                ? obj["published-online"]["date-parts"][0][0]
+                : "";
+        },
+
+        /**
+         * Extracts author names from Crossref API response
+         * @param {Object} obj - Crossref response object
+         * @returns {string} Formatted authors string
+         */
+        extractCrossrefAuthors(obj) {
+            if (obj.author) {
+                return obj.author
+                    .map((author) => author.given + " " + author.family)
+                    .join(", ");
+            }
+            return "";
+        },
+
+        /**
+         * Builds standardized citation text from components
+         * @param {string} journalTitle - Journal title
+         * @param {string} year - Publication year
+         * @param {string} volume - Volume number
+         * @param {string} issue - Issue number
+         * @param {string} pageInfo - Page information
+         * @returns {string} Formatted citation text
+         */
+        buildCitationText(journalTitle, year, volume, issue, pageInfo) {
+            return `${journalTitle} ${year} ${volume} ( ${issue} ) ${pageInfo}`;
         },
     },
 };
