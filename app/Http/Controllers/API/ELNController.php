@@ -272,6 +272,7 @@ class ELNController extends Controller
             return response()->json([
                 'error' => 'A submission with this '.$eln.' external ID already exists and is published',
                 'external_id' => $externalId,
+                'tracking_item_name' => $study->tracking_item_name,
                 'external_url' => $study->external_url,
                 'nmrxiv_id' => $study->identifier,
             ], 400);

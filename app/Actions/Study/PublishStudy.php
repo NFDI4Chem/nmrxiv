@@ -34,7 +34,7 @@ class PublishStudy
     private function trackStudyPublished(Study $study): void
     {
         // Only track if this study came from an ELN submission
-        if (! $study->external_id || ! $study->submitted_through) {
+        if (! $study->tracking_item_name || ! $study->submitted_through) {
             return;
         }
 
@@ -44,7 +44,7 @@ class PublishStudy
             // Check if tracking is enabled
             if (! $trackerService->isEnabled()) {
                 Log::debug('Chemotion tracking is disabled, skipping tracking for published study', [
-                    'external_id' => $study->external_id,
+                    'tracking_item_name' => $study->tracking_item_name,
                     'study_id' => $study->id,
                 ]);
 
@@ -63,7 +63,7 @@ class PublishStudy
             ];
 
             $trackerService->updateElnSubmissionStatus(
-                submissionId: $study->external_id,
+                submissionId: $study->tracking_item_name,
                 newStatus: ChemotionRepositoryTrackerService::STATUS_PUBLISHED,
                 additionalMetadata: $metadata,
                 ownerName: $study->owner->first_name.' '.$study->owner->last_name,
@@ -71,14 +71,14 @@ class PublishStudy
             );
 
             Log::info('Chemotion tracking updated for published study', [
-                'external_id' => $study->external_id,
+                'tracking_item_name' => $study->tracking_item_name,
                 'study_id' => $study->id,
                 'study_identifier' => $study->identifier,
             ]);
 
         } catch (\Exception $e) {
             Log::warning('Failed to update Chemotion tracking for published study', [
-                'external_id' => $study->external_id,
+                'tracking_item_name' => $study->tracking_item_name,
                 'study_id' => $study->id,
                 'error' => $e->getMessage(),
             ]);

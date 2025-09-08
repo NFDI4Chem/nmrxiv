@@ -59,6 +59,7 @@ class Study extends Model implements Auditable
         'external_id',
         'external_url',
         'processing_logs',
+        'tracking_item_name',
     ];
 
     /**

@@ -73,6 +73,7 @@ class ChemotionMetadataService implements ELNMetadataExtractorInterface
             'id' => $metadata['@id'] ?? null,
             'name' => $metadata['name'] ?? null,
             'description' => $metadata['description'] ?? null,
+            'tracking_item_name' => $metadata['trackingItemName'] ?? null,
             'url' => $metadata['url'] ?? null,
             'license' => $metadata['license'] ?? null,
             'date_created' => $metadata['dateCreated'] ?? null,
