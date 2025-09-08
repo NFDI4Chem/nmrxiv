@@ -131,14 +131,14 @@ class ValidateAndSubmitELNDraft implements ShouldQueue
                 'studies_count' => $project->studies->count(),
                 'validated_at' => now()->toISOString(),
                 'ready_for_publishing' => true,
-                'owner_name' => $owner->first_name.' '.$owner->last_name,
-                'owner_email' => $owner->email,
             ];
 
             $trackerService->updateElnSubmissionStatus(
                 submissionId: $draft->external_id,
                 newStatus: ChemotionRepositoryTrackerService::STATUS_PROCESSED,
-                additionalMetadata: $metadata
+                additionalMetadata: $metadata,
+                ownerName: $owner->first_name.' '.$owner->last_name,
+                ownerEmail: $owner->email
             );
 
             Log::info('Chemotion tracking updated for validated submission', [

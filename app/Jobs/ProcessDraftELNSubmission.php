@@ -11,6 +11,7 @@ use App\Models\License;
 use App\Models\Molecule;
 use App\Models\Sample;
 use App\Services\AuthorService;
+use App\Services\ChemotionRepositoryTrackerService;
 use App\Services\ELNMetadataServiceFactory;
 use App\Services\FileSystemObjectService;
 use App\Services\PathGeneratorService;
@@ -271,6 +272,16 @@ class ProcessDraftELNSubmission implements ShouldQueue
                 // Validate and extract metadata
                 if ($metadataService->validateMetadataFromDraft($draft)) {
                     $allMetadata = $metadataService->extractAllMetadataFromDraft($draft);
+                    $draft->tracking_item_name = $allMetadata['project']['tracking_item_name'];
+                    $draft->save();
+
+                    // update STATUS_PROCESSED in Chemotion Repository Tracker
+                    $trackerService = app(ChemotionRepositoryTrackerService::class);
+                    $trackerService->updateElnSubmissionStatus(
+                        submissionId: $draft->external_id,
+                        newStatus: ChemotionRepositoryTrackerService::STATUS_PROCESSED,
+                    );
+
                     if ($allMetadata) {
                         $logger->log($draft, 'info', 'Metadata extracted from draft');
                         $this->processStudyMetadata($draft, $allMetadata, $processDraft, $logger);
@@ -366,8 +377,19 @@ class ProcessDraftELNSubmission implements ShouldQueue
             $study->update([
                 'name' => $studyMetadata['name'].' ('.$studyName.')',
                 'external_url' => $studyMetadata['url'],
+                'tracking_item_name' => $studyMetadata['tracking_item_name'],
                 'processing_logs' => $processingLogs,
             ]);
+
+            // update STATUS_PROCESSED in Chemotion Repository Tracker
+            $trackerService = app(ChemotionRepositoryTrackerService::class);
+            $trackerService->updateElnSubmissionStatus(
+                submissionId: $study->tracking_item_name,
+                newStatus: ChemotionRepositoryTrackerService::STATUS_PROCESSED,
+                additionalMetadata: $studyMetadata,
+                ownerName: $study->owner->first_name.' '.$study->owner->last_name,
+                ownerEmail: $study->owner->email
+            );
 
             $logger->log($project->draft, 'info', 'Attaching metadata to study: '.$study->name);
 

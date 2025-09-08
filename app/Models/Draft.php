@@ -35,6 +35,7 @@ class Draft extends Model
         'release_date',
         'status',
         'processing_logs',
+        'tracking_item_name',
     ];
 
     protected $casts = [
