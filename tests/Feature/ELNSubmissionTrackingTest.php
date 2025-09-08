@@ -8,7 +8,6 @@ use App\Models\Draft;
 use App\Models\Study;
 use App\Models\Team;
 use App\Models\User;
-use App\Services\ChemotionRepositoryTrackerService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
@@ -37,12 +36,12 @@ class ELNSubmissionTrackingTest extends TestCase
             'last_name' => 'Doe',
             'email' => 'john@example.com',
         ]);
-        
+
         $team = Team::factory()->create([
             'user_id' => $user->id,
             'personal_team' => true,
         ]);
-        
+
         $team->users()->attach($user, ['role' => 'owner']);
         $user->current_team_id = $team->id;
         $user->save();
@@ -119,7 +118,7 @@ class ELNSubmissionTrackingTest extends TestCase
         // Create test data
         $user = User::factory()->create();
         $team = Team::factory()->create();
-        
+
         $study = Study::factory()->create([
             'external_id' => 'CHEM-EXP-2024-002',
             'submitted_through' => 'chemotion',
@@ -135,16 +134,17 @@ class ELNSubmissionTrackingTest extends TestCase
         ]);
 
         // Publish the study
-        $publishStudy = new PublishStudy();
+        $publishStudy = new PublishStudy;
         $publishStudy->publish($study);
 
         // Verify study and datasets are now public
         $this->assertTrue($study->fresh()->is_public);
-        $this->assertTrue($study->datasets->every(fn($dataset) => $dataset->is_public));
+        $this->assertTrue($study->datasets->every(fn ($dataset) => $dataset->is_public));
 
         // Verify tracking API was called for publication
         Http::assertSent(function ($request) {
             $data = $request->data();
+
             return $request->url() === 'http://test-tracker.example.com/api/v1/trackings' &&
                    $request->method() === 'POST' &&
                    isset($data['metadata']['published_at']) &&
@@ -187,7 +187,7 @@ class ELNSubmissionTrackingTest extends TestCase
         // Create test data for non-ELN study
         $user = User::factory()->create();
         $team = Team::factory()->create();
-        
+
         $study = Study::factory()->create([
             'external_id' => null, // No external ID
             'submitted_through' => null, // Not from ELN
@@ -197,7 +197,7 @@ class ELNSubmissionTrackingTest extends TestCase
         ]);
 
         // Publish the study
-        $publishStudy = new PublishStudy();
+        $publishStudy = new PublishStudy;
         $publishStudy->publish($study);
 
         // Verify study is now public

@@ -206,7 +206,7 @@ class ChemotionRepositoryTrackerServiceTest extends TestCase
 
         $result = $this->service->createElnSubmissionTracking(
             'eln-submission-789',
-            'submitted',
+            ChemotionRepositoryTrackerService::STATUS_SUBMITTED,
             ['submission_type' => 'eln', 'dataset_count' => 5],
             'Jane Smith',
             'jane@example.com'
@@ -223,7 +223,7 @@ class ChemotionRepositoryTrackerServiceTest extends TestCase
             return $request->url() === 'http://test-tracker.example.com/api/v1/trackings' &&
                    $request->method() === 'POST' &&
                    $data['tracking_item_name'] === 'eln-submission-789' &&
-                   $data['status'] === 'submitted' &&
+                   $data['status'] === ChemotionRepositoryTrackerService::STATUS_SUBMITTED &&
                    $data['tracking_item_owner_name'] === 'Jane Smith' &&
                    $data['tracking_item_owner_email'] === 'jane@example.com' &&
                    $data['from_trackable_system_name'] === 'nmrxiv' &&
@@ -238,32 +238,24 @@ class ChemotionRepositoryTrackerServiceTest extends TestCase
                 'access_token' => 'test-access-token',
                 'token_type' => 'Bearer',
             ], 200),
-            'http://test-tracker.example.com/api/v1/trackings' => Http::sequence()
-                ->push([
-                    [
-                        'id' => 1,
-                        'tracking_item_name' => 'eln-submission-789',
-                        'tracking_item_owner_name' => 'Jane Smith',
-                        'tracking_item_owner_email' => 'jane@example.com',
-                        'metadata' => ['submission_type' => 'eln'],
-                    ],
-                ], 200)
-                ->push([
-                    'id' => 2,
-                    'status' => 'processing',
-                    'tracking_item_name' => 'eln-submission-789',
-                ], 201),
+            'http://test-tracker.example.com/api/v1/trackings' => Http::response([
+                'id' => 2,
+                'status' => 'processed',
+                'tracking_item_name' => 'eln-submission-789',
+            ], 201),
         ]);
 
         $result = $this->service->updateElnSubmissionStatus(
             'eln-submission-789',
-            'processing',
-            ['processing_started_at' => '2024-01-15T10:00:00Z']
+            ChemotionRepositoryTrackerService::STATUS_PROCESSED,
+            ['processing_started_at' => '2024-01-15T10:00:00Z'],
+            'Jane Smith',
+            'jane@example.com'
         );
 
         $this->assertNotNull($result);
         $this->assertEquals(2, $result['id']);
-        $this->assertEquals('processing', $result['status']);
+        $this->assertEquals('processed', $result['status']);
         $this->assertEquals('eln-submission-789', $result['tracking_item_name']);
     }
 
@@ -282,7 +274,7 @@ class ChemotionRepositoryTrackerServiceTest extends TestCase
         Log::shouldReceive('error')->twice(); // Once for API error, once for exception
 
         $trackingData = [
-            'status' => 'submitted',
+            'status' => ChemotionRepositoryTrackerService::STATUS_SUBMITTED,
             'metadata' => ['submission_type' => 'eln'],
             'tracking_item_name' => 'test-submission-123',
             'tracking_item_owner_name' => 'John Doe',
@@ -312,5 +304,24 @@ class ChemotionRepositoryTrackerServiceTest extends TestCase
         config(['services.chemotion_tracker.enabled' => null]);
         $service = new ChemotionRepositoryTrackerService;
         $this->assertFalse($service->isEnabled());
+    }
+
+    public function test_status_validation(): void
+    {
+        // Test valid statuses
+        $this->assertTrue(ChemotionRepositoryTrackerService::isValidStatus(ChemotionRepositoryTrackerService::STATUS_DRAFT));
+        $this->assertTrue(ChemotionRepositoryTrackerService::isValidStatus(ChemotionRepositoryTrackerService::STATUS_RECEIVED));
+        $this->assertTrue(ChemotionRepositoryTrackerService::isValidStatus(ChemotionRepositoryTrackerService::STATUS_PUBLISHED));
+
+        // Test invalid status
+        $this->assertFalse(ChemotionRepositoryTrackerService::isValidStatus('invalid_status'));
+        $this->assertFalse(ChemotionRepositoryTrackerService::isValidStatus(''));
+
+        // Test get valid statuses returns array
+        $validStatuses = ChemotionRepositoryTrackerService::getValidStatuses();
+        $this->assertIsArray($validStatuses);
+        $this->assertCount(12, $validStatuses);
+        $this->assertContains(ChemotionRepositoryTrackerService::STATUS_RECEIVED, $validStatuses);
+        $this->assertContains(ChemotionRepositoryTrackerService::STATUS_PUBLISHED, $validStatuses);
     }
 }

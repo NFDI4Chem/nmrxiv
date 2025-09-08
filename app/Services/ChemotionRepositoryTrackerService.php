@@ -8,6 +8,31 @@ use Illuminate\Support\Facades\Log;
 
 class ChemotionRepositoryTrackerService
 {
+    // Valid status enums for tracking
+    public const STATUS_DRAFT = 'draft';
+
+    public const STATUS_SENT = 'sent';
+
+    public const STATUS_RECEIVED = 'received';
+
+    public const STATUS_PROCESSED = 'processed';
+
+    public const STATUS_PUBLISHED = 'published';
+
+    public const STATUS_SUBMITTED = 'submitted';
+
+    public const STATUS_REVIEWING = 'reviewing';
+
+    public const STATUS_PENDING = 'pending';
+
+    public const STATUS_ACCEPTED = 'accepted';
+
+    public const STATUS_REVIEWED = 'reviewed';
+
+    public const STATUS_REJECTED = 'rejected';
+
+    public const STATUS_DELETED = 'deleted';
+
     private string $baseUrl;
 
     private string $clientId;
@@ -35,12 +60,41 @@ class ChemotionRepositoryTrackerService
     }
 
     /**
+     * Get all valid status values
+     */
+    public static function getValidStatuses(): array
+    {
+        return [
+            self::STATUS_DRAFT,
+            self::STATUS_SENT,
+            self::STATUS_RECEIVED,
+            self::STATUS_PROCESSED,
+            self::STATUS_PUBLISHED,
+            self::STATUS_SUBMITTED,
+            self::STATUS_REVIEWING,
+            self::STATUS_PENDING,
+            self::STATUS_ACCEPTED,
+            self::STATUS_REVIEWED,
+            self::STATUS_REJECTED,
+            self::STATUS_DELETED,
+        ];
+    }
+
+    /**
+     * Check if a status is valid
+     */
+    public static function isValidStatus(string $status): bool
+    {
+        return in_array($status, self::getValidStatuses(), true);
+    }
+
+    /**
      * Authenticate with the Repository-Tracker API using OAuth2 password flow
      */
     private function authenticate(): bool
     {
         try {
-            $response = Http::asForm()->post("{$this->baseUrl}/oauth/token", [
+            $response = Http::timeout(30)->asForm()->post("{$this->baseUrl}/oauth/token", [
                 'grant_type' => 'password',
                 'client_id' => $this->clientId,
                 'client_secret' => '', // Must be empty according to API docs
@@ -50,22 +104,31 @@ class ChemotionRepositoryTrackerService
 
             if ($response->successful()) {
                 $data = $response->json();
-                $this->accessToken = $data['access_token'];
-                Log::info('Chemotion Repository-Tracker authentication successful', [
-                    'access_token' => $this->accessToken,
-                ]);
-                return true;
+                if (isset($data['access_token'])) {
+                    $this->accessToken = $data['access_token'];
+                    Log::debug('Chemotion Repository-Tracker authentication successful');
+
+                    return true;
+                } else {
+                    Log::error('Authentication response missing access_token', [
+                        'response_data' => $data,
+                    ]);
+
+                    return false;
+                }
             }
 
             Log::error('Chemotion Repository-Tracker authentication failed', [
                 'status' => $response->status(),
                 'body' => $response->body(),
+                'url' => "{$this->baseUrl}/oauth/token",
             ]);
 
             return false;
         } catch (Exception $e) {
             Log::error('Chemotion Repository-Tracker authentication error', [
                 'error' => $e->getMessage(),
+                'url' => "{$this->baseUrl}/oauth/token",
             ]);
 
             return false;
@@ -93,6 +156,10 @@ class ChemotionRepositoryTrackerService
     {
         try {
             $client = $this->getAuthenticatedClient();
+
+            Log::info('Creating Chemotion tracking', [
+                'tracking_data' => $trackingData,
+            ]);
 
             $response = $client->post("{$this->baseUrl}/api/v1/trackings", $trackingData);
 

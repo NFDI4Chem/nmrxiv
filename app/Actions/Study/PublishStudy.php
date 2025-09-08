@@ -40,16 +40,17 @@ class PublishStudy
 
         try {
             $trackerService = app(ChemotionRepositoryTrackerService::class);
-            
+
             // Check if tracking is enabled
             if (! $trackerService->isEnabled()) {
                 Log::debug('Chemotion tracking is disabled, skipping tracking for published study', [
                     'external_id' => $study->external_id,
                     'study_id' => $study->id,
                 ]);
+
                 return;
             }
-            
+
             $metadata = [
                 'study_id' => $study->id,
                 'study_identifier' => $study->identifier,
@@ -63,8 +64,10 @@ class PublishStudy
 
             $trackerService->updateElnSubmissionStatus(
                 submissionId: $study->external_id,
-                newStatus: 'published',
-                additionalMetadata: $metadata
+                newStatus: ChemotionRepositoryTrackerService::STATUS_PUBLISHED,
+                additionalMetadata: $metadata,
+                ownerName: $study->owner->first_name.' '.$study->owner->last_name,
+                ownerEmail: $study->owner->email,
             );
 
             Log::info('Chemotion tracking updated for published study', [
