@@ -62,4 +62,12 @@ class Draft extends Model
     {
         return $this->hasOne(Project::class);
     }
+
+    /**
+     * Get the team associated with the draft.
+     */
+    public function team(): BelongsTo
+    {
+        return $this->belongsTo(Team::class, 'team_id');
+    }
 }

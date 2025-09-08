@@ -186,8 +186,23 @@ class Validation extends Model
                         'id' => $dataset->id,
                     ];
 
+                    $instrumentType = $dataset->fsObject ? $dataset->fsObject->instrument_type : null;
+
+                    if (! $instrumentType) {
+                        // check if children have instrument_type
+                        $children = $dataset->fsObject ? $dataset->fsObject->children : null;
+                        if ($children) {
+                            foreach ($children as $child) {
+                                $instrumentType = $child->instrument_type;
+                                if ($instrumentType) {
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
                     $values = [
-                        'files' => $dataset->fsObject ? $dataset->fsObject->instrument_type : null,
+                        'files' => $instrumentType ? $instrumentType : null,
                         'nmrium_info' => ($dataset->has_nmrium) ? $dataset->has_nmrium : null,
                         'assay' => $dataset->assay,
                         'assignments' => ($dataset->has_nmrium) ? $dataset->has_nmrium : null,

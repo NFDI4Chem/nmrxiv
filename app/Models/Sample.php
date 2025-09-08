@@ -20,6 +20,7 @@ class Sample extends Model
         'isa',
         'study_id',
         'project_id',
+        'submitted_through',
     ];
 
     public function molecules(): BelongsToMany
