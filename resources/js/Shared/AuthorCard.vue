@@ -16,11 +16,9 @@
                         {{ author.given_name }}
                         {{ author.family_name }}
                     </h3>
-                    <span
-                        class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-300 text-gray-800 flex-shrink-0"
-                    >
-                        {{ (author.pivot && author.pivot.contributor_type) || author.contributor_type || 'Researcher' }}
-                    </span>
+                    <Tag
+                        :label="(author.pivot && author.pivot.contributor_type) || author.contributor_type || 'Researcher'"
+                    />
                 </div>
                 
                 <div class="space-y-1">
@@ -42,8 +40,10 @@
 </template>
 
 <script>
+import Tag from "@/Shared/Tag.vue";
+
 export default {
-    components: {},
+    components: { Tag },
     props: ["authors"],
     methods: {
         getOrcidLink(orcidId) {
