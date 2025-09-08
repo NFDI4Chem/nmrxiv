@@ -1,83 +1,123 @@
-# GitHub Actions workflow for building and deploying NMRXiv to production environment
-# This workflow runs tests, builds Docker images, and deploys to the FSU production environment
-name: Setup, Build and Publish to Prod
+# Prod build workflow: builds and pushes Docker images to Prod
+# Note: consider
+# - setting explicit minimal permissions (e.g., permissions: { contents: read })
+# - adding concurrency to cancel superseded runs (group per tag/branch, cancel-in-progress: true)
+# - pinning actions to commit SHAs for supply-chain security
+name: Build and Deploy to Prod
 
-# Trigger the workflow only when a release is created
+# Runs on manual workflow_dispatch with confirmation
 on:
-  release:
-    types: [published]
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: "Type 'DEPLOY' to confirm production deployment"
+        required: true
+        type: string
 
 # Environment variables used across all jobs
 env:
-  DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
-  DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
   REPOSITORY_NAME: nmrxiv
   REPOSITORY_NAMESPACE: nfdi4chem
 
 jobs:
-  # Build Docker images and deploy to production environment
-  setup-build-publish-deploy:
-    name: Build & deploy to production
+  # Guard: confirm input and authorize actor
+  guard:
+    name: Access control and confirmation
     runs-on: ubuntu-latest
-    # Only run this job if tests pass successfully
-    # needs: php-unit-test
-    # Use the Dev environment for deployment secrets and protection rules
+    steps:
+      - name: Validate actor and confirmation
+        shell: bash
+        run: |
+          echo "Actor: ${GITHUB_ACTOR}"
+          # Confirm input (workflow_dispatch)
+          if [[ "${{ github.event.inputs.confirm }}" != "DEPLOY" ]]; then
+            echo "Confirmation token mismatch. Expected 'DEPLOY'."
+            exit 1
+          fi
+
+          # Authorize actor (comma/space separated list in secret)
+          AUTHORIZED_ACTORS="${{ secrets.PROD_DEPLOY_AUTHORIZED_ACTORS }}"
+          allowed=0
+          for u in ${AUTHORIZED_ACTORS//,/ }; do
+            if [[ "${u,,}" == "${GITHUB_ACTOR,,}" ]]; then
+              allowed=1
+              break
+            fi
+          done
+          if [[ $allowed -ne 1 ]]; then
+            echo "User '${GITHUB_ACTOR}' is not authorized to trigger this workflow."
+            exit 1
+          fi
+          echo "Authorization check passed."
+
+  # Build and publish Docker images for the production environment
+  setup-build-publish-deploy-prod:
+    name: Deploy to prod
+    runs-on: ubuntu-latest
+    needs: [guard]
     environment:
       name: Prod
     steps:
-      # Checkout the repository code for building Docker images
+      # Checkout code
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Authenticate with Docker Hub for pushing images
+      # Fetch latest release tag (fallback to short SHA) and short SHA for tags
+      - name: Fetch latest release (gh)
+        id: fetch-latest-release
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          # Get latest published release tag
+          tag=$(gh release view --repo "$GITHUB_REPOSITORY" --json tagName -q .tagName 2>/dev/null || echo "")
+          if [[ -z "$tag" ]]; then
+            echo "No published release found; falling back to short SHA."
+            tag="${GITHUB_SHA::12}"
+          fi
+          echo "tag_name=$tag" >> "$GITHUB_OUTPUT"
+          # Expose short commit SHA for tags
+          sha_short="${GITHUB_SHA::12}"
+          echo "sha_short=$sha_short" >> "$GITHUB_OUTPUT"
+
+      # Docker Hub login (uses repository secrets)
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
-          username: ${{ env.DOCKER_HUB_USERNAME }}
-          password: ${{ env.DOCKER_HUB_PASSWORD }}
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
 
-      # Set up Docker Buildx for multi-platform builds
+      # Set up Docker Buildx
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # Build and push the main application Docker image for FSU deployment
-      - name: Build and push App Docker image 
+      # Build + push app image (tags: release, sha, latest). Uses GHA cache.
+      - name: Build and push App Docker image
         uses: docker/build-push-action@v6
         with:
           context: .
           file: ./deployment/Dockerfile
           push: true
-          # Pass proxy settings and release version as build arguments
           build-args: |
-            RELEASE_VERSION=${{ github.event.release.tag_name }}
-          # Tag the image with both the release version and latest
+            RELEASE_VERSION=${{ steps.fetch-latest-release.outputs.tag_name }}
           tags: |
-            ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:app-${{ github.event.release.tag_name }}
+            ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:app-sha-${{ steps.fetch-latest-release.outputs.sha_short }}
+            ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:app-${{ steps.fetch-latest-release.outputs.tag_name }}
             ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:app-latest
-          # Enable build cache for faster builds
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      # Build and push the worker Docker image for background job processing
+      # Build + push worker image (tags: release, sha, latest)
       - name: Build and push Worker Docker image
         uses: docker/build-push-action@v6
         with:
           context: .
           file: ./deployment/Dockerfile.worker
           push: true
-          # Pass proxy settings and release version as build arguments
           build-args: |
-            RELEASE_VERSION=${{ github.event.release.tag_name }}
-          # Tag the worker image with both the release version and latest
+            RELEASE_VERSION=${{ steps.fetch-latest-release.outputs.tag_name }}
           tags: |
-            ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:worker-${{ github.event.release.tag_name }}
+            ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:worker-sha-${{ steps.fetch-latest-release.outputs.sha_short }}
+            ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:worker-${{ steps.fetch-latest-release.outputs.tag_name }}
             ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:worker-latest
-          # Enable build cache for faster builds
           cache-from: type=gha
           cache-to: type=gha,mode=max
-
-      # Optional: Add deployment step if needed
-      # - name: Deploy to production environment
-      #   run: |
-      #     echo "Add your deployment commands here"
-      #     # Example: kubectl apply -f k8s/ or docker-compose up -d

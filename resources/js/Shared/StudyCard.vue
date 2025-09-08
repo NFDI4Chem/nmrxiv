@@ -5,7 +5,7 @@
     >
         <Link
             :href="
-                preview
+                preview && obfuscationCode
                     ? route('preview', [obfuscationCode, study.id, 'study'])
                     : route('dashboard.studies', [study.id])
             "
@@ -142,7 +142,20 @@ export default {
         Link,
         Depictor2D,
     },
-    props: ["study", "preview", "obfuscationCode"],
+    props: {
+        study: {
+            type: Object,
+            required: true
+        },
+        preview: {
+            type: Boolean,
+            default: false
+        },
+        obfuscationCode: {
+            type: String,
+            default: null
+        }
+    },
     data() {
         return {
             selectedPreviewIndex: 0,

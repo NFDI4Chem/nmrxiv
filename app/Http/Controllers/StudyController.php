@@ -239,7 +239,10 @@ class StudyController extends Controller
         if ($study) {
             $nmrium = $study->nmrium;
             if ($nmrium) {
-                return $nmrium->nmrium_info;
+                $nmriumInfo = $nmrium->nmrium_info;
+                $nmriumInfo['data']['molecules'] = [];
+
+                return $nmriumInfo;
             } else {
                 return null;
             }
