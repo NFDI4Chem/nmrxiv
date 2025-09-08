@@ -4,11 +4,15 @@ namespace App\Http\Controllers\API;
 
 use App\Actions\Draft\CreateDraft;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\StudyResource;
 use App\Jobs\ProcessDraftELNSubmission;
 use App\Models\Draft;
+use App\Models\Study;
+use App\Services\ChemotionRepositoryTrackerService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class ELNController extends Controller
 {
@@ -262,7 +266,17 @@ class ELNController extends Controller
 
         $createDraft = new CreateDraft;
 
-        // Check if draft already exists
+        // check if study already exists
+        $study = Study::where('external_id', $externalId)->first();
+        if ($study && $study->is_public && $study->draft == null) {
+            return response()->json([
+                'error' => 'A submission with this '.$eln.' external ID already exists and is published',
+                'external_id' => $externalId,
+                'external_url' => $study->external_url,
+                'nmrxiv_id' => $study->identifier,
+            ], 400);
+        }
+
         $draft = $createDraft->findByExternalId($externalId, $user_id, $team_id);
 
         $isNewDraft = false;
@@ -275,6 +289,7 @@ class ELNController extends Controller
                 'eln' => $eln,
                 'external_id' => $externalId,
                 'callback_url' => $callbackUrl,
+                'eln_status' => 'RECEIVED',
                 'zip_url' => $zipUrl,
             ];
 
@@ -302,12 +317,13 @@ class ELNController extends Controller
             $draft = $createDraft->update($draft, $updateData);
         }
 
+        // Track submission received in Chemotion Repository-Tracker
+        $this->trackSubmissionReceived($draft, $user);
+
         // Dispatch job to process the zip file
         ProcessDraftELNSubmission::dispatch($draft->id);
 
         return response()->json([
-            'message' => 'ELN upload endpoint ready',
-            'eln_system' => strtolower($eln),
             'draft_id' => $draft->id,
             'draft_key' => $draft->key,
             'external_id' => $draft->external_id,
@@ -317,7 +333,7 @@ class ELNController extends Controller
             'created_new' => $isNewDraft,
             'user_id' => $user_id,
             'team_id' => $team_id,
-            'processing_status' => 'job_dispatched',
+            'eln_status' => $draft->eln_status,
         ]);
     }
 
@@ -561,33 +577,101 @@ class ELNController extends Controller
             ->withCount('files')
             ->first();
 
-        if (! $draft) {
+        if ($draft) {
             return response()->json([
-                'error' => 'Draft not found with the provided external ID',
-                'external_id' => $external_id,
-            ], 404);
-        }
+                'success' => true,
+                'data' => [
+                    'draft_id' => $draft->id,
+                    'draft_key' => $draft->key,
+                    'external_id' => $draft->external_id,
+                    'eln_system' => $draft->eln,
+                    'name' => $draft->name,
+                    'description' => $draft->description,
+                    'status' => $draft->status ?? null,
+                    'current_step' => $draft->current_step ?? null,
+                    'callback_url' => $draft->callback_url,
+                    'zip_url' => $draft->zip_url,
+                    'release_date' => $draft->release_date,
+                    'created_at' => $draft->created_at,
+                    'updated_at' => $draft->updated_at,
+                    'owner_id' => $draft->owner_id,
+                    'team_id' => $draft->team_id,
+                    'files_count' => $draft->files_count,
+                ],
+            ]);
+        } else {
+            $studies = Study::with(['sample.molecules', 'datasets'])
+                ->where('external_id', $external_id)
+                ->get();
 
-        return response()->json([
-            'success' => true,
-            'data' => [
-                'draft_id' => $draft->id,
-                'draft_key' => $draft->key,
-                'external_id' => $draft->external_id,
+            if ($studies->count() > 0) {
+                $studyResources = $studies->map(function ($study) {
+                    return (new StudyResource($study))->lite(false, ['sample', 'datasets']);
+                });
+
+                return response()->json([
+                    'success' => true,
+                    'data' => $studyResources,
+                ]);
+            } else {
+                return response()->json([
+                    'error' => 'Submission not found with the provided external ID',
+                    'external_id' => $external_id,
+                ], 404);
+            }
+        }
+    }
+
+    /**
+     * Track submission received in Chemotion Repository-Tracker
+     */
+    private function trackSubmissionReceived(Draft $draft, $user): void
+    {
+        try {
+            $trackerService = app(ChemotionRepositoryTrackerService::class);
+
+            // Check if tracking is enabled
+            if (! $trackerService->isEnabled()) {
+                Log::debug('Chemotion tracking is disabled, skipping tracking for received submission', [
+                    'external_id' => $draft->external_id,
+                    'draft_id' => $draft->id,
+                ]);
+
+                return;
+            }
+
+            $metadata = [
+                'submission_type' => 'eln',
                 'eln_system' => $draft->eln,
-                'name' => $draft->name,
-                'description' => $draft->description,
-                'status' => $draft->status ?? null,
-                'current_step' => $draft->current_step ?? null,
-                'callback_url' => $draft->callback_url,
+                'draft_id' => $draft->id,
                 'zip_url' => $draft->zip_url,
+                'callback_url' => $draft->callback_url,
                 'release_date' => $draft->release_date,
-                'created_at' => $draft->created_at,
-                'updated_at' => $draft->updated_at,
-                'owner_id' => $draft->owner_id,
-                'team_id' => $draft->team_id,
-                'files_count' => $draft->files_count,
-            ],
-        ]);
+                'received_at' => now()->toISOString(),
+            ];
+
+            $trackerService->createElnSubmissionTracking(
+                submissionId: $draft->external_id,
+                status: ChemotionRepositoryTrackerService::STATUS_RECEIVED,
+                metadata: $metadata,
+                ownerName: $user->first_name.' '.$user->last_name,
+                ownerEmail: $user->email,
+                fromSystem: 'nmrxiv',
+                toSystem: 'nmrxiv'
+            );
+
+            Log::info('Chemotion tracking created for received submission', [
+                'external_id' => $draft->external_id,
+                'draft_id' => $draft->id,
+            ]);
+
+        } catch (\Exception $e) {
+            // Don't fail the submission if tracking fails
+            Log::warning('Failed to create Chemotion tracking for received submission', [
+                'external_id' => $draft->external_id,
+                'draft_id' => $draft->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 }
