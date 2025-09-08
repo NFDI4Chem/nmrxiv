@@ -290,17 +290,13 @@
                                         class="mt-2 text-md text-gray-900 space-y-5 focus:pointer-events-auto"
                                     >
                                         <div
-                                            class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-2"
+                                            class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-3 "
                                         >
-                                            <div
-                                                class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-2"
-                                            >
                                                 <citation-card
                                                     :citations="
                                                         project.citations
                                                     "
                                                 />
-                                            </div>
                                         </div>
                                     </dd>
                                 </div>
