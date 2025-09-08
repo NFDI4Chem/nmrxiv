@@ -31,7 +31,7 @@
                     <div
                         class="relative grid grid-cols-1 gap-x-4 max-w-7xl mx-auto lg:grid-cols-2"
                     >
-                        <!--Add Manual Section-->
+                        <!-- Add Manual Section -->
                         <div
                             class="px-4 sm:px-6 lg:pb-5 lg:px-0 lg:row-start-1 lg:col-start-1"
                         >
@@ -197,9 +197,7 @@
                             </div>
                         </div>
                         <!-- Import Section -->
-                        <div
-                            class="lg:px-1 lg:row-start-1 lg:col-start-2 border-l"
-                        >
+                        <div class="lg:px-1 lg:row-start-1 lg:col-start-2 border-l">
                             <div class="pl-2">
                                 <p
                                     class="text-sm leading-6 font-bold text-gray-900"
@@ -267,60 +265,9 @@
                                     "
                                     class="mt-4"
                                 >
-                                    <fieldset
-                                        class="border rounded border-gray-200 overflow-auto"
-                                    >
-                                        <legend class="sr-only">
-                                            Notifications
-                                        </legend>
-                                        <div
-                                            style="height: auto"
-                                            class="divide-y divide-gray-200"
-                                        >
-                                            <div
-                                                class="relative flex items-start p-4"
-                                            >
-                                                <div
-                                                    class="min-w-0 flex-1 text-sm"
-                                                >
-                                                    <label
-                                                        for="citation"
-                                                        class="font-medium text-gray-700"
-                                                    >
-                                                        {{
-                                                            fetchedCitations.title
-                                                        }}
-                                                    </label>
-                                                    <p
-                                                        id="citation-authors"
-                                                        class="text-teal-500"
-                                                    >
-                                                        {{
-                                                            fetchedCitations.authors
-                                                        }}
-                                                    </p>
-                                                    <p
-                                                        id="citation-text"
-                                                        class="text-gray-500"
-                                                    >
-                                                        {{
-                                                            fetchedCitations.citation_text
-                                                        }}
-                                                    </p>
-                                                    <p
-                                                        id="citation-doi"
-                                                        class="text-gray-500 font-bold"
-                                                    >
-                                                        DOI -
-                                                        {{
-                                                            fetchedCitations.doi
-                                                        }}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </fieldset>
-                                    <div>
+                                    <!-- Refactored to reuse CitationCard component -->
+                                    <CitationCard :citations="[fetchedCitations]" />
+                                    <div class="mt-2">
                                         <jet-secondary-button
                                             class="float-right text-md font-bold text-teal-900 mt-4"
                                             @click="save('addFetched')"
@@ -333,7 +280,7 @@
                         </div>
                     </div>
                 </div>
-                <!-- Show existing citation -->
+                <!-- Show existing citations -->
                 <div
                     v-if="citations.length > 0 && !displayAddCitationForms"
                     style="height: 60vh"
@@ -347,80 +294,24 @@
                         @end="drag = false"
                     >
                         <template #item="{ element }">
-                            <div class="overflow-auto">
-                                <ul
-                                    role="list"
-                                    class="divide-y divide-gray-900"
-                                >
-                                    <li>
-                                        <div
-                                            class="px-4 border rounded-md mb-1 py-4 sm:px-6"
-                                        >
-                                            <div
-                                                class="flex items-center cursor justify-between"
-                                            >
-                                                <p
-                                                    class="text-sm font-medium text-teal-900"
-                                                >
-                                                    {{ element.title }}
-                                                </p>
-                                            </div>
-                                            <div
-                                                class="mt-1 sm:flex sm:justify-between"
-                                            >
-                                                <div class="sm:flex">
-                                                    <p
-                                                        class="flex items-center text-xs font-small text-gray-500 break-words"
-                                                    >
-                                                        {{ element.authors }}
-                                                    </p>
-                                                </div>
-                                                <div
-                                                    class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0"
-                                                >
-                                                    <button
-                                                        type="button"
-                                                        class="inline-flex items-center p-1 border border-transparent"
-                                                        @click="edit(element)"
-                                                    >
-                                                        <PencilIcon
-                                                            class="w-3.5 h-3.5 mr-1 text-gray-600"
-                                                        />
-                                                    </button>
-                                                    <button
-                                                        type="button"
-                                                        class="inline-flex items-center p-1 border border-transparent"
-                                                        @click="
-                                                            confirmDeletion(
-                                                                element
-                                                            )
-                                                        "
-                                                    >
-                                                        <TrashIcon
-                                                            class="w-3.5 h-3.5 mr-1 text-gray-600"
-                                                        />
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            <div
-                                                class="sm:flex sm:justify-between"
-                                            >
-                                                <p
-                                                    v-if="element.doi"
-                                                    class="text-xs font-medium text-teal-900"
-                                                >
-                                                    <b class="text-gray-500"
-                                                        >DOI:
-                                                    </b>
-                                                    {{ element.doi }}
-                                                </p>
-                                            </div>
-                                            <div
-                                                class="sm:flex sm:justify-between"
-                                            ></div>
-                                        </div>
-                                    </li>
-                                </ul>
+                            <div class="relative mb-2">
+                                <CitationCard :citations="[element]" />
+                                <div class="absolute top-2 right-2 flex space-x-1">
+                                    <button
+                                        type="button"
+                                        class="inline-flex items-center p-1 border border-transparent bg-white/70 rounded hover:bg-white"
+                                        @click="edit(element)"
+                                    >
+                                        <PencilIcon class="w-3.5 h-3.5 mr-1 text-gray-600" />
+                                    </button>
+                                    <button
+                                        type="button"
+                                        class="inline-flex items-center p-1 border border-transparent bg-white/70 rounded hover:bg-white"
+                                        @click="confirmDeletion(element)"
+                                    >
+                                        <TrashIcon class="w-3.5 h-3.5 mr-1 text-gray-600" />
+                                    </button>
+                                </div>
                             </div>
                         </template>
                     </draggable>
@@ -494,7 +385,6 @@
 <script>
 import JetDialogModal from "@/Jetstream/DialogModal.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
-import JetButton from "@/Jetstream/Button.vue";
 import {
     TrashIcon,
     PencilIcon,
@@ -508,13 +398,13 @@ import JetDangerButton from "@/Jetstream/DangerButton.vue";
 import { router } from "@inertiajs/vue3";
 import Draggable from "vuedraggable";
 import Global from "@/Mixins/Global.js";
+import CitationCard from "@/Shared/CitationCard.vue";
 export default {
     mixins: [Global],
     components: {
         JetDialogModal,
         JetSecondaryButton,
         JetDangerButton,
-        JetButton,
         PencilIcon,
         TrashIcon,
         PlusIcon,
@@ -523,6 +413,7 @@ export default {
         JetInputError,
         LoadingButton,
         Draggable,
+        CitationCard,
     },
 
     props: ["project"],

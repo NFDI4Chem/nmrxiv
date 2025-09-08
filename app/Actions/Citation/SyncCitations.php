@@ -1,28 +1,27 @@
 <?php
 
-namespace App\Services;
+namespace App\Actions\Citation;
 
 use App\Actions\Project\UpdateProject;
 use App\Models\Citation;
 use App\Models\Project;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
-class CitationService
+class SyncCitations
 {
-    /**
-     * Create a new CitationService instance.
-     */
-    public function __construct(
-        private UpdateProject $updater
-    ) {}
+    public function __construct(private UpdateProject $updater) {}
 
     /**
      * Process and sync citations for a project.
      *
+     * @param  array<int, array<string, mixed>>  $citations
+     * @return array<int, Citation>
+     *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function syncCitations(Project $project, array $citations, $user): array
+    public function sync(Project $project, array $citations, User $user): array
     {
         if (empty($citations)) {
             return [];
@@ -44,7 +43,6 @@ class CitationService
             }
         }
 
-        // Use database transaction for bulk operations
         DB::transaction(function () use ($project, $processedCitations, $user): void {
             $this->updater->syncCitations($project, $processedCitations, $user);
         });
@@ -53,17 +51,9 @@ class CitationService
     }
 
     /**
-     * Remove citation from project.
-     */
-    public function removeCitationFromProject(Project $project, int $citationId): void
-    {
-        DB::transaction(function () use ($project, $citationId): void {
-            $this->updater->detachCitation($project, $citationId);
-        });
-    }
-
-    /**
      * Validate citation data against validation rules.
+     *
+     * @param  array<string, mixed>  $citationData
      *
      * @throws \Illuminate\Validation\ValidationException
      */
@@ -79,6 +69,8 @@ class CitationService
 
     /**
      * Find existing citation for project or create new one.
+     *
+     * @param  array<string, mixed>  $citationData
      */
     private function findOrCreateCitation(Project $project, array $citationData, string $doi): Citation
     {
@@ -97,6 +89,9 @@ class CitationService
 
     /**
      * Prepare citation attributes for create or update operations.
+     *
+     * @param  array<string, mixed>  $citationData
+     * @return array<string, mixed>
      */
     private function prepareCitationAttributes(array $citationData): array
     {
