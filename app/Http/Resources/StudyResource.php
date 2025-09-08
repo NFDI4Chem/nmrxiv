@@ -48,6 +48,10 @@ class StudyResource extends JsonResource
             'experiment_types' => $this->study_experiment_types,
             'download_url' => $this->download_url,
             'has_nmrium' => $this->has_nmrium,
+            'submitted_through' => $this->submitted_through,
+            'external_id' => $this->external_id,
+            'external_url' => $this->external_url,
+            'processing_logs' => $this->processing_logs,
             $this->mergeWhen(! $this->lite, function () {
                 return [
                     $this->mergeWhen(

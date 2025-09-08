@@ -1,53 +1,69 @@
 <template>
     <app-layout :title="study.name">
         <template #header>
-            <div>
-                <div class="border-b">
-                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
-                        <img
-                            v-if="study && study.owner"
-                            class="inline h-7 w-7 rounded-full"
-                            :src="study.owner.profile_photo_url"
-                        />
-                        <p
-                            class="inline ml-3 text-xs font-bold text-gray-500 uppercase"
+            <!-- Study header section with background styling -->
+            <div class="bg-white index_beams">
+                <!-- Top header bar with owner info and actions -->
+                <div class="border-b bg-white">
+                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+                        <!-- Responsive flex container for header content -->
+                        <div
+                            class="flex flex-col space-y-3 sm:flex-row sm:items-center sm:justify-between sm:space-y-0"
                         >
-                            <a class="text-gray-900">{{
-                                study.owner.first_name +
-                                " " +
-                                study.owner.last_name
-                            }}</a>
-                            <span class="block md:inline ml-10 md:ml-0">
-                                updated on
-                                <time>{{ formatDate(study.updated_at) }}</time>
-                            </span>
-                        </p>
-                        <div class="flex mt-2 md:inline">
-                            <div
-                                v-if="study.download_url"
-                                class="float-left md:float-right"
-                            >
-                                <a
-                                    class="md:ml-4 cursor-pointer relative inline-flex items-center px-4 py-1 rounded-full border border-gray-300 bg-white text-sm font-black text-dark hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
-                                    :href="study.download_url"
-                                >
-                                    Download
-                                </a>
-                            </div>
-                            <div class="float-left md:float-right">
-                                <div class="flex-shrink-0">
-                                    <span
-                                        v-if="study.stats"
-                                        class="relative z-0 inline-flex shadow-sm rounded-full"
+                            <!-- Left side: Owner information -->
+                            <div class="flex items-center space-x-3">
+                                <!-- Owner profile photo -->
+                                <img
+                                    v-if="study && study.owner"
+                                    class="h-8 w-8 rounded-full flex-shrink-0"
+                                    :src="study.owner.profile_photo_url"
+                                    :alt="
+                                        study.owner.first_name +
+                                        ' ' +
+                                        study.owner.last_name
+                                    "
+                                />
+                                <!-- Owner details and last updated info -->
+                                <div class="min-w-0 flex-1">
+                                    <!-- Owner full name -->
+                                    <p
+                                        class="text-sm font-semibold text-gray-900 truncate"
                                     >
+                                        {{
+                                            study.owner.first_name +
+                                            " " +
+                                            study.owner.last_name
+                                        }}
+                                    </p>
+                                    <!-- Last updated timestamp -->
+                                    <p class="text-xs text-gray-500">
+                                        Updated on
+                                        <time class="font-medium">{{
+                                            formatDate(study.updated_at)
+                                        }}</time>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Right side: Action buttons and statistics -->
+                            <div
+                                class="flex items-center space-x-2 flex-shrink-0"
+                            >
+                                <!-- Like/upvote button with count -->
+                                <div v-if="study.stats" class="flex-shrink-0">
+                                    <div
+                                        class="inline-flex shadow-sm rounded-full"
+                                    >
+                                        <!-- Upvote button -->
                                         <button
                                             type="button"
-                                            class="relative inline-flex items-center px-1 py-1 rounded-l-full border border-gray-300 bg-white text-sm font-medium text-gray-900 hover:bg-gray-50"
+                                            class="relative inline-flex items-center px-2 py-1.5 rounded-l-full border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors"
                                             @click="toggleUpVote()"
                                         >
+                                            <!-- Upvote arrow icon -->
                                             <svg
                                                 xmlns="http://www.w3.org/2000/svg"
-                                                class="h-5 w-5"
+                                                class="h-4 w-4"
                                                 viewBox="0 0 20 20"
                                                 fill="currentColor"
                                             >
@@ -58,57 +74,74 @@
                                                 />
                                             </svg>
                                         </button>
-                                        <a
-                                            class="-ml-px relative inline-flex items-center px-4 py-1 rounded-r-full border border-gray-300 bg-white text-sm font-black text-dark hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                                        <!-- Like count display -->
+                                        <span
+                                            class="-ml-px relative inline-flex items-center px-3 py-1.5 rounded-r-full border border-gray-300 bg-white text-sm font-semibold text-gray-900"
                                         >
                                             {{ study.stats.likes }}
-                                        </a>
-                                    </span>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- Download button (shown if download URL is available) -->
+                                <div
+                                    v-if="study.download_url"
+                                    class="flex-shrink-0"
+                                >
+                                    <a
+                                        class="inline-flex items-center px-4 py-1.5 rounded-full border border-gray-300 bg-white text-sm font-semibold text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors"
+                                        :href="study.download_url"
+                                    >
+                                        <!-- Download icon -->
+                                        <svg
+                                            class="-ml-1 mr-2 h-4 w-4"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="2"
+                                                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                            />
+                                        </svg>
+                                        Download
+                                    </a>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <img
-                    class="h-32 w-full object-cover lg:h-48"
-                    src="https://images.unsplash.com/photo-1637625854255-d893202554f4?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80"
-                />
             </div>
         </template>
         <main
             class="flex-1 relative z-0 overflow-y-auto focus:outline-none xl:order-last"
         >
             <div>
-                <div class="mt-6 sm:mt-2 2xl:mt-5">
-                    <div class="border-b border-gray-200">
-                        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                            <nav
-                                class="-mb-px flex space-x-8"
-                                aria-label="Tabs"
+                <div class="border-b border-gray-200">
+                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+                            <Link
+                                v-for="tab in tabs"
+                                :key="tab.name"
+                                :href="study.public_url + '?tab=' + tab.name"
+                                :class="[
+                                    selectedTab == tab.name
+                                        ? 'border-pink-500 text-gray-900'
+                                        : '',
+                                    'cursor-pointer capitalize text-gray-900 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm',
+                                ]"
+                                aria-current="page"
                             >
-                                <Link
-                                    v-for="tab in tabs"
-                                    :key="tab.name"
-                                    :href="
-                                        study.public_url + '?tab=' + tab.name
-                                    "
-                                    :class="[
-                                        selectedTab == tab.name
-                                            ? 'border-pink-500 text-gray-900'
-                                            : '',
-                                        'cursor-pointer capitalize text-gray-900 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm',
-                                    ]"
-                                    aria-current="page"
-                                >
-                                    {{ tab.name }}
-                                </Link>
-                            </nav>
-                        </div>
+                                {{ tab.name }}
+                            </Link>
+                        </nav>
                     </div>
                 </div>
-                <div class="bg-white">
-                    <slot name="sample-content"></slot>
-                </div>
+            </div>
+            <div class="bg-white">
+                <slot name="sample-content"></slot>
             </div>
         </main>
     </app-layout>

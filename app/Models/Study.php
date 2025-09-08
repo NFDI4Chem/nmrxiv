@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Traits\CacheClear;
-use Auth;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -13,13 +12,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Scout\Searchable;
 use Maize\Markable\Markable;
 use Maize\Markable\Models\Bookmark;
 use Maize\Markable\Models\Like;
 use OwenIt\Auditing\Contracts\Auditable;
 use Spatie\Tags\HasTags;
-use Storage;
 
 class Study extends Model implements Auditable
 {
@@ -52,7 +52,27 @@ class Study extends Model implements Auditable
         'study_photo_path',
         'license_id',
         'species',
+        'authors',
+        'citations',
+        'molecules',
+        'submitted_through',
+        'external_id',
+        'external_url',
+        'processing_logs',
     ];
+
+    /**
+     * The attributes that should be cast.
+     */
+    protected function casts(): array
+    {
+        return [
+            'authors' => 'array',
+            'citations' => 'array',
+            'molecules' => 'array',
+            'processing_logs' => 'array',
+        ];
+    }
 
     protected static $marks = [
         Like::class,
