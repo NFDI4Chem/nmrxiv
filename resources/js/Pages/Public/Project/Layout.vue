@@ -164,25 +164,11 @@
                                         </div>
                                         
                                         <!-- Project identifier badge -->
-                                        <div
-                                            v-if="
-                                                (project.data &&
-                                                    project.data.identifier) ||
-                                                project.identifier
+                                        <Tag
+                                            :identifier="
+                                                (project.data && project.data.identifier) || project.identifier
                                             "
-                                            class="mt-2 sm:mt-0 flex-shrink-0"
-                                        >
-                                            <span
-                                                class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-gray-100 text-gray-700 border border-gray-200"
-                                            >
-                                                #{{
-                                                    (project.data &&
-                                                        project.data
-                                                            .identifier) ||
-                                                    project.identifier
-                                                }}
-                                            </span>
-                                        </div>
+                                        />
                                     </div>
 
                                     <!-- DOI Badge - Primary identifier for citations -->
@@ -439,24 +425,12 @@
                                         "
                                         class="mt-4"
                                     >
-                                        <!-- Desktop: Full tags display -->
-                                        <div class="hidden sm:block">
-                                            <div class="flex flex-wrap justify-start gap-2">
-                                                <a
-                                                    v-for="tag in (project.data &&
-                                                        project.data.tags) ||
-                                                    project.tags"
-                                                    :key="tag.id"
-                                                    class="inline-flex items-center rounded-full bg-gray-50 px-4 py-1 font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10 hover:bg-gray-100 transition-colors duration-150 cursor-pointer"
-                                                    :href="
-                                                        '/projects?tag=' +
-                                                        tag.name.en
-                                                    "
-                                                >
-                                                    {{ tag.name.en }}
-                                                </a>
-                                            </div>
-                                        </div>
+                                        <!-- Desktop: Full tags display via Tag component -->
+                                        <Tag
+                                            :tags="
+                                                (project.data && project.data.tags) || project.tags
+                                            "
+                                        />
 
                                         <!-- Mobile: Compact tags display -->
                                         <div class="sm:hidden">
@@ -580,6 +554,7 @@ import { ArrowDownTrayIcon, ScaleIcon, CalendarDaysIcon, TagIcon } from "@heroic
 
 // Shared component imports
 import DOIBadge from "@/Shared/DOIBadge.vue";
+import Tag from "@/Shared/Tag.vue";
 
 export default {
     name: "PublicProjectLayout",
@@ -594,7 +569,8 @@ export default {
         ScaleIcon,              // License/legal icon
         CalendarDaysIcon,       // Calendar icon for dates
         TagIcon,                // Tag icon for project tags
-        DOIBadge,               // DOI badge component for citations
+    DOIBadge,               // DOI badge component for citations
+    Tag,                    // Reusable identifier badge component (renamed)
     },
 
     /**
