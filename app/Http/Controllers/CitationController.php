@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Citation\RemoveCitation as RemoveCitationAction;
+use App\Actions\Citation\SyncCitations as SyncCitationsAction;
 use App\Http\Resources\CitationResource;
 use App\Models\Project;
-use App\Services\CitationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -18,7 +19,8 @@ class CitationController extends Controller
      * Create a new CitationController instance.
      */
     public function __construct(
-        private CitationService $citationService
+        private SyncCitationsAction $syncCitations,
+        private RemoveCitationAction $removeCitation
     ) {}
 
     /**
@@ -40,7 +42,7 @@ class CitationController extends Controller
             $citations = $request->get('citations', []);
 
             if (count($citations) > 0) {
-                $processedCitations = $this->citationService->syncCitations($project, $citations, $request->user());
+                $processedCitations = $this->syncCitations->sync($project, $citations, $request->user());
 
                 return $this->successResponse($request, 'Citation updated successfully', $processedCitations);
             }
@@ -72,7 +74,7 @@ class CitationController extends Controller
             $citations = $request->get('citations');
 
             if (count($citations) > 0) {
-                $this->citationService->removeCitationFromProject($project, $citations[0]['id']);
+                $this->removeCitation->remove($project, $citations[0]['id']);
             }
 
             return $this->successResponse($request, 'Citation deleted successfully');
