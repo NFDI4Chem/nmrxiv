@@ -2,10 +2,10 @@
 
 namespace App\Notifications;
 
-use App\Mail\DraftProcessed;
+use App\Mail\DraftProcessed as DraftProcessedMailable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Mail\Mailable;
 use Illuminate\Notifications\Notification;
 
 class DraftProcessedNotification extends Notification implements ShouldQueue
@@ -39,9 +39,9 @@ class DraftProcessedNotification extends Notification implements ShouldQueue
      *
      * @param  mixed  $notifiable
      */
-    public function toMail($notifiable): MailMessage
+    public function toMail($notifiable): Mailable
     {
-        return (new DraftProcessed($this->project))->to($notifiable->email);
+        return (new DraftProcessedMailable($this->project))->to($notifiable->email);
     }
 
     /**

@@ -2,10 +2,10 @@
 
 namespace App\Notifications;
 
-use App\Mail\ProjectArchivalNotifyAdmins;
+use App\Mail\ProjectArchivalNotifyAdmins as ProjectArchivalNotifyAdminsMailable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Mail\Mailable;
 use Illuminate\Notifications\Notification;
 
 class ProjectArchivalNotificationToAdmins extends Notification implements ShouldQueue
@@ -39,9 +39,9 @@ class ProjectArchivalNotificationToAdmins extends Notification implements Should
      *
      * @param  mixed  $notifiable
      */
-    public function toMail($notifiable): MailMessage
+    public function toMail($notifiable): Mailable
     {
-        return (new ProjectArchivalNotifyAdmins($this->project))->to($notifiable->email);
+        return (new ProjectArchivalNotifyAdminsMailable($this->project))->to($notifiable->email);
     }
 
     /**

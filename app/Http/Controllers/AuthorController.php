@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Author\RemoveProjectAuthor;
+use App\Actions\Author\SyncProjectAuthors;
+use App\Actions\Author\UpdateProjectAuthorContributorType;
 use App\Http\Resources\AuthorResource;
 use App\Models\Project;
-use App\Actions\Author\SyncProjectAuthors;
-use App\Actions\Author\RemoveProjectAuthor;
-use App\Actions\Author\UpdateProjectAuthorContributorType;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
