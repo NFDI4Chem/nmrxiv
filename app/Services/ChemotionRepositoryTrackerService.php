@@ -331,6 +331,7 @@ class ChemotionRepositoryTrackerService
         string $fromSystem = 'nmrxiv',
         string $toSystem = 'nmrxiv'
     ): ?array {
+        $fromSystem = $status === self::STATUS_RECEIVED ? 'chemotion' : $fromSystem;
         $trackingData = [
             'status' => $status,
             'metadata' => $metadata,
