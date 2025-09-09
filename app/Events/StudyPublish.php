@@ -12,6 +12,8 @@ class StudyPublish implements ShouldBroadcastNow
 
     public $studies;
 
+    public $sendTo;
+
     /**
      * Create a new event instance.
      *

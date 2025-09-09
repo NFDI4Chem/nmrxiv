@@ -9,6 +9,7 @@ use App\Actions\Study\PublishStudy;
 use App\Events\StudyPublish;
 use App\Models\FileSystemObject;
 use App\Models\Project;
+use App\Notifications\StudyPublishNotification;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -16,6 +17,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 
 class ProcessSubmission implements ShouldBeUnique, ShouldQueue
@@ -110,7 +112,6 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                 }
                 $updater->update($project->fresh());
                 ArchiveProject::dispatch($project);
-
                 $project->sendNotification('publish', $this->prepareSendList($project));
             }
         } else {
@@ -177,7 +178,6 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                 $updater->update($_studies);
                 // Notification::send($this->prepareSendList($project), new StudyPublishNotification($_studies));
                 event(new StudyPublish($_studies, $this->prepareSendList($project)));
-
                 $project->delete();
                 $draft->delete();
 

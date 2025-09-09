@@ -2,10 +2,10 @@
 
 namespace App\Notifications;
 
-use App\Mail\StudyPublish;
+use App\Mail\StudyPublish as StudyPublishMailable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Mail\Mailable;
 use Illuminate\Notifications\Notification;
 
 class StudyPublishNotification extends Notification implements ShouldQueue
@@ -39,9 +39,9 @@ class StudyPublishNotification extends Notification implements ShouldQueue
      *
      * @param  mixed  $notifiable
      */
-    public function toMail($notifiable): MailMessage
+    public function toMail($notifiable): Mailable
     {
-        return (new StudyPublish($this->studies))->to($notifiable->email);
+        return (new StudyPublishMailable($this->studies))->to($notifiable->email);
     }
 
     /**

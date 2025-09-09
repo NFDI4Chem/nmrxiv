@@ -2,10 +2,10 @@
 
 namespace App\Notifications;
 
-use App\Mail\ProjectDeletionFailure;
+use App\Mail\ProjectDeletionFailure as ProjectDeletionFailureMailable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Mail\Mailable;
 use Illuminate\Notifications\Notification;
 
 class ProjectDeletionFailureNotification extends Notification implements ShouldQueue
@@ -39,9 +39,9 @@ class ProjectDeletionFailureNotification extends Notification implements ShouldQ
      *
      * @param  mixed  $notifiable
      */
-    public function toMail($notifiable): MailMessage
+    public function toMail($notifiable): Mailable
     {
-        return (new ProjectDeletionFailure($this->project))->to($notifiable->email);
+        return (new ProjectDeletionFailureMailable($this->project))->to($notifiable->email);
     }
 
     /**

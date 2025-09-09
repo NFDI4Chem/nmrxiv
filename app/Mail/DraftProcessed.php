@@ -37,12 +37,21 @@ class DraftProcessed extends Mailable
             $releasedToday = true;
         }
 
+        // Safely handle identifier parsing
+        $publicUrlPath = '';
+        if ($this->project->identifier && str_contains($this->project->identifier, ':')) {
+            $identifierParts = explode(':', $this->project->identifier);
+            if (count($identifierParts) > 1) {
+                $publicUrlPath = $identifierParts[1];
+            }
+        }
+
         return $this->markdown('vendor.mail.draft-processed', [
             'url' => url(config('app.url').'/dashboard/projects/'.$this->project->id),
             'project' => $this->project,
             'releasedToday' => $releasedToday,
             'releaseDate' => explode(' ', $releaseDate)[0],
-            'publicUrl' => url(config('app.url').'/'.explode(':', $this->project->identifier)[1]),
+            'publicUrl' => $publicUrlPath ? url(config('app.url').'/'.$publicUrlPath) : url(config('app.url').'/dashboard/projects/'.$this->project->id),
         ])->subject(__('Submission Processed'.' - '.$this->project->name));
     }
 }

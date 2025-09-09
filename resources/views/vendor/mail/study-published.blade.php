@@ -7,7 +7,7 @@ We have processed your submission and your sample(s) has been published successf
 Please find the details below.
 
 @foreach ($samples as $sample)
-    Sample Name- {{ $sample->name }} , DOI- {{ $sample->doi }}
+    Sample Name: {{ $sample->name }} (DOI - {{ $sample->doi }})
 @endforeach
 
 @else
