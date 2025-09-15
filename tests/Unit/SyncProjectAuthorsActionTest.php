@@ -10,7 +10,6 @@ use App\Actions\Author\UpdateProjectAuthorContributorType;
 use App\Actions\Project\UpdateProject;
 use App\Models\Author;
 use App\Models\Project;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
@@ -30,7 +29,7 @@ class SyncProjectAuthorsActionTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $updateProject = new UpdateProject();
+        $updateProject = new UpdateProject;
         $this->syncProjectAuthors = new SyncProjectAuthors($updateProject);
         $this->removeProjectAuthor = new RemoveProjectAuthor($updateProject);
         $this->updateProjectAuthorContributorType = new UpdateProjectAuthorContributorType($updateProject);
