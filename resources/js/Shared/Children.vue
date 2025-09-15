@@ -99,7 +99,7 @@
                                     aria-hidden="true"
                                 />
                             </span>
-                            {{ truncateMiddle(file.name, 25) }}
+                            <span :title="file.name">{{ truncateMiddle(file.name, 25) }}</span>
                         </span>
                     </DisclosureButton>
                 </div>
@@ -228,12 +228,12 @@
                                                                     aria-hidden="true"
                                                                 />
                                                             </span>
-                                                            {{
+                                                            <span :title="sfile.name">{{
                                                                 truncateMiddle(
                                                                     sfile.name,
                                                                     25
                                                                 )
-                                                            }}
+                                                            }}</span>
                                                         </span>
                                                     </span>
                                                 </DisclosureButton>
@@ -295,12 +295,12 @@
                                                                 class="mr-1 inline h-5 w-5 text-gray-700"
                                                                 aria-hidden="true"
                                                             />
-                                                            {{
+                                                            <span :title="subItem.name">{{
                                                                 truncateMiddle(
                                                                     subItem.name,
                                                                     25
                                                                 )
-                                                            }}
+                                                            }}</span>
                                                         </span>
                                                     </span>
                                                 </div>
@@ -333,7 +333,7 @@
                                             class="inline mr-1 h-5 w-5 text-gray-700"
                                             aria-hidden="true"
                                         />
-                                        {{ truncateMiddle(sfile.name, 25) }}
+                                        <span :title="sfile.name">{{ truncateMiddle(sfile.name, 25) }}</span>
                                     </span>
                                 </span>
                             </div>
