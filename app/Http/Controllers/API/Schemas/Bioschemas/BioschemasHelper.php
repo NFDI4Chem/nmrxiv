@@ -223,9 +223,9 @@ class BioschemasHelper
         } else {
             $NMRiumInfo = (object) json_decode(json_encode($nmrium->nmrium_info));
             // check if data key exists
-            if(isset($NMRiumInfo->data)) {
+            if (isset($NMRiumInfo->data)) {
                 $nmriumData = $NMRiumInfo->data;
-                if($nmriumData) {
+                if ($nmriumData) {
                     $spectraData = $nmriumData->spectra[0];
                     $info = $spectraData->info;
                 } else {
