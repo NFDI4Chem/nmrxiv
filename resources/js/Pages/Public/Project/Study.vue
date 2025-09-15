@@ -353,7 +353,7 @@
                         class="mt-3"
                     >
                         <label>Molecular Composition</label>
-                        <div class="grid md:grid-cols-2 gap-2 mt-2">
+                        <div class="grid md:grid-cols-1 gap-2 mt-2">
                             <div class="pr-2">
                                 <div
                                     v-if="
@@ -373,7 +373,7 @@
                                                     aria-hidden="true"
                                                 ></span>
                                                 <div
-                                                    class="relative flex items-start space-x-3"
+                                                    class="relative flex"
                                                 >
                                                     <div
                                                         v-if="
@@ -383,7 +383,7 @@
                                                         class="relative"
                                                     >
                                                         <div
-                                                            class="rounded-full border p-2 z-10 bg-gray-100 text-sm"
+                                                            class="rounded-full border my-4 p-2 z-10 bg-gray-100 text-sm"
                                                         >
                                                             {{
                                                                 molecule.pivot
@@ -408,33 +408,21 @@
                                                             class="text-sm text-gray-700"
                                                         >
                                                             <div
-                                                                class="rounded-md border flex justify-center items-center mx-auto p-4"
-                                                                style="
-                                                                    min-width: 220px;
-                                                                    min-height: 220px;
-                                                                "
+                                                                class="flex justify-left items-center mx-auto p-4 mt-4 ml-4"
                                                             >
                                                                 <div
                                                                     v-if="
                                                                         molecule.canonical_smiles
                                                                     "
-                                                                    class="w-[200px] h-[200px] flex items-center justify-center"
+                                                                    class="bg-red flex items-center justify-center"
                                                                 >
-                                                                    <img
-                                                                        class="max-w-full max-h-full object-contain"
-                                                                        :src="
-                                                                            getMoleculeImageUrl(
-                                                                                molecule.canonical_smiles
-                                                                            )
-                                                                        "
-                                                                        :alt="
-                                                                            'Molecular structure of ' +
-                                                                            molecule.standard_inchi
-                                                                        "
-                                                                        @error="
-                                                                            handleImageError
-                                                                        "
-                                                                    />
+                                                                    <Depictor2D
+                                                                        class="p-4 h-64 w-64 mr-4"
+                                                                        :molecule="molecule.canonical_smiles"
+                                                                    ></Depictor2D>
+                                                                    <Depictor3D
+                                                                        :molecule="molecule.canonical_smiles"
+                                                                    ></Depictor3D>
                                                                 </div>
                                                                 <div
                                                                     v-else
@@ -663,6 +651,7 @@ import { ShareIcon, ClipboardDocumentIcon } from "@heroicons/vue/24/solid";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import SpectraViewer from "@/Shared/SpectraViewer.vue";
 import Depictor2D from "@/Shared/Depictor2D.vue";
+import Depictor3D from "@/Shared/Depictor3D.vue";   
 import DOIBadge from "@/Shared/DOIBadge.vue";
 import { Head } from "@inertiajs/vue3";
 import Citation from "@/Shared/Citation.vue";
@@ -681,6 +670,7 @@ export default {
         MenuItems,
         SpectraViewer,
         Depictor2D,
+        Depictor3D,
         DOIBadge,
         Head,
         Citation,

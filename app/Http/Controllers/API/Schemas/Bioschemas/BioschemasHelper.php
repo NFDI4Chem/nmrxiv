@@ -222,8 +222,17 @@ class BioschemasHelper
             }
         } else {
             $NMRiumInfo = (object) json_decode(json_encode($nmrium->nmrium_info));
-            $spectra = $NMRiumInfo->data->spectra[0];
-            $info = $spectra->info;
+            // check if data key exists
+            if(isset($NMRiumInfo->data)) {
+                $nmriumData = $NMRiumInfo->data;
+                if($nmriumData) {
+                    $spectraData = $nmriumData->spectra[0];
+                    $info = $spectraData->info;
+                } else {
+                    $spectraData = json_decode($NMRiumInfo->scalar)->data->spectra[0];
+                    $info = $NMRiumInfo->data;
+                }
+            }
         }
 
         return $info;
