@@ -40,10 +40,10 @@
                 </div>
             </div>
             <div
-                class="flex-shrink-0 ml-4"
                 v-if="
                     editable && project.draft_id !== null && !project.is_deleted
                 "
+                class="flex-shrink-0 ml-4"
             >
                 <a
                     type="button"
@@ -188,20 +188,11 @@
 </template>
 
 <script>
-import { Link } from "@inertiajs/vue3";
-import StudyCreate from "@/Pages/Study/Partials/Create.vue";
 import StudyCard from "@/Shared/StudyCard.vue";
-import JetButton from "@/Jetstream/Button.vue";
-import { ArrowLongLeftIcon, ArrowLongRightIcon } from "@heroicons/vue/24/solid";
 
 export default {
     components: {
-        Link,
-        StudyCreate,
         StudyCard,
-        JetButton,
-        ArrowLongLeftIcon,
-        ArrowLongRightIcon,
     },
     props: {
         project: {

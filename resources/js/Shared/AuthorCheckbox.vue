@@ -44,7 +44,7 @@ export default {
         items: [],
         checked: {
             type: [Array],
-            default: [],
+            default: () => [],
         },
         value: {
             default: null,

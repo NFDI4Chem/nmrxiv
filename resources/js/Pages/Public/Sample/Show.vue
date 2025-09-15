@@ -226,8 +226,8 @@
                 </div>
 
                 <div
-                    class="-mx-4"
                     v-if="study.data.is_public && study.data.doi != null"
+                    class="-mx-4"
                 >
                     <Citation
                         :model="'sample'"
@@ -662,7 +662,7 @@
                                     
                                     <!-- License Description (if available) -->
                                     <div v-if="study.data.license.description" class="mt-3">
-                                        <p v-html="study.data.license.description" class="text-sm text-gray-600 leading-relaxed">
+                                        <p class="text-sm text-gray-600 leading-relaxed" v-html="study.data.license.description">
                                         </p>
                                     </div>
                                 </div>

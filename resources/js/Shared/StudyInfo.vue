@@ -107,23 +107,13 @@
 </template>
 
 <script>
-import {
-    LockClosedIcon,
-    StarIcon,
-    LockOpenIcon,
-    PencilIcon,
-    EnvelopeIcon,
-} from "@heroicons/vue/24/solid";
+import { LockClosedIcon } from "@heroicons/vue/24/solid";
 import { Link } from "@inertiajs/vue3";
 import Depictor2D from "@/Shared/Depictor2D.vue";
 
 export default {
     components: {
         LockClosedIcon,
-        LockOpenIcon,
-        EnvelopeIcon,
-        PencilIcon,
-        StarIcon,
         Link,
         Depictor2D,
     },

@@ -150,9 +150,6 @@
  * - Date/time formatting for upload timestamps
  */
 
-// Icon imports from Heroicons
-import { PaperClipIcon } from "@heroicons/vue/24/solid";
-
 export default {
     name: "FileDetails",
     
@@ -160,7 +157,6 @@ export default {
      * Component dependencies
      */
     components: {
-        PaperClipIcon,      // Paper clip icon for file attachments (unused but imported)
     },
     
     /**

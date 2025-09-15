@@ -386,36 +386,10 @@
 <script>
 import { Link } from "@inertiajs/vue3";
 import { ref } from "vue";
-import { MagnifyingGlassIcon } from "@heroicons/vue/20/solid";
-import { ChevronRightIcon, UsersIcon } from "@heroicons/vue/24/outline";
-import {
-    Combobox,
-    ComboboxInput,
-    ComboboxOptions,
-    ComboboxOption,
-    Dialog,
-    DialogPanel,
-    TransitionChild,
-    TransitionRoot,
-} from "@headlessui/vue";
-import Datepicker from "@vuepic/vue-datepicker";
-import "@vuepic/vue-datepicker/dist/main.css";
 
 export default {
     components: {
         Link,
-        MagnifyingGlassIcon,
-        ChevronRightIcon,
-        UsersIcon,
-        Combobox,
-        ComboboxInput,
-        ComboboxOptions,
-        ComboboxOption,
-        Dialog,
-        DialogPanel,
-        TransitionChild,
-        TransitionRoot,
-        Datepicker,
     },
     props: ["project"],
     data() {

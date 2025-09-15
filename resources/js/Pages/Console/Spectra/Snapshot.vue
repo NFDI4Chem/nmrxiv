@@ -24,7 +24,7 @@
                         <div
                             v-if="
                                 datasets.length > 0 &&
-                                this.datasets.length >= this.index + 1
+                                datasets.length >= index + 1
                             "
                             class="mx-auto flex max-w-2xl items-center justify-between gap-x-8 lg:mx-0 lg:max-w-none"
                         >
@@ -36,15 +36,15 @@
                                 </a>
                                 <a
                                     v-if="!autoImport"
-                                    @click="toggleAutoImport"
                                     class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                                    @click="toggleAutoImport"
                                 >
                                     Import
                                 </a>
                                 <a
-                                    @click="toggleAutoImport"
                                     v-else
                                     class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                                    @click="toggleAutoImport"
                                 >
                                     Pause
                                 </a>
@@ -55,7 +55,7 @@
             </div>
         </template>
         <div v-if="datasets.length > 0">
-            <div class="p-10" v-if="this.datasets.length == this.index">
+            <div v-if="datasets.length == index" class="p-10">
                 <button
                     type="button"
                     class="relative block w-full rounded-lg border-2 border-dashed border-gray-300 p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
@@ -83,8 +83,8 @@
             <div v-else>
                 <div v-if="currentId">
                     <SpectraSnapshot
-                        ref="spectraEditorREF"
                         :id="currentId"
+                        ref="spectraEditorREF"
                         @loading="status"
                     ></SpectraSnapshot>
                 </div>
@@ -110,9 +110,9 @@
 
                         <div class="mt-6">
                             <button
-                                @click="toggleAutoImport"
                                 type="button"
                                 class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                                @click="toggleAutoImport"
                             >
                                 <svg
                                     class="-ml-0.5 mr-1.5 h-5 w-5"
@@ -131,7 +131,7 @@
                 </div>
             </div>
         </div>
-        <div class="p-10" v-else>
+        <div v-else class="p-10">
             <button
                 type="button"
                 class="relative block w-full rounded-lg border-2 border-dashed border-gray-300 p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
@@ -160,22 +160,12 @@
 
 <script>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import SearchFilter from "@/Shared/SearchFilter.vue";
-import JetDialogModal from "@/Jetstream/DialogModal.vue";
-import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
-import JetButton from "@/Jetstream/Button.vue";
 import BreadCrumbs from "../../../Jetstream/BreadCrumbs.vue";
-import { Link } from "@inertiajs/vue3";
 import SpectraSnapshot from "@/Shared/SpectraSnapshot.vue";
 
 export default {
     components: {
         AppLayout,
-        SearchFilter,
-        JetDialogModal,
-        JetSecondaryButton,
-        JetButton,
-        Link,
         BreadCrumbs,
         SpectraSnapshot,
     },

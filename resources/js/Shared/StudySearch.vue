@@ -22,12 +22,7 @@
 </template>
 
 <script>
-import Dropdown from "@/Shared/Dropdown.vue";
-
 export default {
-    components: {
-        Dropdown,
-    },
     props: {
         modelValue: String,
         maxWidth: {

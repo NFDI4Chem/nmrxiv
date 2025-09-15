@@ -36,7 +36,7 @@
             :src="nmriumURL"
             @load="loadSpectra()"
         ></iframe>
-        <div class="mt-4" v-if="spectraError && spectraError.length > 0">
+        <div v-if="spectraError && spectraError.length > 0" class="mt-4">
             <div class="rounded-md bg-red-50 p-4">
                 <div class="flex">
                     <div class="flex-shrink-0">
@@ -60,7 +60,7 @@
                         </h3>
                         <div class="mt-2 text-sm text-red-700">
                             <ul role="list" class="list-disc space-y-1 pl-5">
-                                <li v-for="error in spectraError">
+                                <li v-for="(error, index) in spectraError" :key="index">
                                     {{ error }}
                                 </li>
                             </ul>
@@ -430,7 +430,7 @@ export default {
                         this.autoSaving = false;
                         this.dataset.has_nmrium = response.data.has_nmrium;
                     })
-                    .catch((err) => {
+                    .catch(() => {
                         // this.updateLoadingStatus(false);
                         this.infoLog("Error saving spectra info");
                         console.error(
@@ -476,7 +476,7 @@ export default {
                                 img: svg,
                             }
                         )
-                        .then((response) => {
+                        .then(() => {
                             this.infoLog("Saved preview successfully", true);
                         });
                 });

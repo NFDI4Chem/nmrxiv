@@ -377,8 +377,8 @@
                                 <div class="flex items-center">
                                     <div>
                                         <button
-                                            type="button"
                                             id="copyLink"
+                                            type="button"
                                             class="active:bg-green-500 inline-flex mb-4 items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
                                             @click="copyLinkToClipboard"
                                         >
@@ -779,26 +779,15 @@
 </template>
 
 <script>
-import { computed, ref } from "vue";
-import { UsersIcon } from "@heroicons/vue/24/outline";
+import { ref } from "vue";
 import JetActionMessage from "@/Jetstream/ActionMessage.vue";
-import JetActionSection from "@/Jetstream/ActionSection.vue";
 import JetButton from "@/Jetstream/Button.vue";
-import JetConfirmationModal from "@/Jetstream/ConfirmationModal.vue";
-import JetDangerButton from "@/Jetstream/DangerButton.vue";
-import JetDialogModal from "@/Jetstream/DialogModal.vue";
 import JetModalFormSection from "@/Jetstream/ModalFormSection.vue";
 import JetInput from "@/Jetstream/Input.vue";
 import JetTextArea from "@/Jetstream/TextArea.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import JetLabel from "@/Jetstream/Label.vue";
-import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
-import JetSectionBorder from "@/Jetstream/SectionBorder.vue";
 import {
-    Combobox,
-    ComboboxInput,
-    ComboboxOptions,
-    ComboboxOption,
     Dialog,
     DialogPanel,
     TransitionChild,
@@ -819,27 +808,16 @@ export default {
         MenuItem,
         MenuItems,
         ChevronDownIcon,
-        Combobox,
-        ComboboxInput,
-        ComboboxOptions,
-        ComboboxOption,
         Dialog,
         DialogPanel,
         TransitionChild,
         JetModalFormSection,
         TransitionRoot,
-        UsersIcon,
         JetActionMessage,
-        JetActionSection,
         JetButton,
-        JetConfirmationModal,
-        JetDangerButton,
-        JetDialogModal,
         JetInput,
         JetInputError,
         JetLabel,
-        JetSecondaryButton,
-        JetSectionBorder,
         JetTextArea,
         GlobeAltIcon,
         LinkIcon,
@@ -884,6 +862,7 @@ export default {
             } else if (this.model == "project") {
                 return this.project;
             }
+            return null;
         },
         modelInvitations() {
             return this.modelObject[this.model + "_invitations"];
@@ -895,7 +874,7 @@ export default {
             if (this.calledFrom == "studyView") {
                 if (this.members) {
                     this.members.forEach((member) => {
-                        if (member.hasOwnProperty("project_membership")) {
+                        if (Object.prototype.hasOwnProperty.call(member, "project_membership")) {
                             count = count + 1;
                         }
                     });
