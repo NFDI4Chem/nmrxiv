@@ -369,7 +369,7 @@
                             Molecular Composition
                             </h2>
                         </div>
-                        <div class="grid md:grid-cols-2 gap-2 mt-2">
+                        <div class="grid md:grid-cols-1 gap-2 mt-2">
                             <div class="pr-2">
                                 <div
                                     v-if="
@@ -424,14 +424,17 @@
                                                             class="mt-2 text-sm text-gray-700"
                                                         >
                                                             <div
-                                                                class="rounded-md border my-3 flex justify-center items-center"
+                                                                class="my-3 flex justify-left items-center"
                                                             >
                                                                 <Depictor2D
-                                                                    class="py-4 -px-4"
+                                                                    class="py-4 px-4"
                                                                     :molecule="
                                                                         molecule.canonical_smiles
                                                                     "
                                                                 ></Depictor2D>
+                                                                <Depictor3D
+                                                                        :molecule="molecule.canonical_smiles"
+                                                                    ></Depictor3D>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -671,7 +674,7 @@
                             study.data.description &&
                             study.data.description.length > 0
                         "
-                        class="overflow-hidden w-full"
+                        class="overflow-hidden w-full mt-5"
                     >
                         <div class="relative">
                             <div
@@ -723,7 +726,7 @@ import DOIBadge from "@/Shared/DOIBadge.vue";
 import { Head } from "@inertiajs/vue3";
 import Citation from "@/Shared/Citation.vue";
 import ShowProjectDates from "@/Shared/ShowProjectDates.vue";
-
+import Depictor3D from "@/Shared/Depictor3D.vue";
 export default {
     components: {
         SampleLayout,
@@ -735,6 +738,7 @@ export default {
         MenuItems,
         SpectraViewer,
         Depictor2D,
+        Depictor3D,
         DOIBadge,
         Head,
         Citation,
