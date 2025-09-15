@@ -447,104 +447,296 @@
                         class="mb-3"
                     >
                         <div class="py-2 mb-2 block border-b pb-4">
-                            <p class="font-bold text-xl">
-                                {{
-                                    truncateMiddle(
-                                        $page.props.selectedFileSystemObject
-                                            .relative_url,
-                                        50
-                                    )
-                                }}
-                                <a
-                                    v-if="
-                                        $page.props.selectedFileSystemObject
-                                            .id && !readonly
-                                    "
-                                    class="ml-4 cursor-pointer relative inline-flex items-center px-4 py-1 rounded-full border border-gray-300 bg-white text-sm font-black text-dark hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 float-right"
-                                    @click="confirmFSODeletion"
-                                >
-                                    <TrashIcon
-                                        class="cursor-pointer h-4 w-4 text-gray-900 mr-2"
-                                        aria-hidden="true"
-                                    />
-                                    Delete
-                                </a>
-                                <a
-                                    v-if="
-                                        $page.props.selectedFileSystemObject
-                                            .id &&
-                                        readonly &&
-                                        downloadURL
-                                    "
-                                    :href="downloadURL"
-                                    class="ml-4 cursor-pointer relative inline-flex items-center px-4 py-1 rounded-full border border-gray-300 bg-white text-sm font-black text-dark hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 float-right"
-                                >
-                                    Download
-                                </a>
-                            </p>
+                            <div class="flex justify-between items-center">
+                                <p class="font-bold text-xl" :title="$page.props.selectedFileSystemObject.relative_url">
+                                    {{
+                                        truncateMiddle(
+                                            $page.props.selectedFileSystemObject
+                                                .relative_url,
+                                            50
+                                        )
+                                    }}
+                                </p>
+                                <div class="flex items-center space-x-3">
+                                    <!-- View Toggle -->
+                                    <div class="flex space-x-1">
+                                        <button
+                                            @click="setViewMode('grid')"
+                                            :class="[
+                                                viewMode === 'grid'
+                                                    ? 'text-gray-900'
+                                                    : 'text-gray-400 hover:text-gray-600',
+                                                'p-1'
+                                            ]"
+                                            title="Grid View"
+                                        >
+                                            <Squares2X2Icon class="h-5 w-5" />
+                                        </button>
+                                        <button
+                                            @click="setViewMode('list')"
+                                            :class="[
+                                                viewMode === 'list'
+                                                    ? 'text-gray-900'
+                                                    : 'text-gray-400 hover:text-gray-600',
+                                                'p-1'
+                                            ]"
+                                            title="List View"
+                                        >
+                                            <ListBulletIcon class="h-5 w-5" />
+                                        </button>
+                                    </div>
+                                    <a
+                                        v-if="
+                                            $page.props.selectedFileSystemObject
+                                                .id && !readonly
+                                        "
+                                        class="cursor-pointer relative inline-flex items-center px-4 py-1 rounded-full border border-gray-300 bg-white text-sm font-black text-dark hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                                        @click="confirmFSODeletion"
+                                    >
+                                        <TrashIcon
+                                            class="cursor-pointer h-4 w-4 text-gray-900 mr-2"
+                                            aria-hidden="true"
+                                        />
+                                        Delete
+                                    </a>
+                                    <a
+                                        v-if="
+                                            $page.props.selectedFileSystemObject
+                                                .id &&
+                                            readonly &&
+                                            downloadURL
+                                        "
+                                        :href="downloadURL"
+                                        class="cursor-pointer relative inline-flex items-center px-4 py-1 rounded-full border border-gray-300 bg-white text-sm font-black text-dark hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                                    >
+                                        Download
+                                    </a>
+                                </div>
+                            </div>
                         </div>
+                        <!-- List View Table Header -->
+                        <div v-if="viewMode === 'list'" class="mt-6">
+                            <div class="bg-gray-50 px-3 py-2 border border-gray-200 rounded-t-md">
+                                <div class="grid grid-cols-12 gap-4 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <div class="col-span-4">
+                                        <button 
+                                            @click="sortFiles('name')"
+                                            class="flex items-center space-x-1 hover:text-gray-700 focus:outline-none"
+                                        >
+                                            <span>Name</span>
+                                            <ChevronUpIcon 
+                                                v-if="sortBy === 'name' && sortOrder === 'asc'"
+                                                class="h-3 w-3"
+                                            />
+                                            <ChevronDownIcon 
+                                                v-else-if="sortBy === 'name' && sortOrder === 'desc'"
+                                                class="h-3 w-3"
+                                            />
+                                        </button>
+                                    </div>
+                                    <div class="col-span-3">
+                                        <button 
+                                            @click="sortFiles('date')"
+                                            class="flex items-center space-x-1 hover:text-gray-700 focus:outline-none"
+                                        >
+                                            <span>Date Modified</span>
+                                            <ChevronUpIcon 
+                                                v-if="sortBy === 'date' && sortOrder === 'asc'"
+                                                class="h-3 w-3"
+                                            />
+                                            <ChevronDownIcon 
+                                                v-else-if="sortBy === 'date' && sortOrder === 'desc'"
+                                                class="h-3 w-3"
+                                            />
+                                        </button>
+                                    </div>
+                                    <div class="col-span-2">
+                                        <button 
+                                            @click="sortFiles('size')"
+                                            class="flex items-center space-x-1 hover:text-gray-700 focus:outline-none"
+                                        >
+                                            <span>Size</span>
+                                            <ChevronUpIcon 
+                                                v-if="sortBy === 'size' && sortOrder === 'asc'"
+                                                class="h-3 w-3"
+                                            />
+                                            <ChevronDownIcon 
+                                                v-else-if="sortBy === 'size' && sortOrder === 'desc'"
+                                                class="h-3 w-3"
+                                            />
+                                        </button>
+                                    </div>
+                                    <div class="col-span-2">
+                                        <button 
+                                            @click="sortFiles('kind')"
+                                            class="flex items-center space-x-1 hover:text-gray-700 focus:outline-none"
+                                        >
+                                            <span>Kind</span>
+                                            <ChevronUpIcon 
+                                                v-if="sortBy === 'kind' && sortOrder === 'asc'"
+                                                class="h-3 w-3"
+                                            />
+                                            <ChevronDownIcon 
+                                                v-else-if="sortBy === 'kind' && sortOrder === 'desc'"
+                                                class="h-3 w-3"
+                                            />
+                                        </button>
+                                    </div>
+                                    <div class="col-span-1">
+                                        <!-- Download column - no header text -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <ul
                             role="list"
-                            class="mb-3 mt-6 grid grid-cols-1 gap-5 sm:gap-6 sm:grid-cols-2 lg:grid-cols-4"
+                            :class="[
+                                'mb-3',
+                                viewMode === 'grid'
+                                    ? 'grid grid-cols-1 gap-5 sm:gap-6 sm:grid-cols-2 lg:grid-cols-4'
+                                    : 'divide-y divide-gray-200 border border-gray-200 rounded-b-md'
+                            ]"
                         >
                             <li
-                                v-for="file in $page.props
-                                    .selectedFileSystemObject.children"
+                                v-for="file in sortedFiles"
                                 :key="file.key"
-                                class="relative shadow rounded-lg"
+                                :class="[
+                                    viewMode === 'grid'
+                                        ? 'relative shadow rounded-lg'
+                                        : 'hover:bg-gray-50'
+                                ]"
                             >
-                                <div
-                                    style="user-select: none"
-                                    class="hover:cursor-pointer"
-                                    @dblclick.stop="displaySelected(file)"
-                                >
+                                <!-- Grid View Layout -->
+                                <template v-if="viewMode === 'grid'">
                                     <div
-                                        class="group block w-full aspect-w-10 aspect-h-7 py-4 bg-gray-100 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 focus-within:ring-indigo-500 overflow-hidden"
+                                        style="user-select: none"
+                                        class="hover:cursor-pointer"
+                                        @dblclick.stop="displaySelected(file)"
                                     >
-                                        <span v-if="file.type == 'directory'">
-                                            <FolderIcon
-                                                class="cursor-pointer h-28 w-28 text-gray-400 flex-shrink-0 mx-auto"
-                                                aria-hidden="true"
-                                            />
-                                        </span>
-                                        <span v-else>
-                                            <DocumentTextIcon
-                                                class="h-28 w-28 text-gray-400 flex-shrink-0 mx-auto"
-                                                aria-hidden="true"
-                                            />
-                                        </span>
-                                        <span
-                                            v-if="file.status == 'missing'"
-                                            class="absolute right-0 top-0 pr-4 pt-4 text-sm font-medium text-gray-500 pointer-events-none"
+                                        <div
+                                            class="group block w-full aspect-w-10 aspect-h-7 py-4 bg-gray-100 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 focus-within:ring-indigo-500 overflow-hidden"
                                         >
-                                            <div
-                                                class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10"
-                                            >
-                                                <svg
-                                                    class="h-6 w-6 text-red-600"
-                                                    fill="none"
-                                                    viewBox="0 0 24 24"
-                                                    stroke-width="1.5"
-                                                    stroke="currentColor"
+                                            <span v-if="file.type == 'directory'">
+                                                <FolderIcon
+                                                    class="cursor-pointer h-28 w-28 text-teal-600 flex-shrink-0 mx-auto"
                                                     aria-hidden="true"
+                                                />
+                                            </span>
+                                            <span v-else>
+                                                <DocumentTextIcon
+                                                    class="h-28 w-28 text-gray-400 flex-shrink-0 mx-auto"
+                                                    aria-hidden="true"
+                                                />
+                                            </span>
+                                            <span
+                                                v-if="file.status == 'missing'"
+                                                class="absolute right-0 top-0 pr-4 pt-4 text-sm font-medium text-gray-500 pointer-events-none"
+                                            >
+                                                <div
+                                                    class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10"
                                                 >
-                                                    <path
-                                                        stroke-linecap="round"
-                                                        stroke-linejoin="round"
-                                                        d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
-                                                    ></path>
-                                                </svg>
-                                            </div>
-                                        </span>
+                                                    <svg
+                                                        class="h-6 w-6 text-red-600"
+                                                        fill="none"
+                                                        viewBox="0 0 24 24"
+                                                        stroke-width="1.5"
+                                                        stroke="currentColor"
+                                                        aria-hidden="true"
+                                                    >
+                                                        <path
+                                                            stroke-linecap="round"
+                                                            stroke-linejoin="round"
+                                                            d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
+                                                        ></path>
+                                                    </svg>
+                                                </div>
+                                            </span>
+                                        </div>
+                                        <p
+                                            class="mt-2 px-2 py-1 block text-sm font-medium truncate text-gray-900 pointer-events-none"
+                                        >
+                                            <span class="float-left" :title="file.name">
+                                                {{ truncateMiddle(file.name, 25) }}
+                                            </span>
+                                        </p>
+                                        <div class="flex items-center justify-between px-2 pb-1">
+                                            <p class="text-sm font-medium text-gray-500">
+                                                {{ formatFileSize(file) }}
+                                            </p>
+                                            <a
+                                                v-if="file.type !== 'directory' && readonly"
+                                                :href="getFileDownloadURL(file)"
+                                                class="text-gray-400 hover:text-indigo-600 transition-colors duration-200 pointer-events-auto"
+                                                title="Download file"
+                                                @click.stop
+                                            >
+                                                <ArrowDownTrayIcon class="h-4 w-4" />
+                                            </a>
+                                        </div>
                                     </div>
-                                    <p
-                                        class="mt-2 px-2 py-1 block text-sm font-medium truncate text-gray-900 pointer-events-none"
-                                    >
-                                        <span class="float-left">
-                                            {{ truncateMiddle(file.name, 25) }}
-                                        </span>
-                                    </p>
-                                </div>
+                                </template>
+
+                                <!-- List View Layout -->
+                                <template v-else>
+                                    <div class="px-3 py-3 grid grid-cols-12 gap-4 items-center">
+                                        <!-- Name Column -->
+                                        <div class="col-span-4 flex items-center">
+                                            <div class="flex-shrink-0 mr-3">
+                                                <FolderIcon
+                                                    v-if="file.type == 'directory'"
+                                                    class="cursor-pointer h-5 w-5 text-teal-600"
+                                                    aria-hidden="true"
+                                                    @dblclick.stop="displaySelected(file)"
+                                                />
+                                                <DocumentTextIcon
+                                                    v-else
+                                                    class="h-5 w-5 text-gray-400"
+                                                    aria-hidden="true"
+                                                />
+                                            </div>
+                                            <div class="min-w-0 flex-1">
+                                                <p class="text-sm font-medium text-gray-900 truncate" :title="file.name">
+                                                    {{ file.name }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Date Modified Column -->
+                                        <div class="col-span-3">
+                                            <p class="text-sm text-gray-500">
+                                                {{ formatDate(file.updated_at || file.created_at) }}
+                                            </p>
+                                        </div>
+                                        
+                                        <!-- Size Column -->
+                                        <div class="col-span-2">
+                                            <p class="text-sm text-gray-500">
+                                                {{ file.type === 'directory' ? '--' : formatFileSize(file) }}
+                                            </p>
+                                        </div>
+                                        
+                                        <!-- Kind Column -->
+                                        <div class="col-span-2">
+                                            <p class="text-sm text-gray-500">
+                                                {{ file.type === 'directory' ? 'Folder' : 'Document' }}
+                                            </p>
+                                        </div>
+                                        
+                                        <!-- Download Column -->
+                                        <div class="col-span-1 flex justify-center">
+                                            <a
+                                                v-if="file.type !== 'directory' && readonly"
+                                                :href="getFileDownloadURL(file)"
+                                                class="text-gray-400 hover:text-indigo-600 transition-colors duration-200"
+                                                title="Download file"
+                                            >
+                                                <ArrowDownTrayIcon class="h-5 w-5" />
+                                            </a>
+                                            <!-- No download icon for folders -->
+                                        </div>
+                                    </div>
+                                </template>
                             </li>
                         </ul>
                     </div>
@@ -552,6 +744,7 @@
                         <p
                             v-if="$page.props.selectedFileSystemObject"
                             class="font-bold text-xl"
+                            :title="$page.props.selectedFileSystemObject.relative_url"
                         >
                             {{
                                 truncateMiddle(
@@ -802,6 +995,10 @@ import {
     ExclamationCircleIcon,
     TrashIcon,
     ArrowDownTrayIcon,
+    Squares2X2Icon,
+    ListBulletIcon,
+    ChevronUpIcon,
+    ChevronDownIcon,
 } from "@heroicons/vue/24/solid";
 
 // Utility imports
@@ -832,6 +1029,10 @@ export default {
         ToolTip, // Tooltip component
         JetConfirmationModal, // Confirmation dialog component
         JetDangerButton, // Danger button component
+        Squares2X2Icon, // Grid view icon
+        ListBulletIcon, // List view icon
+        ChevronUpIcon, // Sort ascending icon
+        ChevronDownIcon, // Sort descending icon
     },
 
     /**
@@ -892,6 +1093,11 @@ export default {
 
             // Navigation state tracking
             currentStep: null, // Current step for state clearing
+
+            // View mode and sorting
+            viewMode: 'grid', // 'grid' or 'list'
+            sortBy: 'name', // 'name', 'date', 'size', 'kind'
+            sortOrder: 'asc', // 'asc' or 'desc'
         };
     },
     /**
@@ -988,6 +1194,51 @@ export default {
         currentUrl() {
             return window.location.search;
         },
+
+        /**
+         * Get sorted files for the current folder
+         * @returns {Array} Sorted array of files and folders
+         */
+        sortedFiles() {
+            if (!this.$page.props.selectedFileSystemObject?.children) {
+                return [];
+            }
+            
+            const files = [...this.$page.props.selectedFileSystemObject.children];
+            
+            return files.sort((a, b) => {
+                let aValue, bValue;
+                
+                switch (this.sortBy) {
+                    case 'name':
+                        aValue = a.name.toLowerCase();
+                        bValue = b.name.toLowerCase();
+                        break;
+                    case 'date':
+                        aValue = new Date(a.updated_at || a.created_at || 0);
+                        bValue = new Date(b.updated_at || b.created_at || 0);
+                        break;
+                    case 'size':
+                        aValue = this.getFileSizeForSorting(a);
+                        bValue = this.getFileSizeForSorting(b);
+                        break;
+                    case 'kind':
+                        aValue = a.type === 'directory' ? 'folder' : 'document';
+                        bValue = b.type === 'directory' ? 'folder' : 'document';
+                        break;
+                    default:
+                        return 0;
+                }
+                
+                if (aValue < bValue) {
+                    return this.sortOrder === 'asc' ? -1 : 1;
+                }
+                if (aValue > bValue) {
+                    return this.sortOrder === 'asc' ? 1 : -1;
+                }
+                return 0;
+            });
+        },
     },
 
     watch: {
@@ -1001,6 +1252,12 @@ export default {
     },
 
     mounted() {
+        // Load view mode from localStorage
+        const savedViewMode = localStorage.getItem('nmrxiv-files-view-mode');
+        if (savedViewMode && ['grid', 'list'].includes(savedViewMode)) {
+            this.viewMode = savedViewMode;
+        }
+
         if (this.draft) {
             this.url =
                 this.baseURL + "/dashboard/drafts/" + this.draft.id + "/files";
@@ -2505,6 +2762,110 @@ export default {
             }?${urlParams.toString()}`;
             window.history.replaceState({}, "", newUrl);
         },
+
+        /**
+         * Set view mode and save to localStorage
+         */
+        setViewMode(mode) {
+            this.viewMode = mode;
+            localStorage.setItem('nmrxiv-files-view-mode', mode);
+        },
+
+        /**
+         * Handle sorting by column
+         */
+        sortFiles(column) {
+            if (this.sortBy === column) {
+                // Toggle sort order if clicking the same column
+                this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
+            } else {
+                // Set new column and default to ascending
+                this.sortBy = column;
+                this.sortOrder = 'asc';
+            }
+        },
+
+        /**
+         * Format file size for display
+         */
+        formatFileSize(file) {
+            if (file.type === 'directory') return '--';
+            
+            try {
+                const info = JSON.parse(file.info || '{}');
+                const sizeInBytes = parseInt(info.size || 0);
+                
+                if (sizeInBytes === 0) return '0 bytes';
+                
+                const units = ['bytes', 'KB', 'MB', 'GB', 'TB'];
+                const unitIndex = Math.floor(Math.log(sizeInBytes) / Math.log(1024));
+                const size = (sizeInBytes / Math.pow(1024, unitIndex)).toFixed(1);
+                
+                return `${size} ${units[unitIndex]}`;
+            } catch (error) {
+                // Fallback to original size if JSON parsing fails
+                return file.size || '0 bytes';
+            }
+        },
+
+        /**
+         * Get file size for sorting purposes
+         */
+        getFileSizeForSorting(file) {
+            if (file.type === 'directory') return 0;
+            
+            try {
+                const info = JSON.parse(file.info || '{}');
+                return parseInt(info.size || 0);
+            } catch (error) {
+                // Fallback to parsing original size string
+                return parseInt(file.size?.replace(/[^\d]/g, '') || 0);
+            }
+        },
+
+        /**
+         * Format date for display
+         */
+        formatDate(dateString) {
+            if (!dateString) return '--';
+            
+            const date = new Date(dateString);
+            const options = {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
+            
+            // Format like "18. Aug 2025 at 10:52"
+            return date.toLocaleDateString('en-GB', options)
+                .replace(',', ' at')
+                .replace(/(\d+)/, '$1.');
+        },
+
+        /**
+         * Get download URL for individual files
+         */
+        getFileDownloadURL(file) {
+            if (file.type === 'directory') return '#';
+            
+            if (this.project) {
+                return (
+                    this.baseURL +
+                    "/" +
+                    this.project.owner.username +
+                    "/download/" +
+                    this.project.slug +
+                    "?key=" +
+                    file.key +
+                    "&uuid=" +
+                    file.uuid
+                );
+            }
+            return '#';
+        },
     },
 };
 </script>
+
