@@ -364,9 +364,6 @@
  * - URL synchronization for selected items
  */
 
-// Component imports
-import StudyContent from "@/Pages/Study/Content.vue";
-
 // Icon imports from Heroicons
 import { FolderIcon, DocumentTextIcon } from "@heroicons/vue/24/solid";
 
@@ -380,7 +377,6 @@ export default {
      * Component dependencies
      */
     components: {
-        StudyContent,           // Study content component (unused but imported)
         Disclosure,             // HeadlessUI disclosure container
         DisclosureButton,       // HeadlessUI disclosure trigger button
         DisclosurePanel,        // HeadlessUI collapsible content panel

@@ -95,8 +95,8 @@
                                 </button>
                             </div>
                             <div
-                                class="inline-flex items-center mt-3"
                                 v-if="!project.is_deleted"
+                                class="inline-flex items-center mt-3"
                             >
                                 <access-dialogue
                                     :available-roles="availableRoles"
@@ -359,8 +359,8 @@
                 <TransitionRoot
                     :show="showPublishDialog"
                     as="template"
-                    @after-leave="query = ''"
                     appear
+                    @after-leave="query = ''"
                 >
                     <Dialog as="div" class="relative z-10">
                         <TransitionChild
@@ -579,12 +579,12 @@
                                                             class="flex items-top"
                                                         >
                                                             <input
-                                                                type="checkbox"
-                                                                class="rounded mt-1 border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                                                                 id="conditions"
                                                                 v-model="
                                                                     project.conditions
                                                                 "
+                                                                type="checkbox"
+                                                                class="rounded mt-1 border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                                                                 name="conditions"
                                                             />
                                                             <div
@@ -614,12 +614,12 @@
                                                             class="flex items-center"
                                                         >
                                                             <input
-                                                                type="checkbox"
-                                                                class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                                                                 id="terms"
                                                                 v-model="
                                                                     project.terms
                                                                 "
+                                                                type="checkbox"
+                                                                class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                                                                 name="terms"
                                                             />
                                                             <div
@@ -675,12 +675,12 @@
                                                             : 'bg-green-600 hover:bg-green-700',
                                                         'ml-2',
                                                     ]"
-                                                    @click="
-                                                        showPublishConfirmationModal = true
-                                                    "
                                                     :disabled="
                                                         !project.terms &&
                                                         !project.conditions
+                                                    "
+                                                    @click="
+                                                        showPublishConfirmationModal = true
                                                     "
                                                 >
                                                     Publish now
@@ -1166,7 +1166,7 @@ export default {
                         );
                     }
                 })
-                .then(function (response) {
+                .then(function () {
                     router.reload({ only: ["project"] });
                 });
         },
@@ -1210,7 +1210,7 @@ export default {
                     onSuccess: () => {
                         this.showPublishDialog = false;
                     },
-                    onError: (err) => {},
+                    onError: () => {},
                 }
             );
         },

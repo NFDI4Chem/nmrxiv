@@ -325,7 +325,7 @@
                                                         Color
                                                     </label>
                                                     <color-picker
-                                                        v-model:pureColor="
+                                                        v-model:pure-color="
                                                             form.color
                                                         "
                                                     />
@@ -846,17 +846,11 @@ import {
 } from "@headlessui/vue";
 import { XMarkIcon } from "@heroicons/vue/24/outline";
 import {
-    LinkIcon,
-    PlusSmallIcon,
     QuestionMarkCircleIcon,
     ExclamationCircleIcon,
+    ClipboardDocumentIcon,
 } from "@heroicons/vue/24/solid";
 import {
-    Listbox,
-    ListboxButton,
-    ListboxLabel,
-    ListboxOption,
-    ListboxOptions,
     Tab,
     TabGroup,
     TabList,
@@ -867,17 +861,11 @@ import JetInputError from "@/Jetstream/InputError.vue";
 import ProjectActivity from "@/Pages/Project/Partials/Activity.vue";
 import { ColorPicker } from "vue3-colorpicker";
 import "vue3-colorpicker/style.css";
-import { Switch, SwitchGroup, SwitchLabel } from "@headlessui/vue";
-import {
-    ClipboardDocumentIcon,
-    CheckIcon,
-    ChevronDownIcon,
-} from "@heroicons/vue/24/solid";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import SelectRich from "@/Shared/SelectRich.vue";
 import JetButton from "@/Jetstream/Button.vue";
 import VueTagsInput from "@sipec/vue3-tags-input";
-import { router } from "@inertiajs/vue3";
+import { router, Inertia } from "@inertiajs/vue3";
 const publishingOptions = [
     {
         value: "viewer",
@@ -902,9 +890,6 @@ const publishingOptions = [
 
 export default defineComponent({
     components: {
-        Switch,
-        SwitchGroup,
-        SwitchLabel,
         JetSecondaryButton,
         JetButton,
         Dialog,
@@ -917,23 +902,14 @@ export default defineComponent({
         XMarkIcon,
         ProjectActivity,
         TransitionRoot,
-        LinkIcon,
-        PlusSmallIcon,
         QuestionMarkCircleIcon,
         ExclamationCircleIcon,
-        Listbox,
-        ListboxButton,
-        ListboxLabel,
-        ListboxOption,
-        ListboxOptions,
         Tab,
         TabGroup,
         TabList,
         TabPanel,
         TabPanels,
         ClipboardDocumentIcon,
-        CheckIcon,
-        ChevronDownIcon,
         SelectRich,
         VueTagsInput,
     },
@@ -1094,7 +1070,7 @@ export default defineComponent({
                         stale = false;
                     });
                 },
-                onError: (err) => {},
+                onError: () => {},
             });
         },
         toggleActivityDetails() {

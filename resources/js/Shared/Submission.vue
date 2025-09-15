@@ -179,8 +179,8 @@
                                     <div class="flex gap-2">
                                         <button
                                             v-if="draft.processing_logs && draft.processing_logs.length > 0"
-                                            @click="showProcessingLogs(draft)"
                                             class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                            @click="showProcessingLogs(draft)"
                                         >
                                             <InformationCircleIcon
                                                 class="h-4 w-4 mr-1"
@@ -1760,8 +1760,8 @@
     <!-- Processing Logs Modal -->
     <jet-dialog-modal
         :show="showLogsDialog"
-        @close="showLogsDialog = false"
         :max-width="'4xl'"
+        @close="showLogsDialog = false"
     >
         <template #title>
             <div class="block">
@@ -1854,20 +1854,14 @@ import VueTagsInput from "@sipec/vue3-tags-input";
 import { ref } from "vue";
 import slider from "vue3-slider";
 import OCL from "openchemlib/full";
-import SelectRich from "@/Shared/SelectRich.vue";
 import SpectraEditor from "@/Shared/SpectraEditor.vue";
 import Validation from "@/Shared/Validation.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import FileSystemBrowser from "./FileSystemBrowser.vue";
 import {
-    XCircleIcon,
-    ClipboardDocumentIcon,
-    QuestionMarkCircleIcon,
     ExclamationTriangleIcon,
     ExclamationCircleIcon,
     TrashIcon,
-    PlayIcon,
-    PauseIcon,
     PencilIcon,
     ArrowDownOnSquareStackIcon,
     InformationCircleIcon,
@@ -1883,18 +1877,12 @@ export default {
         JetButton,
         VueTagsInput,
         slider,
-        SelectRich,
-        XCircleIcon,
         PencilIcon,
         JetInputError,
         FileSystemBrowser,
-        ClipboardDocumentIcon,
-        QuestionMarkCircleIcon,
         ExclamationTriangleIcon,
         ArrowDownOnSquareStackIcon,
         TrashIcon,
-        PlayIcon,
-        PauseIcon,
         SpectraEditor,
         Validation,
         InformationCircleIcon,
@@ -1910,7 +1898,6 @@ export default {
             currentDraft: null,
             errorMessage: null,
             datasetsToImport: null,
-            errorMessage: "",
 
             draftForm: this.$inertia.form({
                 _method: "POST",
@@ -2110,7 +2097,6 @@ export default {
                     only: ["user", "user.permissions", "user.roles"],
                 });
             });
-            var pattern = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
         },
         skipPrimer() {
             this.showPrimer = false;
@@ -2236,7 +2222,7 @@ export default {
                     onSuccess: () => {
                         this.loadingStep = false;
                     },
-                    onError: (err) => {
+                    onError: () => {
                         this.loadingStep = false;
                     },
                 }
@@ -2346,7 +2332,7 @@ export default {
             this.errorMessage = "";
             if (this.smiles && this.smiles != "") {
                 try {
-                    let mol = OCL.Molecule.fromSmiles(this.smiles);
+                    OCL.Molecule.fromSmiles(this.smiles);
                     this.editor.setSmiles(this.smiles);
                 } catch (e) {
                     this.errorMessage = "The entered SMILES is not valid.";
@@ -2377,7 +2363,7 @@ export default {
                     "/dashboard/drafts/" + this.currentDraft.id + "/complete",
                     {}
                 )
-                .catch((error) => {
+                .catch(() => {
                     this.loadingStep = false;
                 })
                 .then((response) => {
@@ -2682,7 +2668,7 @@ export default {
                                     "/nmriumInfo",
                                 response.data.data
                             )
-                            .then((res) => {
+                            .then(() => {
                                 this.loadingStep = false;
                                 this.datasetsToImport.filter(
                                     (f) =>
@@ -2690,7 +2676,7 @@ export default {
                                 )[0].status = true;
                                 this.fetchNMRium();
                             })
-                            .catch((err) => {
+                            .catch(() => {
                                 this.loadingStep = false;
                                 this.datasetsToImport.filter(
                                     (f) =>
@@ -2699,7 +2685,7 @@ export default {
                                 this.fetchNMRium();
                             });
                     })
-                    .catch((error) => {
+                    .catch(() => {
                         this.loadingStep = false;
                         this.datasetsToImport.filter(
                             (f) => f.datasetId == datasetDetails.datasetId

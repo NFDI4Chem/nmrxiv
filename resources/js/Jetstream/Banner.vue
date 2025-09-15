@@ -27,11 +27,9 @@
 
 <script>
 import { XMarkIcon } from "@heroicons/vue/24/outline";
-import Button from "@/Shared/Dropdown.vue";
 export default {
     components: {
         XMarkIcon,
-        Button,
     },
     data() {
         return {

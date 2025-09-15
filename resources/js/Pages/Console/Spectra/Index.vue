@@ -372,20 +372,12 @@
 
 <script>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import SearchFilter from "@/Shared/SearchFilter.vue";
-import JetDialogModal from "@/Jetstream/DialogModal.vue";
-import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
-import JetButton from "@/Jetstream/Button.vue";
 import BreadCrumbs from "../../../Jetstream/BreadCrumbs.vue";
 import { Link } from "@inertiajs/vue3";
 
 export default {
     components: {
         AppLayout,
-        SearchFilter,
-        JetDialogModal,
-        JetSecondaryButton,
-        JetButton,
         Link,
         BreadCrumbs,
     },

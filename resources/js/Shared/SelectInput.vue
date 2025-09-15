@@ -21,7 +21,7 @@ export default {
     props: {
         id: {
             type: String,
-            default(test, ing) {
+            default() {
                 return `select-input-${Math.random() * 1000}`;
             },
         },

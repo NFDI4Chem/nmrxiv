@@ -342,7 +342,8 @@
                                             :class="author.selected ? 'ring-2 ring-teal-500 rounded-md' : ''"
                                             @click="addAuthorToSelectedList(author)"
                                         >
-                                            <AuthorCard :authors="[{
+                                            <AuthorCard
+:authors="[{
                                                 id: author.authorId ? author.authorId.value : undefined,
                                                 title: author.title || '',
                                                 given_name: author.firstName,
@@ -396,7 +397,7 @@
                             <div class="relative cursor-move mb-2">
                                 <AuthorCard
                                     :authors="[element]"
-                                    :enableRoleClick="true"
+                                    :enable-role-click="true"
                                     @role-click="(a) => { showManageRoleDialog = true; updateRoleForm.author_id = a.id; }"
                                 />
                                 <div class="absolute bottom-2 right-2 flex space-x-1">
@@ -532,7 +533,6 @@
 <script>
 import JetDialogModal from "@/Jetstream/DialogModal.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
-import JetButton from "@/Jetstream/Button.vue";
 import {
     TrashIcon,
     PencilIcon,
@@ -554,7 +554,6 @@ export default {
         JetDialogModal,
         JetSecondaryButton,
         JetDangerButton,
-        JetButton,
         PencilIcon,
         ArrowSmallRightIcon,
         FolderPlusIcon,

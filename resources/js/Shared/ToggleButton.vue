@@ -27,7 +27,6 @@
 </template>
 
 <script>
-import { ref } from "vue";
 import { Switch } from "@headlessui/vue";
 
 export default {
