@@ -334,8 +334,8 @@
                             {{ project.description }}
                         </p>
                         <p
-                            class="text-gray-500 text-base line-clamp-2 ... pr-10"
                             v-else
+                            class="text-gray-500 text-base line-clamp-2 ... pr-10"
                         >
                             <i>-- No description --</i>
                         </p>
@@ -371,13 +371,12 @@
     </div>
 </template>
 <script>
-import { Link, router } from "@inertiajs/vue3";
+import { router } from "@inertiajs/vue3";
 import { StarIcon } from "@heroicons/vue/24/solid";
 import Tag from "@/Shared/Tag.vue";
 import ShowProjectDates from "@/Shared/ShowProjectDates.vue";
 export default {
     components: {
-        Link,
         StarIcon,
         ShowProjectDates,
     Tag,

@@ -148,10 +148,11 @@
                                                 class="mt-3 text-gray-500"
                                             >
                                                 <span
-                                                    class="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-sm mr-2 font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10 mt-2"
-                                                    v-for="synonym in molecule.synonyms
+                                                    v-for="(synonym, index) in molecule.synonyms
                                                         .split(',')
                                                         .slice(1, 20)"
+                                                    :key="index"
+                                                    class="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-sm mr-2 font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10 mt-2"
                                                 >
                                                     {{ synonym }}
                                                 </span>
@@ -453,7 +454,6 @@
 
 <script>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import { Link } from "@inertiajs/vue3";
 import StudySearch from "@/Shared/StudySearch.vue";
 import StudyPublicCard from "@/Shared/StudyCardPublic.vue";
 import { ref } from "vue";
@@ -461,23 +461,11 @@ import throttle from "lodash/throttle";
 import pickBy from "lodash/pickBy";
 import Pagination from "@/Shared/Pagination.vue";
 import {
-    Dialog,
-    DialogPanel,
-    Disclosure,
-    DisclosureButton,
-    DisclosurePanel,
     Menu,
     MenuButton,
     MenuItem,
     MenuItems,
-    Popover,
-    PopoverButton,
-    PopoverGroup,
-    PopoverPanel,
-    TransitionChild,
-    TransitionRoot,
 } from "@headlessui/vue";
-import { XMarkIcon } from "@heroicons/vue/24/outline";
 import {
     ChevronDownIcon,
     QueueListIcon,
@@ -487,25 +475,12 @@ import {
 export default {
     components: {
         AppLayout,
-        Link,
         StudySearch,
         Pagination,
-        Dialog,
-        DialogPanel,
-        Disclosure,
-        DisclosureButton,
-        DisclosurePanel,
         Menu,
         MenuButton,
         MenuItem,
         MenuItems,
-        Popover,
-        PopoverButton,
-        PopoverGroup,
-        PopoverPanel,
-        TransitionChild,
-        TransitionRoot,
-        XMarkIcon,
         ChevronDownIcon,
         QueueListIcon,
         Squares2X2Icon,
@@ -513,32 +488,20 @@ export default {
     },
     props: {
         studies: {
-            default: [],
+            default: () => ({}),
             type: Object,
         },
         filters: {
-            default: {
+            default: () => ({
                 search: "",
                 sort: "newest",
                 mode: "grid",
-            },
+            }),
             type: Object,
         },
         molecule: {
-            default: [],
+            default: () => ({}),
             type: Object,
-        },
-    },
-    computed: {
-        pageTitle() {
-            if (this.molecule && this.molecule.identifier) {
-                let title = `${this.molecule.identifier}`;
-                if (this.molecule.name) {
-                    title += ` (${this.molecule.name})`;
-                }
-                return title;
-            }
-            return "Spectra";
         },
     },
     data() {
@@ -554,6 +517,18 @@ export default {
                 mode: "grid",
             },
         };
+    },
+    computed: {
+        pageTitle() {
+            if (this.molecule && this.molecule.identifier) {
+                let title = `${this.molecule.identifier}`;
+                if (this.molecule.name) {
+                    title += ` (${this.molecule.name})`;
+                }
+                return title;
+            }
+            return "Spectra";
+        },
     },
     mounted() {
         if (this.filters) {

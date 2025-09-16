@@ -125,40 +125,16 @@
 import JetDialogModal from "@/Jetstream/DialogModal.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import JetButton from "@/Jetstream/Button.vue";
-import { CheckCircleIcon, ChevronRightIcon } from "@heroicons/vue/24/solid";
-import { Link } from "@inertiajs/vue3";
-import {
-    AtSymbolIcon,
-    CodeBracketIcon,
-    LinkIcon,
-} from "@heroicons/vue/24/solid";
 import JetInputError from "@/Jetstream/InputError.vue";
-import { ref } from "vue";
 import ToggleButton from "@/Shared/ToggleButton.vue";
-import {
-    Switch,
-    SwitchDescription,
-    SwitchGroup,
-    SwitchLabel,
-} from "@headlessui/vue";
 import Datepicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 
 export default {
     components: {
-        Switch,
-        SwitchDescription,
-        SwitchGroup,
-        SwitchLabel,
-        AtSymbolIcon,
-        CodeBracketIcon,
-        LinkIcon,
         JetDialogModal,
         JetSecondaryButton,
         JetButton,
-        Link,
-        CheckCircleIcon,
-        ChevronRightIcon,
         Datepicker,
         ToggleButton,
         JetInputError,

@@ -35,7 +35,7 @@
                         />
                     </div>
                     <div class="sm:col-span-6">
-                        <TabGroup v-slot="{ $selectedIndex }">
+                        <TabGroup>
                             <TabList class="flex items-center">
                                 <Tab
                                     v-slot="{ selected }"
@@ -309,24 +309,15 @@
 import JetDialogModal from "@/Jetstream/DialogModal.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import JetButton from "@/Jetstream/Button.vue";
-import { CheckCircleIcon, ChevronRightIcon } from "@heroicons/vue/24/solid";
-import { Link } from "@inertiajs/vue3";
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/vue";
-import {
-    AtSymbolIcon,
-    CodeBracketIcon,
-    LinkIcon,
-} from "@heroicons/vue/24/solid";
 import JetInputError from "@/Jetstream/InputError.vue";
 import { ref } from "vue";
 import {
     Switch,
-    SwitchDescription,
     SwitchGroup,
     SwitchLabel,
 } from "@headlessui/vue";
 import SelectRich from "@/Shared/SelectRich.vue";
-import { inject } from "vue";
 
 export default {
     components: {
@@ -336,18 +327,11 @@ export default {
         TabPanel,
         TabPanels,
         Switch,
-        SwitchDescription,
         SwitchGroup,
         SwitchLabel,
-        AtSymbolIcon,
-        CodeBracketIcon,
-        LinkIcon,
         JetDialogModal,
         JetSecondaryButton,
         JetButton,
-        Link,
-        CheckCircleIcon,
-        ChevronRightIcon,
         JetInputError,
         SelectRich,
     },

@@ -22,11 +22,10 @@
 
 <script>
 import { Link } from "@inertiajs/vue3";
-import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/vue/24/solid";
+import { ChevronRightIcon } from "@heroicons/vue/24/solid";
 
 export default {
     components: {
-        ChevronLeftIcon,
         ChevronRightIcon,
         Link,
     },

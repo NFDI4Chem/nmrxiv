@@ -32,12 +32,10 @@
 
 <script>
 import { XMarkIcon } from "@heroicons/vue/24/outline";
-import Button from "@/Shared/Dropdown.vue";
 
 export default {
     components: {
         XMarkIcon,
-        Button,
     },
     props: {},
     setup() {},
@@ -45,10 +43,19 @@ export default {
         return {
             ustring: null,
             show: false,
+            announcementsList: [],
         };
     },
     computed: {
         announcements() {
+            return this.announcementsList;
+        },
+    },
+    mounted() {
+        this.loadAnnouncements();
+    },
+    methods: {
+        loadAnnouncements() {
             let announcements = this.$page.props.config.announcements;
             this.ustring = this.getHash(
                 this.slugify(announcements.map((a) => a.message).toString())
@@ -57,10 +64,8 @@ export default {
                 "announcement" + "_" + this.ustring
             );
             this.show = announcements.length > 0 && userAcknowledged == null;
-            return announcements;
+            this.announcementsList = announcements;
         },
-    },
-    methods: {
         acknowledgeAnnouncement() {
             let localItems = this.findLocalItems("announcement_*");
             if (localItems.length > 0) {

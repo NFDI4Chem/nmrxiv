@@ -266,7 +266,7 @@
                                                         Color
                                                     </label>
                                                     <color-picker
-                                                        v-model:pureColor="
+                                                        v-model:pure-color="
                                                             form.color
                                                         "
                                                     />
@@ -793,8 +793,6 @@ import {
 } from "@headlessui/vue";
 import { XMarkIcon } from "@heroicons/vue/24/outline";
 import {
-    LinkIcon,
-    PlusSmallIcon,
     QuestionMarkCircleIcon,
     ExclamationCircleIcon,
 } from "@heroicons/vue/24/solid";
@@ -803,24 +801,13 @@ import JetInputError from "@/Jetstream/InputError.vue";
 import StudyActivity from "@/Pages/Study/Partials/Activity.vue";
 import { ColorPicker } from "vue3-colorpicker";
 import "vue3-colorpicker/style.css";
-import { Switch, SwitchGroup, SwitchLabel } from "@headlessui/vue";
 import {
     ClipboardDocumentIcon,
-    CheckIcon,
-    ChevronDownIcon,
 } from "@heroicons/vue/24/solid";
-import {
-    Listbox,
-    ListboxButton,
-    ListboxLabel,
-    ListboxOption,
-    ListboxOptions,
-} from "@headlessui/vue";
 import JetButton from "@/Jetstream/Button.vue";
 import SelectRich from "@/Shared/SelectRich.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import VueTagsInput from "@sipec/vue3-tags-input";
-import { inject } from "vue";
 
 const publishingOptions = [
     {
@@ -852,11 +839,6 @@ export default {
         TransitionChild,
         TransitionRoot,
         JetInputError,
-        Listbox,
-        ListboxButton,
-        ListboxLabel,
-        ListboxOption,
-        ListboxOptions,
         StudyActivity,
         Tab,
         JetActionMessage,
@@ -866,18 +848,11 @@ export default {
         TabList,
         TabPanel,
         TabPanels,
-        LinkIcon,
-        PlusSmallIcon,
         QuestionMarkCircleIcon,
         ExclamationCircleIcon,
         XMarkIcon,
         ColorPicker,
-        Switch,
-        SwitchGroup,
-        SwitchLabel,
         ClipboardDocumentIcon,
-        CheckIcon,
-        ChevronDownIcon,
         SelectRich,
         VueTagsInput,
     },
@@ -917,11 +892,6 @@ export default {
             linkAccess: this.study.access == "link",
             tag: "",
             tags: this.getTags(),
-            open: false,
-            selectedAccessType: publishingOptions.filter(
-                (option) => option.value == this.study.access_type
-            )[0],
-            linkAccess: this.study.access == "link",
         };
     },
     computed: {
@@ -1000,7 +970,7 @@ export default {
                     this.open = false;
                     this.form.tag = "";
                 },
-                onError: (err) => {},
+                onError: () => {},
             });
         },
         toggleActivityDetails() {

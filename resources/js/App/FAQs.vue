@@ -9,11 +9,11 @@
                 </h2>
                 <dl class="mt-10 space-y-6 divide-y divide-gray-900/10">
                     <Disclosure
-                        as="div"
                         v-for="faq in faqs.slice(0, limit)"
                         :key="faq.question"
-                        class="pt-6"
                         v-slot="{ open }"
+                        as="div"
+                        class="pt-6"
                     >
                         <dt>
                             <DisclosureButton
@@ -53,7 +53,7 @@
 import { Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/vue";
 import { MinusSmallIcon, PlusSmallIcon } from "@heroicons/vue/24/outline";
 
-const props = defineProps(["limit"]);
+const { limit } = defineProps(["limit"]);
 
 const faqs = [
     {

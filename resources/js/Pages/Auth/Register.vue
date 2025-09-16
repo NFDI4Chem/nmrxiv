@@ -59,8 +59,8 @@
                 />
                 <jet-input
                     id="last_name"
-                    name="lastname"
                     v-model="form.last_name"
+                    name="lastname"
                     type="text"
                     class="mt-1 block w-full"
                     required
@@ -237,7 +237,7 @@
     <!-- Find ORCID iD Modal -->
     <select-orcid-id
         ref="selectOrcidIdElement"
-        v-model:orcidId="form.orcid_id"
+        v-model:orcid-id="form.orcid_id"
         v-model:affiliation="form.affiliation"
     />
 </template>
@@ -252,9 +252,6 @@ import JetLabel from "@/Jetstream/Label.vue";
 import JetValidationErrors from "@/Jetstream/ValidationErrors.vue";
 import { Head, Link } from "@inertiajs/vue3";
 import AnnouncementBanner from "@/Shared/AnnouncementBanner.vue";
-import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
-import JetDialogModal from "@/Jetstream/DialogModal.vue";
-import LoadingButton from "@/Shared/LoadingButton.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import SelectOrcidId from "@/Shared/SelectOrcidId.vue";
 import { ref } from "vue";
@@ -271,12 +268,8 @@ export default {
         JetValidationErrors,
         Link,
         AnnouncementBanner,
-        JetSecondaryButton,
-        JetDialogModal,
-        LoadingButton,
         JetInputError,
         SelectOrcidId,
-        ref,
     },
     setup() {
         const selectOrcidIdElement = ref(null);

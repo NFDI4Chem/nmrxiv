@@ -123,8 +123,6 @@ import FileSystemBrowser from "./../../../Shared/FileSystemBrowser.vue";
 
 // Icon imports from Heroicons
 import {
-    FolderIcon,
-    DocumentTextIcon,
     ChevronRightIcon,
     HomeIcon,
 } from "@heroicons/vue/24/solid";
@@ -140,8 +138,6 @@ export default {
      */
     components: {
         ProjectLayout,           // Main project layout wrapper
-        FolderIcon,            // Folder icon (unused but imported)
-        DocumentTextIcon,      // Document icon (unused but imported)
         ChevronRightIcon,      // Right arrow for breadcrumb separators
         HomeIcon,              // Home icon for root breadcrumb
         FileSystemBrowser,     // Main file browser component
