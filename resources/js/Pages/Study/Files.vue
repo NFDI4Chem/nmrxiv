@@ -457,12 +457,7 @@
                                                     @load="loadSpectra()"
                                                 ></iframe>
                                             </div> -->
-                                            <!-- <div
-                                                v-if="svgString"
-                                                class="rounded-md border my-3 flex justify-center items-center"
-                                            >
-                                                <span v-html="svgString"></span>
-                                            </div> -->
+                                            <!-- SVG rendering removed for security reasons - raw SVG content can contain malicious scripts -->
                                             <File-details
                                                 :study="study"
                                                 :file="

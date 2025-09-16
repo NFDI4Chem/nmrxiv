@@ -101,7 +101,7 @@
             <div class="mt-3 pt-3 border-t border-blue-200 p-3 sm:p-4">
                 <p
                     class="text-sm font-medium text-gray-900 leading-relaxed break-words"
-                    v-html="citationText"
+                    v-html="sanitizeHtml(citationText)"
                 ></p>
             </div>
         </div>

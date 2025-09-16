@@ -90,7 +90,7 @@
                             <!-- Dynamic icon for directories (instrument-specific or generic) -->
                             <span
                                 v-if="file.type == 'directory'"
-                                v-html="composeIcon(file)"
+                                v-html="sanitizeHtml(composeIcon(file))"
                             />
                             <!-- Generic folder icon for non-directories -->
                             <span v-else>
@@ -219,7 +219,7 @@
                                                             <!-- Dynamic icon for nested directory -->
                                                             <span
                                                                 v-if="sfile.type == 'directory'"
-                                                                v-html="composeIcon(sfile)"
+                                                                v-html="sanitizeHtml(composeIcon(sfile))"
                                                             />
                                                             <!-- Document icon for files -->
                                                             <span v-else>

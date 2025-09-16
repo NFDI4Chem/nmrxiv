@@ -1243,9 +1243,9 @@
                                                                                                     >
                                                                                                         <span
                                                                                                             v-html="
-                                                                                                                getSVGString(
+                                                                                                                sanitizeHtml(getSVGString(
                                                                                                                     molecule
-                                                                                                                )
+                                                                                                                ))
                                                                                                             "
                                                                                                         ></span>
                                                                                                     </div>
@@ -1579,7 +1579,7 @@
                         </h3>
                         <div
                             class="mt-2 text-sm text-red-900"
-                            v-html="errorMessage"
+                            v-html="sanitizeHtml(errorMessage)"
                         ></div>
                     </div>
                 </div>
