@@ -156,7 +156,6 @@
 </template>
 
 <script>
-import { ref } from "vue";
 import {
     Listbox,
     ListboxButton,
@@ -165,7 +164,6 @@ import {
     ListboxOptions,
 } from "@headlessui/vue";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/vue/24/solid";
-import ToolTip from "@/Shared/ToolTip.vue";
 
 export default {
     components: {
@@ -176,7 +174,6 @@ export default {
         ListboxOptions,
         CheckIcon,
         ChevronUpDownIcon,
-        ToolTip,
     },
     props: ["items", "selected", "label"],
     computed: {

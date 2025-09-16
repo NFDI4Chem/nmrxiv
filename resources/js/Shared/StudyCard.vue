@@ -126,19 +126,12 @@
 </template>
 
 <script>
-import { LockClosedIcon, LockOpenIcon } from "@heroicons/vue/24/solid";
-import { PencilIcon } from "@heroicons/vue/24/solid";
-import { EnvelopeIcon } from "@heroicons/vue/24/solid";
+import { LockClosedIcon } from "@heroicons/vue/24/solid";
 import { Link } from "@inertiajs/vue3";
-import { StarIcon } from "@heroicons/vue/24/solid";
 import Depictor2D from "@/Shared/Depictor2D.vue";
 export default {
     components: {
         LockClosedIcon,
-        LockOpenIcon,
-        EnvelopeIcon,
-        PencilIcon,
-        StarIcon,
         Link,
         Depictor2D,
     },

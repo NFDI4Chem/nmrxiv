@@ -10,7 +10,7 @@
                     </div>
                 </div>
             </div>
-            <div class="mt-4" v-else>
+            <div v-else class="mt-4">
                 <button
                     type="button"
                     class="relative block w-full rounded-lg border-2 border-dashed border-gray-300 p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
@@ -49,28 +49,19 @@
 </template>
 
 <script>
-import { Link } from "@inertiajs/vue3";
-import StudyCreate from "@/Pages/Study/Partials/Create.vue";
-import StudyCard from "@/Shared/StudyCardPublic.vue";
-import JetButton from "@/Jetstream/Button.vue";
-import { ArrowLongLeftIcon, ArrowLongRightIcon } from "@heroicons/vue/24/solid";
+import StudyCard from "@/Shared/StudyCard.vue";
 
 export default {
     components: {
-        Link,
-        StudyCreate,
         StudyCard,
-        JetButton,
-        ArrowLongLeftIcon,
-        ArrowLongRightIcon,
     },
     props: {
         studies: {
-            default: [],
-            type: Object,
+            default: () => [],
+            type: Array,
         },
         role: {
-            default: {},
+            default: () => ({}),
             type: Object,
         },
         teamRole: {

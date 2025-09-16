@@ -29,6 +29,7 @@ use App\Models\Dataset;
 use App\Models\Molecule;
 use App\Models\Project;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Jetstream\Jetstream;

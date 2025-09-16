@@ -11,8 +11,8 @@
             >
                 <!-- DOI Citation section (only for public studies with DOI) -->
                 <div
-                    class="-mx-4"
                     v-if="study.data.is_public && study.data.doi != null"
+                    class="-mx-4"
                 >
                     <Citation
                         :model="'sample'"
@@ -274,8 +274,8 @@
                         ></div>
                         <button
                             v-if="isDescriptionLong"
-                            @click="toggleDescription"
                             class="mt-2 text-sm text-blue-600 hover:text-blue-800 font-medium focus:outline-none"
+                            @click="toggleDescription"
                         >
                             {{
                                 isDescriptionExpanded
@@ -655,7 +655,6 @@ import Depictor3D from "@/Shared/Depictor3D.vue";
 import DOIBadge from "@/Shared/DOIBadge.vue";
 import { Head } from "@inertiajs/vue3";
 import Citation from "@/Shared/Citation.vue";
-import ShowProjectDates from "@/Shared/ShowProjectDates.vue";
 
 export default {
     name: 'StudyDetail',
@@ -674,7 +673,6 @@ export default {
         DOIBadge,
         Head,
         Citation,
-        ShowProjectDates,
     },
     
     props: {

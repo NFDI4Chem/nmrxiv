@@ -180,9 +180,9 @@
                                     or
                                     <!-- Folder selection button -->
                                     <button
+                                        id="fs-dropzone-click-target"
                                         type="button"
                                         class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white px-2 border border-blue-500 hover:border-transparent rounded"
-                                        id="fs-dropzone-click-target"
                                     >
                                         Select folders
                                     </button>
@@ -931,7 +931,7 @@
 
         <template #content>
             Following files are mising <br />
-            <span v-for="file in missing_files_list">
+            <span v-for="(file, index) in missing_files_list" :key="index">
                 {{ file.relative_url }} <br />
             </span>
         </template>
@@ -979,15 +979,12 @@ import axiosRetry from "axios-retry";
 
 // Shared component imports
 import FileDetails from "@/Shared/FileDetails.vue";
-import SelectInput from "@/Shared/SelectInput.vue";
 import ToolTip from "@/Shared/ToolTip.vue";
 
 // Icon imports from Heroicons
 import {
     FolderIcon,
     DocumentTextIcon,
-    ChevronRightIcon,
-    HomeIcon,
     InformationCircleIcon,
     EllipsisVerticalIcon,
     ArrowUpTrayIcon,
@@ -1013,10 +1010,7 @@ export default {
     components: {
         FolderIcon, // Folder icon for directories
         DocumentTextIcon, // Document icon for files
-        ArrowDownTrayIcon, // Download icon
-        ChevronRightIcon, // Navigation chevron
         InformationCircleIcon, // Information icon for logs
-        HomeIcon, // Home icon for root navigation
         FileDetails, // File details display component
         JetDialogModal, // Modal dialog component
         JetSecondaryButton, // Secondary button component
@@ -1024,7 +1018,6 @@ export default {
         ExclamationCircleIcon, // Error/warning icon
         ArrowUpTrayIcon, // Upload icon
         CheckIcon, // Success checkmark icon
-        SelectInput, // Select dropdown component
         TrashIcon, // Delete icon
         ToolTip, // Tooltip component
         JetConfirmationModal, // Confirmation dialog component
@@ -1448,7 +1441,6 @@ export default {
             // Second pass: test file readability to catch pseudo-files
             const actualFiles = [];
             for (const file of potentialFiles) {
-                const fileName = file.fullPath || file.name;
                 try {
                     // Test if we can actually read from this file
                     const testChunk = file.slice(0, Math.min(1, file.size));
@@ -1609,9 +1601,8 @@ export default {
 
                         if (response.data.success) {
                             // Show success message with details
-                            let message = response.data.message;
                             if (response.data.has_storage_errors) {
-                                message += ` Note: ${response.data.storage_errors.length} storage operation(s) had issues.`;
+                                console.log(`Note: ${response.data.storage_errors.length} storage operation(s) had issues.`);
                             }
 
                             // Clear logs after successful deletion
@@ -2725,10 +2716,10 @@ export default {
                     }?${urlParams.toString()}`;
                     window.history.replaceState({}, "", newUrl);
                 } else {
-                    this.revertToRoot(deletedObject);
+                    this.revertToRoot();
                 }
             } else {
-                this.revertToRoot(deletedObject);
+                this.revertToRoot();
             }
 
             // Refresh UI to reflect changes
@@ -2740,7 +2731,7 @@ export default {
         /**
          * Helper method to revert to root folder
          */
-        revertToRoot(deletedObject) {
+        revertToRoot() {
             this.$page.props.selectedFileSystemObject = this.file;
             this.$page.props.selectedFolder = "/";
 

@@ -73,7 +73,7 @@
                                     <Combobox
                                         as="div"
                                         class="mx-auto max-w-2xl transform divide-y divide-gray-500 divide-opacity-10 overflow-hidden rounded-xl bg-white bg-opacity-80 shadow-2xl ring-1 ring-black ring-opacity-5 backdrop-blur backdrop-filter transition-all"
-                                        @update:modelValue="onSelect"
+                                        @update:model-value="onSelect"
                                     >
                                         <div class="relative">
                                             <MagnifyingGlassIcon

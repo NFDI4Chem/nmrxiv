@@ -448,7 +448,7 @@
                                                 <div class="ml-5.5">
                                                     <div class="flex flex-wrap gap-1.5">
                                                         <a
-                                                            v-for="(tag, index) in ((project.data && project.data.tags) || project.tags).slice(0, showAllTags ? undefined : 3)"
+                                                            v-for="tag in ((project.data && project.data.tags) || project.tags).slice(0, showAllTags ? undefined : 3)"
                                                             :key="tag.id"
                                                             class="inline-flex items-center rounded-md bg-gray-50 px-2 py-0.5 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10 hover:bg-gray-100 transition-colors duration-150 cursor-pointer"
                                                             :href="
@@ -462,8 +462,8 @@
                                                         <!-- Show more/less button -->
                                                         <button
                                                             v-if="((project.data && project.data.tags) || project.tags).length > 3"
-                                                            @click="showAllTags = !showAllTags"
                                                             class="inline-flex items-center rounded-md bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-600 hover:bg-blue-100 transition-colors duration-150 cursor-pointer"
+                                                            @click="showAllTags = !showAllTags"
                                                         >
                                                             {{ showAllTags ? 'Show less' : `+${((project.data && project.data.tags) || project.tags).length - 3} more` }}
                                                         </button>
@@ -550,7 +550,7 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import { Link, router } from "@inertiajs/vue3";
 
 // Icon imports from Heroicons
-import { ArrowDownTrayIcon, ScaleIcon, CalendarDaysIcon, TagIcon } from "@heroicons/vue/24/solid";
+import { ScaleIcon, CalendarDaysIcon, TagIcon } from "@heroicons/vue/24/solid";
 
 // Shared component imports
 import DOIBadge from "@/Shared/DOIBadge.vue";
@@ -565,7 +565,6 @@ export default {
     components: {
         AppLayout,              // Main application layout wrapper
         Link,                   // Inertia.js Link component for navigation
-        ArrowDownTrayIcon,      // Download icon (unused but imported)
         ScaleIcon,              // License/legal icon
         CalendarDaysIcon,       // Calendar icon for dates
         TagIcon,                // Tag icon for project tags

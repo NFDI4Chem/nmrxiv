@@ -196,7 +196,7 @@
         <!-- Find ORCID iD Modal -->
         <select-orcid-id
             ref="selectOrcidIdElement"
-            v-model:orcidId="form.orcid_id"
+            v-model:orcid-id="form.orcid_id"
             v-model:affiliation="form.affiliation"
         />
     </div>

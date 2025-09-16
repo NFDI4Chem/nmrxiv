@@ -10,6 +10,8 @@ class FileSystemController extends Controller
 {
     public function children(Request $request, $fileId)
     {
+        $fileId = intval($fileId);
+
         return [
             'files' => FileSystemObject::with('children')->where([
                 ['id', $fileId],

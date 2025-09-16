@@ -432,10 +432,10 @@
                             </label>
                             <Datepicker
                                 v-model="publishForm.release_date"
-                                @update:modelValue="updateProject"
                                 :min-date="new Date()"
                                 :format="customDateFormat"
                                 :preview-format="customDateFormat"
+                                @update:model-value="updateProject"
                             ></Datepicker>
                             <div
                                 class="mt-3 bg-gray-50 border border-gray-200 rounded-lg p-4"
@@ -825,39 +825,33 @@
                 @close="showPublishConfirmationModal = false"
             >
                 <template #title> Are you sure you want to publish? </template>
-                <template v-if="isReleasedToday()" #content>
-                    Once the data is published you will no longer be able to
-                    change the data uploaded! If published as a project, you may
-                    add more samples (spectra) to the project later.
+                <template #content>
+                    <div v-if="isReleasedToday()">
+                        Once the data is published you will no longer be able to
+                        change the data uploaded! If published as a project, you may
+                        add more samples (spectra) to the project later.
+                    </div>
+                    <div v-else>
+                        Opting for an Embargo publication grants your project a DOI,
+                        yet it stays private exclusively for you. You have the
+                        option to share the project with others and can adjust the
+                        release date or promptly make it public through the
+                        project's dashboard view. But once the data is published you
+                        will no longer be able to change the data uploaded! If
+                        published as a project, you may add more samples (spectra)
+                        to the project later if desired.
+                    </div>
                 </template>
-
-                <template v-if="isReleasedToday()" #footer>
+                <template #footer>
                     <jet-secondary-button
                         @click="showPublishConfirmationModal = false"
                     >
                         Cancel
                     </jet-secondary-button>
-                    <jet-success-button class="ml-2" @click="publish">
+                    <jet-success-button v-if="isReleasedToday()" class="ml-2" @click="publish">
                         Publish Now
                     </jet-success-button>
-                </template>
-                <template v-if="!isReleasedToday()" #content>
-                    Opting for an Embargo publication grants your project a DOI,
-                    yet it stays private exclusively for you. You have the
-                    option to share the project with others and can adjust the
-                    release date or promptly make it public through the
-                    project's dashboard view. But once the data is published you
-                    will no longer be able to change the data uploaded! If
-                    published as a project, you may add more samples (spectra)
-                    to the project later if desired.
-                </template>
-                <template v-if="!isReleasedToday()" #footer>
-                    <jet-secondary-button
-                        @click="showPublishConfirmationModal = false"
-                    >
-                        Cancel
-                    </jet-secondary-button>
-                    <jet-success-button class="ml-2" @click="publish">
+                    <jet-success-button v-else class="ml-2" @click="publish">
                         Publish with Embargo
                     </jet-success-button>
                 </template>
@@ -868,44 +862,24 @@
 
 <script>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import TeamProjects from "@/Pages/Project/Index.vue";
-import Create from "@/Shared/CreateButton.vue";
-import Onboarding from "@/App/Onboarding.vue";
 import { Link } from "@inertiajs/vue3";
-import { computed } from "vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import axios from "axios";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
-import JetButton from "@/Jetstream/Button.vue";
 import VueTagsInput from "@sipec/vue3-tags-input";
 import { ref } from "vue";
-import slider from "vue3-slider";
 import Validation from "@/Shared/Validation.vue";
 import Datepicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 import ManageAuthor from "@/Shared/ManageAuthor.vue";
-import ToolTip from "@/Shared/ToolTip.vue";
 import ManageCitation from "@/Shared/ManageCitation.vue";
-import Citation from "@/Shared/Citation.vue";
 import AuthorCard from "@/Shared/AuthorCard.vue";
 import StudyInfo from "@/Shared/StudyInfo.vue";
 import SelectRich from "@/Shared/SelectRich.vue";
 import CitationCard from "@/Shared/CitationCard.vue";
 import {
-    XCircleIcon,
-    ClipboardDocumentIcon,
-    QuestionMarkCircleIcon,
-    ExclamationTriangleIcon,
-    TrashIcon,
-    PlayIcon,
-    PauseIcon,
     PencilIcon,
-    ArrowDownOnSquareStackIcon,
-    BellAlertIcon,
-    StarIcon,
-    CalendarIcon,
 } from "@heroicons/vue/24/solid";
-import SpectraEditor from "@/Shared/SpectraEditor.vue";
 import ToggleButton from "@/Shared/ToggleButton.vue";
 import "ontology-elements/dist/index.js";
 import JetConfirmationModal from "@/Jetstream/ConfirmationModal.vue";
@@ -916,40 +890,20 @@ export default {
         ManageAuthor,
         AuthorCard,
         ManageCitation,
-        Citation,
-        ToolTip,
         Datepicker,
         VueTagsInput,
-        slider,
         SelectRich,
         AppLayout,
-        computed,
-        TeamProjects,
-        Create,
-        Onboarding,
         Link,
         JetInputError,
         JetSecondaryButton,
-        JetButton,
-        XCircleIcon,
-        ClipboardDocumentIcon,
-        QuestionMarkCircleIcon,
-        ExclamationTriangleIcon,
-        TrashIcon,
-        PlayIcon,
-        PauseIcon,
+        JetSuccessButton,
+        JetConfirmationModal,
         PencilIcon,
-        ArrowDownOnSquareStackIcon,
-        BellAlertIcon,
-        SpectraEditor,
         Validation,
         ToggleButton,
-        StarIcon,
-        CalendarIcon,
         StudyInfo,
         CitationCard,
-        JetConfirmationModal,
-        JetSuccessButton,
     },
     props: ["user", "team", "project", "teamRole", "draft"],
 
@@ -1143,7 +1097,6 @@ export default {
             this.loadingStep = true;
 
             this.publishForm.license_id = this.license ? this.license.id : null;
-            this.publishForm.species = this.publishForm.species;
             this.publishForm.owner_id = this.project.owner_id;
             this.publishForm.tags_array = this.publishForm.tags
                 ? this.publishForm.tags.map((a) => a.text)
@@ -1153,30 +1106,10 @@ export default {
                 {
                     preserveScroll: true,
                     onSuccess: () => {},
-                    onError: (err) => {},
+                    onError: () => {},
                 }
             );
 
-            // axios.put(route("dashboard.project.update", this.project.id), {
-            //     name: this.publishForm.name,
-            //     description: this.publishForm.description,
-            //     tags: this.publishForm.tags,
-            //     tags_array: this.publishForm.tags
-            //         ? this.publishForm.tags.map((a) => a.text)
-            //         : [],
-            //     license_id: this.license ? this.license.id : null,
-            //     species: this.publishForm.species,
-            //     release_date: this.publishForm.release_date,
-            //     photo: this.$refs.photo ? this.$refs.photo.files[0] : null
-            // }, {
-            //         headers: {
-            //         'Content-Type': 'multipart/form-data'
-            //         }
-            //     });
-            // .then((res) => {
-            //     console.log("success");
-            // });
-            // }
         },
         updateSpecies(species) {
             if (species && species != "") {
@@ -1280,20 +1213,6 @@ export default {
                 return true;
             }
         },
-        // trackProject() {
-        //     axios
-        //         .get("/projects/status/" + this.project.id + "/queue")
-        //         .then((response) => {
-        //             this.status = response.data.status;
-        //             if (this.status != "complete") {
-        //                 setTimeout(() => this.trackProject(), 10000);
-        //             } else {
-        //                 return this.$inertia.visit(
-        //                     this.route("dashboard.projects", [this.project.id])
-        //                 );
-        //             }
-        //         });
-        // },
     },
 };
 </script>

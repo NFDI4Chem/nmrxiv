@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import { ref, onMounted, onUnmounted } from "vue";
+import { onMounted, onUnmounted } from "vue";
 import { router } from "@inertiajs/vue3";
 import { usePage } from "@inertiajs/vue3";
 
@@ -20,17 +20,10 @@ export default {
         },
     },
     setup({ closeUrl }) {
-        const mask = ref(null);
         const firstPage = usePage().url === usePage().inline?.url;
 
         function escapeToClose(event) {
             if (event.keyCode == 27) {
-                close();
-            }
-        }
-
-        function clickToClose(event) {
-            if (mask.value === event.target) {
                 close();
             }
         }
