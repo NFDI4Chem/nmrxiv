@@ -20,8 +20,8 @@
                         v-if="enableRoleClick"
                         type="button"
                         class="group inline-flex items-center focus:outline-none"
-                        @click.stop.prevent="onRoleClick(author)"
                         title="Manage Role"
+                        @click.stop.prevent="onRoleClick(author)"
                     >
                         <Tag
                             :label="(author.pivot && author.pivot.contributor_type) || author.contributor_type || 'Researcher'"

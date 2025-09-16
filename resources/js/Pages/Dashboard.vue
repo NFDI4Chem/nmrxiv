@@ -366,24 +366,17 @@ import { useMagicKeys } from "@vueuse/core";
 import { getCurrentInstance } from "vue";
 import { watchEffect } from "vue";
 import { Link } from "@inertiajs/vue3";
-import { computed } from "vue";
 
 const { meta, u } = useMagicKeys();
 
 export default {
     components: {
         AppLayout,
-        computed,
         TeamProjects,
         TeamSamples,
         Create,
         Onboarding,
         Link,
-    },
-    data() {
-        return {
-            selectedTab: "projects",
-        };
     },
     props: ["user", "team", "projects", "samples", "teamRole", "filters"],
     setup() {
@@ -404,6 +397,11 @@ export default {
 
         return {
             openDatasetCreateDialog,
+        };
+    },
+    data() {
+        return {
+            selectedTab: "projects",
         };
     },
 

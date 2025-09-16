@@ -12,8 +12,8 @@
                     <div class="flex items-center">
                         <div class="mb-1 flex items-center">
                             <svg
-                                :key="index"
                                 v-for="index in molecule.annotation_level"
+                                :key="index"
                                 class="inline text-yellow-400 h-4 w-4 flex-shrink-0"
                                 x-state:on="Active"
                                 x-state:off="Inactive"
@@ -31,8 +31,8 @@
                                 ></path>
                             </svg>
                             <svg
-                                :key="index"
                                 v-for="index in 5 - molecule.annotation_level"
+                                :key="index"
                                 class="inline text-gray-200 h-4 w-4 flex-shrink-0"
                                 x-state-description='undefined: "text-yellow-400", undefined: "text-gray-200"'
                                 x-description="Heroicon name: mini/star"
@@ -55,14 +55,14 @@
                         >
                     </div>
                     <div
-                        class="text-gray-700 text-base break-all text-sm capitalize"
                         v-if="molecule.iupac_name && molecule.iupac_name != ''"
+                        class="text-gray-700 text-base break-all text-sm capitalize"
                     >
                         {{ molecule.iupac_name }}
                     </div>
                     <div
-                        class="text-gray-700 text-base break-all text-sm"
                         v-else
+                        class="text-gray-700 text-base break-all text-sm"
                     >
                         {{ molecule.canonical_smiles }}
                     </div>
@@ -96,12 +96,12 @@ export default {
         Link,
     },
     props: ["molecule"],
-    computed: {},
     data() {
         return {
             results: [],
         };
     },
+    computed: {},
     mounted() {},
     methods: {},
 };

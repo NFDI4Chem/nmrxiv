@@ -103,7 +103,7 @@
                             leave-from-class="opacity-100 scale-100"
                             leave-to-class="opacity-0 scale-95"
                         >
-                            <div>
+                            <div v-if="true">
                                 <PopoverPanel
                                     focus
                                     class="absolute z-30 top-0 inset-x-0 p-2 transition transform origin-top-right md:hidden"
@@ -981,36 +981,14 @@
 <script>
 import { Head, Link } from "@inertiajs/vue3";
 import JetApplicationLogo from "@/Jetstream/ApplicationLogo.vue";
-import Projects from "@/Shared/Projects.vue";
 import { defineComponent, h } from "vue";
-import StructureSearch from "@/App/StructureSearch.vue";
 import {
     Popover,
     PopoverButton,
     PopoverGroup,
     PopoverPanel,
 } from "@headlessui/vue";
-import {
-    ShareIcon,
-    ScaleIcon,
-    ChatBubbleLeftIcon,
-    ChatBubbleLeftRightIcon,
-    DocumentTextIcon,
-    HeartIcon,
-    InboxIcon,
-    Bars3Icon,
-    PencilSquareIcon,
-    MagnifyingGlassIcon,
-    ArrowUturnLeftIcon,
-    SparklesIcon,
-    TrashIcon,
-    UsersIcon,
-    XMarkIcon,
-    CircleStackIcon,
-} from "@heroicons/vue/24/outline";
-import { ChevronDownIcon } from "@heroicons/vue/24/solid";
-import ToolTip from "@/Shared/ToolTip.vue";
-import FAQs from "@/App/FAQs.vue";
+import { InboxIcon, Bars3Icon, MagnifyingGlassIcon, XMarkIcon } from "@heroicons/vue/24/outline";
 import FlashMessages from "@/Shared/FlashMessages.vue";
 
 const Search = [
@@ -1027,48 +1005,6 @@ const Search = [
             "Search similar spectra by simple drag and drop of your machine output files or search spectra by structures. Need further guidance or found any missing information. Reach out to us or check out our documentation site.",
         href: "#",
         icon: MagnifyingGlassIcon,
-    },
-];
-const features = [
-    {
-        name: "Advanced search",
-        description: "",
-        icon: MagnifyingGlassIcon,
-    },
-    {
-        name: "Open Source",
-        description: "",
-        icon: ScaleIcon,
-    },
-    {
-        name: "Auto Assignments",
-        description: "",
-        icon: ShareIcon,
-    },
-    {
-        name: "Prediction",
-        description: "",
-        icon: PencilSquareIcon,
-    },
-    {
-        name: "Schemas and MIChI",
-        description: "",
-        icon: DocumentTextIcon,
-    },
-    {
-        name: "Community challenges",
-        description: "",
-        icon: ChatBubbleLeftIcon,
-    },
-    {
-        name: "Docs & API",
-        description: "",
-        icon: DocumentTextIcon,
-    },
-    {
-        name: "Backups",
-        description: "",
-        icon: CircleStackIcon,
     },
 ];
 const footerNavigation = {
@@ -1124,32 +1060,15 @@ export default {
         Head,
         Link,
         JetApplicationLogo,
-        ChatBubbleLeftIcon,
-        ChatBubbleLeftRightIcon,
-        DocumentTextIcon,
-        HeartIcon,
-        InboxIcon,
+    InboxIcon,
         Bars3Icon,
-        PencilSquareIcon,
-        MagnifyingGlassIcon,
-        ArrowUturnLeftIcon,
-        SparklesIcon,
-        TrashIcon,
-        ShareIcon,
-        UsersIcon,
+    MagnifyingGlassIcon,
         XMarkIcon,
-        ScaleIcon,
         Popover,
         PopoverButton,
         PopoverGroup,
         PopoverPanel,
-        ChevronDownIcon,
-        CircleStackIcon,
-        ToolTip,
-        Projects,
-        FAQs,
         FlashMessages,
-        StructureSearch,
     },
 
     props: {
@@ -1160,6 +1079,7 @@ export default {
     setup() {
         return {
             footerNavigation,
+            Search,
         };
     },
 

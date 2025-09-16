@@ -11,8 +11,8 @@
             >
                 <!-- DOI Citation section (only for public projects with DOI) -->
                 <div
-                    class="-mx-4"
                     v-if="project.data.is_public && project.data.doi != null"
+                    class="-mx-4"
                 >
                     <Citation
                         :model="'project'"

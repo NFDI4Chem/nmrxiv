@@ -118,8 +118,8 @@
                                     class="mt-1 flex flex-col sm:flex-row sm:flex-wrap sm:mt-0 sm:space-x-6"
                                 >
                                     <div
-                                        class="mt-2 flex items-center text-sm text-gray-700"
                                         v-if="!study.is_deleted"
+                                        class="mt-2 flex items-center text-sm text-gray-700"
                                     >
                                         <access-dialogue
                                             :available-roles="availableRoles"
@@ -397,18 +397,9 @@ import StudyDetails from "./Partials/Details.vue";
 import { StarIcon } from "@heroicons/vue/24/solid";
 import { ref } from "vue";
 import {
-    BriefcaseIcon,
     CalendarIcon,
-    CheckIcon,
-    ChevronDownIcon,
     ChevronRightIcon,
-    CurrencyDollarIcon,
-    LinkIcon,
-    MapPinIcon,
-    PencilIcon,
-    ExclamationCircleIcon,
 } from "@heroicons/vue/24/solid";
-import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import AccessDialogue from "@/Shared/AccessDialogue.vue";
 import Citation from "@/Shared/Citation.vue";
 import { router } from "@inertiajs/vue3";
@@ -418,20 +409,8 @@ export default {
         Link,
         AppLayout,
         StudyDetails,
-        ExclamationCircleIcon,
-        Menu,
-        MenuButton,
-        MenuItem,
-        MenuItems,
-        BriefcaseIcon,
         CalendarIcon,
-        CheckIcon,
-        ChevronDownIcon,
         ChevronRightIcon,
-        CurrencyDollarIcon,
-        LinkIcon,
-        MapPinIcon,
-        PencilIcon,
         StarIcon,
         AccessDialogue,
         Citation,
@@ -483,7 +462,7 @@ export default {
                         );
                     }
                 })
-                .then(function (response) {
+                .then(function () {
                     router.reload({ only: ["study"] });
                 });
         },

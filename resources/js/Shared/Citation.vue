@@ -31,7 +31,6 @@
                     
                     <!-- Copy button next to title -->
                     <button
-                        @click="copyCitation"
                         :class="[
                             'inline-flex items-center justify-center p-1.5 rounded-md border transition-all duration-200',
                             copied 
@@ -39,6 +38,7 @@
                                 : 'bg-blue-50 text-blue-600 hover:bg-blue-100 hover:border-blue-400'
                         ]"
                         :title="copied ? 'Copied!' : 'Copy citation to clipboard'"
+                        @click="copyCitation"
                     >
                         <!-- Copy icon -->
                         <svg 
@@ -200,18 +200,18 @@ export default {
                                     ""
                                 );
                         } else if (this.selectedFormat == "Springer") {
-                            var pattern = /\(20(\d{2})\)/;
-                            var match = this.processedResponse.match(pattern);
-                            var matchIndex =
-                                this.processedResponse.search(pattern);
+                            var springerPattern = /\(20(\d{2})\)/;
+                            var match = this.processedResponse.match(springerPattern);
+                            var springerMatchIndex =
+                                this.processedResponse.search(springerPattern);
                             this.processedResponse =
                                 this.processedResponse.substring(
                                     0,
-                                    matchIndex
+                                    springerMatchIndex
                                 ) +
                                 this.processedResponse
                                     .replace(" [Data set]", "")
-                                    .substring(matchIndex + 8) +
+                                    .substring(springerMatchIndex + 8) +
                                 " " +
                                 match[0];
                         }

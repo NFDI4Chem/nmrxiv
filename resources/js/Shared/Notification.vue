@@ -176,33 +176,21 @@
 import {
     Dialog,
     DialogPanel,
-    DialogTitle,
     TransitionChild,
     TransitionRoot,
-    Menu,
-    MenuButton,
-    MenuItem,
-    MenuItems,
 } from "@headlessui/vue";
 import { XMarkIcon } from "@heroicons/vue/24/outline";
 import JetButton from "@/Jetstream/Button.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
-import { EllipsisVerticalIcon } from "@heroicons/vue/20/solid";
 export default {
     components: {
         Dialog,
         DialogPanel,
-        DialogTitle,
         TransitionChild,
         TransitionRoot,
         XMarkIcon,
         JetButton,
         JetSecondaryButton,
-        Menu,
-        MenuButton,
-        MenuItem,
-        MenuItems,
-        EllipsisVerticalIcon,
     },
     props: [],
     data() {
@@ -223,7 +211,7 @@ export default {
         };
     },
     methods: {
-        toggleShowNotificationDialog(notifications) {
+        toggleShowNotificationDialog() {
             this.info.title = "";
             this.info.body = "";
             this.open = !this.open;

@@ -235,7 +235,7 @@
     <!-- Find ORCID iD Modal -->
     <select-orcid-id
         ref="selectOrcidIdElement"
-        v-model:orcidId="form.orcid_id"
+        v-model:orcid-id="form.orcid_id"
         v-model:affiliation="form.affiliation"
     />
 </template>
@@ -261,8 +261,9 @@ export default {
         JetLabel,
         JetSecondaryButton,
         SelectOrcidId,
-        ref,
     },
+
+    props: ["user"],
 
     setup() {
         const selectOrcidIdElement = ref(null);
@@ -270,8 +271,6 @@ export default {
             selectOrcidIdElement,
         };
     },
-
-    props: ["user"],
 
     data() {
         return {
