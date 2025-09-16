@@ -865,7 +865,7 @@ import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import SelectRich from "@/Shared/SelectRich.vue";
 import JetButton from "@/Jetstream/Button.vue";
 import VueTagsInput from "@sipec/vue3-tags-input";
-import { router, Inertia } from "@inertiajs/vue3";
+import { router } from "@inertiajs/vue3";
 const publishingOptions = [
     {
         value: "viewer",
