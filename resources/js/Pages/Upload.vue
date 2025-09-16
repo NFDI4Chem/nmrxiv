@@ -437,7 +437,7 @@
                                         >
                                         <div
                                             class="text-red-600"
-                                            v-html="filesErrorMessage"
+                                            v-html="sanitizeHtml(filesErrorMessage)"
                                         ></div>
                                     </div>
                                     <div class="relative border bg-white mt-3">
@@ -1791,7 +1791,7 @@
                                             </svg>
                                             <div
                                                 class="my-4"
-                                                v-html="spectraLoadingMessage"
+                                                v-html="sanitizeHtml(spectraLoadingMessage)"
                                             ></div>
                                             <button
                                                 type="button"

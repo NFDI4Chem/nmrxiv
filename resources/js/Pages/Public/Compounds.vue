@@ -257,7 +257,7 @@
                                                     'first:rounded-l-lg last:rounded-r-lg relative cursor-pointer inline-flex items-center border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20',
                                                 ]"
                                                 @click="navigateTo(link)"
-                                                v-html="link.label"
+                                                v-html="sanitizeHtml(link.label)"
                                             >
                                             </a>
                                         </nav>
@@ -571,7 +571,7 @@
                                                     'first:rounded-l-lg last:rounded-r-lg relative cursor-pointer inline-flex items-center border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20',
                                                 ]"
                                                 @click="navigateTo(link)"
-                                                v-html="link.label"
+                                                v-html="sanitizeHtml(link.label)"
                                             >
                                             </a>
                                         </nav>

@@ -11,7 +11,7 @@
                     v-for="announcement in announcements"
                     :key="announcement.id"
                 >
-                    <span v-html="announcement.message"></span>
+                    <span v-html="sanitizeHtml(announcement.message)"></span>
                 </span>
             </p>
             <div

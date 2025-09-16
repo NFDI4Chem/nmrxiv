@@ -58,14 +58,14 @@
                     >
                         <div
                             class="p-4 object-cover pointer-events-none group-hover:opacity-75"
-                            v-html="molecule.svg"
+                            v-html="sanitizeHtml(molecule.svg)"
                         ></div>
                     </div>
                     <div v-else>
                         <div
                             class="rounded-md border my-3 flex justify-center items-center"
                         >
-                            <span v-html="loadMol(molecule.molfile)"></span>
+                            <span v-html="sanitizeHtml(loadMol(molecule.molfile))"></span>
                         </div>
                     </div>
                 </li>

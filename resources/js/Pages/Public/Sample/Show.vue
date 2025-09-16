@@ -662,7 +662,7 @@
                                     
                                     <!-- License Description (if available) -->
                                     <div v-if="study.data.license.description" class="mt-3">
-                                        <p class="text-sm text-gray-600 leading-relaxed" v-html="study.data.license.description">
+                                        <p class="text-sm text-gray-600 leading-relaxed" v-html="sanitizeHtml(study.data.license.description)">
                                         </p>
                                     </div>
                                 </div>
@@ -698,7 +698,7 @@
                         <div>
                             <p
                                 class="overflow-scroll mt-1 px-0 relative text-sm text-blue-gray-500 h-64 pb-10"
-                                v-html="study.data.description"
+                                v-html="sanitizeHtml(study.data.description)"
                             ></p>
                             <div class="relative" aria-hidden="true">
                                 <div

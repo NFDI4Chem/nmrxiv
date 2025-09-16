@@ -14,7 +14,7 @@
         </svg>
         <span
             class="w-64 bg-gray-900 text-white p-4 shadow-lg rounded-md tooltiptext"
-            v-html="text"
+            v-html="sanitizeHtml(text)"
         ></span>
     </div>
 </template>

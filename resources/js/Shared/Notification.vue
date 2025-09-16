@@ -104,14 +104,13 @@
                                                 <div
                                                     class="text-m font-semi-bold text-gray-900"
                                                     v-html="
-                                                        notification.data.title
+                                                        sanitizeHtml(notification.data.title)
                                                     "
                                                 ></div>
                                                 <div
                                                     class="text-sm text-gray-500"
                                                     v-html="
-                                                        notification.data
-                                                            .message
+                                                        sanitizeHtml(notification.data.message)
                                                     "
                                                 ></div>
                                                 <div

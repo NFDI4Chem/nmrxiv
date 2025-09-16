@@ -252,7 +252,7 @@
                                         ) in uploadBatchErrors"
                                         :key="$index"
                                         class="rounded-md"
-                                        v-html="error"
+                                        v-html="sanitizeHtml(error)"
                                     />
                                 </div>
                             </div>
