@@ -309,13 +309,9 @@ import {
     ChevronRightIcon,
     HomeIcon,
 } from "@heroicons/vue/24/solid";
-import { Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/vue";
 export default {
     components: {
         StudyContent,
-        Disclosure,
-        DisclosureButton,
-        DisclosurePanel,
         FolderIcon,
         DocumentTextIcon,
         FileDetails,

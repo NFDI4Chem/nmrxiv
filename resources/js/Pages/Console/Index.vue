@@ -96,20 +96,16 @@
 
 <script>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import { Link } from "@inertiajs/vue3";
 import Blocks from "@/Shared/Blocks.vue";
 import {
     EllipsisVerticalIcon,
-    RectangleStackIcon,
 } from "@heroicons/vue/24/solid";
 
 export default {
     components: {
-        Link,
         AppLayout,
         Blocks,
         EllipsisVerticalIcon,
-        RectangleStackIcon,
     },
 };
 </script>

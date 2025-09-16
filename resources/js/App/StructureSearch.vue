@@ -16,9 +16,9 @@
             >
         </button>
         <button
-            @click="openDialog(true)"
-            class="w-full flex items-center justify-center px-4 py-3 border border-1 text-base font-medium rounded-full shadow-sm text-white bg-teal-500 sm:px-8"
             v-if="mode == 'button'"
+            class="w-full flex items-center justify-center px-4 py-3 border border-1 text-base font-medium rounded-full shadow-sm text-white bg-teal-500 sm:px-8"
+            @click="openDialog(true)"
         >
             <MagnifyingGlassIcon class="h-5 w-5" aria-hidden="true" />&nbsp;
             Search Structure
@@ -26,8 +26,8 @@
         <TransitionRoot
             :show="open"
             as="template"
-            @after-leave="query = ''"
             appear
+            @after-leave="query = ''"
         >
             <Dialog as="div" class="relative z-10" @close="open = false">
                 <TransitionChild
@@ -96,8 +96,8 @@
                                                 >
                                                     <input
                                                         id="search-type-exact"
-                                                        name="search-type"
                                                         v-model="type"
+                                                        name="search-type"
                                                         value="exact"
                                                         type="radio"
                                                         class="mr-3 h-4 w-4 border-gray-300 text-secondary-dark focus:ring-secondary-dark"
@@ -111,8 +111,8 @@
                                                     class="block cursor-pointer text-sm font-medium text-gray-700"
                                                     ><input
                                                         id="search-type-sub"
-                                                        name="search-type"
                                                         v-model="type"
+                                                        name="search-type"
                                                         type="radio"
                                                         value="substructure"
                                                         class="mr-3 h-4 w-4 border-gray-300 text-secondary-dark focus:ring-secondary-dark"
@@ -141,9 +141,9 @@
                             <div class="p-4">
                                 <div class="flex justify-end">
                                     <button
-                                        @click="openDialog(false)"
                                         type="button"
                                         class="rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-secondary-dark focus:ring-offset-2"
+                                        @click="openDialog(false)"
                                     >
                                         Cancel
                                     </button>
@@ -166,32 +166,17 @@
 <script>
 import { ref } from "vue";
 import OCL from "openchemlib/full";
-import {
-    Combobox,
-    ComboboxInput,
-    ComboboxOptions,
-    ComboboxOption,
-    Dialog,
-    DialogPanel,
-    TransitionChild,
-    TransitionRoot,
-} from "@headlessui/vue";
+import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from "@headlessui/vue";
 import { BeakerIcon, MagnifyingGlassIcon } from "@heroicons/vue/24/solid";
-import ToolTip from "@/Shared/ToolTip.vue";
 
 export default {
     components: {
-        Combobox,
-        ComboboxInput,
-        ComboboxOptions,
-        ComboboxOption,
         Dialog,
         DialogPanel,
         TransitionChild,
         TransitionRoot,
         BeakerIcon,
         MagnifyingGlassIcon,
-        ToolTip,
     },
     props: {
         mode: {
@@ -199,7 +184,6 @@ export default {
             default: "icon",
         },
     },
-    computed: {},
     data() {
         return {
             editor: "",
@@ -209,6 +193,7 @@ export default {
             type: "exact",
         };
     },
+    computed: {},
     mounted() {},
     methods: {
         openDialog(value) {

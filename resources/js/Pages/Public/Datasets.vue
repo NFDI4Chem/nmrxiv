@@ -216,7 +216,6 @@
 
 <script>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import { Link } from "@inertiajs/vue3";
 import DatasetSearch from "@/Shared/DatasetSearch.vue";
 import DatasetCard from "@/Shared/DatasetCard.vue";
 import { ref } from "vue";
@@ -224,23 +223,11 @@ import throttle from "lodash/throttle";
 import pickBy from "lodash/pickBy";
 import Pagination from "@/Shared/Pagination.vue";
 import {
-    Dialog,
-    DialogPanel,
-    Disclosure,
-    DisclosureButton,
-    DisclosurePanel,
     Menu,
     MenuButton,
     MenuItem,
     MenuItems,
-    Popover,
-    PopoverButton,
-    PopoverGroup,
-    PopoverPanel,
-    TransitionChild,
-    TransitionRoot,
 } from "@headlessui/vue";
-import { XMarkIcon } from "@heroicons/vue/24/outline";
 import {
     ChevronDownIcon,
     QueueListIcon,
@@ -250,25 +237,12 @@ import {
 export default {
     components: {
         AppLayout,
-        Link,
         DatasetSearch,
         Pagination,
-        Dialog,
-        DialogPanel,
-        Disclosure,
-        DisclosureButton,
-        DisclosurePanel,
         Menu,
         MenuButton,
         MenuItem,
         MenuItems,
-        Popover,
-        PopoverButton,
-        PopoverGroup,
-        PopoverPanel,
-        TransitionChild,
-        TransitionRoot,
-        XMarkIcon,
         ChevronDownIcon,
         QueueListIcon,
         Squares2X2Icon,
@@ -276,15 +250,15 @@ export default {
     },
     props: {
         datasets: {
-            default: [],
+            default: () => ({}),
             type: Object,
         },
         filters: {
-            default: {
+            default: () => ({
                 search: "",
                 sort: "newest",
                 mode: "grid",
-            },
+            }),
             type: Object,
         },
     },

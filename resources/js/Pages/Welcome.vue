@@ -103,7 +103,7 @@
                             leave-from-class="opacity-100 scale-100"
                             leave-to-class="opacity-0 scale-95"
                         >
-                            <div>
+                            <div v-if="true">
                                 <PopoverPanel
                                     focus
                                     class="absolute z-30 top-0 inset-x-0 p-2 transition transform origin-top-right md:hidden"
@@ -249,8 +249,8 @@
                                         >
                                     </Link>
                                     <StructureSearch
-                                        mode="button"
                                         ref="structure-search"
+                                        mode="button"
                                     ></StructureSearch>
                                     <Link
                                         href="/register"

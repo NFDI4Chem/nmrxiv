@@ -404,8 +404,8 @@
                                                 class="ml-4 flex-shrink-0"
                                             >
                                                 <button
-                                                    @click="showProcessingLogs(draft)"
                                                     class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                                    @click="showProcessingLogs(draft)"
                                                 >
                                                     <InformationCircleIcon class="w-4 h-4 mr-1" />
                                                     View Logs
@@ -494,14 +494,14 @@
                                                         "
                                                     >
                                                         <EyeIcon
-                                                            class="w-4 h-4 mr-1 text-gray-600 hover:text-gray-500"
                                                             v-if="
                                                                 !showCompoundDetails
                                                             "
+                                                            class="w-4 h-4 mr-1 text-gray-600 hover:text-gray-500"
                                                         />
                                                         <EyeSlashIcon
-                                                            class="w-4 h-4 mr-1 text-gray-600 hover:text-gray-500"
                                                             v-else
+                                                            class="w-4 h-4 mr-1 text-gray-600 hover:text-gray-500"
                                                         />
 
                                                         <div
@@ -559,13 +559,13 @@
                                                                 class="font-medium text-blue-gray-900"
                                                             >
                                                                 <div
-                                                                    class="border-b border-gray-100 mb-4 border"
                                                                     v-if="
                                                                         showCompoundDetails &&
                                                                         study
                                                                             .sample
                                                                             .molecules[0]
                                                                     "
+                                                                    class="border-b border-gray-100 mb-4 border"
                                                                 >
                                                                     <Depictor2D
                                                                         class="-py-4 -px-4 rounded-md"
@@ -625,10 +625,10 @@
                                                                                     ds.name
                                                                                 }}
                                                                                 <span
-                                                                                    class="uppercase"
                                                                                     v-if="
                                                                                         ds.type
                                                                                     "
+                                                                                    class="uppercase"
                                                                                     >({{
                                                                                         ds.type
                                                                                     }})</span
@@ -689,14 +689,14 @@
                                                         "
                                                     >
                                                         <ChevronDoubleLeftIcon
+                                                            v-if="showSummary"
                                                             class="h-6 w-6"
                                                             aria-hidden="true"
-                                                            v-if="showSummary"
                                                         />
                                                         <ChevronDoubleRightIcon
+                                                            v-else
                                                             class="h-6 w-6"
                                                             aria-hidden="true"
-                                                            v-else
                                                         />
                                                         <div
                                                             class="bg-gray-900 text-center text-white px-2 py-1 text-xs font-small shadow-lg rounded-md tooltiptextright"
@@ -1047,16 +1047,16 @@
                                                                         "
                                                                     >
                                                                         <ChevronDoubleLeftIcon
-                                                                            class="h-6 w-6"
-                                                                            aria-hidden="true"
                                                                             v-if="
                                                                                 showSummary
                                                                             "
-                                                                        />
-                                                                        <ChevronDoubleRightIcon
                                                                             class="h-6 w-6"
                                                                             aria-hidden="true"
+                                                                        />
+                                                                        <ChevronDoubleRightIcon
                                                                             v-else
+                                                                            class="h-6 w-6"
+                                                                            aria-hidden="true"
                                                                         />
                                                                         <div
                                                                             class="bg-gray-900 text-center text-white px-2 py-1 text-xs font-small shadow-lg rounded-md tooltiptextright"
@@ -1086,10 +1086,10 @@
                                                                 </div>
 
                                                                 <div
+                                                                    class="scroll-smooth overflow-y-scroll h-[calc(100vh-153px)]"
                                                                     @scroll="
                                                                         onScroll
                                                                     "
-                                                                    class="scroll-smooth overflow-y-scroll h-[calc(100vh-153px)]"
                                                                 >
                                                                     <div
                                                                         v-if="
@@ -1790,8 +1790,8 @@
                                                 />
                                             </svg>
                                             <div
-                                                v-html="spectraLoadingMessage"
                                                 class="my-4"
+                                                v-html="spectraLoadingMessage"
                                             ></div>
                                             <button
                                                 type="button"
@@ -1836,8 +1836,8 @@
         <!-- Processing Logs Modal -->
         <jet-dialog-modal
             :show="showLogsDialog"
-            @close="showLogsDialog = false"
             :max-width="'4xl'"
+            @close="showLogsDialog = false"
         >
             <template #title>
                 <div class="block">
@@ -1938,7 +1938,6 @@ import Validation from "@/Shared/Validation.vue";
 import {
     TrashIcon,
     PencilIcon,
-    ArrowDownOnSquareStackIcon,
     EyeIcon,
     EyeSlashIcon,
     ChevronDoubleLeftIcon,
@@ -1967,7 +1966,6 @@ export default {
         FileSystemBrowser,
         TrashIcon,
         PencilIcon,
-        ArrowDownOnSquareStackIcon,
         EyeIcon,
         EyeSlashIcon,
         Validation,
@@ -3007,12 +3005,12 @@ export default {
 
             try {
                 if (format === "SMILES") {
-                    let mol = OCL.Molecule.fromSmiles(
+                    OCL.Molecule.fromSmiles(
                         this.chemicalInput.trim()
                     );
                     this.editor.setSmiles(this.chemicalInput.trim());
                 } else if (format === "MOL/SDF") {
-                    let mol = OCL.Molecule.fromMolfile(this.chemicalInput);
+                    OCL.Molecule.fromMolfile(this.chemicalInput);
                     this.editor.setMolFile(this.chemicalInput);
                 } else {
                     this.errorMessage =
@@ -3077,7 +3075,7 @@ export default {
             }
         },
 
-        handlePaste(event) {
+        handlePaste() {
             // Allow default paste behavior, then auto-load structure
             this.$nextTick(() => {
                 this.handleInput(); // Update detected format

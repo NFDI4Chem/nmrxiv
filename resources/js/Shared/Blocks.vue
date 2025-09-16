@@ -52,14 +52,12 @@
  *  name
  *  path
  */
-import AppLayout from "@/Layouts/AppLayout.vue";
 import { Link } from "@inertiajs/vue3";
 import Icon from "@/Shared/Icon.vue";
 
 export default {
     components: {
         Link,
-        AppLayout,
         Icon,
     },
     props: {

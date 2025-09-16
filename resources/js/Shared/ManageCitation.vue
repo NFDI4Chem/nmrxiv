@@ -400,7 +400,6 @@ import Draggable from "vuedraggable";
 import Global from "@/Mixins/Global.js";
 import CitationCard from "@/Shared/CitationCard.vue";
 export default {
-    mixins: [Global],
     components: {
         JetDialogModal,
         JetSecondaryButton,
@@ -415,6 +414,7 @@ export default {
         Draggable,
         CitationCard,
     },
+    mixins: [Global],
 
     props: ["project"],
     data() {
@@ -440,10 +440,6 @@ export default {
             isEdit: false,
             error: "",
         };
-    },
-
-    mounted() {
-        this.loadInitial();
     },
 
     computed: {
@@ -479,6 +475,10 @@ export default {
         hasFormErrors() {
             return this.formErrorCount > 0 || this.form.hasErrors;
         }
+    },
+
+    mounted() {
+        this.loadInitial();
     },
 
     methods: {
@@ -631,7 +631,7 @@ export default {
                 return citation.title != this.selectedCitation.title;
             });
             for (var key in citation) {
-                this.form[key] = citation.hasOwnProperty(key)
+                this.form[key] = Object.prototype.hasOwnProperty.call(citation, key)
                     ? citation[key]
                     : null;
             }
@@ -667,7 +667,7 @@ export default {
             this.citationsForm.reset();
             let _citation = {};
             for (var key in this.form) {
-                _citation[key] = this.form.hasOwnProperty(key)
+                _citation[key] = Object.prototype.hasOwnProperty.call(this.form, key)
                     ? this.form[key]
                     : null;
             }
@@ -722,7 +722,7 @@ export default {
         buildCitationObject(citation) {
             let citationObj = {};
             for (var key in citation) {
-                citationObj[key] = citation.hasOwnProperty(key) ? citation[key] : null;
+                citationObj[key] = Object.prototype.hasOwnProperty.call(citation, key) ? citation[key] : null;
             }
             return citationObj;
         },
@@ -974,15 +974,6 @@ export default {
         // =============================================================================
 
         /**
-         * Clear import section data
-         */
-        clearImportData() {
-            this.fetchedCitations = {};
-            this.query = null;
-            this.error = "";
-        },
-
-        /**
          * Format API response from different citation sources
          * @param {Object} obj - Raw API response object
          * @param {string} apiType - API source type ('europemc', 'crossref', 'datacite')
@@ -1058,9 +1049,6 @@ export default {
         formatDataciteCitation(obj) {
             const journalTitle = obj.attributes.titles ? obj.attributes.titles[0].title : "";
             const yearofPublication = obj.attributes.publicationYear || null;
-            const volume = obj.attributes.volume || "";
-            const issue = obj.attributes.issue || "";
-            const pageInfo = obj.attributes.page || "";
 
             this.formattedCitationRes.title = journalTitle;
             this.formattedCitationRes.authors = this.extractDataciteAuthors(obj);

@@ -88,23 +88,9 @@
 
 <script>
 import { Link } from "@inertiajs/vue3";
-import { Menu, MenuItem, MenuItems } from "@headlessui/vue";
-import {
-    ArchiveBoxIcon,
-    PencilSquareIcon,
-    TableCellsIcon,
-    PlusIcon,
-} from "@heroicons/vue/24/solid";
 export default {
     components: {
         Link,
-        Menu,
-        MenuItem,
-        MenuItems,
-        ArchiveBoxIcon,
-        PencilSquareIcon,
-        TableCellsIcon,
-        PlusIcon,
     },
     props: {
         mode: String,

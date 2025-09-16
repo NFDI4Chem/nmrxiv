@@ -31,8 +31,8 @@
                         <!-- Individual carousel images -->
                         <div
                             v-for="(url, index) in study.study_preview_urls"
-                            :key="url"
                             v-show="index === selectedPreviewIndex"
+                            :key="url"
                             class="absolute inset-0"
                         >
                             <img
@@ -55,8 +55,8 @@
                                             ? 'bg-white scale-110'
                                             : 'bg-white/60 hover:bg-white/80'
                                     ]"
-                                    @click.prevent="selectedPreviewIndex = index"
                                     :aria-label="`View preview ${index + 1}`"
+                                    @click.prevent="selectedPreviewIndex = index"
                                 />
                             </div>
                         </div>
@@ -118,7 +118,7 @@
                     <div v-if="hasExperimentTypes" class="mt-1 h-12 sm:h-14 overflow-hidden">
                         <!-- Individual experiment type tags (max 3 shown) -->
                         <span
-                            v-for="(type, index) in study.experiment_types?.slice(0, 3)"
+                            v-for="type in study.experiment_types?.slice(0, 3)"
                             :key="type"
                             class="mt-1 inline-flex items-center rounded-full bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10"
                         >
@@ -162,8 +162,6 @@
 // Icon imports from Heroicons
 import { LockClosedIcon } from "@heroicons/vue/24/solid";  // Private study indicator
 import { LockOpenIcon } from "@heroicons/vue/24/solid";    // Public study indicator
-import { PencilIcon } from "@heroicons/vue/24/solid";      // Edit icon (unused but imported)
-import { EnvelopeIcon } from "@heroicons/vue/24/solid";    // Message icon (unused but imported)
 
 // Navigation and component imports
 import { Link } from "@inertiajs/vue3";                    // Inertia.js Link component
@@ -178,8 +176,6 @@ export default {
     components: {
         LockClosedIcon,     // Private study lock icon
         LockOpenIcon,       // Public study unlock icon
-        EnvelopeIcon,       // Message icon (unused)
-        PencilIcon,         // Edit icon (unused)
         Link,               // Inertia.js navigation link
         Depictor2D,         // Molecular structure renderer
     },
@@ -207,33 +203,6 @@ export default {
              */
             selectedPreviewIndex: 0,
         };
-    },
-
-    /**
-     * Component methods (currently empty but available for future functionality)
-     */
-    methods: {
-        /**
-         * Format date for display in study metadata
-         * 
-         * Converts ISO date strings to human-readable format
-         * suitable for displaying creation dates.
-         * 
-         * @param {String} dateString - ISO date string
-         * @returns {String} Formatted date string
-         */
-        formatDate(dateString) {
-            if (!dateString) return '';
-            
-            const date = new Date(dateString);
-            const options = {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            };
-            
-            return date.toLocaleDateString('en-US', options);
-        },
     },
 
     /**
@@ -289,6 +258,33 @@ export default {
         cleanIdentifier() {
             if (!this.study.identifier) return '';
             return this.study.identifier.replace(/^NMRXIV:\s*/, '');
+        },
+    },
+
+    /**
+     * Component methods (currently empty but available for future functionality)
+     */
+    methods: {
+        /**
+         * Format date for display in study metadata
+         * 
+         * Converts ISO date strings to human-readable format
+         * suitable for displaying creation dates.
+         * 
+         * @param {String} dateString - ISO date string
+         * @returns {String} Formatted date string
+         */
+        formatDate(dateString) {
+            if (!dateString) return '';
+            
+            const date = new Date(dateString);
+            const options = {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            };
+            
+            return date.toLocaleDateString('en-US', options);
         },
     },
 };

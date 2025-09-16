@@ -142,7 +142,7 @@ export default {
                         .post("/dashboard/datasets/" + this.id + "/snapshot", {
                             img: svg,
                         })
-                        .then((response) => {
+                        .then(() => {
                             this.updateLoadingStatus(false, "dataset loaded");
                         });
                 });

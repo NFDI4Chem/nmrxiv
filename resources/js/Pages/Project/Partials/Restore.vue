@@ -85,7 +85,6 @@ import JetInput from "@/Jetstream/Input.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import LoadingButton from "@/Shared/LoadingButton.vue";
-import { Link } from "@inertiajs/vue3";
 
 export default {
     components: {
@@ -96,7 +95,6 @@ export default {
         JetInputError,
         JetSecondaryButton,
         LoadingButton,
-        Link,
     },
 
     props: ["project"],
