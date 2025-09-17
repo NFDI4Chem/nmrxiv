@@ -2483,7 +2483,7 @@ export default {
                             this.checkStudyStatus();
                         }
                     } else {
-                        if (this.studies.length == 0) {
+                        if (this.studies?.length == 0) {
                             this.loadingStep = false;
                         }
                     }

@@ -308,7 +308,7 @@
                                     class="flex items-center text-sm text-gray-500"
                                 >
                                     <img
-                                        class="h-7 w-5 mr-2 rounded-full"
+                                        class="h-7 w-7 mr-2 rounded-full"
                                         :src="project.owner.profile_photo_url"
                                     />
                                     {{ project.owner.first_name }}

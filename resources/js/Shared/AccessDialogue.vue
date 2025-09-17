@@ -3,14 +3,14 @@
         class="cursor-pointer flex flex-row-reverse justify-end mr-2"
         @click="open = true"
     >
-        <div
+        <button
             v-if="members.length > 0"
-            class="tooltip w-8 h-8 -ml-.5 rounded-full border-2 border-white bg-gray-100"
+            class="tooltip rounded-full border-2 border-white bg-gray-100 pr-4"
             alt=""
         >
             <svg
                 xmlns="http://www.w3.org/2000/svg"
-                class="h-4 w-4 m-1.5 text-gray-400"
+                class="h-4 w-4 m-1.5 text-gray-400 inline"
                 viewBox="0 0 20 20"
                 fill="currentColor"
             >
@@ -18,11 +18,12 @@
                     d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z"
                 />
             </svg>
+            <div class="text-md text-gray-600 font-medium inline">SHARE</div>
             <span
                 class="bg-gray-900 text-center text-white px-2 py-1 shadow-lg rounded-md tooltiptextbottom"
                 >Click here to edit sharing options.</span
             >
-        </div>
+        </button>
         <img
             v-for="user in members"
             :key="user.id"
