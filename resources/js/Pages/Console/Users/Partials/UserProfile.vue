@@ -104,6 +104,7 @@
                     v-model="form.email"
                     type="email"
                     class="mt-1 block w-full"
+                    autocomplete="email"
                 />
                 <jet-input-error :message="form.errors.email" class="mt-2" />
             </div>

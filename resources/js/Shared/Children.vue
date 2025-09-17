@@ -39,45 +39,23 @@
                     >
                         <!-- Loading spinner when fetching children -->
                         <span v-if="file.loading">
-                            <svg
+                            <ArrowPathIcon
                                 class="animate-spin mr-3 ml-1 h-5 w-5 text-dark inline"
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                            >
-                                <circle
-                                    class="opacity-25"
-                                    cx="12"
-                                    cy="12"
-                                    r="10"
-                                    stroke="currentColor"
-                                    stroke-width="4"
-                                />
-                                <path
-                                    class="opacity-75"
-                                    fill="currentColor"
-                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                />
-                            </svg>
+                                aria-hidden="true"
+                            />
                         </span>
                         
                         <!-- Expand/collapse chevron icon -->
                         <span v-else>
-                            <svg
+                            <ChevronRightIcon
                                 :class="[
                                     open
                                         ? 'text-gray-700 rotate-90'
                                         : 'text-gray-300',
                                     'mr-2 flex-shrink-0 inline h-5 w-5 transform group-hover:text-gray-700 transition-colors ease-in-out duration-150',
                                 ]"
-                                viewBox="0 0 20 20"
                                 aria-hidden="true"
-                            >
-                                <path
-                                    d="M6 6L14 10L6 14V6Z"
-                                    fill="currentColor"
-                                />
-                            </svg>
+                            />
                         </span>
                         
                         <!-- File/folder name with icon and status styling -->
@@ -88,10 +66,50 @@
                             ]"
                         >
                             <!-- Dynamic icon for directories (instrument-specific or generic) -->
-                            <span
-                                v-if="file.type == 'directory'"
-                                v-html="sanitizeHtml(composeIcon(file))"
-                            />
+                            <span v-if="file.type == 'directory'">
+                                <!-- Instrument-specific icons -->
+                                <img
+                                    v-if="file.instrument_type == 'bruker'"
+                                    class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700 border rounded-md"
+                                    src="/img/bruker.jpg"
+                                    alt="Bruker"
+                                />
+                                <img
+                                    v-else-if="file.instrument_type == 'varian'"
+                                    class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700 border rounded-md"
+                                    src="/img/varian.jpeg"
+                                    alt="Varian"
+                                />
+                                <img
+                                    v-else-if="file.instrument_type == 'joel'"
+                                    class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700 border rounded-md"
+                                    src="/img/joel.jpg"
+                                    alt="JOEL"
+                                />
+                                <img
+                                    v-else-if="file.instrument_type == 'jcamp'"
+                                    class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700"
+                                    src="/img/jcamp.png"
+                                    alt="JCAMP"
+                                />
+                                <!-- Study folder with notification indicator -->
+                                <span v-else-if="file.model_type == 'study'" class="relative inline-flex">
+                                    <FolderIcon
+                                        class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700"
+                                        aria-hidden="true"
+                                    />
+                                    <span class="flex absolute h-2 w-2 top-0 right-0">
+                                        <span class="absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+                                        <span class="relative inline-flex rounded-full h-2 w-2 bg-sky-500"></span>
+                                    </span>
+                                </span>
+                                <!-- Default folder icon -->
+                                <FolderIcon
+                                    v-else
+                                    class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700"
+                                    aria-hidden="true"
+                                />
+                            </span>
                             <!-- Generic folder icon for non-directories -->
                             <span v-else>
                                 <FolderIcon
@@ -163,45 +181,23 @@
                                                 >
                                                     <!-- Loading state for nested directory -->
                                                     <span v-if="sfile.loading">
-                                                        <svg
+                                                        <ArrowPathIcon
                                                             class="animate-spin ml-1 mr-3 h-5 w-5 text-dark inline"
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                            fill="none"
-                                                            viewBox="0 0 24 24"
-                                                        >
-                                                            <circle
-                                                                class="opacity-25"
-                                                                cx="12"
-                                                                cy="12"
-                                                                r="10"
-                                                                stroke="currentColor"
-                                                                stroke-width="4"
-                                                            />
-                                                            <path
-                                                                class="opacity-75"
-                                                                fill="currentColor"
-                                                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                                            />
-                                                        </svg>
+                                                            aria-hidden="true"
+                                                        />
                                                     </span>
                                                     
                                                     <!-- Nested chevron icon -->
                                                     <span v-else>
-                                                        <svg
+                                                        <ChevronRightIcon
                                                             :class="[
                                                                 open
                                                                     ? 'text-gray-700 rotate-90'
                                                                     : 'text-gray-300',
                                                                 'mr-2 flex-shrink-0 inline h-5 w-5 transform group-hover:text-gray-700 transition-colors ease-in-out duration-150',
                                                             ]"
-                                                            viewBox="0 0 20 20"
                                                             aria-hidden="true"
-                                                        >
-                                                            <path
-                                                                d="M6 6L14 10L6 14V6Z"
-                                                                fill="currentColor"
-                                                            />
-                                                        </svg>
+                                                        />
                                                     </span>
                                                     
                                                     <!-- Nested directory name and icon -->
@@ -217,10 +213,50 @@
                                                             style="user-select: none"
                                                         >
                                                             <!-- Dynamic icon for nested directory -->
-                                                            <span
-                                                                v-if="sfile.type == 'directory'"
-                                                                v-html="sanitizeHtml(composeIcon(sfile))"
-                                                            />
+                                                            <span v-if="sfile.type == 'directory'">
+                                                                <!-- Instrument-specific icons -->
+                                                                <img
+                                                                    v-if="sfile.instrument_type == 'bruker'"
+                                                                    class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700 border rounded-md"
+                                                                    src="/img/bruker.jpg"
+                                                                    alt="Bruker"
+                                                                />
+                                                                <img
+                                                                    v-else-if="sfile.instrument_type == 'varian'"
+                                                                    class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700 border rounded-md"
+                                                                    src="/img/varian.jpeg"
+                                                                    alt="Varian"
+                                                                />
+                                                                <img
+                                                                    v-else-if="sfile.instrument_type == 'joel'"
+                                                                    class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700 border rounded-md"
+                                                                    src="/img/joel.jpg"
+                                                                    alt="JOEL"
+                                                                />
+                                                                <img
+                                                                    v-else-if="sfile.instrument_type == 'jcamp'"
+                                                                    class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700"
+                                                                    src="/img/jcamp.png"
+                                                                    alt="JCAMP"
+                                                                />
+                                                                <!-- Study folder with notification indicator -->
+                                                                <span v-else-if="sfile.model_type == 'study'" class="relative inline-flex">
+                                                                    <FolderIcon
+                                                                        class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700"
+                                                                        aria-hidden="true"
+                                                                    />
+                                                                    <span class="flex absolute h-2 w-2 top-0 right-0">
+                                                                        <span class="absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+                                                                        <span class="relative inline-flex rounded-full h-2 w-2 bg-sky-500"></span>
+                                                                    </span>
+                                                                </span>
+                                                                <!-- Default folder icon -->
+                                                                <FolderIcon
+                                                                    v-else
+                                                                    class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700"
+                                                                    aria-hidden="true"
+                                                                />
+                                                            </span>
                                                             <!-- Document icon for files -->
                                                             <span v-else>
                                                                 <DocumentTextIcon
@@ -365,7 +401,7 @@
  */
 
 // Icon imports from Heroicons
-import { FolderIcon, DocumentTextIcon } from "@heroicons/vue/24/solid";
+import { FolderIcon, DocumentTextIcon, ChevronRightIcon, ArrowPathIcon } from "@heroicons/vue/24/solid";
 
 // HeadlessUI imports for disclosure functionality
 import { Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/vue";
@@ -382,6 +418,8 @@ export default {
         DisclosurePanel,        // HeadlessUI collapsible content panel
         FolderIcon,            // Folder icon from Heroicons
         DocumentTextIcon,      // Document/file icon from Heroicons
+        ChevronRightIcon,      // Right chevron icon for navigation
+        ArrowPathIcon,         // Loading/refresh icon
     },
     
     /**
@@ -534,38 +572,6 @@ export default {
             this.$refs.vueSimpleContextMenu1.showMenu(event, item);
         },
         
-        /**
-         * Compose appropriate icon HTML for different file types
-         * 
-         * Returns HTML string for icons based on file type and instrument type.
-         * This allows for visual differentiation between different types of
-         * scientific data folders (Bruker, Varian, JOEL, JCAMP) and studies.
-         * 
-         * @param {Object} file - File object with type and instrument information
-         * @returns {String} HTML string for the appropriate icon
-         */
-        composeIcon(file) {
-            // Instrument-specific icons for scientific data folders
-            if (file.instrument_type) {
-                if (file.instrument_type == "bruker") {
-                    return '<img class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700 border rounded-md" src="/img/bruker.jpg" alt=""/>';
-                } else if (file.instrument_type == "varian") {
-                    return '<img class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700 border rounded-md" src="/img/varian.jpeg" alt=""/>';
-                } else if (file.instrument_type == "joel") {
-                    return '<img class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700 border rounded-md" src="/img/joel.jpg" alt=""/>';
-                } else if (file.instrument_type == "jcamp") {
-                    return '<img class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700" src="/img/jcamp.png" alt=""/>';
-                }
-            }
-
-            // Special icon for study folders with notification indicator
-            if (file.model_type == "study") {
-                return '<span class="relative inline-flex"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700"><path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path></svg><span class="flex absolute h-2 w-2 top-0 right-0"><span class="absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-sky-500"></span></span></span>';
-            }
-
-            // Default folder icon for generic directories
-            return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" class="inline -ml-1.5 mr-1 h-5 w-5 text-gray-700"><path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path></svg>';
-        },
         
         /**
          * Display selected file/folder and update application state

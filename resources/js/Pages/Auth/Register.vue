@@ -81,6 +81,7 @@
                     type="email"
                     class="mt-1 block w-full"
                     required
+                    autocomplete="email"
                 />
             </div>
             <!-- Username -->
