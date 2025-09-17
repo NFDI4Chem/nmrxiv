@@ -14,7 +14,7 @@
         <!-- Clickable card area linking to study details -->
         <Link :href="study.public_url" class="block">
             <!-- Preview image section with multiple display options -->
-            <div class="relative bg-gray-50 overflow-hidden">
+            <div class="relative bg-gray-50 overflow-hidden" style="height: 263px;">
                 <!-- Study preview images with carousel functionality -->
                 <div v-if="study.study_preview_urls && study.study_preview_urls.length > 0" class="relative h-full">
                     <!-- Single preview image display -->
@@ -22,7 +22,7 @@
                         <img
                             :src="study.study_preview_urls[0]"
                             :alt="`Preview of ${study.name}`"
-                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            class="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-300"
                         />
                     </div>
                     
@@ -98,7 +98,7 @@
 
             <!-- Study content and metadata section -->
             <div class="bg-white">
-                <div class="p-3 sm:p-4 border-t border-gray-200 cursor-pointer">
+                <div class="p-3 sm:p-4 border-t border-gray-200 cursor-pointer" style="height: 213px;">
                     <!-- Creation date -->
                     <small class="text-gray-500">
                         {{ formatDate(study.created_at) }}

@@ -1017,6 +1017,7 @@ export default {
         EllipsisVerticalIcon, // More options icon
         ExclamationCircleIcon, // Error/warning icon
         ArrowUpTrayIcon, // Upload icon
+        ArrowDownTrayIcon, // Download icon
         CheckIcon, // Success checkmark icon
         TrashIcon, // Delete icon
         ToolTip, // Tooltip component
