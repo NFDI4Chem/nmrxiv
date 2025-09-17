@@ -550,9 +550,10 @@
                                                 </label>
                                                 <Datepicker
                                                     v-model="
-                                                        project.release_date
+                                                        form.release_date
                                                     "
                                                     :format="customDateFormat"
+                                                    :min-date="new Date()"
                                                     :preview-format="
                                                         customDateFormat
                                                     "
@@ -1051,6 +1052,7 @@ import {
     TransitionRoot,
 } from "@headlessui/vue";
 import ShowProjectDates from "@/Shared/ShowProjectDates.vue";
+import "@vuepic/vue-datepicker/dist/main.css";
 
 export default {
     components: {
@@ -1112,6 +1114,11 @@ export default {
             }),
             showPublishDialog: false,
             showPublishConfirmationModal: false,
+            // Added reactive props to avoid Vue warnings during render
+            errors: null,
+            status: null,
+            query: "",
+            validation: null,
         };
     },
     computed: {
@@ -1202,7 +1209,8 @@ export default {
             }
         },
         updatePublishDate() {
-            this.form.release_date = this.project.release_date;
+            console.log("updating release date");
+            this.project.release_date = this.form.release_date;
             this.form.put(
                 route("dashboard.project.updateReleaseDate", this.project.id),
                 {
