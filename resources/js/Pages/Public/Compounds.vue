@@ -2,8 +2,8 @@
     <app-layout title="Compounds">
         <div>
             <div class="mx-auto">
-                <div class="space-y-6 sm:px-6 lg:col-span-9 lg:px-0">
-                    <section class="mb-20 bg-white shadow sm:overflow-hidden">
+                <div class="space-y-6 sm:px-6 lg:col-span-9 lg:px-0 flex flex-col">
+                    <section class="bg-white shadow sm:overflow-hidden flex-1 flex flex-col">
                         <div>
                             <div class="relative border-b border-zinc-900/5">
                                 <div
@@ -219,7 +219,7 @@
                         </div>
                         <div v-if="results">
                             <div
-                                class="py-6 px-4 lg:px-12 sm:p-6 border-b border-gray-200"
+                                class="py-6 px-4 lg:px-12 sm:p-6 border-b border-gray-200" style="height: calc(100vh - 380px);"
                             >
                                 <div
                                     v-if="results.data.length > 0"
@@ -242,7 +242,7 @@
                                             results
                                         </p>
                                     </div>
-                                    <div>
+                                    <div v-if="results.last_page > 1">
                                         <nav
                                             class="isolate inline-flex -space-x-px shadow-sm"
                                             aria-label="Pagination"
@@ -534,7 +534,7 @@
                             </div>
                             <div
                                 v-if="results.data.length > 0"
-                                class="flex items-center justify-between bg-white px-12 py-3 rounded-md"
+                                class="flex items-center justify-between bg-white px-12 py-3 rounded-md sticky bottom-0 border-t border-gray-200 mt-auto"
                             >
                                 <div
                                     class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between"
@@ -556,7 +556,7 @@
                                             results
                                         </p>
                                     </div>
-                                    <div>
+                                    <div v-if="results.last_page > 1">
                                         <nav
                                             class="isolate inline-flex -space-x-px shadow-sm"
                                             aria-label="Pagination"

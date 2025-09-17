@@ -451,7 +451,7 @@
                                         future date if you would like to embargo
                                         your data for peer review. Need help?
                                         <a
-                                            href="https://docs.nmrxiv.org/submission-guides/embargo"
+                                            href="https://docs.nmrxiv.org/submission-guides/submission-process.html#step-3-publish-data"
                                             target="_blank"
                                             class="text-blue-600 hover:text-blue-700"
                                             >Read more</a
@@ -558,20 +558,10 @@
                                                     publishForm.enableProjectMode
                                                 "
                                             >
-                                                I understand once the project is
-                                                published, all the underlying
-                                                samples and spectra will also be
-                                                made public and agree to make
-                                                this data persistently available
-                                                in the nmrXiv platform.
+                                                I understand that publishing makes all underlying data publicly available on the nmrXiv platform after the set release date.
                                             </span>
                                             <span v-else>
-                                                I understand once the samples
-                                                are published, all the
-                                                underlying spectra will also be
-                                                made public and agree to make
-                                                this data persistently available
-                                                in the nmrXiv platform.
+                                                I understand that publishing makes all underlying data publicly available on the nmrXiv platform after the set release date.
                                             </span>
                                         </div>
                                     </div>

@@ -1413,6 +1413,60 @@ export default {
          */
 
         /**
+         * Check if all files are processed and manually trigger queuecomplete
+         */
+        checkAndTriggerQueueComplete() {
+            // Count files with error status
+            const errorFiles = Object.values(this.logs).filter(log => log.status === 'Error').length;
+            const successFiles = Object.values(this.logs).filter(log => log.status === 'Success').length;
+            const processedFiles = errorFiles + successFiles;
+            
+            // Check if all files have been processed (either success or error)
+            if (processedFiles >= this.totalFilesCount && this.totalFilesCount > 0) {
+                this.handleQueueComplete();
+            }
+        },
+
+        /**
+         * Handle queue completion (both automatic and manual)
+         */
+        handleQueueComplete() {
+            this.status = "UPLOAD COMPLETE";
+            this.annotate();
+            this.currentLog = null;
+            if (this.dropzone) {
+                this.dropzone.removeAllFiles();
+            }
+            this.precentageUpload = 0;
+            this.totalFilesCount = 0;
+            this.uploadedFilesCount = 0;
+            this.updateBusyStatus(false);
+            setTimeout(() => {
+                this.status = null;
+            }, 5000);
+        },
+
+        /**
+         * Handle completion when no files are processed (empty queue)
+         */
+        handleEmptyQueueCompletion() {
+            // Reset all upload-related state
+            this.status = null;
+            this.precentageUpload = 0;
+            this.totalFilesCount = 0;
+            this.uploadedFilesCount = 0;
+            this.currentLog = null;
+            
+            // Clear dropzone if it exists
+            if (this.dropzone) {
+                this.dropzone.removeAllFiles();
+            }
+            
+            // Update busy status
+            this.updateBusyStatus(false);
+        },
+
+        /**
          * Calculate checksums for uploaded files before processing
          */
         async calculateChecksumsForFiles(files) {
@@ -1461,6 +1515,12 @@ export default {
 
             if (actualFiles.length === 0) {
                 this.status = "READY";
+                
+                // Manually trigger completion since no files will be processed
+                this.$nextTick(() => {
+                    this.handleEmptyQueueCompletion();
+                });
+                
                 return;
             }
 
@@ -1535,9 +1595,6 @@ export default {
             await Promise.all(checksumPromises);
 
             this.status = "CHECKSUMS CALCULATED";
-            console.log(
-                "All checksums calculated, proceeding with upload preparation"
-            );
         },
 
         /**
@@ -1921,15 +1978,24 @@ export default {
                                 if (f.fullPath) {
                                     return f.fullPath.trim() == u.fullPath;
                                 } else {
-                                    return (
-                                        "/" + f.name.trim() == u.fullPath ||
-                                        vm.$page.props.selectedFolder +
-                                            "/" +
-                                            f.name.trim() ==
-                                            u.fullPath
-                                    );
+                                    // Try multiple matching strategies for files without fullPath
+                                    const fileName = f.name.trim();
+                                    const uploadPath = u.fullPath;
+                                    
+                                    // Direct name match
+                                    const match1 = fileName == uploadPath;
+                                    
+                                    // Name with leading slash
+                                    const match2 = "/" + fileName == uploadPath;
+                                    
+                                    // Name with folder prefix
+                                    const folderPrefix = vm.$page.props.selectedFolder === "/" ? "" : vm.$page.props.selectedFolder;
+                                    const match3 = folderPrefix + "/" + fileName == uploadPath;
+                                    
+                                    return match1 || match2 || match3;
                                 }
                             });
+                            
                             if (cFile) {
                                 let message =
                                     "Presigned Upload URL receieved.  Starting Upload.";
@@ -2072,8 +2138,11 @@ export default {
                     vm.precentageUpload =
                         (vm.uploadedFilesCount / vm.totalFilesCount) * 100;
                     vm.currentLog = file.fullPath;
+                    
+                    // Check if all files are complete and manually trigger queuecomplete
+                    vm.checkAndTriggerQueueComplete();
                 });
-                vm.dropzone.on("error", (file) => {
+                vm.dropzone.on("error", (file, errorMessage) => {
                     let message = "Upload failed";
                     if (file.fullPath) {
                         vm.logs[file.fullPath].status = "Error";
@@ -2082,6 +2151,9 @@ export default {
                         vm.logs[file.name].status = "Error";
                         vm.logs[file.name].messages.push(message);
                     }
+                    
+                    // Check if all files are complete and manually trigger queuecomplete
+                    vm.checkAndTriggerQueueComplete();
                 });
                 vm.dropzone.on("addedfile", (file) => {
                     if (file.fullPath) {
@@ -2162,17 +2234,7 @@ export default {
                     }
                 });
                 vm.dropzone.on("queuecomplete", () => {
-                    vm.status = "UPLOAD COMPLETE";
-                    vm.annotate();
-                    vm.currentLog = null;
-                    vm.dropzone.removeAllFiles();
-                    vm.precentageUpload = 0;
-                    vm.totalFilesCount = 0;
-                    vm.uploadedFilesCount = 0;
-                    this.updateBusyStatus(false);
-                    setTimeout(() => {
-                        vm.status = null;
-                    }, 5000);
+                    vm.handleQueueComplete();
                 });
             });
         },

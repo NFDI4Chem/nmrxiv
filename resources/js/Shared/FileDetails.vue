@@ -7,7 +7,7 @@
 -->
 <template>
     <!-- Main container with shadow and rounded corners -->
-    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+    <div class="bg-white shadow overflow-hidden sm:rounded-lg border border-gray-200">
         <!-- Header section with file name and status indicator -->
         <div class="px-4 py-5 sm:px-6">
             <h3 class="text-lg leading-6 text-xl font-bold text-gray-900">
