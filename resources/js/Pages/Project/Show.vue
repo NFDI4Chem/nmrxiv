@@ -591,20 +591,7 @@
                                                             <div
                                                                 class="ml-2 text-sm"
                                                             >
-                                                                I understand
-                                                                once the project
-                                                                is published,
-                                                                all the
-                                                                underlying
-                                                                samples and
-                                                                spectra will
-                                                                also be made
-                                                                public and agree
-                                                                to make this
-                                                                data
-                                                                persistently
-                                                                available in the
-                                                                nmrXiv platfor
+                                                            I understand that publishing makes all underlying data publicly available on the nmrXiv platform after the set release date.
                                                             </div>
                                                         </div>
                                                     </div>
