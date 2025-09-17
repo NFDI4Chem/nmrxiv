@@ -21,7 +21,7 @@
             >
                 <b>Info: </b> This project is in embargo and set to be released
                 on {{ formatDate(project.release_date) }}. You cannot edit the
-                project, please create a new version to updated the project.
+                project, please create a new version to update the project.
             </div>
             <div v-if="project.is_public">
                 <div
@@ -36,7 +36,7 @@
                     class="text-center px-3 py-2 bg-green-50 text-green-700 border-b"
                 >
                     <b>Info: </b> This project is public. You cannot edit a
-                    published project, please create a new version to updated
+                    published project, please create a new version to update
                     the project.
                 </div>
             </div>
