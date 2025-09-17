@@ -3,7 +3,7 @@
         <div
             v-if="source == 'ocl'"
             class="flex justify-center align-middle pt-5"
-            v-html="getSVGString(molecule)"
+            v-html="sanitizeHtml(getSVGString(molecule))"
         ></div>
         <div v-else class="flex">
             <img

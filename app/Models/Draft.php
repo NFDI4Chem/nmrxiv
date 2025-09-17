@@ -35,6 +35,7 @@ class Draft extends Model
         'release_date',
         'status',
         'processing_logs',
+        'tracking_item_name',
     ];
 
     protected $casts = [
@@ -61,5 +62,13 @@ class Draft extends Model
     public function project(): HasOne
     {
         return $this->hasOne(Project::class);
+    }
+
+    /**
+     * Get the team associated with the draft.
+     */
+    public function team(): BelongsTo
+    {
+        return $this->belongsTo(Team::class, 'team_id');
     }
 }

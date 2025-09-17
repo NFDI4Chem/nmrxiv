@@ -108,8 +108,8 @@ export default {
                         title: "Let's upload a demo dataset",
                     },
                     content: `<small>Click here to start uploading.</small>`,
-                    before: (type) =>
-                        new Promise((resolve, reject) => {
+                    before: () =>
+                        new Promise((resolve) => {
                             this.emitter.emit("openDatasetCreateDialog", {});
                             resolve("upload dialog open");
                         }),

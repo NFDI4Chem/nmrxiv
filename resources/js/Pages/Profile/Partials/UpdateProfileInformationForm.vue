@@ -108,6 +108,7 @@
                         v-model="form.email"
                         type="email"
                         class="mt-1 block w-full"
+                        autocomplete="email"
                     />
                     <jet-input-error
                         :message="form.errors.email"
@@ -196,7 +197,7 @@
         <!-- Find ORCID iD Modal -->
         <select-orcid-id
             ref="selectOrcidIdElement"
-            v-model:orcidId="form.orcid_id"
+            v-model:orcid-id="form.orcid_id"
             v-model:affiliation="form.affiliation"
         />
     </div>

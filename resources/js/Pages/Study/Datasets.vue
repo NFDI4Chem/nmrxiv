@@ -311,7 +311,6 @@ import { ShareIcon, ClipboardDocumentIcon } from "@heroicons/vue/24/solid";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import SpectraViewer from "@/Shared/SpectraViewer.vue";
 import SpectraEditor from "@/Shared/SpectraEditor.vue";
-import Citation from "@/Shared/Citation.vue";
 
 export default {
     components: {
@@ -325,7 +324,6 @@ export default {
         MenuItems,
         SpectraEditor,
         SpectraViewer,
-        Citation,
     },
     props: [
         "study",

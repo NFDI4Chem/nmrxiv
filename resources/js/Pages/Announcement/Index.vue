@@ -261,13 +261,11 @@ import BreadCrumbs from "../../Jetstream/BreadCrumbs.vue";
 import Icon from "@/Shared/Icon.vue";
 import AnnouncementCreate from "@/Pages/Announcement/Partials/Create.vue";
 import AnnouncementEdit from "@/Pages/Announcement/Partials/Edit.vue";
-import JetConfirmationModal from "@/Jetstream/ConfirmationModal.vue";
 import JetDangerButton from "@/Jetstream/DangerButton.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import JetDialogModal from "@/Jetstream/DialogModal.vue";
 import { ref, watch } from "vue";
 import { router } from "@inertiajs/vue3";
-import ToggleButton from "@/Shared/ToggleButton.vue";
 
 export default {
     components: {
@@ -276,11 +274,9 @@ export default {
         Icon,
         AnnouncementCreate,
         AnnouncementEdit,
-        JetConfirmationModal,
         JetDangerButton,
         JetSecondaryButton,
         JetDialogModal,
-        ToggleButton,
     },
     props: {
         announcements: Array,

@@ -8,6 +8,8 @@ use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class SearchController extends Controller
 {
@@ -230,23 +232,34 @@ class SearchController extends Controller
         try {
             set_time_limit(300);
 
+            // Validate and sanitize input parameters
+            $validator = Validator::make($request->all(), [
+                'query' => 'nullable|string|max:1000',
+                'type' => ['nullable', 'string', Rule::in(['text', 'smiles', 'inchi', 'inchikey', 'substructure', 'exact', 'similarity', 'tags', 'filters'])],
+                'limit' => 'nullable|integer|min:1|max:100',
+                'page' => 'nullable|integer|min:1',
+                'sort' => ['nullable', 'string', Rule::in(['recent', 'relevance'])],
+                'tagType' => 'nullable|string|max:100|regex:/^[a-zA-Z_]+$/',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'message' => 'Invalid input parameters',
+                    'errors' => $validator->errors(),
+                ], 400);
+            }
+
             $queryType = 'text';
             $results = [];
 
-            // dd($request);
-
-            $limit = $request->query('limit');
+            $limit = (int) ($request->query('limit') ?? 24);
             $sort = $request->query('sort');
-            $limit = $limit ? $limit : 24;
-            $page = $request->query('page');
-            $tagType = $request->get('tagType') ? $request->get('tagType') : null;
+            $page = (int) ($request->query('page') ?? 1);
+            $tagType = $request->get('tagType');
 
-            $offset =
-                (($page != null && $page != 'null' && $page != 0 ? $page : 1) -
-                    1) *
-                $limit;
+            $offset = ($page - 1) * $limit;
 
-            $query = $request->get('query');
+            $query = $this->sanitizeQuery($request->get('query'));
 
             $type = $request->query('type')
                 ? $request->query('type')
@@ -323,172 +336,99 @@ class SearchController extends Controller
             $statement = null;
 
             if ($queryType == 'smiles' || $queryType == 'substructure') {
-                $statement =
-                    "select id, COUNT(*) OVER () from mols where m@>'".
-                    $query.
-                    "' limit ".
-                    $limit.
-                    ' offset '.
-                    $offset;
+                try {
+                    $hits = DB::select(
+                        'SELECT id, COUNT(*) OVER () as count FROM mols WHERE m@>? LIMIT ? OFFSET ?',
+                        [$query, $limit, $offset]
+                    );
+                } catch (\Exception $e) {
+                    // Log the error and return empty results for invalid SMILES
+                    \Log::warning('SMILES query error: '.$e->getMessage(), ['query' => $query]);
+                    $hits = [];
+                }
             } elseif ($queryType == 'inchi') {
-                $statement =
-                    "select id, COUNT(*) OVER () from molecules WHERE identifier NOTNULL AND standard_inchi LIKE '%".
-                    $query.
-                    "%' limit ".
-                    $limit.
-                    ' offset '.
-                    $offset;
+                $hits = DB::select(
+                    'SELECT id, COUNT(*) OVER () as count FROM molecules WHERE identifier IS NOT NULL AND standard_inchi LIKE ? LIMIT ? OFFSET ?',
+                    ['%'.$query.'%', $limit, $offset]
+                );
             } elseif ($queryType == 'inchikey') {
-                $statement =
-                    "select id, COUNT(*) OVER () from molecules WHERE identifier NOTNULL AND standard_inchi_key LIKE '%".
-                    $query.
-                    "%' limit ".
-                    $limit.
-                    ' offset '.
-                    $offset;
+                $hits = DB::select(
+                    'SELECT id, COUNT(*) OVER () as count FROM molecules WHERE identifier IS NOT NULL AND standard_inchi_key LIKE ? LIMIT ? OFFSET ?',
+                    ['%'.$query.'%', $limit, $offset]
+                );
             } elseif ($queryType == 'exact') {
-                $statement =
-                    "select id, COUNT(*) OVER () from mols where m@='".
-                    $query.
-                    "' limit ".
-                    $limit.
-                    ' offset '.
-                    $offset;
+                try {
+                    $hits = DB::select(
+                        'SELECT id, COUNT(*) OVER () as count FROM mols WHERE m@=? LIMIT ? OFFSET ?',
+                        [$query, $limit, $offset]
+                    );
+                } catch (\Exception $e) {
+                    \Log::warning('Exact match query error: '.$e->getMessage(), ['query' => $query]);
+                    $hits = [];
+                }
             } elseif ($queryType == 'similarity') {
-                $statement =
-                    "select id, COUNT(*) OVER () from fps where mfp2%morganbv_fp('".
-                    $query.
-                    "') limit ".
-                    $limit.
-                    ' offset '.
-                    $offset;
+                try {
+                    $hits = DB::select(
+                        'SELECT id, COUNT(*) OVER () as count FROM fps WHERE mfp2%morganbv_fp(?) LIMIT ? OFFSET ?',
+                        [$query, $limit, $offset]
+                    );
+                } catch (\Exception $e) {
+                    \Log::warning('Similarity query error: '.$e->getMessage(), ['query' => $query]);
+                    $hits = [];
+                }
             } elseif ($queryType == 'tags') {
                 $results = Molecule::withAnyTags([$query], $tagType)->paginate($limit)->items();
                 $count = Molecule::withAnyTags([$query], $tagType)->count();
             } elseif ($queryType == 'filters') {
-                $orConditions = explode('OR', $query);
-                $isORInitial = true;
-                $statement =
-                    'select molecule_id as id, COUNT(*) OVER () from properties where ';
-                foreach ($orConditions as $orCondition) {
-                    if ($isORInitial === false) {
-                        $statement = $statement.' OR ';
-                    }
-                    $isORInitial = false;
-                    $statement = $statement.'(';
-                    $andConditions = explode(' ', trim($orCondition, ' '));
-                    $isANDInitial = true;
-                    foreach ($andConditions as $andCondition) {
-                        if ($isANDInitial === false) {
-                            $statement = $statement.' AND ';
-                        }
-                        $isANDInitial = false;
-                        $_filter = explode(':', $andCondition);
-                        if (str_contains($_filter[1], '..')) {
-                            $range = array_values(explode('..', $_filter[1]));
-                            $statement =
-                                $statement.
-                                '('.
-                                $filterMap[$_filter[0]].
-                                ' between '.
-                                $range[0].
-                                ' and '.
-                                $range[1].
-                                ')';
-                        } elseif (
-                            $_filter[1] === 'true' ||
-                            $_filter[1] === 'false'
-                        ) {
-                            $statement =
-                                $statement.
-                                '('.
-                                $filterMap[$_filter[0]].
-                                ' = '.
-                                $_filter[1].
-                                ')';
-                        } elseif (str_contains($_filter[1], '|')) {
-                            $dbFilters = explode('|', $_filter[1]);
-                            $dbs = explode('+', $dbFilters[0]);
-                            $statement =
-                                $statement.
-                                '('.
-                                $filterMap[$_filter[0]].
-                                " @> '[\"".
-                                implode('","', $dbs).
-                                "\"]')";
-                        } else {
-                            if (str_contains($_filter[1], '+')) {
-                                $_filter[1] = str_replace('+', ' ', $_filter[1]);
-                            }
-                            $statement =
-                                $statement.
-                                '('.$filterMap[$_filter[0]].'::TEXT ILIKE \'%'.$_filter[1].'%\')';
-                        }
-                    }
-                    $statement = $statement.')';
-                }
-                $statement = $statement.' LIMIT '.$limit;
-                // dd($statement );
+                $result = $this->buildSecureFilterQuery($query, $filterMap, $limit, $offset);
+                $hits = $result['hits'];
+                $count = $result['count'];
             } else {
                 if ($query) {
-                    $query = str_replace("'", "''", $query);
-                    $statement =
-                        "select id, COUNT(*) OVER () from molecules WHERE identifier NOTNULL AND (\"name\"::TEXT ILIKE '%".
-                        $query.
-                        "%') OR (\"synonyms\"::TEXT ILIKE '%".
-                        $query.
-                        "%') OR (\"identifier\"::TEXT ILIKE '%".
-                        $query.
-                        "%') limit ".
-                        $limit.
-                        ' offset '.
-                        $offset;
+                    $hits = DB::select(
+                        'SELECT id, COUNT(*) OVER () as count FROM molecules WHERE identifier IS NOT NULL AND (name::TEXT ILIKE ? OR synonyms::TEXT ILIKE ? OR identifier::TEXT ILIKE ?) LIMIT ? OFFSET ?',
+                        ['%'.$query.'%', '%'.$query.'%', '%'.$query.'%', $limit, $offset]
+                    );
                 } else {
-                    $statement =
-                        'select id, COUNT(*) OVER () from molecules WHERE identifier NOTNULL limit '.
-                        $limit.
-                        ' offset '.
-                        $offset;
+                    $hits = DB::select(
+                        'SELECT id, COUNT(*) OVER () as count FROM molecules WHERE identifier IS NOT NULL LIMIT ? OFFSET ?',
+                        [$limit, $offset]
+                    );
                 }
             }
-            if ($statement) {
-                $expression = DB::raw($statement);
-                $qString = $expression->getValue(
-                    DB::connection()->getQueryGrammar()
-                );
 
-                $hits = DB::select($qString);
-
+            // Process results for non-tag queries
+            if ($queryType !== 'tags' && $queryType !== 'filters') {
                 $count = count($hits) > 0 ? $hits[0]->count : 0;
 
-                $ids = implode(
-                    ',',
-                    collect($hits)
-                        ->pluck('id')
-                        ->toArray()
-                );
+                $ids = collect($hits)->pluck('id')->toArray();
 
-                if ($ids != '') {
-                    $statement =
-                        'SELECT * FROM molecules WHERE identifier NOTNULL AND ID IN ('.
-                        implode(
-                            ',',
-                            collect($hits)
-                                ->pluck('id')
-                                ->toArray()
-                        ).
-                        ')';
-                    if ($sort == 'recent') {
-                        $statement = $statement.' ORDER BY created_at DESC';
-                    }
-                    $expression = DB::raw($statement);
-                    $string = $expression->getValue(
-                        DB::connection()->getQueryGrammar()
+                if (! empty($ids)) {
+                    $placeholders = str_repeat('?,', count($ids) - 1).'?';
+                    $orderBy = $sort === 'recent' ? 'ORDER BY created_at DESC' : '';
+
+                    $results = DB::select(
+                        "SELECT * FROM molecules WHERE identifier IS NOT NULL AND id IN ({$placeholders}) {$orderBy}",
+                        $ids
                     );
-                    $results = DB::select($string);
                 } else {
                     $results = [];
                     $count = 0;
+                }
+            } elseif ($queryType === 'filters') {
+                // Results already processed in buildSecureFilterQuery
+                $ids = collect($hits)->pluck('id')->toArray();
+
+                if (! empty($ids)) {
+                    $placeholders = str_repeat('?,', count($ids) - 1).'?';
+                    $orderBy = $sort === 'recent' ? 'ORDER BY created_at DESC' : '';
+
+                    $results = DB::select(
+                        "SELECT * FROM molecules WHERE identifier IS NOT NULL AND id IN ({$placeholders}) {$orderBy}",
+                        $ids
+                    );
+                } else {
+                    $results = [];
                 }
             }
             $pagination = new LengthAwarePaginator(
@@ -507,6 +447,146 @@ class SearchController extends Controller
                 ],
                 500
             );
+        }
+    }
+
+    /**
+     * Sanitize query input to prevent injection attacks
+     */
+    private function sanitizeQuery(?string $query): ?string
+    {
+        if (empty($query)) {
+            return null;
+        }
+
+        // Remove null bytes and control characters
+        $query = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $query);
+
+        // Trim whitespace
+        $query = trim($query);
+
+        // Limit length
+        $query = substr($query, 0, 1000);
+
+        return $query;
+    }
+
+    /**
+     * Build secure filter query with parameter binding
+     */
+    private function buildSecureFilterQuery(string $query, array $filterMap, int $limit, int $offset): array
+    {
+        try {
+            $orConditions = explode('OR', $query);
+            $whereConditions = [];
+            $parameters = [];
+
+            foreach ($orConditions as $orCondition) {
+                $andConditions = explode(' ', trim($orCondition));
+                $andClauses = [];
+
+                foreach ($andConditions as $andCondition) {
+                    // Skip empty conditions
+                    if (empty(trim($andCondition))) {
+                        continue;
+                    }
+
+                    $filter = explode(':', $andCondition, 2);
+
+                    if (count($filter) !== 2) {
+                        continue; // Skip invalid filters
+                    }
+
+                    $field = trim($filter[0]);
+                    $value = trim($filter[1]);
+
+                    // Skip if field or value is empty
+                    if (empty($field) || empty($value)) {
+                        continue;
+                    }
+
+                    // Validate field exists in filterMap
+                    if (! isset($filterMap[$field])) {
+                        continue; // Skip unknown fields
+                    }
+
+                    $dbField = $filterMap[$field];
+
+                    // Additional validation: ensure dbField is safe (alphanumeric + underscore)
+                    if (! preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $dbField)) {
+                        continue;
+                    }
+
+                    if (str_contains($value, '..')) {
+                        // Range query
+                        $range = explode('..', $value, 2);
+                        if (count($range) === 2 && is_numeric($range[0]) && is_numeric($range[1])) {
+                            $andClauses[] = "({$dbField} BETWEEN ? AND ?)";
+                            $parameters[] = (float) $range[0];
+                            $parameters[] = (float) $range[1];
+                        }
+                    } elseif ($value === 'true' || $value === 'false') {
+                        // Boolean query
+                        $andClauses[] = "({$dbField} = ?)";
+                        $parameters[] = $value === 'true';
+                    } elseif (str_contains($value, '|')) {
+                        // Array contains query
+                        $dbFilters = explode('|', $value, 2);
+                        $dbs = explode('+', $dbFilters[0]);
+
+                        // Validate database names (alphanumeric + underscore only)
+                        $validDbs = array_filter($dbs, function ($db) {
+                            return preg_match('/^[a-zA-Z0-9_]+$/', trim($db));
+                        });
+
+                        if (! empty($validDbs)) {
+                            $jsonArray = json_encode($validDbs);
+                            $andClauses[] = "({$dbField} @> ?)";
+                            $parameters[] = $jsonArray;
+                        }
+                    } else {
+                        // Text search - be more aggressive with sanitization
+                        if (str_contains($value, '+')) {
+                            $value = str_replace('+', ' ', $value);
+                        }
+
+                        // Remove any potentially dangerous characters, keep only safe ones
+                        $value = preg_replace('/[^\w\s\-\.]/', '', $value);
+                        $value = trim($value);
+
+                        if (! empty($value) && strlen($value) > 0) {
+                            $andClauses[] = "({$dbField}::TEXT ILIKE ?)";
+                            $parameters[] = '%'.$value.'%';
+                        }
+                    }
+                }
+
+                if (! empty($andClauses)) {
+                    $whereConditions[] = '('.implode(' AND ', $andClauses).')';
+                }
+            }
+
+            if (empty($whereConditions)) {
+                return ['hits' => [], 'count' => 0];
+            }
+
+            $whereClause = implode(' OR ', $whereConditions);
+            $sql = "SELECT molecule_id as id, COUNT(*) OVER () as count FROM properties WHERE {$whereClause} LIMIT ? OFFSET ?";
+
+            $parameters[] = $limit;
+            $parameters[] = $offset;
+
+            $hits = DB::select($sql, $parameters);
+            $count = count($hits) > 0 ? $hits[0]->count : 0;
+
+            return ['hits' => $hits, 'count' => $count];
+
+        } catch (\Exception $e) {
+            // Log the error but don't expose it to prevent information leakage
+            \Log::warning('Filter query error: '.$e->getMessage(), ['query' => $query]);
+
+            // Return empty results for any error to prevent SQL injection
+            return ['hits' => [], 'count' => 0];
         }
     }
 }

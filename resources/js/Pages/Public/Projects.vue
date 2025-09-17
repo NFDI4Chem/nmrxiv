@@ -273,31 +273,13 @@
 
 <script>
 import { ref } from "vue";
-import {
-    Dialog,
-    DialogPanel,
-    Disclosure,
-    DisclosureButton,
-    DisclosurePanel,
-    Menu,
-    MenuButton,
-    MenuItem,
-    MenuItems,
-    Popover,
-    PopoverButton,
-    PopoverGroup,
-    PopoverPanel,
-    TransitionChild,
-    TransitionRoot,
-} from "@headlessui/vue";
+import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import throttle from "lodash/throttle";
-import { XMarkIcon } from "@heroicons/vue/24/outline";
 import {
     ChevronDownIcon,
     QueueListIcon,
     Squares2X2Icon,
 } from "@heroicons/vue/24/solid";
-import { Link } from "@inertiajs/vue3";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import ProjectCard from "@/Shared/ProjectCard.vue";
 import ProjectSearch from "@/Shared/ProjectSearch.vue";
@@ -307,40 +289,27 @@ export default {
     components: {
         AppLayout,
         ProjectCard,
-        Dialog,
-        DialogPanel,
-        Disclosure,
-        DisclosureButton,
-        DisclosurePanel,
         Menu,
         MenuButton,
         MenuItem,
         MenuItems,
-        Popover,
-        PopoverButton,
-        PopoverGroup,
-        PopoverPanel,
-        TransitionChild,
-        TransitionRoot,
-        XMarkIcon,
         ChevronDownIcon,
         QueueListIcon,
-        Link,
         ProjectSearch,
         Pagination,
         Squares2X2Icon,
     },
     props: {
         projects: {
-            default: [],
+            default: () => ({}),
             type: Object,
         },
         filters: {
-            default: {
+            default: () => ({
                 search: "",
                 sort: "creation",
                 mode: "grid",
-            },
+            }),
             type: Object,
         },
     },

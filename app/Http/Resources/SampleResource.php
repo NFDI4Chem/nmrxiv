@@ -20,6 +20,7 @@ class SampleResource extends JsonResource
             'slug' => $this->slug,
             'description' => $this->description,
             'molecules' => $this->molecules,
+            'submitted_through' => $this->submitted_through,
         ];
     }
 }

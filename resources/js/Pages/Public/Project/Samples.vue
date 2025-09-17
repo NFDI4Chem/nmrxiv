@@ -133,7 +133,7 @@
                                             'cursor-pointer border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 border-t-2 pt-4 px-4 inline-flex items-center text-sm font-medium',
                                         ]"
                                         @click="update(link)"
-                                        v-html="link.label"
+                                        v-html="sanitizeHtml(link.label)"
                                     ></div>
                                 </div>
                                 

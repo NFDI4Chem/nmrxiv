@@ -2,10 +2,10 @@
 
 namespace App\Notifications;
 
-use App\Mail\DraftProcessedNotifyAdmins;
+use App\Mail\DraftProcessedNotifyAdmins as DraftProcessedNotifyAdminsMailable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Mail\Mailable;
 use Illuminate\Notifications\Notification;
 
 class DraftProcessedNotificationToAdmin extends Notification implements ShouldQueue
@@ -42,14 +42,15 @@ class DraftProcessedNotificationToAdmin extends Notification implements ShouldQu
      *
      * @param  mixed  $notifiable
      */
-    public function toMail($notifiable): MailMessage
+    public function toMail($notifiable): ?Mailable
     {
         if ($this->project) {
-            return (new DraftProcessedNotifyAdmins($this->project, null))->to($notifiable->email);
+            return (new DraftProcessedNotifyAdminsMailable($this->project, null))->to($notifiable->email);
         } elseif ($this->studies) {
-            return (new DraftProcessedNotifyAdmins(null, $this->studies))->to($notifiable->email);
+            return (new DraftProcessedNotifyAdminsMailable(null, $this->studies))->to($notifiable->email);
+        } else {
+            return null;
         }
-
     }
 
     /**

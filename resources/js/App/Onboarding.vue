@@ -167,7 +167,7 @@
                                                         and new infrastructure,
                                                         necessary to capture
                                                         data early in the life
-                                                        cycle​ and to further
+                                                        cycle and to further
                                                         manage, analyse and
                                                         store associated
                                                         information. Checkout
@@ -524,49 +524,20 @@
 
 <script>
 import JetApplicationLogo from "@/Jetstream/ApplicationLogo.vue";
-import { computed, ref } from "vue";
-import {
-    Combobox,
-    ComboboxInput,
-    ComboboxOptions,
-    ComboboxOption,
-    Dialog,
-    DialogPanel,
-    TransitionChild,
-    TransitionRoot,
-} from "@headlessui/vue";
+import { ref } from "vue";
+import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from "@headlessui/vue";
 
-import { MagnifyingGlassIcon } from "@heroicons/vue/24/solid";
-import {
-    DocumentPlusIcon,
-    FolderIcon,
-    FolderPlusIcon,
-    HashtagIcon,
-    ArrowTopRightOnSquareIcon,
-    TagIcon,
-} from "@heroicons/vue/24/outline";
+import { ArrowTopRightOnSquareIcon } from "@heroicons/vue/24/outline";
 import axios from "axios";
 import { router } from "@inertiajs/vue3";
 
 export default {
     components: {
         JetApplicationLogo,
-        computed,
-        ref,
-        Combobox,
-        ComboboxInput,
-        ComboboxOptions,
-        ComboboxOption,
         Dialog,
         DialogPanel,
         TransitionChild,
         TransitionRoot,
-        MagnifyingGlassIcon,
-        DocumentPlusIcon,
-        FolderIcon,
-        FolderPlusIcon,
-        HashtagIcon,
-        TagIcon,
         ArrowTopRightOnSquareIcon,
     },
     props: [],
@@ -617,7 +588,7 @@ export default {
         },
         onboardingComplete() {
             this.open = false;
-            axios.post("/onboarding/complete").then((resp) => {
+            axios.post("/onboarding/complete").then(() => {
                 router.reload({
                     only: ["user", "user.permissions", "user.roles"],
                 });

@@ -54,6 +54,7 @@ class FileSystemObject extends Model
         'integrity_error',
         'verification_attempts',
         'last_verification_attempt',
+        'external_url',
     ];
 
     /**

@@ -16,16 +16,22 @@
                         {{ author.given_name }}
                         {{ author.family_name }}
                     </h3>
-                    <span
-                        v-if="author.pivot && author.pivot.contributor_type"
-                        class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-teal-100 text-teal-800 flex-shrink-0"
+                    <button
+                        v-if="enableRoleClick"
+                        type="button"
+                        class="group inline-flex items-center focus:outline-none"
+                        title="Manage Role"
+                        @click.stop.prevent="onRoleClick(author)"
                     >
-                        {{
-                            author.pivot.contributor_type
-                                ? author.pivot.contributor_type
-                                : "Researcher"
-                        }}
-                    </span>
+                        <Tag
+                            :label="(author.pivot && author.pivot.contributor_type) || author.contributor_type || 'Researcher'"
+                            class="cursor-pointer group-hover:shadow group-active:scale-[0.97] transition"
+                        />
+                    </button>
+                    <Tag
+                        v-else
+                        :label="(author.pivot && author.pivot.contributor_type) || author.contributor_type || 'Researcher'"
+                    />
                 </div>
                 
                 <div class="space-y-1">
@@ -47,9 +53,15 @@
 </template>
 
 <script>
+import Tag from "@/Shared/Tag.vue";
+
 export default {
-    components: {},
-    props: ["authors"],
+    components: { Tag },
+    props: {
+        authors: { type: Array, required: true },
+        enableRoleClick: { type: Boolean, default: false },
+    },
+    emits: ["role-click"],
     methods: {
         getOrcidLink(orcidId) {
             var link = "#";
@@ -64,6 +76,9 @@ export default {
                 target = "_blank";
             }
             return target;
+        },
+        onRoleClick(author) {
+            this.$emit("role-click", author);
         },
     },
 };

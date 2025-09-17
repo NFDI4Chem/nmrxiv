@@ -598,12 +598,7 @@
 </template>
 
 <script>
-import {
-    PlusSmallIcon,
-    TrashIcon,
-    PencilIcon,
-    InformationCircleIcon,
-} from "@heroicons/vue/24/solid";
+import { TrashIcon, PencilIcon, InformationCircleIcon } from "@heroicons/vue/24/solid";
 import StudyContent from "@/Pages/Study/Content.vue";
 import slider from "vue3-slider";
 import OCL from "openchemlib/full";
@@ -614,7 +609,6 @@ export default {
     components: {
         StudyContent,
         ToolTip,
-        PlusSmallIcon,
         slider,
         TrashIcon,
         PencilIcon,
@@ -633,7 +627,6 @@ export default {
         "license",
         "preview",
     ],
-    setup() {},
     data() {
         return {
             smiles: "",
@@ -676,7 +669,7 @@ export default {
             this.errorMessage = "";
             if (this.smiles && this.smiles != "") {
                 try {
-                    let mol = OCL.Molecule.fromSmiles(this.smiles);
+                    OCL.Molecule.fromSmiles(this.smiles);
                     this.editor.setSmiles(this.smiles);
                 } catch (e) {
                     this.errorMessage = "The entered SMILES is not valid.";
@@ -720,13 +713,13 @@ export default {
                     this.study.sample.molecules = res.data;
                 });
         },
-        saveMolecule(mol, study) {
+    saveMolecule(mol, study) {
             if (!study) {
                 study = this.study;
             }
             if (!mol) {
-                let mol = this.editor.getMolFile();
-                this.standardizeMolecules(mol).then((res) => {
+        let molfile = this.editor.getMolFile();
+        this.standardizeMolecules(molfile).then((res) => {
                     this.associateMoleculeToStudy(res.data, study);
                 });
             } else {

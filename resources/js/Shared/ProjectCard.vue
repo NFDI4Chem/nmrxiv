@@ -112,12 +112,8 @@
                                 
                                 <!-- Project tags section with overflow handling -->
                                 <div class="mt-1 h-14 overflow-hidden">
-                                    <span
-                                        v-for="tag in project.tags"
-                                        :key="tag.id"
-                                        class="mt-1 inline-flex items-center rounded-full bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10"
-                                    >
-                                        {{ tag.name["en"] }}
+                                    <span class="px-2 py-1">
+                                    <Tag :tags="project.tags" size="sm" />
                                     </span>
                                 </div>
                             </Link>
@@ -312,7 +308,7 @@
                                     class="flex items-center text-sm text-gray-500"
                                 >
                                     <img
-                                        class="h-7 w-5 mr-2 rounded-full"
+                                        class="h-7 w-7 mr-2 rounded-full"
                                         :src="project.owner.profile_photo_url"
                                     />
                                     {{ project.owner.first_name }}
@@ -402,6 +398,7 @@ import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 // Inertia.js imports for navigation and routing
 import { router } from "@inertiajs/vue3";
 import { Link } from "@inertiajs/vue3";
+import Tag from "@/Shared/Tag.vue";
 
 export default {
     name: "ProjectCard",
@@ -418,6 +415,7 @@ export default {
         MenuItems,              // HeadlessUI Menu items container
         ArrowDownTrayIcon,      // Download icon
         ScaleIcon,              // License icon
+    Tag,                    // Reusable tag component
     },
 
     /**

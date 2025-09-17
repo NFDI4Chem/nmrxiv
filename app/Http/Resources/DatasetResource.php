@@ -49,6 +49,7 @@ class DatasetResource extends JsonResource
             'is_public' => $this->is_public,
             'public_url' => $this->public_url ? $this->public_url : null,
             'has_nmrium' => $this->has_nmrium,
+            'external_url' => $this->external_url,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

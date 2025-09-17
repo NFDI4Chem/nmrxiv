@@ -21,7 +21,7 @@
             >
                 <b>Info: </b> This project is in embargo and set to be released
                 on {{ formatDate(project.release_date) }}. You cannot edit the
-                project, please create a new version to updated the project.
+                project, please create a new version to update the project.
             </div>
             <div v-if="project.is_public">
                 <div
@@ -36,7 +36,7 @@
                     class="text-center px-3 py-2 bg-green-50 text-green-700 border-b"
                 >
                     <b>Info: </b> This project is public. You cannot edit a
-                    published project, please create a new version to updated
+                    published project, please create a new version to update
                     the project.
                 </div>
             </div>
@@ -95,8 +95,8 @@
                                 </button>
                             </div>
                             <div
-                                class="inline-flex items-center mt-3"
                                 v-if="!project.is_deleted"
+                                class="inline-flex items-center mt-3"
                             >
                                 <access-dialogue
                                     :available-roles="availableRoles"
@@ -284,26 +284,7 @@
                                     </span>
                                     {{ role }}
                                 </span>
-                                <span
-                                    v-if="project.identifier"
-                                    class="inline-flex pr-4 ml-4 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
-                                >
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        class="h-6 w-6 py-1"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                        stroke-width="2"
-                                    >
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            d="M5.25 8.25h15m-16.5 7.5h15m-1.8-13.5l-3.9 19.5m-2.1-19.5l-3.9 19.5"
-                                        />
-                                    </svg>
-                                    <b>{{ project.identifier }}</b>
-                                </span>
+                                <Tag v-if="project.identifier" :identifier="project.identifier" class="ml-4" />
                             </div>
                         </div>
                         <div
@@ -378,8 +359,8 @@
                 <TransitionRoot
                     :show="showPublishDialog"
                     as="template"
-                    @after-leave="query = ''"
                     appear
+                    @after-leave="query = ''"
                 >
                     <Dialog as="div" class="relative z-10">
                         <TransitionChild
@@ -569,9 +550,10 @@
                                                 </label>
                                                 <Datepicker
                                                     v-model="
-                                                        project.release_date
+                                                        form.release_date
                                                     "
                                                     :format="customDateFormat"
+                                                    :min-date="new Date()"
                                                     :preview-format="
                                                         customDateFormat
                                                     "
@@ -598,31 +580,18 @@
                                                             class="flex items-top"
                                                         >
                                                             <input
-                                                                type="checkbox"
-                                                                class="rounded mt-1 border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                                                                 id="conditions"
                                                                 v-model="
                                                                     project.conditions
                                                                 "
+                                                                type="checkbox"
+                                                                class="rounded mt-1 border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                                                                 name="conditions"
                                                             />
                                                             <div
                                                                 class="ml-2 text-sm"
                                                             >
-                                                                I understand
-                                                                once the project
-                                                                is published,
-                                                                all the
-                                                                underlying
-                                                                samples and
-                                                                spectra will
-                                                                also be made
-                                                                public and agree
-                                                                to make this
-                                                                data
-                                                                persistently
-                                                                available in the
-                                                                nmrXiv platfor
+                                                            I understand that publishing makes all underlying data publicly available on the nmrXiv platform after the set release date.
                                                             </div>
                                                         </div>
                                                     </div>
@@ -633,12 +602,12 @@
                                                             class="flex items-center"
                                                         >
                                                             <input
-                                                                type="checkbox"
-                                                                class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                                                                 id="terms"
                                                                 v-model="
                                                                     project.terms
                                                                 "
+                                                                type="checkbox"
+                                                                class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                                                                 name="terms"
                                                             />
                                                             <div
@@ -694,12 +663,12 @@
                                                             : 'bg-green-600 hover:bg-green-700',
                                                         'ml-2',
                                                     ]"
-                                                    @click="
-                                                        showPublishConfirmationModal = true
-                                                    "
                                                     :disabled="
                                                         !project.terms &&
                                                         !project.conditions
+                                                    "
+                                                    @click="
+                                                        showPublishConfirmationModal = true
                                                     "
                                                 >
                                                     Publish now
@@ -895,13 +864,7 @@
                     </div>
                     <dd class="mt-1 text-md text-gray-900 space-y-5">
                         <p>
-                            <span
-                                v-for="tag in project.tags"
-                                :key="tag.id"
-                                class="mt-1 inline-flex items-center rounded-full bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10"
-                            >
-                                {{ tag.name["en"] }}
-                            </span>
+                            <Tag :tags="project.tags" />
                         </p>
                     </dd>
                 </div>
@@ -1064,6 +1027,7 @@ import Publish from "@/Shared/Publish.vue";
 import AuthorCard from "@/Shared/AuthorCard.vue";
 import CitationCard from "@/Shared/CitationCard.vue";
 import DOIBadge from "@/Shared/DOIBadge.vue";
+import Tag from "@/Shared/Tag.vue";
 import Datepicker from "@vuepic/vue-datepicker";
 import JetConfirmationModal from "@/Jetstream/ConfirmationModal.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
@@ -1075,6 +1039,7 @@ import {
     TransitionRoot,
 } from "@headlessui/vue";
 import ShowProjectDates from "@/Shared/ShowProjectDates.vue";
+import "@vuepic/vue-datepicker/dist/main.css";
 
 export default {
     components: {
@@ -1093,6 +1058,7 @@ export default {
         AuthorCard,
         CitationCard,
         DOIBadge,
+    Tag,
         Dialog,
         DialogPanel,
         TransitionChild,
@@ -1135,6 +1101,11 @@ export default {
             }),
             showPublishDialog: false,
             showPublishConfirmationModal: false,
+            // Added reactive props to avoid Vue warnings during render
+            errors: null,
+            status: null,
+            query: "",
+            validation: null,
         };
     },
     computed: {
@@ -1189,7 +1160,7 @@ export default {
                         );
                     }
                 })
-                .then(function (response) {
+                .then(function () {
                     router.reload({ only: ["project"] });
                 });
         },
@@ -1225,7 +1196,8 @@ export default {
             }
         },
         updatePublishDate() {
-            this.form.release_date = this.project.release_date;
+            console.log("updating release date");
+            this.project.release_date = this.form.release_date;
             this.form.put(
                 route("dashboard.project.updateReleaseDate", this.project.id),
                 {
@@ -1233,7 +1205,7 @@ export default {
                     onSuccess: () => {
                         this.showPublishDialog = false;
                     },
-                    onError: (err) => {},
+                    onError: () => {},
                 }
             );
         },

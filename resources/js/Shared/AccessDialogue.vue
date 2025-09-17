@@ -3,14 +3,14 @@
         class="cursor-pointer flex flex-row-reverse justify-end mr-2"
         @click="open = true"
     >
-        <div
+        <button
             v-if="members.length > 0"
-            class="tooltip w-8 h-8 -ml-.5 rounded-full border-2 border-white bg-gray-100"
+            class="tooltip rounded-full border-2 border-white bg-gray-100 pr-4"
             alt=""
         >
             <svg
                 xmlns="http://www.w3.org/2000/svg"
-                class="h-4 w-4 m-1.5 text-gray-400"
+                class="h-4 w-4 m-1.5 text-gray-400 inline"
                 viewBox="0 0 20 20"
                 fill="currentColor"
             >
@@ -18,11 +18,12 @@
                     d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z"
                 />
             </svg>
+            <div class="text-md text-gray-600 font-medium inline">SHARE</div>
             <span
                 class="bg-gray-900 text-center text-white px-2 py-1 shadow-lg rounded-md tooltiptextbottom"
                 >Click here to edit sharing options.</span
             >
-        </div>
+        </button>
         <img
             v-for="user in members"
             :key="user.id"
@@ -73,8 +74,8 @@
                     <DialogPanel
                         class="mx-auto max-w-xl transform rounded-xl bg-white p-2 shadow-2xl ring-1 ring-black ring-opacity-5 transition-all p-4"
                     >
-                        <div class="sm:flex sm:items-start sm:justify-between">
-                            <div>
+                        <div class="sm:flex sm:items-start sm:justify-between border-b pb-2 border-gray-100">
+                            <div class="w-full">
                                 <h3
                                     class="text-lg leading-6 font-medium text-gray-900"
                                 >
@@ -145,7 +146,7 @@
                             <ul
                                 v-if="members.length > 0"
                                 role="list"
-                                class="my-5 shadow divide-y divide-gray-200"
+                                class="my-5 shadow divide-y divide-gray-200 rounded-md"
                             >
                                 <li
                                     v-for="person in members"
@@ -351,7 +352,7 @@
                                 </li>
                             </ul>
 
-                            <div class="border-b pb-2">
+                            <div class="border-t -mx-4 px-4 pt-4">
                                 <span class="text-md font-medium">
                                     General Access
                                 </span>
@@ -366,7 +367,7 @@
                                         class="text-sm text-gray-900 font-medium mb-5"
                                     >
                                         Anyone with the link
-                                        <p class="text-xs text-gray-600">
+                                        <p class="text-xs text-gray-600 pr-4">
                                             Anyone on the internet with the link
                                             can view the project, along with
                                             associated samples and datasets, in
@@ -377,8 +378,8 @@
                                 <div class="flex items-center">
                                     <div>
                                         <button
-                                            type="button"
                                             id="copyLink"
+                                            type="button"
                                             class="active:bg-green-500 inline-flex mb-4 items-center shadow-sm px-4 py-1.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
                                             @click="copyLinkToClipboard"
                                         >
@@ -410,7 +411,7 @@
                                     </p>
                                 </div>
                                 <div
-                                    class="bg-white shadow overflow-hidden sm:rounded-md"
+                                    class="bg-white overflow-hidden"
                                 >
                                     <ul
                                         role="list"
@@ -779,26 +780,15 @@
 </template>
 
 <script>
-import { computed, ref } from "vue";
-import { UsersIcon } from "@heroicons/vue/24/outline";
+import { ref } from "vue";
 import JetActionMessage from "@/Jetstream/ActionMessage.vue";
-import JetActionSection from "@/Jetstream/ActionSection.vue";
 import JetButton from "@/Jetstream/Button.vue";
-import JetConfirmationModal from "@/Jetstream/ConfirmationModal.vue";
-import JetDangerButton from "@/Jetstream/DangerButton.vue";
-import JetDialogModal from "@/Jetstream/DialogModal.vue";
 import JetModalFormSection from "@/Jetstream/ModalFormSection.vue";
 import JetInput from "@/Jetstream/Input.vue";
 import JetTextArea from "@/Jetstream/TextArea.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import JetLabel from "@/Jetstream/Label.vue";
-import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
-import JetSectionBorder from "@/Jetstream/SectionBorder.vue";
 import {
-    Combobox,
-    ComboboxInput,
-    ComboboxOptions,
-    ComboboxOption,
     Dialog,
     DialogPanel,
     TransitionChild,
@@ -819,27 +809,16 @@ export default {
         MenuItem,
         MenuItems,
         ChevronDownIcon,
-        Combobox,
-        ComboboxInput,
-        ComboboxOptions,
-        ComboboxOption,
         Dialog,
         DialogPanel,
         TransitionChild,
         JetModalFormSection,
         TransitionRoot,
-        UsersIcon,
         JetActionMessage,
-        JetActionSection,
         JetButton,
-        JetConfirmationModal,
-        JetDangerButton,
-        JetDialogModal,
         JetInput,
         JetInputError,
         JetLabel,
-        JetSecondaryButton,
-        JetSectionBorder,
         JetTextArea,
         GlobeAltIcon,
         LinkIcon,
@@ -884,6 +863,7 @@ export default {
             } else if (this.model == "project") {
                 return this.project;
             }
+            return null;
         },
         modelInvitations() {
             return this.modelObject[this.model + "_invitations"];
@@ -895,7 +875,7 @@ export default {
             if (this.calledFrom == "studyView") {
                 if (this.members) {
                     this.members.forEach((member) => {
-                        if (member.hasOwnProperty("project_membership")) {
+                        if (Object.prototype.hasOwnProperty.call(member, "project_membership")) {
                             count = count + 1;
                         }
                     });

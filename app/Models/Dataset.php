@@ -38,6 +38,7 @@ class Dataset extends Model implements Auditable
         'fs_id',
         'dataset_photo_path',
         'license_id',
+        'external_url',
     ];
 
     /**

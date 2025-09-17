@@ -1,4 +1,5 @@
 import * as marked from "marked";
+import DOMPurify from "dompurify";
 import { copyText } from "vue3-clipboard";
 import pluralize from "pluralize";
 import OCL from "openchemlib/full";
@@ -13,7 +14,7 @@ export default {
                     return "InChiKey";
                 } else {
                     try {
-                        let molecule = OCL.Molecule.fromSmiles(query);
+                        OCL.Molecule.fromSmiles(query);
                     } catch (err) {
                         return "text";
                     }
@@ -46,52 +47,12 @@ export default {
                     !!query.match(/^([0-9A-Z\-]+)$/))
             );
         },
-        hasAnyRole: function (roles) {
-            return this.checkIfValueExists(roles, "roles");
-        },
-        hasAnyPermission: function (permissions) {
-            return this.checkIfValueExists(permissions, "permissions");
-        },
-        checkIfValueExists(queryArray, type) {
-            if (
-                this.$page.props.auth.user &&
-                this.$page.props.auth.user[type]
-            ) {
-                let allValues = Array.from(this.$page.props.auth.user[type]);
-                return queryArray.some((r) => allValues.indexOf(r) >= 0);
-            }
-        },
-        formatDate(timestamp) {
-            const date = new Date(timestamp);
-            return new Intl.DateTimeFormat("default", {
-                dateStyle: "long",
-            }).format(date);
-        },
-        formatDateTime(timestamp) {
-            const date = new Date(timestamp);
-            return new Intl.DateTimeFormat("en", {
-                dateStyle: "full",
-                timeStyle: "short",
-            }).format(date);
-        },
-        md(data) {
-            return data ? marked.parse(data) : "";
-        },
-        getHash(input) {
-            var hash = 0,
-                len = input.length;
-            for (var i = 0; i < len; i++) {
-                hash = (hash << 5) - hash + input.charCodeAt(i);
-                hash |= 0; // to 32bit integer
-            }
-            return hash;
-        },
         findLocalItems(query) {
             var i,
                 results = [];
             if (typeof window !== "undefined") {
                 for (i in localStorage) {
-                    if (localStorage.hasOwnProperty(i)) {
+                    if (Object.prototype.hasOwnProperty.call(localStorage, i)) {
                         if (
                             i.match(query) ||
                             (!query && typeof i === "string")
@@ -105,52 +66,6 @@ export default {
                 }
             }
             return results;
-        },
-        slugify(str) {
-            str = str.replace(/^\s+|\s+$/g, "");
-            str = str.toLowerCase();
-            var from = "àáäâèéëêìíïîòóöôùúüûñç·/_,:;";
-            var to = "aaaaeeeeiiiioooouuuunc------";
-            for (var i = 0, l = from.length; i < l; i++) {
-                str = str.replace(
-                    new RegExp(from.charAt(i), "g"),
-                    to.charAt(i)
-                );
-            }
-            str = str
-                .replace(/[^a-z0-9 -]/g, "")
-                .replace(/\s+/g, "-")
-                .replace(/-+/g, "-");
-
-            return str;
-        },
-        copyToClipboard(text) {
-            copyText(text, undefined, (error) => {
-                if (error) {
-                    console.log(error);
-                } else {
-                    console.log("copied");
-                    // console.log(event)
-                }
-            });
-        },
-        bytesToSize(bytes) {
-            var sizes = ["Bytes", "KB", "MB", "GB", "TB"];
-            if (bytes == 0) return "0 Byte";
-            var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
-            return Math.round(bytes / Math.pow(1024, i), 2) + " " + sizes[i];
-        },
-        isString(val) {
-            return typeof val === "string" || val instanceof String;
-        },
-        parseJSON(val) {
-            if (!val) {
-                return null;
-            }
-            if (this.isString(val)) {
-                return JSON.parse(val);
-            }
-            return val;
         },
         downloadMolFile2D(e, smiles, identifier, CM_API) {
             axios
@@ -215,18 +130,7 @@ export default {
 
             downloadLink.click();
         },
-        /*Extract Doi from URL*/
-        extractQueryParam(query) {
-            if (query.indexOf("http") > -1) {
-                var url = new URL(query);
-                if (query.indexOf("dois") > -1) {
-                    query = url.pathname.replace("/dois/", "");
-                } else {
-                    query = url.pathname.replace("/", "");
-                }
-            }
-            return query.trim();
-        },
+    /*Extract Doi from URL*/
         fixedDecimelPoint(input, decimelPoint) {
             return Number.parseFloat(input).toFixed(decimelPoint);
         },
@@ -259,7 +163,75 @@ export default {
             }).format(date);
         },
         md(data) {
-            return data ? marked.parse(data) : "";
+            if (!data) return "";
+            
+            // Configure marked with security settings
+            marked.setOptions({
+                breaks: true,
+                gfm: true,
+                sanitize: false, // We'll use DOMPurify for sanitization
+                smartLists: true,
+                smartypants: false
+            });
+            
+            // Parse markdown to HTML
+            const rawHtml = marked.parse(data);
+            
+            // Sanitize the HTML to prevent XSS attacks
+            return DOMPurify.sanitize(rawHtml, {
+                ALLOWED_TAGS: [
+                    'p', 'br', 'strong', 'em', 'u', 'strike', 'del', 'ins',
+                    'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+                    'ul', 'ol', 'li',
+                    'blockquote', 'pre', 'code',
+                    'a', 'img',
+                    'table', 'thead', 'tbody', 'tr', 'th', 'td',
+                    'hr'
+                ],
+                ALLOWED_ATTR: [
+                    'href', 'title', 'alt', 'src', 'width', 'height',
+                    'class', 'id'
+                ],
+                ALLOWED_URI_REGEXP: /^(?:(?:(?:f|ht)tps?|mailto|tel|callto|cid|xmpp|data):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i,
+                FORBID_TAGS: ['script', 'object', 'embed', 'form', 'input', 'textarea', 'select', 'button'],
+                FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'onfocus', 'onblur', 'onchange', 'onsubmit'],
+                KEEP_CONTENT: true,
+                RETURN_DOM: false,
+                RETURN_DOM_FRAGMENT: false,
+                RETURN_DOM_IMPORT: false,
+                SANITIZE_DOM: true,
+                WHOLE_DOCUMENT: false
+            });
+        },
+        sanitizeHtml(data) {
+            if (!data) return "";
+            
+            // Sanitize raw HTML content to prevent XSS attacks
+            // This is for content that's already HTML (not markdown)
+            return DOMPurify.sanitize(data, {
+                ALLOWED_TAGS: [
+                    'p', 'br', 'strong', 'em', 'u', 'strike', 'del', 'ins',
+                    'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+                    'ul', 'ol', 'li',
+                    'blockquote', 'pre', 'code',
+                    'a', 'img',
+                    'table', 'thead', 'tbody', 'tr', 'th', 'td',
+                    'hr', 'div', 'span'
+                ],
+                ALLOWED_ATTR: [
+                    'href', 'title', 'alt', 'src', 'width', 'height',
+                    'class', 'id'
+                ],
+                ALLOWED_URI_REGEXP: /^(?:(?:(?:f|ht)tps?|mailto|tel|callto|cid|xmpp|data):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i,
+                FORBID_TAGS: ['script', 'object', 'embed', 'form', 'input', 'textarea', 'select', 'button', 'svg'],
+                FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'onfocus', 'onblur', 'onchange', 'onsubmit'],
+                KEEP_CONTENT: true,
+                RETURN_DOM: false,
+                RETURN_DOM_FRAGMENT: false,
+                RETURN_DOM_IMPORT: false,
+                SANITIZE_DOM: true,
+                WHOLE_DOCUMENT: false
+            });
         },
         getHash(input) {
             var hash = 0,

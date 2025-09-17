@@ -2,8 +2,8 @@
     <app-layout title="Compounds">
         <div>
             <div class="mx-auto">
-                <div class="space-y-6 sm:px-6 lg:col-span-9 lg:px-0">
-                    <section class="mb-20 bg-white shadow sm:overflow-hidden">
+                <div class="space-y-6 sm:px-6 lg:col-span-9 lg:px-0 flex flex-col">
+                    <section class="bg-white shadow sm:overflow-hidden flex-1 flex flex-col">
                         <div>
                             <div class="relative border-b border-zinc-900/5">
                                 <div
@@ -135,22 +135,22 @@
                                                                     </svg>
                                                                 </div>
                                                                 <input
-                                                                    name="mobile-search-field"
                                                                     id="mobile-search-field"
+                                                                    name="mobile-search-field"
                                                                     class="h-full w-full border-transparent py-2 pl-8 pr-3 text-base text-gray-900 placeholder-gray-500 focus:border-transparent focus:placeholder-gray-400 focus:outline-none focus:ring-0 sm:hidden"
                                                                     placeholder="Search"
                                                                     type="search"
                                                                     autofocus
                                                                 />
                                                                 <input
-                                                                    name="desktop-search-field"
                                                                     id="desktop-search-field"
-                                                                    class="relative w-full border-0 px-6 py-3 rounded-full focus:shadow-outline hidden h-full w-full border-transparent text-gray-900 placeholder-gray-500 focus:border-transparent focus:placeholder-gray-400 focus:outline-none focus:ring-0 sm:block"
-                                                                    placeholder="Search by Compound name, SMILES, InChI, InChI Key"
-                                                                    type="search"
                                                                     v-model="
                                                                         searchTerm
                                                                     "
+                                                                    name="desktop-search-field"
+                                                                    class="relative w-full border-0 px-6 py-3 rounded-full focus:shadow-outline hidden h-full w-full border-transparent text-gray-900 placeholder-gray-500 focus:border-transparent focus:placeholder-gray-400 focus:outline-none focus:ring-0 sm:block"
+                                                                    placeholder="Search by Compound name, SMILES, InChI, InChI Key"
+                                                                    type="search"
                                                                     autofocus
                                                                     @change="
                                                                         search()
@@ -219,7 +219,7 @@
                         </div>
                         <div v-if="results">
                             <div
-                                class="py-6 px-4 lg:px-12 sm:p-6 border-b border-gray-200"
+                                class="py-6 px-4 lg:px-12 sm:p-6 border-b border-gray-200" style="height: calc(100vh - 380px);"
                             >
                                 <div
                                     v-if="results.data.length > 0"
@@ -242,13 +242,12 @@
                                             results
                                         </p>
                                     </div>
-                                    <div>
+                                    <div v-if="results.last_page > 1">
                                         <nav
                                             class="isolate inline-flex -space-x-px shadow-sm"
                                             aria-label="Pagination"
                                         >
                                             <a
-                                                @click="navigateTo(link)"
                                                 v-for="link in results.links"
                                                 :key="link.label"
                                                 :class="[
@@ -257,7 +256,8 @@
                                                         : '',
                                                     'first:rounded-l-lg last:rounded-r-lg relative cursor-pointer inline-flex items-center border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20',
                                                 ]"
-                                                v-html="link.label"
+                                                @click="navigateTo(link)"
+                                                v-html="sanitizeHtml(link.label)"
                                             >
                                             </a>
                                         </nav>
@@ -268,9 +268,9 @@
                                     class="mx-auto grid mt-6 gap-5 lg:max-w-none md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6"
                                 >
                                     <span
-                                        class="rounded-lg hover:shadow-lg shadow border"
                                         v-for="result in results.data"
                                         :key="result.id"
+                                        class="rounded-lg hover:shadow-lg shadow border"
                                     >
                                         <MoleculeCard
                                             :molecule="result"
@@ -534,7 +534,7 @@
                             </div>
                             <div
                                 v-if="results.data.length > 0"
-                                class="flex items-center justify-between bg-white px-12 py-3 rounded-md"
+                                class="flex items-center justify-between bg-white px-12 py-3 rounded-md sticky bottom-0 border-t border-gray-200 mt-auto"
                             >
                                 <div
                                     class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between"
@@ -556,13 +556,12 @@
                                             results
                                         </p>
                                     </div>
-                                    <div>
+                                    <div v-if="results.last_page > 1">
                                         <nav
                                             class="isolate inline-flex -space-x-px shadow-sm"
                                             aria-label="Pagination"
                                         >
                                             <a
-                                                @click="navigateTo(link)"
                                                 v-for="link in results.links"
                                                 :key="link.label"
                                                 :class="[
@@ -571,7 +570,8 @@
                                                         : '',
                                                     'first:rounded-l-lg last:rounded-r-lg relative cursor-pointer inline-flex items-center border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20',
                                                 ]"
-                                                v-html="link.label"
+                                                @click="navigateTo(link)"
+                                                v-html="sanitizeHtml(link.label)"
                                             >
                                             </a>
                                         </nav>
@@ -600,8 +600,8 @@
                                             class="-m-1 flex flex-wrap items-center"
                                         >
                                             <span
-                                                :key="query"
                                                 v-for="query in recentQueries"
+                                                :key="query"
                                                 class="m-1 inline-flex items-center rounded-full border border-gray-200 bg-white py-1.5 pl-3 pr-2 text-sm font-medium text-gray-900"
                                             >
                                                 <a
@@ -611,10 +611,10 @@
                                                 >
                                                 <button
                                                     type="button"
+                                                    class="ml-1 inline-flex h-4 w-4 flex-shrink-0 rounded-full p-1 text-gray-400 hover:bg-gray-200 hover:text-gray-500"
                                                     @click="
                                                         removeSearchQuery(query)
                                                     "
-                                                    class="ml-1 inline-flex h-4 w-4 flex-shrink-0 rounded-full p-1 text-gray-400 hover:bg-gray-200 hover:text-gray-500"
                                                 >
                                                     <span class="sr-only"
                                                         >Remove filter for
@@ -674,18 +674,13 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import MoleculeCard from "@/App/MoleculeCard.vue";
 import StructureSearch from "@/App/StructureSearch.vue";
-import JetDropdownLink from "@/Jetstream/DropdownLink.vue";
-import { Menu, MenuItems, MenuButton } from "@headlessui/vue";
+// Removed unused imports
 
 export default {
     components: {
         AppLayout,
         MoleculeCard,
         StructureSearch,
-        JetDropdownLink,
-        Menu,
-        MenuItems,
-        MenuButton,
     },
     props: ["page", "query", "limit", "tagType"],
     data() {

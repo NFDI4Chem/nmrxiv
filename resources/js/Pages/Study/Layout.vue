@@ -24,8 +24,7 @@
                     class="text-center px-3 py-2 bg-green-50 text-green-700 border-b"
                 >
                     <b>Info: </b> This project is published. You cannot edit a
-                    published project, please create a new version to updated
-                    the project.
+                    published project. Contact us at info.nmrxiv@uni-jena.de if you need to make changes.
                 </div>
             </div>
             <div v-if="study.is_public && study.doi != null">
@@ -61,7 +60,8 @@
                                                 />
                                                 <Link
                                                     :href="
-                                                        preview && project.obfuscationcode
+                                                        preview &&
+                                                        project.obfuscationcode
                                                             ? route(
                                                                   'project.preview',
                                                                   [
@@ -118,8 +118,8 @@
                                     class="mt-1 flex flex-col sm:flex-row sm:flex-wrap sm:mt-0 sm:space-x-6"
                                 >
                                     <div
-                                        class="mt-2 flex items-center text-sm text-gray-700"
                                         v-if="!study.is_deleted"
+                                        class="mt-2 flex items-center text-sm text-gray-700"
                                     >
                                         <access-dialogue
                                             :available-roles="availableRoles"
@@ -384,7 +384,7 @@
                 </div>
             </div>
         </template>
-        <div class="pb-12 pt-6 px-10">
+        <div class="pb-12 pt-6 px-10 min-h-[calc(100vh-theme(spacing.16))]">
             <slot name="scontent"></slot>
         </div>
     </app-layout>
@@ -396,19 +396,7 @@ import { Link } from "@inertiajs/vue3";
 import StudyDetails from "./Partials/Details.vue";
 import { StarIcon } from "@heroicons/vue/24/solid";
 import { ref } from "vue";
-import {
-    BriefcaseIcon,
-    CalendarIcon,
-    CheckIcon,
-    ChevronDownIcon,
-    ChevronRightIcon,
-    CurrencyDollarIcon,
-    LinkIcon,
-    MapPinIcon,
-    PencilIcon,
-    ExclamationCircleIcon,
-} from "@heroicons/vue/24/solid";
-import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
+import { CalendarIcon, ChevronRightIcon } from "@heroicons/vue/24/solid";
 import AccessDialogue from "@/Shared/AccessDialogue.vue";
 import Citation from "@/Shared/Citation.vue";
 import { router } from "@inertiajs/vue3";
@@ -418,20 +406,8 @@ export default {
         Link,
         AppLayout,
         StudyDetails,
-        ExclamationCircleIcon,
-        Menu,
-        MenuButton,
-        MenuItem,
-        MenuItems,
-        BriefcaseIcon,
         CalendarIcon,
-        CheckIcon,
-        ChevronDownIcon,
         ChevronRightIcon,
-        CurrencyDollarIcon,
-        LinkIcon,
-        MapPinIcon,
-        PencilIcon,
         StarIcon,
         AccessDialogue,
         Citation,
@@ -483,7 +459,7 @@ export default {
                         );
                     }
                 })
-                .then(function (response) {
+                .then(function () {
                     router.reload({ only: ["study"] });
                 });
         },

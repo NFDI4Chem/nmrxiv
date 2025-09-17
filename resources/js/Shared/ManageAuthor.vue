@@ -334,49 +334,24 @@
                                 <div>
                                     <div
                                         style="max-height: 40vh"
-                                        class="overflow-auto p-2 mt-4"
+                                        class="overflow-auto p-2 mt-4 space-y-2"
                                     >
                                         <div
                                             v-for="author in fetchedAuthors"
-                                            :key="author.authorId"
-                                            class="relative flex items-start mt-2"
+                                            :key="author.authorId || author.orcidId || author.fullName"
+                                            :class="author.selected ? 'ring-2 ring-teal-500 rounded-md' : ''"
+                                            @click="addAuthorToSelectedList(author)"
                                         >
-                                            <div
-                                                :class="[
-                                                    author.selected
-                                                        ? 'bg-gray-200 text-white'
-                                                        : '',
-                                                    'cursor-pointer min-w-0 flex-1 text-sm font-medium border rounded-md p-4',
-                                                ]"
-                                                @click="
-                                                    addAuthorToSelectedList(
-                                                        author
-                                                    )
-                                                "
-                                            >
-                                                <label
-                                                    for="items"
-                                                    class="font-medium text-teal-900"
-                                                    >{{ author.firstName }}
-                                                    {{ author.lastName }}
-                                                </label>
-                                                <p
-                                                    v-if="author.affiliation"
-                                                    id="items-description"
-                                                    class="text-xs font-medium text-gray-900"
-                                                >
-                                                    {{ author.affiliation }}
-                                                </p>
-                                                <div
-                                                    v-if="author.orcidId"
-                                                    class="text-xs leading-6 font-medium text-teal-900"
-                                                >
-                                                    <b class="text-gray-500"
-                                                        >ORCID iD:</b
-                                                    >
-                                                    {{ author.orcidId }}
-                                                </div>
-                                            </div>
+                                            <AuthorCard
+:authors="[{
+                                                id: author.authorId ? author.authorId.value : undefined,
+                                                title: author.title || '',
+                                                given_name: author.firstName,
+                                                family_name: author.lastName,
+                                                affiliation: author.affiliation,
+                                                orcid_id: author.orcidId,
+                                                email_id: author.email_id
+                                            }]" />
                                         </div>
                                     </div>
                                     <div
@@ -419,119 +394,37 @@
                         @change="onSort()"
                     >
                         <template #item="{ element }">
-                            <div class="overflow-auto">
-                                <ul
-                                    role="list"
-                                    class="divide-y divide-gray-900"
-                                >
-                                    <li>
-                                        <div
-                                            class="px-4 border cursor-move hover:bg-gray-200 rounded-md mb-1 py-4 sm:px-6"
-                                        >
-                                            <div
-                                                class="flex items-center cursor justify-between"
-                                            >
-                                                <p
-                                                    class="text-sm font-medium text-teal-900"
-                                                >
-                                                    {{ element.title }}
-                                                    {{ element.given_name }}
-                                                    {{ element.family_name }}
-                                                </p>
-                                                <button
-                                                    class="ml-2 flex flex-shrink-0"
-                                                    @click="
-                                                        (showManageRoleDialog = true),
-                                                            (updateRoleForm.author_id =
-                                                                element.id)
-                                                    "
-                                                >
-                                                    <p
-                                                        v-if="
-                                                            element.pivot &&
-                                                            element.pivot
-                                                                .contributor_type
-                                                        "
-                                                        class="inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold leading-5 text-green-800"
-                                                    >
-                                                        {{
-                                                            element.pivot
-                                                                .contributor_type
-                                                                ? element.pivot
-                                                                      .contributor_type
-                                                                : "Researcher"
-                                                        }}
-                                                    </p>
-                                                </button>
-                                            </div>
-                                            <div
-                                                class="mt-1 sm:flex sm:justify-between"
-                                            >
-                                                <div class="sm:flex">
-                                                    <p
-                                                        class="flex items-center text-xs font-small text-gray-500 break-words"
-                                                    >
-                                                        {{
-                                                            element.affiliation
-                                                        }}
-                                                    </p>
-                                                </div>
-                                                <div
-                                                    class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0"
-                                                >
-                                                    <button
-                                                        type="button"
-                                                        class="inline-flex items-center p-1 border border-transparent"
-                                                        @click="edit(element)"
-                                                    >
-                                                        <PencilIcon
-                                                            class="w-3.5 h-3.5 mr-1 text-gray-600"
-                                                        />
-                                                    </button>
-                                                    <button
-                                                        type="button"
-                                                        class="inline-flex items-center p-1 border border-transparent"
-                                                        @click="
-                                                            confirmDeletion(
-                                                                element
-                                                            )
-                                                        "
-                                                    >
-                                                        <TrashIcon
-                                                            class="w-3.5 h-3.5 mr-1 text-gray-600"
-                                                        />
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            <div
-                                                class="sm:flex sm:justify-between"
-                                            >
-                                                <p
-                                                    v-if="element.orcid_id"
-                                                    class="text-xs font-medium text-teal-900"
-                                                >
-                                                    <b class="text-gray-500"
-                                                        >ORCID iD:</b
-                                                    >
-                                                    {{ element.orcid_id }}
-                                                </p>
-                                            </div>
-                                            <div
-                                                class="sm:flex sm:justify-between"
-                                            >
-                                                <p
-                                                    v-if="element.email_id"
-                                                    class="text-xs font-medium text-gray-900"
-                                                >
-                                                    <b class="text-gray-500"
-                                                        >Email-Id:</b
-                                                    >
-                                                    {{ element.email_id }}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </li>
-                                </ul>
+                            <div class="relative cursor-move mb-2">
+                                <AuthorCard
+                                    :authors="[element]"
+                                    :enable-role-click="true"
+                                    @role-click="(a) => { showManageRoleDialog = true; updateRoleForm.author_id = a.id; }"
+                                />
+                                <div class="absolute bottom-2 right-2 flex space-x-1">
+                                    <!-- <button
+                                        class="inline-flex items-center p-1 border border-transparent bg-white/70 rounded hover:bg-white"
+                                        @click="(showManageRoleDialog = true), (updateRoleForm.author_id = element.id)"
+                                    >
+                                        <span class="sr-only">Manage Role</span>
+                                        <PencilIcon class="w-3.5 h-3.5 text-gray-600" />
+                                    </button> -->
+                                    <button
+                                        type="button"
+                                        class="inline-flex items-center p-1 border border-transparent"
+                                        @click="edit(element)"
+                                    >
+                                        <span class="sr-only">Edit</span>
+                                        <PencilIcon class="w-3.5 h-3.5 mr-1 text-gray-600" />
+                                    </button>
+                                    <button
+                                        type="button"
+                                        class="inline-flex items-center p-1 border border-transparent"
+                                        @click="confirmDeletion(element)"
+                                    >
+                                        <span class="sr-only">Delete</span>
+                                        <TrashIcon class="w-3.5 h-3.5 mr-1 text-gray-600" />
+                                    </button>
+                                </div>
                             </div>
                         </template>
                     </draggable>
@@ -640,7 +533,6 @@
 <script>
 import JetDialogModal from "@/Jetstream/DialogModal.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
-import JetButton from "@/Jetstream/Button.vue";
 import {
     TrashIcon,
     PencilIcon,
@@ -655,13 +547,13 @@ import { router } from "@inertiajs/vue3";
 import SelectRich from "@/Shared/SelectRich.vue";
 import Draggable from "vuedraggable";
 import Global from "@/Mixins/Global.js";
+import AuthorCard from "@/Shared/AuthorCard.vue";
 
 export default {
     components: {
         JetDialogModal,
         JetSecondaryButton,
         JetDangerButton,
-        JetButton,
         PencilIcon,
         ArrowSmallRightIcon,
         FolderPlusIcon,
@@ -671,6 +563,7 @@ export default {
         LoadingButton,
         SelectRich,
         Draggable,
+    AuthorCard,
     },
 
     mixins: [Global],

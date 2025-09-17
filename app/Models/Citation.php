@@ -18,7 +18,18 @@ class Citation extends Model
     ];
 
     /**
-     * Projects that belongs to citations.
+     * Get the attributes that should be cast.
+     */
+    protected function casts(): array
+    {
+        return [
+            'created_at' => 'datetime',
+            'updated_at' => 'datetime',
+        ];
+    }
+
+    /**
+     * Projects that belong to citations.
      */
     public function projects(): BelongsToMany
     {

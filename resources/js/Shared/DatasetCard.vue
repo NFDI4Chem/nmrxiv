@@ -222,7 +222,7 @@
                                     class="flex items-center text-sm text-gray-500"
                                 >
                                     <img
-                                        class="h-7 w-5 mr-2 rounded-full"
+                                        class="h-7 w-7 mr-2 rounded-full"
                                         :src="dataset.owner.profile_photo_url"
                                     />
                                     {{ dataset.owner.first_name }}
@@ -282,30 +282,14 @@
 </template>
 
 <script>
-import { LockClosedIcon } from "@heroicons/vue/24/solid";
-import { LockOpenIcon, ArrowDownTrayIcon } from "@heroicons/vue/24/solid";
-import { PencilIcon } from "@heroicons/vue/24/solid";
-import { EnvelopeIcon } from "@heroicons/vue/24/solid";
-import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
-import { EllipsisVerticalIcon, ScaleIcon } from "@heroicons/vue/24/solid";
+import { ScaleIcon } from "@heroicons/vue/24/solid";
 import { router } from "@inertiajs/vue3";
-import { Head, Link } from "@inertiajs/vue3";
+import { Link } from "@inertiajs/vue3";
 
 export default {
     components: {
-        Head,
         Link,
-        LockClosedIcon,
-        LockOpenIcon,
-        ArrowDownTrayIcon,
-        EnvelopeIcon,
-        PencilIcon,
         ScaleIcon,
-        Menu,
-        MenuButton,
-        MenuItem,
-        MenuItems,
-        EllipsisVerticalIcon,
     },
     props: ["dataset", "mode"],
     setup() {},
@@ -336,7 +320,7 @@ export default {
                             );
                         }
                     })
-                    .then(function (response) {
+                    .then(function () {
                         router.reload({ only: ["datasets"] });
                     });
             } else {

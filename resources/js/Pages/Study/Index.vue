@@ -40,10 +40,10 @@
                 </div>
             </div>
             <div
-                class="flex-shrink-0 ml-4"
                 v-if="
                     editable && project.draft_id !== null && !project.is_deleted
                 "
+                class="flex-shrink-0 ml-4"
             >
                 <a
                     type="button"
@@ -150,7 +150,7 @@
                                     'cursor-pointer border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 border-t-2 pt-4 px-4 inline-flex items-center text-sm font-medium',
                                 ]"
                                 @click="update(link)"
-                                v-html="link.label"
+                                v-html="sanitizeHtml(link.label)"
                             ></div>
                         </div>
                         <div class="-mt-px w-0 flex-1 flex justify-end">
@@ -188,20 +188,11 @@
 </template>
 
 <script>
-import { Link } from "@inertiajs/vue3";
-import StudyCreate from "@/Pages/Study/Partials/Create.vue";
 import StudyCard from "@/Shared/StudyCard.vue";
-import JetButton from "@/Jetstream/Button.vue";
-import { ArrowLongLeftIcon, ArrowLongRightIcon } from "@heroicons/vue/24/solid";
 
 export default {
     components: {
-        Link,
-        StudyCreate,
         StudyCard,
-        JetButton,
-        ArrowLongLeftIcon,
-        ArrowLongRightIcon,
     },
     props: {
         project: {

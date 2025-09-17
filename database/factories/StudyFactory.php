@@ -50,6 +50,27 @@ class StudyFactory extends Factory
             'validation_id' => 1,
             'validation_status' => false,
             'internal_status' => null, // todo: provide varying values
+            'submitted_through' => null,
         ];
+    }
+
+    /**
+     * Indicate that the study was submitted through ELN.
+     */
+    public function submittedThroughELN(string $elnName = 'chemotion'): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'submitted_through' => $elnName,
+        ]);
+    }
+
+    /**
+     * Indicate that the study was submitted through a specific method.
+     */
+    public function submittedThrough(string $method): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'submitted_through' => $method,
+        ]);
     }
 }
