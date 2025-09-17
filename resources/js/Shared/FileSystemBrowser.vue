@@ -2142,7 +2142,7 @@ export default {
                     // Check if all files are complete and manually trigger queuecomplete
                     vm.checkAndTriggerQueueComplete();
                 });
-                vm.dropzone.on("error", (file, errorMessage) => {
+                vm.dropzone.on("error", (file) => {
                     let message = "Upload failed";
                     if (file.fullPath) {
                         vm.logs[file.fullPath].status = "Error";
