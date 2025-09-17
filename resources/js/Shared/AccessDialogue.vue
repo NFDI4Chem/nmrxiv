@@ -74,8 +74,8 @@
                     <DialogPanel
                         class="mx-auto max-w-xl transform rounded-xl bg-white p-2 shadow-2xl ring-1 ring-black ring-opacity-5 transition-all p-4"
                     >
-                        <div class="sm:flex sm:items-start sm:justify-between">
-                            <div>
+                        <div class="sm:flex sm:items-start sm:justify-between border-b pb-2 border-gray-100">
+                            <div class="w-full">
                                 <h3
                                     class="text-lg leading-6 font-medium text-gray-900"
                                 >
@@ -146,7 +146,7 @@
                             <ul
                                 v-if="members.length > 0"
                                 role="list"
-                                class="my-5 shadow divide-y divide-gray-200"
+                                class="my-5 shadow divide-y divide-gray-200 rounded-md"
                             >
                                 <li
                                     v-for="person in members"
@@ -352,7 +352,7 @@
                                 </li>
                             </ul>
 
-                            <div class="border-b pb-2">
+                            <div class="border-t -mx-4 px-4 pt-4">
                                 <span class="text-md font-medium">
                                     General Access
                                 </span>
@@ -367,7 +367,7 @@
                                         class="text-sm text-gray-900 font-medium mb-5"
                                     >
                                         Anyone with the link
-                                        <p class="text-xs text-gray-600">
+                                        <p class="text-xs text-gray-600 pr-4">
                                             Anyone on the internet with the link
                                             can view the project, along with
                                             associated samples and datasets, in
@@ -411,7 +411,7 @@
                                     </p>
                                 </div>
                                 <div
-                                    class="bg-white shadow overflow-hidden sm:rounded-md"
+                                    class="bg-white overflow-hidden"
                                 >
                                     <ul
                                         role="list"

@@ -461,7 +461,6 @@
                                     <!-- View Toggle -->
                                     <div class="flex space-x-1">
                                         <button
-                                            @click="setViewMode('grid')"
                                             :class="[
                                                 viewMode === 'grid'
                                                     ? 'text-gray-900'
@@ -469,11 +468,11 @@
                                                 'p-1'
                                             ]"
                                             title="Grid View"
+                                            @click="setViewMode('grid')"
                                         >
                                             <Squares2X2Icon class="h-5 w-5" />
                                         </button>
                                         <button
-                                            @click="setViewMode('list')"
                                             :class="[
                                                 viewMode === 'list'
                                                     ? 'text-gray-900'
@@ -481,6 +480,7 @@
                                                 'p-1'
                                             ]"
                                             title="List View"
+                                            @click="setViewMode('list')"
                                         >
                                             <ListBulletIcon class="h-5 w-5" />
                                         </button>
@@ -520,8 +520,8 @@
                                 <div class="grid grid-cols-12 gap-4 text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     <div class="col-span-4">
                                         <button 
-                                            @click="sortFiles('name')"
                                             class="flex items-center space-x-1 hover:text-gray-700 focus:outline-none"
+                                            @click="sortFiles('name')"
                                         >
                                             <span>Name</span>
                                             <ChevronUpIcon 
@@ -536,8 +536,8 @@
                                     </div>
                                     <div class="col-span-3">
                                         <button 
-                                            @click="sortFiles('date')"
                                             class="flex items-center space-x-1 hover:text-gray-700 focus:outline-none"
+                                            @click="sortFiles('date')"
                                         >
                                             <span>Date Modified</span>
                                             <ChevronUpIcon 
@@ -552,8 +552,8 @@
                                     </div>
                                     <div class="col-span-2">
                                         <button 
-                                            @click="sortFiles('size')"
                                             class="flex items-center space-x-1 hover:text-gray-700 focus:outline-none"
+                                            @click="sortFiles('size')"
                                         >
                                             <span>Size</span>
                                             <ChevronUpIcon 
@@ -568,8 +568,8 @@
                                     </div>
                                     <div class="col-span-2">
                                         <button 
-                                            @click="sortFiles('kind')"
                                             class="flex items-center space-x-1 hover:text-gray-700 focus:outline-none"
+                                            @click="sortFiles('kind')"
                                         >
                                             <span>Kind</span>
                                             <ChevronUpIcon 

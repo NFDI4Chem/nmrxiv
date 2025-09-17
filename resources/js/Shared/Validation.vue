@@ -6,7 +6,7 @@
             <a
                 target="_blank"
                 class="text-blue-800"
-                href="https://www.nfdi4chem.de/index.php/reports-from-minimum-information-standards-workshops"
+                href="https://nfdi4chem.github.io/workshops/docs/category/margaritas-michi-standard-for-reporting-liquid-state-nmr-experiments-of-small-molecules"
                 >recommended community standards</a
             >.
         </h1>
