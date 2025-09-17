@@ -58,9 +58,7 @@
                                     <div
                                         class="flex-1 flex flex-col justify-between"
                                     >
-                                        <div
-                                            class="px-4 sm:px-6"
-                                        >
+                                        <div class="px-4 sm:px-6">
                                             <div class="space-y-6 pt-6 pb-5">
                                                 <div>
                                                     <label
@@ -336,7 +334,10 @@
                                                     >
                                                         Status
                                                     </legend>
-                                                    <div v-if="!form.is_public" class="mt-2 space-y-5">
+                                                    <div
+                                                        v-if="!form.is_public"
+                                                        class="mt-2 space-y-5"
+                                                    >
                                                         <div
                                                             class="relative flex items-start"
                                                             @click="
@@ -370,71 +371,86 @@
                                                                     for="privacy-private-to-project"
                                                                     class="font-medium text-gray-900"
                                                                 >
-                                                                    Private (accessible to
-                                                                    project members only)
+                                                                    Private
+                                                                    (accessible
+                                                                    to project
+                                                                    members
+                                                                    only)
                                                                 </label>
                                                                 <p
                                                                     id="privacy-private-to-project-description"
                                                                     class="text-gray-500"
                                                                 >
-                                                                    
-                                                                    <div class="mt-2 flex text-sm">
-                                                                <a
-                                                                    target="_blank"
-                                                                    href="https://docs.nmrxiv.org/submission-guides/sharing.html"
-                                                                    class="group inline-flex items-center text-gray-500 hover:text-gray-900"
-                                                                >
-                                                                Only project members can access this project. <QuestionMarkCircleIcon
-                                                                        class="ml-1 h-5 w-5 text-gray-400 group-hover:text-gray-500"
-                                                                        aria-hidden="true"
-                                                                    />
-                                                                    <span class="ml-1">
-                                                                        Learn more about
-                                                                        sharing
+                                                                    <span
+                                                                        class="mt-2 flex text-sm"
+                                                                    >
+                                                                        <a
+                                                                            target="_blank"
+                                                                            href="https://docs.nmrxiv.org/submission-guides/sharing.html"
+                                                                            class="group inline-flex items-center text-gray-500 hover:text-gray-900"
+                                                                        >
+                                                                            Only
+                                                                            project
+                                                                            members
+                                                                            can
+                                                                            access
+                                                                            this
+                                                                            project.
+                                                                            <QuestionMarkCircleIcon
+                                                                                class="ml-1 h-5 w-5 text-gray-400 group-hover:text-gray-500"
+                                                                                aria-hidden="true"
+                                                                            />
+                                                                            <span
+                                                                                class="ml-1"
+                                                                            >
+                                                                                Learn
+                                                                                more
+                                                                                about
+                                                                                sharing
+                                                                            </span>
+                                                                        </a>
                                                                     </span>
-                                                                </a>
-                                                            </div>
                                                                 </p>
                                                             </div>
                                                         </div>
-                                                            
                                                     </div>
                                                 </fieldset>
                                             </div>
                                             <div>
                                                 <div v-if="form.is_public">
                                                     <div
-                                                            class="relative flex items-start"
+                                                        class="relative flex items-start"
+                                                    >
+                                                        <div
+                                                            class="absolute flex items-center h-5"
                                                         >
-                                                            <div
-                                                                class="absolute flex items-center h-5"
-                                                            >
-                                                                <input
-                                                                    :checked="
-                                                                        form.is_public ===
-                                                                        true
-                                                                    "
-                                                                    :disabled="
-                                                                        !canUpdateProject
-                                                                    "
-                                                                    name="privacy"
-                                                                    aria-describedby="privacy-private-to-project-description"
-                                                                    type="radio"
-                                                                    class="focus:ring-gray-500 h-4 w-4 text-gray-600 border-gray-300"
-                                                                />
-                                                            </div>
-                                                            <div
-                                                                class="pl-7 text-sm"
-                                                            >
-                                                                <label
-                                                                    for="privacy-private-to-project"
-                                                                    class="font-medium text-gray-900"
-                                                                >
-                                                                    Public (accessible to
-                                                                    everyone)
-                                                                </label>
-                                                            </div>
+                                                            <input
+                                                                :checked="
+                                                                    form.is_public ===
+                                                                    true
+                                                                "
+                                                                :disabled="
+                                                                    !canUpdateProject
+                                                                "
+                                                                name="privacy"
+                                                                aria-describedby="privacy-private-to-project-description"
+                                                                type="radio"
+                                                                class="focus:ring-gray-500 h-4 w-4 text-gray-600 border-gray-300"
+                                                            />
                                                         </div>
+                                                        <div
+                                                            class="pl-7 text-sm"
+                                                        >
+                                                            <label
+                                                                for="privacy-private-to-project"
+                                                                class="font-medium text-gray-900"
+                                                            >
+                                                                Public
+                                                                (accessible to
+                                                                everyone)
+                                                            </label>
+                                                        </div>
+                                                    </div>
                                                     <label
                                                         class="block text-sm font-medium text-gray-700 mt-5"
                                                         >Link</label
@@ -876,13 +892,7 @@ import {
     ExclamationCircleIcon,
     ClipboardDocumentIcon,
 } from "@heroicons/vue/24/solid";
-import {
-    Tab,
-    TabGroup,
-    TabList,
-    TabPanel,
-    TabPanels,
-} from "@headlessui/vue";
+import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import ProjectActivity from "@/Pages/Project/Partials/Activity.vue";
 import { ColorPicker } from "vue3-colorpicker";

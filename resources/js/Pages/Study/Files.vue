@@ -761,9 +761,6 @@ export default {
             if (!dateString) return '--';
             
             const date = new Date(dateString);
-            const now = new Date();
-            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-            const fileDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
             
             const options = {
                 day: 'numeric',
