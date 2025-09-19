@@ -36,4 +36,18 @@ return [
         'password' => env('CHEMOTION_TRACKER_PASSWORD'),
     ],
 
+    // External chemistry / molecular data sources
+    'pubchem' => [
+        'base_url' => env('PUBCHEM_URL', 'https://pubchem.ncbi.nlm.nih.gov'),
+        // Allow overriding the PUG REST path if needed
+        'pug_rest_path' => env('PUBCHEM_PUG_PATH', '/rest/pug'),
+    ],
+    'common_chemistry' => [
+        'base_url' => env('COMMON_CHEMISTRY_URL', 'https://commonchemistry.cas.org'),
+        'api_path' => env('COMMON_CHEMISTRY_API_PATH', '/api'),
+    ],
+    'chemistry_standardize' => [
+        'url' => env('CHEMISTRY_STANDARDIZE_URL', 'https://api.cheminf.studio/latest/chem/standardize'),
+    ],
+
 ];
