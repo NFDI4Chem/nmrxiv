@@ -62,7 +62,11 @@ class SanitizeMolecules extends Command
 
     protected function fetchPubChemIUPACProperties($inchi)
     {
-        $cid_response = Http::get('https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/inchi/cids/JSON?inchi='.urlencode($inchi));
+        $pubchemBase = rtrim(config('services.pubchem.base_url'), '/');
+        $pubchemPug = trim(config('services.pubchem.pug_rest_path'), '/');
+        $cid_response = Http::get($pubchemBase.'/'.$pubchemPug.'/compound/inchi/cids/JSON', [
+            'inchi' => $inchi,
+        ]);
         $cid_data = $cid_response->json();
         $cid = null;
         if (array_key_exists('IdentifierList', $cid_data)) {
@@ -72,13 +76,13 @@ class SanitizeMolecules extends Command
         $synonyms = '';
         $properties = [];
         if ($cid) {
-            $synonyms_response = Http::get('https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/'.$cid.'/Synonyms/JSON');
+            $synonyms_response = Http::get($pubchemBase.'/'.$pubchemPug.'/compound/cid/'.$cid.'/Synonyms/JSON');
             $synonyms_data = $synonyms_response->json();
             if (! array_key_exists('Fault', $synonyms_data)) {
                 $synonyms = implode(',', $synonyms_data['InformationList']['Information'][0]['Synonym']);
             }
 
-            $properties_response = Http::get('https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/'.$cid.'/property/IUPACName,MolecularWeight,MolecularFormula/JSON');
+            $properties_response = Http::get($pubchemBase.'/'.$pubchemPug.'/compound/cid/'.$cid.'/property/IUPACName,MolecularWeight,MolecularFormula/JSON');
             $properties_data = $properties_response->json();
             if (! array_key_exists('Fault', $properties_data)) {
                 $properties = $properties_data['PropertyTable']['Properties'][0];
@@ -94,7 +98,11 @@ class SanitizeMolecules extends Command
     protected function fetchCAS($smiles)
     {
         try {
-            $response = Http::get('https://commonchemistry.cas.org/api/search?q='.$smiles);
+            $ccBase = rtrim(config('services.common_chemistry.base_url'), '/');
+            $ccApi = trim(config('services.common_chemistry.api_path'), '/');
+            $response = Http::get($ccBase.'/'.$ccApi.'/search', [
+                'q' => $smiles,
+            ]);
             if (! $response->failed()) {
                 $data = $response->json();
                 if ($data['count'] > 0) {
@@ -111,7 +119,8 @@ class SanitizeMolecules extends Command
     protected function standardizeMolecule($mol)
     {
         try {
-            $response = Http::post('https://api.cheminf.studio/latest/chem/standardize', $mol);
+            $stdUrl = config('services.chemistry_standardize.url');
+            $response = Http::post($stdUrl, $mol);
 
             return $response->json();
         } catch (\Illuminate\Http\Client\ConnectionException $e) {

@@ -219,7 +219,7 @@
                         </div>
                         <div v-if="results">
                             <div
-                                class="py-6 px-4 lg:px-12 sm:p-6 border-b border-gray-200" style="height: calc(100vh - 380px);"
+                                class="py-6 px-4 lg:px-12 sm:p-6 border-b border-gray-200 overflow-y-scroll" style="height: calc(100vh - 380px);"
                             >
                                 <div
                                     v-if="results.data.length > 0"
