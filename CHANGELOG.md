@@ -1,5 +1,56 @@
 # Changelog
 
+## [1.6.0](https://github.com/NFDI4Chem/nmrxiv/compare/v1.5.0...v1.6.0) (2025-09-22)
+
+
+### Features
+
+* add grid/list view toggle with sorting and download functionality ([a0d1b6c](https://github.com/NFDI4Chem/nmrxiv/commit/a0d1b6c3860a94139ef9555354fc309d47d04ee6))
+* allow prod build to be triggered manually ([1b78510](https://github.com/NFDI4Chem/nmrxiv/commit/1b7851050a305965a0eda1b4dcd789415f957857))
+* allow prod build to be triggered manually ([e4b2821](https://github.com/NFDI4Chem/nmrxiv/commit/e4b2821858d8f0b2a7230f3a2272b5af3ca8ad7f))
+* ELN Submission - Chemotion enabled ([#1237](https://github.com/NFDI4Chem/nmrxiv/issues/1237)) ([17ff2f8](https://github.com/NFDI4Chem/nmrxiv/commit/17ff2f8b99d18bb7adefb852990da25f29175562))
+* ELN Submission - Chemotion enabled ([#1237](https://github.com/NFDI4Chem/nmrxiv/issues/1237)) ([5f65544](https://github.com/NFDI4Chem/nmrxiv/commit/5f65544b08e698bf34b9ad7573d10e933058c454))
+* **refactor:** implement review changes ([4ff3c52](https://github.com/NFDI4Chem/nmrxiv/commit/4ff3c5214f1a1cae28bfdf20041ee50557d3bee8))
+* **refactor:** implement review changes ([c4b5cf8](https://github.com/NFDI4Chem/nmrxiv/commit/c4b5cf84ee6e8e523f1619577dfe17261d063ce9))
+* **refactoring:** restructure citation handling ([9fcdb7f](https://github.com/NFDI4Chem/nmrxiv/commit/9fcdb7fca844324882801f2da9496ce158796bdc))
+
+
+### Bug Fixes
+
+* added sanitization ([ceb8764](https://github.com/NFDI4Chem/nmrxiv/commit/ceb8764c862bb62af8cc654b8b9b05a78677d775))
+* author contributor type display issue ([e020828](https://github.com/NFDI4Chem/nmrxiv/commit/e02082839ede26bad97205b653714e688ffec694))
+* compounds page scroll issue fix ([af6075e](https://github.com/NFDI4Chem/nmrxiv/commit/af6075eb8c985f19a7b05b55f636a8412e47282b))
+* env variables updated, 3d molecule rendering enabled, bioschemas error handling ([b2b13ea](https://github.com/NFDI4Chem/nmrxiv/commit/b2b13eaa374e02a0667040b736d7ecf264ec2468))
+* **eslint:** resolve all Vue component ESLint errors ([475b8bf](https://github.com/NFDI4Chem/nmrxiv/commit/475b8bf7eaeb85315722211dc4df1e81b58cb5a9))
+* **eslint:** resolve all Vue component ESLint errors ([f76fa1f](https://github.com/NFDI4Chem/nmrxiv/commit/f76fa1fe9c7144ef69c1f3ef0cfa17f37a48c30a))
+* events, mail notificationd and chemotion_repository tracker updates ([532e7b6](https://github.com/NFDI4Chem/nmrxiv/commit/532e7b6718d693bbad9456e15d2276f51cd9c8e9))
+* move hardcoded urls to env and config files ([cbc79d8](https://github.com/NFDI4Chem/nmrxiv/commit/cbc79d86537ec730e4a18f2384cf2c9b7b21edb5))
+* move tag to a component ([1846d34](https://github.com/NFDI4Chem/nmrxiv/commit/1846d34f3cf72b413089aa4847b63c897862b9ca))
+* npm updates ([01832c4](https://github.com/NFDI4Chem/nmrxiv/commit/01832c402360b8850f59810d4f0701952a3ec2f5))
+* pint updates and other minor fixes ([4fc1fef](https://github.com/NFDI4Chem/nmrxiv/commit/4fc1fef74afba6f2ae00b1d3f2720ff31ba5b5ef))
+* received status now records from provider ([c064d4e](https://github.com/NFDI4Chem/nmrxiv/commit/c064d4ec565facefca7bdc430402cd110867f9cb))
+* release date issue in project show view ([61cd72f](https://github.com/NFDI4Chem/nmrxiv/commit/61cd72fa92636aaa00eb5a743480471d6a0e45b1))
+* release date issue in project show view ([e487ec5](https://github.com/NFDI4Chem/nmrxiv/commit/e487ec5eb2f94ee78da830949fb8f79cdc16a456))
+* study name break issue fix ([c21f5b1](https://github.com/NFDI4Chem/nmrxiv/commit/c21f5b109e72cfcdb48455fe2ce22a2a6fc2545b))
+* typo fix ([4aa2923](https://github.com/NFDI4Chem/nmrxiv/commit/4aa2923ea007683c66bc90ca057ebab48e8ebe76))
+* typo fix ([ba63bf3](https://github.com/NFDI4Chem/nmrxiv/commit/ba63bf3939a9427ecc908aff981fbd113a2e6c61))
+* update deploy script to create db backup only once. ([d38a97f](https://github.com/NFDI4Chem/nmrxiv/commit/d38a97f9eeab5f6678a332a98a40a27d5044c0c6))
+* update deploy script to create db backup only once. ([e942b96](https://github.com/NFDI4Chem/nmrxiv/commit/e942b96e854892f5351bbd5223d3df1a3d139a4f))
+* update deploy script to create db backup only once. ([7d72e60](https://github.com/NFDI4Chem/nmrxiv/commit/7d72e60ad020f1a7e48cedb89e8cd36f5dc0a56b))
+* updated tracking item name ([72d8304](https://github.com/NFDI4Chem/nmrxiv/commit/72d83040239fe0baacf7ac3dbd9ee44fce11e23b))
+* ux/ui updates ([a9bb742](https://github.com/NFDI4Chem/nmrxiv/commit/a9bb7426101de4f420eed7ec4a81d83be8905cd1))
+* various ui updates ([984085d](https://github.com/NFDI4Chem/nmrxiv/commit/984085d96c1a322b27504b39b0dc0f843d23a5b2))
+* various ui updates and file upload bug fix ([7b8a2cb](https://github.com/NFDI4Chem/nmrxiv/commit/7b8a2cb86947cad53049ab12f96b888a98bcb8b6))
+
+
+### Miscellaneous Chores
+
+* linting fix ([78149b7](https://github.com/NFDI4Chem/nmrxiv/commit/78149b7fdb88f4dc66fce30d42bad6e06f8b9ca5))
+* **main:** release 1.5.0 ([46d1b57](https://github.com/NFDI4Chem/nmrxiv/commit/46d1b57339e95c5d0f9c8463b53af37a5a0ba458))
+* **main:** release 1.5.0 ([7d28918](https://github.com/NFDI4Chem/nmrxiv/commit/7d2891839b9a80de968844b0658bca8e530c1561))
+* pint changes ([385b38c](https://github.com/NFDI4Chem/nmrxiv/commit/385b38c8200f206b1eceaa1933239df3029a410e))
+* removed michi field logging ([5cf4bf7](https://github.com/NFDI4Chem/nmrxiv/commit/5cf4bf7c49ed06876544b0c78dac551a05855a8e))
+
 ## [1.5.0](https://github.com/NFDI4Chem/nmrxiv/compare/v1.4.1...v1.5.0) (2025-09-01)
 
 
