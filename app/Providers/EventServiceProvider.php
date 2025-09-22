@@ -43,5 +43,9 @@ class EventServiceProvider extends ServiceProvider
         // Manually register event listeners as fallback
         Event::listen(DraftProcessed::class, SendDraftProcessedNotification::class);
         Event::listen(StudyPublish::class, StudyPublishListener::class);
+        Event::listen(function (\SocialiteProviders\Manager\SocialiteWasCalled $event) {
+            // Canonical slug for NFDI AAI provider is 'regapp' (matches IdP registered callback URI)
+            $event->extendSocialite('regapp', \App\Services\Socialite\NFDIAAI\Provider::class);
+        });
     }
 }

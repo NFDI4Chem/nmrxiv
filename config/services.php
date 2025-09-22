@@ -28,6 +28,12 @@ return [
         'redirect' => env('TWITTER_REDIRECT_URL'),
     ],
 
+    'regapp' => [
+        'client_id' => env('NFDIAAI_CLIENT_ID'),
+        'client_secret' => env('NFDIAAI_CLIENT_SECRET'),
+        'redirect' => env('NFDIAAI_REDIRECT_URL'), // Consider changing value to .../regapp/callback
+    ],
+
     'chemotion_tracker' => [
         'enabled' => env('CHEMOTION_TRACKER_ENABLED', false),
         'base_url' => env('CHEMOTION_TRACKER_BASE_URL', 'https://tracker-deploy.chemdev.scc.kit.edu'),

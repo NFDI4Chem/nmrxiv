@@ -1,0 +1,21 @@
+{
+    "name": "socialiteproviders/nfdi-aai",
+    "description": "NFDIAAI OAuth2 Provider for Laravel Socialite",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Nisha Sharma",
+            "email": "nisha.sharma@uni-jena.de"
+        }
+    ],
+    "require": {
+        "php": "^8.0",
+        "ext-json": "*",
+        "socialiteproviders/manager": "^4.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "SocialiteProviders\\NFDIAAI\\": ""
+        }
+    }
+}
