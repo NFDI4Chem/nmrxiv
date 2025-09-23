@@ -1,6 +1,6 @@
 <?php
 
-namespace SocialiteProviders\NFDIAAI;
+namespace App\Services\Socialite\NFDIAAI;;
 
 use SocialiteProviders\Manager\SocialiteWasCalled;
 
