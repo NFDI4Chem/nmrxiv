@@ -16,11 +16,22 @@ env:
   REPOSITORY_NAMESPACE: nfdi4chem
 
 jobs:
+  lint-security:
+    name: Lint & Security (reusable)
+    uses: ./.github/workflows/lint-security-check.yml
+    permissions:
+      contents: read
+    with:
+      run_php: true
+      run_js: true
+      run_secrets: true
+
   # Build and publish Docker images for the development environment
   setup-build-publish-deploy:
     name: Build & deploy to development
     runs-on: ubuntu-latest
-    # Tip: gate deploys on tests with `needs: php-unit-test` once a tests job exists
+    needs: [lint-security]
+
     # Environment provides secrets and protection rules
     environment:
       name: Dev
