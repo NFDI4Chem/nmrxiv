@@ -95,6 +95,18 @@ jobs:
           npx eslint --ext .js,.vue --ignore-path .gitignore -f sarif -o eslint-results.sarif resources/js
           code=$?
           echo "$code" > eslint-exit-code.txt
+          if [ ! -f eslint-results.sarif ]; then
+            echo "ESLint did not produce SARIF file; creating empty SARIF stub for upload." >&2
+            printf '%s\n' '{' \
+              '  "version": "2.1.0",' \
+              '  "runs": [' \
+              '    {' \
+              '      "tool": { "driver": { "name": "ESLint", "informationUri": "https://eslint.org" } },' \
+              '      "results": []' \
+              '    }' \
+              '  ]' \
+              '}' > eslint-results.sarif
+          fi
           # Never fail here; we fail after SARIF upload so annotations appear
           exit 0
 
