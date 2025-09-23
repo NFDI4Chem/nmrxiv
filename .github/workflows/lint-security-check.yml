@@ -89,40 +89,7 @@ jobs:
         run: npm ci
 
       - name: ESLint
-        id: eslint
-        run: |
-          set +e
-          npx eslint --ext .js,.vue --ignore-path .gitignore -f sarif -o eslint-results.sarif resources/js
-          code=$?
-          echo "$code" > eslint-exit-code.txt
-          if [ ! -f eslint-results.sarif ]; then
-            echo "ESLint did not produce SARIF file; creating empty SARIF stub for upload." >&2
-            printf '%s\n' '{' \
-              '  "version": "2.1.0",' \
-              '  "runs": [' \
-              '    {' \
-              '      "tool": { "driver": { "name": "ESLint", "informationUri": "https://eslint.org" } },' \
-              '      "results": []' \
-              '    }' \
-              '  ]' \
-              '}' > eslint-results.sarif
-          fi
-          # Never fail here; we fail after SARIF upload so annotations appear
-          exit 0
-
-      - name: Upload ESLint SARIF
-        if: always()
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: eslint-results.sarif
-
-      - name: Fail if ESLint errors
-        run: |
-          code=$(cat eslint-exit-code.txt || echo 0)
-          if [ "$code" -ne 0 ]; then
-            echo "ESLint reported errors (exit code $code). Failing job after SARIF upload." >&2
-            exit 1
-          fi
+        run: npx eslint --ext .js,.vue --ignore-path .gitignore resources/js
 
       - name: Prettier (check)
         run: npx prettier resources/js --check
@@ -139,12 +106,36 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Gitleaks scan
-        uses: gitleaks/gitleaks-action@v2
-        with:
-          args: detect --source . --no-git --redact --report-format sarif --report-path gitleaks.sarif
+        id: gitleaks
+        run: |
+          set +e
+          gitleaks detect --source . --no-git --redact --report-format sarif --report-path gitleaks.sarif
+          code=$?
+          echo "$code" > gitleaks-exit-code.txt
+          if [ ! -f gitleaks.sarif ]; then
+            echo "Gitleaks did not produce SARIF file; creating empty stub." >&2
+            printf '%s\n' '{' \
+              '  "version": "2.1.0",' \
+              '  "runs": [' \
+              '    {' \
+              '      "tool": { "driver": { "name": "Gitleaks", "informationUri": "https://github.com/gitleaks/gitleaks" } },' \
+              '      "results": []' \
+              '    }' \
+              '  ]' \
+              '}' > gitleaks.sarif
+          fi
+          # Always succeed here; we fail after uploading SARIF for annotations
+          exit 0
 
       - name: Upload SARIF (code scanning)
         if: always()
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: gitleaks.sarif
+      - name: Fail if Gitleaks found leaks
+        run: |
+          code=$(cat gitleaks-exit-code.txt || echo 0)
+          if [ "$code" -ne 0 ]; then
+            echo "Gitleaks detected potential secrets (exit code $code). Failing job after SARIF upload." >&2
+            exit 1
+          fi
