@@ -412,6 +412,7 @@
                                 >
                                     {{ projects }} Projects
                                 </a>
+                                <small v-if="embargoed_projects && embargoed_projects > 0">({{ embargoed_projects }} in embargo)</small>
                             </p>
                             <p class="text-center">
                                 <a
@@ -429,11 +430,6 @@
                                     {{ spectra }} Spectra
                                 </a>
                             </p>
-                            <!-- <p>
-                                <span class="block text-2xl font-bold"
-                                    >{{ techniques }} Techniques</span
-                                >
-                            </p> -->
                         </div>
                     </div>
                 </div>
@@ -1152,6 +1148,7 @@ export default {
         spectra: String,
         projects: String,
         compounds: String,
+        embargoed_projects: String,
         techniques: String,
     },
 

@@ -28,6 +28,7 @@ use App\Http\Controllers\UploadController;
 use App\Models\Dataset;
 use App\Models\Molecule;
 use App\Models\Project;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
@@ -52,6 +53,9 @@ Route::get('/', function () {
         }),
         'projects' => Cache::rememberForever('stats.projects', function () {
             return Project::where('is_public', true)->get()->count();
+        }),
+        'embargoed_projects' => Cache::rememberForever('stats.embargoed_projects', function () {
+            return Project::where('is_public', false)->where('release_date', '>', Carbon::now())->where('is_deleted', false)->get()->count();
         }),
         'compounds' => Cache::rememberForever('stats.compounds', function () {
             return Molecule::whereNotNull('identifier')->get()->count();
