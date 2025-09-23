@@ -7,6 +7,10 @@ Currently nmrXiv supports login via below three clients:
 - [GitHub](https://github.com/)
 - [ORCID](https://orcid.org/)
 
+Additional enterprise / federation providers:
+
+- NFDI AAI
+
 In order to get this feature available in your application, you need to register your application with the service. This is done through a registration form in the **developer** or **API** portion of the service's website, where you will provide following information (and probably details about your application):
 
 - Application Name
@@ -27,8 +31,13 @@ ORCID_REDIRECT_URL=
 TWITTER_CLIENT_ID=
 TWITTER_CLIENT_SECRET=
 TWITTER_REDIRECT_URL=
+
+# NFDI AAI 
+NFDIAAI_CLIENT_ID=
+NFDIAAI_CLIENT_SECRET=
+NFDIAAI_REDIRECT_URL=https://your-domain/auth/login/regapp/callback
 ```
 
 Once done restart or refresh your application and you would be able to find the single sign-on section added in the Login page.
 
-To know more about how nmrXiv works with OAuth visit the official site of [Laravel](https://laravel.com/8.x/socialite) for more details.
+To know more about how nmrXiv works with OAuth visit the official site of [Laravel Socialite](https://laravel.com/docs/socialite) for more details.

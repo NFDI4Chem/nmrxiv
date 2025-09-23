@@ -34,6 +34,7 @@
         "phpunit/php-code-coverage": "^11.0.9",
         "predis/predis": "^2.2",
         "socialiteproviders/orcid": "^5.1",
+        "socialiteproviders/manager": "^4.7",
         "spatie/laravel-backup": "^9.2",
         "spatie/laravel-cookie-consent": "^3.3",
         "spatie/laravel-permission": "^6.12",
