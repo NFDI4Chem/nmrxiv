@@ -252,7 +252,7 @@ return [
             /*
              * The number of days for which daily backups must be kept.
              */
-            'keep_daily_backups_for_days' => 0,
+            'keep_daily_backups_for_days' => 7,
 
             /*
              * The number of weeks for which one weekly backup must be kept.
