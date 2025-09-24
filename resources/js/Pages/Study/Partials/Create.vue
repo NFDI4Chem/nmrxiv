@@ -312,11 +312,7 @@ import JetButton from "@/Jetstream/Button.vue";
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import { ref } from "vue";
-import {
-    Switch,
-    SwitchGroup,
-    SwitchLabel,
-} from "@headlessui/vue";
+import { Switch, SwitchGroup, SwitchLabel } from "@headlessui/vue";
 import SelectRich from "@/Shared/SelectRich.vue";
 
 export default {

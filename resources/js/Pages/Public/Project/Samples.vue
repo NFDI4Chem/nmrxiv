@@ -1,7 +1,7 @@
 <template>
     <!-- Page header with dynamic title -->
     <Head :title="'Samples - ' + project.data.name" />
-    
+
     <!-- Main layout wrapper -->
     <project-layout :project="project" :selected-tab="tab">
         <template #project-content>
@@ -14,7 +14,11 @@
                     <div>
                         <!-- Search bar - only shown when pagination is needed -->
                         <div
-                            v-if="!loading && studies.meta && studies.meta.total > studies.meta.per_page"
+                            v-if="
+                                !loading &&
+                                studies.meta &&
+                                studies.meta.total > studies.meta.per_page
+                            "
                             class="flex items-center mr-4 w-full"
                         >
                             <!-- Search input container -->
@@ -31,7 +35,7 @@
                                     placeholder="Search…"
                                 />
                             </div>
-                            
+
                             <!-- Search action button -->
                             <button
                                 type="button"
@@ -40,7 +44,7 @@
                             >
                                 GO
                             </button>
-                            
+
                             <!-- Reset search button -->
                             <button
                                 class="ml-3 text-sm text-gray-500 hover:text-gray-700 focus:text-indigo-500"
@@ -52,7 +56,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Main content area -->
                 <div v-if="!loading && studies.data">
                     <!-- Empty state when no studies found -->
@@ -104,7 +108,7 @@
                                 />
                             </div>
                         </div>
-                        
+
                         <!-- Pagination controls -->
                         <div
                             v-if="
@@ -119,7 +123,7 @@
                             >
                                 <!-- Left spacer -->
                                 <div class="-mt-px w-0 flex-1 flex">&nbsp;</div>
-                                
+
                                 <!-- Pagination links (desktop only) -->
                                 <div class="hidden md:-mt-px md:flex">
                                     <!-- Individual pagination link -->
@@ -136,7 +140,7 @@
                                         v-html="sanitizeHtml(link.label)"
                                     ></div>
                                 </div>
-                                
+
                                 <!-- Right spacer -->
                                 <div class="-mt-px w-0 flex-1 flex justify-end">
                                     &nbsp;
@@ -145,7 +149,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Loading state -->
                 <div v-else class="text-gray-400 mt-10">
                     <!-- Loading spinner -->
@@ -179,7 +183,7 @@
 <script>
 /**
  * Project Samples Page Component
- * 
+ *
  * Displays a paginated list of studies (samples) for a specific project.
  * Includes search functionality and loading states.
  */
@@ -189,27 +193,27 @@ import StudyCard from "@/Shared/StudyCardPublic.vue";
 import { Head } from "@inertiajs/vue3";
 
 export default {
-    name: 'ProjectSamples',
-    
+    name: "ProjectSamples",
+
     components: {
         ProjectLayout,
         StudyCard,
         Head,
     },
-    
+
     props: {
         /** Project data object */
         project: {
             type: Object,
-            required: true
+            required: true,
         },
         /** Active tab identifier */
         tab: {
             type: String,
-            required: true
-        }
+            required: true,
+        },
     },
-    
+
     data() {
         return {
             /** Loading state indicator */
@@ -220,14 +224,14 @@ export default {
             query: "",
         };
     },
-    
+
     mounted() {
         // Initialize studies data on component mount
         if (this.project) {
             this.fetchStudies(route("project.studies", this.project.data.id));
         }
     },
-    
+
     methods: {
         /**
          * Fetch studies data from API
@@ -239,7 +243,7 @@ export default {
                 this.studies = response.data;
             });
         },
-        
+
         /**
          * Update studies list with search or pagination
          * @param {Object|null} link - Pagination link object
@@ -251,13 +255,13 @@ export default {
                 link["url"] =
                     route("project.studies", this.project.data.id) + "?page=1";
             }
-            
+
             if (link.url) {
                 this.loading = true;
                 this.executeQuery(link);
             }
         },
-        
+
         /**
          * Reset search and return to first page
          */
@@ -269,7 +273,7 @@ export default {
             this.loading = true;
             this.executeQuery(link);
         },
-        
+
         /**
          * Execute search query with current search term
          * @param {Object} link - Link object containing URL

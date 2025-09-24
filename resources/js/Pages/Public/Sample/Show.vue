@@ -325,10 +325,12 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Submitted Through Information -->
                     <div v-if="study.data.submitted_through" class="mt-4">
-                        <div class="flex items-center space-x-3 text-sm text-gray-600">
+                        <div
+                            class="flex items-center space-x-3 text-sm text-gray-600"
+                        >
                             <svg
                                 class="h-4 w-4 text-gray-400"
                                 fill="none"
@@ -343,30 +345,50 @@
                                 />
                             </svg>
                             <span>Submitted via:</span>
-                            <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium text-gray-800 uppercase">
-                                <img :src="`/img/eln/${study.data.submitted_through}.png`" class="h-12" />
+                            <span
+                                class="inline-flex items-center px-2 py-1 rounded text-xs font-medium text-gray-800 uppercase"
+                            >
+                                <img
+                                    :src="`/img/eln/${study.data.submitted_through}.png`"
+                                    class="h-12"
+                                />
                             </span>
-                            <a :href="study.data.external_url" target="_blank" class="inline-flex items-center py-1 rounded text-md font-bold text-gray-800 uppercase hover:text-blue-600">
-                                <span class="inline-flex items-center py-1 rounded text-md font-bold uppercase">
-                                    {{ study.data.external_id }} 
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 ml-3">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
+                            <a
+                                :href="study.data.external_url"
+                                target="_blank"
+                                class="inline-flex items-center py-1 rounded text-md font-bold text-gray-800 uppercase hover:text-blue-600"
+                            >
+                                <span
+                                    class="inline-flex items-center py-1 rounded text-md font-bold uppercase"
+                                >
+                                    {{ study.data.external_id }}
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke-width="1.5"
+                                        stroke="currentColor"
+                                        class="w-4 h-4 ml-3"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"
+                                        />
                                     </svg>
                                 </span>
                             </a>
                         </div>
                     </div>
-                    
-                    <div class="relative">
-                        &nbsp;
-                    </div>
+
+                    <div class="relative">&nbsp;</div>
                     <div
                         v-if="study.data.sample.molecules.length > 0"
                         class="mt-3"
                     >
                         <div class="relative flex items-center justify-between">
                             <h2 class="text-lg font-semibold text-gray-900">
-                            Molecular Composition
+                                Molecular Composition
                             </h2>
                         </div>
                         <div class="grid md:grid-cols-1 gap-2 mt-2">
@@ -433,8 +455,10 @@
                                                                     "
                                                                 ></Depictor2D>
                                                                 <Depictor3D
-                                                                        :molecule="molecule.canonical_smiles"
-                                                                    ></Depictor3D>
+                                                                    :molecule="
+                                                                        molecule.canonical_smiles
+                                                                    "
+                                                                ></Depictor3D>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -556,9 +580,20 @@
                                                 <h3
                                                     class="text-md font-bold text-gray-600 group-hover:text-blue-600 transition-colors duration-200 line-clamp-2 flex-1 pr-2 capitalize"
                                                 >
-                                                    {{ dataset.name }} 
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 ml-2 inline-block">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
+                                                    {{ dataset.name }}
+                                                    <svg
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        fill="none"
+                                                        viewBox="0 0 24 24"
+                                                        stroke-width="1.5"
+                                                        stroke="currentColor"
+                                                        class="w-4 h-4 ml-2 inline-block"
+                                                    >
+                                                        <path
+                                                            stroke-linecap="round"
+                                                            stroke-linejoin="round"
+                                                            d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"
+                                                        />
                                                     </svg>
                                                 </h3>
                                             </div>
@@ -587,7 +622,9 @@
                     </div>
                     <!-- License Information Section -->
                     <div v-if="study.data.license" class="mt-6">
-                        <div class="bg-gray-50 rounded-lg p-6 border border-gray-200">
+                        <div
+                            class="bg-gray-50 rounded-lg p-6 border border-gray-200"
+                        >
                             <div class="flex items-start space-x-4">
                                 <!-- License Icon -->
                                 <div class="flex-shrink-0">
@@ -605,24 +642,35 @@
                                         />
                                     </svg>
                                 </div>
-                                
+
                                 <!-- License Content -->
                                 <div class="flex-1 min-w-0">
-                                    <h3 class="text-lg font-semibold text-gray-900 mb-2">
+                                    <h3
+                                        class="text-lg font-semibold text-gray-900 mb-2"
+                                    >
                                         License Information
                                     </h3>
-                                    
+
                                     <!-- Desktop Layout -->
                                     <div class="hidden sm:block">
-                                        <div class="flex items-center space-x-2">
-                                            <span class="text-sm font-medium text-gray-600">License:</span>
+                                        <div
+                                            class="flex items-center space-x-2"
+                                        >
+                                            <span
+                                                class="text-sm font-medium text-gray-600"
+                                                >License:</span
+                                            >
                                             <a
                                                 v-if="study.data.license.url"
                                                 :href="study.data.license.url"
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 class="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline transition-colors duration-150"
-                                                :title="'View ' + study.data.license.title + ' license details'"
+                                                :title="
+                                                    'View ' +
+                                                    study.data.license.title +
+                                                    ' license details'
+                                                "
                                             >
                                                 {{ study.data.license.title }}
                                             </a>
@@ -634,11 +682,13 @@
                                             </span>
                                         </div>
                                     </div>
-                                    
+
                                     <!-- Mobile Layout -->
                                     <div class="sm:hidden space-y-2">
                                         <div class="text-sm text-gray-600">
-                                            <span class="font-medium">License</span>
+                                            <span class="font-medium"
+                                                >License</span
+                                            >
                                         </div>
                                         <div>
                                             <a
@@ -659,11 +709,21 @@
                                             </span>
                                         </div>
                                     </div>
-                                    
+
                                     <!-- License Description (if available) -->
-                                    <div v-if="study.data.license.description" class="mt-3">
-                                        <p class="text-sm text-gray-600 leading-relaxed" v-html="sanitizeHtml(study.data.license.description)">
-                                        </p>
+                                    <div
+                                        v-if="study.data.license.description"
+                                        class="mt-3"
+                                    >
+                                        <p
+                                            class="text-sm text-gray-600 leading-relaxed"
+                                            v-html="
+                                                sanitizeHtml(
+                                                    study.data.license
+                                                        .description
+                                                )
+                                            "
+                                        ></p>
                                     </div>
                                 </div>
                             </div>

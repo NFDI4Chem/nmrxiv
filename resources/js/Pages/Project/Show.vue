@@ -36,8 +36,8 @@
                     class="text-center px-3 py-2 bg-green-50 text-green-700 border-b"
                 >
                     <b>Info: </b> This project is public. You cannot edit a
-                    published project, please create a new version to update
-                    the project.
+                    published project, please create a new version to update the
+                    project.
                 </div>
             </div>
             <div v-if="preview">
@@ -284,7 +284,11 @@
                                     </span>
                                     {{ role }}
                                 </span>
-                                <Tag v-if="project.identifier" :identifier="project.identifier" class="ml-4" />
+                                <Tag
+                                    v-if="project.identifier"
+                                    :identifier="project.identifier"
+                                    class="ml-4"
+                                />
                             </div>
                         </div>
                         <div
@@ -549,9 +553,7 @@
                                                     Release Date
                                                 </label>
                                                 <Datepicker
-                                                    v-model="
-                                                        form.release_date
-                                                    "
+                                                    v-model="form.release_date"
                                                     :format="customDateFormat"
                                                     :min-date="new Date()"
                                                     :preview-format="
@@ -591,7 +593,15 @@
                                                             <div
                                                                 class="ml-2 text-sm"
                                                             >
-                                                            I understand that publishing makes all underlying data publicly available on the nmrXiv platform after the set release date.
+                                                                I understand
+                                                                that publishing
+                                                                makes all
+                                                                underlying data
+                                                                publicly
+                                                                available on the
+                                                                nmrXiv platform
+                                                                after the set
+                                                                release date.
                                                             </div>
                                                         </div>
                                                     </div>
@@ -1058,7 +1068,7 @@ export default {
         AuthorCard,
         CitationCard,
         DOIBadge,
-    Tag,
+        Tag,
         Dialog,
         DialogPanel,
         TransitionChild,

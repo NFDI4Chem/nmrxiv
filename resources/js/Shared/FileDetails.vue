@@ -7,7 +7,9 @@
 -->
 <template>
     <!-- Main container with shadow and rounded corners -->
-    <div class="bg-white shadow overflow-hidden sm:rounded-lg border border-gray-200">
+    <div
+        class="bg-white shadow overflow-hidden sm:rounded-lg border border-gray-200"
+    >
         <!-- Header section with file name and status indicator -->
         <div class="px-4 py-5 sm:px-6">
             <h3 class="text-lg leading-6 text-xl font-bold text-gray-900">
@@ -42,30 +44,38 @@
             <!-- Subtitle describing the content -->
             <p class="mt-1 max-w-2xl text-sm text-gray-500">File information</p>
         </div>
-        
+
         <!-- File details section with structured data -->
         <div class="border-t border-gray-200 px-4 py-5 sm:p-0">
             <!-- Definition list for file metadata -->
             <dl class="sm:divide-y sm:divide-gray-200">
                 <!-- File metadata grid -->
-                <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                <div
+                    class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+                >
                     <!-- Upload timestamp -->
                     <dt class="text-sm font-medium text-gray-500">
                         Uploaded at
                     </dt>
-                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                    <dd
+                        class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"
+                    >
                         {{ formatDateTime(file.created_at) }}
                     </dd>
-                    
+
                     <!-- File size information -->
                     <dt class="text-sm font-medium text-gray-500">File size</dt>
-                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                    <dd
+                        class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"
+                    >
                         {{ bytesToSize(fileInfo.size) }}
                     </dd>
-                    
+
                     <!-- ETag for file integrity verification -->
                     <dt class="text-sm font-medium text-gray-500">ETag</dt>
-                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                    <dd
+                        class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"
+                    >
                         <!-- Display ETag without quotes if available -->
                         <div v-if="fileInfo.ETag">
                             {{ fileInfo.ETag.replace(/"/g, "") }}
@@ -74,21 +84,27 @@
                         <div v-else>-</div>
                     </dd>
                 </div>
-                
+
                 <!-- Spacer element -->
                 <div></div>
-                
+
                 <!-- File content and download section -->
-                <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                <div
+                    class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+                >
                     <dt class="text-sm font-medium text-gray-500">Content</dt>
-                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                    <dd
+                        class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"
+                    >
                         <!-- File attachment list -->
                         <ul
                             role="list"
                             class="border border-gray-200 rounded-md divide-y divide-gray-200"
                         >
                             <!-- Single file item with download option -->
-                            <li class="pl-3 pr-4 py-3 flex items-center justify-between text-sm">
+                            <li
+                                class="pl-3 pr-4 py-3 flex items-center justify-between text-sm"
+                            >
                                 <!-- File icon and name -->
                                 <div class="w-0 flex-1 flex items-center">
                                     <!-- Paper clip icon indicating attachment -->
@@ -111,7 +127,7 @@
                                         {{ file.name }}
                                     </span>
                                 </div>
-                                
+
                                 <!-- Download link (only shown if download URL is available) -->
                                 <div
                                     v-if="downloadURL"
@@ -136,11 +152,11 @@
 <script>
 /**
  * File Details Component
- * 
+ *
  * This component renders detailed information about a selected file in a structured
  * format. It displays file metadata including upload timestamp, file size, ETag for
  * integrity verification, and provides download functionality when available.
- * 
+ *
  * Key Features:
  * - File metadata display (name, size, upload date, ETag)
  * - Missing file status indication with warning icon
@@ -152,13 +168,12 @@
 
 export default {
     name: "FileDetails",
-    
+
     /**
      * Component dependencies
      */
-    components: {
-    },
-    
+    components: {},
+
     /**
      * Component props
      * @prop {Object} file - File object containing metadata and properties
@@ -166,7 +181,7 @@ export default {
      * @prop {Object} study - Study object for download URL generation (optional)
      */
     props: ["file", "project", "study"],
-    
+
     /**
      * Composition API setup function
      * @returns {Object} Empty object - using Options API instead
@@ -174,7 +189,7 @@ export default {
     setup() {
         return {};
     },
-    
+
     /**
      * Component reactive data
      * @returns {Object} Empty object - no local state needed
@@ -182,24 +197,24 @@ export default {
     data() {
         return {};
     },
-    
+
     /**
      * Computed properties
      */
     computed: {
         /**
          * Generate download URL for the file
-         * 
+         *
          * Creates a download URL based on the project or study context.
          * Handles both direct project files and study-related files.
-         * 
+         *
          * @returns {String|undefined} Complete download URL or undefined if not available
          */
         downloadURL() {
             // Check if we have project or study context for download
             if (this.study || this.project) {
                 let project = null;
-                
+
                 // Determine which project to use for URL generation
                 if (this.study && !this.project) {
                     // Use project from study if only study is provided
@@ -208,7 +223,7 @@ export default {
                     // Use direct project reference
                     project = this.project;
                 }
-                
+
                 // Generate download URL if project is available
                 if (project) {
                     return (
@@ -224,11 +239,11 @@ export default {
                     );
                 }
             }
-            
+
             // Return undefined if no download context is available
             return undefined;
         },
-        
+
         /**
          * Get the base URL from page props
          * @returns {String} Base application URL
@@ -236,73 +251,77 @@ export default {
         url() {
             return String(this.$page.props.url);
         },
-        
+
         /**
          * Parse file information from JSON string
-         * 
+         *
          * The file.info property contains JSON-encoded metadata about the file
          * including size, ETag, and other storage-related information.
-         * 
+         *
          * @returns {Object} Parsed file information object
          */
         fileInfo() {
             return JSON.parse(this.file.info);
         },
     },
-    
+
     /**
      * Component methods
      */
     methods: {
         /**
          * Format file size from bytes to human-readable format
-         * 
+         *
          * Converts byte values to appropriate units (B, KB, MB, GB, TB)
          * with proper decimal places for readability.
-         * 
+         *
          * @param {Number} bytes - File size in bytes
          * @returns {String} Formatted file size string
-         * 
+         *
          * @example
          * bytesToSize(1024) // Returns: "1.00 KB"
          * bytesToSize(1048576) // Returns: "1.00 MB"
          */
         bytesToSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            
+            if (bytes === 0) return "0 Bytes";
+
             const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+            const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
             const i = Math.floor(Math.log(bytes) / Math.log(k));
-            
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+
+            return (
+                parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i]
+            );
         },
-        
+
         /**
          * Format date and time for display
-         * 
+         *
          * Converts ISO date string to a human-readable format
          * suitable for displaying upload timestamps.
-         * 
+         *
          * @param {String} dateString - ISO date string
          * @returns {String} Formatted date and time string
-         * 
+         *
          * @example
          * formatDateTime("2023-12-01T10:30:00Z") // Returns: "Dec 1, 2023 at 10:30 AM"
          */
         formatDateTime(dateString) {
-            if (!dateString) return '-';
-            
+            if (!dateString) return "-";
+
             const date = new Date(dateString);
             const options = {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: true
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: true,
             };
-            
-            return date.toLocaleDateString('en-US', options).replace(',', ' at');
+
+            return date
+                .toLocaleDateString("en-US", options)
+                .replace(",", " at");
         },
     },
 };

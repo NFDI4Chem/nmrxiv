@@ -97,7 +97,7 @@ export default {
         JetInput,
         JetInputError,
         JetSecondaryButton,
-    LoadingButton,
+        LoadingButton,
     },
 
     props: ["project"],

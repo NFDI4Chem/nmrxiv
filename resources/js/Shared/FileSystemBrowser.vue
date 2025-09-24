@@ -448,7 +448,13 @@
                     >
                         <div class="py-2 mb-2 block border-b pb-4">
                             <div class="flex justify-between items-center">
-                                <p class="font-bold text-xl" :title="$page.props.selectedFileSystemObject.relative_url">
+                                <p
+                                    class="font-bold text-xl"
+                                    :title="
+                                        $page.props.selectedFileSystemObject
+                                            .relative_url
+                                    "
+                                >
                                     {{
                                         truncateMiddle(
                                             $page.props.selectedFileSystemObject
@@ -465,7 +471,7 @@
                                                 viewMode === 'grid'
                                                     ? 'text-gray-900'
                                                     : 'text-gray-400 hover:text-gray-600',
-                                                'p-1'
+                                                'p-1',
                                             ]"
                                             title="Grid View"
                                             @click="setViewMode('grid')"
@@ -477,7 +483,7 @@
                                                 viewMode === 'list'
                                                     ? 'text-gray-900'
                                                     : 'text-gray-400 hover:text-gray-600',
-                                                'p-1'
+                                                'p-1',
                                             ]"
                                             title="List View"
                                             @click="setViewMode('list')"
@@ -516,68 +522,96 @@
                         </div>
                         <!-- List View Table Header -->
                         <div v-if="viewMode === 'list'" class="mt-6">
-                            <div class="bg-gray-50 px-3 py-2 border border-gray-200 rounded-t-md">
-                                <div class="grid grid-cols-12 gap-4 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <div
+                                class="bg-gray-50 px-3 py-2 border border-gray-200 rounded-t-md"
+                            >
+                                <div
+                                    class="grid grid-cols-12 gap-4 text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                >
                                     <div class="col-span-4">
-                                        <button 
+                                        <button
                                             class="flex items-center space-x-1 hover:text-gray-700 focus:outline-none"
                                             @click="sortFiles('name')"
                                         >
                                             <span>Name</span>
-                                            <ChevronUpIcon 
-                                                v-if="sortBy === 'name' && sortOrder === 'asc'"
+                                            <ChevronUpIcon
+                                                v-if="
+                                                    sortBy === 'name' &&
+                                                    sortOrder === 'asc'
+                                                "
                                                 class="h-3 w-3"
                                             />
-                                            <ChevronDownIcon 
-                                                v-else-if="sortBy === 'name' && sortOrder === 'desc'"
+                                            <ChevronDownIcon
+                                                v-else-if="
+                                                    sortBy === 'name' &&
+                                                    sortOrder === 'desc'
+                                                "
                                                 class="h-3 w-3"
                                             />
                                         </button>
                                     </div>
                                     <div class="col-span-3">
-                                        <button 
+                                        <button
                                             class="flex items-center space-x-1 hover:text-gray-700 focus:outline-none"
                                             @click="sortFiles('date')"
                                         >
                                             <span>Date Modified</span>
-                                            <ChevronUpIcon 
-                                                v-if="sortBy === 'date' && sortOrder === 'asc'"
+                                            <ChevronUpIcon
+                                                v-if="
+                                                    sortBy === 'date' &&
+                                                    sortOrder === 'asc'
+                                                "
                                                 class="h-3 w-3"
                                             />
-                                            <ChevronDownIcon 
-                                                v-else-if="sortBy === 'date' && sortOrder === 'desc'"
+                                            <ChevronDownIcon
+                                                v-else-if="
+                                                    sortBy === 'date' &&
+                                                    sortOrder === 'desc'
+                                                "
                                                 class="h-3 w-3"
                                             />
                                         </button>
                                     </div>
                                     <div class="col-span-2">
-                                        <button 
+                                        <button
                                             class="flex items-center space-x-1 hover:text-gray-700 focus:outline-none"
                                             @click="sortFiles('size')"
                                         >
                                             <span>Size</span>
-                                            <ChevronUpIcon 
-                                                v-if="sortBy === 'size' && sortOrder === 'asc'"
+                                            <ChevronUpIcon
+                                                v-if="
+                                                    sortBy === 'size' &&
+                                                    sortOrder === 'asc'
+                                                "
                                                 class="h-3 w-3"
                                             />
-                                            <ChevronDownIcon 
-                                                v-else-if="sortBy === 'size' && sortOrder === 'desc'"
+                                            <ChevronDownIcon
+                                                v-else-if="
+                                                    sortBy === 'size' &&
+                                                    sortOrder === 'desc'
+                                                "
                                                 class="h-3 w-3"
                                             />
                                         </button>
                                     </div>
                                     <div class="col-span-2">
-                                        <button 
+                                        <button
                                             class="flex items-center space-x-1 hover:text-gray-700 focus:outline-none"
                                             @click="sortFiles('kind')"
                                         >
                                             <span>Kind</span>
-                                            <ChevronUpIcon 
-                                                v-if="sortBy === 'kind' && sortOrder === 'asc'"
+                                            <ChevronUpIcon
+                                                v-if="
+                                                    sortBy === 'kind' &&
+                                                    sortOrder === 'asc'
+                                                "
                                                 class="h-3 w-3"
                                             />
-                                            <ChevronDownIcon 
-                                                v-else-if="sortBy === 'kind' && sortOrder === 'desc'"
+                                            <ChevronDownIcon
+                                                v-else-if="
+                                                    sortBy === 'kind' &&
+                                                    sortOrder === 'desc'
+                                                "
                                                 class="h-3 w-3"
                                             />
                                         </button>
@@ -595,7 +629,7 @@
                                 'mb-3',
                                 viewMode === 'grid'
                                     ? 'grid grid-cols-1 gap-5 sm:gap-6 sm:grid-cols-2 lg:grid-cols-4'
-                                    : 'divide-y divide-gray-200 border border-gray-200 rounded-b-md'
+                                    : 'divide-y divide-gray-200 border border-gray-200 rounded-b-md',
                             ]"
                         >
                             <li
@@ -604,7 +638,7 @@
                                 :class="[
                                     viewMode === 'grid'
                                         ? 'relative shadow rounded-lg'
-                                        : 'hover:bg-gray-50'
+                                        : 'hover:bg-gray-50',
                                 ]"
                             >
                                 <!-- Grid View Layout -->
@@ -617,7 +651,9 @@
                                         <div
                                             class="group block w-full aspect-w-10 aspect-h-7 py-4 bg-gray-100 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 focus-within:ring-indigo-500 overflow-hidden"
                                         >
-                                            <span v-if="file.type == 'directory'">
+                                            <span
+                                                v-if="file.type == 'directory'"
+                                            >
                                                 <FolderIcon
                                                     class="cursor-pointer h-28 w-28 text-teal-600 flex-shrink-0 mx-auto"
                                                     aria-hidden="true"
@@ -656,22 +692,39 @@
                                         <p
                                             class="mt-2 px-2 py-1 block text-sm font-medium truncate text-gray-900 pointer-events-none"
                                         >
-                                            <span class="float-left" :title="file.name">
-                                                {{ truncateMiddle(file.name, 25) }}
+                                            <span
+                                                class="float-left"
+                                                :title="file.name"
+                                            >
+                                                {{
+                                                    truncateMiddle(
+                                                        file.name,
+                                                        25
+                                                    )
+                                                }}
                                             </span>
                                         </p>
-                                        <div class="flex items-center justify-between px-2 pb-1">
-                                            <p class="text-sm font-medium text-gray-500">
+                                        <div
+                                            class="flex items-center justify-between px-2 pb-1"
+                                        >
+                                            <p
+                                                class="text-sm font-medium text-gray-500"
+                                            >
                                                 {{ formatFileSize(file) }}
                                             </p>
                                             <a
-                                                v-if="file.type !== 'directory' && readonly"
+                                                v-if="
+                                                    file.type !== 'directory' &&
+                                                    readonly
+                                                "
                                                 :href="getFileDownloadURL(file)"
                                                 class="text-gray-400 hover:text-indigo-600 transition-colors duration-200 pointer-events-auto"
                                                 title="Download file"
                                                 @click.stop
                                             >
-                                                <ArrowDownTrayIcon class="h-4 w-4" />
+                                                <ArrowDownTrayIcon
+                                                    class="h-4 w-4"
+                                                />
                                             </a>
                                         </div>
                                     </div>
@@ -679,15 +732,23 @@
 
                                 <!-- List View Layout -->
                                 <template v-else>
-                                    <div class="px-3 py-3 grid grid-cols-12 gap-4 items-center">
+                                    <div
+                                        class="px-3 py-3 grid grid-cols-12 gap-4 items-center"
+                                    >
                                         <!-- Name Column -->
-                                        <div class="col-span-4 flex items-center">
+                                        <div
+                                            class="col-span-4 flex items-center"
+                                        >
                                             <div class="flex-shrink-0 mr-3">
                                                 <FolderIcon
-                                                    v-if="file.type == 'directory'"
+                                                    v-if="
+                                                        file.type == 'directory'
+                                                    "
                                                     class="cursor-pointer h-5 w-5 text-teal-600"
                                                     aria-hidden="true"
-                                                    @dblclick.stop="displaySelected(file)"
+                                                    @dblclick.stop="
+                                                        displaySelected(file)
+                                                    "
                                                 />
                                                 <DocumentTextIcon
                                                     v-else
@@ -696,42 +757,65 @@
                                                 />
                                             </div>
                                             <div class="min-w-0 flex-1">
-                                                <p class="text-sm font-medium text-gray-900 truncate" :title="file.name">
+                                                <p
+                                                    class="text-sm font-medium text-gray-900 truncate"
+                                                    :title="file.name"
+                                                >
                                                     {{ file.name }}
                                                 </p>
                                             </div>
                                         </div>
-                                        
+
                                         <!-- Date Modified Column -->
                                         <div class="col-span-3">
                                             <p class="text-sm text-gray-500">
-                                                {{ formatDate(file.updated_at || file.created_at) }}
+                                                {{
+                                                    formatDate(
+                                                        file.updated_at ||
+                                                            file.created_at
+                                                    )
+                                                }}
                                             </p>
                                         </div>
-                                        
+
                                         <!-- Size Column -->
                                         <div class="col-span-2">
                                             <p class="text-sm text-gray-500">
-                                                {{ file.type === 'directory' ? '--' : formatFileSize(file) }}
+                                                {{
+                                                    file.type === "directory"
+                                                        ? "--"
+                                                        : formatFileSize(file)
+                                                }}
                                             </p>
                                         </div>
-                                        
+
                                         <!-- Kind Column -->
                                         <div class="col-span-2">
                                             <p class="text-sm text-gray-500">
-                                                {{ file.type === 'directory' ? 'Folder' : 'Document' }}
+                                                {{
+                                                    file.type === "directory"
+                                                        ? "Folder"
+                                                        : "Document"
+                                                }}
                                             </p>
                                         </div>
-                                        
+
                                         <!-- Download Column -->
-                                        <div class="col-span-1 flex justify-center">
+                                        <div
+                                            class="col-span-1 flex justify-center"
+                                        >
                                             <a
-                                                v-if="file.type !== 'directory' && readonly"
+                                                v-if="
+                                                    file.type !== 'directory' &&
+                                                    readonly
+                                                "
                                                 :href="getFileDownloadURL(file)"
                                                 class="text-gray-400 hover:text-indigo-600 transition-colors duration-200"
                                                 title="Download file"
                                             >
-                                                <ArrowDownTrayIcon class="h-5 w-5" />
+                                                <ArrowDownTrayIcon
+                                                    class="h-5 w-5"
+                                                />
                                             </a>
                                             <!-- No download icon for folders -->
                                         </div>
@@ -744,7 +828,10 @@
                         <p
                             v-if="$page.props.selectedFileSystemObject"
                             class="font-bold text-xl"
-                            :title="$page.props.selectedFileSystemObject.relative_url"
+                            :title="
+                                $page.props.selectedFileSystemObject
+                                    .relative_url
+                            "
                         >
                             {{
                                 truncateMiddle(
@@ -1089,9 +1176,9 @@ export default {
             currentStep: null, // Current step for state clearing
 
             // View mode and sorting
-            viewMode: 'grid', // 'grid' or 'list'
-            sortBy: 'name', // 'name', 'date', 'size', 'kind'
-            sortOrder: 'asc', // 'asc' or 'desc'
+            viewMode: "grid", // 'grid' or 'list'
+            sortBy: "name", // 'name', 'date', 'size', 'kind'
+            sortOrder: "asc", // 'asc' or 'desc'
         };
     },
     /**
@@ -1197,38 +1284,40 @@ export default {
             if (!this.$page.props.selectedFileSystemObject?.children) {
                 return [];
             }
-            
-            const files = [...this.$page.props.selectedFileSystemObject.children];
-            
+
+            const files = [
+                ...this.$page.props.selectedFileSystemObject.children,
+            ];
+
             return files.sort((a, b) => {
                 let aValue, bValue;
-                
+
                 switch (this.sortBy) {
-                    case 'name':
+                    case "name":
                         aValue = a.name.toLowerCase();
                         bValue = b.name.toLowerCase();
                         break;
-                    case 'date':
+                    case "date":
                         aValue = new Date(a.updated_at || a.created_at || 0);
                         bValue = new Date(b.updated_at || b.created_at || 0);
                         break;
-                    case 'size':
+                    case "size":
                         aValue = this.getFileSizeForSorting(a);
                         bValue = this.getFileSizeForSorting(b);
                         break;
-                    case 'kind':
-                        aValue = a.type === 'directory' ? 'folder' : 'document';
-                        bValue = b.type === 'directory' ? 'folder' : 'document';
+                    case "kind":
+                        aValue = a.type === "directory" ? "folder" : "document";
+                        bValue = b.type === "directory" ? "folder" : "document";
                         break;
                     default:
                         return 0;
                 }
-                
+
                 if (aValue < bValue) {
-                    return this.sortOrder === 'asc' ? -1 : 1;
+                    return this.sortOrder === "asc" ? -1 : 1;
                 }
                 if (aValue > bValue) {
-                    return this.sortOrder === 'asc' ? 1 : -1;
+                    return this.sortOrder === "asc" ? 1 : -1;
                 }
                 return 0;
             });
@@ -1247,8 +1336,8 @@ export default {
 
     mounted() {
         // Load view mode from localStorage
-        const savedViewMode = localStorage.getItem('nmrxiv-files-view-mode');
-        if (savedViewMode && ['grid', 'list'].includes(savedViewMode)) {
+        const savedViewMode = localStorage.getItem("nmrxiv-files-view-mode");
+        if (savedViewMode && ["grid", "list"].includes(savedViewMode)) {
             this.viewMode = savedViewMode;
         }
 
@@ -1417,12 +1506,19 @@ export default {
          */
         checkAndTriggerQueueComplete() {
             // Count files with error status
-            const errorFiles = Object.values(this.logs).filter(log => log.status === 'Error').length;
-            const successFiles = Object.values(this.logs).filter(log => log.status === 'Success').length;
+            const errorFiles = Object.values(this.logs).filter(
+                (log) => log.status === "Error"
+            ).length;
+            const successFiles = Object.values(this.logs).filter(
+                (log) => log.status === "Success"
+            ).length;
             const processedFiles = errorFiles + successFiles;
-            
+
             // Check if all files have been processed (either success or error)
-            if (processedFiles >= this.totalFilesCount && this.totalFilesCount > 0) {
+            if (
+                processedFiles >= this.totalFilesCount &&
+                this.totalFilesCount > 0
+            ) {
                 this.handleQueueComplete();
             }
         },
@@ -1456,12 +1552,12 @@ export default {
             this.totalFilesCount = 0;
             this.uploadedFilesCount = 0;
             this.currentLog = null;
-            
+
             // Clear dropzone if it exists
             if (this.dropzone) {
                 this.dropzone.removeAllFiles();
             }
-            
+
             // Update busy status
             this.updateBusyStatus(false);
         },
@@ -1515,12 +1611,12 @@ export default {
 
             if (actualFiles.length === 0) {
                 this.status = "READY";
-                
+
                 // Manually trigger completion since no files will be processed
                 this.$nextTick(() => {
                     this.handleEmptyQueueCompletion();
                 });
-                
+
                 return;
             }
 
@@ -1599,7 +1695,7 @@ export default {
 
         /**
          * Confirm file system object deletion
-         * 
+         *
          * Sets up the confirmation dialog for deleting a file or folder.
          * Stores the ID of the object to be deleted for the confirmation modal.
          */
@@ -1609,7 +1705,7 @@ export default {
 
         /**
          * Delete file system object (file or folder)
-         * 
+         *
          * Performs the actual deletion of a file or folder after confirmation.
          * Handles the complete deletion workflow including:
          * - Progress indication with overlay
@@ -1617,7 +1713,7 @@ export default {
          * - API call to delete the object
          * - Error handling and user feedback
          * - File tree refresh and state management
-         * 
+         *
          * The method ensures proper cleanup and user experience by:
          * - Showing deletion progress to the user
          * - Reverting selection to parent folder after deletion
@@ -1660,7 +1756,9 @@ export default {
                         if (response.data.success) {
                             // Show success message with details
                             if (response.data.has_storage_errors) {
-                                console.log(`Note: ${response.data.storage_errors.length} storage operation(s) had issues.`);
+                                console.log(
+                                    `Note: ${response.data.storage_errors.length} storage operation(s) had issues.`
+                                );
                             }
 
                             // Clear logs after successful deletion
@@ -1717,7 +1815,7 @@ export default {
 
         /**
          * Show missing files details modal
-         * 
+         *
          * Displays a modal dialog containing details about files that are
          * missing from the file system. Fetches the latest missing files
          * data before showing the modal.
@@ -1729,7 +1827,7 @@ export default {
 
         /**
          * Fetch missing files from the server
-         * 
+         *
          * Retrieves the list of files that are referenced in the database
          * but missing from the actual file system. This helps users identify
          * and resolve file integrity issues.
@@ -1745,7 +1843,7 @@ export default {
 
         /**
          * Toggle fullscreen mode
-         * 
+         *
          * Switches the file browser between normal and fullscreen display modes.
          * Currently unused but available for future implementation.
          */
@@ -1755,7 +1853,7 @@ export default {
 
         /**
          * Toggle the logs dialog visibility
-         * 
+         *
          * Shows or hides the detailed upload logs modal dialog.
          * Used to display comprehensive information about file upload
          * status, errors, and processing details.
@@ -1766,11 +1864,11 @@ export default {
 
         /**
          * Update the busy status of the component
-         * 
+         *
          * Sets the busy state to indicate when the component is performing
          * operations like file uploads, deletions, or API calls. This helps
          * prevent user interactions during critical operations.
-         * 
+         *
          * @param {Boolean} status - True if component is busy, false otherwise
          */
         updateBusyStatus(status) {
@@ -1779,7 +1877,7 @@ export default {
 
         /**
          * Load files from the server
-         * 
+         *
          * Fetches the file tree structure from the server and initializes
          * the file browser interface. This method handles:
          * - Loading the root file system object
@@ -1787,7 +1885,7 @@ export default {
          * - Selecting the appropriate folder based on navigation state
          * - Fetching missing folder contents for expanded folders
          * - Updating the UI to reflect the loaded state
-         * 
+         *
          * The method supports both draft mode (with server data) and
          * read-only mode (with pre-loaded data from page props).
          */
@@ -1829,7 +1927,7 @@ export default {
 
         /**
          * Annotate uploaded files
-         * 
+         *
          * Triggers the server-side annotation process for uploaded files.
          * This process analyzes uploaded files to:
          * - Detect file types and formats
@@ -1837,7 +1935,7 @@ export default {
          * - Identify instrument-specific data structures
          * - Generate thumbnails and previews where applicable
          * - Update the file tree with processed information
-         * 
+         *
          * After annotation completes, the file tree is reloaded to show
          * the updated file structure and metadata.
          */
@@ -1981,21 +2079,26 @@ export default {
                                     // Try multiple matching strategies for files without fullPath
                                     const fileName = f.name.trim();
                                     const uploadPath = u.fullPath;
-                                    
+
                                     // Direct name match
                                     const match1 = fileName == uploadPath;
-                                    
+
                                     // Name with leading slash
                                     const match2 = "/" + fileName == uploadPath;
-                                    
+
                                     // Name with folder prefix
-                                    const folderPrefix = vm.$page.props.selectedFolder === "/" ? "" : vm.$page.props.selectedFolder;
-                                    const match3 = folderPrefix + "/" + fileName == uploadPath;
-                                    
+                                    const folderPrefix =
+                                        vm.$page.props.selectedFolder === "/"
+                                            ? ""
+                                            : vm.$page.props.selectedFolder;
+                                    const match3 =
+                                        folderPrefix + "/" + fileName ==
+                                        uploadPath;
+
                                     return match1 || match2 || match3;
                                 }
                             });
-                            
+
                             if (cFile) {
                                 let message =
                                     "Presigned Upload URL receieved.  Starting Upload.";
@@ -2055,7 +2158,7 @@ export default {
         },
         /**
          * Initialize Dropzone.js for file uploads
-         * 
+         *
          * Sets up the drag-and-drop file upload interface using Dropzone.js.
          * This method configures:
          * - Upload batch processing with sequential handling
@@ -2064,7 +2167,7 @@ export default {
          * - Event handlers for upload lifecycle
          * - Checksum calculation integration
          * - Error handling and logging
-         * 
+         *
          * The dropzone is configured for:
          * - Large file uploads (up to 20,000 files)
          * - Folder structure preservation
@@ -2074,7 +2177,7 @@ export default {
         loadDropZone() {
             this.$nextTick(() => {
                 const vm = this;
-                
+
                 // Initialize upload counters and batch configuration
                 vm.totalFilesCount = 0;
                 vm.uploadedFilesCount = 0;
@@ -2091,8 +2194,8 @@ export default {
 
                 // Configure Dropzone.js options
                 let options = {
-                    url: "/",                    // Placeholder URL (will be updated per file)
-                    method: "put",               // HTTP method for uploads
+                    url: "/", // Placeholder URL (will be updated per file)
+                    method: "put", // HTTP method for uploads
                     sending(file, xhr) {
                         // Custom sending logic to use file object directly
                         let _send = xhr.send;
@@ -2100,26 +2203,31 @@ export default {
                             _send.call(xhr, file);
                         };
                     },
-                    autoProcessQueue: false,     // Manual queue processing for batch control
-                    uploadMultiple: true,        // Support multiple file uploads
-                    disablePreviews: true,       // Disable image previews for performance
-                    parallelUploads: 100,        // Allow many parallel uploads
-                    useFsAccessApi: false,       // Disable File System Access API
-                    autoQueue: false,            // Manual queue management
-                    maxFiles: 20000,             // Support large numbers of files
-                    clickable: "#fs-dropzone-click-target",              // Click target element
+                    autoProcessQueue: false, // Manual queue processing for batch control
+                    uploadMultiple: true, // Support multiple file uploads
+                    disablePreviews: true, // Disable image previews for performance
+                    parallelUploads: 100, // Allow many parallel uploads
+                    useFsAccessApi: false, // Disable File System Access API
+                    autoQueue: false, // Manual queue management
+                    maxFiles: 20000, // Support large numbers of files
+                    clickable: "#fs-dropzone-click-target", // Click target element
                     hiddenInputContainer: "#fs-dropzone-hidden-input-container", // Hidden input container
-                    dictDefaultMessage: document.querySelector("#fs-dropzone-message").innerHTML, // Default message
+                    dictDefaultMessage: document.querySelector(
+                        "#fs-dropzone-message"
+                    ).innerHTML, // Default message
                     totaluploadprogress: function (progress) {
                         vm.progress = Math.ceil(progress);
                     },
                 };
-                
+
                 // Initialize Dropzone instance
                 vm.dropzone = new Dropzone("#fs-dropzone", options);
-                
+
                 // Enable folder selection by setting webkitdirectory attribute
-                vm.dropzone.hiddenFileInput.setAttribute("webkitdirectory", true);
+                vm.dropzone.hiddenFileInput.setAttribute(
+                    "webkitdirectory",
+                    true
+                );
 
                 vm.dropzone.on("processing", (file) => {
                     vm.dropzone.options.url = file.uploadURL;
@@ -2138,7 +2246,7 @@ export default {
                     vm.precentageUpload =
                         (vm.uploadedFilesCount / vm.totalFilesCount) * 100;
                     vm.currentLog = file.fullPath;
-                    
+
                     // Check if all files are complete and manually trigger queuecomplete
                     vm.checkAndTriggerQueueComplete();
                 });
@@ -2151,7 +2259,7 @@ export default {
                         vm.logs[file.name].status = "Error";
                         vm.logs[file.name].messages.push(message);
                     }
-                    
+
                     // Check if all files are complete and manually trigger queuecomplete
                     vm.checkAndTriggerQueueComplete();
                 });
@@ -2240,25 +2348,25 @@ export default {
         },
         /**
          * Display selected file or folder in the details panel
-         * 
+         *
          * Updates the application state to show the selected file or folder
          * in the right panel. This method handles:
          * - Setting the selected file system object globally
          * - Calculating the correct folder path for breadcrumb navigation
          * - Lazy loading folder contents if needed
          * - Updating the selected folder state for UI consistency
-         * 
+         *
          * The method determines the correct folder path based on:
          * - Root folder ("/") for the root directory
          * - Full relative URL for directories
          * - Parent directory path for individual files
-         * 
+         *
          * @param {Object} file - The file or folder object to display
          */
         displaySelected(file) {
             this.$page.props.selectedFileSystemObject = file;
             let sFolder = "/";
-            
+
             // Calculate the appropriate folder path for breadcrumb navigation
             if (this.$page.props.selectedFileSystemObject.name == "/") {
                 sFolder = "/";
@@ -2822,7 +2930,7 @@ export default {
          */
         setViewMode(mode) {
             this.viewMode = mode;
-            localStorage.setItem('nmrxiv-files-view-mode', mode);
+            localStorage.setItem("nmrxiv-files-view-mode", mode);
         },
 
         /**
@@ -2831,11 +2939,11 @@ export default {
         sortFiles(column) {
             if (this.sortBy === column) {
                 // Toggle sort order if clicking the same column
-                this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
+                this.sortOrder = this.sortOrder === "asc" ? "desc" : "asc";
             } else {
                 // Set new column and default to ascending
                 this.sortBy = column;
-                this.sortOrder = 'asc';
+                this.sortOrder = "asc";
             }
         },
 
@@ -2843,22 +2951,26 @@ export default {
          * Format file size for display
          */
         formatFileSize(file) {
-            if (file.type === 'directory') return '--';
-            
+            if (file.type === "directory") return "--";
+
             try {
-                const info = JSON.parse(file.info || '{}');
+                const info = JSON.parse(file.info || "{}");
                 const sizeInBytes = parseInt(info.size || 0);
-                
-                if (sizeInBytes === 0) return '0 bytes';
-                
-                const units = ['bytes', 'KB', 'MB', 'GB', 'TB'];
-                const unitIndex = Math.floor(Math.log(sizeInBytes) / Math.log(1024));
-                const size = (sizeInBytes / Math.pow(1024, unitIndex)).toFixed(1);
-                
+
+                if (sizeInBytes === 0) return "0 bytes";
+
+                const units = ["bytes", "KB", "MB", "GB", "TB"];
+                const unitIndex = Math.floor(
+                    Math.log(sizeInBytes) / Math.log(1024)
+                );
+                const size = (sizeInBytes / Math.pow(1024, unitIndex)).toFixed(
+                    1
+                );
+
                 return `${size} ${units[unitIndex]}`;
             } catch (error) {
                 // Fallback to original size if JSON parsing fails
-                return file.size || '0 bytes';
+                return file.size || "0 bytes";
             }
         },
 
@@ -2866,14 +2978,14 @@ export default {
          * Get file size for sorting purposes
          */
         getFileSizeForSorting(file) {
-            if (file.type === 'directory') return 0;
-            
+            if (file.type === "directory") return 0;
+
             try {
-                const info = JSON.parse(file.info || '{}');
+                const info = JSON.parse(file.info || "{}");
                 return parseInt(info.size || 0);
             } catch (error) {
                 // Fallback to parsing original size string
-                return parseInt(file.size?.replace(/[^\d]/g, '') || 0);
+                return parseInt(file.size?.replace(/[^\d]/g, "") || 0);
             }
         },
 
@@ -2881,29 +2993,30 @@ export default {
          * Format date for display
          */
         formatDate(dateString) {
-            if (!dateString) return '--';
-            
+            if (!dateString) return "--";
+
             const date = new Date(dateString);
             const options = {
-                day: 'numeric',
-                month: 'short',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
             };
-            
+
             // Format like "18. Aug 2025 at 10:52"
-            return date.toLocaleDateString('en-GB', options)
-                .replace(',', ' at')
-                .replace(/(\d+)/, '$1.');
+            return date
+                .toLocaleDateString("en-GB", options)
+                .replace(",", " at")
+                .replace(/(\d+)/, "$1.");
         },
 
         /**
          * Get download URL for individual files
          */
         getFileDownloadURL(file) {
-            if (file.type === 'directory') return '#';
-            
+            if (file.type === "directory") return "#";
+
             if (this.project) {
                 return (
                     this.baseURL +
@@ -2917,9 +3030,8 @@ export default {
                     file.uuid
                 );
             }
-            return '#';
+            return "#";
         },
     },
 };
 </script>
-

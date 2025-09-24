@@ -2,8 +2,12 @@
     <app-layout title="Compounds">
         <div>
             <div class="mx-auto">
-                <div class="space-y-6 sm:px-6 lg:col-span-9 lg:px-0 flex flex-col">
-                    <section class="bg-white shadow sm:overflow-hidden flex-1 flex flex-col">
+                <div
+                    class="space-y-6 sm:px-6 lg:col-span-9 lg:px-0 flex flex-col"
+                >
+                    <section
+                        class="bg-white shadow sm:overflow-hidden flex-1 flex flex-col"
+                    >
                         <div>
                             <div class="relative border-b border-zinc-900/5">
                                 <div
@@ -219,7 +223,8 @@
                         </div>
                         <div v-if="results">
                             <div
-                                class="py-6 px-4 lg:px-12 sm:p-6 border-b border-gray-200 overflow-y-scroll" style="height: calc(100vh - 380px);"
+                                class="py-6 px-4 lg:px-12 sm:p-6 border-b border-gray-200 overflow-y-scroll"
+                                style="height: calc(100vh - 380px)"
                             >
                                 <div
                                     v-if="results.data.length > 0"
@@ -257,7 +262,9 @@
                                                     'first:rounded-l-lg last:rounded-r-lg relative cursor-pointer inline-flex items-center border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20',
                                                 ]"
                                                 @click="navigateTo(link)"
-                                                v-html="sanitizeHtml(link.label)"
+                                                v-html="
+                                                    sanitizeHtml(link.label)
+                                                "
                                             >
                                             </a>
                                         </nav>
@@ -571,7 +578,9 @@
                                                     'first:rounded-l-lg last:rounded-r-lg relative cursor-pointer inline-flex items-center border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20',
                                                 ]"
                                                 @click="navigateTo(link)"
-                                                v-html="sanitizeHtml(link.label)"
+                                                v-html="
+                                                    sanitizeHtml(link.label)
+                                                "
                                             >
                                             </a>
                                         </nav>

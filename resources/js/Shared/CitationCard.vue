@@ -13,7 +13,7 @@
                 <h3 class="text-md font-bold text-gray-900 mb-1 leading-5">
                     {{ citation.title }}
                 </h3>
-                
+
                 <div>
                     <p class="text-sm text-gray-700 font-medium">
                         {{ citation.authors }}

@@ -166,7 +166,12 @@
 <script>
 import { ref } from "vue";
 import OCL from "openchemlib/full";
-import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from "@headlessui/vue";
+import {
+    Dialog,
+    DialogPanel,
+    TransitionChild,
+    TransitionRoot,
+} from "@headlessui/vue";
 import { BeakerIcon, MagnifyingGlassIcon } from "@heroicons/vue/24/solid";
 
 export default {

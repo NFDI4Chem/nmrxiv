@@ -162,22 +162,20 @@ export default {
             const fileName = this.fileName;
 
             switch (this.status) {
-                case "verified":
-                    {
-                        const verifiedDate = this.verifiedAt
-                            ? new Date(this.verifiedAt).toLocaleString()
-                            : "recently";
-                        return `${fileName} integrity verified ${verifiedDate}`;
-                    }
+                case "verified": {
+                    const verifiedDate = this.verifiedAt
+                        ? new Date(this.verifiedAt).toLocaleString()
+                        : "recently";
+                    return `${fileName} integrity verified ${verifiedDate}`;
+                }
 
                 case "pending":
                     return `${fileName} integrity verification in progress`;
 
-                case "failed":
-                    {
-                        const errorMsg = this.error ? ` (${this.error})` : "";
-                        return `${fileName} integrity verification failed${errorMsg}`;
-                    }
+                case "failed": {
+                    const errorMsg = this.error ? ` (${this.error})` : "";
+                    return `${fileName} integrity verification failed${errorMsg}`;
+                }
 
                 case "skipped":
                     return `${fileName} integrity verification was skipped`;

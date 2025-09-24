@@ -801,9 +801,7 @@ import JetInputError from "@/Jetstream/InputError.vue";
 import StudyActivity from "@/Pages/Study/Partials/Activity.vue";
 import { ColorPicker } from "vue3-colorpicker";
 import "vue3-colorpicker/style.css";
-import {
-    ClipboardDocumentIcon,
-} from "@heroicons/vue/24/solid";
+import { ClipboardDocumentIcon } from "@heroicons/vue/24/solid";
 import JetButton from "@/Jetstream/Button.vue";
 import SelectRich from "@/Shared/SelectRich.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";

@@ -222,12 +222,7 @@ import { ref } from "vue";
 import throttle from "lodash/throttle";
 import pickBy from "lodash/pickBy";
 import Pagination from "@/Shared/Pagination.vue";
-import {
-    Menu,
-    MenuButton,
-    MenuItem,
-    MenuItems,
-} from "@headlessui/vue";
+import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import {
     ChevronDownIcon,
     QueueListIcon,

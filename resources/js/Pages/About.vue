@@ -988,7 +988,12 @@ import {
     PopoverGroup,
     PopoverPanel,
 } from "@headlessui/vue";
-import { InboxIcon, Bars3Icon, MagnifyingGlassIcon, XMarkIcon } from "@heroicons/vue/24/outline";
+import {
+    InboxIcon,
+    Bars3Icon,
+    MagnifyingGlassIcon,
+    XMarkIcon,
+} from "@heroicons/vue/24/outline";
 import FlashMessages from "@/Shared/FlashMessages.vue";
 
 const Search = [
@@ -1060,9 +1065,9 @@ export default {
         Head,
         Link,
         JetApplicationLogo,
-    InboxIcon,
+        InboxIcon,
         Bars3Icon,
-    MagnifyingGlassIcon,
+        MagnifyingGlassIcon,
         XMarkIcon,
         Popover,
         PopoverButton,
