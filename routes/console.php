@@ -25,6 +25,5 @@ Schedule::command('nmrxiv:delete-citations')->weekly();
 Schedule::command('nmrxiv:delete-authors')->weekly();
 if (App::environment('production')) {
     Schedule::command('nmrxiv:backup-postgres-dump')->daily();
-    // Run cleanup of postgres backups daily and retain only last 7 backups.
-    Schedule::command('backup:clean')->daily()->onOneServer();
 }
+Schedule::command('nmrxiv:backup-cleanup')->daily()->onOneServer();

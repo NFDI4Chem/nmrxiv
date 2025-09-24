@@ -9,14 +9,9 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Artisan;
 
-class CleanupBackups implements ShouldQueue
+class CleanupBackupsJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-
-    public function __construct()
-    {
-        //
-    }
 
     public function handle(): void
     {
