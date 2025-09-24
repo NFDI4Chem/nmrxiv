@@ -525,7 +525,12 @@
 <script>
 import JetApplicationLogo from "@/Jetstream/ApplicationLogo.vue";
 import { ref } from "vue";
-import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from "@headlessui/vue";
+import {
+    Dialog,
+    DialogPanel,
+    TransitionChild,
+    TransitionRoot,
+} from "@headlessui/vue";
 
 import { ArrowTopRightOnSquareIcon } from "@heroicons/vue/24/outline";
 import axios from "axios";

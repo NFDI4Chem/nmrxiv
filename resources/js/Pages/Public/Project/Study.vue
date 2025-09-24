@@ -1,7 +1,7 @@
 <template>
     <!-- Page header with study title -->
     <Head :title="study.data.name" />
-    
+
     <!-- Main layout wrapper -->
     <project-layout :project="project" :selected-tab="tab">
         <template #project-content>
@@ -19,7 +19,7 @@
                         :doi="study.data.doi"
                     ></Citation>
                 </div>
-                
+
                 <!-- Study header section -->
                 <div class="mt-2">
                     <!-- Study title -->
@@ -102,7 +102,7 @@
                                                                 "
                                                             />
                                                         </div>
-                                                        
+
                                                         <!-- Copy to clipboard button -->
                                                         <button
                                                             type="button"
@@ -144,7 +144,7 @@
                         </div>
                     </div>
                     <div class="clear-both"></div>
-                    
+
                     <!-- Mobile layout section -->
                     <div class="mt-4">
                         <!-- Mobile controls (stacked vertically) -->
@@ -372,9 +372,7 @@
                                                     class="absolute top-5 left-5 -ml-px h-full w-0.5 bg-gray-200"
                                                     aria-hidden="true"
                                                 ></span>
-                                                <div
-                                                    class="relative flex"
-                                                >
+                                                <div class="relative flex">
                                                     <div
                                                         v-if="
                                                             molecule &&
@@ -418,10 +416,14 @@
                                                                 >
                                                                     <Depictor2D
                                                                         class="p-4 h-64 w-64 mr-4"
-                                                                        :molecule="molecule.canonical_smiles"
+                                                                        :molecule="
+                                                                            molecule.canonical_smiles
+                                                                        "
                                                                     ></Depictor2D>
                                                                     <Depictor3D
-                                                                        :molecule="molecule.canonical_smiles"
+                                                                        :molecule="
+                                                                            molecule.canonical_smiles
+                                                                        "
                                                                     ></Depictor3D>
                                                                 </div>
                                                                 <div
@@ -640,7 +642,7 @@
 <script>
 /**
  * Study Detail Page Component
- * 
+ *
  * Displays comprehensive information about a study including description,
  * tags, molecular composition, spectra viewer, and associated datasets.
  * Features expandable description, share functionality, and responsive layout.
@@ -651,14 +653,14 @@ import { ShareIcon, ClipboardDocumentIcon } from "@heroicons/vue/24/solid";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import SpectraViewer from "@/Shared/SpectraViewer.vue";
 import Depictor2D from "@/Shared/Depictor2D.vue";
-import Depictor3D from "@/Shared/Depictor3D.vue";   
+import Depictor3D from "@/Shared/Depictor3D.vue";
 import DOIBadge from "@/Shared/DOIBadge.vue";
 import { Head } from "@inertiajs/vue3";
 import Citation from "@/Shared/Citation.vue";
 
 export default {
-    name: 'StudyDetail',
-    
+    name: "StudyDetail",
+
     components: {
         ProjectLayout,
         ShareIcon,
@@ -674,25 +676,25 @@ export default {
         Head,
         Citation,
     },
-    
+
     props: {
         /** Project data object */
         project: {
             type: Object,
-            required: true
+            required: true,
         },
         /** Active tab identifier */
         tab: {
             type: String,
-            required: true
+            required: true,
         },
         /** Study data object */
         study: {
             type: Object,
-            required: true
-        }
+            required: true,
+        },
     },
-    
+
     data() {
         return {
             /** Currently selected dataset for sharing */
@@ -707,7 +709,7 @@ export default {
             isDescriptionLong: false,
         };
     },
-    
+
     computed: {
         /**
          * Get the public URL for sharing the selected dataset
@@ -716,7 +718,7 @@ export default {
         shareURL() {
             return this.selectedDataset.public_url;
         },
-        
+
         /**
          * Get the current page URL
          * @returns {string} Current page URL
@@ -725,20 +727,20 @@ export default {
             return String(this.$page.props.url);
         },
     },
-    
+
     mounted() {
         // Parse URL parameters to set initial dataset selection
         const urlSearchParams = new URLSearchParams(window.location.search);
         const params = Object.fromEntries(urlSearchParams.entries());
         let dsId = params["dsid"];
-        
+
         // Find and set the dataset based on URL parameter
         this.study.data.datasets.forEach((ds) => {
             if (ds.slug == dsId) {
                 this.selectedDataset = ds;
             }
         });
-        
+
         // Default to first dataset if none specified or found
         if (!this.selectedDataset) {
             this.selectedDataset = this.study.data.datasets[0];
@@ -756,7 +758,7 @@ export default {
             this.checkDescriptionLength();
         });
     },
-    
+
     methods: {
         /**
          * Generate SVG string from molecule MOL data (legacy method)
@@ -771,7 +773,7 @@ export default {
                 return mol.toSVG(200, 200);
             }
         },
-        
+
         /**
          * Generate molecule image URL from SMILES string
          * @param {string} smiles - SMILES representation of molecule
@@ -784,7 +786,7 @@ export default {
             const encodedSmiles = encodeURIComponent(smiles);
             return `${this.$page.props.CM_API}depict/2D?smiles=${encodedSmiles}&height=200&width=200&CIP=false&toolkit=cdk`;
         },
-        
+
         /**
          * Handle image loading errors by hiding image and showing placeholder
          * @param {Event} event - Image error event
@@ -792,21 +794,21 @@ export default {
         handleImageError(event) {
             // Hide the failed image
             event.target.style.display = "none";
-            
+
             // Create and show placeholder text
             const placeholder = document.createElement("div");
             placeholder.className = "text-gray-500 text-sm text-center";
             placeholder.textContent = "Structure unavailable";
             event.target.parentNode.appendChild(placeholder);
         },
-        
+
         /**
          * Toggle the expanded state of the description
          */
         toggleDescription() {
             this.isDescriptionExpanded = !this.isDescriptionExpanded;
         },
-        
+
         /**
          * Check if description is long enough to require expansion functionality
          * Sets isDescriptionLong based on character count approximation

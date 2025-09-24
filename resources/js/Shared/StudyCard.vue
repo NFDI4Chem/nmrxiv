@@ -138,16 +138,16 @@ export default {
     props: {
         study: {
             type: Object,
-            required: true
+            required: true,
         },
         preview: {
             type: Boolean,
-            default: false
+            default: false,
         },
         obfuscationCode: {
             type: String,
-            default: null
-        }
+            default: null,
+        },
     },
     data() {
         return {

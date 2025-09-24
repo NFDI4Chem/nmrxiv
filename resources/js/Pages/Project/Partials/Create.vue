@@ -344,7 +344,7 @@ export default {
         SwitchLabel,
         JetDialogModal,
         JetSecondaryButton,
-    JetButton,
+        JetButton,
         JetInputError,
         SelectRich,
     },

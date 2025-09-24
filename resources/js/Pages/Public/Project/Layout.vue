@@ -35,7 +35,9 @@
                                 <!-- Owner details and last updated info -->
                                 <div class="min-w-0 flex-1">
                                     <!-- Owner full name -->
-                                    <p class="text-sm font-semibold text-gray-900 truncate">
+                                    <p
+                                        class="text-sm font-semibold text-gray-900 truncate"
+                                    >
                                         {{
                                             project.data.owner.first_name +
                                             " " +
@@ -53,13 +55,17 @@
                             </div>
 
                             <!-- Right side: Action buttons and statistics -->
-                            <div class="flex items-center space-x-2 flex-shrink-0">
+                            <div
+                                class="flex items-center space-x-2 flex-shrink-0"
+                            >
                                 <!-- Like/upvote button with count -->
                                 <div
                                     v-if="project.data.stats"
                                     class="flex-shrink-0"
                                 >
-                                    <div class="inline-flex shadow-sm rounded-full">
+                                    <div
+                                        class="inline-flex shadow-sm rounded-full"
+                                    >
                                         <!-- Upvote button -->
                                         <button
                                             type="button"
@@ -162,11 +168,13 @@
                                                 }}
                                             </h1>
                                         </div>
-                                        
+
                                         <!-- Project identifier badge -->
                                         <Tag
                                             :identifier="
-                                                (project.data && project.data.identifier) || project.identifier
+                                                (project.data &&
+                                                    project.data.identifier) ||
+                                                project.identifier
                                             "
                                         />
                                     </div>
@@ -174,14 +182,16 @@
                                     <!-- DOI Badge - Primary identifier for citations -->
                                     <div
                                         v-if="
-                                            (project.data && project.data.doi) ||
+                                            (project.data &&
+                                                project.data.doi) ||
                                             project.doi
                                         "
                                         class="mt-3"
                                     >
                                         <DOIBadge
                                             :doi="
-                                                (project.data && project.data.doi) ||
+                                                (project.data &&
+                                                    project.data.doi) ||
                                                 project.doi
                                             "
                                         />
@@ -190,20 +200,29 @@
                                     <!-- Metadata row with license, dates and other info -->
                                     <div
                                         v-if="
-                                            ((project.data && project.data.license) || project.license) ||
-                                            ((project.data && (project.data.release_date || project.data.created_at)) || 
-                                             (project.release_date || project.created_at))
+                                            (project.data &&
+                                                project.data.license) ||
+                                            project.license ||
+                                            (project.data &&
+                                                (project.data.release_date ||
+                                                    project.data.created_at)) ||
+                                            project.release_date ||
+                                            project.created_at
                                         "
                                         class="mt-3"
                                     >
                                         <!-- Mobile-first responsive layout -->
                                         <div class="space-y-3 sm:space-y-0">
                                             <!-- Desktop: Single row layout -->
-                                            <div class="hidden sm:flex sm:flex-wrap sm:items-center sm:gap-x-6 sm:gap-y-2 text-sm text-gray-600">
+                                            <div
+                                                class="hidden sm:flex sm:flex-wrap sm:items-center sm:gap-x-6 sm:gap-y-2 text-sm text-gray-600"
+                                            >
                                                 <!-- License Information -->
-                                                <div 
+                                                <div
                                                     v-if="
-                                                        (project.data && project.data.license) ||
+                                                        (project.data &&
+                                                            project.data
+                                                                .license) ||
                                                         project.license
                                                     "
                                                     class="flex items-center space-x-1.5"
@@ -212,24 +231,60 @@
                                                         class="h-4 w-4 text-gray-400 flex-shrink-0"
                                                         aria-hidden="true"
                                                     />
-                                                    <span class="font-medium">License:</span>
+                                                    <span class="font-medium"
+                                                        >License:</span
+                                                    >
                                                     <a
                                                         v-if="
-                                                            ((project.data && project.data.license && project.data.license.url) ||
-                                                            (project.license && project.license.url))
+                                                            (project.data &&
+                                                                project.data
+                                                                    .license &&
+                                                                project.data
+                                                                    .license
+                                                                    .url) ||
+                                                            (project.license &&
+                                                                project.license
+                                                                    .url)
                                                         "
                                                         :href="
-                                                            (project.data && project.data.license && project.data.license.url) ||
-                                                            (project.license && project.license.url)
+                                                            (project.data &&
+                                                                project.data
+                                                                    .license &&
+                                                                project.data
+                                                                    .license
+                                                                    .url) ||
+                                                            (project.license &&
+                                                                project.license
+                                                                    .url)
                                                         "
                                                         target="_blank"
                                                         rel="noopener noreferrer"
                                                         class="font-medium text-blue-600 hover:text-blue-800 hover:underline transition-colors duration-150"
-                                                        :title="'View ' + ((project.data && project.data.license && project.data.license.title) || (project.license && project.license.title)) + ' license details'"
+                                                        :title="
+                                                            'View ' +
+                                                            ((project.data &&
+                                                                project.data
+                                                                    .license &&
+                                                                project.data
+                                                                    .license
+                                                                    .title) ||
+                                                                (project.license &&
+                                                                    project
+                                                                        .license
+                                                                        .title)) +
+                                                            ' license details'
+                                                        "
                                                     >
                                                         {{
-                                                            (project.data && project.data.license && project.data.license.title) ||
-                                                            (project.license && project.license.title)
+                                                            (project.data &&
+                                                                project.data
+                                                                    .license &&
+                                                                project.data
+                                                                    .license
+                                                                    .title) ||
+                                                            (project.license &&
+                                                                project.license
+                                                                    .title)
                                                         }}
                                                     </a>
                                                     <span
@@ -237,17 +292,29 @@
                                                         class="font-medium text-gray-900"
                                                     >
                                                         {{
-                                                            (project.data && project.data.license && project.data.license.title) ||
-                                                            (project.license && project.license.title)
+                                                            (project.data &&
+                                                                project.data
+                                                                    .license &&
+                                                                project.data
+                                                                    .license
+                                                                    .title) ||
+                                                            (project.license &&
+                                                                project.license
+                                                                    .title)
                                                         }}
                                                     </span>
                                                 </div>
 
                                                 <!-- Project Dates -->
-                                                <div 
+                                                <div
                                                     v-if="
-                                                        (project.data && (project.data.release_date || project.data.created_at)) ||
-                                                        (project.release_date || project.created_at)
+                                                        (project.data &&
+                                                            (project.data
+                                                                .release_date ||
+                                                                project.data
+                                                                    .created_at)) ||
+                                                        project.release_date ||
+                                                        project.created_at
                                                     "
                                                     class="flex items-center space-x-1.5"
                                                 >
@@ -255,50 +322,80 @@
                                                         class="h-4 w-4 text-gray-400 flex-shrink-0"
                                                         aria-hidden="true"
                                                     />
-                                                    <div class="flex items-center space-x-3">
+                                                    <div
+                                                        class="flex items-center space-x-3"
+                                                    >
                                                         <!-- Published date -->
-                                                        <div 
+                                                        <div
                                                             v-if="
-                                                                (project.data && project.data.release_date) ||
+                                                                (project.data &&
+                                                                    project.data
+                                                                        .release_date) ||
                                                                 project.release_date
-                                                            " 
+                                                            "
                                                             class="flex items-center space-x-1"
                                                         >
-                                                            <span class="font-medium">Published:</span>
-                                                            <span class="font-medium text-gray-900">
-                                                                {{ 
+                                                            <span
+                                                                class="font-medium"
+                                                                >Published:</span
+                                                            >
+                                                            <span
+                                                                class="font-medium text-gray-900"
+                                                            >
+                                                                {{
                                                                     formatDate(
-                                                                        (project.data && project.data.release_date) ||
-                                                                        project.release_date
-                                                                    ) 
+                                                                        (project.data &&
+                                                                            project
+                                                                                .data
+                                                                                .release_date) ||
+                                                                            project.release_date
+                                                                    )
                                                                 }}
                                                             </span>
                                                         </div>
-                                                        
+
                                                         <!-- Separator -->
-                                                        <div 
+                                                        <div
                                                             v-if="
-                                                                ((project.data && project.data.release_date) || project.release_date) &&
-                                                                ((project.data && project.data.created_at) || project.created_at)
-                                                            " 
+                                                                ((project.data &&
+                                                                    project.data
+                                                                        .release_date) ||
+                                                                    project.release_date) &&
+                                                                ((project.data &&
+                                                                    project.data
+                                                                        .created_at) ||
+                                                                    project.created_at)
+                                                            "
                                                             class="text-gray-300"
-                                                        >•</div>
-                                                        
+                                                        >
+                                                            •
+                                                        </div>
+
                                                         <!-- Created date -->
-                                                        <div 
+                                                        <div
                                                             v-if="
-                                                                (project.data && project.data.created_at) ||
+                                                                (project.data &&
+                                                                    project.data
+                                                                        .created_at) ||
                                                                 project.created_at
-                                                            " 
+                                                            "
                                                             class="flex items-center space-x-1"
                                                         >
-                                                            <span class="font-medium">Created:</span>
-                                                            <span class="font-medium text-gray-900">
-                                                                {{ 
+                                                            <span
+                                                                class="font-medium"
+                                                                >Created:</span
+                                                            >
+                                                            <span
+                                                                class="font-medium text-gray-900"
+                                                            >
+                                                                {{
                                                                     formatDate(
-                                                                        (project.data && project.data.created_at) ||
-                                                                        project.created_at
-                                                                    ) 
+                                                                        (project.data &&
+                                                                            project
+                                                                                .data
+                                                                                .created_at) ||
+                                                                            project.created_at
+                                                                    )
                                                                 }}
                                                             </span>
                                                         </div>
@@ -307,31 +404,56 @@
                                             </div>
 
                                             <!-- Mobile: Label-above-value layout -->
-                                            <div class="sm:hidden space-y-3 text-sm">
+                                            <div
+                                                class="sm:hidden space-y-3 text-sm"
+                                            >
                                                 <!-- License Information -->
-                                                <div 
+                                                <div
                                                     v-if="
-                                                        (project.data && project.data.license) ||
+                                                        (project.data &&
+                                                            project.data
+                                                                .license) ||
                                                         project.license
                                                     "
                                                     class="space-y-1"
                                                 >
-                                                    <div class="flex items-center space-x-1.5 text-gray-600">
+                                                    <div
+                                                        class="flex items-center space-x-1.5 text-gray-600"
+                                                    >
                                                         <ScaleIcon
                                                             class="h-4 w-4 text-gray-400 flex-shrink-0"
                                                             aria-hidden="true"
                                                         />
-                                                        <span class="font-medium">License</span>
+                                                        <span
+                                                            class="font-medium"
+                                                            >License</span
+                                                        >
                                                     </div>
                                                     <div class="ml-5.5">
                                                         <a
                                                             v-if="
-                                                                ((project.data && project.data.license && project.data.license.url) ||
-                                                                (project.license && project.license.url))
+                                                                (project.data &&
+                                                                    project.data
+                                                                        .license &&
+                                                                    project.data
+                                                                        .license
+                                                                        .url) ||
+                                                                (project.license &&
+                                                                    project
+                                                                        .license
+                                                                        .url)
                                                             "
                                                             :href="
-                                                                (project.data && project.data.license && project.data.license.url) ||
-                                                                (project.license && project.license.url)
+                                                                (project.data &&
+                                                                    project.data
+                                                                        .license &&
+                                                                    project.data
+                                                                        .license
+                                                                        .url) ||
+                                                                (project.license &&
+                                                                    project
+                                                                        .license
+                                                                        .url)
                                                             "
                                                             target="_blank"
                                                             rel="noopener noreferrer"
@@ -339,8 +461,16 @@
                                                             :title="'View license details'"
                                                         >
                                                             {{
-                                                                (project.data && project.data.license && project.data.license.title) ||
-                                                                (project.license && project.license.title)
+                                                                (project.data &&
+                                                                    project.data
+                                                                        .license &&
+                                                                    project.data
+                                                                        .license
+                                                                        .title) ||
+                                                                (project.license &&
+                                                                    project
+                                                                        .license
+                                                                        .title)
                                                             }}
                                                         </a>
                                                         <span
@@ -348,62 +478,94 @@
                                                             class="font-medium text-gray-900"
                                                         >
                                                             {{
-                                                                (project.data && project.data.license && project.data.license.title) ||
-                                                                (project.license && project.license.title)
+                                                                (project.data &&
+                                                                    project.data
+                                                                        .license &&
+                                                                    project.data
+                                                                        .license
+                                                                        .title) ||
+                                                                (project.license &&
+                                                                    project
+                                                                        .license
+                                                                        .title)
                                                             }}
                                                         </span>
                                                     </div>
                                                 </div>
 
                                                 <!-- Published date -->
-                                                <div 
+                                                <div
                                                     v-if="
-                                                        (project.data && project.data.release_date) ||
+                                                        (project.data &&
+                                                            project.data
+                                                                .release_date) ||
                                                         project.release_date
-                                                    " 
+                                                    "
                                                     class="space-y-1"
                                                 >
-                                                    <div class="flex items-center space-x-1.5 text-gray-600">
+                                                    <div
+                                                        class="flex items-center space-x-1.5 text-gray-600"
+                                                    >
                                                         <CalendarDaysIcon
                                                             class="h-4 w-4 text-gray-400 flex-shrink-0"
                                                             aria-hidden="true"
                                                         />
-                                                        <span class="font-medium">Published</span>
+                                                        <span
+                                                            class="font-medium"
+                                                            >Published</span
+                                                        >
                                                     </div>
                                                     <div class="ml-5.5">
-                                                        <span class="font-medium text-gray-900">
-                                                            {{ 
+                                                        <span
+                                                            class="font-medium text-gray-900"
+                                                        >
+                                                            {{
                                                                 formatDate(
-                                                                    (project.data && project.data.release_date) ||
-                                                                    project.release_date
-                                                                ) 
+                                                                    (project.data &&
+                                                                        project
+                                                                            .data
+                                                                            .release_date) ||
+                                                                        project.release_date
+                                                                )
                                                             }}
                                                         </span>
                                                     </div>
                                                 </div>
-                                                
+
                                                 <!-- Created date -->
-                                                <div 
+                                                <div
                                                     v-if="
-                                                        (project.data && project.data.created_at) ||
+                                                        (project.data &&
+                                                            project.data
+                                                                .created_at) ||
                                                         project.created_at
-                                                    " 
+                                                    "
                                                     class="space-y-1"
                                                 >
-                                                    <div class="flex items-center space-x-1.5 text-gray-600">
+                                                    <div
+                                                        class="flex items-center space-x-1.5 text-gray-600"
+                                                    >
                                                         <CalendarDaysIcon
                                                             class="h-4 w-4 text-gray-400 flex-shrink-0"
                                                             aria-hidden="true"
                                                         />
-                                                        <span class="font-medium">Created</span>
+                                                        <span
+                                                            class="font-medium"
+                                                            >Created</span
+                                                        >
                                                     </div>
                                                     <div class="ml-5.5">
-                                                        <span class="font-medium text-gray-900">
-                                                            {{ 
+                                                        <span
+                                                            class="font-medium text-gray-900"
+                                                        >
+                                                            {{
                                                                 formatDate(
-                                                                    (project.data && project.data.created_at) ||
-                                                                    project.created_at
-                                                                ) 
+                                                                    (project.data &&
+                                                                        project
+                                                                            .data
+                                                                            .created_at) ||
+                                                                        project.created_at
+                                                                )
                                                             }}
                                                         </span>
                                                     </div>
@@ -428,7 +590,9 @@
                                         <!-- Desktop: Full tags display via Tag component -->
                                         <Tag
                                             :tags="
-                                                (project.data && project.data.tags) || project.tags
+                                                (project.data &&
+                                                    project.data.tags) ||
+                                                project.tags
                                             "
                                         />
 
@@ -436,19 +600,35 @@
                                         <div class="sm:hidden">
                                             <div class="space-y-2">
                                                 <!-- Tags label -->
-                                                <div class="flex items-center space-x-1.5 text-sm text-gray-600">
+                                                <div
+                                                    class="flex items-center space-x-1.5 text-sm text-gray-600"
+                                                >
                                                     <TagIcon
                                                         class="h-4 w-4 text-gray-400 flex-shrink-0"
                                                         aria-hidden="true"
                                                     />
-                                                    <span class="font-medium">Tags</span>
+                                                    <span class="font-medium"
+                                                        >Tags</span
+                                                    >
                                                 </div>
-                                                
+
                                                 <!-- Limited tags with show more -->
                                                 <div class="ml-5.5">
-                                                    <div class="flex flex-wrap gap-1.5">
+                                                    <div
+                                                        class="flex flex-wrap gap-1.5"
+                                                    >
                                                         <a
-                                                            v-for="tag in ((project.data && project.data.tags) || project.tags).slice(0, showAllTags ? undefined : 3)"
+                                                            v-for="tag in (
+                                                                (project.data &&
+                                                                    project.data
+                                                                        .tags) ||
+                                                                project.tags
+                                                            ).slice(
+                                                                0,
+                                                                showAllTags
+                                                                    ? undefined
+                                                                    : 3
+                                                            )"
                                                             :key="tag.id"
                                                             class="inline-flex items-center rounded-md bg-gray-50 px-2 py-0.5 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10 hover:bg-gray-100 transition-colors duration-150 cursor-pointer"
                                                             :href="
@@ -458,14 +638,39 @@
                                                         >
                                                             {{ tag.name.en }}
                                                         </a>
-                                                        
+
                                                         <!-- Show more/less button -->
                                                         <button
-                                                            v-if="((project.data && project.data.tags) || project.tags).length > 3"
+                                                            v-if="
+                                                                (
+                                                                    (project.data &&
+                                                                        project
+                                                                            .data
+                                                                            .tags) ||
+                                                                    project.tags
+                                                                ).length > 3
+                                                            "
                                                             class="inline-flex items-center rounded-md bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-600 hover:bg-blue-100 transition-colors duration-150 cursor-pointer"
-                                                            @click="showAllTags = !showAllTags"
+                                                            @click="
+                                                                showAllTags =
+                                                                    !showAllTags
+                                                            "
                                                         >
-                                                            {{ showAllTags ? 'Show less' : `+${((project.data && project.data.tags) || project.tags).length - 3} more` }}
+                                                            {{
+                                                                showAllTags
+                                                                    ? "Show less"
+                                                                    : `+${
+                                                                          (
+                                                                              (project.data &&
+                                                                                  project
+                                                                                      .data
+                                                                                      .tags) ||
+                                                                              project.tags
+                                                                          )
+                                                                              .length -
+                                                                          3
+                                                                      } more`
+                                                            }}
                                                         </button>
                                                     </div>
                                                 </div>
@@ -480,7 +685,9 @@
             </div>
         </template>
         <!-- Main content area with navigation tabs and content slot -->
-        <main class="flex-1 relative z-0 overflow-y-auto focus:outline-none xl:order-last">
+        <main
+            class="flex-1 relative z-0 overflow-y-auto focus:outline-none xl:order-last"
+        >
             <div>
                 <!-- Navigation tabs section -->
                 <div class="mt-6 sm:mt-2 2xl:mt-5">
@@ -514,7 +721,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Content area for tab-specific content -->
                 <div class="bg-white">
                     <!-- Slot for project-specific content based on selected tab -->
@@ -528,12 +735,12 @@
 <script>
 /**
  * Public Project Layout Component
- * 
+ *
  * This component serves as the main layout wrapper for public project pages,
  * providing a comprehensive header with project information, owner details,
  * statistics, metadata display, and navigation tabs. It creates a consistent
  * structure for all project-related content with responsive design.
- * 
+ *
  * Key Features:
  * - Project header with owner information and profile photo
  * - Interactive upvote/like functionality with authentication checks
@@ -563,13 +770,13 @@ export default {
      * Component dependencies
      */
     components: {
-        AppLayout,              // Main application layout wrapper
-        Link,                   // Inertia.js Link component for navigation
-        ScaleIcon,              // License/legal icon
-        CalendarDaysIcon,       // Calendar icon for dates
-        TagIcon,                // Tag icon for project tags
-    DOIBadge,               // DOI badge component for citations
-    Tag,                    // Reusable identifier badge component (renamed)
+        AppLayout, // Main application layout wrapper
+        Link, // Inertia.js Link component for navigation
+        ScaleIcon, // License/legal icon
+        CalendarDaysIcon, // Calendar icon for dates
+        TagIcon, // Tag icon for project tags
+        DOIBadge, // DOI badge component for citations
+        Tag, // Reusable identifier badge component (renamed)
     },
 
     /**
@@ -578,7 +785,7 @@ export default {
     props: {
         /**
          * Project data object containing all project information and metadata
-         * 
+         *
          * Expected structure:
          * - data.name: Project name
          * - data.owner: Owner information with profile photo
@@ -593,7 +800,7 @@ export default {
             type: Object,
             required: true,
         },
-        
+
         /**
          * Currently selected tab name for navigation highlighting
          * Used to apply active styles to the current tab
@@ -615,7 +822,7 @@ export default {
              * When true, shows all tags with "show less" button
              */
             showAllTags: false,
-            
+
             /**
              * Available navigation tabs for the project
              * Each tab represents a different section of project information
@@ -664,13 +871,13 @@ export default {
     methods: {
         /**
          * Toggle the upvote/like status for the current project
-         * 
+         *
          * Handles user interaction with the like button by:
          * - Checking user authentication status
          * - Making API call to toggle upvote status
          * - Reloading project data to reflect changes
          * - Redirecting to login if user is not authenticated
-         * 
+         *
          * The method includes error handling for API failures and
          * uses Inertia's selective reloading for better performance.
          */
@@ -681,8 +888,9 @@ export default {
                 this.$page.props.auth.username != ""
             ) {
                 // Construct API endpoint URL
-                const url = "/projects/" + this.project.data.id + "/toggleUpVote";
-                
+                const url =
+                    "/projects/" + this.project.data.id + "/toggleUpVote";
+
                 // Make API call to toggle upvote
                 axios
                     .get(url)
@@ -709,10 +917,10 @@ export default {
 
         /**
          * Navigate to a specific project tab
-         * 
+         *
          * Uses Inertia router to navigate to different project sections
          * while maintaining the current project context.
-         * 
+         *
          * @param {String} tabName - Name of the tab to navigate to
          */
         navigateToTab(tabName) {
@@ -721,18 +929,18 @@ export default {
 
         /**
          * Convert string to proper title case formatting
-         * 
+         *
          * Applies title case rules where:
          * - First and last words are always capitalized
          * - Articles, prepositions, and conjunctions remain lowercase
          * - All other words are capitalized
-         * 
+         *
          * This ensures consistent and professional formatting of project names
          * following standard English title capitalization rules.
-         * 
+         *
          * @param {String} str - String to convert to title case
          * @returns {String} Properly formatted title case string
-         * 
+         *
          * @example
          * toTitleCase("analysis of nmr data") // Returns: "Analysis of NMR Data"
          * toTitleCase("the quick brown fox") // Returns: "The Quick Brown Fox"
@@ -742,9 +950,25 @@ export default {
 
             // Words that should remain lowercase (except at beginning/end)
             const lowercaseWords = [
-                "a", "an", "and", "as", "at", "but", "by", "for",
-                "if", "in", "nor", "of", "on", "or", "so", "the",
-                "to", "up", "yet",
+                "a",
+                "an",
+                "and",
+                "as",
+                "at",
+                "but",
+                "by",
+                "for",
+                "if",
+                "in",
+                "nor",
+                "of",
+                "on",
+                "or",
+                "so",
+                "the",
+                "to",
+                "up",
+                "yet",
             ];
 
             return str
@@ -769,24 +993,24 @@ export default {
 
         /**
          * Format date for display in project metadata
-         * 
+         *
          * Converts ISO date strings to human-readable format
          * suitable for displaying creation and publication dates.
-         * 
+         *
          * @param {String} dateString - ISO date string
          * @returns {String} Formatted date string
          */
         formatDate(dateString) {
-            if (!dateString) return '';
-            
+            if (!dateString) return "";
+
             const date = new Date(dateString);
             const options = {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
+                year: "numeric",
+                month: "long",
+                day: "numeric",
             };
-            
-            return date.toLocaleDateString('en-US', options);
+
+            return date.toLocaleDateString("en-US", options);
         },
     },
 };

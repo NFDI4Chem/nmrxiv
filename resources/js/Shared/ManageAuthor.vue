@@ -289,13 +289,33 @@
                                 </div>
                                 <div class="sm:col-span-2 mt-4">
                                     <jet-secondary-button
-                                        :disabled="query == '' || !query || loading"
+                                        :disabled="
+                                            query == '' || !query || loading
+                                        "
                                         @click="fetchAuthors"
                                     >
-                                        <span v-if="loading" class="flex items-center">
-                                            <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24">
-                                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        <span
+                                            v-if="loading"
+                                            class="flex items-center"
+                                        >
+                                            <svg
+                                                class="animate-spin -ml-1 mr-2 h-4 w-4 text-gray-600"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <circle
+                                                    class="opacity-25"
+                                                    cx="12"
+                                                    cy="12"
+                                                    r="10"
+                                                    stroke="currentColor"
+                                                    stroke-width="4"
+                                                ></circle>
+                                                <path
+                                                    class="opacity-75"
+                                                    fill="currentColor"
+                                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                                ></path>
                                             </svg>
                                             Importing...
                                         </span>
@@ -338,20 +358,42 @@
                                     >
                                         <div
                                             v-for="author in fetchedAuthors"
-                                            :key="author.authorId || author.orcidId || author.fullName"
-                                            :class="author.selected ? 'ring-2 ring-teal-500 rounded-md' : ''"
-                                            @click="addAuthorToSelectedList(author)"
+                                            :key="
+                                                author.authorId ||
+                                                author.orcidId ||
+                                                author.fullName
+                                            "
+                                            :class="
+                                                author.selected
+                                                    ? 'ring-2 ring-teal-500 rounded-md'
+                                                    : ''
+                                            "
+                                            @click="
+                                                addAuthorToSelectedList(author)
+                                            "
                                         >
                                             <AuthorCard
-:authors="[{
-                                                id: author.authorId ? author.authorId.value : undefined,
-                                                title: author.title || '',
-                                                given_name: author.firstName,
-                                                family_name: author.lastName,
-                                                affiliation: author.affiliation,
-                                                orcid_id: author.orcidId,
-                                                email_id: author.email_id
-                                            }]" />
+                                                :authors="[
+                                                    {
+                                                        id: author.authorId
+                                                            ? author.authorId
+                                                                  .value
+                                                            : undefined,
+                                                        title:
+                                                            author.title || '',
+                                                        given_name:
+                                                            author.firstName,
+                                                        family_name:
+                                                            author.lastName,
+                                                        affiliation:
+                                                            author.affiliation,
+                                                        orcid_id:
+                                                            author.orcidId,
+                                                        email_id:
+                                                            author.email_id,
+                                                    },
+                                                ]"
+                                            />
                                         </div>
                                     </div>
                                     <div
@@ -363,7 +405,9 @@
                                             class="float-right ml-2"
                                             @click="save('addSelected')"
                                         >
-                                            Add Selected ({{ selectedAuthorsCount }})
+                                            Add Selected ({{
+                                                selectedAuthorsCount
+                                            }})
                                         </jet-secondary-button>
                                         <jet-secondary-button
                                             class="float-right"
@@ -398,9 +442,16 @@
                                 <AuthorCard
                                     :authors="[element]"
                                     :enable-role-click="true"
-                                    @role-click="(a) => { showManageRoleDialog = true; updateRoleForm.author_id = a.id; }"
+                                    @role-click="
+                                        (a) => {
+                                            showManageRoleDialog = true;
+                                            updateRoleForm.author_id = a.id;
+                                        }
+                                    "
                                 />
-                                <div class="absolute bottom-2 right-2 flex space-x-1">
+                                <div
+                                    class="absolute bottom-2 right-2 flex space-x-1"
+                                >
                                     <!-- <button
                                         class="inline-flex items-center p-1 border border-transparent bg-white/70 rounded hover:bg-white"
                                         @click="(showManageRoleDialog = true), (updateRoleForm.author_id = element.id)"
@@ -414,7 +465,9 @@
                                         @click="edit(element)"
                                     >
                                         <span class="sr-only">Edit</span>
-                                        <PencilIcon class="w-3.5 h-3.5 mr-1 text-gray-600" />
+                                        <PencilIcon
+                                            class="w-3.5 h-3.5 mr-1 text-gray-600"
+                                        />
                                     </button>
                                     <button
                                         type="button"
@@ -422,7 +475,9 @@
                                         @click="confirmDeletion(element)"
                                     >
                                         <span class="sr-only">Delete</span>
-                                        <TrashIcon class="w-3.5 h-3.5 mr-1 text-gray-600" />
+                                        <TrashIcon
+                                            class="w-3.5 h-3.5 mr-1 text-gray-600"
+                                        />
                                     </button>
                                 </div>
                             </div>
@@ -515,7 +570,12 @@
                             <b>{{ item.title }}</b> <br />
                             <p
                                 class="text-xs align-top"
-                                v-text="item.description.replace(/<br\s*\/?>/gi, ' ')"
+                                v-text="
+                                    item.description.replace(
+                                        /<br\s*\/?>/gi,
+                                        ' '
+                                    )
+                                "
                             ></p>
                         </div>
                     </div>
@@ -563,7 +623,7 @@ export default {
         LoadingButton,
         SelectRich,
         Draggable,
-    AuthorCard,
+        AuthorCard,
     },
 
     mixins: [Global],
@@ -708,20 +768,24 @@ export default {
          * @returns {string} CSS class string for input styling
          */
         inputClasses() {
-            const baseClasses = 'shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md';
-            const editClasses = 'shadow-sm focus:ring-red-500 focus:border-red-500 block w-full sm:text-sm border-red-500 rounded-md bg-gray-100';
-            
+            const baseClasses =
+                "shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border-gray-300 rounded-md";
+            const editClasses =
+                "shadow-sm focus:ring-red-500 focus:border-red-500 block w-full sm:text-sm border-red-500 rounded-md bg-gray-100";
+
             return this.isEdit ? editClasses : baseClasses;
         },
-        
+
         /**
          * Returns CSS classes for textarea fields based on edit state
          * @returns {string} CSS class string for textarea styling
          */
         textareaClasses() {
-            const baseClasses = 'shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border border-gray-300 rounded-md';
-            const editClasses = 'shadow-sm focus:ring-red-500 focus:border-red-500 block w-full sm:text-sm border-red-500 rounded-md bg-gray-100';
-            
+            const baseClasses =
+                "shadow-sm focus:ring-teal-500 focus:border-teal-500 block w-full sm:text-sm border border-gray-300 rounded-md";
+            const editClasses =
+                "shadow-sm focus:ring-red-500 focus:border-red-500 block w-full sm:text-sm border-red-500 rounded-md bg-gray-100";
+
             return this.isEdit ? editClasses : baseClasses;
         },
 
@@ -730,7 +794,7 @@ export default {
          * @returns {string} CSS class string for add button
          */
         addButtonClasses() {
-            return 'inline-flex float-right items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2';
+            return "inline-flex float-right items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2";
         },
 
         /**
@@ -738,7 +802,7 @@ export default {
          * @returns {string} CSS class string for back button
          */
         backButtonClasses() {
-            return 'inline-flex float-right items-center rounded-md border border-transparent bg-gray-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2';
+            return "inline-flex float-right items-center rounded-md border border-transparent bg-gray-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2";
         },
 
         /**
@@ -746,7 +810,7 @@ export default {
          * @returns {number} Number of selected authors
          */
         selectedAuthorsCount() {
-            return this.fetchedAuthors.filter(a => a.selected).length;
+            return this.fetchedAuthors.filter((a) => a.selected).length;
         },
 
         /**
@@ -770,8 +834,12 @@ export default {
          * @returns {boolean} True if form is valid for submission
          */
         isFormValid() {
-            return this.form.given_name && this.form.given_name.trim() && 
-                   this.form.family_name && this.form.family_name.trim();
+            return (
+                this.form.given_name &&
+                this.form.given_name.trim() &&
+                this.form.family_name &&
+                this.form.family_name.trim()
+            );
         },
 
         /**
@@ -892,19 +960,25 @@ export default {
             this.loading = true;
             this.error = "";
             this.formattedAuthors = []; // Reset previous results
-            
+
             this.query = this.extractQueryParam(this.query);
             if (!this.query.trim()) {
                 this.handleFetchError("Please enter a valid DOI or ORCID ID.");
                 return;
             }
-            
-            let isDOI = new RegExp(/\b(10[.][0-9]{4,}(?:[.][0-9]+)*)\b/g).test(this.query);
-            
+
+            let isDOI = new RegExp(/\b(10[.][0-9]{4,}(?:[.][0-9]+)*)\b/g).test(
+                this.query
+            );
+
             this.fetchFromEuropePMC(isDOI)
                 .catch(() => this.fetchFromCrossref())
                 .catch(() => this.fetchFromDatacite())
-                .catch(() => this.handleFetchError("No author data found for the provided identifier. Please enter details manually."))
+                .catch(() =>
+                    this.handleFetchError(
+                        "No author data found for the provided identifier. Please enter details manually."
+                    )
+                )
                 .finally(() => {
                     this.loading = false;
                 });
@@ -916,30 +990,41 @@ export default {
          * @returns {Promise} Promise that resolves on successful data fetch
          */
         fetchFromEuropePMC(isDOI) {
-            return axios.get(this.$page.props.europemcWSApi, {
-                params: {
-                    query: isDOI ? "DOI:" + this.query : this.query,
-                    format: "json",
-                    pageSize: "1",
-                    resulttype: "core",
-                    synonym: "true",
-                },
-            }).then((res) => {
-                if (res && res.data && res.data.resultList.result.length > 0) {
-                    const authors = isDOI
-                        ? res.data.resultList.result[0].authorList.author
-                        : res.data.resultList.result[0].authorList.author.filter(
-                              (a) => a.authorId && a.authorId.type == "ORCID" && 
-                                     a.authorId.value == this.query
-                          );
-                    
-                    if (authors && authors.length > 0) {
-                        this.fetchedAuthors = this.formatAuthorResponse(authors, "europemc");
-                        return Promise.resolve();
+            return axios
+                .get(this.$page.props.europemcWSApi, {
+                    params: {
+                        query: isDOI ? "DOI:" + this.query : this.query,
+                        format: "json",
+                        pageSize: "1",
+                        resulttype: "core",
+                        synonym: "true",
+                    },
+                })
+                .then((res) => {
+                    if (
+                        res &&
+                        res.data &&
+                        res.data.resultList.result.length > 0
+                    ) {
+                        const authors = isDOI
+                            ? res.data.resultList.result[0].authorList.author
+                            : res.data.resultList.result[0].authorList.author.filter(
+                                  (a) =>
+                                      a.authorId &&
+                                      a.authorId.type == "ORCID" &&
+                                      a.authorId.value == this.query
+                              );
+
+                        if (authors && authors.length > 0) {
+                            this.fetchedAuthors = this.formatAuthorResponse(
+                                authors,
+                                "europemc"
+                            );
+                            return Promise.resolve();
+                        }
                     }
-                }
-                return Promise.reject();
-            });
+                    return Promise.reject();
+                });
         },
 
         /**
@@ -950,15 +1035,17 @@ export default {
             // Properly encode query parameter to prevent URL injection
             const encodedQuery = encodeURIComponent(this.query.trim());
             const safeUrl = `${this.$page.props.CROSSREF_API}${encodedQuery}`;
-            
-            return axios.get(safeUrl)
-                .then((res) => {
-                    if (res.data && res.data.message && res.data.message.author) {
-                        this.fetchedAuthors = this.formatAuthorResponse(res.data.message.author, "crossref");
-                        return Promise.resolve();
-                    }
-                    return Promise.reject();
-                });
+
+            return axios.get(safeUrl).then((res) => {
+                if (res.data && res.data.message && res.data.message.author) {
+                    this.fetchedAuthors = this.formatAuthorResponse(
+                        res.data.message.author,
+                        "crossref"
+                    );
+                    return Promise.resolve();
+                }
+                return Promise.reject();
+            });
         },
 
         /**
@@ -969,15 +1056,22 @@ export default {
             // Properly encode query parameter to prevent URL injection
             const encodedQuery = encodeURIComponent(this.query.trim());
             const safeUrl = `${this.$page.props.DATACITE_API}${encodedQuery}`;
-            
-            return axios.get(safeUrl)
-                .then((res) => {
-                    if (res && res.data && res.data.data && res.data.data.attributes.creators) {
-                        this.fetchedAuthors = this.formatAuthorResponse(res.data.data.attributes.creators, "datacite");
-                        return Promise.resolve();
-                    }
-                    return Promise.reject();
-                });
+
+            return axios.get(safeUrl).then((res) => {
+                if (
+                    res &&
+                    res.data &&
+                    res.data.data &&
+                    res.data.data.attributes.creators
+                ) {
+                    this.fetchedAuthors = this.formatAuthorResponse(
+                        res.data.data.attributes.creators,
+                        "datacite"
+                    );
+                    return Promise.resolve();
+                }
+                return Promise.reject();
+            });
         },
 
         /**
@@ -1025,11 +1119,16 @@ export default {
                     firstName: author.firstName,
                     lastName: author.lastName,
                     fullName: author.fullName,
-                    orcidId: author.authorId && author.authorId.type == "ORCID"
-                        ? author.authorId.value : "",
-                    affiliation: author.authorAffiliationDetailsList &&
+                    orcidId:
+                        author.authorId && author.authorId.type == "ORCID"
+                            ? author.authorId.value
+                            : "",
+                    affiliation:
+                        author.authorAffiliationDetailsList &&
                         author.authorAffiliationDetailsList.authorAffiliation[0]
-                        ? author.authorAffiliationDetailsList.authorAffiliation[0].affiliation : ""
+                            ? author.authorAffiliationDetailsList
+                                  .authorAffiliation[0].affiliation
+                            : "",
                 };
                 this.formattedAuthors.push(a);
             });
@@ -1045,7 +1144,9 @@ export default {
                     firstName: author.given,
                     lastName: author.family,
                     orcidId: "", // Crossref doesn't provide ORCID ID in response
-                    affiliation: author.affiliation[0] ? author.affiliation[0].name : ""
+                    affiliation: author.affiliation[0]
+                        ? author.affiliation[0].name
+                        : "",
                 };
                 this.formattedAuthors.push(a);
             });
@@ -1061,12 +1162,19 @@ export default {
                     firstName: author.givenName,
                     lastName: author.familyName,
                     orcidId: "",
-                    affiliation: author.affiliation ? author.affiliation[0] : ""
+                    affiliation: author.affiliation
+                        ? author.affiliation[0]
+                        : "",
                 };
 
-                if (author.nameIdentifiers && author.nameIdentifiers[0] &&
-                    author.nameIdentifiers[0].nameIdentifierScheme == "ORCID") {
-                    a.orcidId = this.extractQueryParam(author.nameIdentifiers[0].nameIdentifier);
+                if (
+                    author.nameIdentifiers &&
+                    author.nameIdentifiers[0] &&
+                    author.nameIdentifiers[0].nameIdentifierScheme == "ORCID"
+                ) {
+                    a.orcidId = this.extractQueryParam(
+                        author.nameIdentifiers[0].nameIdentifier
+                    );
                 }
 
                 this.formattedAuthors.push(a);
@@ -1146,7 +1254,7 @@ export default {
         addManually() {
             this.validateForm();
             if (this.form.hasErrors) return;
-            
+
             this.authorsForm.reset();
             const newAuthor = this.buildNewAuthorObject();
             this.addAuthorToList(newAuthor);
@@ -1160,13 +1268,20 @@ export default {
         buildNewAuthorObject() {
             return {
                 title: this.form.title ? this.form.title.trim() : null,
-                given_name: this.form.given_name ? this.form.given_name.trim() : null,
-                family_name: this.form.family_name ? this.form.family_name.trim() : null,
+                given_name: this.form.given_name
+                    ? this.form.given_name.trim()
+                    : null,
+                family_name: this.form.family_name
+                    ? this.form.family_name.trim()
+                    : null,
                 email_id: this.form.email_id ? this.form.email_id.trim() : null,
                 orcid_id: this.form.orcid_id ? this.form.orcid_id.trim() : null,
-                affiliation: this.form.affiliation ? this.form.affiliation.trim() : null,
+                affiliation: this.form.affiliation
+                    ? this.form.affiliation.trim()
+                    : null,
                 contributor_type: this.form.contributor_type
-                    ? this.form.contributor_type.title.trim() : "Researcher",
+                    ? this.form.contributor_type.title.trim()
+                    : "Researcher",
             };
         },
 
@@ -1177,7 +1292,11 @@ export default {
         addAuthorToList(newAuthor) {
             if (this.authors.length > 0) {
                 if (this.selectedAuthor) {
-                    this.authors.splice(this.selectedAuthor.pivot.sort_order, 0, newAuthor);
+                    this.authors.splice(
+                        this.selectedAuthor.pivot.sort_order,
+                        0,
+                        newAuthor
+                    );
                 } else {
                     this.authors.push(newAuthor);
                 }
@@ -1191,8 +1310,10 @@ export default {
          * Handles deduplication and API communication
          */
         executeQuery() {
-            this.authorsForm.authors = this.deduplicateAuthorsList(this.authors);
-            
+            this.authorsForm.authors = this.deduplicateAuthorsList(
+                this.authors
+            );
+
             this.authorsForm.post(route("author.save", this.project.id), {
                 preserveScroll: true,
                 onSuccess: () => this.onSaveSuccess(),
@@ -1222,8 +1343,11 @@ export default {
          */
         deduplicateAuthorsList(authorsList) {
             const keys = ["given_name", "family_name"];
-            return authorsList.filter((value, index, self) =>
-                self.findIndex((v) => keys.every((k) => v[k] === value[k])) === index
+            return authorsList.filter(
+                (value, index, self) =>
+                    self.findIndex((v) =>
+                        keys.every((k) => v[k] === value[k])
+                    ) === index
             );
         },
 
@@ -1269,37 +1393,43 @@ export default {
         validateForm() {
             this.form.errors = {};
             this.form.hasErrors = false;
-            
+
             // Validate required fields
             if (!this.form.given_name || !this.form.given_name.trim()) {
                 this.form.errors.given_name = "First name is required.";
                 this.form.hasErrors = true;
             }
-            
+
             if (!this.form.family_name || !this.form.family_name.trim()) {
                 this.form.errors.family_name = "Family name is required.";
                 this.form.hasErrors = true;
             }
-            
+
             // Validate email format if provided
             if (this.form.email_id && this.form.email_id.trim()) {
                 if (!this.isValidEmail(this.form.email_id.trim())) {
-                    this.form.errors.email_id = "Please enter a valid email address.";
+                    this.form.errors.email_id =
+                        "Please enter a valid email address.";
                     this.form.hasErrors = true;
                 }
             }
-            
+
             // Validate ORCID format if provided
             if (this.form.orcid_id && this.form.orcid_id.trim()) {
                 if (!this.isValidOrcid(this.form.orcid_id.trim())) {
-                    this.form.errors.orcid_id = "Please enter a valid ORCID ID.";
+                    this.form.errors.orcid_id =
+                        "Please enter a valid ORCID ID.";
                     this.form.hasErrors = true;
                 }
             }
-            
+
             // Validate contributor type is selected
-            if (!this.form.contributor_type || !this.form.contributor_type.title) {
-                this.form.errors.contributor_type = "Please select a contributor type.";
+            if (
+                !this.form.contributor_type ||
+                !this.form.contributor_type.title
+            ) {
+                this.form.errors.contributor_type =
+                    "Please select a contributor type.";
                 this.form.hasErrors = true;
             }
         },
@@ -1395,7 +1525,8 @@ export default {
                 user.authorId.value = this.$page.props.auth.user.orcid_id;
                 user.authorAffiliationDetailsList = {};
                 user.authorAffiliationDetailsList.authorAffiliation = [];
-                affiliation.affiliation = this.$page.props.auth.user.affiliation;
+                affiliation.affiliation =
+                    this.$page.props.auth.user.affiliation;
                 user.authorAffiliationDetailsList.authorAffiliation.push(
                     affiliation
                 );

@@ -128,7 +128,9 @@
                             >
                                 <div class="flex items-center space-x-4">
                                     <div class="flex-1 min-w-0">
-                                        <div class="flex items-center gap-2 mb-1">
+                                        <div
+                                            class="flex items-center gap-2 mb-1"
+                                        >
                                             <p
                                                 class="text-lg font-large text-black truncate"
                                             >
@@ -144,11 +146,48 @@
                                                 v-if="draft.status"
                                                 class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
                                                 :class="{
-                                                    'bg-blue-100 text-blue-800': ['received'].includes(draft.status.toLowerCase()),
-                                                    'bg-yellow-100 text-yellow-800': ['zip_processed', 'processing', 'pending', 'job_dispatched'].includes(draft.status.toLowerCase()),
-                                                    'bg-green-100 text-green-800': ['validated', 'processed', 'successful', 'published'].includes(draft.status.toLowerCase()),
-                                                    'bg-red-100 text-red-800': ['failed'].includes(draft.status.toLowerCase()),
-                                                    'bg-gray-100 text-gray-800': !['received', 'zip_processed', 'validated', 'processed', 'successful', 'published', 'failed', 'processing', 'pending', 'job_dispatched'].includes(draft.status.toLowerCase())
+                                                    'bg-blue-100 text-blue-800':
+                                                        ['received'].includes(
+                                                            draft.status.toLowerCase()
+                                                        ),
+                                                    'bg-yellow-100 text-yellow-800':
+                                                        [
+                                                            'zip_processed',
+                                                            'processing',
+                                                            'pending',
+                                                            'job_dispatched',
+                                                        ].includes(
+                                                            draft.status.toLowerCase()
+                                                        ),
+                                                    'bg-green-100 text-green-800':
+                                                        [
+                                                            'validated',
+                                                            'processed',
+                                                            'successful',
+                                                            'published',
+                                                        ].includes(
+                                                            draft.status.toLowerCase()
+                                                        ),
+                                                    'bg-red-100 text-red-800': [
+                                                        'failed',
+                                                    ].includes(
+                                                        draft.status.toLowerCase()
+                                                    ),
+                                                    'bg-gray-100 text-gray-800':
+                                                        ![
+                                                            'received',
+                                                            'zip_processed',
+                                                            'validated',
+                                                            'processed',
+                                                            'successful',
+                                                            'published',
+                                                            'failed',
+                                                            'processing',
+                                                            'pending',
+                                                            'job_dispatched',
+                                                        ].includes(
+                                                            draft.status.toLowerCase()
+                                                        ),
                                                 }"
                                             >
                                                 {{ formatStatus(draft.status) }}
@@ -164,7 +203,8 @@
                                         >
                                             ID: {{ draft.key }}
                                             <span v-if="draft.external_id">
-                                                &middot; External ID: {{ draft.external_id }}
+                                                &middot; External ID:
+                                                {{ draft.external_id }}
                                             </span>
                                         </p>
                                         <p
@@ -178,7 +218,10 @@
                                     </div>
                                     <div class="flex gap-2">
                                         <button
-                                            v-if="draft.processing_logs && draft.processing_logs.length > 0"
+                                            v-if="
+                                                draft.processing_logs &&
+                                                draft.processing_logs.length > 0
+                                            "
                                             class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                                             @click="showProcessingLogs(draft)"
                                         >
@@ -1243,9 +1286,11 @@
                                                                                                     >
                                                                                                         <span
                                                                                                             v-html="
-                                                                                                                sanitizeHtml(getSVGString(
-                                                                                                                    molecule
-                                                                                                                ))
+                                                                                                                sanitizeHtml(
+                                                                                                                    getSVGString(
+                                                                                                                        molecule
+                                                                                                                    )
+                                                                                                                )
                                                                                                             "
                                                                                                         ></span>
                                                                                                     </div>
@@ -1770,16 +1815,19 @@
         </template>
 
         <template #content>
-            <div
-                class="relative h-[70vh] overflow-y-auto z-0 mt-1 rounded-lg"
-            >
+            <div class="relative h-[70vh] overflow-y-auto z-0 mt-1 rounded-lg">
                 <ul
-                    v-if="selectedDraftForLogs?.processing_logs && selectedDraftForLogs.processing_logs.length > 0"
+                    v-if="
+                        selectedDraftForLogs?.processing_logs &&
+                        selectedDraftForLogs.processing_logs.length > 0
+                    "
                     role="list"
                     class="divide-y divide-gray-200"
                 >
                     <li
-                        v-for="(log, index) in selectedDraftForLogs.processing_logs"
+                        v-for="(
+                            log, index
+                        ) in selectedDraftForLogs.processing_logs"
                         :key="index"
                         class="py-4 flex"
                     >
@@ -1819,12 +1867,24 @@
                                 Level: {{ log.level }}
                             </p>
                             <div
-                                v-if="log.context && Object.keys(log.context).length > 0"
+                                v-if="
+                                    log.context &&
+                                    Object.keys(log.context).length > 0
+                                "
                                 class="mt-2 text-xs text-gray-600"
                             >
                                 <details class="cursor-pointer">
-                                    <summary class="font-medium hover:text-gray-900">Context</summary>
-                                    <pre class="mt-1 p-2 bg-gray-50 rounded text-xs overflow-x-auto">{{ JSON.stringify(log.context, null, 2) }}</pre>
+                                    <summary
+                                        class="font-medium hover:text-gray-900"
+                                    >
+                                        Context
+                                    </summary>
+                                    <pre
+                                        class="mt-1 p-2 bg-gray-50 rounded text-xs overflow-x-auto"
+                                        >{{
+                                            JSON.stringify(log.context, null, 2)
+                                        }}</pre
+                                    >
                                 </details>
                             </div>
                         </div>
@@ -2705,22 +2765,27 @@ export default {
             return axios.get("/dashboard/drafts");
         },
         formatStatus(status) {
-            if (!status) return '';
-            
+            if (!status) return "";
+
             const statusMap = {
-                'received': 'Received',
-                'zip_processed': 'ZIP Processed',
-                'validated': 'Validated',
-                'processed': 'Processed',
-                'successful': 'Successful',
-                'published': 'Published',
-                'failed': 'Failed',
-                'processing': 'Processing',
-                'pending': 'Pending',
-                'job_dispatched': 'Job Dispatched'
+                received: "Received",
+                zip_processed: "ZIP Processed",
+                validated: "Validated",
+                processed: "Processed",
+                successful: "Successful",
+                published: "Published",
+                failed: "Failed",
+                processing: "Processing",
+                pending: "Pending",
+                job_dispatched: "Job Dispatched",
             };
-            
-            return statusMap[status.toLowerCase()] || status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+
+            return (
+                statusMap[status.toLowerCase()] ||
+                status
+                    .replace(/_/g, " ")
+                    .replace(/\b\w/g, (l) => l.toUpperCase())
+            );
         },
 
         selectDraft(draft) {

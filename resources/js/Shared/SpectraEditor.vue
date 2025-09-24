@@ -60,7 +60,10 @@
                         </h3>
                         <div class="mt-2 text-sm text-red-700">
                             <ul role="list" class="list-disc space-y-1 pl-5">
-                                <li v-for="(error, index) in spectraError" :key="index">
+                                <li
+                                    v-for="(error, index) in spectraError"
+                                    :key="index"
+                                >
                                     {{ error }}
                                 </li>
                             </ul>

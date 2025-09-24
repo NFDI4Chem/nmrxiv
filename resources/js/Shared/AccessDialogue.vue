@@ -74,7 +74,9 @@
                     <DialogPanel
                         class="mx-auto max-w-xl transform rounded-xl bg-white p-2 shadow-2xl ring-1 ring-black ring-opacity-5 transition-all p-4"
                     >
-                        <div class="sm:flex sm:items-start sm:justify-between border-b pb-2 border-gray-100">
+                        <div
+                            class="sm:flex sm:items-start sm:justify-between border-b pb-2 border-gray-100"
+                        >
                             <div class="w-full">
                                 <h3
                                     class="text-lg leading-6 font-medium text-gray-900"
@@ -410,9 +412,7 @@
                                         {{ model }}.
                                     </p>
                                 </div>
-                                <div
-                                    class="bg-white overflow-hidden"
-                                >
+                                <div class="bg-white overflow-hidden">
                                     <ul
                                         role="list"
                                         class="divide-y divide-gray-200"
@@ -875,7 +875,12 @@ export default {
             if (this.calledFrom == "studyView") {
                 if (this.members) {
                     this.members.forEach((member) => {
-                        if (Object.prototype.hasOwnProperty.call(member, "project_membership")) {
+                        if (
+                            Object.prototype.hasOwnProperty.call(
+                                member,
+                                "project_membership"
+                            )
+                        ) {
                             count = count + 1;
                         }
                     });

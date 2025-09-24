@@ -379,7 +379,7 @@ export default {
     components: {
         StarIcon,
         ShowProjectDates,
-    Tag,
+        Tag,
     },
     props: ["projects", "mode", "teamRole", "team"],
     setup() {},

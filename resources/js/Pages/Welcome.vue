@@ -412,7 +412,14 @@
                                 >
                                     {{ projects }} Projects
                                 </a>
-                                <small v-if="embargoed_projects && embargoed_projects > 0">({{ embargoed_projects }} in embargo)</small>
+                                <small
+                                    v-if="
+                                        embargoed_projects &&
+                                        embargoed_projects > 0
+                                    "
+                                    >({{ embargoed_projects }} in
+                                    embargo)</small
+                                >
                             </p>
                             <p class="text-center">
                                 <a

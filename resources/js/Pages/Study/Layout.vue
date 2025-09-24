@@ -24,7 +24,8 @@
                     class="text-center px-3 py-2 bg-green-50 text-green-700 border-b"
                 >
                     <b>Info: </b> This project is published. You cannot edit a
-                    published project. Contact us at info.nmrxiv@uni-jena.de if you need to make changes.
+                    published project. Contact us at info.nmrxiv@uni-jena.de if
+                    you need to make changes.
                 </div>
             </div>
             <div v-if="study.is_public && study.doi != null">

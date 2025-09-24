@@ -97,9 +97,7 @@
 <script>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Blocks from "@/Shared/Blocks.vue";
-import {
-    EllipsisVerticalIcon,
-} from "@heroicons/vue/24/solid";
+import { EllipsisVerticalIcon } from "@heroicons/vue/24/solid";
 
 export default {
     components: {
