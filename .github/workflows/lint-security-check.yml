@@ -18,11 +18,6 @@ on:
         required: false
         type: boolean
         default: true
-    secrets:
-      DOCKER_HUB_USERNAME:
-        required: false
-      DOCKER_HUB_PASSWORD:
-        required: false
 
 permissions:
   contents: read
@@ -33,6 +28,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Lints PHP code style (Pint) and audits Composer dependencies for vulnerabilities
   php:
     if: ${{ inputs.run_php }}
     name: PHP Lint & Security
@@ -71,6 +67,7 @@ jobs:
       - name: Composer security audit
         run: composer audit --no-interaction --locked
 
+  # Runs JS/Vue linting (ESLint), formatting check (Prettier), and npm security audit
   js:
     if: ${{ inputs.run_js }}
     name: JS Lint & Security
@@ -97,6 +94,7 @@ jobs:
       - name: npm audit (high+)
         run: npm audit --audit-level=high
 
+  # Scans the repository for hard-coded secrets using Gitleaks
   secrets:
     if: ${{ inputs.run_secrets }}
     name: Secret Leakage Scan
