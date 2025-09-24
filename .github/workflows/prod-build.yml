@@ -25,6 +25,7 @@ jobs:
     uses: ./.github/workflows/lint-security-check.yml
     permissions:
       contents: read
+      security-events: write
     with:
       run_php: true
       run_js: true
