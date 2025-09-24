@@ -26,3 +26,4 @@ Schedule::command('nmrxiv:delete-authors')->weekly();
 if (App::environment('production')) {
     Schedule::command('nmrxiv:backup-postgres-dump')->daily();
 }
+Schedule::command('nmrxiv:backup-cleanup')->daily()->onOneServer();
