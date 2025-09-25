@@ -175,6 +175,12 @@
                                             </div>
                                             {{ project.name }}
                                             <span
+                                                v-if="project.active === false"
+                                                class="ml-4 inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-gray-200 text-gray-700 uppercase"
+                                            >
+                                                Inactive
+                                            </span>
+                                            <span
                                                 v-if="
                                                     project.draft_id != null &&
                                                     project.status == null

@@ -24,6 +24,7 @@ class ProjectFactory extends Factory
             'is_public' => false,
             'is_deleted' => false,
             'is_archived' => false,
+            'active' => true,
             'status' => 'draft',
             'process_logs' => null,
             'location' => null, // todo: Adjust when location field is provided in nmrXiv
