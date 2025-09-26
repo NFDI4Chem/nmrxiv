@@ -316,11 +316,15 @@
                                                 submission
                                             </p>
                                         </div>
-                                        <div class="ml-4 mt-4 flex items-center gap-4 flex-shrink-0">
+                                        <div
+                                            class="ml-4 mt-4 flex items-center gap-4 flex-shrink-0"
+                                        >
                                             <div class="w-72">
                                                 <DraftSearch
                                                     v-model="searchDraftQuery"
-                                                    @reset="searchDraftQuery = ''"
+                                                    @reset="
+                                                        searchDraftQuery = ''
+                                                    "
                                                 />
                                             </div>
                                             <button
@@ -508,24 +512,40 @@
                                         </div>
                                     </li>
                                 </ul>
-                                <div class="flex items-center justify-between px-6 py-3 border-t bg-white">
+                                <div
+                                    class="flex items-center justify-between px-6 py-3 border-t bg-white"
+                                >
                                     <div class="text-sm text-gray-600">
-                                        Page {{ currentDraftsPage }} of {{ totalDraftPages }}
+                                        Page {{ currentDraftsPage }} of
+                                        {{ totalDraftPages }}
                                     </div>
                                     <div class="flex items-center gap-2">
                                         <button
                                             type="button"
                                             class="px-3 py-1.5 rounded border text-sm disabled:opacity-50"
                                             :disabled="currentDraftsPage === 1"
-                                            @click="currentDraftsPage = Math.max(1, currentDraftsPage - 1)"
+                                            @click="
+                                                currentDraftsPage = Math.max(
+                                                    1,
+                                                    currentDraftsPage - 1
+                                                )
+                                            "
                                         >
                                             Previous
                                         </button>
                                         <button
                                             type="button"
                                             class="px-3 py-1.5 rounded border text-sm disabled:opacity-50"
-                                            :disabled="currentDraftsPage === totalDraftPages"
-                                            @click="currentDraftsPage = Math.min(totalDraftPages, currentDraftsPage + 1)"
+                                            :disabled="
+                                                currentDraftsPage ===
+                                                totalDraftPages
+                                            "
+                                            @click="
+                                                currentDraftsPage = Math.min(
+                                                    totalDraftPages,
+                                                    currentDraftsPage + 1
+                                                )
+                                            "
                                         >
                                             Next
                                         </button>
@@ -2110,7 +2130,7 @@ export default {
         JetDialogModal,
         Primer,
         FileSystemBrowser,
-    DraftSearch,
+        DraftSearch,
         TrashIcon,
         PencilIcon,
         EyeIcon,
@@ -2248,10 +2268,10 @@ export default {
             }
             const q = this.searchDraftQuery.toLowerCase().trim();
             return this.drafts.filter((d) => {
-                const name = (d.name || '').toLowerCase();
-                const desc = (d.description || '').toLowerCase();
-                const idText = String(d.id || '').toLowerCase();
-                const keyText = String(d.key || '').toLowerCase();
+                const name = (d.name || "").toLowerCase();
+                const desc = (d.description || "").toLowerCase();
+                const idText = String(d.id || "").toLowerCase();
+                const keyText = String(d.key || "").toLowerCase();
                 return (
                     name.includes(q) ||
                     desc.includes(q) ||
@@ -2265,7 +2285,10 @@ export default {
             return this.filteredDrafts.slice(start, start + this.draftsPerPage);
         },
         totalDraftPages() {
-            return Math.max(1, Math.ceil(this.filteredDrafts.length / this.draftsPerPage));
+            return Math.max(
+                1,
+                Math.ceil(this.filteredDrafts.length / this.draftsPerPage)
+            );
         },
         currentStep() {
             return this.steps.filter((s) => s.status == "current")[0];

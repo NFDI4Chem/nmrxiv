@@ -26,7 +26,7 @@ export default {
     props: {
         modelValue: {
             type: String,
-            default: '',
+            default: "",
         },
         maxWidth: {
             type: Number,
