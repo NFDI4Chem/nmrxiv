@@ -28,6 +28,13 @@ class Molecule extends Model
     ];
 
     /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
+    protected $appends = ['public_url'];
+
+    /**
      * Get the molecule identifier
      */
     protected function identifier(): Attribute
@@ -35,6 +42,11 @@ class Molecule extends Model
         return Attribute::make(
             get: fn ($value) => $value ? 'NMRXIV:M'.$value : null,
         );
+    }
+
+    protected function getPublicUrlAttribute()
+    {
+        return env('APP_URL', null).'/compound/M'.$this->getRawOriginal('identifier');
     }
 
     public function samples(): BelongsToMany

@@ -29,6 +29,7 @@ use App\Models\Dataset;
 use App\Models\Molecule;
 use App\Models\Project;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
@@ -83,6 +84,16 @@ Route::supportBubble();
 Route::impersonate();
 
 Route::get('/email/verify/{id}/{hash}', [VerificationController::class, 'verify'])->name('verification.verify');
+
+// New structured routes - must come before more general project routes
+Route::get('/compound/{id}', [ApplicationController::class, 'resolveCompound'])->where('id', '(M|m)[0-9]+')
+    ->name('public.compound');
+
+Route::get('/sample/{id}', [ApplicationController::class, 'resolveSample'])->where('id', '(S|s)[0-9]+')
+    ->name('public.sample');
+
+Route::get('/project/{id}', [ApplicationController::class, 'resolveProject'])->where('id', '(P|p)[0-9]+')
+    ->name('public.project.id');
 
 Route::get('project/{url}', [ProjectController::class, 'review'])->name('project.preview');
 Route::get('project/{url}/studies', [ProjectController::class, 'reviewerStudies'])->name('studies.preview');
@@ -340,7 +351,33 @@ Route::prefix('admin')->group(function () {
     });
 });
 
-Route::get('{id}', [ApplicationController::class, 'resolve'])->where('id', '(P|S|D|M|p|s|d|m)[0-9]+')
+// Redirect old compound URLs to new structure
+Route::get('/spectra', function (Request $request) {
+    $compound = $request->query('compound');
+    if ($compound) {
+        return redirect()->route('public.compound', ['id' => 'M'.$compound], 301);
+    }
+
+    // If no compound parameter, show the spectra page as before
+    return app(StudyController::class)->publicStudiesView($request);
+})->name('public.spectra');
+
+// Keep the old generic resolver for backward compatibility but redirect to new URLs
+Route::get('{id}', function ($id) {
+    $resolvedModel = resolveIdentifier($id);
+    $namespace = $resolvedModel['namespace'];
+
+    if ($namespace === 'Project') {
+        return redirect()->route('public.project.id', ['id' => $id], 301);
+    } elseif ($namespace === 'Study') {
+        return redirect()->route('public.sample', ['id' => $id], 301);
+    } elseif ($namespace === 'Molecule') {
+        return redirect()->route('public.compound', ['id' => $id], 301);
+    }
+
+    // Fallback to original resolver for datasets or unknown types
+    return app(ApplicationController::class)->resolve(request(), $id);
+})->where('id', '(P|S|D|M|p|s|d|m)[0-9]+')
     ->name('public');
 
 // Search / browse page
