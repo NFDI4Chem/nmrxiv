@@ -316,7 +316,13 @@
                                                 submission
                                             </p>
                                         </div>
-                                        <div class="ml-4 mt-4 flex-shrink-0">
+                                        <div class="ml-4 mt-4 flex items-center gap-4 flex-shrink-0">
+                                            <div class="w-72">
+                                                <DraftSearch
+                                                    v-model="searchDraftQuery"
+                                                    @reset="searchDraftQuery = ''"
+                                                />
+                                            </div>
                                             <button
                                                 class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring focus:ring-gray-300 disabled:opacity-25 transition"
                                                 @click="createNewDraft()"
@@ -332,7 +338,7 @@
                                     class="overflow-y-scroll h-[calc(100vh-290px)]"
                                 >
                                     <li
-                                        v-for="draft in drafts"
+                                        v-for="draft in paginatedDrafts"
                                         :key="draft.id"
                                         class="border-b px-5 py-4"
                                     >
@@ -502,6 +508,29 @@
                                         </div>
                                     </li>
                                 </ul>
+                                <div class="flex items-center justify-between px-6 py-3 border-t bg-white">
+                                    <div class="text-sm text-gray-600">
+                                        Page {{ currentDraftsPage }} of {{ totalDraftPages }}
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <button
+                                            type="button"
+                                            class="px-3 py-1.5 rounded border text-sm disabled:opacity-50"
+                                            :disabled="currentDraftsPage === 1"
+                                            @click="currentDraftsPage = Math.max(1, currentDraftsPage - 1)"
+                                        >
+                                            Previous
+                                        </button>
+                                        <button
+                                            type="button"
+                                            class="px-3 py-1.5 rounded border text-sm disabled:opacity-50"
+                                            :disabled="currentDraftsPage === totalDraftPages"
+                                            @click="currentDraftsPage = Math.min(totalDraftPages, currentDraftsPage + 1)"
+                                        >
+                                            Next
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -2051,6 +2080,7 @@ import { ref } from "vue";
 import Primer from "@/Shared/Primer.vue";
 import FileSystemBrowser from "./../Shared/FileSystemBrowser.vue";
 import Validation from "@/Shared/Validation.vue";
+import DraftSearch from "@/Shared/DraftSearch.vue";
 import {
     TrashIcon,
     PencilIcon,
@@ -2080,6 +2110,7 @@ export default {
         JetDialogModal,
         Primer,
         FileSystemBrowser,
+    DraftSearch,
         TrashIcon,
         PencilIcon,
         EyeIcon,
@@ -2114,6 +2145,9 @@ export default {
 
             currentDraft: null,
             drafts: [],
+            searchDraftQuery: "",
+            currentDraftsPage: 1,
+            draftsPerPage: 15,
 
             draftForm: this.$inertia.form({
                 _method: "POST",
@@ -2208,6 +2242,31 @@ export default {
         };
     },
     computed: {
+        filteredDrafts() {
+            if (!this.searchDraftQuery) {
+                return this.drafts;
+            }
+            const q = this.searchDraftQuery.toLowerCase().trim();
+            return this.drafts.filter((d) => {
+                const name = (d.name || '').toLowerCase();
+                const desc = (d.description || '').toLowerCase();
+                const idText = String(d.id || '').toLowerCase();
+                const keyText = String(d.key || '').toLowerCase();
+                return (
+                    name.includes(q) ||
+                    desc.includes(q) ||
+                    idText.includes(q) ||
+                    keyText.includes(q)
+                );
+            });
+        },
+        paginatedDrafts() {
+            const start = (this.currentDraftsPage - 1) * this.draftsPerPage;
+            return this.filteredDrafts.slice(start, start + this.draftsPerPage);
+        },
+        totalDraftPages() {
+            return Math.max(1, Math.ceil(this.filteredDrafts.length / this.draftsPerPage));
+        },
         currentStep() {
             return this.steps.filter((s) => s.status == "current")[0];
         },
@@ -2250,6 +2309,9 @@ export default {
         },
     },
     watch: {
+        searchDraftQuery() {
+            this.currentDraftsPage = 1;
+        },
         getMax(newMax) {
             // Ensure percentage doesn't exceed the new maximum
             if (this.percentage > newMax) {
