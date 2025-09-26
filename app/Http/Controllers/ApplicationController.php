@@ -69,6 +69,16 @@ class ApplicationController extends Controller
     }
 
     /**
+     * Resolve dataset by ID and render the appropriate view
+     *
+     * @return Inertia\Inertia
+     */
+    public function resolveDataset(Request $request, $identifier)
+    {
+        return $this->resolve($request, $identifier);
+    }
+
+    /**
      * Resolve the incoming request into right models and render the
      * inertia view
      *

@@ -40,7 +40,7 @@ trait HasDOI
                     } else {
                         $suffix = 'S'.$studyIdentifier.'.D'.$identifier;
                     }
-                    $url = $url.'D'.$identifier;
+                    $url = $url.'dataset/D'.$identifier;
                     $resourceType = 'Dataset';
                 }
 
