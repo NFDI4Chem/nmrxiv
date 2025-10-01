@@ -10,7 +10,7 @@ class NFDIAAIProviderTest extends TestCase
 {
     public function test_redirect_builds_authorization_url(): void
     {
-        if (! env('NFDIAAI_CLIENT_ID')) {
+        if (! config('services.regapp.client_id')) {
             $this->markTestSkipped('NFDIAAI env vars not set');
         }
 
@@ -23,7 +23,7 @@ class NFDIAAIProviderTest extends TestCase
 
         $this->assertNotNull($target);
         $this->assertTrue(Str::startsWith($target, 'https://regapp.nfdi-aai.de/oidc/realms/nfdi/protocol/openid-connect/auth'));
-        $this->assertStringContainsString('client_id='.urlencode(env('NFDIAAI_CLIENT_ID')), $target);
+        $this->assertStringContainsString('client_id='.urlencode(config('services.regapp.client_id')), $target);
         $this->assertStringContainsString('response_type=code', $target);
         $this->assertStringContainsString('scope=', $target);
         $this->assertStringContainsString('redirect_uri=', $target);
