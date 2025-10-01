@@ -2168,6 +2168,7 @@ export default {
             searchDraftQuery: "",
             currentDraftsPage: 1,
             draftsPerPage: 15,
+            searchDebounceTimer: null,
 
             draftForm: this.$inertia.form({
                 _method: "POST",
@@ -2333,7 +2334,13 @@ export default {
     },
     watch: {
         searchDraftQuery() {
-            this.currentDraftsPage = 1;
+            // Debounce the search query to avoid excessive pagination resets
+            if (this.searchDebounceTimer) {
+                clearTimeout(this.searchDebounceTimer);
+            }
+            this.searchDebounceTimer = setTimeout(() => {
+                this.currentDraftsPage = 1;
+            }, 300); // 300ms debounce delay
         },
         getMax(newMax) {
             // Ensure percentage doesn't exceed the new maximum
@@ -2390,6 +2397,12 @@ export default {
         let localItems = this.findLocalItems("show_compound_details");
         if (localItems.length > 0) {
             this.showCompoundDetails = JSON.parse(localItems[0].val);
+        }
+    },
+    beforeUnmount() {
+        // Clean up the search debounce timer to prevent memory leaks
+        if (this.searchDebounceTimer) {
+            clearTimeout(this.searchDebounceTimer);
         }
     },
     methods: {
