@@ -13,7 +13,9 @@
             <!-- Grid/Mini Mode Layout -->
             <div v-if="mode == 'mini' || mode == 'grid'">
                 <!-- Card container with rounded corners and shadow -->
-                <div class="relative flex flex-col rounded-lg shadow-lg border border-gray-200">
+                <div
+                    class="relative flex flex-col rounded-lg shadow-lg border border-gray-200"
+                >
                     <!-- Clickable project link area -->
                     <Link
                         :href="project.public_url"
@@ -35,7 +37,7 @@
                                 v-else
                                 class="flex-shrink-0 lg:h-36 xl:h-36 pattern-diagonal-lines pattern-gray-400 pattern-bg-white pattern-size-2 pattern-opacity-20"
                             />
-                            
+
                             <!-- Overlay with upvote button (top-right corner) -->
                             <div class="absolute top-0 right-0">
                                 <div class="p-2 flex items-center">
@@ -86,7 +88,10 @@
                         ]"
                     >
                         <!-- Main content area with fixed height for consistent layout -->
-                        <div style="min-height: 168px" class="flex-1 p-3 border-t border-gray-200 cursor-pointer">
+                        <div
+                            style="min-height: 168px"
+                            class="flex-1 p-3 border-t border-gray-200 cursor-pointer"
+                        >
                             <!-- Project identifier (if available) -->
                             <small
                                 v-if="project.identifier"
@@ -94,26 +99,28 @@
                             >
                                 #{{ project.identifier }}
                             </small>
-                            
+
                             <!-- Clickable content area -->
                             <Link
                                 :href="project.public_url"
                                 class="block cursor-pointer"
                             >
                                 <!-- Project title with line clamping -->
-                                <p class="text-lg h-14 font-black text-gray-900 line-clamp-2">
+                                <p
+                                    class="text-lg h-14 font-black text-gray-900 line-clamp-2"
+                                >
                                     {{ project.name }}
                                 </p>
-                                
+
                                 <!-- Project description with line clamping -->
                                 <p class="text-xs text-gray-500 line-clamp-3">
                                     {{ project.description }}
                                 </p>
-                                
+
                                 <!-- Project tags section with overflow handling -->
                                 <div class="mt-1 h-14 overflow-hidden">
                                     <span class="px-2 py-1">
-                                    <Tag :tags="project.tags" size="sm" />
+                                        <Tag :tags="project.tags" size="sm" />
                                     </span>
                                 </div>
                             </Link>
@@ -131,22 +138,26 @@
                                 :src="project.owner.profile_photo_url"
                             />
                         </div>
-                        
+
                         <!-- Owner name and creation date -->
-                        <div class="flex-auto pl-4 text-xs font-xs font-semibold text-black">
+                        <div
+                            class="flex-auto pl-4 text-xs font-xs font-semibold text-black"
+                        >
                             <!-- Owner full name -->
                             <p class="text-ellipsis overflow-hidden ...">
                                 {{ project.owner.first_name }}
                                 {{ project.owner.last_name }}
                             </p>
                             <!-- Project creation date -->
-                            <div class="flex-1 space-x-1 text-xs font-xs text-gray-500">
+                            <div
+                                class="flex-1 space-x-1 text-xs font-xs text-gray-500"
+                            >
                                 <time datetime="2020-03-16">
                                     {{ formatDate(project.created_at) }}
                                 </time>
                             </div>
                         </div>
-                        
+
                         <!-- Actions menu -->
                         <div class="flex-0.5 self-center">
                             <Menu as="div" class="relative text-left">
@@ -155,14 +166,16 @@
                                     <MenuButton
                                         class="bg-white rounded-full flex items-center text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500"
                                     >
-                                        <span class="sr-only">Open options</span>
+                                        <span class="sr-only"
+                                            >Open options</span
+                                        >
                                         <EllipsisVerticalIcon
                                             class="h-5 w-5"
                                             aria-hidden="true"
                                         />
                                     </MenuButton>
                                 </div>
-                                
+
                                 <!-- Menu dropdown with transitions -->
                                 <transition
                                     enter-active-class="transition ease-out duration-100"
@@ -199,14 +212,22 @@
                                                     Download
                                                 </a>
                                             </MenuItem>
-                                            
+
                                             <!-- License information -->
                                             <MenuItem>
                                                 <div class="px-4 py-2">
                                                     <p class="pb-2">
-                                                        <small class="text-gray-500">License</small><br />
-                                                        <span class="mt-2 text-xs text-gray-900 break-words">
-                                                            {{ project.license.title }}
+                                                        <small
+                                                            class="text-gray-500"
+                                                            >License</small
+                                                        ><br />
+                                                        <span
+                                                            class="mt-2 text-xs text-gray-900 break-words"
+                                                        >
+                                                            {{
+                                                                project.license
+                                                                    .title
+                                                            }}
                                                         </span>
                                                     </p>
                                                 </div>
@@ -369,12 +390,12 @@
 <script>
 /**
  * Project Card Component
- * 
+ *
  * A versatile project display component that supports multiple layout modes:
  * - 'mini': Compact card with minimal information
  * - 'grid': Full card with owner info and actions menu
  * - 'list': Horizontal layout for list views
- * 
+ *
  * Features:
  * - Responsive design with different layouts for different screen sizes
  * - Interactive upvote functionality with authentication checks
@@ -387,9 +408,9 @@
 
 // Icon imports from Heroicons
 import {
-    EllipsisVerticalIcon,    // Three dots menu icon
-    ScaleIcon,               // License/legal icon
-    ArrowDownTrayIcon,       // Download icon
+    EllipsisVerticalIcon, // Three dots menu icon
+    ScaleIcon, // License/legal icon
+    ArrowDownTrayIcon, // Download icon
 } from "@heroicons/vue/24/solid";
 
 // HeadlessUI components for dropdown menu
@@ -407,15 +428,15 @@ export default {
      * Component dependencies
      */
     components: {
-        Link,                   // Inertia.js Link component for navigation
-        EllipsisVerticalIcon,   // Menu trigger icon
-        Menu,                   // HeadlessUI Menu container
-        MenuButton,             // HeadlessUI Menu button
-        MenuItem,               // HeadlessUI Menu item
-        MenuItems,              // HeadlessUI Menu items container
-        ArrowDownTrayIcon,      // Download icon
-        ScaleIcon,              // License icon
-    Tag,                    // Reusable tag component
+        Link, // Inertia.js Link component for navigation
+        EllipsisVerticalIcon, // Menu trigger icon
+        Menu, // HeadlessUI Menu container
+        MenuButton, // HeadlessUI Menu button
+        MenuItem, // HeadlessUI Menu item
+        MenuItems, // HeadlessUI Menu items container
+        ArrowDownTrayIcon, // Download icon
+        ScaleIcon, // License icon
+        Tag, // Reusable tag component
     },
 
     /**
@@ -431,13 +452,13 @@ export default {
     methods: {
         /**
          * Toggle the upvote/like status for the project
-         * 
+         *
          * Handles user interaction with the upvote button by:
          * - Checking user authentication status
          * - Making API call to toggle upvote status
          * - Reloading projects data to reflect changes
          * - Redirecting to login if user is not authenticated
-         * 
+         *
          * Includes error handling for API failures and uses Inertia's
          * selective reloading for better performance.
          */
@@ -449,7 +470,7 @@ export default {
             ) {
                 // Construct API endpoint URL
                 const url = "/projects/" + this.project.id + "/toggleUpVote";
-                
+
                 // Make API call to toggle upvote
                 axios
                     .get(url)
@@ -476,24 +497,24 @@ export default {
 
         /**
          * Format date for display in project metadata
-         * 
+         *
          * Converts ISO date strings to human-readable format
          * suitable for displaying creation dates.
-         * 
+         *
          * @param {String} dateString - ISO date string
          * @returns {String} Formatted date string
          */
         formatDate(dateString) {
-            if (!dateString) return '';
-            
+            if (!dateString) return "";
+
             const date = new Date(dateString);
             const options = {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
+                year: "numeric",
+                month: "long",
+                day: "numeric",
             };
-            
-            return date.toLocaleDateString('en-US', options);
+
+            return date.toLocaleDateString("en-US", options);
         },
     },
 };

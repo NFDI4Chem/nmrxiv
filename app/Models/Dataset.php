@@ -77,7 +77,7 @@ class Dataset extends Model implements Auditable
     protected function getPublicUrlAttribute()
     {
         // return  env('APP_URL', null).'/datasets/'.urlencode($this->slug);
-        return env('APP_URL', null).'/D'.$this->getRawOriginal('identifier');
+        return env('APP_URL', null).'/dataset/D'.$this->getRawOriginal('identifier');
     }
 
     protected function getPrivateUrlAttribute()

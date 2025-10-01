@@ -21,11 +21,61 @@ class ApplicationController extends Controller
     public function compounds(Request $request)
     {
         $query = $request->get('query');
-        $limit = $request->get('limit') ? $limit : 24;
+        $limit = $request->get('limit') ? $request->get('limit') : 24;
         $page = $request->query('page');
         $tagType = $request->query('tagType') ? $request->query('tagType') : null;
 
         return Inertia::render('Public/Compounds', compact(['query', 'limit', 'page', 'tagType']));
+    }
+
+    /**
+     * Resolve compound by ID and render the appropriate view
+     *
+     * @return Inertia\Inertia
+     */
+    public function resolveCompound(Request $request, $identifier)
+    {
+        $resolvedModel = resolveIdentifier($identifier);
+        $namespace = $resolvedModel['namespace'];
+        $model = $resolvedModel['model'];
+
+        if ($model && $namespace === 'Molecule') {
+            // Redirect to spectra page with compound parameter for now
+            // This maintains the current compound viewing functionality
+            return redirect('/spectra?compound='.substr($identifier, 1));
+        } else {
+            abort(404, 'Compound not found');
+        }
+    }
+
+    /**
+     * Resolve sample by ID and render the appropriate view
+     *
+     * @return Inertia\Inertia
+     */
+    public function resolveSample(Request $request, $identifier)
+    {
+        return $this->resolve($request, $identifier);
+    }
+
+    /**
+     * Resolve project by ID and render the appropriate view
+     *
+     * @return Inertia\Inertia
+     */
+    public function resolveProject(Request $request, $identifier)
+    {
+        return $this->resolve($request, $identifier);
+    }
+
+    /**
+     * Resolve dataset by ID and render the appropriate view
+     *
+     * @return Inertia\Inertia
+     */
+    public function resolveDataset(Request $request, $identifier)
+    {
+        return $this->resolve($request, $identifier);
     }
 
     /**

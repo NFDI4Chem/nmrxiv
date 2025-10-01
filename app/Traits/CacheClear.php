@@ -5,7 +5,7 @@ namespace App\Traits;
 use App\Models\Dataset;
 use App\Models\Project;
 use App\Models\Study;
-use Artisan;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 
 trait CacheClear
@@ -26,6 +26,7 @@ trait CacheClear
             if ($model instanceof Project) {
                 Cache::forget('projects');
                 Cache::forget('stats.projects');
+                Cache::forget('stats.embargoed_projects');
             } elseif ($model instanceof Study) {
                 Cache::forget('studies');
                 Cache::forget('stats.compounds');

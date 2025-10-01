@@ -106,11 +106,29 @@
                                         class="mt-2"
                                     />
                                     <!-- Draft Warning Error Message -->
-                                    <div v-if="hasDraftInName && !draftWarningConfirmed" class="mt-2 flex items-center text-red-600 text-sm">
-                                        <svg class="w-4 h-4 mr-1.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                    <div
+                                        v-if="
+                                            hasDraftInName &&
+                                            !draftWarningConfirmed
+                                        "
+                                        class="mt-2 flex items-center text-red-600 text-sm"
+                                    >
+                                        <svg
+                                            class="w-4 h-4 mr-1.5 flex-shrink-0"
+                                            fill="currentColor"
+                                            viewBox="0 0 20 20"
+                                        >
+                                            <path
+                                                fill-rule="evenodd"
+                                                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                                clip-rule="evenodd"
+                                            />
                                         </svg>
-                                        <span>Invalid project name - contains "DRAFT" - please update the project name to publish</span>
+                                        <span
+                                            >Invalid project name - contains
+                                            "DRAFT" - please update the project
+                                            name to publish</span
+                                        >
                                     </div>
                                 </div>
                                 <div id="project-desc" class="mb-3">
@@ -290,13 +308,11 @@
                                         class="mt-2 text-md text-gray-900 space-y-5 focus:pointer-events-auto"
                                     >
                                         <div
-                                            class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-3 "
+                                            class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-3"
                                         >
-                                                <citation-card
-                                                    :citations="
-                                                        project.citations
-                                                    "
-                                                />
+                                            <citation-card
+                                                :citations="project.citations"
+                                            />
                                         </div>
                                     </dd>
                                 </div>
@@ -558,10 +574,18 @@
                                                     publishForm.enableProjectMode
                                                 "
                                             >
-                                                I understand that publishing makes all underlying data publicly available on the nmrXiv platform after the set release date.
+                                                I understand that publishing
+                                                makes all underlying data
+                                                publicly available on the nmrXiv
+                                                platform after the set release
+                                                date.
                                             </span>
                                             <span v-else>
-                                                I understand that publishing makes all underlying data publicly available on the nmrXiv platform after the set release date.
+                                                I understand that publishing
+                                                makes all underlying data
+                                                publicly available on the nmrXiv
+                                                platform after the set release
+                                                date.
                                             </span>
                                         </div>
                                     </div>
@@ -771,7 +795,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Draft Warning Modal -->
             <jet-confirmation-modal
                 :show="showDraftWarningModal"
@@ -779,8 +803,18 @@
             >
                 <template #title>
                     <div class="flex items-center">
-                        <svg class="w-6 h-6 text-amber-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                        <svg
+                            class="w-6 h-6 text-amber-500 mr-2"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z"
+                            ></path>
                         </svg>
                         Project Name Contains "DRAFT"
                     </div>
@@ -788,23 +822,33 @@
                 <template #content>
                     <div class="space-y-3">
                         <p class="text-sm text-gray-600">
-                            Your project name contains the word "DRAFT", which suggests this might be a work-in-progress version.
+                            Your project name contains the word "DRAFT", which
+                            suggests this might be a work-in-progress version.
                         </p>
-                        <div class="bg-amber-50 border border-amber-200 rounded-md p-3">
+                        <div
+                            class="bg-amber-50 border border-amber-200 rounded-md p-3"
+                        >
                             <p class="text-sm text-amber-800">
-                                <strong>Current name:</strong> {{ publishForm.name }}
+                                <strong>Current name:</strong>
+                                {{ publishForm.name }}
                             </p>
                         </div>
                         <p class="text-sm text-gray-600">
-                            Are you sure you want to proceed with publishing this project with the current name?
+                            Are you sure you want to proceed with publishing
+                            this project with the current name?
                         </p>
                     </div>
                 </template>
                 <template #footer>
-                    <jet-secondary-button @click="showDraftWarningModal = false">
+                    <jet-secondary-button
+                        @click="showDraftWarningModal = false"
+                    >
                         Cancel
                     </jet-secondary-button>
-                    <jet-success-button class="ml-2" @click="confirmDraftWarning">
+                    <jet-success-button
+                        class="ml-2"
+                        @click="confirmDraftWarning"
+                    >
                         Yes, Proceed
                     </jet-success-button>
                 </template>
@@ -818,18 +862,18 @@
                 <template #content>
                     <div v-if="isReleasedToday()">
                         Once the data is published you will no longer be able to
-                        change the data uploaded! If published as a project, you may
-                        add more samples (spectra) to the project later.
+                        change the data uploaded! If published as a project, you
+                        may add more samples (spectra) to the project later.
                     </div>
                     <div v-else>
-                        Opting for an Embargo publication grants your project a DOI,
-                        yet it stays private exclusively for you. You have the
-                        option to share the project with others and can adjust the
-                        release date or promptly make it public through the
-                        project's dashboard view. But once the data is published you
-                        will no longer be able to change the data uploaded! If
-                        published as a project, you may add more samples (spectra)
-                        to the project later if desired.
+                        Opting for an Embargo publication grants your project a
+                        DOI, yet it stays private exclusively for you. You have
+                        the option to share the project with others and can
+                        adjust the release date or promptly make it public
+                        through the project's dashboard view. But once the data
+                        is published you will no longer be able to change the
+                        data uploaded! If published as a project, you may add
+                        more samples (spectra) to the project later if desired.
                     </div>
                 </template>
                 <template #footer>
@@ -838,7 +882,11 @@
                     >
                         Cancel
                     </jet-secondary-button>
-                    <jet-success-button v-if="isReleasedToday()" class="ml-2" @click="publish">
+                    <jet-success-button
+                        v-if="isReleasedToday()"
+                        class="ml-2"
+                        @click="publish"
+                    >
                         Publish Now
                     </jet-success-button>
                     <jet-success-button v-else class="ml-2" @click="publish">
@@ -867,9 +915,7 @@ import AuthorCard from "@/Shared/AuthorCard.vue";
 import StudyInfo from "@/Shared/StudyInfo.vue";
 import SelectRich from "@/Shared/SelectRich.vue";
 import CitationCard from "@/Shared/CitationCard.vue";
-import {
-    PencilIcon,
-} from "@heroicons/vue/24/solid";
+import { PencilIcon } from "@heroicons/vue/24/solid";
 import ToggleButton from "@/Shared/ToggleButton.vue";
 import "ontology-elements/dist/index.js";
 import JetConfirmationModal from "@/Jetstream/ConfirmationModal.vue";
@@ -969,13 +1015,18 @@ export default {
             return releaseDate.getTime() === today.getTime();
         },
         hasDraftInName() {
-            return this.publishForm.name && this.publishForm.name.toLowerCase().includes('draft');
+            return (
+                this.publishForm.name &&
+                this.publishForm.name.toLowerCase().includes("draft")
+            );
         },
         canPublish() {
-            return this.publishForm.terms && 
-                   this.publishForm.conditions && 
-                   !this.publishForm.processing &&
-                   (!this.hasDraftInName || this.draftWarningConfirmed);
+            return (
+                this.publishForm.terms &&
+                this.publishForm.conditions &&
+                !this.publishForm.processing &&
+                (!this.hasDraftInName || this.draftWarningConfirmed)
+            );
         },
     },
 
@@ -1062,7 +1113,7 @@ export default {
         updateProject() {
             // Reset draft warning when name changes
             this.draftWarningConfirmed = false;
-            
+
             // if (this.publishForm.enableProjectMode) {
             if (this.$refs.photo) {
                 this.publishForm.photo = this.$refs.photo.files[0];
@@ -1099,7 +1150,6 @@ export default {
                     onError: () => {},
                 }
             );
-
         },
         updateSpecies(species) {
             if (species && species != "") {

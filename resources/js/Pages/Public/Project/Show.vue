@@ -1,7 +1,7 @@
 <template>
     <!-- Page header with project title -->
     <Head :title="project.data.name" />
-    
+
     <!-- Main layout wrapper -->
     <project-layout :project="project" :selected-tab="tab">
         <template #project-content>
@@ -19,7 +19,7 @@
                         :doi="project.data.doi"
                     ></Citation>
                 </div>
-                
+
                 <!-- Project information sections -->
                 <div class="mt-6 space-y-4">
                     <!-- About project section -->
@@ -81,7 +81,7 @@
                                 Submitter(s)
                             </h2>
                         </div>
-                        
+
                         <!-- Submitters grid -->
                         <div class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <!-- Individual submitter card -->
@@ -98,7 +98,7 @@
                                         alt=""
                                     />
                                 </div>
-                                
+
                                 <!-- User information -->
                                 <div class="flex-1 min-w-0">
                                     <a class="focus:outline-none">
@@ -107,7 +107,7 @@
                                             class="absolute inset-0"
                                             aria-hidden="true"
                                         ></span>
-                                        
+
                                         <!-- User full name -->
                                         <p
                                             class="text-sm font-medium text-gray-900"
@@ -118,7 +118,7 @@
                                                 user.last_name
                                             }}
                                         </p>
-                                        
+
                                         <!-- Username -->
                                         <p
                                             class="text-sm text-gray-500 truncate"
@@ -145,14 +145,14 @@
                                     Author(s)
                                 </h2>
                             </div>
-                            
+
                             <!-- Authors grid -->
                             <div
                                 class="mt-1 grid grid-cols-1 gap-4 sm:grid-cols-2"
                             >
                                 <author-card :authors="project.data.authors" />
                             </div>
-                            
+
                             <!-- Citations section (only shown if citations exist) -->
                             <div
                                 v-if="
@@ -169,7 +169,7 @@
                                         Citation(s)
                                     </h2>
                                 </div>
-                                
+
                                 <!-- Citations content -->
                                 <dd
                                     class="mt-2 text-md text-gray-900 space-y-5 focus:pointer-events-auto"
@@ -190,7 +190,7 @@
             </div>
         </template>
     </project-layout>
-    
+
     <!-- JSON-LD structured data for SEO -->
     <component :is="'script'" type="application/ld+json">{{
         schema
@@ -200,7 +200,7 @@
 <script>
 /**
  * Project Show Page Component
- * 
+ *
  * Displays detailed information about a project including description,
  * organisms, submitters, authors, and citations.
  */
@@ -213,8 +213,8 @@ import Citation from "@/Shared/Citation.vue";
 import { Head } from "@inertiajs/vue3";
 
 export default {
-    name: 'ProjectShow',
-    
+    name: "ProjectShow",
+
     components: {
         ProjectLayout,
         AuthorCard,
@@ -222,27 +222,27 @@ export default {
         Citation,
         Head,
     },
-    
+
     props: {
         /** Project data object */
         project: {
             type: Object,
-            required: true
+            required: true,
         },
         /** Active tab identifier */
         tab: {
             type: String,
-            required: true
-        }
+            required: true,
+        },
     },
-    
+
     data() {
         return {
             /** JSON-LD schema data for structured markup */
             schema: {},
         };
     },
-    
+
     mounted() {
         // Fetch bioschemas structured data for SEO
         axios

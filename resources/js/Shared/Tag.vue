@@ -15,7 +15,10 @@
             <a
                 v-for="tag in tags"
                 :key="tag.id"
-                :class="[chipClasses, 'hover:bg-gray-100 transition-colors duration-150 cursor-pointer']"
+                :class="[
+                    chipClasses,
+                    'hover:bg-gray-100 transition-colors duration-150 cursor-pointer',
+                ]"
                 :href="'/projects?tag=' + (tag?.name?.en ?? '')"
             >
                 {{ tag?.name?.en }}
@@ -43,16 +46,17 @@ export default {
         // Size variant: 'md' (default) or 'sm' for more compact chips
         size: {
             type: String,
-            default: 'md',
-            validator: (v) => ['sm', 'md'].includes(v),
+            default: "md",
+            validator: (v) => ["sm", "md"].includes(v),
         },
     },
     computed: {
         chipClasses() {
-            const base = 'inline-flex items-center rounded-full bg-gray-50 font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10';
+            const base =
+                "inline-flex items-center rounded-full bg-gray-50 font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10";
             const sizes = {
-                md: 'px-4 py-1 text-sm',
-                sm: 'px-2 py-0.5 text-xs',
+                md: "px-4 py-1 text-sm",
+                sm: "px-2 py-0.5 text-xs",
             };
             return `${base} ${sizes[this.size]}`;
         },

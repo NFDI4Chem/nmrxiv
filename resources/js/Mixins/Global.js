@@ -130,7 +130,7 @@ export default {
 
             downloadLink.click();
         },
-    /*Extract Doi from URL*/
+        /*Extract Doi from URL*/
         fixedDecimelPoint(input, decimelPoint) {
             return Number.parseFloat(input).toFixed(decimelPoint);
         },
@@ -164,73 +164,170 @@ export default {
         },
         md(data) {
             if (!data) return "";
-            
+
             // Configure marked with security settings
             marked.setOptions({
                 breaks: true,
                 gfm: true,
                 sanitize: false, // We'll use DOMPurify for sanitization
                 smartLists: true,
-                smartypants: false
+                smartypants: false,
             });
-            
+
             // Parse markdown to HTML
             const rawHtml = marked.parse(data);
-            
+
             // Sanitize the HTML to prevent XSS attacks
             return DOMPurify.sanitize(rawHtml, {
                 ALLOWED_TAGS: [
-                    'p', 'br', 'strong', 'em', 'u', 'strike', 'del', 'ins',
-                    'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-                    'ul', 'ol', 'li',
-                    'blockquote', 'pre', 'code',
-                    'a', 'img',
-                    'table', 'thead', 'tbody', 'tr', 'th', 'td',
-                    'hr'
+                    "p",
+                    "br",
+                    "strong",
+                    "em",
+                    "u",
+                    "strike",
+                    "del",
+                    "ins",
+                    "h1",
+                    "h2",
+                    "h3",
+                    "h4",
+                    "h5",
+                    "h6",
+                    "ul",
+                    "ol",
+                    "li",
+                    "blockquote",
+                    "pre",
+                    "code",
+                    "a",
+                    "img",
+                    "table",
+                    "thead",
+                    "tbody",
+                    "tr",
+                    "th",
+                    "td",
+                    "hr",
                 ],
                 ALLOWED_ATTR: [
-                    'href', 'title', 'alt', 'src', 'width', 'height',
-                    'class', 'id'
+                    "href",
+                    "title",
+                    "alt",
+                    "src",
+                    "width",
+                    "height",
+                    "class",
+                    "id",
                 ],
-                ALLOWED_URI_REGEXP: /^(?:(?:(?:f|ht)tps?|mailto|tel|callto|cid|xmpp|data):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i,
-                FORBID_TAGS: ['script', 'object', 'embed', 'form', 'input', 'textarea', 'select', 'button'],
-                FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'onfocus', 'onblur', 'onchange', 'onsubmit'],
+                ALLOWED_URI_REGEXP:
+                    /^(?:(?:(?:f|ht)tps?|mailto|tel|callto|cid|xmpp|data):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i,
+                FORBID_TAGS: [
+                    "script",
+                    "object",
+                    "embed",
+                    "form",
+                    "input",
+                    "textarea",
+                    "select",
+                    "button",
+                ],
+                FORBID_ATTR: [
+                    "onerror",
+                    "onload",
+                    "onclick",
+                    "onmouseover",
+                    "onfocus",
+                    "onblur",
+                    "onchange",
+                    "onsubmit",
+                ],
                 KEEP_CONTENT: true,
                 RETURN_DOM: false,
                 RETURN_DOM_FRAGMENT: false,
                 RETURN_DOM_IMPORT: false,
                 SANITIZE_DOM: true,
-                WHOLE_DOCUMENT: false
+                WHOLE_DOCUMENT: false,
             });
         },
         sanitizeHtml(data) {
             if (!data) return "";
-            
+
             // Sanitize raw HTML content to prevent XSS attacks
             // This is for content that's already HTML (not markdown)
             return DOMPurify.sanitize(data, {
                 ALLOWED_TAGS: [
-                    'p', 'br', 'strong', 'em', 'u', 'strike', 'del', 'ins',
-                    'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-                    'ul', 'ol', 'li',
-                    'blockquote', 'pre', 'code',
-                    'a', 'img',
-                    'table', 'thead', 'tbody', 'tr', 'th', 'td',
-                    'hr', 'div', 'span'
+                    "p",
+                    "br",
+                    "strong",
+                    "em",
+                    "u",
+                    "strike",
+                    "del",
+                    "ins",
+                    "h1",
+                    "h2",
+                    "h3",
+                    "h4",
+                    "h5",
+                    "h6",
+                    "ul",
+                    "ol",
+                    "li",
+                    "blockquote",
+                    "pre",
+                    "code",
+                    "a",
+                    "img",
+                    "table",
+                    "thead",
+                    "tbody",
+                    "tr",
+                    "th",
+                    "td",
+                    "hr",
+                    "div",
+                    "span",
                 ],
                 ALLOWED_ATTR: [
-                    'href', 'title', 'alt', 'src', 'width', 'height',
-                    'class', 'id'
+                    "href",
+                    "title",
+                    "alt",
+                    "src",
+                    "width",
+                    "height",
+                    "class",
+                    "id",
                 ],
-                ALLOWED_URI_REGEXP: /^(?:(?:(?:f|ht)tps?|mailto|tel|callto|cid|xmpp|data):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i,
-                FORBID_TAGS: ['script', 'object', 'embed', 'form', 'input', 'textarea', 'select', 'button', 'svg'],
-                FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'onfocus', 'onblur', 'onchange', 'onsubmit'],
+                ALLOWED_URI_REGEXP:
+                    /^(?:(?:(?:f|ht)tps?|mailto|tel|callto|cid|xmpp|data):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i,
+                FORBID_TAGS: [
+                    "script",
+                    "object",
+                    "embed",
+                    "form",
+                    "input",
+                    "textarea",
+                    "select",
+                    "button",
+                    "svg",
+                ],
+                FORBID_ATTR: [
+                    "onerror",
+                    "onload",
+                    "onclick",
+                    "onmouseover",
+                    "onfocus",
+                    "onblur",
+                    "onchange",
+                    "onsubmit",
+                ],
                 KEEP_CONTENT: true,
                 RETURN_DOM: false,
                 RETURN_DOM_FRAGMENT: false,
                 RETURN_DOM_IMPORT: false,
                 SANITIZE_DOM: true,
-                WHOLE_DOCUMENT: false
+                WHOLE_DOCUMENT: false,
             });
         },
         getHash(input) {

@@ -24,16 +24,25 @@
                         @click.stop.prevent="onRoleClick(author)"
                     >
                         <Tag
-                            :label="(author.pivot && author.pivot.contributor_type) || author.contributor_type || 'Researcher'"
+                            :label="
+                                (author.pivot &&
+                                    author.pivot.contributor_type) ||
+                                author.contributor_type ||
+                                'Researcher'
+                            "
                             class="cursor-pointer group-hover:shadow group-active:scale-[0.97] transition"
                         />
                     </button>
                     <Tag
                         v-else
-                        :label="(author.pivot && author.pivot.contributor_type) || author.contributor_type || 'Researcher'"
+                        :label="
+                            (author.pivot && author.pivot.contributor_type) ||
+                            author.contributor_type ||
+                            'Researcher'
+                        "
                     />
                 </div>
-                
+
                 <div class="space-y-1">
                     <p v-if="author.affiliation" class="text-sm text-gray-500">
                         {{ author.affiliation }}

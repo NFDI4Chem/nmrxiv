@@ -65,7 +65,9 @@
                         <div
                             class="rounded-md border my-3 flex justify-center items-center"
                         >
-                            <span v-html="sanitizeHtml(loadMol(molecule.molfile))"></span>
+                            <span
+                                v-html="sanitizeHtml(loadMol(molecule.molfile))"
+                            ></span>
                         </div>
                     </div>
                 </li>

@@ -148,7 +148,9 @@
                                                 class="mt-3 text-gray-500"
                                             >
                                                 <span
-                                                    v-for="(synonym, index) in molecule.synonyms
+                                                    v-for="(
+                                                        synonym, index
+                                                    ) in molecule.synonyms
                                                         .split(',')
                                                         .slice(1, 20)"
                                                     :key="index"
@@ -460,12 +462,7 @@ import { ref } from "vue";
 import throttle from "lodash/throttle";
 import pickBy from "lodash/pickBy";
 import Pagination from "@/Shared/Pagination.vue";
-import {
-    Menu,
-    MenuButton,
-    MenuItem,
-    MenuItems,
-} from "@headlessui/vue";
+import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import {
     ChevronDownIcon,
     QueueListIcon,

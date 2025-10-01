@@ -598,7 +598,11 @@
 </template>
 
 <script>
-import { TrashIcon, PencilIcon, InformationCircleIcon } from "@heroicons/vue/24/solid";
+import {
+    TrashIcon,
+    PencilIcon,
+    InformationCircleIcon,
+} from "@heroicons/vue/24/solid";
 import StudyContent from "@/Pages/Study/Content.vue";
 import slider from "vue3-slider";
 import OCL from "openchemlib/full";
@@ -713,13 +717,13 @@ export default {
                     this.study.sample.molecules = res.data;
                 });
         },
-    saveMolecule(mol, study) {
+        saveMolecule(mol, study) {
             if (!study) {
                 study = this.study;
             }
             if (!mol) {
-        let molfile = this.editor.getMolFile();
-        this.standardizeMolecules(molfile).then((res) => {
+                let molfile = this.editor.getMolFile();
+                this.standardizeMolecules(molfile).then((res) => {
                     this.associateMoleculeToStudy(res.data, study);
                 });
             } else {

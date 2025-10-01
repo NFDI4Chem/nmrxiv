@@ -86,7 +86,10 @@
                                     @click="show = false"
                                 >
                                     <span class="sr-only">Close</span>
-                                    <XMarkIcon class="h-5 w-5" aria-hidden="true" />
+                                    <XMarkIcon
+                                        class="h-5 w-5"
+                                        aria-hidden="true"
+                                    />
                                 </button>
                             </div>
                         </div>

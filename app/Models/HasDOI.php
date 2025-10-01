@@ -17,7 +17,7 @@ trait HasDOI
 
                 if ($this instanceof Project) {
                     $suffix = 'P'.$identifier;
-                    $url = $url.'P'.$identifier;
+                    $url = $url.'project/P'.$identifier;
                     $resourceType = 'Project';
 
                 } elseif ($this instanceof Study) {
@@ -29,7 +29,7 @@ trait HasDOI
                         $suffix = 'S'.$identifier;
                     }
 
-                    $url = $url.'S'.$identifier;
+                    $url = $url.'sample/S'.$identifier;
                     $resourceType = 'Study';
 
                 } elseif ($this instanceof Dataset) {
@@ -40,7 +40,7 @@ trait HasDOI
                     } else {
                         $suffix = 'S'.$studyIdentifier.'.D'.$identifier;
                     }
-                    $url = $url.'D'.$identifier;
+                    $url = $url.'dataset/D'.$identifier;
                     $resourceType = 'Dataset';
                 }
 

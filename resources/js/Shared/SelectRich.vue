@@ -81,7 +81,9 @@
                                         <b>{{ item.title }}</b> <br />
                                         <small
                                             v-if="item.description"
-                                            v-html="sanitizeHtml(item.description)"
+                                            v-html="
+                                                sanitizeHtml(item.description)
+                                            "
                                         >
                                         </small>
                                     </span>

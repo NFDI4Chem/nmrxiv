@@ -166,7 +166,9 @@
                                     class="mb-3"
                                 >
                                     <div class="py-2 mb-2 block">
-                                        <div class="flex justify-between items-center">
+                                        <div
+                                            class="flex justify-between items-center"
+                                        >
                                             <p class="font-bold text-xl">
                                                 {{
                                                     $page.props
@@ -174,7 +176,9 @@
                                                         .name
                                                 }}
                                             </p>
-                                            <div class="flex items-center space-x-3">
+                                            <div
+                                                class="flex items-center space-x-3"
+                                            >
                                                 <!-- View Toggle - New Feature -->
                                                 <div class="flex space-x-1">
                                                     <button
@@ -182,24 +186,32 @@
                                                             viewMode === 'grid'
                                                                 ? 'text-gray-900'
                                                                 : 'text-gray-400 hover:text-gray-600',
-                                                            'p-1'
+                                                            'p-1',
                                                         ]"
                                                         title="Grid View"
-                                                        @click="setViewMode('grid')"
+                                                        @click="
+                                                            setViewMode('grid')
+                                                        "
                                                     >
-                                                        <Squares2X2Icon class="h-5 w-5" />
+                                                        <Squares2X2Icon
+                                                            class="h-5 w-5"
+                                                        />
                                                     </button>
                                                     <button
                                                         :class="[
                                                             viewMode === 'list'
                                                                 ? 'text-gray-900'
                                                                 : 'text-gray-400 hover:text-gray-600',
-                                                            'p-1'
+                                                            'p-1',
                                                         ]"
                                                         title="List View"
-                                                        @click="setViewMode('list')"
+                                                        @click="
+                                                            setViewMode('list')
+                                                        "
                                                     >
-                                                        <ListBulletIcon class="h-5 w-5" />
+                                                        <ListBulletIcon
+                                                            class="h-5 w-5"
+                                                        />
                                                     </button>
                                                 </div>
                                                 <a
@@ -213,68 +225,122 @@
                                     </div>
                                     <!-- List View Table Header -->
                                     <div v-if="viewMode === 'list'">
-                                        <div class="bg-gray-50 px-3 py-2 border border-gray-200 rounded-t-md">
-                                            <div class="grid grid-cols-12 gap-4 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <div
+                                            class="bg-gray-50 px-3 py-2 border border-gray-200 rounded-t-md"
+                                        >
+                                            <div
+                                                class="grid grid-cols-12 gap-4 text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                            >
                                                 <div class="col-span-4">
-                                                    <button 
+                                                    <button
                                                         class="flex items-center space-x-1 hover:text-gray-700 focus:outline-none"
-                                                        @click="sortFiles('name')"
+                                                        @click="
+                                                            sortFiles('name')
+                                                        "
                                                     >
                                                         <span>Name</span>
-                                                        <ChevronUpIcon 
-                                                            v-if="sortBy === 'name' && sortOrder === 'asc'"
+                                                        <ChevronUpIcon
+                                                            v-if="
+                                                                sortBy ===
+                                                                    'name' &&
+                                                                sortOrder ===
+                                                                    'asc'
+                                                            "
                                                             class="h-3 w-3"
                                                         />
-                                                        <ChevronDownIcon 
-                                                            v-else-if="sortBy === 'name' && sortOrder === 'desc'"
+                                                        <ChevronDownIcon
+                                                            v-else-if="
+                                                                sortBy ===
+                                                                    'name' &&
+                                                                sortOrder ===
+                                                                    'desc'
+                                                            "
                                                             class="h-3 w-3"
                                                         />
                                                     </button>
                                                 </div>
                                                 <div class="col-span-3">
-                                                    <button 
+                                                    <button
                                                         class="flex items-center space-x-1 hover:text-gray-700 focus:outline-none"
-                                                        @click="sortFiles('date')"
+                                                        @click="
+                                                            sortFiles('date')
+                                                        "
                                                     >
-                                                        <span>Date Modified</span>
-                                                        <ChevronUpIcon 
-                                                            v-if="sortBy === 'date' && sortOrder === 'asc'"
+                                                        <span
+                                                            >Date Modified</span
+                                                        >
+                                                        <ChevronUpIcon
+                                                            v-if="
+                                                                sortBy ===
+                                                                    'date' &&
+                                                                sortOrder ===
+                                                                    'asc'
+                                                            "
                                                             class="h-3 w-3"
                                                         />
-                                                        <ChevronDownIcon 
-                                                            v-else-if="sortBy === 'date' && sortOrder === 'desc'"
+                                                        <ChevronDownIcon
+                                                            v-else-if="
+                                                                sortBy ===
+                                                                    'date' &&
+                                                                sortOrder ===
+                                                                    'desc'
+                                                            "
                                                             class="h-3 w-3"
                                                         />
                                                     </button>
                                                 </div>
                                                 <div class="col-span-2">
-                                                    <button 
+                                                    <button
                                                         class="flex items-center space-x-1 hover:text-gray-700 focus:outline-none"
-                                                        @click="sortFiles('size')"
+                                                        @click="
+                                                            sortFiles('size')
+                                                        "
                                                     >
                                                         <span>Size</span>
-                                                        <ChevronUpIcon 
-                                                            v-if="sortBy === 'size' && sortOrder === 'asc'"
+                                                        <ChevronUpIcon
+                                                            v-if="
+                                                                sortBy ===
+                                                                    'size' &&
+                                                                sortOrder ===
+                                                                    'asc'
+                                                            "
                                                             class="h-3 w-3"
                                                         />
-                                                        <ChevronDownIcon 
-                                                            v-else-if="sortBy === 'size' && sortOrder === 'desc'"
+                                                        <ChevronDownIcon
+                                                            v-else-if="
+                                                                sortBy ===
+                                                                    'size' &&
+                                                                sortOrder ===
+                                                                    'desc'
+                                                            "
                                                             class="h-3 w-3"
                                                         />
                                                     </button>
                                                 </div>
                                                 <div class="col-span-2">
-                                                    <button 
+                                                    <button
                                                         class="flex items-center space-x-1 hover:text-gray-700 focus:outline-none"
-                                                        @click="sortFiles('kind')"
+                                                        @click="
+                                                            sortFiles('kind')
+                                                        "
                                                     >
                                                         <span>Kind</span>
-                                                        <ChevronUpIcon 
-                                                            v-if="sortBy === 'kind' && sortOrder === 'asc'"
+                                                        <ChevronUpIcon
+                                                            v-if="
+                                                                sortBy ===
+                                                                    'kind' &&
+                                                                sortOrder ===
+                                                                    'asc'
+                                                            "
                                                             class="h-3 w-3"
                                                         />
-                                                        <ChevronDownIcon 
-                                                            v-else-if="sortBy === 'kind' && sortOrder === 'desc'"
+                                                        <ChevronDownIcon
+                                                            v-else-if="
+                                                                sortBy ===
+                                                                    'kind' &&
+                                                                sortOrder ===
+                                                                    'desc'
+                                                            "
                                                             class="h-3 w-3"
                                                         />
                                                     </button>
@@ -292,7 +358,7 @@
                                             'mb-3',
                                             viewMode === 'grid'
                                                 ? 'grid grid-cols-1 gap-5 sm:gap-6 sm:grid-cols-2 lg:grid-cols-4'
-                                                : 'divide-y divide-gray-200 border border-gray-200 rounded-b-md'
+                                                : 'divide-y divide-gray-200 border border-gray-200 rounded-b-md',
                                         ]"
                                     >
                                         <li
@@ -301,17 +367,20 @@
                                             :class="[
                                                 viewMode === 'grid'
                                                     ? 'relative shadow rounded-lg'
-                                                    : 'hover:bg-gray-50'
+                                                    : 'hover:bg-gray-50',
                                             ]"
                                         >
                                             <!-- Grid View Layout -->
-                                            <template v-if="viewMode === 'grid'">
+                                            <template
+                                                v-if="viewMode === 'grid'"
+                                            >
                                                 <div
                                                     class="group block w-full aspect-w-10 aspect-h-7 py-4 bg-gray-100 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 focus-within:ring-indigo-500 overflow-hidden"
                                                 >
                                                     <span
                                                         v-if="
-                                                            file.type == 'directory'
+                                                            file.type ==
+                                                            'directory'
                                                         "
                                                     >
                                                         <FolderIcon
@@ -337,33 +406,68 @@
                                                 >
                                                     {{ file.name }}
                                                 </p>
-                                                <div class="flex items-center justify-between px-2 pb-1">
-                                                    <p class="text-sm font-medium text-gray-500">
-                                                        {{ formatFileSize(file) }}
+                                                <div
+                                                    class="flex items-center justify-between px-2 pb-1"
+                                                >
+                                                    <p
+                                                        class="text-sm font-medium text-gray-500"
+                                                    >
+                                                        {{
+                                                            formatFileSize(file)
+                                                        }}
                                                     </p>
                                                     <a
-                                                        v-if="file.type !== 'directory'"
-                                                        :href="url + '/' + project.owner.username + '/download/' + project.slug + '?key=' + file.key + '&uuid=' + file.uuid"
+                                                        v-if="
+                                                            file.type !==
+                                                            'directory'
+                                                        "
+                                                        :href="
+                                                            url +
+                                                            '/' +
+                                                            project.owner
+                                                                .username +
+                                                            '/download/' +
+                                                            project.slug +
+                                                            '?key=' +
+                                                            file.key +
+                                                            '&uuid=' +
+                                                            file.uuid
+                                                        "
                                                         class="text-gray-400 hover:text-indigo-600 transition-colors duration-200 pointer-events-auto"
                                                         title="Download file"
                                                         @click.stop
                                                     >
-                                                        <ArrowDownTrayIcon class="h-4 w-4" />
+                                                        <ArrowDownTrayIcon
+                                                            class="h-4 w-4"
+                                                        />
                                                     </a>
                                                 </div>
                                             </template>
 
                                             <!-- List View Layout -->
                                             <template v-else>
-                                                <div class="px-3 py-3 grid grid-cols-12 gap-4 items-center">
+                                                <div
+                                                    class="px-3 py-3 grid grid-cols-12 gap-4 items-center"
+                                                >
                                                     <!-- Name Column -->
-                                                    <div class="col-span-4 flex items-center">
-                                                        <div class="flex-shrink-0 mr-3">
+                                                    <div
+                                                        class="col-span-4 flex items-center"
+                                                    >
+                                                        <div
+                                                            class="flex-shrink-0 mr-3"
+                                                        >
                                                             <FolderIcon
-                                                                v-if="file.type == 'directory'"
+                                                                v-if="
+                                                                    file.type ==
+                                                                    'directory'
+                                                                "
                                                                 class="cursor-pointer h-5 w-5 text-teal-600"
                                                                 aria-hidden="true"
-                                                                @dblclick.stop="displaySelected(file)"
+                                                                @dblclick.stop="
+                                                                    displaySelected(
+                                                                        file
+                                                                    )
+                                                                "
                                                             />
                                                             <DocumentTextIcon
                                                                 v-else
@@ -371,43 +475,91 @@
                                                                 aria-hidden="true"
                                                             />
                                                         </div>
-                                                        <div class="min-w-0 flex-1">
-                                                            <p class="text-sm font-medium text-gray-900 truncate" :title="file.name">
+                                                        <div
+                                                            class="min-w-0 flex-1"
+                                                        >
+                                                            <p
+                                                                class="text-sm font-medium text-gray-900 truncate"
+                                                                :title="
+                                                                    file.name
+                                                                "
+                                                            >
                                                                 {{ file.name }}
                                                             </p>
                                                         </div>
                                                     </div>
-                                                    
+
                                                     <!-- Date Modified Column -->
                                                     <div class="col-span-3">
-                                                        <p class="text-sm text-gray-500">
-                                                            {{ formatDate(file.updated_at || file.created_at) }}
+                                                        <p
+                                                            class="text-sm text-gray-500"
+                                                        >
+                                                            {{
+                                                                formatDate(
+                                                                    file.updated_at ||
+                                                                        file.created_at
+                                                                )
+                                                            }}
                                                         </p>
                                                     </div>
-                                                    
+
                                                     <!-- Size Column -->
                                                     <div class="col-span-2">
-                                                        <p class="text-sm text-gray-500">
-                                                            {{ file.type === 'directory' ? '--' : formatFileSize(file) }}
+                                                        <p
+                                                            class="text-sm text-gray-500"
+                                                        >
+                                                            {{
+                                                                file.type ===
+                                                                "directory"
+                                                                    ? "--"
+                                                                    : formatFileSize(
+                                                                          file
+                                                                      )
+                                                            }}
                                                         </p>
                                                     </div>
-                                                    
+
                                                     <!-- Kind Column -->
                                                     <div class="col-span-2">
-                                                        <p class="text-sm text-gray-500">
-                                                            {{ file.type === 'directory' ? 'Folder' : 'Document' }}
+                                                        <p
+                                                            class="text-sm text-gray-500"
+                                                        >
+                                                            {{
+                                                                file.type ===
+                                                                "directory"
+                                                                    ? "Folder"
+                                                                    : "Document"
+                                                            }}
                                                         </p>
                                                     </div>
-                                                    
+
                                                     <!-- Download Column -->
-                                                    <div class="col-span-1 flex justify-center">
+                                                    <div
+                                                        class="col-span-1 flex justify-center"
+                                                    >
                                                         <a
-                                                            v-if="file.type !== 'directory'"
-                                                            :href="url + '/' + project.owner.username + '/download/' + project.slug + '?key=' + file.key + '&uuid=' + file.uuid"
+                                                            v-if="
+                                                                file.type !==
+                                                                'directory'
+                                                            "
+                                                            :href="
+                                                                url +
+                                                                '/' +
+                                                                project.owner
+                                                                    .username +
+                                                                '/download/' +
+                                                                project.slug +
+                                                                '?key=' +
+                                                                file.key +
+                                                                '&uuid=' +
+                                                                file.uuid
+                                                            "
                                                             class="text-gray-400 hover:text-indigo-600 transition-colors duration-200"
                                                             title="Download file"
                                                         >
-                                                            <ArrowDownTrayIcon class="h-5 w-5" />
+                                                            <ArrowDownTrayIcon
+                                                                class="h-5 w-5"
+                                                            />
                                                         </a>
                                                         <!-- No download icon for folders -->
                                                     </div>
@@ -530,9 +682,9 @@ export default {
             status: null,
             selectedFileSystemObject: null,
             svgString: null,
-            viewMode: 'grid', // 'grid' or 'list'
-            sortBy: 'name', // 'name', 'date', 'size', 'kind'
-            sortOrder: 'asc', // 'asc' or 'desc'
+            viewMode: "grid", // 'grid' or 'list'
+            sortBy: "name", // 'name', 'date', 'size', 'kind'
+            sortOrder: "asc", // 'asc' or 'desc'
         };
     },
     computed: {
@@ -566,39 +718,41 @@ export default {
             if (!this.$page.props.selectedFileSystemObject?.children) {
                 return [];
             }
-            
-            const files = [...this.$page.props.selectedFileSystemObject.children];
-            
+
+            const files = [
+                ...this.$page.props.selectedFileSystemObject.children,
+            ];
+
             return files.sort((a, b) => {
                 let aValue, bValue;
-                
+
                 switch (this.sortBy) {
-                    case 'name':
+                    case "name":
                         aValue = a.name.toLowerCase();
                         bValue = b.name.toLowerCase();
                         break;
-                    case 'date':
+                    case "date":
                         aValue = new Date(a.updated_at || a.created_at || 0);
                         bValue = new Date(b.updated_at || b.created_at || 0);
                         break;
-                    case 'size':
+                    case "size":
                         // Use the new method to get accurate file sizes for sorting
                         aValue = this.getFileSizeForSorting(a);
                         bValue = this.getFileSizeForSorting(b);
                         break;
-                    case 'kind':
-                        aValue = a.type === 'directory' ? 'folder' : 'document';
-                        bValue = b.type === 'directory' ? 'folder' : 'document';
+                    case "kind":
+                        aValue = a.type === "directory" ? "folder" : "document";
+                        bValue = b.type === "directory" ? "folder" : "document";
                         break;
                     default:
                         return 0;
                 }
-                
+
                 if (aValue < bValue) {
-                    return this.sortOrder === 'asc' ? -1 : 1;
+                    return this.sortOrder === "asc" ? -1 : 1;
                 }
                 if (aValue > bValue) {
-                    return this.sortOrder === 'asc' ? 1 : -1;
+                    return this.sortOrder === "asc" ? 1 : -1;
                 }
                 return 0;
             });
@@ -606,13 +760,13 @@ export default {
     },
     mounted() {
         const vm = this;
-        
+
         // Load view mode from localStorage
-        const savedViewMode = localStorage.getItem('nmrxiv-files-view-mode');
-        if (savedViewMode && ['grid', 'list'].includes(savedViewMode)) {
+        const savedViewMode = localStorage.getItem("nmrxiv-files-view-mode");
+        if (savedViewMode && ["grid", "list"].includes(savedViewMode)) {
             vm.viewMode = savedViewMode;
         }
-        
+
         vm.$page.props.selectedFileSystemObject = vm.file;
         vm.$page.props.selectedFolder = vm.file.children[0]
             ? vm.file.children[0].relative_url
@@ -736,7 +890,10 @@ export default {
                         file.loading = false;
                     })
                     .catch((error) => {
-                        console.error(`Failed to load children for ${file.name}:`, error);
+                        console.error(
+                            `Failed to load children for ${file.name}:`,
+                            error
+                        );
                         file.children = []; // Set empty array to prevent repeated requests
                         file.loading = false;
                     });
@@ -755,70 +912,75 @@ export default {
         },
         setViewMode(mode) {
             this.viewMode = mode;
-            localStorage.setItem('nmrxiv-files-view-mode', mode);
+            localStorage.setItem("nmrxiv-files-view-mode", mode);
         },
         formatDate(dateString) {
-            if (!dateString) return '--';
-            
+            if (!dateString) return "--";
+
             const date = new Date(dateString);
-            
+
             const options = {
-                day: 'numeric',
-                month: 'short',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
             };
-            
+
             // Format like "18. Aug 2025 at 10:52"
-            return date.toLocaleDateString('en-GB', options)
-                .replace(',', ' at')
-                .replace(/(\d+)/, '$1.');
+            return date
+                .toLocaleDateString("en-GB", options)
+                .replace(",", " at")
+                .replace(/(\d+)/, "$1.");
         },
         sortFiles(column) {
             if (this.sortBy === column) {
                 // Toggle sort order if clicking the same column
-                this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
+                this.sortOrder = this.sortOrder === "asc" ? "desc" : "asc";
             } else {
                 // Set new column and default to ascending
                 this.sortBy = column;
-                this.sortOrder = 'asc';
+                this.sortOrder = "asc";
             }
         },
         formatFileSize(file) {
-            if (file.type === 'directory') return '--';
-            
+            if (file.type === "directory") return "--";
+
             try {
-                const info = JSON.parse(file.info || '{}');
+                const info = JSON.parse(file.info || "{}");
                 const sizeInBytes = parseInt(info.size || 0);
-                
-                if (sizeInBytes === 0) return '0 bytes';
-                
-                const units = ['bytes', 'KB', 'MB', 'GB', 'TB'];
-                const unitIndex = Math.floor(Math.log(sizeInBytes) / Math.log(1024));
-                const size = (sizeInBytes / Math.pow(1024, unitIndex)).toFixed(1);
-                
+
+                if (sizeInBytes === 0) return "0 bytes";
+
+                const units = ["bytes", "KB", "MB", "GB", "TB"];
+                const unitIndex = Math.floor(
+                    Math.log(sizeInBytes) / Math.log(1024)
+                );
+                const size = (sizeInBytes / Math.pow(1024, unitIndex)).toFixed(
+                    1
+                );
+
                 return `${size} ${units[unitIndex]}`;
             } catch (error) {
                 // Fallback to original size if JSON parsing fails
-                return file.size || '0 bytes';
+                return file.size || "0 bytes";
             }
         },
         getFileSizeForSorting(file) {
-            if (file.type === 'directory') return 0;
-            
+            if (file.type === "directory") return 0;
+
             try {
-                const info = JSON.parse(file.info || '{}');
+                const info = JSON.parse(file.info || "{}");
                 return parseInt(info.size || 0);
             } catch (error) {
                 // Fallback to parsing original size string
-                return parseInt(file.size?.replace(/[^\d]/g, '') || 0);
+                return parseInt(file.size?.replace(/[^\d]/g, "") || 0);
             }
         },
         getFileDownloadURL(file) {
-            console.log('getFileDownloadURL called for:', file.name);
-            if (file.type === 'directory') return '#';
-            
+            console.log("getFileDownloadURL called for:", file.name);
+            if (file.type === "directory") return "#";
+
             return (
                 this.url +
                 "/" +
@@ -834,5 +996,3 @@ export default {
     },
 };
 </script>
-
-
