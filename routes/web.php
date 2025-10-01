@@ -56,7 +56,7 @@ Route::get('/', function () {
             return Project::where('is_public', true)->get()->count();
         }),
         'embargoed_projects' => Cache::rememberForever('stats.embargoed_projects', function () {
-            return Project::where('is_public', false)->where('release_date', '>', Carbon::now())->where('is_deleted', false)->get()->count();
+            return Project::where('is_public', false)->where('release_date', '>', Carbon::now())->where('is_deleted', false)->count();
         }),
         'compounds' => Cache::rememberForever('stats.compounds', function () {
             return Molecule::whereNotNull('identifier')->get()->count();
@@ -94,6 +94,9 @@ Route::get('/sample/{id}', [ApplicationController::class, 'resolveSample'])->whe
 
 Route::get('/project/{id}', [ApplicationController::class, 'resolveProject'])->where('id', '(P|p)[0-9]+')
     ->name('public.project.id');
+
+Route::get('/dataset/{id}', [ApplicationController::class, 'resolveDataset'])->where('id', '(D|d)[0-9]+')
+    ->name('public.dataset.id');
 
 Route::get('project/{url}', [ProjectController::class, 'review'])->name('project.preview');
 Route::get('project/{url}/studies', [ProjectController::class, 'reviewerStudies'])->name('studies.preview');
@@ -373,9 +376,11 @@ Route::get('{id}', function ($id) {
         return redirect()->route('public.sample', ['id' => $id], 301);
     } elseif ($namespace === 'Molecule') {
         return redirect()->route('public.compound', ['id' => $id], 301);
+    } elseif ($namespace === 'Dataset') {
+        return redirect()->route('public.dataset.id', ['id' => $id], 301);
     }
 
-    // Fallback to original resolver for datasets or unknown types
+    // Fallback to original resolver for unknown types
     return app(ApplicationController::class)->resolve(request(), $id);
 })->where('id', '(P|S|D|M|p|s|d|m)[0-9]+')
     ->name('public');
