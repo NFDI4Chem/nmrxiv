@@ -11,6 +11,7 @@ use App\Http\Controllers\Auth\MyWelcomeController;
 use App\Http\Controllers\Auth\SocialController;
 use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\CitationController;
+use App\Http\Controllers\CspViolationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DatasetController;
 use App\Http\Controllers\DownloadController;
@@ -43,6 +44,14 @@ Route::prefix('auth')->group(function () {
     Route::get('/checkPassword', [UsersController::class, 'checkPassword'])
         ->name('auth.checkPassword');
 });
+
+// CSP Violation Reporting
+Route::post('/csp-violation-report', [CspViolationController::class, 'report'])
+    ->name('csp.violation.report')
+    ->middleware('throttle:300,1'); // Increased limit for development
+
+Route::get('/csp-violation-report', [CspViolationController::class, 'index'])
+    ->name('csp.violation.index');
 
 Route::get('/', function () {
     // if (Auth::check()) {
