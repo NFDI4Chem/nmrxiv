@@ -30,7 +30,7 @@ class CspViolationController extends Controller
         // Read log file line by line for memory efficiency
         $matches = [];
         $file = new \SplFileObject($logPath, 'r');
-        while (!$file->eof()) {
+        while (! $file->eof()) {
             $line = $file->fgets();
             if (preg_match('/\[(.*?)\].*?CSP Violation Detected\s+(\{.+?\})(?=\s*\n|\s*$)/', $line, $match)) {
                 $matches[] = $match;
