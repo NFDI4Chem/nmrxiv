@@ -27,9 +27,15 @@ class CspViolationController extends Controller
             return [];
         }
 
-        $logContent = file_get_contents($logPath);
-        // Match CSP violation log entries - the JSON is all on one line
-        preg_match_all('/\[(.*?)\].*?CSP Violation Detected\s+(\{.+?\})(?=\s*\n|\s*$)/m', $logContent, $matches, PREG_SET_ORDER);
+        // Read log file line by line for memory efficiency
+        $matches = [];
+        $file = new \SplFileObject($logPath, 'r');
+        while (!$file->eof()) {
+            $line = $file->fgets();
+            if (preg_match('/\[(.*?)\].*?CSP Violation Detected\s+(\{.+?\})(?=\s*\n|\s*$)/', $line, $match)) {
+                $matches[] = $match;
+            }
+        }
 
         $violations = [];
         foreach (array_reverse($matches) as $match) {
