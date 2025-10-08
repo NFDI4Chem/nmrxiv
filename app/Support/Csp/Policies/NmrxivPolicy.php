@@ -33,7 +33,7 @@ class NmrxivPolicy implements Preset
             ->add(Directive::CONNECT, 'https://matomo.nfdi4chem.de', 'https://fonts.bunny.net');
 
         // Environment-specific rules
-        if (app()->environment(['local', 'development'])) {
+        if (!app()->environment('production')) {
             // Development: Allow Vite HMR and inline styles/scripts
             $policy
                 ->add(Directive::SCRIPT, 'http://localhost:5173', Keyword::UNSAFE_EVAL, Keyword::UNSAFE_INLINE)
