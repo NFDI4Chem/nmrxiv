@@ -11,30 +11,32 @@ class CspViolationController extends Controller
     {
         // Parse violations from log files
         $violations = $this->parseViolationsFromLogs();
-        
+
         return response()->json([
             'violations' => $violations,
             'total' => count($violations),
-            'message' => 'CSP Violations retrieved from logs'
+            'message' => 'CSP Violations retrieved from logs',
         ]);
     }
-    
+
     private function parseViolationsFromLogs($limit = 50)
     {
         $logPath = storage_path('logs/laravel.log');
-        
-        if (!file_exists($logPath)) {
+
+        if (! file_exists($logPath)) {
             return [];
         }
-        
+
         $logContent = file_get_contents($logPath);
         // Match CSP violation log entries - the JSON is all on one line
         preg_match_all('/\[(.*?)\].*?CSP Violation Detected\s+(\{.+?\})(?=\s*\n|\s*$)/m', $logContent, $matches, PREG_SET_ORDER);
-        
+
         $violations = [];
         foreach (array_reverse($matches) as $match) {
-            if (count($violations) >= $limit) break;
-            
+            if (count($violations) >= $limit) {
+                break;
+            }
+
             try {
                 $data = json_decode($match[2], true);
                 $violations[] = [
@@ -50,14 +52,14 @@ class CspViolationController extends Controller
                 continue;
             }
         }
-        
+
         return $violations;
     }
 
     public function report(Request $request)
     {
         $violation = $request->input('csp-report');
-        
+
         if ($violation) {
             Log::channel('stack')->warning('CSP Violation Detected', [
                 'document_uri' => $violation['document-uri'] ?? 'unknown',
@@ -71,7 +73,7 @@ class CspViolationController extends Controller
                 'full_report' => $violation,
             ]);
         }
-        
+
         return response('', 204);
     }
 }
