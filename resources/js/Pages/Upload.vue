@@ -3581,7 +3581,7 @@ export default {
                 standardizedMol.cas_number = casData.rn;
                 standardizedMol.cas_name = casData.name;
                 standardizedMol.molecular_formula =
-                    casData.molecularFormula?.replace(/<[^>]*>/g, "") ||
+                    this.stripHtmlTags(casData.molecularFormula) ||
                     standardizedMol.molecular_formula;
 
                 // Add synonyms if available

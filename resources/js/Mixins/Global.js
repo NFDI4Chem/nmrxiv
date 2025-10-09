@@ -420,6 +420,16 @@ export default {
             const minutes = String(date.getMinutes()).padStart(2, "0");
             return `${day}/${month}/${year}, ${hours}:${minutes}`;
         },
+
+        /**
+         * Removes all HTML tags from a string
+         * @param {string} str - The string containing HTML tags
+         * @returns {string} - The string with HTML tags removed
+         */
+        stripHtmlTags(str) {
+            if (!str) return "";
+            return str.replace(/<[^>]*>/g, "");
+        },
     },
 
     computed: {

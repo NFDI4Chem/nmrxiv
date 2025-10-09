@@ -42,9 +42,9 @@ class CommonChemistry implements CASService
                 return $response->json();
             }
 
-            throw new \Exception('Unable to fetch CAS details');
+            throw new \Exception('Unable to retrieve CAS details. Please verify the CAS number and try again.');
         } catch (\Exception $e) {
-            throw new \Exception('Unable to fetch CAS details');
+            throw new \Exception('Unable to retrieve CAS details. Please verify the CAS number and try again.');
         }
     }
 
