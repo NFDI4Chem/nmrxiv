@@ -10,6 +10,7 @@ use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\Auth\MyWelcomeController;
 use App\Http\Controllers\Auth\SocialController;
 use App\Http\Controllers\AuthorController;
+use App\Http\Controllers\CasController;
 use App\Http\Controllers\CitationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DatasetController;
@@ -159,6 +160,9 @@ Route::middleware('auth', 'verified')->group(function () {
 
     Route::get('upload', [UploadController::class, 'upload'])->name('upload');
     Route::get('publish/{draft}', [UploadController::class, 'publish'])->name('publish');
+
+    // CAS Common Chemistry API Proxy
+    Route::get('/cas/detail', [CasController::class, 'fetchCasData'])->name('cas.detail');
 
     Route::prefix('dashboard')->group(function () {
         Route::get('ssubmission', [DashboardController::class, 'dashboard'])
