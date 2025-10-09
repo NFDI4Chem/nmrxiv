@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Molecule;
+use App\Services\CAS\CASService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 
@@ -21,6 +22,12 @@ class SanitizeMolecules extends Command
      * @var string
      */
     protected $description = 'Sanitize molecules';
+
+    public function __construct(
+        private CASService $casService
+    ) {
+        parent::__construct();
+    }
 
     /**
      * Execute the console command.
@@ -109,41 +116,21 @@ class SanitizeMolecules extends Command
         ];
     }
 
-    protected function fetchCAS($smiles)
+    protected function fetchCAS(string $smiles): ?string
     {
-        try {
-            $ccBase = rtrim(config('services.cas.base_url'), '/');
-            $apiToken = config('services.cas.api_token');
+        if (! config('services.cas.api_token')) {
+            $this->error('CAS API token not configured');
 
-            if (! $apiToken) {
-                $this->error('CAS API token not configured');
-
-                return null;
-            }
-
-            $response = Http::withHeaders([
-                'X-API-KEY' => $apiToken,
-            ])->get($ccBase.'/search', [
-                'q' => $smiles,
-            ]);
-
-            if (! $response->failed()) {
-                $data = $response->json();
-                if (isset($data['count']) && $data['count'] > 0) {
-                    $cas = $data['results'][0]['rn'];
-
-                    return $cas;
-                }
-            } else {
-                $this->warn('CAS API failed with status: '.$response->status().' for molecule');
-            }
-        } catch (\Illuminate\Http\Client\ConnectionException $e) {
-            $this->warn('CAS API connection timeout for molecule');
-        } catch (\Exception $e) {
-            $this->error('Error fetching CAS: '.$e->getMessage());
+            return null;
         }
 
-        return null;
+        try {
+            return $this->casService->searchCasBySmiles($smiles);
+        } catch (\Exception $e) {
+            $this->warn("Failed to fetch CAS for SMILES {$smiles}: ".$e->getMessage());
+
+            return null;
+        }
     }
 
     protected function standardizeMolecule($mol)
