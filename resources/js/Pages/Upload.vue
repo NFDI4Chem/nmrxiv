@@ -1500,35 +1500,52 @@
                                                                                         </label>
 
                                                                                         <!-- Tab Navigation -->
-                                                                                        <div class="border-b border-gray-200 mb-4">
-                                                                                            <nav class="-mb-px flex space-x-8">
+                                                                                        <div
+                                                                                            class="border-b border-gray-200 mb-4"
+                                                                                        >
+                                                                                            <nav
+                                                                                                class="-mb-px flex space-x-8"
+                                                                                            >
                                                                                                 <button
                                                                                                     :class="[
-                                                                                                        activeInputTab === 'structure'
+                                                                                                        activeInputTab ===
+                                                                                                        'structure'
                                                                                                             ? 'border-teal-500 text-teal-600'
                                                                                                             : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
-                                                                                                        'whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm'
+                                                                                                        'whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm',
                                                                                                     ]"
-                                                                                                    @click="switchToStructureTab()"
+                                                                                                    @click="
+                                                                                                        switchToStructureTab()
+                                                                                                    "
                                                                                                 >
                                                                                                     Structure/SMILES
                                                                                                 </button>
                                                                                                 <button
                                                                                                     :class="[
-                                                                                                        activeInputTab === 'cas'
+                                                                                                        activeInputTab ===
+                                                                                                        'cas'
                                                                                                             ? 'border-teal-500 text-teal-600'
                                                                                                             : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
-                                                                                                        'whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm'
+                                                                                                        'whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm',
                                                                                                     ]"
-                                                                                                    @click="switchToCasTab()"
+                                                                                                    @click="
+                                                                                                        switchToCasTab()
+                                                                                                    "
                                                                                                 >
-                                                                                                    CAS Registry Number
+                                                                                                    CAS
+                                                                                                    Registry
+                                                                                                    Number
                                                                                                 </button>
                                                                                             </nav>
                                                                                         </div>
 
                                                                                         <!-- Structure/SMILES Input Tab -->
-                                                                                        <div v-if="activeInputTab === 'structure'">
+                                                                                        <div
+                                                                                            v-if="
+                                                                                                activeInputTab ===
+                                                                                                'structure'
+                                                                                            "
+                                                                                        >
                                                                                             <div
                                                                                                 class="mt-1 mb-2"
                                                                                             >
@@ -1635,46 +1652,119 @@
                                                                                         </div>
 
                                                                                         <!-- CAS Registry Number Input Tab -->
-                                                                                        <div v-if="activeInputTab === 'cas'">
-                                                                                            <div class="mt-1 mb-2">
-                                                                                                <div class="border border-gray-300 rounded-md p-4">
-                                                                                                    <div class="mb-3">
-                                                                                                        <p class="text-sm text-gray-600 mb-1">
-                                                                                                            Enter a CAS Registry Number to import chemical structure
+                                                                                        <div
+                                                                                            v-if="
+                                                                                                activeInputTab ===
+                                                                                                'cas'
+                                                                                            "
+                                                                                        >
+                                                                                            <div
+                                                                                                class="mt-1 mb-2"
+                                                                                            >
+                                                                                                <div
+                                                                                                    class="border border-gray-300 rounded-md p-4"
+                                                                                                >
+                                                                                                    <div
+                                                                                                        class="mb-3"
+                                                                                                    >
+                                                                                                        <p
+                                                                                                            class="text-sm text-gray-600 mb-1"
+                                                                                                        >
+                                                                                                            Enter
+                                                                                                            a
+                                                                                                            CAS
+                                                                                                            Registry
+                                                                                                            Number
+                                                                                                            to
+                                                                                                            import
+                                                                                                            chemical
+                                                                                                            structure
                                                                                                         </p>
-                                                                                                        <div class="text-xs text-gray-500">
-                                                                                                            Format: XXX-XX-X (e.g., 58-08-2 for Caffeine)
+                                                                                                        <div
+                                                                                                            class="text-xs text-gray-500"
+                                                                                                        >
+                                                                                                            Format:
+                                                                                                            XXX-XX-X
+                                                                                                            (e.g.,
+                                                                                                            58-08-2
+                                                                                                            for
+                                                                                                            Caffeine)
                                                                                                         </div>
                                                                                                     </div>
-                                                                                                    
-                                                                                                    <div class="flex space-x-3">
-                                                                                                        <div class="flex-1">
+
+                                                                                                    <div
+                                                                                                        class="flex space-x-3"
+                                                                                                    >
+                                                                                                        <div
+                                                                                                            class="flex-1"
+                                                                                                        >
                                                                                                             <input
-                                                                                                                v-model="casInput"
+                                                                                                                v-model="
+                                                                                                                    casInput
+                                                                                                                "
                                                                                                                 type="text"
                                                                                                                 placeholder="Enter CAS Registry Number (e.g., 58-08-2)"
                                                                                                                 class="w-full shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm border-gray-300 rounded-md"
-                                                                                                                :disabled="casLoading"
-                                                                                                                @keyup.enter="importFromCAS"
+                                                                                                                :disabled="
+                                                                                                                    casLoading
+                                                                                                                "
+                                                                                                                @keyup.enter="
+                                                                                                                    importFromCAS
+                                                                                                                "
                                                                                                             />
                                                                                                         </div>
                                                                                                         <button
-                                                                                                            :disabled="!casInput.trim() || casLoading"
+                                                                                                            :disabled="
+                                                                                                                !casInput.trim() ||
+                                                                                                                casLoading
+                                                                                                            "
                                                                                                             class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                                                                                                            @click="importFromCAS"
+                                                                                                            @click="
+                                                                                                                importFromCAS
+                                                                                                            "
                                                                                                         >
-                                                                                                            <svg v-if="casLoading" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                                                                                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                                                                                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                                                                            <svg
+                                                                                                                v-if="
+                                                                                                                    casLoading
+                                                                                                                "
+                                                                                                                class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                                                                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                                                                fill="none"
+                                                                                                                viewBox="0 0 24 24"
+                                                                                                            >
+                                                                                                                <circle
+                                                                                                                    class="opacity-25"
+                                                                                                                    cx="12"
+                                                                                                                    cy="12"
+                                                                                                                    r="10"
+                                                                                                                    stroke="currentColor"
+                                                                                                                    stroke-width="4"
+                                                                                                                ></circle>
+                                                                                                                <path
+                                                                                                                    class="opacity-75"
+                                                                                                                    fill="currentColor"
+                                                                                                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                                                                                                ></path>
                                                                                                             </svg>
-                                                                                                            {{ casLoading ? 'Loading...' : 'Import' }}
+                                                                                                            {{
+                                                                                                                casLoading
+                                                                                                                    ? "Loading..."
+                                                                                                                    : "Import"
+                                                                                                            }}
                                                                                                         </button>
                                                                                                     </div>
 
-                                                                                                    <div v-if="casInput" class="mt-2 flex justify-between">
+                                                                                                    <div
+                                                                                                        v-if="
+                                                                                                            casInput
+                                                                                                        "
+                                                                                                        class="mt-2 flex justify-between"
+                                                                                                    >
                                                                                                         <button
                                                                                                             class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                                                                                            @click="clearCasInput"
+                                                                                                            @click="
+                                                                                                                clearCasInput
+                                                                                                            "
                                                                                                         >
                                                                                                             Clear
                                                                                                         </button>
@@ -1684,7 +1774,10 @@
                                                                                         </div>
 
                                                                                         <jet-input-error
-                                                                                            :message="errorMessage || casError"
+                                                                                            :message="
+                                                                                                errorMessage ||
+                                                                                                casError
+                                                                                            "
                                                                                             class="mt-2"
                                                                                         />
                                                                                     </div>
@@ -2433,9 +2526,9 @@ export default {
         },
         activeInputTab(newTab, oldTab) {
             // Clear errors when switching tabs
-            if (newTab === 'structure' && oldTab === 'cas') {
+            if (newTab === "structure" && oldTab === "cas") {
                 this.casError = "";
-            } else if (newTab === 'cas' && oldTab === 'structure') {
+            } else if (newTab === "cas" && oldTab === "structure") {
                 this.errorMessage = "";
             }
         },
@@ -3305,7 +3398,6 @@ export default {
             }
         },
         loadStructure() {
-            console.log("loadStructure method called..");
             this.errorMessage = "";
 
             if (!this.chemicalInput || this.chemicalInput.trim() === "") {
@@ -3392,19 +3484,20 @@ export default {
         async fetchFromCAS(casNumber) {
             try {
                 // Use backend API proxy to avoid CORS issues
-                const response = await axios.get('/cas/detail', {
+                const response = await axios.get("/cas/detail", {
                     params: {
-                        cas_rn: casNumber
+                        cas_rn: casNumber,
                     },
                     timeout: 30000, // 30 second timeout
                 });
-                
+
                 return response.data;
             } catch (error) {
                 // Use error message from backend controller
-                const errorMessage = error.response?.data?.error || 
-                                   error.response?.data?.message || 
-                                   'CAS API server error - please try again later';
+                const errorMessage =
+                    error.response?.data?.error ||
+                    error.response?.data?.message ||
+                    "CAS API server error - please try again later";
                 throw new Error(errorMessage);
             }
         },
@@ -3423,16 +3516,15 @@ export default {
             try {
                 // Fetch data from CAS Common Chemistry API
                 const casData = await this.fetchFromCAS(casNumber);
-                
+
                 // Validate that we have the required data
                 if (!casData.smile && !casData.canonicalSmile) {
                     this.casError = `No structural data (SMILES) available for CAS number ${casNumber}`;
                     return;
                 }
-                
+
                 // Process the CAS response
                 this.processCASResponse(casData);
-                
             } catch (error) {
                 // Use error messages from backend controller
                 this.casError = error.message;
@@ -3445,9 +3537,10 @@ export default {
             try {
                 // Extract SMILES from CAS response
                 let smiles = casData.smile || casData.canonicalSmile;
-                
+
                 if (!smiles) {
-                    this.casError = "No SMILES data available for this CAS number";
+                    this.casError =
+                        "No SMILES data available for this CAS number";
                     return;
                 }
 
@@ -3469,7 +3562,6 @@ export default {
 
                 // Use existing standardization workflow
                 this.processCASMolecule(casData, smiles);
-
             } catch (error) {
                 this.casError = "Failed to process CAS response data";
             }
@@ -3483,13 +3575,15 @@ export default {
 
                 // Use existing standardization workflow
                 const response = await this.standardizeMolecules(molfile);
-                
+
                 // Add CAS-specific data to the standardized molecule
                 const standardizedMol = response.data;
                 standardizedMol.cas_number = casData.rn;
                 standardizedMol.cas_name = casData.name;
-                standardizedMol.molecular_formula = casData.molecularFormula?.replace(/<[^>]*>/g, '') || standardizedMol.molecular_formula;
-                
+                standardizedMol.molecular_formula =
+                    casData.molecularFormula?.replace(/<[^>]*>/g, "") ||
+                    standardizedMol.molecular_formula;
+
                 // Add synonyms if available
                 if (casData.synonyms && casData.synonyms.length > 0) {
                     standardizedMol.synonyms = casData.synonyms.slice(0, 5); // Limit to first 5 synonyms
@@ -3497,20 +3591,23 @@ export default {
 
                 // Integrate with existing molecule association workflow
                 if (this.selectedStudy) {
-                    this.associateMoleculeToStudy(standardizedMol, this.selectedStudy);
-                    
+                    this.associateMoleculeToStudy(
+                        standardizedMol,
+                        this.selectedStudy
+                    );
+
                     // Clear CAS input after successful association
                     this.clearCasInput();
-                    
+
                     // Show success message
-                    this.$emit('show-notification', {
-                        type: 'success',
-                        message: `Successfully imported ${casData.name} (CAS: ${casData.rn}) from CAS Registry`
+                    this.$emit("show-notification", {
+                        type: "success",
+                        message: `Successfully imported ${casData.name} (CAS: ${casData.rn}) from CAS Registry`,
                     });
                 } else {
-                    this.casError = "Please select a study before importing molecules";
+                    this.casError =
+                        "Please select a study before importing molecules";
                 }
-
             } catch (error) {
                 this.casError = `Failed to standardize molecule: ${error.message}`;
             }
