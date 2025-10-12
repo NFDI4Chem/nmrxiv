@@ -27,7 +27,7 @@ class CasController extends Controller
         // Check if API token is configured
         if (! Config::get('services.cas.api_token')) {
             return response()->json([
-                'error' => 'CAS API token not configured',
+                'error' => 'Service configuration error',
             ], 500);
         }
 
@@ -38,14 +38,8 @@ class CasController extends Controller
 
         } catch (\Exception $e) {
             return response()->json([
-                'error' => $e->getMessage(),
-            ], match (true) {
-                str_contains($e->getMessage(), 'authentication failed') => 401,
-                str_contains($e->getMessage(), 'Details not found') => 404,
-                str_contains($e->getMessage(), 'Rate limit') => 429,
-                str_contains($e->getMessage(), 'server error') => 502,
-                default => 400,
-            });
+                'error' => 'Unable to retrieve CAS details. Please verify the CAS number and try again.',
+            ], 400);
         }
     }
 }
