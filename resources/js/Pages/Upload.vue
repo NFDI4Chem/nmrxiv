@@ -338,9 +338,7 @@
                                                     )
                                                 }}
                                                 of
-                                                {{
-                                                    filteredDrafts.length
-                                                }}
+                                                {{ filteredDrafts.length }}
                                                 drafts
                                             </div>
                                             <div
