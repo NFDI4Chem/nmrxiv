@@ -174,7 +174,9 @@
                                                 ></StarIcon>
                                             </div>
                                             {{ project.name }}
-                                            <ProjectStatusBadge :project="project" />
+                                            <ProjectStatusBadge
+                                                :project="project"
+                                            />
                                             <div
                                                 class="flex items-baseline mt-1"
                                             >

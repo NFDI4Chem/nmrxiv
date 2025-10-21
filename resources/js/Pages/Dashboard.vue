@@ -103,16 +103,31 @@
                     <div class="flex items-center justify-between mb-4">
                         <div class="text-sm text-gray-600">
                             <span v-if="filteredProjects.length > 0">
-                                Showing {{ ((currentProjectsPage - 1) * projectsPerPage) + 1 }} to 
-                                {{ Math.min(currentProjectsPage * projectsPerPage, filteredProjects.length) }} 
-                                of {{ filteredProjects.length }} 
-                                {{ selectedProjectStatus !== 'all' ? selectedProjectStatus + ' ' : '' }}projects
+                                Showing
+                                {{
+                                    (currentProjectsPage - 1) *
+                                        projectsPerPage +
+                                    1
+                                }}
+                                to
+                                {{
+                                    Math.min(
+                                        currentProjectsPage * projectsPerPage,
+                                        filteredProjects.length
+                                    )
+                                }}
+                                of {{ filteredProjects.length }}
+                                {{
+                                    selectedProjectStatus !== "all"
+                                        ? selectedProjectStatus + " "
+                                        : ""
+                                }}projects
                             </span>
                         </div>
                         <div class="flex items-center gap-3">
                             <!-- Status Filter Dropdown -->
                             <StatusFilter v-model="selectedProjectStatus" />
-                            
+
                             <!-- Search Input -->
                             <div class="w-72">
                                 <SearchInput
@@ -133,7 +148,7 @@
                         :projects="paginatedProjects"
                     ></team-projects>
                 </div>
-                
+
                 <!-- Show original TeamProjects empty state only when there are genuinely no projects and no filters applied -->
                 <div v-if="projects.length === 0">
                     <team-projects
@@ -143,35 +158,68 @@
                         :projects="[]"
                     ></team-projects>
                 </div>
-                
+
                 <!-- Empty search/filter results message for projects -->
-                <div v-if="projects.length > 0 && (searchProjectQuery || selectedProjectStatus !== 'all') && filteredProjects.length === 0" class="text-center py-12">
+                <div
+                    v-if="
+                        projects.length > 0 &&
+                        (searchProjectQuery ||
+                            selectedProjectStatus !== 'all') &&
+                        filteredProjects.length === 0
+                    "
+                    class="text-center py-12"
+                >
                     <EmptySearchState
                         entity-type="projects"
-                        :search-query="searchProjectQuery || (selectedProjectStatus !== 'all' ? `status: ${selectedProjectStatus}` : '')"
-                        :title="searchProjectQuery ? 'No matching projects found' : `No ${selectedProjectStatus} projects found`"
+                        :search-query="
+                            searchProjectQuery ||
+                            (selectedProjectStatus !== 'all'
+                                ? `status: ${selectedProjectStatus}`
+                                : '')
+                        "
+                        :title="
+                            searchProjectQuery
+                                ? 'No matching projects found'
+                                : `No ${selectedProjectStatus} projects found`
+                        "
                         @clear-search="clearProjectFilters"
                     />
                 </div>
-                
-                <div v-if="projects.length > 0 && totalProjectPages > 1" class="flex items-center justify-between px-6 py-3 border-t bg-white mt-4">
+
+                <div
+                    v-if="projects.length > 0 && totalProjectPages > 1"
+                    class="flex items-center justify-between px-6 py-3 border-t bg-white mt-4"
+                >
                     <div class="text-sm text-gray-600">
-                        Page {{ currentProjectsPage }} of {{ totalProjectPages }}
+                        Page {{ currentProjectsPage }} of
+                        {{ totalProjectPages }}
                     </div>
                     <div class="flex items-center gap-2">
                         <button
                             type="button"
                             class="px-3 py-1.5 rounded border text-sm disabled:opacity-50"
                             :disabled="currentProjectsPage === 1"
-                            @click="currentProjectsPage = Math.max(1, currentProjectsPage - 1)"
+                            @click="
+                                currentProjectsPage = Math.max(
+                                    1,
+                                    currentProjectsPage - 1
+                                )
+                            "
                         >
                             Previous
                         </button>
                         <button
                             type="button"
                             class="px-3 py-1.5 rounded border text-sm disabled:opacity-50"
-                            :disabled="currentProjectsPage === totalProjectPages"
-                            @click="currentProjectsPage = Math.min(totalProjectPages, currentProjectsPage + 1)"
+                            :disabled="
+                                currentProjectsPage === totalProjectPages
+                            "
+                            @click="
+                                currentProjectsPage = Math.min(
+                                    totalProjectPages,
+                                    currentProjectsPage + 1
+                                )
+                            "
                         >
                             Next
                         </button>
@@ -183,16 +231,30 @@
                     <div class="flex items-center justify-between mb-4">
                         <div class="text-sm text-gray-600">
                             <span v-if="filteredSamples.length > 0">
-                                Showing {{ ((currentSamplesPage - 1) * samplesPerPage) + 1 }} to 
-                                {{ Math.min(currentSamplesPage * samplesPerPage, filteredSamples.length) }} 
-                                of {{ filteredSamples.length }} 
-                                {{ selectedSampleStatus !== 'all' ? selectedSampleStatus + ' ' : '' }}samples
+                                Showing
+                                {{
+                                    (currentSamplesPage - 1) * samplesPerPage +
+                                    1
+                                }}
+                                to
+                                {{
+                                    Math.min(
+                                        currentSamplesPage * samplesPerPage,
+                                        filteredSamples.length
+                                    )
+                                }}
+                                of {{ filteredSamples.length }}
+                                {{
+                                    selectedSampleStatus !== "all"
+                                        ? selectedSampleStatus + " "
+                                        : ""
+                                }}samples
                             </span>
                         </div>
                         <div class="flex items-center gap-3">
                             <!-- Status Filter Dropdown for Samples -->
                             <StatusFilter v-model="selectedSampleStatus" />
-                            
+
                             <!-- Search Input -->
                             <div class="w-72">
                                 <SearchInput
@@ -213,7 +275,7 @@
                         :studies="paginatedSamples"
                     ></team-samples>
                 </div>
-                
+
                 <!-- Show original TeamSamples empty state only when there are genuinely no samples -->
                 <div v-if="samples.length === 0">
                     <team-samples
@@ -223,18 +285,37 @@
                         :studies="[]"
                     ></team-samples>
                 </div>
-                
+
                 <!-- Empty search/filter results message for samples -->
-                <div v-if="samples.length > 0 && (searchSampleQuery || selectedSampleStatus !== 'all') && filteredSamples.length === 0" class="text-center py-12">
+                <div
+                    v-if="
+                        samples.length > 0 &&
+                        (searchSampleQuery || selectedSampleStatus !== 'all') &&
+                        filteredSamples.length === 0
+                    "
+                    class="text-center py-12"
+                >
                     <EmptySearchState
                         entity-type="samples"
-                        :search-query="searchSampleQuery || (selectedSampleStatus !== 'all' ? `status: ${selectedSampleStatus}` : '')"
-                        :title="searchSampleQuery ? 'No matching samples found' : `No ${selectedSampleStatus} samples found`"
+                        :search-query="
+                            searchSampleQuery ||
+                            (selectedSampleStatus !== 'all'
+                                ? `status: ${selectedSampleStatus}`
+                                : '')
+                        "
+                        :title="
+                            searchSampleQuery
+                                ? 'No matching samples found'
+                                : `No ${selectedSampleStatus} samples found`
+                        "
                         @clear-search="clearSampleFilters"
                     />
                 </div>
-                
-                <div v-if="samples.length > 0 && totalSamplePages > 1" class="flex items-center justify-between px-6 py-3 border-t bg-white mt-4">
+
+                <div
+                    v-if="samples.length > 0 && totalSamplePages > 1"
+                    class="flex items-center justify-between px-6 py-3 border-t bg-white mt-4"
+                >
                     <div class="text-sm text-gray-600">
                         Page {{ currentSamplesPage }} of {{ totalSamplePages }}
                     </div>
@@ -243,7 +324,12 @@
                             type="button"
                             class="px-3 py-1.5 rounded border text-sm disabled:opacity-50"
                             :disabled="currentSamplesPage === 1"
-                            @click="currentSamplesPage = Math.max(1, currentSamplesPage - 1)"
+                            @click="
+                                currentSamplesPage = Math.max(
+                                    1,
+                                    currentSamplesPage - 1
+                                )
+                            "
                         >
                             Previous
                         </button>
@@ -251,7 +337,12 @@
                             type="button"
                             class="px-3 py-1.5 rounded border text-sm disabled:opacity-50"
                             :disabled="currentSamplesPage === totalSamplePages"
-                            @click="currentSamplesPage = Math.min(totalSamplePages, currentSamplesPage + 1)"
+                            @click="
+                                currentSamplesPage = Math.min(
+                                    totalSamplePages,
+                                    currentSamplesPage + 1
+                                )
+                            "
                         >
                             Next
                         </button>
@@ -588,7 +679,9 @@ export default {
                 const q = this.searchProjectQuery.toLowerCase().trim();
                 filtered = filtered.filter((project) => {
                     const name = (project.name || "").toLowerCase();
-                    const description = (project.description || "").toLowerCase();
+                    const description = (
+                        project.description || ""
+                    ).toLowerCase();
                     const idText = String(project.id || "").toLowerCase();
                     const uuid = String(project.uuid || "").toLowerCase();
                     return (
@@ -605,7 +698,10 @@ export default {
 
         paginatedProjects() {
             const start = (this.currentProjectsPage - 1) * this.projectsPerPage;
-            return this.filteredProjects.slice(start, start + this.projectsPerPage);
+            return this.filteredProjects.slice(
+                start,
+                start + this.projectsPerPage
+            );
         },
 
         totalProjectPages() {
@@ -637,7 +733,9 @@ export default {
                 const q = this.searchSampleQuery.toLowerCase().trim();
                 filtered = filtered.filter((sample) => {
                     const name = (sample.name || "").toLowerCase();
-                    const description = (sample.description || "").toLowerCase();
+                    const description = (
+                        sample.description || ""
+                    ).toLowerCase();
                     const idText = String(sample.id || "").toLowerCase();
                     const uuid = String(sample.uuid || "").toLowerCase();
                     return (
@@ -654,7 +752,10 @@ export default {
 
         paginatedSamples() {
             const start = (this.currentSamplesPage - 1) * this.samplesPerPage;
-            return this.filteredSamples.slice(start, start + this.samplesPerPage);
+            return this.filteredSamples.slice(
+                start,
+                start + this.samplesPerPage
+            );
         },
 
         totalSamplePages() {

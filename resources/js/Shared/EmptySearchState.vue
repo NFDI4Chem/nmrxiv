@@ -18,7 +18,10 @@
             {{ title || `No ${entityType} found` }}
         </h3>
         <p class="mt-1 text-sm text-gray-500">
-            {{ message || `No ${entityType} match your search criteria "${searchQuery}". Try adjusting your search terms.` }}
+            {{
+                message ||
+                `No ${entityType} match your search criteria "${searchQuery}". Try adjusting your search terms.`
+            }}
         </p>
         <div v-if="showClearButton" class="mt-6">
             <button
@@ -34,44 +37,44 @@
 
 <script>
 export default {
-    name: 'EmptySearchState',
+    name: "EmptySearchState",
     props: {
         /**
          * The type of entity being searched (e.g., 'projects', 'samples', 'drafts')
          */
         entityType: {
             type: String,
-            required: true
+            required: true,
         },
         /**
          * The current search query
          */
         searchQuery: {
             type: String,
-            required: true
+            required: true,
         },
         /**
          * Custom title to override the default "No {entityType} found"
          */
         title: {
             type: String,
-            default: null
+            default: null,
         },
         /**
          * Custom message to override the default search message
          */
         message: {
             type: String,
-            default: null
+            default: null,
         },
         /**
          * Whether to show the "Clear search" button
          */
         showClearButton: {
             type: Boolean,
-            default: true
-        }
+            default: true,
+        },
     },
-    emits: ['clear-search']
-}
+    emits: ["clear-search"],
+};
 </script>
