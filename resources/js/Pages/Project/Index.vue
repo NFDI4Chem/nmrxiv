@@ -174,55 +174,7 @@
                                                 ></StarIcon>
                                             </div>
                                             {{ project.name }}
-                                            <span
-                                                v-if="
-                                                    project.draft_id != null &&
-                                                    project.status == null
-                                                "
-                                                class="ml-4 inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800"
-                                            >
-                                                Draft
-                                            </span>
-                                            <span
-                                                v-if="
-                                                    project.status != null &&
-                                                    project.status != 'complete'
-                                                "
-                                                class="ml-4 inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-blue-100 text-blue-800 capitalize"
-                                            >
-                                                {{ project.status }}
-                                            </span>
-                                            <span
-                                                v-if="
-                                                    project.is_deleted !=
-                                                        null &&
-                                                    project.is_deleted
-                                                "
-                                                class="ml-4 inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-red-100 text-red-800 capitalize"
-                                            >
-                                                DELETED
-                                            </span>
-                                            <span
-                                                v-if="
-                                                    project.is_archived !=
-                                                        null &&
-                                                    project.is_archived
-                                                "
-                                                class="ml-4 inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-yellow-100 text-red-800 capitalize"
-                                            >
-                                                ARCHIVED
-                                            </span>
-                                            <span
-                                                v-if="
-                                                    project.draft_id == null &&
-                                                    !project.is_archived &&
-                                                    project.release_date &&
-                                                    !project.is_published
-                                                "
-                                                class="ml-4 inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-yellow-100 text-red-800 capitalize"
-                                            >
-                                                EMBARGO
-                                            </span>
+                                            <ProjectStatusBadge :project="project" />
                                             <div
                                                 class="flex items-baseline mt-1"
                                             >
@@ -375,11 +327,13 @@ import { router } from "@inertiajs/vue3";
 import { StarIcon } from "@heroicons/vue/24/solid";
 import Tag from "@/Shared/Tag.vue";
 import ShowProjectDates from "@/Shared/ShowProjectDates.vue";
+import ProjectStatusBadge from "@/Components/ProjectStatusBadge.vue";
 export default {
     components: {
         StarIcon,
         ShowProjectDates,
         Tag,
+        ProjectStatusBadge,
     },
     props: ["projects", "mode", "teamRole", "team"],
     setup() {},

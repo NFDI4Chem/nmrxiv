@@ -31,7 +31,9 @@ class DeleteProject
             $project->studies()->update(['is_deleted' => true]);
             foreach ($project->studies as $study) {
                 $study->update(['is_deleted' => true]);
+                $study->update(['status' => 'deleted']);
                 $study->datasets()->update(['is_deleted' => true]);
+                $study->datasets()->update(['status' => 'deleted']);
             }
             $draft = $project->draft;
             if ($draft) {
@@ -40,6 +42,7 @@ class DeleteProject
             $project->name = $project->name;
             $project->deleted_on = Carbon::now();
             $project->is_deleted = true;
+            $project->status = 'deleted';
             $project->sendNotification('deletion', $this->prepareSendList($project));
         }
         $project->save();

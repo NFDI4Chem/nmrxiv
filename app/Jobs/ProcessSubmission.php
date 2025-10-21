@@ -99,13 +99,16 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
 
                 $project->draft_id = null;
 
-                $project->status = 'complete';
+                $release_date = Carbon::parse($project->release_date);
+                if ($release_date->isFuture()) {
+                    $project->status = 'embargo';
+                } else {
+                    $project->status = 'published';
+                }
 
                 $project->save();
 
                 $assigner->assign($project->fresh());
-
-                $release_date = Carbon::parse($project->release_date);
 
                 if ($release_date->isPast()) {
                     $projectPublisher->publish($project);

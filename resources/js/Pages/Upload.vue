@@ -317,30 +317,51 @@
                                             </p>
                                         </div>
                                         <div
-                                            class="ml-4 mt-4 flex items-center gap-4 flex-shrink-0"
+                                            class="ml-4 mt-4 flex items-center justify-between flex-shrink-0"
                                         >
-                                            <div class="w-72">
-                                                <DraftSearch
-                                                    v-model="searchDraftQuery"
-                                                    @reset="
-                                                        searchDraftQuery = ''
-                                                    "
-                                                />
+                                            <div v-if="filteredDrafts.length > 0" class="text-sm text-gray-600 mr-4">
+                                                Showing {{ ((currentDraftsPage - 1) * draftsPerPage) + 1 }} to 
+                                                {{ Math.min(currentDraftsPage * draftsPerPage, filteredDrafts.length) }} 
+                                                of {{ filteredDrafts.length }} drafts
                                             </div>
-                                            <button
-                                                class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring focus:ring-gray-300 disabled:opacity-25 transition"
-                                                @click="createNewDraft()"
-                                            >
-                                                + Create New
-                                            </button>
+                                            <div class="flex items-center gap-4">
+                                                <div class="w-72">
+                                                    <SearchInput
+                                                        v-model="searchDraftQuery"
+                                                        name="draft-search"
+                                                        placeholder="Search drafts..."
+                                                        @reset="
+                                                            searchDraftQuery = ''
+                                                        "
+                                                    />
+                                                </div>
+                                                <button
+                                                    class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring focus:ring-gray-300 disabled:opacity-25 transition"
+                                                    @click="createNewDraft()"
+                                                >
+                                                    + Create New
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <ul
-                                    role="list"
-                                    class="overflow-y-scroll h-[calc(100vh-290px)]"
-                                >
+                                <div class="overflow-y-scroll h-[calc(100vh-290px)]">
+                                    <!-- Empty search results message for drafts -->
+                                    <div v-if="drafts.length > 0 && searchDraftQuery && filteredDrafts.length === 0" class="flex items-center justify-center h-full">
+                                        <EmptySearchState
+                                            entity-type="drafts"
+                                            :search-query="searchDraftQuery"
+                                            @clear-search="searchDraftQuery = ''"
+                                        />
+                                    </div>
+                                    
+                                    <!-- Drafts list -->
+                                    <ul
+                                        v-else
+                                        role="list"
+                                        class="divide-y divide-gray-200"
+                                    >
                                     <li
                                         v-for="draft in paginatedDrafts"
                                         :key="draft.id"
@@ -512,6 +533,8 @@
                                         </div>
                                     </li>
                                 </ul>
+                                </div>
+                                
                                 <div
                                     class="flex items-center justify-between px-6 py-3 border-t bg-white"
                                 >
@@ -2100,7 +2123,8 @@ import { ref } from "vue";
 import Primer from "@/Shared/Primer.vue";
 import FileSystemBrowser from "./../Shared/FileSystemBrowser.vue";
 import Validation from "@/Shared/Validation.vue";
-import DraftSearch from "@/Shared/DraftSearch.vue";
+import SearchInput from "@/Shared/SearchInput.vue";
+import EmptySearchState from "@/Shared/EmptySearchState.vue";
 import {
     TrashIcon,
     PencilIcon,
@@ -2130,7 +2154,8 @@ export default {
         JetDialogModal,
         Primer,
         FileSystemBrowser,
-        DraftSearch,
+        SearchInput,
+        EmptySearchState,
         TrashIcon,
         PencilIcon,
         EyeIcon,
