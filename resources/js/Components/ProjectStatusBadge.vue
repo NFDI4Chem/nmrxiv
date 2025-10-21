@@ -63,7 +63,7 @@ export default {
                 embargo:
                     "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
 
-                draft: "bg-yellow-100 text-yellow-800 dark:bg-blue-900dark:text-yellow-200",
+                draft: "bg-yellow-100 text-yellow-800 dark:bg-blue-900 dark:text-yellow-200",
 
                 // Neutral states - Gray theme
                 archived:

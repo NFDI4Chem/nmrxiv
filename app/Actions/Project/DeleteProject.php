@@ -30,10 +30,8 @@ class DeleteProject
         } else {
             $project->studies()->update(['is_deleted' => true]);
             foreach ($project->studies as $study) {
-                $study->update(['is_deleted' => true]);
-                $study->update(['status' => 'deleted']);
-                $study->datasets()->update(['is_deleted' => true]);
-                $study->datasets()->update(['status' => 'deleted']);
+                $study->update(['is_deleted' => true, 'status' => 'deleted']);
+                $study->datasets()->update(['is_deleted' => true, 'status' => 'deleted']);
             }
             $draft = $project->draft;
             if ($draft) {
