@@ -45,5 +45,12 @@
         />
     @endif
 
+    @if(config('services.recaptcha.site_key'))
+        <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.site_key') }}"></div>
+        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    @else
+        <!-- CAPTCHA not configured - add environment variables RECAPTCHA_SITE_KEY and RECAPTCHA_SECRET_KEY to enable -->
+    @endif
+
     <button type="submit" class="{{ config('support-bubble.classes.button') }}">{{ __('support-bubble::support-bubble.submit_label') }}</button>
 </form>
