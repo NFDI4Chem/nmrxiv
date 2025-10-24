@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Rules\RecaptchaRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Log;
 
 class SupportBubbleRequest extends FormRequest
 {
@@ -236,7 +237,7 @@ class SupportBubbleRequest extends FormRequest
     {
         // Log suspicious attempts for monitoring
         if ($this->containsSpamIndicators()) {
-            \Log::warning('Potential spam attempt blocked on support bubble', [
+            Log::warning('Potential spam attempt blocked on support bubble', [
                 'ip' => $this->ip(),
                 'user_agent' => $this->userAgent(),
                 'data' => $this->only(['email', 'subject', 'message']),
