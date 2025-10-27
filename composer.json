@@ -10,7 +10,7 @@
     "require": {
         "php": "^8.2",
         "aws/aws-sdk-php": "^3.208",
-        "darkaonline/l5-swagger": "^8.5",
+        "darkaonline/l5-swagger": "^9.0",
         "doctrine/dbal": "^3.5",
         "guzzlehttp/guzzle": "^7.8",
         "http-interop/http-factory-guzzle": "^1.2",
@@ -102,6 +102,9 @@
         "sort-packages": true,
         "allow-plugins": {
             "php-http/discovery": true
+        },
+        "audit": {
+            "abandoned": "ignore"
         }
     },
     "minimum-stability": "stable",

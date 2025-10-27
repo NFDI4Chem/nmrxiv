@@ -10,6 +10,7 @@ use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\Auth\MyWelcomeController;
 use App\Http\Controllers\Auth\SocialController;
 use App\Http\Controllers\AuthorController;
+use App\Http\Controllers\CASController;
 use App\Http\Controllers\CitationController;
 use App\Http\Controllers\CspViolationController;
 use App\Http\Controllers\DashboardController;
@@ -88,7 +89,10 @@ Route::get('/about-us', function () {
     ]);
 })->name('about');
 
-Route::supportBubble();
+// Custom support bubble route with rate limiting and enhanced security
+Route::post('support-bubble', [\App\Http\Controllers\SupportBubbleController::class, 'submit'])
+    ->middleware(['throttle:support-bubble'])
+    ->name('supportBubble.submit');
 
 Route::impersonate();
 
@@ -168,6 +172,9 @@ Route::middleware('auth', 'verified')->group(function () {
 
     Route::get('upload', [UploadController::class, 'upload'])->name('upload');
     Route::get('publish/{draft}', [UploadController::class, 'publish'])->name('publish');
+
+    // CAS Common Chemistry API Proxy
+    Route::get('/cas/detail', [CASController::class, 'fetchCasData'])->name('cas.detail');
 
     Route::prefix('dashboard')->group(function () {
         Route::get('ssubmission', [DashboardController::class, 'dashboard'])
