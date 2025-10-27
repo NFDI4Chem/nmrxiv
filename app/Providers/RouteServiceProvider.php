@@ -83,11 +83,11 @@ class RouteServiceProvider extends ServiceProvider
 
             return [
                 // Allow 5 submissions per minute per IP
-                Limit::perMinute(5)->by($request->ip()),
+                Limit::perMinute(1)->by($request->ip()),
                 // Allow 20 submissions per hour per IP
-                Limit::perHour(20)->by($request->ip()),
+                Limit::perHour(5)->by($request->ip()),
                 // Allow 50 submissions per day per IP
-                Limit::perDay(50)->by($request->ip()),
+                Limit::perDay(20)->by($request->ip()),
 
             ];
         });
