@@ -16,8 +16,8 @@
         <!-- Heading and Description section -->
         <div class="mt-8">
             <h3 class="text-lg font-medium">
-                <Link 
-                    :href="route(path)" 
+                <Link
+                    :href="route(path)"
                     class="focus:outline-none"
                     :target="openInNewTab ? '_blank' : '_self'"
                 >
