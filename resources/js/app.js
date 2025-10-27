@@ -3,7 +3,8 @@ import "../css/app.css";
 
 import { createApp, h } from "vue";
 import { createInertiaApp } from "@inertiajs/vue3";
-import { ZiggyVue } from "../../vendor/tightenco/ziggy";
+import { ZiggyVue } from "ziggy-js";
+import { Ziggy } from "./ziggy";
 
 import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
 import helpers from "./Mixins/Global.js";
@@ -29,7 +30,7 @@ createInertiaApp({
     setup({ el, App, props, plugin }) {
         const application = createApp({ render: () => h(App, props) })
             .use(plugin)
-            .use(ZiggyVue)
+            .use(ZiggyVue, Ziggy)
             .component("Children", Children)
             .mixin(helpers)
             .use(InstantSearch)
