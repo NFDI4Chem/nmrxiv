@@ -48,6 +48,7 @@ return [
         // Allow overriding the PUG REST path if needed
         'pug_rest_path' => env('PUBCHEM_PUG_PATH', '/rest/pug'),
     ],
+
     'chemistry_standardize' => [
         'url' => env('CHEMISTRY_STANDARDIZE_URL', 'https://api.cheminf.studio/latest/chem/standardize'),
     ],
@@ -57,5 +58,4 @@ return [
         'api_token' => env('CAS_API_TOKEN'),
         'base_url' => env('COMMON_CHEMISTRY_URL', 'https://commonchemistry.cas.org/api'),
     ],
-
 ];

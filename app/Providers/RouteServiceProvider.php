@@ -73,5 +73,23 @@ class RouteServiceProvider extends ServiceProvider
         RateLimiter::for('api', function (Request $request) {
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });
+
+        // Support bubble rate limiting to prevent spam
+        RateLimiter::for('support-bubble', function (Request $request) {
+            // Skip rate limiting in testing environment
+            if (app()->environment('testing')) {
+                return Limit::none();
+            }
+
+            return [
+                // Allow 5 submissions per minute per IP
+                Limit::perMinute(1)->by($request->ip()),
+                // Allow 20 submissions per hour per IP
+                Limit::perHour(5)->by($request->ip()),
+                // Allow 50 submissions per day per IP
+                Limit::perDay(20)->by($request->ip()),
+
+            ];
+        });
     }
 }

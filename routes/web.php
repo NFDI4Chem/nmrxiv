@@ -80,7 +80,10 @@ Route::get('/about-us', function () {
     ]);
 })->name('about');
 
-Route::supportBubble();
+// Custom support bubble route with rate limiting and enhanced security
+Route::post('support-bubble', [\App\Http\Controllers\SupportBubbleController::class, 'submit'])
+    ->middleware(['throttle:support-bubble'])
+    ->name('supportBubble.submit');
 
 Route::impersonate();
 
