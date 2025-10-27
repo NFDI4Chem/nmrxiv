@@ -2,6 +2,7 @@
 
 return [
     App\Providers\AppServiceProvider::class,
+    App\Providers\CASServiceProvider::class,
     App\Providers\CephStorageServiceProvider::class,
     App\Providers\DOIServiceProvider::class,
     App\Providers\EventServiceProvider::class,

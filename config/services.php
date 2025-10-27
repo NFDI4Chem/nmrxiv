@@ -48,17 +48,14 @@ return [
         // Allow overriding the PUG REST path if needed
         'pug_rest_path' => env('PUBCHEM_PUG_PATH', '/rest/pug'),
     ],
-    'common_chemistry' => [
-        'base_url' => env('COMMON_CHEMISTRY_URL', 'https://commonchemistry.cas.org'),
-        'api_path' => env('COMMON_CHEMISTRY_API_PATH', '/api'),
-    ],
+
     'chemistry_standardize' => [
         'url' => env('CHEMISTRY_STANDARDIZE_URL', 'https://api.cheminf.studio/latest/chem/standardize'),
     ],
 
-    'recaptcha' => [
-        'site_key' => env('RECAPTCHA_SITE_KEY'),
-        'secret_key' => env('RECAPTCHA_SECRET_KEY'),
+    'cas' => [
+        'provider' => env('CAS_PROVIDER', 'CAS_CommonChemistry'),
+        'api_token' => env('CAS_API_TOKEN'),
+        'base_url' => env('COMMON_CHEMISTRY_URL', 'https://commonchemistry.cas.org/api'),
     ],
-
 ];
