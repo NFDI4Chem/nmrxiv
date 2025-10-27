@@ -46,7 +46,6 @@ Route::prefix('auth')->group(function () {
         ->name('auth.checkPassword');
 });
 
-
 Route::get('/', function () {
     // if (Auth::check()) {
     //     return redirect()->route('dashboard');
