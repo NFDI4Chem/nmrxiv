@@ -46,13 +46,6 @@ Route::prefix('auth')->group(function () {
         ->name('auth.checkPassword');
 });
 
-// CSP Violation Reporting
-Route::post('/csp-violation-report', [CspViolationController::class, 'report'])
-    ->name('csp.violation.report')
-    ->middleware('throttle:300,1'); // Increased limit for development
-
-Route::get('/csp-violation-report', [CspViolationController::class, 'index'])
-    ->name('csp.violation.index');
 
 Route::get('/', function () {
     // if (Auth::check()) {
@@ -366,6 +359,15 @@ Route::prefix('admin')->group(function () {
                 ->name('console.spectra');
             Route::get('snapshots', [CurationController::class, 'snapshots'])
                 ->name('console.spectra.snapshots');
+        });
+
+        // CSP Violation Reporting (Admin only)
+        Route::middleware('auth', 'permission:manage platform')->group(function () {
+            Route::get('csp-violations', [CspViolationController::class, 'index'])
+                ->name('console.csp.violations.index');
+            Route::post('csp-violation-report', [CspViolationController::class, 'report'])
+                ->name('console.csp.violation.report')
+                ->middleware('throttle:300,1');
         });
     });
 });
