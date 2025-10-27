@@ -30,15 +30,11 @@ class CASServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(CASService::class, function ($app) {
-            return new CommonChemistry;
+            $provider = config('services.cas.provider');
+            if ($provider === 'CAS_CommonChemistry') {
+                return new CommonChemistry;
+            }
+            throw new \Exception('Invalid CAS provider: '.$provider);
         });
-    }
-
-    /**
-     * Bootstrap services.
-     */
-    public function boot(): void
-    {
-        //
     }
 }

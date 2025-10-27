@@ -53,6 +53,7 @@ return [
     ],
 
     'cas' => [
+        'provider' => env('CAS_PROVIDER', 'CAS_CommonChemistry'),
         'api_token' => env('CAS_API_TOKEN'),
         'base_url' => env('COMMON_CHEMISTRY_URL', 'https://commonchemistry.cas.org/api'),
     ],
