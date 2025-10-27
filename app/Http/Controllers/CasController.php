@@ -7,7 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 
-class CasController extends Controller
+class CASController extends Controller
 {
     public function __construct(
         private CASService $casService
@@ -27,7 +27,7 @@ class CasController extends Controller
         // Check if API token is configured
         if (! Config::get('services.cas.api_token')) {
             return response()->json([
-                'error' => 'Service configuration error',
+                'error' => 'CAS Service not configured',
             ], 500);
         }
 

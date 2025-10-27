@@ -12,5 +12,5 @@ interface CASService
     /**
      * Search for CAS number by SMILES
      */
-    public function searchCasBySmiles(string $smiles): ?string;
+    public function searchCASBySmiles(string $smiles): ?string;
 }

@@ -39,7 +39,14 @@ class CommonChemistry implements CASService
                 ]);
 
             if ($response->successful()) {
-                return $response->json();
+                $data = $response->json();
+
+                // Ensure we have valid array data
+                if (is_array($data)) {
+                    return $data;
+                }
+
+                throw new \Exception('Invalid response format from CAS API');
             }
 
             throw new \Exception('Unable to retrieve CAS details. Please verify the CAS number and try again.');
@@ -51,7 +58,7 @@ class CommonChemistry implements CASService
     /**
      * Search for CAS registry number using SMILES molecular structure notation
      */
-    public function searchCasBySmiles(string $smiles): ?string
+    public function searchCASBySmiles(string $smiles): ?string
     {
         try {
             $config = $this->getApiConfig();

@@ -125,7 +125,7 @@ class SanitizeMolecules extends Command
         }
 
         try {
-            return $this->casService->searchCasBySmiles($smiles);
+            return $this->casService->searchCASBySmiles($smiles);
         } catch (\Exception $e) {
             $this->warn("Failed to fetch CAS for SMILES {$smiles}: ".$e->getMessage());
 
