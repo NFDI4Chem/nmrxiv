@@ -3,7 +3,7 @@
         <Menu as="div" class="relative inline-block text-left">
             <div>
                 <MenuButton
-                    class="inline-flex items-center justify-center w-10 h-10 rounded-md border border-gray-300 shadow-sm bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    class="inline-flex items-center justify-center w-10 h-10 rounded-md bg-white text-gray-700 hover:bg-gray-50 focus:outline-none"
                 >
                     <AdjustmentsHorizontalIcon class="h-5 w-5 text-gray-400" />
                 </MenuButton>
