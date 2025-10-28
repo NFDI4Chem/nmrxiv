@@ -32,21 +32,28 @@ class PublishReleasedProjects extends Command
     public function handle(PublishProject $publisher): int
     {
         return DB::transaction(function () use ($publisher) {
+            $publishedCount = 0;
             $projects = Project::where([
                 ['is_public', false],
                 ['release_date', 'IS NOT', null],
             ])->get();
+
             foreach ($projects as $project) {
                 $release_date = Carbon::parse($project->release_date);
                 if ($release_date->isPast()) {
                     if (! is_null($project->doi) && ! $project->is_archived) {
-                        // echo($project->identifier);
-                        // echo("\r\n");
+                        echo($project->identifier);
+                        echo("\r\n");
                         $publisher->publish($project);
                         Notification::send($project->owner, new DraftProcessedNotification($project));
+                        $publishedCount++;
                     }
                 }
             }
+
+            $this->info("Published {$publishedCount} projects.");
+
+            return Command::SUCCESS;
         });
     }
 }
