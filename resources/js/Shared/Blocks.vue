@@ -10,12 +10,17 @@
                 <icon v-if="name === 'users'" name="users" />
                 <icon v-if="name === 'announcements'" name="announcements" />
                 <icon v-if="name === 'curation'" name="spectra" />
+                <icon v-if="name === 'security'" name="security" />
             </span>
         </div>
         <!-- Heading and Description section -->
         <div class="mt-8">
             <h3 class="text-lg font-medium">
-                <Link :href="route(path)" class="focus:outline-none">
+                <Link
+                    :href="route(path)"
+                    class="focus:outline-none"
+                    :target="openInNewTab ? '_blank' : '_self'"
+                >
                     <span class="absolute inset-0" aria-hidden="true"></span>
                     {{ heading }}
                 </Link>
@@ -65,6 +70,10 @@ export default {
         description: String,
         name: String,
         path: String,
+        openInNewTab: {
+            type: Boolean,
+            default: false,
+        },
     },
 };
 </script>

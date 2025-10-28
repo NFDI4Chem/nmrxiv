@@ -88,6 +88,14 @@
                         name="curation"
                         path="console.spectra"
                     />
+                    <!-- CSP Violations Block -->
+                    <blocks
+                        heading="CSP Violations"
+                        description="Monitor Content Security Policy violations and security issues."
+                        name="security"
+                        path="console.csp.violations.index"
+                        :open-in-new-tab="true"
+                    />
                 </div>
             </div>
         </div>

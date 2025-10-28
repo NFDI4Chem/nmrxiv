@@ -26,6 +26,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->validateCsrfTokens(except: [
             //
             'support-bubble',
+            'csp-violation-report',
         ]);
 
         $middleware->append(\Spatie\CookieConsent\CookieConsentMiddleware::class);
@@ -34,6 +35,7 @@ return Application::configure(basePath: dirname(__DIR__))
             \Laravel\Jetstream\Http\Middleware\AuthenticateSession::class,
             \App\Http\Middleware\HandleInertiaRequests::class,
             \App\Http\Middleware\XFrameOptions::class,
+            \Spatie\Csp\AddCspHeaders::class,
         ]);
 
         $middleware->throttleApi();

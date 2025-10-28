@@ -12,6 +12,7 @@ use App\Http\Controllers\Auth\SocialController;
 use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\CASController;
 use App\Http\Controllers\CitationController;
+use App\Http\Controllers\CspViolationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DatasetController;
 use App\Http\Controllers\DownloadController;
@@ -357,6 +358,15 @@ Route::prefix('admin')->group(function () {
                 ->name('console.spectra');
             Route::get('snapshots', [CurationController::class, 'snapshots'])
                 ->name('console.spectra.snapshots');
+        });
+
+        // CSP Violation Reporting (Admin only)
+        Route::middleware('auth', 'permission:manage platform')->group(function () {
+            Route::get('csp-violations', [CspViolationController::class, 'index'])
+                ->name('console.csp.violations.index');
+            Route::post('csp-violation-report', [CspViolationController::class, 'report'])
+                ->name('console.csp.violation.report')
+                ->middleware('throttle:300,1');
         });
     });
 });
