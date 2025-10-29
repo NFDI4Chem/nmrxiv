@@ -57,19 +57,19 @@ class NmrxivPolicy implements Preset
 
     /**
      * Add nmrXiv-specific external sources that the application needs
-     * 
+     *
      * This method includes core external sources that are essential for the application.
-     * For runtime-configurable sources without code deployment, use the global 
+     * For runtime-configurable sources without code deployment, use the global
      * directives in config/csp.php with environment variables:
      * - CSP_ADDITIONAL_CONNECT_SRC
-     * - CSP_ADDITIONAL_IMG_SRC  
+     * - CSP_ADDITIONAL_IMG_SRC
      * - CSP_ADDITIONAL_SCRIPT_SRC
      * - CSP_ADDITIONAL_STYLE_SRC
      */
     private function addNmrxivSources(Policy $policy): void
     {
         // Image sources - External domains for logos, avatars, and institutional content
-        $policy->add(Directive::IMG, 
+        $policy->add(Directive::IMG,
             'https://www.uni-jena.de',              // University of Jena resources
             'https://s3.uni-jena.de',               // S3 storage for user-uploaded content
             'https://orcid.org',                    // ORCID logos
@@ -81,12 +81,12 @@ class NmrxivPolicy implements Preset
         );
 
         // Connection sources - External APIs for data retrieval and services
-        $policy->add(Directive::CONNECT, 
+        $policy->add(Directive::CONNECT,
             // DOI and metadata APIs (configurable via env)
             env('DATACITE_API', 'https://api.datacite.org'),
             env('CROSSREF_API', 'https://api.crossref.org/works/'),
             env('DATACITE_ENDPOINT', 'https://api.datacite.org'),
-            
+
             // Chemical data and research APIs (using env config where possible)
             env('NMRKIT_URL', 'https://nodejs.nmrxiv.org'),
             config('services.pubchem.base_url'),
@@ -98,8 +98,8 @@ class NmrxivPolicy implements Preset
         );
 
         // Font sources - External font services
-        $policy->add(Directive::FONT, 
-            'https://fonts.googleapis.com', 
+        $policy->add(Directive::FONT,
+            'https://fonts.googleapis.com',
             'https://fonts.gstatic.com'
         );
     }
