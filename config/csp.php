@@ -16,9 +16,28 @@ return [
 
     /**
      * Register additional global CSP directives here.
+     * These can be configured via environment variables for runtime flexibility.
      */
     'directives' => [
-        // [Directive::SCRIPT, [Keyword::UNSAFE_EVAL, Keyword::UNSAFE_INLINE]],
+        // Additional connect-src domains (configurable via env)
+        ...(env('CSP_ADDITIONAL_CONNECT_SRC') ? [
+            [Spatie\Csp\Directive::CONNECT, array_filter(explode(',', env('CSP_ADDITIONAL_CONNECT_SRC')))]
+        ] : []),
+        
+        // Additional img-src domains (configurable via env)
+        ...(env('CSP_ADDITIONAL_IMG_SRC') ? [
+            [Spatie\Csp\Directive::IMG, array_filter(explode(',', env('CSP_ADDITIONAL_IMG_SRC')))]
+        ] : []),
+        
+        // Additional script-src domains (configurable via env)
+        ...(env('CSP_ADDITIONAL_SCRIPT_SRC') ? [
+            [Spatie\Csp\Directive::SCRIPT, array_filter(explode(',', env('CSP_ADDITIONAL_SCRIPT_SRC')))]
+        ] : []),
+        
+        // Additional style-src domains (configurable via env)
+        ...(env('CSP_ADDITIONAL_STYLE_SRC') ? [
+            [Spatie\Csp\Directive::STYLE, array_filter(explode(',', env('CSP_ADDITIONAL_STYLE_SRC')))]
+        ] : []),
     ],
 
     /*
