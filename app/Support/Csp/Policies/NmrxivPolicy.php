@@ -107,6 +107,8 @@ class NmrxivPolicy implements Preset
             ->add(Directive::FRAME, Keyword::SELF)
             ->add(Directive::FRAME, 'https://api.cheminf.studio')
             ->add(Directive::FRAME, 'https://api.naturalproducts.net')
-            ->add(Directive::FRAME, 'https://dev.api.naturalproducts.net');
+            ->add(Directive::FRAME, 'https://dev.api.naturalproducts.net')
+            ->add(Directive::FRAME, 'https://nmrium.nmrxiv.org')
+            ->add(Directive::FRAME, 'https://nmriumdev.nmrxiv.org');
     }
 }
