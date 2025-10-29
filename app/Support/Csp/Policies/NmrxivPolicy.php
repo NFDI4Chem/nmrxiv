@@ -101,7 +101,7 @@ class NmrxivPolicy implements Preset
             ->add(Directive::CONNECT, config('services.cas.base_url'))
             ->add(Directive::CONNECT, config('services.chemistry_standardize.url'))
             ->add(Directive::CONNECT, env('EUROPEMC_WS_API', 'https://www.ebi.ac.uk/europepmc/webservices/rest/search'))
-            ->add(Directive::CONNECT, env('ORCID_ID_SEARCH_API', 'https://pub.orcid.org/v2.1/search'))
+            ->add(Directive::CONNECT, env('ORCID_ID_SEARCH_API', 'https://pub.orcid.org'))
             ->add(Directive::CONNECT, config('services.chemotion_tracker.base_url'))
             ->add(Directive::CONNECT, env('CM_API', 'https://api.cheminf.studio'))
             ->add(Directive::CONNECT, env('AWS_ENDPOINT', 'https://s3.uni-jena.de')); // S3 storage for file uploads and downloads
