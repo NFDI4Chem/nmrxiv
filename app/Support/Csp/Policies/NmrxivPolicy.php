@@ -19,10 +19,13 @@ class NmrxivPolicy implements Preset
             ->add(Directive::OBJECT, Keyword::NONE);
 
         // Asset sources
+        // NOTE: combine img-src values into a single add call to avoid
+        // multiple `add` calls for the same directive being merged in an
+        // unexpected way by the package implementation. All other asset
+        // directives can be added normally.
         $policy
             ->add(Directive::SCRIPT, Keyword::SELF)
             ->add(Directive::STYLE, Keyword::SELF)
-            ->add(Directive::IMG, Keyword::SELF, 'data:', 'blob:')
             ->add(Directive::FONT, 'data:', 'https://fonts.bunny.net')
             ->add(Directive::CONNECT, Keyword::SELF);
 
@@ -69,7 +72,11 @@ class NmrxivPolicy implements Preset
     private function addNmrxivSources(Policy $policy): void
     {
         // Image sources - External domains for logos, avatars, and institutional content
+        // Add all image sources in one call (include 'self', data: and blob:)
         $policy->add(Directive::IMG,
+            Keyword::SELF,
+            'data:',
+            'blob:',
             'https://www.uni-jena.de',              // University of Jena resources
             'https://s3.uni-jena.de',               // S3 storage for user-uploaded content
             'https://orcid.org',                    // ORCID logos
