@@ -93,7 +93,7 @@ class NmrxivPolicy implements Preset
             ->add(Directive::CONNECT, env('DATACITE_API', 'https://api.datacite.org'))
             ->add(Directive::CONNECT, env('CROSSREF_API', 'https://api.crossref.org/works/'))
             ->add(Directive::CONNECT, env('DATACITE_ENDPOINT', 'https://api.datacite.org'))
-            
+
             // Chemical data and research APIs (using env config where possible)
             ->add(Directive::CONNECT, env('NMRKIT_URL', 'https://nodejs.nmrxiv.org'))
             ->add(Directive::CONNECT, config('services.pubchem.base_url'))
