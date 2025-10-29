@@ -68,15 +68,19 @@ class NmrxivPolicy implements Preset
             ->add(Directive::IMG, 'https://ui-avatars.com')
             ->add(Directive::IMG, 'https://www.nfdi4chem.de')
             ->add(Directive::IMG, 'https://www.nmrium.org')
+            ->add(Directive::IMG, 'https://nmriumdev.nmrxiv.org')
             ->add(Directive::IMG, 'https://upload.wikimedia.org')
             ->add(Directive::IMG, 'https://pbs.twimg.com')
-            ->add(Directive::IMG, 'https://api.cheminf.studio');
+            ->add(Directive::IMG, 'https://api.cheminf.studio')
+            ->add(Directive::IMG, 'https://api.naturalproducts.net')
+            ->add(Directive::IMG, 'https://dev.api.naturalproducts.net')
+            ->add(Directive::IMG, 'https://placehold.co');
 
         // Connection sources
         $policy
             ->add(Directive::CONNECT, env('DATACITE_API', 'https://api.datacite.org'))
             ->add(Directive::CONNECT, env('CROSSREF_API', 'https://api.crossref.org/works/'))
-            ->add(Directive::CONNECT, env('DATACITE_ENDPOINT', 'https://api.datacite.org')) 
+            ->add(Directive::CONNECT, env('DATACITE_ENDPOINT', 'https://api.datacite.org'))
             ->add(Directive::CONNECT, env('NMRKIT_URL', 'https://nodejs.nmrxiv.org'))
             ->add(Directive::CONNECT, config('services.pubchem.base_url'))
             ->add(Directive::CONNECT, config('services.cas.base_url'))
@@ -85,12 +89,24 @@ class NmrxivPolicy implements Preset
             ->add(Directive::CONNECT, env('ORCID_ID_SEARCH_API', 'https://pub.orcid.org'))
             ->add(Directive::CONNECT, config('services.chemotion_tracker.base_url'))
             ->add(Directive::CONNECT, env('CM_API', 'https://api.cheminf.studio'))
-            ->add(Directive::CONNECT, env('AWS_ENDPOINT', 'https://s3.uni-jena.de'));
+            ->add(Directive::CONNECT, env('AWS_ENDPOINT', 'https://s3.uni-jena.de'))
+            ->add(Directive::CONNECT, 'https://nmrium.nmrxiv.org')
+            ->add(Directive::CONNECT, 'https://nmriumdev.nmrxiv.org')
+            ->add(Directive::CONNECT, 'https://api.cheminf.studio')
+            ->add(Directive::CONNECT, 'https://api.naturalproducts.net')
+            ->add(Directive::CONNECT, 'https://dev.api.naturalproducts.net');
 
         // Font sources
         $policy
             ->add(Directive::FONT, 'https://fonts.googleapis.com')
             ->add(Directive::FONT, 'https://fonts.gstatic.com')
             ->add(Directive::FONT, 'https://fonts.bunny.net');
+
+        // Frame sources
+        $policy
+            ->add(Directive::FRAME, Keyword::SELF)
+            ->add(Directive::FRAME, 'https://api.cheminf.studio')
+            ->add(Directive::FRAME, 'https://api.naturalproducts.net')
+            ->add(Directive::FRAME, 'https://dev.api.naturalproducts.net');
     }
 }
