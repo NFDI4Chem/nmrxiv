@@ -360,13 +360,10 @@ Route::prefix('admin')->group(function () {
                 ->name('console.spectra.snapshots');
         });
 
-        // CSP Violation Reporting (Admin only)
+        // CSP Violation Reporting (Admin dashboard protected)
         Route::middleware('auth', 'permission:manage platform')->group(function () {
             Route::get('csp-violations', [CspViolationController::class, 'index'])
                 ->name('console.csp.violations.index');
-            Route::post('csp-violation-report', [CspViolationController::class, 'report'])
-                ->name('console.csp.violation.report')
-                ->middleware('throttle:300,1');
         });
     });
 });
@@ -457,6 +454,11 @@ Route::middleware(['throttle:60,1'])->group(function () {
     Route::get('services/oembed', [OEmbedController::class, 'spectra']);
     Route::get('embed/{id}', [OEmbedController::class, 'embed'])->name('embed');
 });
+
+// Public CSP violation reporting endpoint (must be at root level, no auth required)
+Route::post('csp-violation-report', [CspViolationController::class, 'report'])
+    ->name('csp.violation.report')
+    ->middleware('throttle:300,1');
 
 // Test route for Octane
 Route::get('/octane-test', function () {

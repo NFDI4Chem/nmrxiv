@@ -32,18 +32,41 @@ class NmrxivPolicy implements Preset
             ->add(Directive::SCRIPT, 'https://matomo.nfdi4chem.de')
             ->add(Directive::CONNECT, 'https://matomo.nfdi4chem.de', 'https://fonts.bunny.net');
 
-        // Environment-specific rules
-        if (! app()->environment('production')) {
-            // Development: Allow Vite HMR and inline styles/scripts
-            $policy
-                ->add(Directive::SCRIPT, 'http://localhost:5173', Keyword::UNSAFE_EVAL, Keyword::UNSAFE_INLINE)
-                ->add(Directive::STYLE, Keyword::UNSAFE_INLINE)
-                ->add(Directive::CONNECT, 'ws://localhost:5173', 'http://localhost:5173');
-        } else {
-            // Production: Use nonces for enhanced security
-            $policy
-                ->addNonce(Directive::SCRIPT)
-                ->addNonce(Directive::STYLE);
-        }
+        // Add nmrXiv-specific external sources
+        $this->addNmrxivSources($policy);
+
+        // Unified rules for all environments
+        $this->addUnifiedRules($policy);
+    }
+
+    /**
+     * Add unified CSP rules that apply to all environments
+     */
+    private function addUnifiedRules(Policy $policy): void
+    {
+        // Allow inline scripts and styles (needed for the application to function)
+        $policy
+            ->add(Directive::SCRIPT, Keyword::UNSAFE_INLINE, Keyword::UNSAFE_EVAL)
+            ->add(Directive::STYLE, Keyword::UNSAFE_INLINE);
+
+        // Development server support (for local development with Vite)
+        $policy
+            ->add(Directive::SCRIPT, 'http://localhost:5173')
+            ->add(Directive::CONNECT, 'ws://localhost:5173', 'http://localhost:5173');
+    }
+
+    /**
+     * Add nmrXiv-specific external sources that the application needs
+     */
+    private function addNmrxivSources(Policy $policy): void
+    {
+        // University of Jena resources (for logos and institutional content)
+        $policy->add(Directive::IMG, 'https://www.uni-jena.de');
+
+        // S3 storage for user-uploaded content and static assets
+        $policy->add(Directive::IMG, 'https://s3.uni-jena.de');
+
+        // Web fonts from various providers
+        $policy->add(Directive::FONT, 'https://fonts.googleapis.com', 'https://fonts.gstatic.com');
     }
 }
