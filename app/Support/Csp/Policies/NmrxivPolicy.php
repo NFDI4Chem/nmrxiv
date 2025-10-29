@@ -84,7 +84,8 @@ class NmrxivPolicy implements Preset
             ->add(Directive::IMG, 'https://www.nfdi4chem.de')             // NFDI4Chem logos and assets
             ->add(Directive::IMG, 'https://www.nmrium.org')               // NMRium branding assets
             ->add(Directive::IMG, 'https://upload.wikimedia.org')         // Wikipedia/Wikimedia images (ChEBI logo, etc.)
-            ->add(Directive::IMG, 'https://pbs.twimg.com');                // Twitter profile images
+            ->add(Directive::IMG, 'https://pbs.twimg.com')                // Twitter profile images
+            ->add(Directive::IMG, 'https://api.cheminf.studio');           // Chemical structure depiction service
 
         // Connection sources - External APIs for data retrieval and services
         // Using chained add() calls for better compatibility
@@ -101,11 +102,14 @@ class NmrxivPolicy implements Preset
             ->add(Directive::CONNECT, config('services.chemistry_standardize.url'))
             ->add(Directive::CONNECT, env('EUROPEMC_WS_API', 'https://www.ebi.ac.uk/europepmc/webservices/rest/search'))
             ->add(Directive::CONNECT, env('ORCID_ID_SEARCH_API', 'https://pub.orcid.org/v2.1/search'))
-            ->add(Directive::CONNECT, config('services.chemotion_tracker.base_url'));
+            ->add(Directive::CONNECT, config('services.chemotion_tracker.base_url'))
+            ->add(Directive::CONNECT, env('CM_API', 'https://api.cheminf.studio'))
+            ->add(Directive::CONNECT, env('AWS_ENDPOINT', 'https://s3.uni-jena.de')); // S3 storage for file uploads and downloads
 
         // Font sources - External font services
         $policy
             ->add(Directive::FONT, 'https://fonts.googleapis.com')
-            ->add(Directive::FONT, 'https://fonts.gstatic.com');
+            ->add(Directive::FONT, 'https://fonts.gstatic.com')
+            ->add(Directive::FONT, 'https://fonts.bunny.net');
     }
 }
