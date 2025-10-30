@@ -52,7 +52,7 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # Build + push app image (tag: app-dev-csp). Uses GHA cache for speed.
+      # Build + push app image (tag: app-dev-latest). Uses GHA cache for speed.
       - name: Build and push App Docker image
         uses: docker/build-push-action@v6
         with:
@@ -60,8 +60,8 @@ jobs:
           file: ./deployment/Dockerfile
           push: true
           build-args: |
-            RELEASE_VERSION=app-dev-csp
-          tags: ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:app-dev-csp
+            RELEASE_VERSION=app-dev-latest
+          tags: ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:app-dev-latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -74,6 +74,6 @@ jobs:
           push: true
           build-args: |
             RELEASE_VERSION=worker-dev-latest
-          tags: ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:worker-dev-csp
+          tags: ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:worker-dev-latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
