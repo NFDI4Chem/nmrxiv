@@ -8,7 +8,7 @@ name: Setup, Build and Publish to Dev
 # Runs on pushes to the development branch
 on:
   push:
-    branches: [csp-fixes]
+    branches: [development]
 
 # Environment variables used across all jobs
 env:
@@ -61,7 +61,7 @@ jobs:
           push: true
           build-args: |
             RELEASE_VERSION=app-dev-csp
-          tags: ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:app-dev-csp
+          tags: ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:app-dev-latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -74,6 +74,6 @@ jobs:
           push: true
           build-args: |
             RELEASE_VERSION=worker-dev-latest
-          tags: ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:worker-dev-csp
+          tags: ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:worker-dev-latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
