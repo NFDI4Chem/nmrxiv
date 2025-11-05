@@ -28,7 +28,6 @@ jobs:
         image: redis:7.0
         ports:
           - 6379:6379
-        options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=3
       
       meilisearch:
         image: getmeili/meilisearch:v1.5
@@ -37,7 +36,6 @@ jobs:
         env:
           MEILI_ENV: development
           MEILI_NO_ANALYTICS: true
-        options: --health-cmd="curl -f http://localhost:7700/health || exit 1" --health-interval=10s --health-timeout=5s --health-retries=3
 
     name: PHP ${{ matrix.php-version }}
     
@@ -87,27 +85,8 @@ jobs:
     - name: Directory permissions
       run: chmod -R 777 storage bootstrap/cache
       
-    - name: Wait for services to be ready
-      run: |
-        # Wait for PostgreSQL
-        until pg_isready -h 127.0.0.1 -p 5432 -U postgres; do
-          echo "Waiting for PostgreSQL..."
-          sleep 2
-        done
-        
-        # Wait for Redis
-        until redis-cli -h 127.0.0.1 -p 6379 ping; do
-          echo "Waiting for Redis..."
-          sleep 2
-        done
-        
-        # Wait for Meilisearch
-        until curl -f http://127.0.0.1:7700/health > /dev/null 2>&1; do
-          echo "Waiting for Meilisearch..."
-          sleep 2
-        done
-        
-        echo "All services are ready!"
+    - name: Wait for services
+      run: sleep 10
       
     - name: Run database migrations
       run: php artisan migrate --force
