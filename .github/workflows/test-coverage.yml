@@ -1,8 +1,7 @@
-name: Run Test Coverage and Report to Codecov
+name: PHPUnit Tests & Coverage Analysis
 
 on:
-  push:
-    branches: [test-report-code-cov]
+  workflow_call:
 
 jobs:
   test-coverage:
