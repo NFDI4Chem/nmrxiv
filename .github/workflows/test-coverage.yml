@@ -1,12 +1,12 @@
-name : Run Test Coverage and Report to Codecov
+name: Run Test Coverage and Report to Codecov
 
 on:
   push:
     branches: [test-report-code-cov]
 
 jobs:
-  tests:
-    name: Run tests
+  test-coverage:
+    name: Tests & Coverage (PHP 8.3)
     runs-on: ubuntu-latest
     
     services:
@@ -21,18 +21,25 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v4
 
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
-        php-version: '8.2'
+        php-version: '8.3'
         extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_pgsql, bcmath, soap, intl, gd, exif, iconv
         coverage: pcov
 
+    - name: Cache Composer packages
+      uses: actions/cache@v4
+      with:
+        path: vendor
+        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-php-
+
     - name: Install composer dependencies
-      run: |
-        composer install --ignore-platform-reqs
+      run: composer install --no-dev --optimize-autoloader --no-interaction
     
     - name: Prepare Laravel Application
       run: |
@@ -42,28 +49,32 @@ jobs:
         echo AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY_DEV }} >> .env
         echo MEILISEARCH_KEY=${{ secrets.MEILISEARCH_KEY_DEV }} >> .env
         echo MEILISEARCH_PUBLICKEY=${{ secrets.MEILISEARCH_PUBLICKEY_DEV }} >> .env
-        echo TWITTER_CLIENT_ID=${{ secrets.TWITTER_CLIENT_ID_DEV }} >> .env
-        echo TWITTER_CLIENT_SECRET=${{ secrets.TWITTER_CLIENT_SECRET_DEV }} >> .env
-        echo GITHUB_CLIENT_ID=${{ secrets.CLIENT_ID_GITHUB_DEV }} >> .env
-        echo GITHUB_CLIENT_SECRET=${{ secrets.CLIENT_SECRET_GITHUB_DEV }} >> .env
 
         php artisan key:generate
         php artisan migrate --seed
 
-    - name: Install pcov
-      run: |
-        sudo apt-get update
-        sudo apt-get -y install php-pcov
+    - name: Cache Node modules
+      uses: actions/cache@v4
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
 
     - name: Install front-end dependencies
-      run: |
-        npm install
-        npm run build
+      run: npm ci
+
+    - name: Build front-end assets
+      run: npm run build
     
     - name: Run tests and collect coverage
       run: vendor/bin/phpunit --coverage-clover coverage.xml
 
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
-    env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      uses: codecov/codecov-action@v4
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
+        token: ${{ secrets.CODECOV_TOKEN }}
