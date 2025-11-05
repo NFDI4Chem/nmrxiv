@@ -44,8 +44,8 @@ class ProcessDraftELNSubmissionProxyTest extends TestCase
         $pathGenerator->method('generateDraftFilePath')
             ->willReturn('test/path/file.txt');
 
-        // Mock the DraftProcessingLogger
-        $logger = $this->createMock(\App\Services\DraftProcessingLogger::class);
+        // Mock the DraftProcessingLogger (actual class lives under App\Actions\Draft)
+        $logger = $this->createMock(\App\Actions\Draft\DraftProcessingLogger::class);
 
         try {
             // This will fail because we're not actually extracting a real zip,
@@ -92,8 +92,8 @@ class ProcessDraftELNSubmissionProxyTest extends TestCase
         $pathGenerator->method('generateDraftFilePath')
             ->willReturn('test/path/file.txt');
 
-        // Mock the DraftProcessingLogger
-        $logger = $this->createMock(\App\Services\DraftProcessingLogger::class);
+        // Mock the DraftProcessingLogger (actual class lives under App\Actions\Draft)
+        $logger = $this->createMock(\App\Actions\Draft\DraftProcessingLogger::class);
 
         try {
             // This will fail because we're not actually extracting a real zip,
