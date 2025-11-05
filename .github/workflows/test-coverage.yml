@@ -2,7 +2,7 @@ name: Tests & Code Coverage
 
 on:
   push:
-    branches: test-report-code-cov
+    branches: development
 
 jobs:
   test:
