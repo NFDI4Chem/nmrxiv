@@ -1,17 +1,13 @@
-name: Tests & Code Coverage
+name : Run Test Coverage and Report to Codecov
 
 on:
   push:
-    branches: development
+    branches: [test-report-code-cov]
 
 jobs:
-  test:
+  tests:
+    name: Run tests
     runs-on: ubuntu-latest
-    
-    strategy:
-      fail-fast: false
-      matrix:
-        php-version: [8.3]
     
     services:
       postgres:
@@ -21,99 +17,53 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: password
         ports:
-          - 5432:5432
-        options: --health-cmd="pg_isready -U postgres" --health-interval=10s --health-timeout=5s --health-retries=3
-      
-      redis:
-        image: redis:7.0
-        ports:
-          - 6379:6379
-      
-      meilisearch:
-        image: getmeili/meilisearch:v1.5
-        ports:
-          - 7700:7700
-        env:
-          MEILI_ENV: development
-          MEILI_NO_ANALYTICS: true
+        - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
-    name: PHP ${{ matrix.php-version }}
-    
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
+    - uses: actions/checkout@v1
+
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
-        php-version: ${{ matrix.php-version }}
-        extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick, redis, pgsql, pdo_pgsql
-        coverage: xdebug
-        
-    - name: Cache Composer packages
-      id: composer-cache
-      uses: actions/cache@v4
-      with:
-        path: vendor
-        key: ${{ runner.os }}-php-${{ matrix.php-version }}-${{ hashFiles('**/composer.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-php-${{ matrix.php-version }}-
-          
-    - name: Install dependencies
-      run: composer install --prefer-dist --no-interaction --no-progress --optimize-autoloader
-      
-    - name: Cache Node modules
-      uses: actions/cache@v4
-      with:
-        path: ~/.npm
-        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-node-
-          
-    - name: Install Node dependencies
-      run: npm ci
-      
-    - name: Build frontend assets
-      run: npm run build
-      
-    - name: Copy environment file
-      run: cp .env.ci .env
-      
-    - name: Generate application key
-      run: php artisan key:generate
-      
-    - name: Directory permissions
-      run: chmod -R 777 storage bootstrap/cache
-      
-    - name: Wait for services
-      run: sleep 10
-      
-    - name: Run database migrations
-      run: php artisan migrate --force
-        
-    - name: Run database seeders
-      run: php artisan db:seed --force
-        
-    - name: Run tests with coverage
-      run: php artisan test --coverage --coverage-clover=coverage.xml --coverage-html=coverage-report --coverage-text --colors=never
-      env:
-        # Override only the critical settings that might differ from .env.ci
-        APP_ENV: testing
-        SCOUT_DRIVER: null
-        
-    - name: Upload coverage reports to Codecov
-      uses: codecov/codecov-action@v4
-      with:
-        file: ./coverage.xml
-        flags: unittests
-        name: codecov-umbrella
-        fail_ci_if_error: false
-        token: ${{ secrets.CODECOV_TOKEN }}
-        
-    - name: Upload coverage to artifacts
-      uses: actions/upload-artifact@v4
-      if: matrix.php-version == '8.3'
-      with:
-        name: coverage-report
-        path: coverage-report/
-        retention-days: 30
+        php-version: '8.2'
+        extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_pgsql, bcmath, soap, intl, gd, exif, iconv
+        coverage: pcov
+
+    - name: Install composer dependencies
+      run: |
+        composer install --ignore-platform-reqs
+    
+    - name: Prepare Laravel Application
+      run: |
+        php -r "file_exists('.env') || copy('.env.ci', '.env');"
+
+        echo AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID_DEV }} >> .env
+        echo AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY_DEV }} >> .env
+        echo MEILISEARCH_KEY=${{ secrets.MEILISEARCH_KEY_DEV }} >> .env
+        echo MEILISEARCH_PUBLICKEY=${{ secrets.MEILISEARCH_PUBLICKEY_DEV }} >> .env
+        echo TWITTER_CLIENT_ID=${{ secrets.TWITTER_CLIENT_ID_DEV }} >> .env
+        echo TWITTER_CLIENT_SECRET=${{ secrets.TWITTER_CLIENT_SECRET_DEV }} >> .env
+        echo GITHUB_CLIENT_ID=${{ secrets.CLIENT_ID_GITHUB_DEV }} >> .env
+        echo GITHUB_CLIENT_SECRET=${{ secrets.CLIENT_SECRET_GITHUB_DEV }} >> .env
+
+        php artisan key:generate
+        php artisan migrate --seed
+
+    - name: Install pcov
+      run: |
+        sudo apt-get update
+        sudo apt-get -y install php-pcov
+
+    - name: Install front-end dependencies
+      run: |
+        npm install
+        npm run build
+    
+    - name: Run tests and collect coverage
+      run: vendor/bin/phpunit --coverage-clover coverage.xml
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+    env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
