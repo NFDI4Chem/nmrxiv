@@ -1,4 +1,4 @@
-name : Setup, Build and Publish to Dev
+name : Run Test Coverage and Report to Codecov
 
 on:
   push:
@@ -36,7 +36,7 @@ jobs:
     
     - name: Prepare Laravel Application
       run: |
-        php -r "file_exists('.env') || copy('.env.ci.test', '.env');"
+        php -r "file_exists('.env') || copy('.env.ci', '.env');"
 
         echo AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID_DEV }} >> .env
         echo AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY_DEV }} >> .env
