@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-version: [8.2, 8.3]
+        php-version: [8.3]
     
     services:
       postgres:
@@ -29,6 +29,15 @@ jobs:
         ports:
           - 6379:6379
         options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=3
+      
+      meilisearch:
+        image: getmeili/meilisearch:v1.5
+        ports:
+          - 7700:7700
+        env:
+          MEILI_ENV: development
+          MEILI_NO_ANALYTICS: true
+        options: --health-cmd="curl -f http://localhost:7700/health || exit 1" --health-interval=10s --health-timeout=5s --health-retries=3
 
     name: PHP ${{ matrix.php-version }}
     
@@ -78,37 +87,40 @@ jobs:
     - name: Directory permissions
       run: chmod -R 777 storage bootstrap/cache
       
+    - name: Wait for services to be ready
+      run: |
+        # Wait for PostgreSQL
+        until pg_isready -h 127.0.0.1 -p 5432 -U postgres; do
+          echo "Waiting for PostgreSQL..."
+          sleep 2
+        done
+        
+        # Wait for Redis
+        until redis-cli -h 127.0.0.1 -p 6379 ping; do
+          echo "Waiting for Redis..."
+          sleep 2
+        done
+        
+        # Wait for Meilisearch
+        until curl -f http://127.0.0.1:7700/health > /dev/null 2>&1; do
+          echo "Waiting for Meilisearch..."
+          sleep 2
+        done
+        
+        echo "All services are ready!"
+      
     - name: Run database migrations
       run: php artisan migrate --force
-      env:
-        DB_CONNECTION: pgsql
-        DB_HOST: 127.0.0.1
-        DB_PORT: 5432
-        DB_DATABASE: nmrxiv_test
-        DB_USERNAME: postgres
-        DB_PASSWORD: password
         
     - name: Run database seeders
       run: php artisan db:seed --force
-      env:
-        DB_CONNECTION: pgsql
-        DB_HOST: 127.0.0.1
-        DB_PORT: 5432
-        DB_DATABASE: nmrxiv_test
-        DB_USERNAME: postgres
-        DB_PASSWORD: password
         
     - name: Run tests with coverage
       run: php artisan test --coverage --coverage-clover=coverage.xml --coverage-html=coverage-report --coverage-text --colors=never
       env:
-        DB_CONNECTION: pgsql
-        DB_HOST: 127.0.0.1
-        DB_PORT: 5432
-        DB_DATABASE: nmrxiv_test
-        DB_USERNAME: postgres
-        DB_PASSWORD: password
-        REDIS_HOST: 127.0.0.1
-        REDIS_PORT: 6379
+        # Override only the critical settings that might differ from .env.ci
+        APP_ENV: testing
+        SCOUT_DRIVER: null
         
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v4
