@@ -15,12 +15,7 @@ class LicenseFactory extends Factory
      */
     public function definition(): array
     {
-        // Ensure faker is initialized
-        if (!$this->faker) {
-            $this->faker = \Faker\Factory::create();
-        }
-        
-        $title = $this->faker->sentence(4);
+        $title = $this->faker->sentence($nbWords = 4);
         $slug = Str::slug($title, '-');
 
         return [
