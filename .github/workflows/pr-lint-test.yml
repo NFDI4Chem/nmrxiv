@@ -25,3 +25,4 @@ jobs:
   test-coverage:
     name: Tests & Coverage (PHP 8.3)
     uses: ./.github/workflows/test-coverage.yml
+    secrets: inherit
