@@ -67,7 +67,7 @@ jobs:
       run: npm run build
     
     - name: Run tests and collect coverage
-      run: vendor/bin/phpunit --coverage-clover coverage.xml
+      run: vendor/bin/phpunit --coverage-clover coverage.xml --display-skipped
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v4
