@@ -66,7 +66,7 @@ class SyncProjectAuthorsActionTest extends TestCase
             'family_name' => 'Doe',
             'email_id' => 'john@example.com',
         ]);
-        
+
         // Attach the existing author to the project
         $this->project->authors()->attach($existingAuthor->id, ['contributor_type' => 'Researcher']);
 
@@ -84,12 +84,12 @@ class SyncProjectAuthorsActionTest extends TestCase
 
         $this->assertCount(1, $result);
         $this->assertEquals($existingAuthor->id, $result[0]->id);
-        
+
         // Verify the existing author was updated, not a new one created
         $existingAuthor->refresh();
         $this->assertEquals('john.doe@updated.com', $existingAuthor->email_id);
         $this->assertEquals('0000-0000-0000-0001', $existingAuthor->orcid_id);
-        
+
         // Verify only one author exists in database
         $this->assertCount(1, Author::all());
     }
