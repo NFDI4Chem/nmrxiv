@@ -324,12 +324,21 @@ class ProjectController extends Controller
 
     public function publish(Request $request, Project $project, PublishProject $publisher, UpdateProject $updater)
     {
+        if (! Gate::forUser($request->user())->allows('publishProject', $project)) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
         if ($project) {
             $input = $request->all();
-            $release_date = $input['release_date'];
+            $release_date = $request->get('release_date');
             $enableProjectMode = $request->get('enableProjectMode');
             if ($enableProjectMode) {
                 $validation = $project->validation;
+                if (!$validation) {
+                    return response()->json([
+                        'errors' => 'Project validation not found. Please ensure the project is properly configured.',
+                    ], 422);
+                }
                 $validation->process();
                 $validation = $validation->fresh();
                 if ($validation['report']['project']['status']) {
@@ -351,16 +360,20 @@ class ProjectController extends Controller
                 }
             } else {
                 $draft = $project->draft;
-                $draft->project_enabled = false;
-                $draft->save();
+                if ($draft) {
+                    $draft->project_enabled = false;
+                    $draft->save();
+                }
 
                 $project->release_date = $request->get('release_date');
                 $project->status = 'queued';
                 $project->save();
 
                 $validation = $project->validation;
-                $validation->process();
-                $validation = $validation->fresh();
+                if ($validation) {
+                    $validation->process();
+                    $validation = $validation->fresh();
+                }
 
                 foreach ($project->studies as $study) {
                     $study->license_id = $project->license_id;
@@ -373,9 +386,11 @@ class ProjectController extends Controller
 
                 $status = true;
 
-                foreach ($validation['report']['project']['studies'] as $study) {
-                    if (! $study['status']) {
-                        $status = false;
+                if ($validation && isset($validation['report']['project']['studies'])) {
+                    foreach ($validation['report']['project']['studies'] as $study) {
+                        if (! $study['status']) {
+                            $status = false;
+                        }
                     }
                 }
                 // add license check
@@ -398,7 +413,7 @@ class ProjectController extends Controller
 
     public function store(Request $request, CreateNewProject $creator)
     {
-        if (! Gate::forUser($request->user())->check('createProject', $project)) {
+        if (! Gate::forUser($request->user())->allows('createProject', Project::class)) {
             throw new AuthorizationException;
         }
 
