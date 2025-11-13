@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class ProjectInvitation extends Model
 {
     use HasFactory;
+
     /**
      * The attributes that are mass assignable.
      *

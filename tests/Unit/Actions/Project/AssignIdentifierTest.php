@@ -3,10 +3,7 @@
 namespace Tests\Unit\Actions\Project;
 
 use App\Actions\Project\AssignIdentifier;
-use App\Models\Dataset;
-use App\Models\Molecule;
 use App\Models\Project;
-use App\Models\Sample;
 use App\Models\Study;
 use App\Models\Ticker;
 use App\Services\DOI\DOIService;
@@ -19,24 +16,25 @@ class AssignIdentifierTest extends TestCase
     use RefreshDatabase;
 
     private AssignIdentifier $action;
+
     private DOIService $doiService;
 
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Create a mock DOI service that returns predictable responses
         $this->doiService = $this->createMock(DOIService::class);
         $this->doiService->method('createDOI')->willReturn([
-            'data' => ['id' => '10.1234/test-doi']
+            'data' => ['id' => '10.1234/test-doi'],
         ]);
-        
+
         $this->action = new AssignIdentifier($this->doiService);
 
         // Create necessary tickers using the same approach as the seeder
         $types = ['project', 'study', 'dataset', 'sample', 'molecule'];
         foreach ($types as $type) {
-            $ticker = new Ticker();
+            $ticker = new Ticker;
             $ticker->type = $type;
             $ticker->index = 0;
             $ticker->save();
@@ -123,7 +121,7 @@ class AssignIdentifierTest extends TestCase
 
     public function test_assign_handles_unsupported_model_type()
     {
-        $unsupportedModel = new \stdClass();
+        $unsupportedModel = new \stdClass;
 
         // Should not throw any errors when unsupported model is passed
         $this->action->assign($unsupportedModel);
@@ -132,7 +130,7 @@ class AssignIdentifierTest extends TestCase
 
     public function test_assign_skips_non_study_objects_in_collection()
     {
-        $nonStudyObject = new \stdClass();
+        $nonStudyObject = new \stdClass;
         $studies = collect([$nonStudyObject]);
 
         // Should not throw errors when processing non-study objects
@@ -162,24 +160,24 @@ class AssignIdentifierTest extends TestCase
     public function test_assign_handles_mixed_existing_and_new_identifiers()
     {
         $license = \App\Models\License::factory()->create();
-        
+
         // Test with existing identifier
         $existingProject = Project::factory()->create(['identifier' => 100, 'license_id' => $license->id]);
         $this->action->assign($existingProject);
-        
+
         $existingProject->refresh();
         $this->assertTrue($existingProject->identifier == 100 || $existingProject->identifier == 'NMRXIV:P100');
-        
+
         // Project ticker should not be updated
         $this->assertEquals(0, Ticker::whereType('project')->first()->index);
 
         // Test with new identifier
         $newProject = Project::factory()->create(['identifier' => null, 'license_id' => $license->id]);
         $this->action->assign($newProject);
-        
+
         $newProject->refresh();
         $this->assertTrue($newProject->identifier == 1 || $newProject->identifier == 'NMRXIV:P1');
-        
+
         // Now ticker should be updated
         $this->assertEquals(1, Ticker::whereType('project')->first()->index);
     }

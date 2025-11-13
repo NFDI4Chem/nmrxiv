@@ -3,7 +3,6 @@
 namespace Database\Factories;
 
 use App\Models\Draft;
-use App\Models\FileSystemObject;
 use App\Models\Project;
 use App\Models\Study;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -20,11 +19,11 @@ class FileSystemObjectFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->word() . '.' . $this->faker->fileExtension(),
+            'name' => $this->faker->word().'.'.$this->faker->fileExtension(),
             'uuid' => Str::uuid(),
             'slug' => $this->faker->slug(),
             'description' => $this->faker->sentence(),
-            'relative_url' => '/' . $this->faker->slug() . '/' . $this->faker->word(),
+            'relative_url' => '/'.$this->faker->slug().'/'.$this->faker->word(),
             'path' => $this->faker->filePath(),
             'type' => $this->faker->randomElement(['file', 'directory']),
             'key' => Str::uuid(),

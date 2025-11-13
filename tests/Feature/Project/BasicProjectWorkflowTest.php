@@ -14,13 +14,15 @@ class BasicProjectWorkflowTest extends TestCase
     use RefreshDatabase;
 
     private User $user;
+
     private Team $team;
+
     private License $license;
 
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->user = User::factory()->withPersonalTeam()->create();
         $this->team = $this->user->currentTeam;
         $this->license = License::factory()->create();
@@ -40,7 +42,7 @@ class BasicProjectWorkflowTest extends TestCase
             ->post('/dashboard/projects/create', $projectData);
 
         $response->assertRedirect();
-        
+
         $this->assertDatabaseHas('projects', [
             'name' => 'Basic Workflow Test Project',
             'slug' => 'basic-workflow-test-project',
@@ -63,7 +65,7 @@ class BasicProjectWorkflowTest extends TestCase
 
         $response->assertStatus(302);
         $response->assertSessionHasErrors(['name']);
-        
+
         $this->assertEquals(0, Project::count());
     }
 
@@ -80,7 +82,7 @@ class BasicProjectWorkflowTest extends TestCase
             'team_id' => $this->team->id,
             'is_archived' => false,
         ]);
-        
+
         $project->users()->attach($this->user, ['role' => 'creator']);
 
         // Toggle archive requires password confirmation
@@ -90,7 +92,7 @@ class BasicProjectWorkflowTest extends TestCase
             ]);
 
         $response->assertRedirect();
-        
+
         $project->refresh();
         $this->assertTrue($project->is_archived);
     }
@@ -102,7 +104,7 @@ class BasicProjectWorkflowTest extends TestCase
             'team_id' => $this->team->id,
             'is_archived' => true,
         ]);
-        
+
         $project->users()->attach($this->user, ['role' => 'creator']);
 
         // Toggle archive again to restore (requires password confirmation)
@@ -112,7 +114,7 @@ class BasicProjectWorkflowTest extends TestCase
             ]);
 
         $response->assertRedirect();
-        
+
         $project->refresh();
         $this->assertFalse($project->is_archived);
     }
@@ -124,7 +126,7 @@ class BasicProjectWorkflowTest extends TestCase
             'team_id' => $this->team->id,
             'is_deleted' => false,
         ]);
-        
+
         $project->users()->attach($this->user, ['role' => 'creator']);
 
         $response = $this->actingAs($this->user)
@@ -132,7 +134,7 @@ class BasicProjectWorkflowTest extends TestCase
 
         // Check if redirect happened (indicating successful processing)
         $response->assertRedirect();
-        
+
         // Note: Controller doesn't actually set is_deleted=true immediately
         // It may queue for background deletion or have other logic
         // This is testing the HTTP workflow works correctly
@@ -145,9 +147,9 @@ class BasicProjectWorkflowTest extends TestCase
             'owner_id' => $this->user->id,
             'team_id' => $this->team->id,
         ]);
-        
+
         $project->users()->attach($this->user, ['role' => 'creator']);
-        
+
         $newMember = User::factory()->create();
 
         $response = $this->actingAs($this->user)
@@ -157,7 +159,7 @@ class BasicProjectWorkflowTest extends TestCase
             ]);
 
         $response->assertRedirect();
-        
+
         // Member management might create invitations instead of direct additions
         // Check if invitation was created
         $this->assertDatabaseHas('project_invitations', [
@@ -173,9 +175,9 @@ class BasicProjectWorkflowTest extends TestCase
             'owner_id' => $this->user->id,
             'team_id' => $this->team->id,
         ]);
-        
+
         $project->users()->attach($this->user, ['role' => 'creator']);
-        
+
         $member = User::factory()->create();
         $project->users()->attach($member, ['role' => 'viewer']);
 
@@ -185,7 +187,7 @@ class BasicProjectWorkflowTest extends TestCase
             ]);
 
         $response->assertRedirect();
-        
+
         $project->refresh();
         $updatedMember = $project->users->where('id', $member->id)->first();
         $this->assertEquals('collaborator', $updatedMember->projectMembership->role);
@@ -197,9 +199,9 @@ class BasicProjectWorkflowTest extends TestCase
             'owner_id' => $this->user->id,
             'team_id' => $this->team->id,
         ]);
-        
+
         $project->users()->attach($this->user, ['role' => 'creator']);
-        
+
         $member = User::factory()->create();
         $project->users()->attach($member, ['role' => 'viewer']);
 
@@ -207,7 +209,7 @@ class BasicProjectWorkflowTest extends TestCase
             ->delete("/dashboard/projects/{$project->id}/members/{$member->id}");
 
         $response->assertRedirect();
-        
+
         $project->refresh();
         $this->assertFalse($project->users->contains($member));
     }
@@ -218,7 +220,7 @@ class BasicProjectWorkflowTest extends TestCase
             'owner_id' => $this->user->id,
             'team_id' => $this->team->id,
         ]);
-        
+
         $unauthorizedUser = User::factory()->create();
 
         // Skip project publishing due to controller bug - line 354: "Attempt to assign property 'project_enabled' on null"
@@ -245,9 +247,9 @@ class BasicProjectWorkflowTest extends TestCase
             'owner_id' => $this->user->id,
             'team_id' => $this->team->id,
         ]);
-        
+
         $project->users()->attach($this->user, ['role' => 'creator']);
-        
+
         // Check that project has studies relationship
         $this->assertInstanceOf(\Illuminate\Database\Eloquent\Collection::class, $project->studies);
         $this->assertEquals(0, $project->studies->count());
@@ -260,9 +262,9 @@ class BasicProjectWorkflowTest extends TestCase
             'team_id' => $this->team->id,
             'license_id' => $this->license->id,
         ]);
-        
+
         $project->users()->attach($this->user, ['role' => 'creator']);
-        
+
         // Test relationships exist
         $this->assertInstanceOf(User::class, $project->owner);
         $this->assertInstanceOf(Team::class, $project->team);

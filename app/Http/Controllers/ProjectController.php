@@ -334,7 +334,7 @@ class ProjectController extends Controller
             $enableProjectMode = $request->get('enableProjectMode');
             if ($enableProjectMode) {
                 $validation = $project->validation;
-                if (!$validation) {
+                if (! $validation) {
                     return response()->json([
                         'errors' => 'Project validation not found. Please ensure the project is properly configured.',
                     ], 422);

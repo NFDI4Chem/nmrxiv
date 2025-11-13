@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Project;
 
-use App\Jobs\ProcessSubmission;
 use App\Models\License;
 use App\Models\Project;
 use App\Models\Sample;
@@ -10,10 +9,7 @@ use App\Models\Study;
 use App\Models\Team;
 use App\Models\User;
 use App\Models\Validation;
-use App\Notifications\ProjectPublishedNotification;
-use App\Services\ChemotionRepositoryTrackerService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Queue;
 use PHPUnit\Framework\Attributes\Test;
@@ -24,39 +20,42 @@ class PublishProjectTest extends TestCase
     use RefreshDatabase;
 
     private User $user;
+
     private Team $team;
+
     private Project $project;
+
     private License $license;
 
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->user = User::factory()->withPersonalTeam()->create();
         $this->team = $this->user->currentTeam;
         $this->license = License::factory()->create();
-        
+
         $this->project = Project::factory()->create([
             'owner_id' => $this->user->id,
             'team_id' => $this->team->id,
             'is_public' => false,
             'license_id' => $this->license->id,
         ]);
-        
+
         // Attach user as creator
         $this->project->users()->attach($this->user, ['role' => 'creator']);
-        
+
         // Create studies for the project (needed for validation)
         $study = Study::factory()->create(['project_id' => $this->project->id]);
-        
+
         // Create a sample for the study (Study factory should do this, but let's ensure it)
-        if (!$study->sample) {
+        if (! $study->sample) {
             $sample = Sample::factory()->create([
                 'study_id' => $study->id,
                 'project_id' => $this->project->id,
             ]);
         }
-        
+
         // Create a passing validation for the project
         $validation = Validation::factory()->passed()->create();
         $this->project->update(['validation_id' => $validation->id]);
@@ -73,7 +72,7 @@ class PublishProjectTest extends TestCase
         // Test passes regardless of validation outcome (200 or 422)
         // The key is that authorized users get a proper response, not 403
         $this->assertContains($response->getStatusCode(), [200, 422]);
-        
+
         if ($response->getStatusCode() === 200) {
             // If we get 200, expect project data in response
             $response->assertJson([
@@ -81,7 +80,7 @@ class PublishProjectTest extends TestCase
                     'id' => $this->project->id,
                 ],
             ]);
-            
+
             // Job dispatch depends on internal validation logic - don't assert it
             // as the controller has complex logic that may or may not dispatch jobs
         } else {
@@ -91,7 +90,7 @@ class PublishProjectTest extends TestCase
             ]);
             Queue::assertNothingPushed();
         }
-        
+
         // Verify the user has proper access (not forbidden)
         $this->assertNotEquals(403, $response->getStatusCode());
     }
@@ -112,12 +111,11 @@ class PublishProjectTest extends TestCase
         $response->assertJson([
             'errors' => 'Validation failing. Please provide all the required data and try again. If the problem persists, please contact us.',
         ]);
-        
+
         // Check that validation processing was triggered even though it failed
         $this->project->refresh();
         $this->assertNotNull($this->project->validation);
     }
-
 
     public function test_unauthorized_user_cannot_publish_project()
     {
@@ -130,7 +128,7 @@ class PublishProjectTest extends TestCase
 
         $response->assertStatus(403);
         $response->assertJson(['message' => 'Forbidden']);
-        
+
         $this->project->refresh();
         $this->assertFalse($this->project->is_public);
     }
@@ -147,7 +145,7 @@ class PublishProjectTest extends TestCase
 
         $response->assertStatus(403);
         $response->assertJson(['message' => 'Forbidden']);
-        
+
         $this->project->refresh();
         $this->assertFalse($this->project->is_public);
     }
@@ -155,7 +153,7 @@ class PublishProjectTest extends TestCase
     public function test_collaborator_can_publish_project()
     {
         Queue::fake();
-        
+
         $collaborator = User::factory()->create();
         $this->project->users()->attach($collaborator, ['role' => 'collaborator']);
 
@@ -212,7 +210,7 @@ class PublishProjectTest extends TestCase
 
         $response->assertStatus(403);
         $response->assertJson(['message' => 'Forbidden']);
-        
+
         // Verify project remains in archived state
         $archivedProject->refresh();
         $this->assertFalse($archivedProject->is_public);
@@ -241,7 +239,7 @@ class PublishProjectTest extends TestCase
 
         $response->assertStatus(403);
         $response->assertJson(['message' => 'Forbidden']);
-        
+
         // Verify project remains in deleted state
         $deletedProject->refresh();
         $this->assertFalse($deletedProject->is_public);
@@ -272,7 +270,7 @@ class PublishProjectTest extends TestCase
                 'id' => $incompleteProject->id,
             ],
         ]);
-        
+
         $incompleteProject->refresh();
         $this->assertFalse($incompleteProject->is_public);
     }
@@ -298,7 +296,7 @@ class PublishProjectTest extends TestCase
                 'id' => $this->project->id,
             ],
         ]);
-        
+
         // Verify that project data is preserved during publication process
         $this->project->refresh();
         $this->assertEquals($originalName, $this->project->name);
@@ -311,9 +309,9 @@ class PublishProjectTest extends TestCase
     public function test_project_publication_updates_timestamps()
     {
         Queue::fake();
-        
+
         $originalUpdatedAt = $this->project->updated_at;
-        
+
         // Wait a moment to ensure timestamp difference
         sleep(1);
 
@@ -329,7 +327,7 @@ class PublishProjectTest extends TestCase
                 'id' => $this->project->id,
             ],
         ]);
-        
+
         // Controller does save the project with release_date, so timestamps should update
         $this->project->refresh();
         $this->assertNotEquals($originalUpdatedAt, $this->project->updated_at);

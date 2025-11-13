@@ -18,7 +18,7 @@ class UnPublishProjectTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->action = new UnPublishProject();
+        $this->action = new UnPublishProject;
     }
 
     public function test_unpublish_makes_project_private()
@@ -112,7 +112,7 @@ class UnPublishProjectTest extends TestCase
     public function test_unpublish_handles_complex_project_structure()
     {
         $project = Project::factory()->create(['is_public' => true]);
-        
+
         $study1 = Study::factory()->create([
             'project_id' => $project->id,
             'is_public' => true,
@@ -121,7 +121,7 @@ class UnPublishProjectTest extends TestCase
             'project_id' => $project->id,
             'is_public' => true,
         ]);
-        
+
         $dataset1 = Dataset::factory()->create([
             'study_id' => $study1->id,
             'is_public' => true,
@@ -171,7 +171,7 @@ class UnPublishProjectTest extends TestCase
         $project->refresh();
         $study->refresh();
         $dataset->refresh();
-        
+
         $this->assertFalse($project->is_public);
         $this->assertFalse($study->is_public);
         $this->assertFalse($dataset->is_public);
@@ -191,7 +191,7 @@ class UnPublishProjectTest extends TestCase
 
         $project->refresh();
         $study->refresh();
-        
+
         $this->assertFalse($project->is_public);
         $this->assertFalse($study->is_public);
     }

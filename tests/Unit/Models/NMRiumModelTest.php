@@ -220,7 +220,7 @@ class NMRiumModelTest extends TestCase
         $this->assertContains('nmriumable_id', $fillable);
         $this->assertContains('nmriumable_type', $fillable);
         $this->assertContains('nmrium_info', $fillable);
-        $this->assertContains('dataset_id', $fillable); 
+        $this->assertContains('dataset_id', $fillable);
     }
 
     public function test_it_uses_has_factory_trait(): void

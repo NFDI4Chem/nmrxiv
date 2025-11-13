@@ -2,9 +2,9 @@
 
 namespace Tests\Feature\Project;
 
+use App\Models\Dataset;
 use App\Models\Project;
 use App\Models\Study;
-use App\Models\Dataset;
 use App\Models\User;
 use App\Models\Validation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -15,6 +15,7 @@ class ProjectValidationTest extends TestCase
     use RefreshDatabase;
 
     private User $user;
+
     private Project $project;
 
     protected function setUp(): void
@@ -22,7 +23,7 @@ class ProjectValidationTest extends TestCase
         parent::setUp();
         $this->user = User::factory()->withPersonalTeam()->create();
         $this->project = Project::factory()->for($this->user, 'owner')->create([
-            'team_id' => $this->user->personalTeam()->id
+            'team_id' => $this->user->personalTeam()->id,
         ]);
     }
 
@@ -54,22 +55,22 @@ class ProjectValidationTest extends TestCase
     public function test_validation_associates_with_studies_and_datasets()
     {
         $study = Study::factory()->for($this->project)->create([
-            'owner_id' => $this->user->id
+            'owner_id' => $this->user->id,
         ]);
-        
+
         // Create a sample for the study to avoid null access in Validation
         \App\Models\Sample::factory()->create([
             'study_id' => $study->id,
-            'project_id' => $this->project->id
+            'project_id' => $this->project->id,
         ]);
-        
+
         $dataset = Dataset::factory()->for($study)->create();
 
         $response = $this->actingAs($this->user)
             ->get(route('dashboard.project.validation', $this->project));
 
         $response->assertStatus(200);
-        
+
         $validation = $this->project->fresh()->validation;
         $this->assertEquals($validation->id, $study->fresh()->validation->id);
         $this->assertEquals($validation->id, $dataset->fresh()->validation->id);
@@ -104,24 +105,24 @@ class ProjectValidationTest extends TestCase
         $study = Study::factory()->for($this->project)->create([
             'name' => 'Test Study',
             'description' => 'Test Description',
-            'owner_id' => $this->user->id
+            'owner_id' => $this->user->id,
         ]);
-        
+
         // Create a sample for the study to avoid null access in Validation
         \App\Models\Sample::factory()->create([
             'study_id' => $study->id,
-            'project_id' => $this->project->id
+            'project_id' => $this->project->id,
         ]);
-        
+
         $dataset = Dataset::factory()->for($study)->create([
-            'name' => 'Test Dataset'
+            'name' => 'Test Dataset',
         ]);
 
         $response = $this->actingAs($this->user)
             ->get(route('project.validation', $this->project));
 
         $response->assertStatus(200);
-        
+
         $validation = $this->project->fresh()->validation;
         $this->assertNotNull($validation->report);
         $this->assertIsArray($validation->report);
@@ -155,23 +156,23 @@ class ProjectValidationTest extends TestCase
     {
         $study1 = Study::factory()->for($this->project)->create([
             'name' => 'Study 1',
-            'owner_id' => $this->user->id
+            'owner_id' => $this->user->id,
         ]);
         $study2 = Study::factory()->for($this->project)->create([
             'name' => 'Study 2',
-            'owner_id' => $this->user->id
+            'owner_id' => $this->user->id,
         ]);
-        
+
         // Create samples for both studies to avoid null access in Validation
         \App\Models\Sample::factory()->create([
             'study_id' => $study1->id,
-            'project_id' => $this->project->id
+            'project_id' => $this->project->id,
         ]);
         \App\Models\Sample::factory()->create([
             'study_id' => $study2->id,
-            'project_id' => $this->project->id
+            'project_id' => $this->project->id,
         ]);
-        
+
         $dataset1 = Dataset::factory()->for($study1)->create();
         $dataset2 = Dataset::factory()->for($study2)->create();
 
@@ -179,7 +180,7 @@ class ProjectValidationTest extends TestCase
             ->get(route('dashboard.project.validation', $this->project));
 
         $response->assertStatus(200);
-        
+
         $validation = $this->project->fresh()->validation;
         $this->assertEquals($validation->id, $study1->fresh()->validation->id);
         $this->assertEquals($validation->id, $study2->fresh()->validation->id);
@@ -193,7 +194,7 @@ class ProjectValidationTest extends TestCase
             ->get(route('project.validation', $this->project));
 
         $response->assertStatus(200);
-        
+
         $validation = $this->project->fresh()->validation;
         $this->assertNotNull($validation->report);
         $this->assertIsArray($validation->report);

@@ -2,13 +2,11 @@
 
 namespace Tests\Feature\Project;
 
-use App\Jobs\ProcessSubmission;
 use App\Models\License;
 use App\Models\Project;
 use App\Models\Team;
 use App\Models\User;
 use App\Models\Validation;
-use App\Notifications\ProjectDeletionNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Queue;
@@ -19,13 +17,15 @@ class CreateNewProjectTest extends TestCase
     use RefreshDatabase;
 
     private User $user;
+
     private Team $team;
+
     private License $license;
 
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->user = User::factory()->withPersonalTeam()->create();
         $this->team = $this->user->currentTeam;
         $this->license = License::factory()->create();
@@ -45,7 +45,7 @@ class CreateNewProjectTest extends TestCase
             ->post('/dashboard/projects/create', $projectData);
 
         $response->assertRedirect();
-        
+
         $this->assertDatabaseHas('projects', [
             'name' => 'HTTP Test Project',
             'slug' => 'http-test-project',
@@ -88,7 +88,7 @@ class CreateNewProjectTest extends TestCase
             ->post('/dashboard/projects/create', $projectData);
 
         $response->assertRedirect();
-        
+
         $project = Project::where('name', 'Complete Project')->first();
         $this->assertNotNull($project);
         $this->assertEquals('#ff5733', $project->color);
@@ -114,7 +114,7 @@ class CreateNewProjectTest extends TestCase
 
         $response->assertStatus(302);
         $response->assertSessionHasErrors(['name']);
-        
+
         $this->assertEquals(0, Project::count());
     }
 
@@ -137,7 +137,7 @@ class CreateNewProjectTest extends TestCase
 
         $response->assertStatus(302);
         $response->assertSessionHasErrors(['name']);
-        
+
         // Should still have only one project
         $this->assertEquals(1, Project::where('name', 'Existing Project')->count());
     }
@@ -155,7 +155,7 @@ class CreateNewProjectTest extends TestCase
 
         $response->assertStatus(302);
         $response->assertSessionHasErrors(['license']);
-        
+
         $this->assertEquals(0, Project::count());
     }
 
@@ -172,7 +172,7 @@ class CreateNewProjectTest extends TestCase
             ]);
 
         $response->assertRedirect();
-        
+
         $project = Project::where('name', 'Licensed Public Project')->first();
         $this->assertTrue($project->is_public);
         $this->assertEquals($this->license->id, $project->license_id);
@@ -201,7 +201,7 @@ class CreateNewProjectTest extends TestCase
         ];
 
         $projectData2 = [
-            'name' => 'Project Two', 
+            'name' => 'Project Two',
             'description' => 'Second project',
             'owner_id' => $this->user->id,
             'team_id' => $this->team->id,
@@ -266,7 +266,7 @@ class CreateNewProjectTest extends TestCase
             ->post('/dashboard/projects/create', $projectData);
 
         $response->assertRedirect();
-        
+
         $project = Project::where('name', 'Team Context Project')->first();
         $this->assertEquals($otherTeam->id, $project->team_id);
         $this->assertEquals($otherTeam->id, $project->team->id);
@@ -289,7 +289,7 @@ class CreateNewProjectTest extends TestCase
             ->post('/dashboard/projects/create', $projectData);
 
         $response->assertRedirect();
-        
+
         // Verify project was created
         $project = Project::where('name', 'Event Test Project')->first();
         $this->assertNotNull($project);
@@ -339,7 +339,7 @@ class CreateNewProjectTest extends TestCase
             ->post('/dashboard/projects/create', $projectData);
 
         $response->assertRedirect();
-        
+
         $project = Project::where('name', 'Default Values Project')->first();
         $this->assertEquals('restricted', $project->access);
         $this->assertEquals('viewer', $project->access_type);
@@ -366,7 +366,7 @@ class CreateNewProjectTest extends TestCase
             ->post('/dashboard/projects/create', $projectData);
 
         $response->assertRedirect();
-        
+
         // The redirect location would depend on the controller implementation
         // Could be to project dashboard, project view, or projects list
         $project = Project::where('name', 'Redirect Test Project')->first();

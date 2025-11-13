@@ -2,16 +2,15 @@
 
 namespace Tests\Feature\Project;
 
+use App\Models\Draft;
+use App\Models\License;
 use App\Models\Project;
 use App\Models\Study;
 use App\Models\User;
-use App\Models\License;
 use App\Models\Validation;
-use App\Models\Draft;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Queue;
-use Maize\Markable\Models\Like;
 use Maize\Markable\Models\Bookmark;
+use Maize\Markable\Models\Like;
 use Tests\TestCase;
 
 class ProjectControllerAdditionalCoverageTest extends TestCase
@@ -19,17 +18,20 @@ class ProjectControllerAdditionalCoverageTest extends TestCase
     use RefreshDatabase;
 
     private User $owner;
+
     private User $collaborator;
+
     private Project $project;
+
     private Project $privateProject;
 
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->owner = User::factory()->withPersonalTeam()->create(['username' => 'testowner']);
         $this->collaborator = User::factory()->create();
-        
+
         $this->project = Project::factory()
             ->for($this->owner, 'owner')
             ->create([
@@ -37,7 +39,7 @@ class ProjectControllerAdditionalCoverageTest extends TestCase
                 'is_public' => true,
                 'name' => 'Test Project',
                 'team_id' => $this->owner->personalTeam()->id,
-                'obfuscationcode' => 'test-obfuscation-code'
+                'obfuscationcode' => 'test-obfuscation-code',
             ]);
 
         $this->privateProject = Project::factory()
@@ -47,20 +49,20 @@ class ProjectControllerAdditionalCoverageTest extends TestCase
                 'is_public' => false,
                 'name' => 'Private Project',
                 'team_id' => $this->owner->personalTeam()->id,
-                'obfuscationcode' => 'private-obfuscation-code'
+                'obfuscationcode' => 'private-obfuscation-code',
             ]);
 
         // Add collaborator to projects
         $this->project->users()->attach($this->collaborator, [
             'role' => 'collaborator',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
-        
+
         $this->privateProject->users()->attach($this->collaborator, [
             'role' => 'collaborator',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
     }
 
@@ -71,13 +73,13 @@ class ProjectControllerAdditionalCoverageTest extends TestCase
             $study = Study::factory()->create([
                 'project_id' => $this->project->id,
                 'is_public' => true,
-                'owner_id' => $this->owner->id
+                'owner_id' => $this->owner->id,
             ]);
-            
+
             // Create a sample for each study
             \App\Models\Sample::factory()->create([
                 'study_id' => $study->id,
-                'project_id' => $this->project->id
+                'project_id' => $this->project->id,
             ]);
         }
 
@@ -85,13 +87,13 @@ class ProjectControllerAdditionalCoverageTest extends TestCase
         $privateStudy = Study::factory()->create([
             'project_id' => $this->project->id,
             'is_public' => false,
-            'owner_id' => $this->owner->id
+            'owner_id' => $this->owner->id,
         ]);
-        
+
         // Create sample for private study too
         \App\Models\Sample::factory()->create([
             'study_id' => $privateStudy->id,
-            'project_id' => $this->project->id
+            'project_id' => $this->project->id,
         ]);
 
         $response = $this->get("/projects/{$this->project->id}/studies");
@@ -103,13 +105,13 @@ class ProjectControllerAdditionalCoverageTest extends TestCase
                     'id',
                     'name',
                     'slug',
-                    'is_public'
-                ]
+                    'is_public',
+                ],
             ],
             'links',
-            'meta'
+            'meta',
         ]);
-        
+
         // Should only return the 3 public studies
         $this->assertCount(3, $response->json('data'));
     }
@@ -120,13 +122,13 @@ class ProjectControllerAdditionalCoverageTest extends TestCase
             'project_id' => $this->project->id,
             'is_public' => true,
             'name' => 'Searchable Study Name',
-            'owner_id' => $this->owner->id
+            'owner_id' => $this->owner->id,
         ]);
-        
+
         // Create a sample for the study
         \App\Models\Sample::factory()->create([
             'study_id' => $study->id,
-            'project_id' => $this->project->id
+            'project_id' => $this->project->id,
         ]);
 
         $response = $this->get("/projects/{$this->project->id}/studies?search=Searchable&sort=newest");
@@ -141,7 +143,7 @@ class ProjectControllerAdditionalCoverageTest extends TestCase
             ->get("/projects/{$this->project->id}/toggleUpVote");
 
         $response->assertStatus(201);
-        
+
         // Verify like was added
         $this->assertTrue(Like::has($this->project, $this->owner));
     }
@@ -156,7 +158,7 @@ class ProjectControllerAdditionalCoverageTest extends TestCase
             ->get("/projects/{$this->project->id}/toggleUpVote");
 
         $response->assertStatus(200);
-        
+
         // Verify like was removed
         $this->assertFalse(Like::has($this->project, $this->owner));
     }
@@ -167,7 +169,7 @@ class ProjectControllerAdditionalCoverageTest extends TestCase
             ->get("/projects/{$this->project->id}/toggleStarred");
 
         $response->assertStatus(201);
-        
+
         // Verify bookmark was added
         $this->assertTrue(Bookmark::has($this->project, $this->owner));
     }
@@ -182,7 +184,7 @@ class ProjectControllerAdditionalCoverageTest extends TestCase
             ->get("/projects/{$this->project->id}/toggleStarred");
 
         $response->assertStatus(200);
-        
+
         // Verify bookmark was removed
         $this->assertFalse(Bookmark::has($this->project, $this->owner));
     }
@@ -191,7 +193,7 @@ class ProjectControllerAdditionalCoverageTest extends TestCase
     {
         $this->project->update([
             'status' => 'processing',
-            'process_logs' => ['step1' => 'completed', 'step2' => 'in_progress']
+            'process_logs' => ['step1' => 'completed', 'step2' => 'in_progress'],
         ]);
         $this->project->refresh();
 
@@ -202,7 +204,7 @@ class ProjectControllerAdditionalCoverageTest extends TestCase
         // Just check that we get a response with status and logs keys
         $response->assertJsonStructure([
             'status',
-            'logs'
+            'logs',
         ]);
     }
 
@@ -210,7 +212,7 @@ class ProjectControllerAdditionalCoverageTest extends TestCase
     {
         // This test covers the if ($project) condition in the status method
         $response = $this->actingAs($this->owner)
-            ->get("/projects/status/99999/queue");
+            ->get('/projects/status/99999/queue');
 
         $response->assertStatus(404);
     }
@@ -245,13 +247,13 @@ class ProjectControllerAdditionalCoverageTest extends TestCase
         for ($i = 0; $i < 2; $i++) {
             $study = Study::factory()->create([
                 'project_id' => $this->privateProject->id,
-                'owner_id' => $this->owner->id
+                'owner_id' => $this->owner->id,
             ]);
-            
+
             // Create a sample for each study
             \App\Models\Sample::factory()->create([
                 'study_id' => $study->id,
-                'project_id' => $this->privateProject->id
+                'project_id' => $this->privateProject->id,
             ]);
         }
 
@@ -263,9 +265,9 @@ class ProjectControllerAdditionalCoverageTest extends TestCase
                 '*' => [
                     'id',
                     'name',
-                    'slug'
-                ]
-            ]
+                    'slug',
+                ],
+            ],
         ]);
         $this->assertCount(2, $response->json('data'));
     }
@@ -275,13 +277,13 @@ class ProjectControllerAdditionalCoverageTest extends TestCase
         $study = Study::factory()->create([
             'project_id' => $this->privateProject->id,
             'name' => 'Special Study Name',
-            'owner_id' => $this->owner->id
+            'owner_id' => $this->owner->id,
         ]);
-        
+
         // Create a sample for the study
         \App\Models\Sample::factory()->create([
             'study_id' => $study->id,
-            'project_id' => $this->privateProject->id
+            'project_id' => $this->privateProject->id,
         ]);
 
         $response = $this->get("/project/{$this->privateProject->obfuscationcode}/studies?search=Special&sort=newest");
@@ -305,13 +307,13 @@ class ProjectControllerAdditionalCoverageTest extends TestCase
         for ($i = 0; $i < 3; $i++) {
             $study = Study::factory()->create([
                 'project_id' => $this->privateProject->id,
-                'owner_id' => $this->owner->id
+                'owner_id' => $this->owner->id,
             ]);
-            
+
             // Create a sample for each study
             \App\Models\Sample::factory()->create([
                 'study_id' => $study->id,
-                'project_id' => $this->privateProject->id
+                'project_id' => $this->privateProject->id,
             ]);
         }
 
@@ -328,7 +330,7 @@ class ProjectControllerAdditionalCoverageTest extends TestCase
         $this->privateProject->users()->attach($viewer, [
             'role' => 'viewer',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
 
         $response = $this->actingAs($viewer)
@@ -363,7 +365,7 @@ class ProjectControllerAdditionalCoverageTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertJsonStructure([
-            'audit' => []
+            'audit' => [],
         ]);
     }
 
@@ -377,15 +379,15 @@ class ProjectControllerAdditionalCoverageTest extends TestCase
     {
         $license = License::factory()->create();
         $this->privateProject->update(['license_id' => $license->id]);
-        
+
         // Create validation with failing report
         $validation = Validation::factory()->create([
             'report' => [
                 'project' => [
                     'status' => false,
-                    'studies' => []
-                ]
-            ]
+                    'studies' => [],
+                ],
+            ],
         ]);
         $this->privateProject->validation()->associate($validation);
         $this->privateProject->save();
@@ -393,13 +395,13 @@ class ProjectControllerAdditionalCoverageTest extends TestCase
         $response = $this->actingAs($this->owner)
             ->putJson("/dashboard/projects/{$this->privateProject->id}/publish", [
                 'enableProjectMode' => true,
-                'release_date' => now()->addDays(30)->toDateString()
+                'release_date' => now()->addDays(30)->toDateString(),
             ]);
 
         $response->assertStatus(422);
         $response->assertJsonStructure([
             'errors',
-            'validation'
+            'validation',
         ]);
     }
 
@@ -411,12 +413,12 @@ class ProjectControllerAdditionalCoverageTest extends TestCase
         $response = $this->actingAs($this->owner)
             ->putJson("/dashboard/projects/{$this->privateProject->id}/publish", [
                 'enableProjectMode' => true,
-                'release_date' => now()->addDays(30)->toDateString()
+                'release_date' => now()->addDays(30)->toDateString(),
             ]);
 
         $response->assertStatus(422);
         $response->assertJson([
-            'errors' => 'Project validation not found. Please ensure the project is properly configured.'
+            'errors' => 'Project validation not found. Please ensure the project is properly configured.',
         ]);
     }
 
@@ -439,11 +441,11 @@ class ProjectControllerAdditionalCoverageTest extends TestCase
         $this->project->users()->attach($creator, [
             'role' => 'creator',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
 
         // Use reflection to access private method
-        $controller = new \App\Http\Controllers\ProjectController();
+        $controller = new \App\Http\Controllers\ProjectController;
         $reflection = new \ReflectionClass($controller);
         $method = $reflection->getMethod('prepareSendList');
         $method->setAccessible(true);
@@ -462,10 +464,10 @@ class ProjectControllerAdditionalCoverageTest extends TestCase
         $this->project->users()->attach($ownerUser, [
             'role' => 'owner',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
 
-        $controller = new \App\Http\Controllers\ProjectController();
+        $controller = new \App\Http\Controllers\ProjectController;
         $reflection = new \ReflectionClass($controller);
         $method = $reflection->getMethod('prepareSendList');
         $method->setAccessible(true);
@@ -484,10 +486,10 @@ class ProjectControllerAdditionalCoverageTest extends TestCase
         $this->project->users()->attach($collaborator, [
             'role' => 'collaborator',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
 
-        $controller = new \App\Http\Controllers\ProjectController();
+        $controller = new \App\Http\Controllers\ProjectController;
         $reflection = new \ReflectionClass($controller);
         $method = $reflection->getMethod('prepareSendList');
         $method->setAccessible(true);

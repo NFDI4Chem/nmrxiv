@@ -8,13 +8,13 @@ use App\Models\Citation;
 use App\Models\Dataset;
 use App\Models\Draft;
 use App\Models\FileSystemObject;
+use App\Models\Molecule;
 use App\Models\NMRium;
 use App\Models\Project;
 use App\Models\Sample;
 use App\Models\Study;
 use App\Models\User;
 use App\Models\Validation;
-use App\Models\Molecule;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
@@ -28,7 +28,7 @@ class DeleteProjectTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->action = new DeleteProject();
+        $this->action = new DeleteProject;
         Storage::fake('local');
     }
 
@@ -65,7 +65,7 @@ class DeleteProjectTest extends TestCase
         $draft = Draft::factory()->create();
         $project = Project::factory()->create([
             'is_public' => false,
-            'draft_id' => $draft->id
+            'draft_id' => $draft->id,
         ]);
 
         $this->action->delete($project);
@@ -77,7 +77,7 @@ class DeleteProjectTest extends TestCase
     public function test_delete_private_project_sends_notification()
     {
         $project = Project::factory()->create(['is_public' => false]);
-        
+
         // Mock notification sending (since we can't easily test actual notifications)
         $this->action->delete($project);
 
@@ -89,19 +89,19 @@ class DeleteProjectTest extends TestCase
         $owner = User::factory()->create();
         $creator = User::factory()->create();
         $collaborator = User::factory()->create();
-        
+
         $project = Project::factory()->for($owner, 'owner')->create();
-        
+
         // Attach users with different roles
         $project->users()->attach($creator, ['role' => 'creator']);
         $project->users()->attach($collaborator, ['role' => 'collaborator']);
 
         $sendList = $this->action->prepareSendList($project);
 
-        // Algorithm iterates through project users and adds creators directly, 
+        // Algorithm iterates through project users and adds creators directly,
         // for others it adds the project owner
         $this->assertCount(2, $sendList); // creator + owner (for collaborator)
-        
+
         // Find creator and owner in the results
         $userIds = collect($sendList)->pluck('id');
         $this->assertTrue($userIds->contains($creator->id));
@@ -181,7 +181,7 @@ class DeleteProjectTest extends TestCase
         $dataset = Dataset::factory()->for($study)->create();
         $nmrium = NMRium::factory()->create([
             'nmriumable_type' => Dataset::class,
-            'nmriumable_id' => $dataset->id
+            'nmriumable_id' => $dataset->id,
         ]);
 
         $this->action->deleteDatasets($dataset);
@@ -195,7 +195,7 @@ class DeleteProjectTest extends TestCase
         $project = Project::factory()->create(['is_public' => false]);
         $author = Author::factory()->create();
         $citation = Citation::factory()->create();
-        
+
         $project->authors()->attach($author);
         $project->citations()->attach($citation);
 
@@ -206,11 +206,11 @@ class DeleteProjectTest extends TestCase
         $this->assertDatabaseHas('citations', ['id' => $citation->id]);
         $this->assertDatabaseMissing('author_project', [
             'author_id' => $author->id,
-            'project_id' => $project->id
+            'project_id' => $project->id,
         ]);
         $this->assertDatabaseMissing('citation_project', [
             'citation_id' => $citation->id,
-            'project_id' => $project->id
+            'project_id' => $project->id,
         ]);
     }
 
@@ -218,9 +218,9 @@ class DeleteProjectTest extends TestCase
     {
         $file = FileSystemObject::factory()->create([
             'type' => 'file',
-            'path' => 'test/file.txt'
+            'path' => 'test/file.txt',
         ]);
-        
+
         Storage::put($file->path, 'test content');
         $this->assertTrue(Storage::exists($file->path));
 
@@ -234,11 +234,11 @@ class DeleteProjectTest extends TestCase
     {
         $directory = FileSystemObject::factory()->create([
             'type' => 'directory',
-            'path' => 'test/directory'
+            'path' => 'test/directory',
         ]);
-        
+
         Storage::makeDirectory($directory->path);
-        Storage::put($directory->path . '/file.txt', 'test content');
+        Storage::put($directory->path.'/file.txt', 'test content');
         $this->assertTrue(Storage::exists($directory->path));
 
         $this->action->deleteFSO($directory);
@@ -253,7 +253,7 @@ class DeleteProjectTest extends TestCase
         $child1 = FileSystemObject::factory()->create(['parent_id' => $parent->id]);
         $child2 = FileSystemObject::factory()->create([
             'parent_id' => $parent->id,
-            'has_children' => true
+            'has_children' => true,
         ]);
         $grandchild = FileSystemObject::factory()->create(['parent_id' => $child2->id]);
 
@@ -275,7 +275,7 @@ class DeleteProjectTest extends TestCase
         $sample = Sample::factory()->for($study)->create();
         $molecule1 = Molecule::factory()->create();
         $molecule2 = Molecule::factory()->create();
-        
+
         $sample->molecules()->attach([$molecule1->id, $molecule2->id]);
 
         $this->action->deleteSample($sample);
@@ -290,7 +290,7 @@ class DeleteProjectTest extends TestCase
     public function test_delete_nmrium_removes_versions()
     {
         $nmrium = NMRium::factory()->create();
-        
+
         // Mock versions relationship - NMRium uses versionable trait
         $this->action->deleteNMRium($nmrium);
 

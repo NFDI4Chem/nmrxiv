@@ -18,7 +18,7 @@ class PublishProjectTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->action = new PublishProject();
+        $this->action = new PublishProject;
     }
 
     public function test_publish_makes_project_public()
@@ -78,11 +78,11 @@ class PublishProjectTest extends TestCase
     public function test_publish_handles_complex_project_structure()
     {
         $project = Project::factory()->create(['is_public' => false]);
-        
+
         // Create multiple studies with datasets
         $study1 = Study::factory()->for($project)->create(['is_public' => false]);
         $study2 = Study::factory()->for($project)->create(['is_public' => false]);
-        
+
         $dataset1 = Dataset::factory()->for($study1)->create(['is_public' => false]);
         $dataset2 = Dataset::factory()->for($study1)->create(['is_public' => false]);
         $dataset3 = Dataset::factory()->for($study2)->create(['is_public' => false]);

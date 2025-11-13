@@ -18,17 +18,19 @@ class AddProjectMemberTest extends TestCase
     use RefreshDatabase;
 
     private AddProjectMember $action;
+
     private User $owner;
+
     private Project $project;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->action = new AddProjectMember();
+        $this->action = new AddProjectMember;
         $this->owner = User::factory()->withPersonalTeam()->create();
         $this->project = Project::factory()->create([
             'owner_id' => $this->owner->id,
-            'team_id' => $this->owner->currentTeam->id
+            'team_id' => $this->owner->currentTeam->id,
         ]);
     }
 
@@ -41,7 +43,7 @@ class AddProjectMemberTest extends TestCase
 
         $this->project->refresh();
         $this->assertTrue($this->project->hasUserWithEmail($newMember->email));
-        
+
         $addedUser = $this->project->users()->where('user_id', $newMember->id)->first();
         $this->assertNotNull($addedUser, 'User should be added to project');
         $this->assertEquals('reviewer', $addedUser->projectMembership->role);
@@ -114,7 +116,7 @@ class AddProjectMemberTest extends TestCase
 
         $this->project->refresh();
         $this->assertTrue($this->project->hasUserWithEmail($newMember->email));
-        
+
         $addedUser = $this->project->users()->where('user_id', $newMember->id)->first();
         $this->assertNotNull($addedUser, 'User should be added to project');
         $this->assertEquals('collaborator', $addedUser->projectMembership->role);
@@ -128,7 +130,7 @@ class AddProjectMemberTest extends TestCase
 
         $this->project->refresh();
         $this->assertTrue($this->project->hasUserWithEmail($newMember->email));
-        
+
         $addedUser = $this->project->users()->where('user_id', $newMember->id)->first();
         $this->assertNotNull($addedUser, 'User should be added to project');
         $this->assertEquals('reviewer', $addedUser->projectMembership->role);

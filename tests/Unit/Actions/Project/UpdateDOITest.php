@@ -16,6 +16,7 @@ class UpdateDOITest extends TestCase
     use RefreshDatabase;
 
     private UpdateDOI $action;
+
     private DOIService $doiService;
 
     protected function setUp(): void
@@ -34,10 +35,11 @@ class UpdateDOITest extends TestCase
     public function test_update_processes_project_type()
     {
         $project = Project::factory()->create();
-        
+
         // Create a test class that tracks what was processed
         $processedModels = [];
-        $testAction = new class($this->doiService, $processedModels) extends UpdateDOI {
+        $testAction = new class($this->doiService, $processedModels) extends UpdateDOI
+        {
             private $processedModels;
 
             public function __construct($doiService, &$processedModels)
@@ -49,7 +51,7 @@ class UpdateDOITest extends TestCase
             public function update($model)
             {
                 $this->processedModels[] = get_class($model);
-                
+
                 if ($model instanceof Project) {
                     $this->processedModels[] = 'processed_project';
                     $studies = $model->studies;
@@ -81,7 +83,7 @@ class UpdateDOITest extends TestCase
         };
 
         $testAction->update($project);
-        
+
         $this->assertContains(Project::class, $processedModels);
         $this->assertContains('processed_project', $processedModels);
     }
@@ -94,7 +96,8 @@ class UpdateDOITest extends TestCase
 
         // Create a test class that tracks what was processed
         $processedModels = [];
-        $testAction = new class($this->doiService, $processedModels) extends UpdateDOI {
+        $testAction = new class($this->doiService, $processedModels) extends UpdateDOI
+        {
             private $processedModels;
 
             public function __construct($doiService, &$processedModels)
@@ -117,7 +120,7 @@ class UpdateDOITest extends TestCase
         };
 
         $testAction->update($studies);
-        
+
         $this->assertContains('processed_collection', $processedModels);
         $this->assertContains('processed_study', $processedModels);
     }
@@ -140,7 +143,7 @@ class UpdateDOITest extends TestCase
 
     public function test_update_handles_unsupported_model_type()
     {
-        $unsupportedModel = new \stdClass();
+        $unsupportedModel = new \stdClass;
 
         // Should not throw any errors when unsupported model is passed
         $this->action->update($unsupportedModel);
@@ -150,12 +153,13 @@ class UpdateDOITest extends TestCase
     public function test_update_skips_non_study_objects_in_collection()
     {
         $study = Study::factory()->create();
-        $nonStudyObject = new \stdClass();
+        $nonStudyObject = new \stdClass;
         $studies = collect([$study, $nonStudyObject]);
-        
+
         // Create a test class that tracks what was processed
         $processedModels = [];
-        $testAction = new class($this->doiService, $processedModels) extends UpdateDOI {
+        $testAction = new class($this->doiService, $processedModels) extends UpdateDOI
+        {
             private $processedModels;
 
             public function __construct($doiService, &$processedModels)
@@ -179,7 +183,7 @@ class UpdateDOITest extends TestCase
         };
 
         $testAction->update($studies);
-        
+
         $this->assertContains('processed_study', $processedModels);
         $this->assertContains('skipped_non_study', $processedModels);
     }
@@ -188,15 +192,16 @@ class UpdateDOITest extends TestCase
     {
         $study = Study::factory()->create();
         $dataset = Dataset::factory()->create(['study_id' => $study->id]);
-        $nonDatasetObject = new \stdClass();
-        
+        $nonDatasetObject = new \stdClass;
+
         // Set a custom collection on the study that includes a non-dataset object
         $study->setRelation('datasets', collect([$dataset, $nonDatasetObject]));
         $studies = collect([$study]);
-        
+
         // Create a test class that tracks what was processed
         $processedModels = [];
-        $testAction = new class($this->doiService, $processedModels) extends UpdateDOI {
+        $testAction = new class($this->doiService, $processedModels) extends UpdateDOI
+        {
             private $processedModels;
 
             public function __construct($doiService, &$processedModels)
@@ -225,7 +230,7 @@ class UpdateDOITest extends TestCase
         };
 
         $testAction->update($studies);
-        
+
         $this->assertContains('processed_dataset', $processedModels);
         $this->assertContains('skipped_non_dataset', $processedModels);
     }
@@ -235,10 +240,11 @@ class UpdateDOITest extends TestCase
         $project = Project::factory()->create();
         $study = Study::factory()->create(['project_id' => $project->id]);
         $dataset = Dataset::factory()->create(['study_id' => $study->id]);
-        
+
         // Create a test class that tracks processing flow
         $processedModels = [];
-        $testAction = new class($this->doiService, $processedModels) extends UpdateDOI {
+        $testAction = new class($this->doiService, $processedModels) extends UpdateDOI
+        {
             private $processedModels;
 
             public function __construct($doiService, &$processedModels)
@@ -268,7 +274,7 @@ class UpdateDOITest extends TestCase
         };
 
         $testAction->update($project);
-        
+
         $this->assertContains('project', $processedModels);
         $this->assertContains('study', $processedModels);
         $this->assertContains('dataset', $processedModels);
@@ -277,12 +283,12 @@ class UpdateDOITest extends TestCase
     public function test_update_uses_correct_service_instance()
     {
         $project = Project::factory()->create();
-        
+
         // Verify the service is stored correctly
         $reflection = new \ReflectionClass($this->action);
         $property = $reflection->getProperty('doiService');
         $property->setAccessible(true);
-        
+
         $this->assertSame($this->doiService, $property->getValue($this->action));
     }
 
@@ -298,7 +304,7 @@ class UpdateDOITest extends TestCase
         $license = \App\Models\License::factory()->create();
         $project = Project::factory()->create(['license_id' => $license->id]);
         $project->studies()->delete(); // Ensure no studies exist
-        
+
         // Should not throw any errors
         $this->action->update($project);
         $this->assertTrue(true);
@@ -312,7 +318,7 @@ class UpdateDOITest extends TestCase
         $study = Study::factory()->create(['project_id' => $project->id, 'license_id' => $license->id]);
         $study->datasets()->delete(); // Ensure no datasets exist
         $studies = collect([$study]);
-        
+
         // Should not throw any errors
         $this->action->update($studies);
         $this->assertTrue(true);
@@ -322,24 +328,33 @@ class UpdateDOITest extends TestCase
     {
         // Create license first
         $license = \App\Models\License::factory()->create();
-        
+
         // Create a project with nested relationships
         $project = Project::factory()->create(['license_id' => $license->id]);
         $study = Study::factory()->create(['project_id' => $project->id, 'license_id' => $license->id]);
         $dataset = Dataset::factory()->create(['study_id' => $study->id, 'license_id' => $license->id]);
-        
+
         // Create a simple mock DOI service
-        $mockService = new class implements DOIService {
-            public function getDOIs() { return []; }
-            public function createDOI($suffix, $attributes = []) { }
-            public function getDOI($doi) { }
-            public function updateDOI($doi, $attributes = []) { }
-            public function deleteDOI($doi) { }
-            public function getDOIActivity($doi) { }
+        $mockService = new class implements DOIService
+        {
+            public function getDOIs()
+            {
+                return [];
+            }
+
+            public function createDOI($suffix, $attributes = []) {}
+
+            public function getDOI($doi) {}
+
+            public function updateDOI($doi, $attributes = []) {}
+
+            public function deleteDOI($doi) {}
+
+            public function getDOIActivity($doi) {}
         };
-        
+
         $action = new UpdateDOI($mockService);
-        
+
         // Should complete without errors
         $action->update($project);
         $this->assertTrue(true);

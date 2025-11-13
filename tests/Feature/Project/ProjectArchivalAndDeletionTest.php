@@ -3,17 +3,11 @@
 namespace Tests\Feature\Project;
 
 use App\Events\ProjectArchival;
-use App\Events\ProjectDeletion;
-use App\Jobs\ArchiveProject;
-use App\Jobs\DeleteProjects;
 use App\Models\Project;
 use App\Models\Team;
 use App\Models\User;
-use App\Notifications\ProjectArchivalNotification;
-use App\Notifications\ProjectDeletionNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
@@ -23,24 +17,27 @@ class ProjectArchivalAndDeletionTest extends TestCase
     use RefreshDatabase;
 
     private User $owner;
+
     private User $collaborator;
+
     private Team $team;
+
     private Project $project;
 
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->owner = User::factory()->withPersonalTeam()->create();
         $this->collaborator = User::factory()->create();
         $this->team = $this->owner->currentTeam;
-        
+
         $this->project = Project::factory()->create([
             'owner_id' => $this->owner->id,
             'team_id' => $this->team->id,
             'is_public' => false,
         ]);
-        
+
         $this->project->users()->attach($this->owner, ['role' => 'creator']);
         $this->project->users()->attach($this->collaborator, ['role' => 'collaborator']);
     }
@@ -51,14 +48,14 @@ class ProjectArchivalAndDeletionTest extends TestCase
         Event::fake();
 
         $response = $this->actingAs($this->owner)->put("/dashboard/projects/{$this->project->id}/toggle-archive", [
-                'password' => 'password',
-            ]);
+            'password' => 'password',
+        ]);
 
         $response->assertRedirect();
-        
+
         $this->project->refresh();
         $this->assertTrue($this->project->is_archived);
-        
+
         // The archival action is synchronous, no job is dispatched
         Queue::assertNothingPushed();
 
@@ -76,7 +73,7 @@ class ProjectArchivalAndDeletionTest extends TestCase
             ->put("/dashboard/projects/{$this->project->id}");
 
         $response->assertRedirect();
-        
+
         $this->project->refresh();
         $this->assertFalse($this->project->is_archived);
     }
@@ -91,10 +88,10 @@ class ProjectArchivalAndDeletionTest extends TestCase
             ]);
 
         $response->assertRedirect();
-        
+
         $this->project->refresh();
         $this->assertTrue($this->project->is_deleted);
-        
+
         Event::assertDispatched(\App\Events\ProjectDeletion::class, function ($event) {
             return $event->project->id === $this->project->id;
         });
@@ -109,7 +106,7 @@ class ProjectArchivalAndDeletionTest extends TestCase
 
         $response->assertRedirect();
         $response->assertSessionHasErrors(['password']);
-        
+
         $this->project->refresh();
         $this->assertFalse($this->project->is_deleted);
     }
@@ -124,10 +121,10 @@ class ProjectArchivalAndDeletionTest extends TestCase
             ]);
 
         $response->assertRedirect();
-        
+
         // Deletion is synchronous, no job is dispatched
         Queue::assertNothingPushed();
-        
+
         $this->project->refresh();
         $this->assertTrue($this->project->is_deleted);
     }
@@ -140,7 +137,7 @@ class ProjectArchivalAndDeletionTest extends TestCase
             ]);
 
         $response->assertStatus(403);
-        
+
         $this->project->refresh();
         $this->assertFalse($this->project->is_archived);
     }
@@ -153,7 +150,7 @@ class ProjectArchivalAndDeletionTest extends TestCase
             ]);
 
         $response->assertStatus(403);
-        
+
         $this->project->refresh();
         $this->assertFalse($this->project->is_deleted);
     }
@@ -190,7 +187,7 @@ class ProjectArchivalAndDeletionTest extends TestCase
             ]);
 
         $response->assertRedirect();
-        
+
         $this->project->refresh();
         $this->assertEquals($originalName, $this->project->name);
         $this->assertEquals($originalDescription, $this->project->description);
@@ -217,7 +214,7 @@ class ProjectArchivalAndDeletionTest extends TestCase
             ]);
 
         $response->assertRedirect();
-        
+
         // Project and studies should be archived
         $this->project->refresh();
         $study->refresh();
@@ -249,13 +246,13 @@ class ProjectArchivalAndDeletionTest extends TestCase
 
         $response1->assertRedirect();
         $response2->assertRedirect();
-        
+
         $this->project->refresh();
         $project2->refresh();
-        
+
         $this->assertTrue($this->project->is_archived);
         $this->assertTrue($project2->is_archived);
-        
+
         // Archival is synchronous, no jobs are dispatched
         Queue::assertNothingPushed();
     }
@@ -271,7 +268,7 @@ class ProjectArchivalAndDeletionTest extends TestCase
             ]);
 
         $response->assertRedirect();
-        
+
         $this->project->refresh();
         $this->assertTrue($this->project->is_archived);
     }
@@ -279,7 +276,7 @@ class ProjectArchivalAndDeletionTest extends TestCase
     public function test_archived_published_project_maintains_public_status()
     {
         Queue::fake();
-        
+
         // Make project public/published
         $this->project->update(['is_public' => true]);
 
@@ -289,11 +286,11 @@ class ProjectArchivalAndDeletionTest extends TestCase
             ]);
 
         $response->assertRedirect();
-        
+
         $this->project->refresh();
         $this->assertTrue($this->project->is_archived);
         $this->assertTrue($this->project->is_public); // Should remain public
-        
+
         Queue::assertNothingPushed();
     }
 
@@ -315,10 +312,10 @@ class ProjectArchivalAndDeletionTest extends TestCase
             ]);
 
         $response->assertRedirect();
-        
+
         // Deletion is synchronous, no job is dispatched
         Queue::assertNothingPushed();
-        
+
         $this->project->refresh();
         $study->refresh();
         $this->assertTrue($this->project->is_deleted);
@@ -343,7 +340,7 @@ class ProjectArchivalAndDeletionTest extends TestCase
             ]);
 
         $response->assertRedirect();
-        
+
         $this->project->refresh();
         // Public projects should be archived, not deleted
         $this->assertTrue($this->project->is_archived);
@@ -373,7 +370,7 @@ class ProjectArchivalAndDeletionTest extends TestCase
                 'password' => 'password',
             ]);
         $response->assertStatus(403);
-        
+
         $this->project->refresh();
         $this->assertFalse($this->project->is_archived);
         $this->assertFalse($this->project->is_deleted);
@@ -388,7 +385,7 @@ class ProjectArchivalAndDeletionTest extends TestCase
             ->put("/dashboard/projects/{$this->project->id}/toggle-archive", [
                 'password' => 'password',
             ]);
-        
+
         $response2 = $this->actingAs($this->owner)
             ->put("/dashboard/projects/{$this->project->id}/toggle-archive", [
                 'password' => 'password',
@@ -396,10 +393,10 @@ class ProjectArchivalAndDeletionTest extends TestCase
 
         $response1->assertRedirect();
         $response2->assertRedirect(); // Second call will un-archive since it's a toggle
-        
+
         // No jobs are dispatched (synchronous)
         Queue::assertNothingPushed();
-        
+
         // After two toggles, project should be back to not archived
         $this->project->refresh();
         $this->assertFalse($this->project->is_archived);
@@ -418,7 +415,7 @@ class ProjectArchivalAndDeletionTest extends TestCase
 
         $response->assertRedirect();
         $response->assertSessionHas('error');
-        
+
         $this->project->refresh();
         $this->assertFalse($this->project->is_deleted);
     }
@@ -448,10 +445,8 @@ class ProjectArchivalAndDeletionTest extends TestCase
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
-        
+
         $this->project->refresh();
         $this->assertTrue($this->project->is_archived);
     }
-
-
 }

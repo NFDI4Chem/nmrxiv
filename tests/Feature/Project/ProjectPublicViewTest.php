@@ -2,11 +2,10 @@
 
 namespace Tests\Feature\Project;
 
+use App\Models\License;
 use App\Models\Project;
 use App\Models\Study;
-use App\Models\Dataset;
 use App\Models\User;
-use App\Models\License;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -15,21 +14,23 @@ class ProjectPublicViewTest extends TestCase
     use RefreshDatabase;
 
     private User $owner;
+
     private Project $publicProject;
+
     private Project $privateProject;
 
     protected function setUp(): void
     {
         parent::setUp();
         $this->owner = User::factory()->withPersonalTeam()->create(['username' => 'testowner']);
-        
+
         $this->publicProject = Project::factory()
             ->for($this->owner, 'owner')
             ->create([
                 'slug' => 'test-project',
                 'is_public' => true,
                 'name' => 'Test Public Project',
-                'team_id' => $this->owner->personalTeam()->id
+                'team_id' => $this->owner->personalTeam()->id,
             ]);
 
         $this->privateProject = Project::factory()
@@ -38,7 +39,7 @@ class ProjectPublicViewTest extends TestCase
                 'slug' => 'private-project',
                 'is_public' => false,
                 'name' => 'Test Private Project',
-                'team_id' => $this->owner->personalTeam()->id
+                'team_id' => $this->owner->personalTeam()->id,
             ]);
     }
 
@@ -46,13 +47,13 @@ class ProjectPublicViewTest extends TestCase
     {
         $response = $this->get(route('public.project', [
             'owner' => $this->owner->username,
-            'slug' => $this->publicProject->slug
+            'slug' => $this->publicProject->slug,
         ]));
 
         // Debug the response if it's not 200
         if ($response->status() !== 200) {
             $content = $response->getContent();
-            $this->fail("Expected 200 status but got {$response->status()}. Content: " . substr($content, 0, 500));
+            $this->fail("Expected 200 status but got {$response->status()}. Content: ".substr($content, 0, 500));
         }
 
         $response->assertStatus(200);
@@ -61,17 +62,17 @@ class ProjectPublicViewTest extends TestCase
     public function test_public_project_samples_tab_view()
     {
         $study = Study::factory()->for($this->publicProject)->create();
-        
+
         // Create a sample for the study to avoid null access in StudyResource
         \App\Models\Sample::factory()->create([
             'study_id' => $study->id,
-            'project_id' => $this->publicProject->id
+            'project_id' => $this->publicProject->id,
         ]);
 
         $response = $this->get(route('public.project', [
             'owner' => $this->owner->username,
             'slug' => $this->publicProject->slug,
-            'tab' => 'samples'
+            'tab' => 'samples',
         ]));
 
         $response->assertStatus(200);
@@ -82,7 +83,7 @@ class ProjectPublicViewTest extends TestCase
         $response = $this->get(route('public.project', [
             'owner' => $this->owner->username,
             'slug' => $this->publicProject->slug,
-            'tab' => 'files'
+            'tab' => 'files',
         ]));
 
         $response->assertStatus(200);
@@ -96,7 +97,7 @@ class ProjectPublicViewTest extends TestCase
         $response = $this->get(route('public.project', [
             'owner' => $this->owner->username,
             'slug' => $this->publicProject->slug,
-            'tab' => 'license'
+            'tab' => 'license',
         ]));
 
         $response->assertStatus(200);
@@ -106,20 +107,20 @@ class ProjectPublicViewTest extends TestCase
     {
         $study = Study::factory()->for($this->publicProject)->create([
             'slug' => 'test-study',
-            'owner_id' => $this->owner->id  // Ensure study has same owner as project
+            'owner_id' => $this->owner->id,  // Ensure study has same owner as project
         ]);
 
         // Create a sample for the study to avoid null access in StudyResource
         \App\Models\Sample::factory()->create([
             'study_id' => $study->id,
-            'project_id' => $this->publicProject->id
+            'project_id' => $this->publicProject->id,
         ]);
 
         $response = $this->get(route('public.project', [
             'owner' => $this->owner->username,
             'slug' => $this->publicProject->slug,
             'tab' => 'study',
-            'id' => $study->slug
+            'id' => $study->slug,
         ]));
 
         $response->assertStatus(200);
@@ -129,7 +130,7 @@ class ProjectPublicViewTest extends TestCase
     {
         $response = $this->get(route('public.project', [
             'owner' => $this->owner->username,
-            'slug' => $this->privateProject->slug
+            'slug' => $this->privateProject->slug,
         ]));
 
         $response->assertStatus(403);
@@ -140,7 +141,7 @@ class ProjectPublicViewTest extends TestCase
         $response = $this->actingAs($this->owner)
             ->get(route('public.project', [
                 'owner' => $this->owner->username,
-                'slug' => $this->privateProject->slug
+                'slug' => $this->privateProject->slug,
             ]));
 
         $response->assertStatus(200);
@@ -149,18 +150,18 @@ class ProjectPublicViewTest extends TestCase
     public function test_private_project_accessible_to_collaborator()
     {
         $collaborator = User::factory()->create();
-        
+
         // Add collaborator to project
         $this->privateProject->users()->attach($collaborator, [
             'role' => 'collaborator',
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
 
         $response = $this->actingAs($collaborator)
             ->get(route('public.project', [
                 'owner' => $this->owner->username,
-                'slug' => $this->privateProject->slug
+                'slug' => $this->privateProject->slug,
             ]));
 
         $response->assertStatus(200);
@@ -170,7 +171,7 @@ class ProjectPublicViewTest extends TestCase
     {
         $response = $this->get(route('public.project', [
             'owner' => $this->owner->username,
-            'slug' => 'nonexistent-project'
+            'slug' => 'nonexistent-project',
         ]));
 
         $response->assertStatus(404);
@@ -180,7 +181,7 @@ class ProjectPublicViewTest extends TestCase
     {
         $response = $this->get(route('public.project', [
             'owner' => 'nonexistent-user',
-            'slug' => $this->publicProject->slug
+            'slug' => $this->publicProject->slug,
         ]));
 
         $response->assertStatus(404);
@@ -192,7 +193,7 @@ class ProjectPublicViewTest extends TestCase
             'owner' => $this->owner->username,
             'slug' => $this->publicProject->slug,
             'tab' => 'study',
-            'id' => 'nonexistent-study'
+            'id' => 'nonexistent-study',
         ]));
 
         $response->assertStatus(404);
@@ -203,14 +204,14 @@ class ProjectPublicViewTest extends TestCase
         $otherProject = Project::factory()
             ->for($this->owner, 'owner')
             ->create(['is_public' => true]);
-        
+
         $study = Study::factory()->for($otherProject)->create(['slug' => 'other-study']);
 
         $response = $this->get(route('public.project', [
             'owner' => $this->owner->username,
             'slug' => $this->publicProject->slug,
             'tab' => 'study',
-            'id' => $study->slug
+            'id' => $study->slug,
         ]));
 
         $response->assertStatus(404);
@@ -221,7 +222,7 @@ class ProjectPublicViewTest extends TestCase
         $response = $this->get(route('public.project', [
             'owner' => $this->owner->username,
             'slug' => $this->publicProject->slug,
-            'tab' => 'invalid-tab'
+            'tab' => 'invalid-tab',
         ]));
 
         $response->assertStatus(200);

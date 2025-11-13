@@ -14,25 +14,29 @@ class ProjectMemberManagementTest extends TestCase
     use RefreshDatabase;
 
     private User $owner;
+
     private User $collaborator;
+
     private User $viewer;
+
     private Team $team;
+
     private Project $project;
 
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->owner = User::factory()->withPersonalTeam()->create();
         $this->collaborator = User::factory()->create();
         $this->viewer = User::factory()->create();
         $this->team = $this->owner->currentTeam;
-        
+
         $this->project = Project::factory()->create([
             'owner_id' => $this->owner->id,
             'team_id' => $this->team->id,
         ]);
-        
+
         // Set up initial project members
         $this->project->users()->attach($this->owner, ['role' => 'creator']);
         $this->project->users()->attach($this->collaborator, ['role' => 'collaborator']);
@@ -42,7 +46,7 @@ class ProjectMemberManagementTest extends TestCase
     public function test_project_owner_can_invite_new_member_via_http()
     {
         Notification::fake();
-        
+
         $newUser = User::factory()->create();
 
         $response = $this->actingAs($this->owner)
@@ -52,7 +56,7 @@ class ProjectMemberManagementTest extends TestCase
             ]);
 
         $response->assertRedirect();
-        
+
         $this->assertDatabaseHas('project_invitations', [
             'project_id' => $this->project->id,
             'email' => $newUser->email,
@@ -71,7 +75,7 @@ class ProjectMemberManagementTest extends TestCase
             ]);
 
         $response->assertRedirect();
-        
+
         $this->project->refresh();
         $member = $this->project->users->where('id', $this->viewer->id)->first();
         $this->assertEquals('collaborator', $member->projectMembership->role);
@@ -85,7 +89,7 @@ class ProjectMemberManagementTest extends TestCase
             ->delete("/dashboard/projects/{$this->project->id}/members/{$this->viewer->id}");
 
         $response->assertRedirect();
-        
+
         $this->project->refresh();
         $this->assertFalse($this->project->users->contains($this->viewer));
     }
@@ -96,7 +100,7 @@ class ProjectMemberManagementTest extends TestCase
             ->delete("/dashboard/projects/{$this->project->id}/members/{$this->collaborator->id}");
 
         $response->assertStatus(403);
-        
+
         $this->project->refresh();
         $this->assertTrue($this->project->users->contains($this->collaborator));
     }
@@ -107,7 +111,7 @@ class ProjectMemberManagementTest extends TestCase
             ->delete("/dashboard/projects/{$this->project->id}/members/{$this->owner->id}");
 
         $response->assertStatus(403);
-        
+
         $this->project->refresh();
         $this->assertTrue($this->project->users->contains($this->owner));
     }
@@ -118,7 +122,7 @@ class ProjectMemberManagementTest extends TestCase
             ->delete("/dashboard/projects/{$this->project->id}/members/{$this->owner->id}");
 
         $response->assertRedirect();
-        
+
         $this->project->refresh();
         $this->assertTrue($this->project->users->contains($this->owner));
     }

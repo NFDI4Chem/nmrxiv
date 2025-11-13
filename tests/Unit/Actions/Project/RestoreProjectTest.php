@@ -19,14 +19,14 @@ class RestoreProjectTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->action = new RestoreProject();
+        $this->action = new RestoreProject;
     }
 
     public function test_restore_public_archived_project()
     {
         $project = Project::factory()->create([
             'is_public' => true,
-            'is_archived' => true
+            'is_archived' => true,
         ]);
 
         $this->action->restore($project);
@@ -38,7 +38,7 @@ class RestoreProjectTest extends TestCase
     {
         $project = Project::factory()->create([
             'is_public' => true,
-            'is_archived' => true
+            'is_archived' => true,
         ]);
         $study1 = Study::factory()->for($project)->create(['is_archived' => true]);
         $study2 = Study::factory()->for($project)->create(['is_archived' => true]);
@@ -53,7 +53,7 @@ class RestoreProjectTest extends TestCase
     {
         $project = Project::factory()->create([
             'is_public' => true,
-            'is_archived' => true
+            'is_archived' => true,
         ]);
         $study = Study::factory()->for($project)->create(['is_archived' => true]);
         $dataset1 = Dataset::factory()->for($study)->create(['is_archived' => true]);
@@ -69,7 +69,7 @@ class RestoreProjectTest extends TestCase
     {
         $project = Project::factory()->create([
             'is_public' => false,
-            'is_deleted' => true
+            'is_deleted' => true,
         ]);
 
         $this->action->restore($project);
@@ -81,7 +81,7 @@ class RestoreProjectTest extends TestCase
     {
         $project = Project::factory()->create([
             'is_public' => false,
-            'is_deleted' => true
+            'is_deleted' => true,
         ]);
         $study1 = Study::factory()->for($project)->create(['is_deleted' => true]);
         $study2 = Study::factory()->for($project)->create(['is_deleted' => true]);
@@ -96,7 +96,7 @@ class RestoreProjectTest extends TestCase
     {
         $project = Project::factory()->create([
             'is_public' => false,
-            'is_deleted' => true
+            'is_deleted' => true,
         ]);
         $study = Study::factory()->for($project)->create(['is_deleted' => true]);
         $dataset1 = Dataset::factory()->for($study)->create(['is_deleted' => true]);
@@ -114,9 +114,9 @@ class RestoreProjectTest extends TestCase
         $project = Project::factory()->create([
             'is_public' => false,
             'is_deleted' => true,
-            'draft_id' => $draft->id
+            'draft_id' => $draft->id,
         ]);
-        
+
         $this->action->restore($project);
 
         $this->assertFalse($draft->fresh()->is_deleted);
@@ -126,13 +126,13 @@ class RestoreProjectTest extends TestCase
     {
         $project = Project::factory()->create([
             'is_public' => true,
-            'is_archived' => true
+            'is_archived' => true,
         ]);
-        
+
         // Create multiple studies with datasets
         $study1 = Study::factory()->for($project)->create(['is_archived' => true]);
         $study2 = Study::factory()->for($project)->create(['is_archived' => true]);
-        
+
         $dataset1 = Dataset::factory()->for($study1)->create(['is_archived' => true]);
         $dataset2 = Dataset::factory()->for($study1)->create(['is_archived' => true]);
         $dataset3 = Dataset::factory()->for($study2)->create(['is_archived' => true]);
@@ -152,7 +152,7 @@ class RestoreProjectTest extends TestCase
     {
         $project = Project::factory()->create([
             'is_public' => true,
-            'is_archived' => true
+            'is_archived' => true,
         ]);
 
         $this->action->restore($project);
@@ -164,7 +164,7 @@ class RestoreProjectTest extends TestCase
     {
         $project = Project::factory()->create([
             'is_public' => true,
-            'is_archived' => true
+            'is_archived' => true,
         ]);
         $study = Study::factory()->for($project)->create(['is_archived' => true]);
 
@@ -178,7 +178,7 @@ class RestoreProjectTest extends TestCase
     {
         $project = Project::factory()->create([
             'is_public' => false,
-            'is_deleted' => true
+            'is_deleted' => true,
         ]);
         $study = Study::factory()->for($project)->create(['is_deleted' => true]);
 
@@ -193,7 +193,7 @@ class RestoreProjectTest extends TestCase
     {
         $project = Project::factory()->create([
             'is_public' => true,
-            'is_archived' => true
+            'is_archived' => true,
         ]);
         $study = Study::factory()->for($project)->create(['is_archived' => false]); // Already restored
         $dataset = Dataset::factory()->for($study)->create(['is_archived' => true]);
@@ -209,7 +209,7 @@ class RestoreProjectTest extends TestCase
     {
         $project = Project::factory()->create([
             'is_public' => true,
-            'is_archived' => true
+            'is_archived' => true,
         ]);
         $study = Study::factory()->for($project)->create(['is_archived' => true]);
         $dataset = Dataset::factory()->for($study)->create(['is_archived' => true]);
@@ -230,7 +230,7 @@ class RestoreProjectTest extends TestCase
         $project = Project::factory()->create([
             'is_public' => false,
             'is_deleted' => true,
-            'draft_id' => $draft->id
+            'draft_id' => $draft->id,
         ]);
         $study = Study::factory()->for($project)->create(['is_deleted' => true]);
         $dataset = Dataset::factory()->for($study)->create(['is_deleted' => true]);

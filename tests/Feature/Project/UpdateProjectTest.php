@@ -14,24 +14,30 @@ class UpdateProjectTest extends TestCase
     use RefreshDatabase;
 
     private User $owner;
+
     private User $collaborator;
+
     private User $viewer;
+
     private User $outsideUser;
+
     private Team $team;
+
     private Project $project;
+
     private License $license;
 
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->owner = User::factory()->withPersonalTeam()->create();
         $this->collaborator = User::factory()->create();
         $this->viewer = User::factory()->create();
         $this->outsideUser = User::factory()->create();
         $this->team = $this->owner->currentTeam;
         $this->license = License::factory()->create();
-        
+
         $this->project = Project::factory()->create([
             'owner_id' => $this->owner->id,
             'team_id' => $this->team->id,
@@ -40,7 +46,7 @@ class UpdateProjectTest extends TestCase
             'is_public' => false,
             'license_id' => $this->license->id,
         ]);
-        
+
         // Attach users with different roles
         $this->project->users()->attach($this->owner, ['role' => 'creator']);
         $this->project->users()->attach($this->collaborator, ['role' => 'collaborator']);
@@ -61,7 +67,7 @@ class UpdateProjectTest extends TestCase
         // The controller returns a redirect with success message for form requests
         $response->assertStatus(302);
         $response->assertSessionHas('success', 'Project updated successfully');
-        
+
         $this->project->refresh();
         $this->assertEquals('Updated Project Name', $this->project->name);
         $this->assertEquals('Updated project description', $this->project->description);
@@ -80,7 +86,7 @@ class UpdateProjectTest extends TestCase
 
         $response->assertStatus(302);
         $response->assertSessionHas('success', 'Project updated successfully');
-        
+
         $this->project->refresh();
         $this->assertEquals('Updated by Collaborator', $this->project->name);
         $this->assertEquals('Updated by collaborator', $this->project->description);
@@ -97,7 +103,7 @@ class UpdateProjectTest extends TestCase
             ->put("/dashboard/projects/{$this->project->id}/update", $updateData);
 
         $response->assertStatus(403);
-        
+
         $this->project->refresh();
         $this->assertEquals('Original Project Name', $this->project->name);
         $this->assertEquals('Original description', $this->project->description);
@@ -114,7 +120,7 @@ class UpdateProjectTest extends TestCase
             ->put("/dashboard/projects/{$this->project->id}/update", $updateData);
 
         $response->assertStatus(403);
-        
+
         $this->project->refresh();
         $this->assertEquals('Original Project Name', $this->project->name);
         $this->assertEquals('Original description', $this->project->description);
@@ -130,7 +136,7 @@ class UpdateProjectTest extends TestCase
         $response = $this->put("/dashboard/projects/{$this->project->id}/update", $updateData);
 
         $response->assertRedirect('/login');
-        
+
         $this->project->refresh();
         $this->assertEquals('Original Project Name', $this->project->name);
     }
@@ -147,11 +153,11 @@ class UpdateProjectTest extends TestCase
 
         // Depending on validation rules, this might be 422 or redirect with errors
         $this->assertContains($response->getStatusCode(), [302, 422]);
-        
+
         if ($response->getStatusCode() === 302) {
             $response->assertSessionHasErrors(['name']);
         }
-        
+
         $this->project->refresh();
         $this->assertEquals('Original Project Name', $this->project->name); // Should not change
     }
@@ -174,11 +180,11 @@ class UpdateProjectTest extends TestCase
 
         // Should fail validation due to unique constraint
         $this->assertContains($response->getStatusCode(), [302, 422]);
-        
+
         if ($response->getStatusCode() === 302) {
             $response->assertSessionHasErrors(['name']);
         }
-        
+
         $this->project->refresh();
         $this->assertEquals('Original Project Name', $this->project->name); // Should not change
     }
@@ -186,7 +192,7 @@ class UpdateProjectTest extends TestCase
     public function test_project_update_can_change_license()
     {
         $newLicense = License::factory()->create();
-        
+
         $updateData = [
             'name' => 'Project with New License',
             'license_id' => $newLicense->id,
@@ -197,7 +203,7 @@ class UpdateProjectTest extends TestCase
 
         $response->assertStatus(302);
         $response->assertSessionHas('success', 'Project updated successfully');
-        
+
         $this->project->refresh();
         $this->assertEquals($newLicense->id, $this->project->license_id);
         $this->assertEquals('Project with New License', $this->project->name);
@@ -217,7 +223,7 @@ class UpdateProjectTest extends TestCase
             ->put("/dashboard/projects/{$this->project->id}/update", $updateData);
 
         $response->assertStatus(403);
-        
+
         $this->project->refresh();
         $this->assertEquals('Original Project Name', $this->project->name);
     }
@@ -237,7 +243,7 @@ class UpdateProjectTest extends TestCase
             ->put("/dashboard/projects/{$this->project->id}/update", $updateData);
 
         $response->assertStatus(403);
-        
+
         $this->project->refresh();
         $this->assertEquals('Original Project Name', $this->project->name);
     }
@@ -257,7 +263,7 @@ class UpdateProjectTest extends TestCase
             ->put("/dashboard/projects/{$this->project->id}/update", $updateData);
 
         $response->assertStatus(403);
-        
+
         $this->project->refresh();
         $this->assertEquals('Original Project Name', $this->project->name);
     }
@@ -278,7 +284,7 @@ class UpdateProjectTest extends TestCase
 
         $response->assertStatus(302);
         $response->assertSessionHas('success', 'Project updated successfully');
-        
+
         $this->project->refresh();
         $this->assertEquals('Only Name Changed', $this->project->name);
         $this->assertEquals('Original description', $this->project->description); // Unchanged
@@ -291,7 +297,7 @@ class UpdateProjectTest extends TestCase
     public function test_project_update_updates_timestamps()
     {
         $originalUpdatedAt = $this->project->updated_at;
-        
+
         // Wait a moment to ensure timestamp difference
         sleep(1);
 
@@ -304,7 +310,7 @@ class UpdateProjectTest extends TestCase
 
         $response->assertStatus(302);
         $response->assertSessionHas('success', 'Project updated successfully');
-        
+
         $this->project->refresh();
         $this->assertNotEquals($originalUpdatedAt, $this->project->updated_at);
         $this->assertTrue($this->project->updated_at->greaterThan($originalUpdatedAt));
@@ -322,7 +328,7 @@ class UpdateProjectTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertJsonStructure([]); // Expects empty JSON response on success
-        
+
         $this->project->refresh();
         $this->assertEquals('JSON Update Test', $this->project->name);
         $this->assertEquals('Updated via JSON', $this->project->description);
@@ -340,7 +346,7 @@ class UpdateProjectTest extends TestCase
 
         $response->assertStatus(302);
         $response->assertSessionHas('success', 'Project updated successfully');
-        
+
         $this->project->refresh();
         $this->assertEquals('Form Update Test', $this->project->name);
         $this->assertEquals('Updated via form submission', $this->project->description);
@@ -384,7 +390,7 @@ class UpdateProjectTest extends TestCase
 
         $response->assertStatus(302);
         $response->assertSessionHas('success', 'Project updated successfully');
-        
+
         $this->project->refresh();
         $this->assertEquals('Çhemïcal Prøject with Ñ & special chars', $this->project->name);
         $this->assertEquals('Description with émojis 🧪⚗️ and symbols @#$%', $this->project->description);
@@ -405,7 +411,7 @@ class UpdateProjectTest extends TestCase
 
         // Should either succeed or fail validation gracefully
         $this->assertContains($response->getStatusCode(), [302, 422]);
-        
+
         if ($response->getStatusCode() === 302) {
             $response->assertSessionHas('success', 'Project updated successfully');
             $this->project->refresh();
@@ -417,25 +423,25 @@ class UpdateProjectTest extends TestCase
     public function test_project_owner_can_update_release_date_via_http()
     {
         $releaseDate = now()->addDays(30)->format('Y-m-d');
-        
+
         $response = $this->actingAs($this->owner)
             ->put("/dashboard/projects/{$this->project->id}/updateReleaseDate", [
                 'name' => $this->project->name,
-                'release_date' => $releaseDate
+                'release_date' => $releaseDate,
             ]);
 
         $response->assertStatus(302);
         $response->assertSessionHas('success', "Project's release date updated successfully");
-        
+
         $this->project->refresh();
-        $this->assertEquals($releaseDate, $this->project->release_date ? 
+        $this->assertEquals($releaseDate, $this->project->release_date ?
             \Carbon\Carbon::parse($this->project->release_date)->format('Y-m-d') : null);
     }
 
     public function test_project_release_date_update_requires_authorization()
     {
         $releaseDate = now()->addDays(30)->format('Y-m-d H:i:s');
-        
+
         $updateData = [
             'name' => $this->project->name,
             'release_date' => $releaseDate,
@@ -449,7 +455,7 @@ class UpdateProjectTest extends TestCase
         // It should return 403 but actually returns 302 (success)
         $response->assertStatus(302);
         $response->assertSessionHas('success', "Project's release date updated successfully");
-        
+
         $this->project->refresh();
         // Since the update actually succeeds (due to missing auth), the date is set
         $this->assertNotNull($this->project->release_date);
@@ -458,7 +464,7 @@ class UpdateProjectTest extends TestCase
     public function test_project_release_date_update_response_includes_success_message()
     {
         $releaseDate = now()->addDays(30)->format('Y-m-d H:i:s');
-        
+
         $updateData = [
             'name' => $this->project->name,
             'release_date' => $releaseDate,
@@ -475,7 +481,7 @@ class UpdateProjectTest extends TestCase
     public function test_project_release_date_can_be_updated_via_json()
     {
         $releaseDate = now()->addDays(30)->format('Y-m-d H:i:s');
-        
+
         $updateData = [
             'name' => $this->project->name,
             'release_date' => $releaseDate,
@@ -486,9 +492,9 @@ class UpdateProjectTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertJsonStructure([]); // Expects empty JSON response on success
-        
+
         $this->project->refresh();
-        $this->assertEquals($releaseDate, $this->project->release_date ? 
+        $this->assertEquals($releaseDate, $this->project->release_date ?
             \Carbon\Carbon::parse($this->project->release_date)->format('Y-m-d H:i:s') : null);
     }
 }
