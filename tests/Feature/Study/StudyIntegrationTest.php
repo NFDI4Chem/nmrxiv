@@ -49,7 +49,7 @@ class StudyIntegrationTest extends TestCase
         ]);
 
         $this->markTestSkipped('API endpoint /api/v1/list/studies not implemented yet');
-        
+
         $response = $this->get('/api/v1/list/studies')
             ->assertStatus(200)
             ->assertJsonStructure([
@@ -86,10 +86,10 @@ class StudyIntegrationTest extends TestCase
         ]);
 
         $response = $this->get(route('public.spectra'));
-        
+
         // Just check if it returns 200 first
         $response->assertStatus(200);
-        
+
         // For now, skip the Inertia assertion until we fix the core issue
         $this->markTestIncomplete('Inertia response assertion needs investigation');
     }
@@ -118,7 +118,7 @@ class StudyIntegrationTest extends TestCase
 
         $this->get(route('public.spectra', ['search' => 'Searchable']))
             ->assertStatus(200);
-        
+
         // TODO: Fix Inertia response testing
         // ->assertInertia(fn ($page) => $page
         //     ->component('Public/Studies')
@@ -149,7 +149,7 @@ class StudyIntegrationTest extends TestCase
 
         $this->get(route('public.spectra', ['sort' => 'creation']))
             ->assertStatus(200);
-        
+
         // TODO: Fix Inertia response testing
         // ->assertInertia(fn ($page) => $page
         //     ->component('Public/Studies')
@@ -184,7 +184,7 @@ class StudyIntegrationTest extends TestCase
 
         $this->get(route('public.spectra', ['compound' => '123']))
             ->assertStatus(200);
-        
+
         // TODO: Fix Inertia response testing
         // ->assertInertia(fn ($page) => $page
         //     ->component('Public/Studies')
@@ -204,13 +204,13 @@ class StudyIntegrationTest extends TestCase
         ]);
 
         $datasets = Dataset::factory(2)->create(['study_id' => $study->id]);
-        
+
         // Load the datasets relationship
         $study->load('datasets');
 
         $resource = (new StudyResource($study))->lite(false, ['datasets']);
         $resourceArray = $resource->toArray(request());
-        
+
         $this->assertArrayHasKey('id', $resourceArray);
         $this->assertArrayHasKey('name', $resourceArray);
         $this->assertArrayHasKey('slug', $resourceArray);
@@ -228,7 +228,7 @@ class StudyIntegrationTest extends TestCase
     public function test_study_preview_functionality(): void
     {
         $this->markTestSkipped('Preview route not implemented yet');
-        
+
         $study = Study::factory()->create([
             'project_id' => $this->project->id,
             'owner_id' => $this->user->id,
@@ -358,7 +358,7 @@ class StudyIntegrationTest extends TestCase
         // Make study archived
         $study->update(['is_public' => true, 'is_archived' => true]);
         $study->refresh(); // Ensure we have fresh data
-        
+
         $this->assertFalse($study->shouldBeSearchable());
     }
 
@@ -450,7 +450,7 @@ class StudyIntegrationTest extends TestCase
     public function test_study_api_versioning(): void
     {
         $this->markTestSkipped('API endpoints not implemented yet');
-        
+
         $study = Study::factory()->create([
             'project_id' => $this->project->id,
             'owner_id' => $this->user->id,

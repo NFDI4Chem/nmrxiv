@@ -63,8 +63,6 @@ class StudyMemberManagementTest extends TestCase
         ]);
     }
 
-
-
     public function test_unauthorized_user_cannot_invite_study_members(): void
     {
         $this->actingAs($this->member)
@@ -79,8 +77,6 @@ class StudyMemberManagementTest extends TestCase
             'email' => $this->otherUser->email,
         ]);
     }
-
-
 
     public function test_study_owner_can_cancel_pending_invitations(): void
     {
@@ -318,10 +314,10 @@ class StudyMemberManagementTest extends TestCase
 
         $response = $this->actingAs($this->owner)
             ->get(route('dashboard.studies', $this->study));
-            
+
         // Test passes if we can access the route and get a valid response (either 200 or valid Inertia redirect)
         $this->assertTrue(
-            in_array($response->status(), [200, 409]) && 
+            in_array($response->status(), [200, 409]) &&
             ($response->status() === 200 || $response->headers->has('X-Inertia-Location'))
         );
     }

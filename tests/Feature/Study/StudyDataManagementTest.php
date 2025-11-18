@@ -241,10 +241,10 @@ class StudyDataManagementTest extends TestCase
 
         $response = $this->actingAs($this->user)
             ->get(route('dashboard.study.files', $this->study));
-            
+
         // Test passes if we can access the route and get a valid response (either 200 or valid Inertia redirect)
         $this->assertTrue(
-            in_array($response->status(), [200, 409]) && 
+            in_array($response->status(), [200, 409]) &&
             ($response->status() === 200 || $response->headers->has('X-Inertia-Location'))
         );
     }

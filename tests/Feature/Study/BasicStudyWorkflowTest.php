@@ -5,12 +5,12 @@ namespace Tests\Feature\Study;
 use App\Actions\Study\CreateNewStudy;
 use App\Actions\Study\UpdateStudy;
 use App\Models\Dataset;
+use App\Models\FileSystemObject;
 use App\Models\License;
 use App\Models\Project;
 use App\Models\Study;
 use App\Models\Team;
 use App\Models\User;
-use App\Models\FileSystemObject;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -317,7 +317,7 @@ class BasicStudyWorkflowTest extends TestCase
         $this->assertNotNull($study->uuid);
         $this->assertNotNull($study->obfuscationcode);
         $this->assertEquals(40, strlen($study->obfuscationcode));
-        
+
         // Manual UUID validation using regex pattern
         $uuidPattern = '/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i';
         $this->assertMatchesRegularExpression($uuidPattern, $study->uuid);

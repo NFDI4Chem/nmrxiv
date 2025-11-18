@@ -318,16 +318,16 @@ class StudyAuthorizationTest extends TestCase
         $this->actingAs($this->owner)
             ->get(route('dashboard.studies', $this->study))
             ->assertStatus(200);
-            
+
         // Test that permissions are computed correctly for the owner
         $this->assertTrue(Gate::forUser($this->owner)->check('deleteStudy', $this->study));
         $this->assertTrue(Gate::forUser($this->owner)->check('updateStudy', $this->study));
 
-        // Test that collaborator can access the study view  
+        // Test that collaborator can access the study view
         $this->actingAs($this->collaborator)
             ->get(route('dashboard.studies', $this->study))
             ->assertStatus(200);
-            
+
         // Test that permissions are computed correctly for the collaborator
         $this->assertFalse(Gate::forUser($this->collaborator)->check('deleteStudy', $this->study));
         $this->assertTrue(Gate::forUser($this->collaborator)->check('updateStudy', $this->study));
@@ -409,7 +409,7 @@ class StudyAuthorizationTest extends TestCase
 
         // Viewer permissions - viewers don't "belong" to study according to current business logic
         $this->assertFalse($this->viewer->belongsToStudy($this->study));
-        $this->assertFalse($this->viewer->canUpdateStudy($this->study)); 
+        $this->assertFalse($this->viewer->canUpdateStudy($this->study));
         $this->assertFalse($this->viewer->isStudyCreator($this->study));
         $this->assertFalse($this->viewer->ownsStudy($this->study));
 

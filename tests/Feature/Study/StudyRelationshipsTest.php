@@ -223,10 +223,6 @@ class StudyRelationshipsTest extends TestCase
         }
     }
 
-
-
-
-
     public function test_study_can_get_user_with_email(): void
     {
         $studyMember = User::factory()->create();
@@ -291,8 +287,6 @@ class StudyRelationshipsTest extends TestCase
         $this->assertIsArray($previewUrls);
         $this->assertCount(2, $previewUrls); // Only datasets with photos
     }
-
-
 
     public function test_study_is_published_attribute(): void
     {
@@ -383,6 +377,4 @@ class StudyRelationshipsTest extends TestCase
         $this->assertTrue($tags->pluck('name')->contains('Organic Chemistry'));
         $this->assertTrue($tags->pluck('name')->contains('Research'));
     }
-
-
 }
