@@ -38,6 +38,7 @@ class Study extends Model implements Auditable
         'starred',
         'location',
         'is_public',
+        'is_archived',
         'obfuscationcode',
         'description',
         'type',
@@ -60,6 +61,9 @@ class Study extends Model implements Auditable
         'external_url',
         'processing_logs',
         'tracking_item_name',
+        'doi',
+        'identifier',
+        'validation_id',
     ];
 
     /**
@@ -314,6 +318,8 @@ class Study extends Model implements Auditable
         if ($this->is_public && ! $this->is_archived) {
             return true;
         }
+
+        return false;
     }
 
     /**

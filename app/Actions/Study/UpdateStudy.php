@@ -4,6 +4,7 @@ namespace App\Actions\Study;
 
 use App\Models\Study;
 use App\Models\Ticker;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -29,7 +30,7 @@ class UpdateStudy
             $study->forceFill([
                 'name' => $input['name'],
                 'slug' => Str::slug($input['name'], '-'),
-                'description' => $input['description'] ? $input['description'] : $study->description,
+                'description' => array_key_exists('description', $input) ? $input['description'] : $study->description,
                 'color' => array_key_exists('color', $input) ? $input['color'] : $study->color,
                 'starred' => array_key_exists('starred', $input) ? $input['starred'] : $study->starred,
                 'location' => array_key_exists('location', $input) ? $input['location'] : $study->location,
@@ -56,30 +57,32 @@ class UpdateStudy
                 $release_date = Carbon::now()->timestamp;
 
                 $sample = $study->sample;
-                $sampleIdentifier = $sample->identifier ? $sample->identifier : null;
+                if ($sample) {
+                    $sampleIdentifier = $sample->identifier ? $sample->identifier : null;
 
-                if ($sampleIdentifier == null) {
-                    $sampleTicker = Ticker::whereType('sample')->first();
-                    $sampleIdentifier = $sampleTicker->index + 1;
-                    $sample->identifier = $sampleIdentifier;
-                    $sample->save();
+                    if ($sampleIdentifier == null) {
+                        $sampleTicker = Ticker::whereType('sample')->first();
+                        $sampleIdentifier = $sampleTicker->index + 1;
+                        $sample->identifier = $sampleIdentifier;
+                        $sample->save();
 
-                    $sampleTicker->index = $sampleIdentifier;
-                    $sampleTicker->save();
-                }
+                        $sampleTicker->index = $sampleIdentifier;
+                        $sampleTicker->save();
+                    }
 
-                $molecules = $sample->molecules;
+                    $molecules = $sample->molecules;
 
-                foreach ($molecules as $molecule) {
-                    $moleculeIdentifier = $molecule->identifier ? $molecule->identifier : null;
-                    if ($moleculeIdentifier == null) {
-                        $moleculeTicker = Ticker::whereType('molecule')->first();
-                        $moleculeIdentifier = $moleculeTicker->index + 1;
-                        $molecule->identifier = $moleculeIdentifier;
-                        $molecule->save();
+                    foreach ($molecules as $molecule) {
+                        $moleculeIdentifier = $molecule->identifier ? $molecule->identifier : null;
+                        if ($moleculeIdentifier == null) {
+                            $moleculeTicker = Ticker::whereType('molecule')->first();
+                            $moleculeIdentifier = $moleculeTicker->index + 1;
+                            $molecule->identifier = $moleculeIdentifier;
+                            $molecule->save();
 
-                        $moleculeTicker->index = $moleculeIdentifier;
-                        $moleculeTicker->save();
+                            $moleculeTicker->index = $moleculeIdentifier;
+                            $moleculeTicker->save();
+                        }
                     }
                 }
             }

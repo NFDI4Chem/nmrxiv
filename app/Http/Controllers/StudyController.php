@@ -65,6 +65,8 @@ class StudyController extends Controller
 
     public function update(Request $request, UpdateStudy $updater, Study $study)
     {
+        Gate::authorize('updateStudy', $study);
+
         $updater->update($study, $request->all());
 
         $study = $study->fresh();
@@ -208,6 +210,10 @@ class StudyController extends Controller
 
     public function moleculeStore(Request $request, Study $study)
     {
+        if (! Gate::forUser($request->user())->check('updateStudy', $study)) {
+            throw new AuthorizationException;
+        }
+
         $sample = $study->sample;
         if (! $sample) {
             $sample = Sample::create([
@@ -277,6 +283,10 @@ class StudyController extends Controller
 
     public function nmriumInfo(Request $request, Study $study)
     {
+        if (! Gate::forUser($request->user())->check('updateStudy', $study)) {
+            throw new AuthorizationException;
+        }
+
         // $version = $request->get('version');
         // $spectra = $request->get('spectra');
         // $molecules = $nmriumInfo['data']['molecules'];
@@ -497,6 +507,10 @@ class StudyController extends Controller
 
     public function settings(Request $request, Study $study)
     {
+        if (! Gate::forUser($request->user())->check('viewStudy', $study)) {
+            throw new AuthorizationException;
+        }
+
         return Inertia::render('Study/Settings', [
             'study' => $study,
             'project' => $study->project,
@@ -508,6 +522,10 @@ class StudyController extends Controller
         StatefulGuard $guard,
         Study $study
     ) {
+        if (! Gate::forUser($request->user())->check('deleteStudy', $study)) {
+            throw new AuthorizationException;
+        }
+
         $confirmed = app(ConfirmPassword::class)(
             $guard,
             $request->user(),
@@ -545,6 +563,10 @@ class StudyController extends Controller
 
     public function snapshot(Request $request, Study $study)
     {
+        if (! Gate::forUser($request->user())->check('updateStudy', $study)) {
+            throw new AuthorizationException;
+        }
+
         $content = $request->get('img');
         if ($content) {
             $path = '/projects/'.$study->project->uuid.'/'.$study->slug.'.svg';

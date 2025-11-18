@@ -42,8 +42,8 @@ class StudyFactory extends Factory
             'fs_id' => 1,
             'release_date' => null,
             'study_photo_path' => null, // todo: Adjust when studies images field is provided in nmrXiv
-            'created_at' => Carbon::now()->timestamp,
-            'updated_at' => Carbon::now()->timestamp,
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
             'doi' => null,
             'datacite_schema' => null,
             'identifier' => null,
