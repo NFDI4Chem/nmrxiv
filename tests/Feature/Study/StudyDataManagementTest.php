@@ -141,7 +141,7 @@ class StudyDataManagementTest extends TestCase
 
         $expectedPath = '/projects/'.$this->study->project->uuid.'/'.$this->study->slug.'.svg';
 
-        Storage::disk(env('FILESYSTEM_DRIVER_PUBLIC', 'public'))->assertExists($expectedPath);
+        Storage::disk(config('filesystems.default_public', 'public'))->assertExists($expectedPath);
 
         $this->study->refresh();
         $this->assertEquals($expectedPath, $this->study->study_photo_path);

@@ -315,11 +315,7 @@ class Study extends Model implements Auditable
      */
     public function shouldBeSearchable()
     {
-        if ($this->is_public && ! $this->is_archived) {
-            return true;
-        }
-
-        return false;
+        return $this->is_public && ! $this->is_archived;
     }
 
     /**

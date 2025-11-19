@@ -251,8 +251,8 @@ class StudyRelationshipsTest extends TestCase
 
     public function test_study_url_attributes(): void
     {
-        $expectedPublicUrl = env('APP_URL', '').'/sample/S'.$this->study->identifier;
-        $expectedPrivateUrl = env('APP_URL', '').'/studies/'.urlencode($this->study->url ?? '');
+        $expectedPublicUrl = config('app.url').'/sample/S'.$this->study->identifier;
+        $expectedPrivateUrl = config('app.url').'/studies/'.urlencode($this->study->url ?? '');
 
         $this->assertEquals($expectedPublicUrl, $this->study->public_url);
         $this->assertEquals($expectedPrivateUrl, $this->study->private_url);
