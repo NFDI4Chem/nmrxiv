@@ -17,6 +17,7 @@ class DraftActionsTest extends TestCase
     use RefreshDatabase;
 
     private User $user;
+
     private Team $team;
 
     protected function setUp(): void
@@ -68,7 +69,7 @@ class DraftActionsTest extends TestCase
     {
         $createDraft = new CreateDraft;
         [$userId, $teamId] = $this->user->getUserTeamData();
-        
+
         // Create an existing draft
         $existingDraft = Draft::factory()->create([
             'owner_id' => $userId,
@@ -87,7 +88,7 @@ class DraftActionsTest extends TestCase
     {
         $createDraft = new CreateDraft;
         [$userId, $teamId] = $this->user->getUserTeamData();
-        
+
         $draft = Draft::factory()->create([
             'owner_id' => $userId,
             'team_id' => $teamId,
@@ -109,7 +110,7 @@ class DraftActionsTest extends TestCase
     {
         $userDrafts = new UserDrafts;
 
-        // Get the correct user/team data 
+        // Get the correct user/team data
         [$userId, $teamId] = $this->user->getUserTeamData();
 
         // Create drafts with and without files
@@ -188,7 +189,7 @@ class DraftActionsTest extends TestCase
     {
         $draftFiles = new DraftFiles;
         [$userId, $teamId] = $this->user->getUserTeamData();
-        
+
         $draft = Draft::factory()->create([
             'owner_id' => $userId,
             'team_id' => $teamId,
@@ -214,7 +215,7 @@ class DraftActionsTest extends TestCase
     {
         $draftFiles = new DraftFiles;
         [$userId, $teamId] = $this->user->getUserTeamData();
-        
+
         $draft = Draft::factory()->create([
             'owner_id' => $userId,
             'team_id' => $teamId,
@@ -238,7 +239,7 @@ class DraftActionsTest extends TestCase
     {
         $draftFiles = new DraftFiles;
         [$userId, $teamId] = $this->user->getUserTeamData();
-        
+
         $draft = Draft::factory()->create([
             'owner_id' => $userId,
             'team_id' => $teamId,
@@ -266,7 +267,7 @@ class DraftActionsTest extends TestCase
     {
         $draftFiles = new DraftFiles;
         [$userId, $teamId] = $this->user->getUserTeamData();
-        
+
         $draft = Draft::factory()->create([
             'owner_id' => $userId,
             'team_id' => $teamId,
@@ -284,7 +285,7 @@ class DraftActionsTest extends TestCase
         $createDraft = new CreateDraft;
         $draft = $createDraft->execute($this->user);
 
-        $expectedPathPattern = '/^' . preg_quote(env('APP_ENV', 'local'), '/') . '\/' . $this->user->id . '\/drafts\/[a-f0-9\-]{36}$/';
+        $expectedPathPattern = '/^'.preg_quote(env('APP_ENV', 'local'), '/').'\/'.$this->user->id.'\/drafts\/[a-f0-9\-]{36}$/';
         $this->assertMatchesRegularExpression($expectedPathPattern, $draft->path);
     }
 

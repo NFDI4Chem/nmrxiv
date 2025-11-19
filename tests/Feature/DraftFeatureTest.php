@@ -2,9 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Actions\Draft\CreateDraft;
-use App\Actions\Draft\DraftFiles;
-use App\Actions\Draft\UserDrafts;
 use App\Models\Draft;
 use App\Models\FileSystemObject;
 use App\Models\Project;
@@ -18,7 +15,9 @@ class DraftFeatureTest extends TestCase
     use RefreshDatabase;
 
     private User $user;
+
     private Team $team;
+
     private Draft $draft;
 
     protected function setUp(): void
@@ -45,7 +44,7 @@ class DraftFeatureTest extends TestCase
             ->get('/dashboard/drafts');
 
         $response->assertStatus(200);
-        
+
         $responseData = $response->json();
         $this->assertArrayHasKey('drafts', $responseData);
         $this->assertArrayHasKey('sharedDrafts', $responseData);
@@ -71,7 +70,7 @@ class DraftFeatureTest extends TestCase
             ->get("/dashboard/drafts/{$this->draft->id}/files");
 
         $response->assertStatus(200);
-        
+
         $responseData = $response->json();
         $this->assertArrayHasKey('file', $responseData);
         $this->assertArrayHasKey('missing_files', $responseData);
@@ -89,7 +88,7 @@ class DraftFeatureTest extends TestCase
             ->get("/dashboard/drafts/{$this->draft->id}/missing-files");
 
         $response->assertStatus(200);
-        
+
         $responseData = $response->json();
         $this->assertArrayHasKey('missing_files', $responseData);
         $this->assertCount(2, $responseData['missing_files']);
@@ -107,7 +106,7 @@ class DraftFeatureTest extends TestCase
             ->put("/dashboard/drafts/{$this->draft->id}", $updateData);
 
         $response->assertStatus(200);
-        
+
         $this->draft->refresh();
         $this->assertEquals('Updated Draft Name', $this->draft->name);
         $this->assertTrue($this->draft->project_enabled);
@@ -159,7 +158,7 @@ class DraftFeatureTest extends TestCase
             ->get("/dashboard/drafts/{$this->draft->id}/info");
 
         $response->assertStatus(200);
-        
+
         $responseData = $response->json();
         $this->assertArrayHasKey('project', $responseData);
         $this->assertArrayHasKey('studies', $responseData);
@@ -177,7 +176,7 @@ class DraftFeatureTest extends TestCase
             ->get("/dashboard/drafts/{$this->draft->id}/annotate");
 
         $response->assertStatus(200);
-        
+
         $responseData = $response->json();
         $this->assertArrayHasKey('message', $responseData);
         $this->assertArrayHasKey('status', $responseData);
@@ -188,7 +187,7 @@ class DraftFeatureTest extends TestCase
     {
         $otherUser = User::factory()->withPersonalTeam()->create();
 
-        // Since there's no explicit authorization policy, this test checks 
+        // Since there's no explicit authorization policy, this test checks
         // that the draft is only returned for the owner or team members
         $response = $this->actingAs($otherUser)
             ->get("/dashboard/drafts/{$this->draft->id}/files");
@@ -259,7 +258,7 @@ class DraftFeatureTest extends TestCase
             ->get("/dashboard/drafts/{$this->draft->id}/files");
 
         $response->assertStatus(200);
-        
+
         $responseData = $response->json();
         $this->assertEquals('/', $responseData['file']['name']);
         $this->assertArrayHasKey('children', $responseData['file']);
