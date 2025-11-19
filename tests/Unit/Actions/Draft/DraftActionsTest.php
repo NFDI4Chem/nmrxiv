@@ -285,7 +285,7 @@ class DraftActionsTest extends TestCase
         $createDraft = new CreateDraft;
         $draft = $createDraft->execute($this->user);
 
-        $expectedPathPattern = '/^'.preg_quote(env('APP_ENV', 'local'), '/').'\/'.$this->user->id.'\/drafts\/[a-f0-9\-]{36}$/';
+        $expectedPathPattern = '/^'.preg_quote(config('app.env', 'local'), '/').'\/'.$this->user->id.'\/drafts\/[a-f0-9\-]{36}$/';
         $this->assertMatchesRegularExpression($expectedPathPattern, $draft->path);
     }
 
