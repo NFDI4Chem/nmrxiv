@@ -5,8 +5,8 @@
                 class="relative w-full border-0 px-6 py-3 rounded-full focus:shadow-outline"
                 autocomplete="off"
                 type="text"
-                name="draft-search"
-                placeholder="Search drafts"
+                :name="name"
+                :placeholder="placeholder"
                 :value="modelValue"
                 @input="$emit('update:modelValue', $event.target.value)"
             />
@@ -27,6 +27,14 @@ export default {
         modelValue: {
             type: String,
             default: "",
+        },
+        placeholder: {
+            type: String,
+            default: "Search...",
+        },
+        name: {
+            type: String,
+            default: "search",
         },
         maxWidth: {
             type: Number,

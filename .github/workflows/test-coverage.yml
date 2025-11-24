@@ -10,7 +10,7 @@ jobs:
     
     services:
       postgres:
-        image: postgres:13
+        image: postgres:17
         env:
           POSTGRES_DB: nmrxiv_test
           POSTGRES_USER: postgres
