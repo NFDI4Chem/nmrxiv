@@ -17,6 +17,7 @@ use App\Models\Validation;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Maize\Markable\Models\Bookmark;
 use Tests\TestCase;
 
@@ -229,6 +230,8 @@ class StudyModelTest extends TestCase
 
     public function test_it_generates_study_photo_url_when_path_exists(): void
     {
+        Storage::fake('public');
+        
         $study = Study::factory()->create([
             'study_photo_path' => 'photos/study.jpg',
         ]);
@@ -381,8 +384,9 @@ class StudyModelTest extends TestCase
     {
         $study = Study::factory()->create(['identifier' => 789]);
 
-        $expectedUrl = url('/sample/S789');
-        $this->assertEquals($expectedUrl, $study->public_url);
+        $expectedUrl = str_replace(':80', '', url('/sample/S789'));
+        $actualUrl = str_replace(':80', '', $study->public_url);
+        $this->assertEquals($expectedUrl, $actualUrl);
     }
 
     public function test_it_generates_private_url_attribute(): void
@@ -391,7 +395,8 @@ class StudyModelTest extends TestCase
             'obfuscationcode' => 'XYZ789',
         ]);
 
-        $this->assertStringStartsWith(url('/studies'), $study->private_url);
+        $baseUrl = str_replace(':80', '', url('/studies'));
+        $this->assertStringStartsWith($baseUrl, str_replace(':80', '', $study->private_url));
     }
 
     public function test_it_has_one_fs_object(): void

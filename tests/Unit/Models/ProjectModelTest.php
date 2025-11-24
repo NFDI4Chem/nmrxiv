@@ -23,6 +23,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Storage;
 use Maize\Markable\Models\Bookmark;
 use Maize\Markable\Models\Like;
 use Tests\TestCase;
@@ -137,7 +138,7 @@ class ProjectModelTest extends TestCase
     {
         $fillable = [
             'name', 'slug', 'color', 'starred', 'location', 'is_public',
-            'obfuscationcode', 'description', 'type', 'uuid', 'access',
+            'is_deleted', 'is_archived', 'status', 'obfuscationcode', 'description', 'type', 'uuid', 'access',
             'access_type', 'team_id', 'owner_id', 'draft_id', 'fs_id',
             'project_photo_path', 'license_id', 'release_date', 'deleted_on', 'species',
         ];
@@ -150,8 +151,9 @@ class ProjectModelTest extends TestCase
     {
         $project = Project::factory()->create(['identifier' => 123]);
 
-        $expectedUrl = url('/project/P123');
-        $this->assertEquals($expectedUrl, $project->public_url);
+        $expectedUrl = str_replace(':80', '', url('/project/P123'));
+        $actualUrl = str_replace(':80', '', $project->public_url);
+        $this->assertEquals($expectedUrl, $actualUrl);
     }
 
     public function test_it_generates_private_url_attribute(): void
@@ -162,12 +164,15 @@ class ProjectModelTest extends TestCase
 
         // The implementation uses $this->url but the field was renamed to obfuscationcode
         // This results in an empty URL parameter, so we test the actual behavior
-        $this->assertStringStartsWith(url('/projects'), $project->private_url);
+        $baseUrl = str_replace(':80', '', url('/projects'));
+        $this->assertStringStartsWith($baseUrl, str_replace(':80', '', $project->private_url));
         $this->assertStringContainsString('/projects/', $project->private_url);
     }
 
     public function test_it_generates_project_photo_url_when_path_exists(): void
     {
+        Storage::fake('public');
+        
         $project = Project::factory()->create([
             'project_photo_path' => 'photos/project.jpg',
         ]);

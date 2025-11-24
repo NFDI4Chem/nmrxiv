@@ -12,6 +12,7 @@ use App\Models\Study;
 use App\Models\User;
 use App\Models\Validation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class DatasetModelTest extends TestCase
@@ -114,6 +115,8 @@ class DatasetModelTest extends TestCase
 
     public function test_it_generates_dataset_photo_url_when_path_exists(): void
     {
+        Storage::fake('public');
+        
         $dataset = Dataset::factory()->create(['dataset_photo_path' => 'datasets/photo.jpg']);
 
         $this->assertStringContainsString('datasets/photo.jpg', $dataset->dataset_photo_url);
