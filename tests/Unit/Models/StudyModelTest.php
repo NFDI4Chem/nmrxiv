@@ -252,7 +252,7 @@ class StudyModelTest extends TestCase
     public function test_it_generates_study_preview_urls_from_datasets(): void
     {
         Storage::fake('local');
-        
+
         $study = Study::factory()->create();
         $dataset1 = Dataset::factory()->create([
             'study_id' => $study->id,
