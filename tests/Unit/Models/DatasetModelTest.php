@@ -253,7 +253,7 @@ class DatasetModelTest extends TestCase
     public function test_it_belongs_to_a_team(): void
     {
         $dataset = Dataset::factory()->create();
-        
+
         $relationship = $dataset->team();
         $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsTo::class, $relationship);
         $this->assertEquals('Team_id', $relationship->getForeignKeyName());

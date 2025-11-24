@@ -476,19 +476,19 @@ class HasStudiesTraitTest extends TestCase
         $teamOwner = User::factory()->create();
         $team = Team::factory()->create([
             'user_id' => $teamOwner->id,
-            'personal_team' => false
+            'personal_team' => false,
         ]);
         $project = Project::factory()->create(['team_id' => $team->id]);
         $study = Study::factory()->create([
             'team_id' => $team->id,
-            'project_id' => $project->id
+            'project_id' => $project->id,
         ]);
 
         // Create a mock team user that exists but has no membership
         $teamUserMock = $this->getMockBuilder(User::class)
             ->onlyMethods(['ownsTeam'])
             ->getMock();
-        
+
         $teamUserMock->membership = null;
         $teamUserMock->method('ownsTeam')->willReturn(false);
 
@@ -496,7 +496,7 @@ class HasStudiesTraitTest extends TestCase
         $teamMock = $this->getMockBuilder(Team::class)
             ->onlyMethods(['allUsers'])
             ->getMock();
-        
+
         $userCollection = collect([$teamUserMock]);
         $teamMock->method('allUsers')->willReturn($userCollection);
         $teamMock->personal_team = false;
@@ -505,11 +505,11 @@ class HasStudiesTraitTest extends TestCase
         $studyMock = $this->getMockBuilder(Study::class)
             ->onlyMethods(['getAttribute'])
             ->getMock();
-        
+
         $studyMock->method('getAttribute')->willReturnMap([
-            ['team', $teamMock], 
+            ['team', $teamMock],
             ['users', collect()],
-            ['project', $project]
+            ['project', $project],
         ]);
 
         // This should return false because the team user has no membership - covers line 157

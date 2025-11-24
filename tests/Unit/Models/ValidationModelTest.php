@@ -925,26 +925,26 @@ class ValidationModelTest extends TestCase
         // Test lines 130, 174-175, 230-231: else branches when validation passes
         $validation = new Validation;
         $validation->save();
-        
+
         $project = Project::factory()->create([
             'name' => 'Valid Project Name',
             'description' => 'This is a valid description that meets minimum requirements',
-            'validation_id' => $validation->id
+            'validation_id' => $validation->id,
         ]);
-        
+
         $study = Study::factory()->create([
             'name' => 'Valid Study Name',
             'project_id' => $project->id,
         ]);
-        
+
         $sample = \App\Models\Sample::factory()->create([
-            'study_id' => $study->id
+            'study_id' => $study->id,
         ]);
-        
+
         $dataset = Dataset::factory()->create([
             'name' => 'Valid Dataset Name',
             'study_id' => $study->id,
-            'project_id' => $project->id
+            'project_id' => $project->id,
         ]);
 
         // Set up validation rules that will pass
@@ -964,11 +964,11 @@ class ValidationModelTest extends TestCase
         $validation->refresh();
 
         $report = $validation->report;
-        
+
         // Check that success paths create 'true|rule' entries (lines 130, 174-175, 230-231)
         $this->assertStringStartsWith('true|', $report['project']['title']);
         $this->assertStringStartsWith('true|', $report['project']['description']);
-        
+
         if (isset($report['project']['studies']) && count($report['project']['studies']) > 0) {
             $studyReport = $report['project']['studies'][0];
             // For studies, check if the validation rule created the proper format
@@ -982,7 +982,7 @@ class ValidationModelTest extends TestCase
     {
         // Test line 296: UTF-8 validation and conversion
         $validation = new Validation;
-        
+
         // Use reflection to test the private method
         $reflection = new \ReflectionClass($validation);
         $method = $reflection->getMethod('recursiveUnicodeSanitize');
@@ -990,9 +990,9 @@ class ValidationModelTest extends TestCase
 
         // Test with invalid UTF-8 data (simulated with a string that needs conversion)
         $invalidUtf8 = "Test\x80\x81 string"; // Invalid UTF-8 sequence
-        
+
         $result = $method->invokeArgs($validation, [$invalidUtf8]);
-        
+
         // The method should handle invalid UTF-8 and return a sanitized string
         $this->assertIsString($result);
         $this->assertTrue(mb_check_encoding($result, 'UTF-8'));

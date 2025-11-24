@@ -362,7 +362,7 @@ class HasProjectsTraitTest extends TestCase
         $teamOwner = User::factory()->create();
         $team = Team::factory()->create([
             'user_id' => $teamOwner->id,
-            'personal_team' => false
+            'personal_team' => false,
         ]);
         $project = Project::factory()->create(['team_id' => $team->id]);
 
@@ -370,7 +370,7 @@ class HasProjectsTraitTest extends TestCase
         $teamUserMock = $this->getMockBuilder(User::class)
             ->onlyMethods(['ownsTeam'])
             ->getMock();
-        
+
         $teamUserMock->membership = null;
         $teamUserMock->method('ownsTeam')->willReturn(false);
 
@@ -378,7 +378,7 @@ class HasProjectsTraitTest extends TestCase
         $teamMock = $this->getMockBuilder(Team::class)
             ->onlyMethods(['allUsers'])
             ->getMock();
-        
+
         $userCollection = collect([$teamUserMock]);
         $teamMock->method('allUsers')->willReturn($userCollection);
         $teamMock->personal_team = false;
@@ -387,10 +387,10 @@ class HasProjectsTraitTest extends TestCase
         $projectMock = $this->getMockBuilder(Project::class)
             ->onlyMethods(['getAttribute'])
             ->getMock();
-        
+
         $projectMock->method('getAttribute')->willReturnMap([
             ['team', $teamMock],
-            ['users', collect()]
+            ['users', collect()],
         ]);
 
         // This should return false because the team user has no membership - covers line 168
