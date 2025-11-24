@@ -35,3 +35,9 @@ When you contribute scientific data to the nmrXiv database through our website o
 nmrXiv itself places no additional restrictions on the use or redistribution of the data available via its online services other than those provided by the original data owners.
 
 nmrXiv does not guarantee the accuracy of any provided data, generated database, software or online service nor the suitability of data, software and online services for any purpose.
+
+## Inactive Projects
+
+To ensure efficient use of storage and to maintain a high-quality catalogue, nmrXiv may classify projects as inactive when no updates or activity have occurred for an extended period. Currently, the inactivity grace period is six (6) months by default and may be adjusted by the service configuration.
+
+If a project remains inactive beyond the grace period, nmrXiv may notify the project owner(s) and designated collaborators via email. Continued inactivity after notifications may result in additional administrative actions, which can include archival or deletion in accordance with our data retention policies. Owners can prevent these actions by resuming activity or contacting support for assistance within the notification timeframe.

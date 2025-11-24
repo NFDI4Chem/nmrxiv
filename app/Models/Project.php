@@ -7,6 +7,7 @@ use App\Events\ProjectArchival;
 use App\Events\ProjectDeletion;
 use App\Notifications\ProjectDeletionFailureNotification;
 use App\Notifications\ProjectDeletionReminderNotification;
+use App\Notifications\ProjectInactivityReminderNotification;
 use App\Traits\CacheClear;
 use Auth;
 use Carbon\Carbon;
@@ -42,6 +43,7 @@ class Project extends Model implements Auditable
         'starred',
         'location',
         'is_public',
+        'active',
         'obfuscationcode',
         'description',
         'type',
@@ -58,6 +60,16 @@ class Project extends Model implements Auditable
         'deleted_on',
         'species',
     ];
+
+    /**
+     * Casts for the model attributes.
+     */
+    protected function casts(): array
+    {
+        return [
+            'active' => 'boolean',
+        ];
+    }
 
     protected static $marks = [
         Like::class,
@@ -286,6 +298,19 @@ class Project extends Model implements Auditable
     }
 
     /**
+     * Model boot method to ensure that any meaningful update re-activates the project.
+     */
+    protected static function booted(): void
+    {
+        static::saving(function (Project $project): void {
+            // If something changes other than 'active' itself, mark as active again
+            if ($project->isDirty() && ! $project->isDirty('active')) {
+                $project->active = true;
+            }
+        });
+    }
+
+    /**
      * Determine if the model should be searchable.
      *
      * @return bool
@@ -353,6 +378,9 @@ class Project extends Model implements Auditable
                 break;
             case 'publish':
                 event(new DraftProcessed($this, $sendTo));
+                break;
+            case 'inactivityReminder':
+                Notification::send($sendTo, new ProjectInactivityReminderNotification($this));
                 break;
         }
     }

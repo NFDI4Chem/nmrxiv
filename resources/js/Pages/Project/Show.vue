@@ -74,6 +74,12 @@
                                     @click="toogleStarred"
                                 />
                                 {{ project.name }}
+                                <span
+                                    v-if="project.active === false"
+                                    class="ml-3 inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-gray-200 text-gray-700 uppercase"
+                                >
+                                    Inactive
+                                </span>
                                 <button
                                     v-if="canUpdateProject"
                                     type="button"
