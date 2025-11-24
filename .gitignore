@@ -7,7 +7,6 @@
 /vendor
 .env
 .env.production
-.env.*
 .env.backup
 .phpunit.result.cache
 docker-compose.override.yml
@@ -24,3 +23,8 @@ docs/.vitepress/cache
 **/caddy
 frankenphp
 frankenphp-worker.php
+
+# Coverage reports
+coverage.xml
+coverage-report/
+.phpunit.cache
