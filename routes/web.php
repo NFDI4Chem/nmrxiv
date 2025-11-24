@@ -10,7 +10,9 @@ use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\Auth\MyWelcomeController;
 use App\Http\Controllers\Auth\SocialController;
 use App\Http\Controllers\AuthorController;
+use App\Http\Controllers\CASController;
 use App\Http\Controllers\CitationController;
+use App\Http\Controllers\CspViolationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DatasetController;
 use App\Http\Controllers\DownloadController;
@@ -79,7 +81,10 @@ Route::get('/about-us', function () {
     ]);
 })->name('about');
 
-Route::supportBubble();
+// Custom support bubble route with rate limiting and enhanced security
+Route::post('support-bubble', [\App\Http\Controllers\SupportBubbleController::class, 'submit'])
+    ->middleware(['throttle:support-bubble'])
+    ->name('supportBubble.submit');
 
 Route::impersonate();
 
@@ -159,6 +164,9 @@ Route::middleware('auth', 'verified')->group(function () {
 
     Route::get('upload', [UploadController::class, 'upload'])->name('upload');
     Route::get('publish/{draft}', [UploadController::class, 'publish'])->name('publish');
+
+    // CAS Common Chemistry API Proxy
+    Route::get('/cas/detail', [CASController::class, 'fetchCasData'])->name('cas.detail');
 
     Route::prefix('dashboard')->group(function () {
         Route::get('ssubmission', [DashboardController::class, 'dashboard'])
@@ -351,6 +359,12 @@ Route::prefix('admin')->group(function () {
             Route::get('snapshots', [CurationController::class, 'snapshots'])
                 ->name('console.spectra.snapshots');
         });
+
+        // CSP Violation Reporting (Admin dashboard protected)
+        Route::middleware('auth', 'permission:manage platform')->group(function () {
+            Route::get('csp-violations', [CspViolationController::class, 'index'])
+                ->name('console.csp.violations.index');
+        });
     });
 });
 
@@ -440,6 +454,11 @@ Route::middleware(['throttle:60,1'])->group(function () {
     Route::get('services/oembed', [OEmbedController::class, 'spectra']);
     Route::get('embed/{id}', [OEmbedController::class, 'embed'])->name('embed');
 });
+
+// Public CSP violation reporting endpoint (must be at root level, no auth required)
+Route::post('csp-violation-report', [CspViolationController::class, 'report'])
+    ->name('csp.violation.report')
+    ->middleware('throttle:300,1');
 
 // Test route for Octane
 Route::get('/octane-test', function () {

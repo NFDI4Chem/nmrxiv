@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Molecule;
+use App\Services\CAS\CASService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 
@@ -22,42 +23,62 @@ class SanitizeMolecules extends Command
      */
     protected $description = 'Sanitize molecules';
 
+    public function __construct(
+        private CASService $casService
+    ) {
+        parent::__construct();
+    }
+
     /**
      * Execute the console command.
      */
     public function handle(): void
     {
-        $molecules = Molecule::all();
+        $totalMolecules = Molecule::count();
+        $this->info("Processing {$totalMolecules} molecules...");
 
-        foreach ($molecules as $molecule) {
-            echo $molecule->id;
-            echo "\r\n";
-            $inchi = $molecule->standard_inchi;
-            if ($inchi) {
-                $data = $this->fetchPubChemIUPACProperties($inchi);
-                $molecule->synonyms = $data['synonyms'];
-                $molecule->iupac_name = (array_key_exists('IUPACName', $data['properties']) ? $data['properties']['IUPACName'] : $molecule->iupac_name);
-                $molecule->molecular_formula = (array_key_exists('MolecularFormula', $data['properties']) ? $data['properties']['MolecularFormula'] : $molecule->molecular_formula);
-                $molecule->molecular_weight = (array_key_exists('MolecularWeight', $data['properties']) ? $data['properties']['MolecularWeight'] : $molecule->molecular_weight);
-                $molecule->Save();
-            }
-            if (! $molecule->canonical_smiles) {
-                echo $molecule->id;
-                echo "\r\n";
-                $molecule->sdf = '
-                '.$molecule->sdf;
-                $standardisedMOL = $this->standardizeMolecule($molecule->sdf);
-                $molecule->canonical_smiles = array_key_exists('canonical_smiles', $standardisedMOL) ? $standardisedMOL['canonical_smiles'] : null;
-                $molecule->standard_inchi = array_key_exists('inchi', $standardisedMOL) ? $standardisedMOL['inchi'] : null;
-                $molecule->inchi_key = array_key_exists('canonicalinchikey_smiles', $standardisedMOL) ? $standardisedMOL['inchikey'] : null;
-                $molecule->save();
-            }
-            if ($molecule->canonical_smiles) {
-                $cas = $this->fetchCAS($molecule->canonical_smiles);
-                $molecule->cas = $cas;
-                $molecule->save();
-            }
+        if ($totalMolecules === 0) {
+            $this->info('No molecules found to process.');
+
+            return;
         }
+
+        $progressBar = $this->output->createProgressBar($totalMolecules);
+        $progressBar->start();
+
+        Molecule::chunk(100, function ($molecules) use ($progressBar) {
+            foreach ($molecules as $molecule) {
+                $inchi = $molecule->standard_inchi;
+                if ($inchi) {
+                    $data = $this->fetchPubChemIUPACProperties($inchi);
+                    $molecule->synonyms = $data['synonyms'];
+                    $molecule->iupac_name = (array_key_exists('IUPACName', $data['properties']) ? $data['properties']['IUPACName'] : $molecule->iupac_name);
+                    $molecule->molecular_formula = (array_key_exists('MolecularFormula', $data['properties']) ? $data['properties']['MolecularFormula'] : $molecule->molecular_formula);
+                    $molecule->molecular_weight = (array_key_exists('MolecularWeight', $data['properties']) ? $data['properties']['MolecularWeight'] : $molecule->molecular_weight);
+                    $molecule->save();
+                }
+                if (! $molecule->canonical_smiles) {
+                    $molecule->sdf = '
+                '.$molecule->sdf;
+                    $standardisedMOL = $this->standardizeMolecule($molecule->sdf);
+                    $molecule->canonical_smiles = array_key_exists('canonical_smiles', $standardisedMOL) ? $standardisedMOL['canonical_smiles'] : null;
+                    $molecule->standard_inchi = array_key_exists('inchi', $standardisedMOL) ? $standardisedMOL['inchi'] : null;
+                    $molecule->inchi_key = array_key_exists('canonicalinchikey_smiles', $standardisedMOL) ? $standardisedMOL['inchikey'] : null;
+                    $molecule->save();
+                }
+                if ($molecule->canonical_smiles) {
+                    $cas = $this->fetchCAS($molecule->canonical_smiles);
+                    $molecule->cas = $cas;
+                    $molecule->save();
+                }
+
+                $progressBar->advance();
+            }
+        });
+
+        $progressBar->finish();
+        $this->newLine();
+        $this->info('Molecule sanitization completed successfully!');
     }
 
     protected function fetchPubChemIUPACProperties($inchi)
@@ -95,24 +116,20 @@ class SanitizeMolecules extends Command
         ];
     }
 
-    protected function fetchCAS($smiles)
+    protected function fetchCAS(string $smiles): ?string
     {
-        try {
-            $ccBase = rtrim(config('services.common_chemistry.base_url'), '/');
-            $ccApi = trim(config('services.common_chemistry.api_path'), '/');
-            $response = Http::get($ccBase.'/'.$ccApi.'/search', [
-                'q' => $smiles,
-            ]);
-            if (! $response->failed()) {
-                $data = $response->json();
-                if ($data['count'] > 0) {
-                    $cas = $data['results'][0]['rn'];
+        if (! config('services.cas.api_token')) {
+            $this->error('CAS API token not configured');
 
-                    return $cas;
-                }
-            }
-        } catch (\Illuminate\Http\Client\ConnectionException $e) {
-            echo 'timed out: '.$smiles;
+            return null;
+        }
+
+        try {
+            return $this->casService->searchCASBySmiles($smiles);
+        } catch (\Exception $e) {
+            $this->warn("Failed to fetch CAS for SMILES {$smiles}: ".$e->getMessage());
+
+            return null;
         }
     }
 
@@ -124,7 +141,7 @@ class SanitizeMolecules extends Command
 
             return $response->json();
         } catch (\Illuminate\Http\Client\ConnectionException $e) {
-            echo 'timed out: '.$mol;
+            $this->warn('Chemistry standardize API timeout');
         }
     }
 }

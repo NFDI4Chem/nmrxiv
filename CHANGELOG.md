@@ -1,5 +1,25 @@
 # Changelog
 
+## [1.7.0](https://github.com/NFDI4Chem/nmrxiv/compare/v1.6.0...v1.7.0) (2025-10-01)
+
+
+### Features
+
+* add automated cleanup of old backups ([#1261](https://github.com/NFDI4Chem/nmrxiv/issues/1261)) ([4a5831a](https://github.com/NFDI4Chem/nmrxiv/commit/4a5831aa660d18787b28260da09b8ed92cc369fd))
+* add lint and security check workflow and integrate into build w… ([#1257](https://github.com/NFDI4Chem/nmrxiv/issues/1257)) ([6413c4e](https://github.com/NFDI4Chem/nmrxiv/commit/6413c4e8c0103f1d2945b49f1f96f0afd6079df3))
+* enable nfdi-aai single sign-on via socialite ([#1256](https://github.com/NFDI4Chem/nmrxiv/issues/1256)) ([40332a6](https://github.com/NFDI4Chem/nmrxiv/commit/40332a64c0c111e5fb2c21940151a8e429f501d3))
+* enable pagination and search based filtering for drafts. ([#1265](https://github.com/NFDI4Chem/nmrxiv/issues/1265)) ([c79eb7d](https://github.com/NFDI4Chem/nmrxiv/commit/c79eb7d571f0b97218e8628f393e162d4ab4810d))
+* enabled embargoed_projects in the metrics section ([cc8874a](https://github.com/NFDI4Chem/nmrxiv/commit/cc8874a5e86f8d3a0ab9d9749ff77b5e7481d9f7))
+
+
+### Bug Fixes
+
+* allow security-events write permission in dev and prod workflows ([459cc91](https://github.com/NFDI4Chem/nmrxiv/commit/459cc9171e3cc747ec858672dbfd4fc72ee42604))
+* enabled semantic url pattern for dataset endpoint ([d4c4057](https://github.com/NFDI4Chem/nmrxiv/commit/d4c4057b2ea76a809491ba6867167af3f47eecfb))
+* resolves https://github.com/biopragmatics/bioregistry/pull/1708 ([4fe66f9](https://github.com/NFDI4Chem/nmrxiv/commit/4fe66f9586e704b2aaaa9c3f8bffb26076696a20))
+* schedule the backup cleanup command monthly ([706fc7d](https://github.com/NFDI4Chem/nmrxiv/commit/706fc7dcc01ff8ffec396f911ec2c0fbc146ac72))
+* update backup config ([bd15426](https://github.com/NFDI4Chem/nmrxiv/commit/bd15426393b58c7bd2a880fdcdd0286ea27192aa))
+
 ## [1.6.0](https://github.com/NFDI4Chem/nmrxiv/compare/v1.5.0...v1.6.0) (2025-09-22)
 
 
