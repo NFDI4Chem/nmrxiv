@@ -172,7 +172,7 @@ class ProjectModelTest extends TestCase
     public function test_it_generates_project_photo_url_when_path_exists(): void
     {
         Storage::fake('public');
-        
+
         $project = Project::factory()->create([
             'project_photo_path' => 'photos/project.jpg',
         ]);
