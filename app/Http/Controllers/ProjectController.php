@@ -251,7 +251,7 @@ class ProjectController extends Controller
             ]);
         }
 
-        $creator->toggle($project);
+        $creator->toggleArchive($project);
 
         return redirect()->route('dashboard')->with('success', 'Project archive state updated successfully');
     }
