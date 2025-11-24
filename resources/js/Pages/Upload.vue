@@ -317,201 +317,261 @@
                                             </p>
                                         </div>
                                         <div
-                                            class="ml-4 mt-4 flex items-center gap-4 flex-shrink-0"
+                                            class="ml-4 mt-4 flex items-center justify-between flex-shrink-0"
                                         >
-                                            <div class="w-72">
-                                                <DraftSearch
-                                                    v-model="searchDraftQuery"
-                                                    @reset="
-                                                        searchDraftQuery = ''
-                                                    "
-                                                />
-                                            </div>
-                                            <button
-                                                class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring focus:ring-gray-300 disabled:opacity-25 transition"
-                                                @click="createNewDraft()"
+                                            <div
+                                                v-if="filteredDrafts.length > 0"
+                                                class="text-sm text-gray-600 mr-4"
                                             >
-                                                + Create New
-                                            </button>
+                                                Showing
+                                                {{
+                                                    (currentDraftsPage - 1) *
+                                                        draftsPerPage +
+                                                    1
+                                                }}
+                                                to
+                                                {{
+                                                    Math.min(
+                                                        currentDraftsPage *
+                                                            draftsPerPage,
+                                                        filteredDrafts.length
+                                                    )
+                                                }}
+                                                of
+                                                {{ filteredDrafts.length }}
+                                                drafts
+                                            </div>
+                                            <div
+                                                class="flex items-center gap-4"
+                                            >
+                                                <div class="w-72">
+                                                    <SearchInput
+                                                        v-model="
+                                                            searchDraftQuery
+                                                        "
+                                                        name="draft-search"
+                                                        placeholder="Search drafts..."
+                                                        @reset="
+                                                            searchDraftQuery =
+                                                                ''
+                                                        "
+                                                    />
+                                                </div>
+                                                <button
+                                                    class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring focus:ring-gray-300 disabled:opacity-25 transition"
+                                                    @click="createNewDraft()"
+                                                >
+                                                    + Create New
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <ul
-                                    role="list"
+                                <div
                                     class="overflow-y-scroll h-[calc(100vh-290px)]"
                                 >
-                                    <li
-                                        v-for="draft in paginatedDrafts"
-                                        :key="draft.id"
-                                        class="border-b px-5 py-4"
+                                    <!-- Empty search results message for drafts -->
+                                    <div
+                                        v-if="
+                                            drafts.length > 0 &&
+                                            searchDraftQuery &&
+                                            filteredDrafts.length === 0
+                                        "
+                                        class="flex items-center justify-center h-full"
                                     >
-                                        <div
-                                            class="flex items-center justify-between"
+                                        <EmptySearchState
+                                            entity-type="drafts"
+                                            :search-query="searchDraftQuery"
+                                            @clear-search="
+                                                searchDraftQuery = ''
+                                            "
+                                        />
+                                    </div>
+
+                                    <!-- Drafts list -->
+                                    <ul
+                                        v-else
+                                        role="list"
+                                        class="divide-y divide-gray-200"
+                                    >
+                                        <li
+                                            v-for="draft in paginatedDrafts"
+                                            :key="draft.id"
+                                            class="border-b px-5 py-4"
                                         >
-                                            <Link
-                                                :href="
-                                                    route('upload', {
-                                                        draft_id: draft.id,
-                                                    })
-                                                "
-                                                class="flex-1 hover:cursor-pointer hover:bg-gray-50 -mx-5 -my-4 px-5 py-4"
+                                            <div
+                                                class="flex items-center justify-between"
                                             >
-                                                <div
-                                                    class="flex items-center space-x-4"
+                                                <Link
+                                                    :href="
+                                                        route('upload', {
+                                                            draft_id: draft.id,
+                                                        })
+                                                    "
+                                                    class="flex-1 hover:cursor-pointer hover:bg-gray-50 -mx-5 -my-4 px-5 py-4"
                                                 >
                                                     <div
-                                                        class="flex-1 min-w-0 mr-auto max-w-2xl"
+                                                        class="flex items-center space-x-4"
                                                     >
                                                         <div
-                                                            class="flex items-center gap-2 mb-1"
+                                                            class="flex-1 min-w-0 mr-auto max-w-2xl"
                                                         >
-                                                            <p
-                                                                class="text-lg font-large text-black truncate"
+                                                            <div
+                                                                class="flex items-center gap-2 mb-1"
                                                             >
-                                                                <b>{{
-                                                                    draft.name
-                                                                }}</b>
-                                                            </p>
-                                                            <span
-                                                                v-if="draft.eln"
-                                                                class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
-                                                            >
-                                                                {{
-                                                                    draft.external_id
-                                                                }}
-                                                            </span>
-                                                            <span
-                                                                v-if="
-                                                                    draft.status
-                                                                "
-                                                                class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
-                                                                :class="{
-                                                                    'bg-blue-100 text-blue-800':
-                                                                        [
-                                                                            'received',
-                                                                        ].includes(
-                                                                            draft.status.toLowerCase()
-                                                                        ),
-                                                                    'bg-yellow-100 text-yellow-800':
-                                                                        [
-                                                                            'zip_processed',
-                                                                            'processing',
-                                                                            'pending',
-                                                                            'job_dispatched',
-                                                                        ].includes(
-                                                                            draft.status.toLowerCase()
-                                                                        ),
-                                                                    'bg-green-100 text-green-800':
-                                                                        [
-                                                                            'validated',
-                                                                            'processed',
-                                                                            'successful',
-                                                                            'published',
-                                                                        ].includes(
-                                                                            draft.status.toLowerCase()
-                                                                        ),
-                                                                    'bg-red-100 text-red-800':
-                                                                        [
-                                                                            'failed',
-                                                                        ].includes(
-                                                                            draft.status.toLowerCase()
-                                                                        ),
-                                                                    'bg-gray-100 text-gray-800':
-                                                                        ![
-                                                                            'received',
-                                                                            'zip_processed',
-                                                                            'validated',
-                                                                            'processed',
-                                                                            'successful',
-                                                                            'published',
-                                                                            'failed',
-                                                                            'processing',
-                                                                            'pending',
-                                                                            'job_dispatched',
-                                                                        ].includes(
-                                                                            draft.status.toLowerCase()
-                                                                        ),
-                                                                }"
-                                                            >
-                                                                {{
-                                                                    formatStatus(
+                                                                <p
+                                                                    class="text-lg font-large text-black truncate"
+                                                                >
+                                                                    <b>{{
+                                                                        draft.name
+                                                                    }}</b>
+                                                                </p>
+                                                                <span
+                                                                    v-if="
+                                                                        draft.eln
+                                                                    "
+                                                                    class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                                                                >
+                                                                    {{
+                                                                        draft.external_id
+                                                                    }}
+                                                                </span>
+                                                                <span
+                                                                    v-if="
                                                                         draft.status
+                                                                    "
+                                                                    class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
+                                                                    :class="{
+                                                                        'bg-blue-100 text-blue-800':
+                                                                            [
+                                                                                'received',
+                                                                            ].includes(
+                                                                                draft.status.toLowerCase()
+                                                                            ),
+                                                                        'bg-yellow-100 text-yellow-800':
+                                                                            [
+                                                                                'zip_processed',
+                                                                                'processing',
+                                                                                'pending',
+                                                                                'job_dispatched',
+                                                                            ].includes(
+                                                                                draft.status.toLowerCase()
+                                                                            ),
+                                                                        'bg-green-100 text-green-800':
+                                                                            [
+                                                                                'validated',
+                                                                                'processed',
+                                                                                'successful',
+                                                                                'published',
+                                                                            ].includes(
+                                                                                draft.status.toLowerCase()
+                                                                            ),
+                                                                        'bg-red-100 text-red-800':
+                                                                            [
+                                                                                'failed',
+                                                                            ].includes(
+                                                                                draft.status.toLowerCase()
+                                                                            ),
+                                                                        'bg-gray-100 text-gray-800':
+                                                                            ![
+                                                                                'received',
+                                                                                'zip_processed',
+                                                                                'validated',
+                                                                                'processed',
+                                                                                'successful',
+                                                                                'published',
+                                                                                'failed',
+                                                                                'processing',
+                                                                                'pending',
+                                                                                'job_dispatched',
+                                                                            ].includes(
+                                                                                draft.status.toLowerCase()
+                                                                            ),
+                                                                    }"
+                                                                >
+                                                                    {{
+                                                                        formatStatus(
+                                                                            draft.status
+                                                                        )
+                                                                    }}
+                                                                </span>
+                                                            </div>
+                                                            <p
+                                                                class="text-sm font-medium text-gray-700 truncate pr-10"
+                                                            >
+                                                                {{
+                                                                    draft.description
+                                                                }}
+                                                            </p>
+                                                            <p
+                                                                class="text-sm font-medium text-gray-500 truncate"
+                                                            >
+                                                                ID:
+                                                                {{ draft.key }}
+                                                                &middot; Created
+                                                                at:
+                                                                {{
+                                                                    formatDateTime(
+                                                                        draft.created_at
                                                                     )
                                                                 }}
-                                                            </span>
+                                                                <span
+                                                                    v-if="
+                                                                        draft.external_id
+                                                                    "
+                                                                >
+                                                                    &middot;
+                                                                    External ID:
+                                                                    {{
+                                                                        draft.external_id
+                                                                    }}
+                                                                </span>
+                                                            </p>
                                                         </div>
-                                                        <p
-                                                            class="text-sm font-medium text-gray-700 truncate pr-10"
-                                                        >
-                                                            {{
-                                                                draft.description
-                                                            }}
-                                                        </p>
-                                                        <p
-                                                            class="text-sm font-medium text-gray-500 truncate"
-                                                        >
-                                                            ID: {{ draft.key }}
-                                                            &middot; Created at:
-                                                            {{
-                                                                formatDateTime(
-                                                                    draft.created_at
-                                                                )
-                                                            }}
-                                                            <span
-                                                                v-if="
-                                                                    draft.external_id
-                                                                "
+                                                        <div>
+                                                            <svg
+                                                                class="h-5 w-5 flex-none text-gray-400"
+                                                                viewBox="0 0 20 20"
+                                                                fill="currentColor"
+                                                                aria-hidden="true"
                                                             >
-                                                                &middot;
-                                                                External ID:
-                                                                {{
-                                                                    draft.external_id
-                                                                }}
-                                                            </span>
-                                                        </p>
+                                                                <path
+                                                                    fill-rule="evenodd"
+                                                                    d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
+                                                                    clip-rule="evenodd"
+                                                                ></path>
+                                                            </svg>
+                                                        </div>
                                                     </div>
-                                                    <div>
-                                                        <svg
-                                                            class="h-5 w-5 flex-none text-gray-400"
-                                                            viewBox="0 0 20 20"
-                                                            fill="currentColor"
-                                                            aria-hidden="true"
-                                                        >
-                                                            <path
-                                                                fill-rule="evenodd"
-                                                                d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
-                                                                clip-rule="evenodd"
-                                                            ></path>
-                                                        </svg>
-                                                    </div>
-                                                </div>
-                                            </Link>
-                                            <div
-                                                v-if="
-                                                    draft.processing_logs &&
-                                                    draft.processing_logs
-                                                        .length > 0
-                                                "
-                                                class="ml-4 flex-shrink-0"
-                                            >
-                                                <button
-                                                    class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                                                    @click="
-                                                        showProcessingLogs(
-                                                            draft
-                                                        )
+                                                </Link>
+                                                <div
+                                                    v-if="
+                                                        draft.processing_logs &&
+                                                        draft.processing_logs
+                                                            .length > 0
                                                     "
+                                                    class="ml-4 flex-shrink-0"
                                                 >
-                                                    <InformationCircleIcon
-                                                        class="w-4 h-4 mr-1"
-                                                    />
-                                                    View Logs
-                                                </button>
+                                                    <button
+                                                        class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                                        @click="
+                                                            showProcessingLogs(
+                                                                draft
+                                                            )
+                                                        "
+                                                    >
+                                                        <InformationCircleIcon
+                                                            class="w-4 h-4 mr-1"
+                                                        />
+                                                        View Logs
+                                                    </button>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </li>
-                                </ul>
+                                        </li>
+                                    </ul>
+                                </div>
+
                                 <div
                                     class="flex items-center justify-between px-6 py-3 border-t bg-white"
                                 >
@@ -2270,7 +2330,8 @@ import { ref } from "vue";
 import Primer from "@/Shared/Primer.vue";
 import FileSystemBrowser from "./../Shared/FileSystemBrowser.vue";
 import Validation from "@/Shared/Validation.vue";
-import DraftSearch from "@/Shared/DraftSearch.vue";
+import SearchInput from "@/Shared/SearchInput.vue";
+import EmptySearchState from "@/Shared/EmptySearchState.vue";
 import {
     TrashIcon,
     PencilIcon,
@@ -2300,7 +2361,8 @@ export default {
         JetDialogModal,
         Primer,
         FileSystemBrowser,
-        DraftSearch,
+        SearchInput,
+        EmptySearchState,
         TrashIcon,
         PencilIcon,
         EyeIcon,
