@@ -115,7 +115,7 @@ class DatasetModelTest extends TestCase
 
     public function test_it_generates_dataset_photo_url_when_path_exists(): void
     {
-        Storage::fake('public');
+        Storage::fake('local');
 
         $dataset = Dataset::factory()->create(['dataset_photo_path' => 'datasets/photo.jpg']);
 
