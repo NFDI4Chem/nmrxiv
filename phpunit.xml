@@ -20,12 +20,13 @@
     <env name="BCRYPT_ROUNDS" value="4"/>
     <env name="CACHE_STORE" value="array"/>
     <env name="DB_DATABASE" value="nmrxiv_test"/>
+    <env name="FILESYSTEM_DRIVER" value="local"/>
+    <env name="FILESYSTEM_DRIVER_PUBLIC" value="local"/>
     <env name="MAIL_MAILER" value="array"/>
     <env name="QUEUE_CONNECTION" value="sync"/>
     <env name="SESSION_DRIVER" value="array"/>
     <env name="TELESCOPE_ENABLED" value="false"/>
     <env name="DEBUGBAR_ENABLED" value="false"/>
-    <env name="FILESYSTEM_DRIVER" value="local"/>
   </php>
   <source>
     <include>
