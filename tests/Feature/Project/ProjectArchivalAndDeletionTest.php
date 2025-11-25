@@ -69,13 +69,13 @@ class ProjectArchivalAndDeletionTest extends TestCase
         // Make project public first, then archive it
         // Public projects get archived, private projects get deleted
         $this->project->update(['is_public' => true, 'is_archived' => true]);
-        
+
         // Verify it's archived
         $this->assertTrue($this->project->fresh()->is_archived);
 
         $response = $this->actingAs($this->owner)
             ->put("/dashboard/projects/{$this->project->id}", [
-                'password' => 'password'
+                'password' => 'password',
             ]);
 
         $response->assertRedirect();

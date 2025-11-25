@@ -116,7 +116,7 @@ class DeleteProjectTest extends TestCase
     {
         // Create super-admin role for test
         \Spatie\Permission\Models\Role::create(['name' => 'super-admin', 'guard_name' => 'web']);
-        
+
         $project = Project::factory()->create(['is_public' => false]);
         $study = Study::factory()->for($project)->create();
         $dataset = Dataset::factory()->for($study)->create();
