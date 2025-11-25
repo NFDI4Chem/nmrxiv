@@ -76,6 +76,9 @@ class Study extends Model implements Auditable
             'citations' => 'array',
             'molecules' => 'array',
             'processing_logs' => 'array',
+            'starred' => 'boolean',
+            'is_public' => 'boolean',
+            'is_archived' => 'boolean',
         ];
     }
 

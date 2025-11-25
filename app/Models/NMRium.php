@@ -20,6 +20,8 @@ class NMRium extends Model
     protected $fillable = [
         'nmrium_info',
         'dataset_id',
+        'nmriumable_id',
+        'nmriumable_type',
     ];
 
     /**

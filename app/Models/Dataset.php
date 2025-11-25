@@ -53,6 +53,17 @@ class Dataset extends Model implements Auditable
     ];
 
     /**
+     * The attributes that should be cast.
+     */
+    protected function casts(): array
+    {
+        return [
+            'starred' => 'boolean',
+            'is_public' => 'boolean',
+        ];
+    }
+
+    /**
      * Get the dataset identifier
      */
     protected function identifier(): Attribute
