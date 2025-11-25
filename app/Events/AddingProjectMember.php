@@ -24,7 +24,7 @@ class AddingProjectMember
     /**
      * Create a new event instance.
      */
-    public function __construct($project, $user): void
+    public function __construct($project, $user)
     {
         $this->project = $project;
         $this->user = $user;
