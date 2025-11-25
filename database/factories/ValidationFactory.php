@@ -21,11 +21,11 @@ class ValidationFactory extends Factory
                     'affiliation' => true,
                     'license' => true,
                     'keywords' => true,
-                    'studies' => []
+                    'studies' => [],
                 ],
                 'missing' => [],
                 'errors' => [],
-                'version' => 1
+                'version' => 1,
             ],
         ];
     }
