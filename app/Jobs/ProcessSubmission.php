@@ -53,7 +53,7 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
 
         $draft = $project->draft;
 
-        if ($draft->project_enabled) {
+        if ($draft && $draft->project_enabled) {
             $logs = 'Moving files in progress';
 
             if ($project) {
@@ -100,11 +100,7 @@ class ProcessSubmission implements ShouldBeUnique, ShouldQueue
                 $project->draft_id = null;
 
                 $release_date = Carbon::parse($project->release_date);
-                if ($release_date->isFuture()) {
-                    $project->status = 'embargo';
-                } else {
-                    $project->status = 'published';
-                }
+                $project->status = 'published';
 
                 $project->save();
 

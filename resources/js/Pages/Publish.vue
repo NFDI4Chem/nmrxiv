@@ -749,51 +749,8 @@
                     </div>
                 </div>
             </div>
-            <div
-                v-else
-                class="mt-24 mx-auto max-w-3xl transform overflow-hidden rounded-xl bg-white shadow-2xl ring-1 ring-black ring-opacity-5 transition-all"
-            >
-                <div class="py-16">
-                    <div class="text-center">
-                        <div
-                            class="m-3 relative clear-both border-dotted border-2 border-gray-300 rounded-lg"
-                        >
-                            <span
-                                class="inline-flex items-center px-4 py-2 font-semibold leading-6 text-sm rounded-md text-sky-500 bg-white transition ease-in-out duration-150 cursor-not-allowed"
-                                disabled=""
-                                ><h1
-                                    class="capitalize text-4xl font-extrabold text-gray-900 tracking-tight sm:text-5xl"
-                                >
-                                    {{ status }}
-                                </h1></span
-                            >
-                        </div>
-                        <Link
-                            type="button"
-                            :href="route('dashboard')"
-                            class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                        >
-                            Go to Dashboard
-                        </Link>
-                    </div>
-                </div>
-                <div class="w-full">
-                    <div
-                        class="flex flex-wrap items-center bg-gray-50 py-2.5 px-4 text-xs text-gray-700"
-                    >
-                        <b>Whats next?</b>
-                        <div>
-                            <p>
-                                Please allow some time to process your
-                                submission. You will recieve an email once your
-                                submission is processed. Upon publishing you
-                                will also receive an email with citation details
-                                and other helpful information to share your
-                                datasets.
-                            </p>
-                        </div>
-                    </div>
-                </div>
+            <div class="mt-24" v-else>
+                <publish-status-modal />
             </div>
 
             <!-- Draft Warning Modal -->
@@ -920,6 +877,7 @@ import ToggleButton from "@/Shared/ToggleButton.vue";
 import "ontology-elements/dist/index.js";
 import JetConfirmationModal from "@/Jetstream/ConfirmationModal.vue";
 import JetSuccessButton from "@/Jetstream/SuccessButton.vue";
+import PublishStatusModal from "@/Shared/PublishStatusModal.vue";
 
 export default {
     components: {
@@ -940,6 +898,7 @@ export default {
         ToggleButton,
         StudyInfo,
         CitationCard,
+        PublishStatusModal,
     },
     props: ["user", "team", "project", "teamRole", "draft"],
 
@@ -1229,18 +1188,28 @@ export default {
             this.showPublishConfirmationModal = false;
             if (this.publishForm.conditions && this.publishForm.terms) {
                 this.errors = null;
-                axios
-                    .post(
-                        route("dashboard.project.publish", this.project.id),
-                        this.publishForm
-                    )
+                
+                // Check if release date is in the future (embargo)
+                const releaseDate = new Date(this.publishForm.release_date);
+                const now = new Date();
+                const isEmbargo = releaseDate > now;
+                
+                // Choose the appropriate endpoint and HTTP method
+                const endpoint = isEmbargo ? 
+                    route("dashboard.project.setEmbargo", this.project.id) :
+                    route("dashboard.project.publish", this.project.id);
+                const httpMethod = isEmbargo ? 'put' : 'post';
+                
+                axios[httpMethod](endpoint, this.publishForm)
                     .catch((err) => {
                         this.errors = err.response.data.errors;
-                        this.validation = err.response.data.validation.report;
+                        this.validation = err.response.data.validation ? err.response.data.validation.report : null;
                     })
                     .then((response) => {
-                        this.status = response.data.project.status;
-                        // this.trackProject();
+                        if (response && response.data) {
+                            this.status = response.data.project.status;
+                            // this.trackProject(); // Only needed for immediate publish, but harmless for embargo
+                        }
                     });
             }
         },

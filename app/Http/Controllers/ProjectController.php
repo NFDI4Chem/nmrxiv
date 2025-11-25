@@ -6,8 +6,10 @@ use App\Actions\License\GetLicense;
 use App\Actions\Project\ArchiveProject;
 use App\Actions\Project\CreateNewProject;
 use App\Actions\Project\DeleteProject;
+use App\Actions\Project\PublishEmbargoProject;
 use App\Actions\Project\PublishProject;
 use App\Actions\Project\RestoreProject;
+use App\Actions\Project\SetEmbargoProject;
 use App\Actions\Project\UpdateProject;
 use App\Http\Resources\ProjectResource;
 use App\Http\Resources\StudyResource;
@@ -394,6 +396,48 @@ class ProjectController extends Controller
             }
         }
 
+    }
+
+    public function setEmbargo(Request $request, Project $project, SetEmbargoProject $embargoSetter)
+    {
+        if ($project) {
+            $input = $request->all();
+            $releaseDate = $input['release_date'];
+
+            try {
+                $result = $embargoSetter->setEmbargo($project, $releaseDate);
+
+                return response()->json($result);
+            } catch (\InvalidArgumentException $e) {
+                $responseData = ['errors' => $e->getMessage()];
+
+                // Include validation data if available
+                if (property_exists($e, 'validation') && $e->validation) {
+                    $responseData['validation'] = $e->validation;
+                }
+
+                return response()->json($responseData, 422);
+            }
+        }
+
+        return response()->json(['errors' => 'Project not found.'], 404);
+    }
+
+    public function publishEmbargoProject(Request $request, Project $project, PublishEmbargoProject $publisher)
+    {
+        if ($project) {
+            try {
+                $result = $publisher->publish($project);
+
+                return response()->json($result);
+            } catch (\InvalidArgumentException $e) {
+                return response()->json([
+                    'errors' => $e->getMessage(),
+                ], 422);
+            }
+        }
+
+        return response()->json(['errors' => 'Project not found.'], 404);
     }
 
     public function store(Request $request, CreateNewProject $creator)

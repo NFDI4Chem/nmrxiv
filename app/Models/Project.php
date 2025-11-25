@@ -75,6 +75,19 @@ class Project extends Model implements Auditable
     protected $appends = ['public_url', 'private_url', 'project_photo_url', 'is_bookmarked', 'is_published'];
 
     /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'release_date' => 'datetime',
+            'deleted_on' => 'datetime',
+        ];
+    }
+
+    /**
      * Get the URL to the project's profile photo.
      *
      * @return string
@@ -144,6 +157,11 @@ class Project extends Model implements Auditable
     public function draft(): BelongsTo
     {
         return $this->belongsTo(Draft::class, 'draft_id');
+    }
+
+    public function embargoReminders(): HasMany
+    {
+        return $this->hasMany(EmbargoReminder::class);
     }
 
     public function likesCount()

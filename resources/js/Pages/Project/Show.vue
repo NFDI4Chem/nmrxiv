@@ -12,10 +12,7 @@
             </div>
             <div
                 v-if="
-                    !project.is_public &&
-                    !project.is_published &&
-                    project.doi &&
-                    !preview
+                    project.status == 'embargo'
                 "
                 class="text-center px-3 py-2 bg-green-50 text-green-700 border-b"
             >
@@ -361,7 +358,7 @@
 
             <div>
                 <TransitionRoot
-                    :show="showPublishDialog"
+                    :show="showPublishDialog || showPublishConfirmationModal || showProcessingModal"
                     as="template"
                     appear
                     @after-leave="query = ''"
@@ -396,381 +393,279 @@
                                 <DialogPanel
                                     class="mx-auto max-w-3xl transform overflow-hidden rounded-xl bg-white shadow-2xl ring-1 ring-black ring-opacity-5 transition-all"
                                 >
-                                    <div
-                                        v-if="
-                                            status == 'queued' ||
-                                            status == 'processing' ||
-                                            status == 'complete'
-                                        "
-                                    >
-                                        <div class="py-16">
-                                            <div class="text-center">
-                                                <p
-                                                    class="text-sm font-semibold text-indigo-600 uppercase tracking-wide"
-                                                >
-                                                    {{ project.name }}
-                                                </p>
-                                                <span v-if="status == 'queued'">
-                                                    <div
-                                                        class="m-3 relative clear-both border-dotted border-2 border-gray-300 rounded-lg"
-                                                    >
-                                                        <span
-                                                            class="inline-flex items-center px-4 py-2 font-semibold leading-6 text-sm rounded-md text-sky-500 bg-white transition ease-in-out duration-150 cursor-not-allowed"
-                                                            disabled=""
-                                                            ><h1
-                                                                class="capitalize text-4xl font-extrabold text-gray-900 tracking-tight sm:text-5xl"
-                                                            >
-                                                                {{ status }}
-                                                            </h1></span
-                                                        >
-                                                    </div>
-                                                    <Link
-                                                        type="button"
-                                                        :href="
-                                                            route('dashboard')
-                                                        "
-                                                        class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                                                    >
-                                                        Go to Dashboard
-                                                    </Link>
-                                                </span>
-                                                <span
-                                                    v-if="
-                                                        status == 'processing'
-                                                    "
-                                                >
-                                                    <div
-                                                        class="m-3 relative clear-both border-dotted border-2 border-gray-300 rounded-lg"
-                                                    >
-                                                        <span
-                                                            class="inline-flex items-center px-4 py-2 font-semibold leading-6 text-sm rounded-md text-sky-500 bg-white transition ease-in-out duration-150 cursor-not-allowed"
-                                                            disabled=""
-                                                            ><h1
-                                                                class="capitalize text-4xl font-extrabold text-gray-900 tracking-tight sm:text-5xl"
-                                                            >
-                                                                {{ status }}
-                                                            </h1></span
-                                                        ><span
-                                                            class="flex absolute h-3 w-3 top-0 right-0 -mt-1 -mr-1"
-                                                            ><span
-                                                                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"
-                                                            ></span
-                                                            ><span
-                                                                class="relative inline-flex rounded-full h-3 w-3 bg-sky-500"
-                                                            ></span
-                                                        ></span>
-                                                    </div>
-                                                    <Link
-                                                        type="button"
-                                                        :href="
-                                                            route('dashboard')
-                                                        "
-                                                        class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                                                    >
-                                                        Go to Dashboard
-                                                    </Link>
-                                                </span>
-                                                <span
-                                                    v-if="status == 'complete'"
-                                                >
-                                                    <div
-                                                        class="m-3 clear-both relative border-dotted border-2 border-gray-300 rounded-lg"
-                                                    >
-                                                        <span
-                                                            class="inline-flex items-center px-4 py-2 font-semibold leading-6 text-sm rounded-md text-sky-500 bg-white transition ease-in-out duration-150 cursor-not-allowed"
-                                                            disabled=""
-                                                            ><h1
-                                                                class="capitalize text-4xl font-extrabold text-gray-900 tracking-tight sm:text-5xl"
-                                                            >
-                                                                {{ status }}
-                                                            </h1></span
-                                                        ><span
-                                                            class="flex absolute h-3 w-3 top-0 right-0 -mt-1 -mr-1"
-                                                            ><span
-                                                                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"
-                                                            ></span
-                                                            ><span
-                                                                class="relative inline-flex rounded-full h-3 w-3 bg-sky-500"
-                                                            ></span
-                                                        ></span>
-                                                    </div>
-                                                    <Link
-                                                        type="button"
-                                                        :href="
-                                                            route('dashboard')
-                                                        "
-                                                        class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                                                    >
-                                                        Go to Dashboard
-                                                    </Link>
-                                                </span>
-                                            </div>
+                                    <!-- Processing Modal Content (Highest Priority) -->
+                                    <div v-if="showProcessingModal">
+                                        <publish-status-modal />
+                                    </div>
+
+                                    <!-- Confirmation Modal Content -->
+                                    <div v-else-if="showPublishConfirmationModal">
+                                        <div class="p-6">
+                                            <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">
+                                                {{ project.status === 'embargo' 
+                                                    ? 'Are you sure you want to publish this embargo project?' 
+                                                    : 'Are you sure you want to publish?' }}
+                                            </h3>
+                                            <p class="text-sm text-gray-500">
+                                                {{ project.status === 'embargo' 
+                                                    ? 'This embargo project already has a DOI and will be made publicly available immediately. This action cannot be undone. Once the data is published you will no longer be able to change the data uploaded! If published as a project, you may add more compounds (spectra) to the project later.'
+                                                    : 'Once the data is published you will no longer be able to change the data uploaded! If published as a project, you may add more compounds (spectra) to the project later.' }}
+                                            </p>
                                         </div>
-                                        <div
-                                            v-if="status != 'complete'"
-                                            class="w-full"
-                                        >
-                                            <div
-                                                class="flex flex-wrap items-center bg-gray-50 py-2.5 px-4 text-xs text-gray-700"
+                                        <div class="bg-gray-50 px-6 py-3 flex justify-end space-x-3">
+                                            <jet-secondary-button
+                                                @click="showPublishConfirmationModal = false"
                                             >
-                                                <b>Whats next?</b>
-                                                <div>
-                                                    <p>
-                                                        Please allow some time
-                                                        to process your
-                                                        submission. You will
-                                                        recieve an email once
-                                                        your submission is
-                                                        processed. You will
-                                                        receive an email with
-                                                        citation details and
-                                                        other helpful
-                                                        information to share
-                                                        your datasets.
-                                                    </p>
-                                                </div>
-                                            </div>
+                                                Cancel
+                                            </jet-secondary-button>
+                                            <jet-success-button @click="publish">
+                                                Publish Now
+                                            </jet-success-button>
                                         </div>
                                     </div>
-                                    <div v-else>
-                                        <div class="p-8">
-                                            <div>
-                                                <label
-                                                    class="block tracking-wider text-sm font-medium text-gray-700, block text-sm font-medium text-gray-700"
-                                                >
-                                                    <small>PROJECT NAME</small>
-                                                </label>
-                                                <h1
-                                                    class="text-2xl font-extrabold text-gray-900"
-                                                >
-                                                    {{ project.name }}
-                                                </h1>
-                                            </div>
-                                            <div class="mt-3">
-                                                <label
-                                                    class="block text-sm font-medium text-gray-700, block text-sm font-medium text-gray-700"
-                                                >
-                                                    Release Date
-                                                </label>
-                                                <Datepicker
-                                                    v-model="form.release_date"
-                                                    :format="customDateFormat"
-                                                    :min-date="new Date()"
-                                                    :preview-format="
-                                                        customDateFormat
-                                                    "
-                                                ></Datepicker>
-                                                <p
-                                                    class="mt-1 text-sm text-gray-500"
-                                                >
-                                                    Publish your data now or
-                                                    choose a release date to
-                                                    auto publish your project to
-                                                    public.
-                                                </p>
-                                            </div>
-                                            <div class="mt-5">
-                                                <h3
-                                                    class="text-lg font-bold text-gray-400"
-                                                >
-                                                    Terms & Conditions
-                                                </h3>
 
-                                                <div class="mt-3">
-                                                    <div class="ml-2">
-                                                        <div
-                                                            class="flex items-top"
-                                                        >
-                                                            <input
-                                                                id="conditions"
-                                                                v-model="
-                                                                    project.conditions
-                                                                "
-                                                                type="checkbox"
-                                                                class="rounded mt-1 border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                                                                name="conditions"
-                                                            />
-                                                            <div
-                                                                class="ml-2 text-sm"
-                                                            >
-                                                                I understand
-                                                                that publishing
-                                                                makes all
-                                                                underlying data
-                                                                publicly
-                                                                available on the
-                                                                nmrXiv platform
-                                                                after the set
-                                                                release date.
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="mt-2">
-                                                    <div class="ml-2">
-                                                        <div
-                                                            class="flex items-center"
-                                                        >
-                                                            <input
-                                                                id="terms"
-                                                                v-model="
-                                                                    project.terms
-                                                                "
-                                                                type="checkbox"
-                                                                class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                                                                name="terms"
-                                                            />
-                                                            <div
-                                                                class="ml-2 text-sm"
-                                                            >
-                                                                I agree to the
-                                                                <a
-                                                                    target="_blank"
-                                                                    :href="
-                                                                        route(
-                                                                            'terms.show'
-                                                                        )
-                                                                    "
-                                                                    class="underline text-sm text-gray-600 hover:text-gray-900"
-                                                                    >Terms of
-                                                                    Service</a
-                                                                >
-                                                                and
-                                                                <a
-                                                                    target="_blank"
-                                                                    :href="
-                                                                        route(
-                                                                            'policy.show'
-                                                                        )
-                                                                    "
-                                                                    class="underline text-sm text-gray-600 hover:text-gray-900"
-                                                                    >Privacy
-                                                                    Policy</a
-                                                                >
-                                                                and hereby also
-                                                                grant nmrXiv
-                                                                permissions to
-                                                                distribute the
-                                                                datasets (and
-                                                                meta-data) under
-                                                                the specified
-                                                                license.
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
+                                    <!-- Release Date Dialog Content -->
+                                    <div v-else-if="showPublishDialog">
                                         <div>
-                                            <div class="px-8 pb-8 pt-0">
-                                                <jet-success-button
-                                                    type="button"
-                                                    :class="[
-                                                        !project.terms &&
-                                                        !project.conditions
-                                                            ? 'bg-gray-200 cursor-not-allowed'
-                                                            : 'bg-green-600 hover:bg-green-700',
-                                                        'ml-2',
-                                                    ]"
-                                                    :disabled="
-                                                        !project.terms &&
-                                                        !project.conditions
-                                                    "
-                                                    @click="
-                                                        showPublishConfirmationModal = true
-                                                    "
-                                                >
-                                                    Publish now
-                                                </jet-success-button>
-                                                <jet-secondary-button
-                                                    type="button"
-                                                    class="ml-2"
-                                                    @click="updatePublishDate()"
-                                                >
-                                                    Update publish date
-                                                </jet-secondary-button>
-                                                <jet-secondary-button
-                                                    type="button"
-                                                    class="ml-2"
-                                                    @click="
-                                                        showPublishDialog = false
-                                                    "
-                                                >
-                                                    Cancel
-                                                </jet-secondary-button>
-                                            </div>
-                                            <div v-if="errors">
-                                                <div
-                                                    class="rounded-md bg-red-50 p-4 mx-4 mb-4"
-                                                >
-                                                    <div class="flex">
-                                                        <div
-                                                            class="flex-shrink-0"
-                                                        >
-                                                            <svg
-                                                                class="h-5 w-5 text-red-400"
-                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                viewBox="0 0 20 20"
-                                                                fill="currentColor"
-                                                                aria-hidden="true"
-                                                            >
-                                                                <path
-                                                                    fill-rule="evenodd"
-                                                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
-                                                                    clip-rule="evenodd"
-                                                                />
-                                                            </svg>
-                                                        </div>
-                                                        <div class="ml-3">
-                                                            <h3
-                                                                class="text-sm font-medium text-red-800"
-                                                            >
-                                                                Error publishing
-                                                                your project
-                                                            </h3>
+                                            <div class="p-8">
+                                                <div>
+                                                    <label
+                                                        class="block tracking-wider text-sm font-medium text-gray-700, block text-sm font-medium text-gray-700"
+                                                    >
+                                                        <small>PROJECT NAME</small>
+                                                    </label>
+                                                    <h1
+                                                        class="text-2xl font-extrabold text-gray-900"
+                                                    >
+                                                        {{ project.name }}
+                                                    </h1>
+                                                </div>
+                                                <div class="mt-3">
+                                                    <label
+                                                        class="block text-sm font-medium text-gray-700, block text-sm font-medium text-gray-700"
+                                                    >
+                                                        Release Date
+                                                    </label>
+                                                    <Datepicker
+                                                        v-model="form.release_date"
+                                                        :format="customDateFormat"
+                                                        :min-date="new Date()"
+                                                        :preview-format="
+                                                            customDateFormat
+                                                        "
+                                                    ></Datepicker>
+                                                    <p
+                                                        class="mt-1 text-sm text-gray-500"
+                                                    >
+                                                        Publish your data now or
+                                                        choose a release date to
+                                                        auto publish your project to
+                                                        public.
+                                                    </p>
+                                                </div>
+                                                <div class="mt-5">
+                                                    <h3
+                                                        class="text-lg font-bold text-gray-400"
+                                                    >
+                                                        Terms & Conditions
+                                                    </h3>
+
+                                                    <div class="mt-3">
+                                                        <div class="ml-2">
                                                             <div
-                                                                class="mt-2 text-sm text-red-700"
+                                                                class="flex items-top"
                                                             >
-                                                                <ul
-                                                                    role="list"
-                                                                    class="list-disc space-y-1 pl-5"
+                                                                <input
+                                                                    id="conditions"
+                                                                    v-model="
+                                                                        project.conditions
+                                                                    "
+                                                                    type="checkbox"
+                                                                    class="rounded mt-1 border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                                                                    name="conditions"
+                                                                />
+                                                                <div
+                                                                    class="ml-2 text-sm"
                                                                 >
-                                                                    <li>
-                                                                        {{
-                                                                            errors
-                                                                        }}
-                                                                    </li>
-                                                                </ul>
+                                                                    I understand
+                                                                    that publishing
+                                                                    makes all
+                                                                    underlying data
+                                                                    publicly
+                                                                    available on the
+                                                                    nmrXiv platform
+                                                                    after the set
+                                                                    release date.
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="mt-2">
+                                                        <div class="ml-2">
+                                                            <div
+                                                                class="flex items-center"
+                                                            >
+                                                                <input
+                                                                    id="terms"
+                                                                    v-model="
+                                                                        project.terms
+                                                                    "
+                                                                    type="checkbox"
+                                                                    class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                                                                    name="terms"
+                                                                />
+                                                                <div
+                                                                    class="ml-2 text-sm"
+                                                                >
+                                                                    I agree to the
+                                                                    <a
+                                                                        target="_blank"
+                                                                        :href="
+                                                                            route(
+                                                                                'terms.show'
+                                                                            )
+                                                                        "
+                                                                        class="underline text-sm text-gray-600 hover:text-gray-900"
+                                                                        >Terms of
+                                                                        Service</a
+                                                                    >
+                                                                    and
+                                                                    <a
+                                                                        target="_blank"
+                                                                        :href="
+                                                                            route(
+                                                                                'policy.show'
+                                                                            )
+                                                                        "
+                                                                        class="underline text-sm text-gray-600 hover:text-gray-900"
+                                                                        >Privacy
+                                                                        Policy</a
+                                                                    >
+                                                                    and hereby also
+                                                                    grant nmrXiv
+                                                                    permissions to
+                                                                    distribute the
+                                                                    datasets (and
+                                                                    meta-data) under
+                                                                    the specified
+                                                                    license.
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
 
-                                        <div class="w-full">
-                                            <div
-                                                class="flex flex-wrap items-center bg-gray-50 py-2.5 px-4 text-xs text-gray-700"
-                                            >
-                                                <b>Whats next?</b>
-                                                <div>
-                                                    <p>
-                                                        Upon clicking publish,
-                                                        your project is
-                                                        submitted to our queue
-                                                        system for automatic
-                                                        processing. Once
-                                                        successfully processed,
-                                                        your data is assigned
-                                                        with stable identifiers,
-                                                        and DOIs are generated.
-                                                        You will receive an
-                                                        email with citation
-                                                        details and other
-                                                        helpful information to
-                                                        share your datasets.
-                                                    </p>
+                                            <div>
+                                                <div class="px-8 pb-8 pt-0">
+                                                    <jet-success-button
+                                                        type="button"
+                                                        :class="[
+                                                            !project.terms &&
+                                                            !project.conditions
+                                                                ? 'bg-gray-200 cursor-not-allowed'
+                                                                : 'bg-green-600 hover:bg-green-700',
+                                                            'ml-2',
+                                                        ]"
+                                                        :disabled="
+                                                            !project.terms &&
+                                                            !project.conditions
+                                                        "
+                                                        @click="
+                                                            showPublishConfirmationModal = true
+                                                        "
+                                                    >
+                                                        Publish Now
+                                                    </jet-success-button>
+                                                    <jet-secondary-button
+                                                        type="button"
+                                                        class="ml-2"
+                                                        @click="updatePublishDate()"
+                                                    >
+                                                        Update publish date
+                                                    </jet-secondary-button>
+                                                    <jet-secondary-button
+                                                        type="button"
+                                                        class="ml-2"
+                                                        @click="
+                                                            showPublishDialog = false
+                                                        "
+                                                    >
+                                                        Cancel
+                                                    </jet-secondary-button>
+                                                </div>
+                                                <div v-if="errors">
+                                                    <div
+                                                        class="rounded-md bg-red-50 p-4 mx-4 mb-4"
+                                                    >
+                                                        <div class="flex">
+                                                            <div
+                                                                class="flex-shrink-0"
+                                                            >
+                                                                <svg
+                                                                    class="h-5 w-5 text-red-400"
+                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                    viewBox="0 0 20 20"
+                                                                    fill="currentColor"
+                                                                    aria-hidden="true"
+                                                                >
+                                                                    <path
+                                                                        fill-rule="evenodd"
+                                                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
+                                                                        clip-rule="evenodd"
+                                                                    />
+                                                                </svg>
+                                                            </div>
+                                                            <div class="ml-3">
+                                                                <h3
+                                                                    class="text-sm font-medium text-red-800"
+                                                                >
+                                                                    Error publishing
+                                                                    your project
+                                                                </h3>
+                                                                <div
+                                                                    class="mt-2 text-sm text-red-700"
+                                                                >
+                                                                    <ul
+                                                                        role="list"
+                                                                        class="list-disc space-y-1 pl-5"
+                                                                    >
+                                                                        <li>
+                                                                            {{
+                                                                                errors
+                                                                            }}
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="w-full">
+                                                <div
+                                                    class="flex flex-wrap items-center bg-gray-50 py-2.5 px-4 text-xs text-gray-700"
+                                                >
+                                                    <b>Whats next?</b>
+                                                    <div>
+                                                        <p>
+                                                            Upon clicking publish,
+                                                            your project is
+                                                            submitted to our queue
+                                                            system for automatic
+                                                            processing. Once
+                                                            successfully processed,
+                                                            your data is assigned
+                                                            with stable identifiers,
+                                                            and DOIs are generated.
+                                                            You will receive an
+                                                            email with citation
+                                                            details and other
+                                                            helpful information to
+                                                            share your datasets.
+                                                        </p>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -780,31 +675,6 @@
                         </div>
                     </Dialog>
                 </TransitionRoot>
-                <jet-confirmation-modal
-                    :show="showPublishConfirmationModal"
-                    @close="showPublishConfirmationModal = false"
-                >
-                    <template #title>
-                        Are you sure you want to publish?
-                    </template>
-
-                    <template #content>
-                        Once the data is published you will no longer be able to
-                        change the data uploaded! If published as a project, you
-                        may add more compounds (spectra) to the project later.
-                    </template>
-
-                    <template #footer>
-                        <jet-secondary-button
-                            @click="showPublishConfirmationModal = false"
-                        >
-                            Cancel
-                        </jet-secondary-button>
-                        <jet-success-button class="ml-2" @click="publish">
-                            Publish Now
-                        </jet-success-button>
-                    </template>
-                </jet-confirmation-modal>
             </div>
         </template>
         <div class="p-12 pt-8">
@@ -1042,6 +912,7 @@ import Datepicker from "@vuepic/vue-datepicker";
 import JetConfirmationModal from "@/Jetstream/ConfirmationModal.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import JetSuccessButton from "@/Jetstream/SuccessButton.vue";
+import axios from "axios";
 import {
     Dialog,
     DialogPanel,
@@ -1049,6 +920,7 @@ import {
     TransitionRoot,
 } from "@headlessui/vue";
 import ShowProjectDates from "@/Shared/ShowProjectDates.vue";
+import PublishStatusModal from "@/Shared/PublishStatusModal.vue";
 import "@vuepic/vue-datepicker/dist/main.css";
 
 export default {
@@ -1078,6 +950,7 @@ export default {
         JetSecondaryButton,
         JetSuccessButton,
         ShowProjectDates,
+        PublishStatusModal,
     },
     props: [
         "project",
@@ -1111,6 +984,7 @@ export default {
             }),
             showPublishDialog: false,
             showPublishConfirmationModal: false,
+            showProcessingModal: false, // New variable to track embargo publishing
             // Added reactive props to avoid Vue warnings during render
             errors: null,
             status: null,
@@ -1187,22 +1061,57 @@ export default {
         publish() {
             this.showPublishConfirmationModal = false;
             this.showPublishDialog = false;
-            this.form.release_date = new Date();
+            
+            // Show the processing modal for all publish operations
+            this.showProcessingModal = true;
+            
+            // Check if this is an embargo project
+            const isEmbargoProject = this.project.status === 'embargo';
+            
             if (this.project.conditions && this.project.terms) {
                 this.errors = null;
-                this.form
-                    .post(
-                        route("dashboard.project.publish", this.project.id),
-                        this.form
-                    )
-                    .catch((err) => {
-                        this.errors = err.response.data.errors;
-                        this.validation = err.response.data.validation.report;
-                    })
-                    .then((response) => {
-                        this.status = response.data.project.status;
-                        this.showPublishDialog = false;
-                    });
+                
+                if (isEmbargoProject) {
+                    // Use the publishEmbargoProject endpoint for embargo projects
+                    axios.put(route("dashboard.project.publishEmbargoProject", this.project.id))
+                        .then((response) => {
+                            if (response.status === 200) {
+                                // Keep the modal visible - user will navigate via "Go to Dashboard" button
+                                this.project = response.data.project; // Update project data
+                                this.$page.props.flash.banner = response.data.message;
+                                this.$page.props.flash.bannerStyle = 'success';
+                                // Modal stays visible until user clicks "Go to Dashboard"
+                            }
+                        })
+                        .catch((err) => {
+                            // Hide modal on error and show error
+                            this.errors = err.response.data.errors;
+                            this.$page.props.flash.banner = this.errors;
+                            this.$page.props.flash.bannerStyle = 'danger';
+                        });
+                } else {
+                    // Use regular publish for non-embargo projects
+                    this.form.release_date = new Date();
+                    this.form
+                        .post(
+                            route("dashboard.project.publish", this.project.id),
+                            this.form
+                        )
+                        .catch((err) => {
+                            // Hide modal on error and show error
+                            this.errors = err.response.data.errors;
+                            this.validation = err.response.data.validation.report;
+                        })
+                        .then((response) => {
+                            if (response && response.data) {
+                                this.status = response.data.project.status;
+                                // Keep modal visible - user will navigate via "Go to Dashboard" button
+                                this.project = response.data.project; // Update project data
+                                this.$page.props.flash.banner = 'Project published successfully';
+                                this.$page.props.flash.bannerStyle = 'success';
+                            }
+                        });
+                }
             }
         },
         updatePublishDate() {

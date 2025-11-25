@@ -211,6 +211,12 @@ Route::middleware('auth', 'verified')->group(function () {
         Route::put('projects/{project}/publish', [ProjectController::class, 'publish'])
             ->name('dashboard.project.publish');
 
+        Route::put('projects/{project}/setEmbargo', [ProjectController::class, 'setEmbargo'])
+            ->name('dashboard.project.setEmbargo');
+
+        Route::put('projects/{project}/publishEmbargoProject', [ProjectController::class, 'publishEmbargoProject'])
+            ->name('dashboard.project.publishEmbargoProject');
+
         Route::post('projects/{project}/members', [ProjectMemberController::class, 'memberStore'])
             ->name('project-members.store');
         Route::put('/projects/{project}/members/{user}', [ProjectMemberController::class, 'updateMemberRole'])

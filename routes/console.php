@@ -18,7 +18,8 @@ Artisan::command('nmrxiv', function () {
     $this->comment('Welcome to nmrXiv!');
 })->purpose('Display nmrxiv info');
 
-// Schedule::command('nmrxiv:publish')->daily();
+// Schedule commands
+//Schedule::command('nmrxiv:publish-embargo-projects')->daily();
 Schedule::command('nmrxiv:delete-projects')->daily();
 Schedule::command('nmrxiv:index-molecules')->daily();
 Schedule::command('nmrxiv:delete-citations')->weekly();
