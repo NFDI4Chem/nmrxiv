@@ -12,14 +12,24 @@ class ArchiveProject
      * @param  mixed  $project
      * @return void
      */
-    public function toggle($project)
+    public function toggleArchive($project)
     {
         $archiveState = ! $project->is_archived;
-        $project->studies()->update(['is_archived' => $archiveState]);
+        $project->studies()->update([
+            'is_archived' => $archiveState,
+            'status' => $archiveState ? 'archived' : 'published',
+        ]);
+
         foreach ($project->studies as $study) {
-            $study->datasets()->update(['is_archived' => $archiveState]);
+            $study->datasets()->update([
+                'is_archived' => $archiveState,
+                'status' => $archiveState ? 'archived' : 'published',
+            ]);
         }
+
         $project->is_archived = $archiveState;
+        $project->status = $archiveState ? 'archived' : 'published';
+
         if ($project->is_archived) {
             $project->sendNotification('archival', $this->prepareSendList($project));
         }

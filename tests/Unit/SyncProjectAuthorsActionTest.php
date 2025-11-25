@@ -60,17 +60,22 @@ class SyncProjectAuthorsActionTest extends TestCase
 
     public function test_sync_authors_reuses_existing_authors_by_name(): void
     {
+        // Create existing author and attach to the project
         $existingAuthor = Author::factory()->create([
             'given_name' => 'John',
-            'family_name' => 'Smith',
+            'family_name' => 'Doe',
             'email_id' => 'john@example.com',
         ]);
+
+        // Attach the existing author to the project
+        $this->project->authors()->attach($existingAuthor->id, ['contributor_type' => 'Researcher']);
 
         $authorsData = [
             [
                 'given_name' => 'John',
-                'family_name' => 'Doe', // different last name
-                'email_id' => 'john@example.com',
+                'family_name' => 'Doe', // same name - should reuse
+                'email_id' => 'john.doe@updated.com', // different email - should update
+                'orcid_id' => '0000-0000-0000-0001',
                 'contributor_type' => 'Researcher',
             ],
         ];
@@ -79,8 +84,14 @@ class SyncProjectAuthorsActionTest extends TestCase
 
         $this->assertCount(1, $result);
         $this->assertEquals($existingAuthor->id, $result[0]->id);
+
+        // Verify the existing author was updated, not a new one created
         $existingAuthor->refresh();
-        $this->assertEquals('Doe', $existingAuthor->family_name);
+        $this->assertEquals('john.doe@updated.com', $existingAuthor->email_id);
+        $this->assertEquals('0000-0000-0000-0001', $existingAuthor->orcid_id);
+
+        // Verify only one author exists in database
+        $this->assertCount(1, Author::all());
     }
 
     public function test_sync_authors_handles_empty_array(): void
@@ -137,8 +148,20 @@ class SyncProjectAuthorsActionTest extends TestCase
 
     public function test_sync_authors_uses_database_transaction(): void
     {
-        DB::shouldReceive('transaction')->once()->andReturn([]);
-        $this->syncProjectAuthors->handle($this->project, []);
+        DB::shouldReceive('transaction')->once()->andReturnUsing(function ($callback) {
+            return $callback();
+        });
+
+        $authorsData = [
+            [
+                'given_name' => 'John',
+                'family_name' => 'Doe',
+                'email_id' => 'john@example.com',
+                'contributor_type' => 'Researcher',
+            ],
+        ];
+
+        $this->syncProjectAuthors->handle($this->project, $authorsData);
     }
 
     public function test_sync_authors_prevents_n_plus_one_queries(): void

@@ -44,10 +44,13 @@ class ProcessDraftELNSubmissionProxyTest extends TestCase
         $pathGenerator->method('generateDraftFilePath')
             ->willReturn('test/path/file.txt');
 
+        // Mock the DraftProcessingLogger (actual class lives under App\Actions\Draft)
+        $logger = $this->createMock(\App\Actions\Draft\DraftProcessingLogger::class);
+
         try {
             // This will fail because we're not actually extracting a real zip,
             // but we can verify the HTTP client was configured with proxy
-            $method->invoke($job, $draft, $pathGenerator);
+            $method->invoke($job, $draft, $pathGenerator, $logger);
         } catch (\Exception $e) {
             // Expected to fail due to fake zip content
         }
@@ -89,10 +92,13 @@ class ProcessDraftELNSubmissionProxyTest extends TestCase
         $pathGenerator->method('generateDraftFilePath')
             ->willReturn('test/path/file.txt');
 
+        // Mock the DraftProcessingLogger (actual class lives under App\Actions\Draft)
+        $logger = $this->createMock(\App\Actions\Draft\DraftProcessingLogger::class);
+
         try {
             // This will fail because we're not actually extracting a real zip,
             // but we can verify the HTTP client works without proxy
-            $method->invoke($job, $draft, $pathGenerator);
+            $method->invoke($job, $draft, $pathGenerator, $logger);
         } catch (\Exception $e) {
             // Expected to fail due to fake zip content
         }
