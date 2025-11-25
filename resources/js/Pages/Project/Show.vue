@@ -909,7 +909,6 @@ import CitationCard from "@/Shared/CitationCard.vue";
 import DOIBadge from "@/Shared/DOIBadge.vue";
 import Tag from "@/Shared/Tag.vue";
 import Datepicker from "@vuepic/vue-datepicker";
-import JetConfirmationModal from "@/Jetstream/ConfirmationModal.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import JetSuccessButton from "@/Jetstream/SuccessButton.vue";
 import axios from "axios";
@@ -946,7 +945,6 @@ export default {
         TransitionChild,
         TransitionRoot,
         Datepicker,
-        JetConfirmationModal,
         JetSecondaryButton,
         JetSuccessButton,
         ShowProjectDates,

@@ -5,7 +5,6 @@ namespace App\Console\Commands;
 use App\Actions\Project\PublishEmbargoProject;
 use App\Models\EmbargoReminder;
 use App\Models\Project;
-use App\Notifications\DraftProcessedNotification;
 use App\Notifications\EmbargoReleaseReminderNotification;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
@@ -107,7 +106,7 @@ class PublishEmbargoProjects extends Command
     private function publishReadyProjects(PublishEmbargoProject $embargoPublisher, Carbon $now): int
     {
         $this->info("Looking for projects to publish with release_date <= {$now->toDateString()}");
-        
+
         $projects = Project::where([
             ['status', 'embargo'],
             ['is_public', false],

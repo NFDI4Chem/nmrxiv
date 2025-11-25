@@ -19,7 +19,7 @@ Artisan::command('nmrxiv', function () {
 })->purpose('Display nmrxiv info');
 
 // Schedule commands
-//Schedule::command('nmrxiv:publish-embargo-projects')->daily();
+// Schedule::command('nmrxiv:publish-embargo-projects')->daily();
 Schedule::command('nmrxiv:delete-projects')->daily();
 Schedule::command('nmrxiv:index-molecules')->daily();
 Schedule::command('nmrxiv:delete-citations')->weekly();

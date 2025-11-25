@@ -749,7 +749,7 @@
                     </div>
                 </div>
             </div>
-            <div class="mt-24" v-else>
+            <div v-else class="mt-24">
                 <publish-status-modal />
             </div>
 
