@@ -11,9 +11,7 @@
                 restore a deleted project within the 30-day recovery period.
             </div>
             <div
-                v-if="
-                    project.status == 'embargo'
-                "
+                v-if="project.status == 'embargo'"
                 class="text-center px-3 py-2 bg-green-50 text-green-700 border-b"
             >
                 <b>Info: </b> This project is in embargo and set to be released
@@ -358,7 +356,11 @@
 
             <div>
                 <TransitionRoot
-                    :show="showPublishDialog || showPublishConfirmationModal || showProcessingModal"
+                    :show="
+                        showPublishDialog ||
+                        showPublishConfirmationModal ||
+                        showProcessingModal
+                    "
                     as="template"
                     appear
                     @after-leave="query = ''"
@@ -399,26 +401,40 @@
                                     </div>
 
                                     <!-- Confirmation Modal Content -->
-                                    <div v-else-if="showPublishConfirmationModal">
+                                    <div
+                                        v-else-if="showPublishConfirmationModal"
+                                    >
                                         <div class="p-6">
-                                            <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">
-                                                {{ project.status === 'embargo' 
-                                                    ? 'Are you sure you want to publish this embargo project?' 
-                                                    : 'Are you sure you want to publish?' }}
+                                            <h3
+                                                class="text-lg font-medium leading-6 text-gray-900 mb-4"
+                                            >
+                                                {{
+                                                    project.status === "embargo"
+                                                        ? "Are you sure you want to publish this embargo project?"
+                                                        : "Are you sure you want to publish?"
+                                                }}
                                             </h3>
                                             <p class="text-sm text-gray-500">
-                                                {{ project.status === 'embargo' 
-                                                    ? 'This embargo project already has a DOI and will be made publicly available immediately. This action cannot be undone. Once the data is published you will no longer be able to change the data uploaded! If published as a project, you may add more compounds (spectra) to the project later.'
-                                                    : 'Once the data is published you will no longer be able to change the data uploaded! If published as a project, you may add more compounds (spectra) to the project later.' }}
+                                                {{
+                                                    project.status === "embargo"
+                                                        ? "This embargo project already has a DOI and will be made publicly available immediately. This action cannot be undone. Once the data is published you will no longer be able to change the data uploaded! If published as a project, you may add more compounds (spectra) to the project later."
+                                                        : "Once the data is published you will no longer be able to change the data uploaded! If published as a project, you may add more compounds (spectra) to the project later."
+                                                }}
                                             </p>
                                         </div>
-                                        <div class="bg-gray-50 px-6 py-3 flex justify-end space-x-3">
+                                        <div
+                                            class="bg-gray-50 px-6 py-3 flex justify-end space-x-3"
+                                        >
                                             <jet-secondary-button
-                                                @click="showPublishConfirmationModal = false"
+                                                @click="
+                                                    showPublishConfirmationModal = false
+                                                "
                                             >
                                                 Cancel
                                             </jet-secondary-button>
-                                            <jet-success-button @click="publish">
+                                            <jet-success-button
+                                                @click="publish"
+                                            >
                                                 Publish Now
                                             </jet-success-button>
                                         </div>
@@ -432,7 +448,9 @@
                                                     <label
                                                         class="block tracking-wider text-sm font-medium text-gray-700, block text-sm font-medium text-gray-700"
                                                     >
-                                                        <small>PROJECT NAME</small>
+                                                        <small
+                                                            >PROJECT NAME</small
+                                                        >
                                                     </label>
                                                     <h1
                                                         class="text-2xl font-extrabold text-gray-900"
@@ -447,8 +465,12 @@
                                                         Release Date
                                                     </label>
                                                     <Datepicker
-                                                        v-model="form.release_date"
-                                                        :format="customDateFormat"
+                                                        v-model="
+                                                            form.release_date
+                                                        "
+                                                        :format="
+                                                            customDateFormat
+                                                        "
                                                         :min-date="new Date()"
                                                         :preview-format="
                                                             customDateFormat
@@ -459,8 +481,8 @@
                                                     >
                                                         Publish your data now or
                                                         choose a release date to
-                                                        auto publish your project to
-                                                        public.
+                                                        auto publish your
+                                                        project to public.
                                                     </p>
                                                 </div>
                                                 <div class="mt-5">
@@ -488,14 +510,18 @@
                                                                     class="ml-2 text-sm"
                                                                 >
                                                                     I understand
-                                                                    that publishing
+                                                                    that
+                                                                    publishing
                                                                     makes all
-                                                                    underlying data
+                                                                    underlying
+                                                                    data
                                                                     publicly
-                                                                    available on the
-                                                                    nmrXiv platform
-                                                                    after the set
-                                                                    release date.
+                                                                    available on
+                                                                    the nmrXiv
+                                                                    platform
+                                                                    after the
+                                                                    set release
+                                                                    date.
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -517,7 +543,8 @@
                                                                 <div
                                                                     class="ml-2 text-sm"
                                                                 >
-                                                                    I agree to the
+                                                                    I agree to
+                                                                    the
                                                                     <a
                                                                         target="_blank"
                                                                         :href="
@@ -526,7 +553,8 @@
                                                                             )
                                                                         "
                                                                         class="underline text-sm text-gray-600 hover:text-gray-900"
-                                                                        >Terms of
+                                                                        >Terms
+                                                                        of
                                                                         Service</a
                                                                     >
                                                                     and
@@ -541,13 +569,17 @@
                                                                         >Privacy
                                                                         Policy</a
                                                                     >
-                                                                    and hereby also
-                                                                    grant nmrXiv
-                                                                    permissions to
-                                                                    distribute the
-                                                                    datasets (and
-                                                                    meta-data) under
-                                                                    the specified
+                                                                    and hereby
+                                                                    also grant
+                                                                    nmrXiv
+                                                                    permissions
+                                                                    to
+                                                                    distribute
+                                                                    the datasets
+                                                                    (and
+                                                                    meta-data)
+                                                                    under the
+                                                                    specified
                                                                     license.
                                                                 </div>
                                                             </div>
@@ -580,7 +612,9 @@
                                                     <jet-secondary-button
                                                         type="button"
                                                         class="ml-2"
-                                                        @click="updatePublishDate()"
+                                                        @click="
+                                                            updatePublishDate()
+                                                        "
                                                     >
                                                         Update publish date
                                                     </jet-secondary-button>
@@ -620,7 +654,8 @@
                                                                 <h3
                                                                     class="text-sm font-medium text-red-800"
                                                                 >
-                                                                    Error publishing
+                                                                    Error
+                                                                    publishing
                                                                     your project
                                                                 </h3>
                                                                 <div
@@ -650,20 +685,24 @@
                                                     <b>Whats next?</b>
                                                     <div>
                                                         <p>
-                                                            Upon clicking publish,
-                                                            your project is
-                                                            submitted to our queue
-                                                            system for automatic
+                                                            Upon clicking
+                                                            publish, your
+                                                            project is submitted
+                                                            to our queue system
+                                                            for automatic
                                                             processing. Once
-                                                            successfully processed,
-                                                            your data is assigned
-                                                            with stable identifiers,
-                                                            and DOIs are generated.
-                                                            You will receive an
-                                                            email with citation
+                                                            successfully
+                                                            processed, your data
+                                                            is assigned with
+                                                            stable identifiers,
+                                                            and DOIs are
+                                                            generated. You will
+                                                            receive an email
+                                                            with citation
                                                             details and other
-                                                            helpful information to
-                                                            share your datasets.
+                                                            helpful information
+                                                            to share your
+                                                            datasets.
                                                         </p>
                                                     </div>
                                                 </div>
@@ -1059,25 +1098,32 @@ export default {
         publish() {
             this.showPublishConfirmationModal = false;
             this.showPublishDialog = false;
-            
+
             // Show the processing modal for all publish operations
             this.showProcessingModal = true;
-            
+
             // Check if this is an embargo project
-            const isEmbargoProject = this.project.status === 'embargo';
-            
+            const isEmbargoProject = this.project.status === "embargo";
+
             if (this.project.conditions && this.project.terms) {
                 this.errors = null;
-                
+
                 if (isEmbargoProject) {
                     // Use the publishEmbargoProject endpoint for embargo projects
-                    axios.put(route("dashboard.project.publishEmbargoProject", this.project.id))
+                    axios
+                        .put(
+                            route(
+                                "dashboard.project.publishEmbargoProject",
+                                this.project.id
+                            )
+                        )
                         .then((response) => {
                             if (response.status === 200) {
                                 // Keep the modal visible - user will navigate via "Go to Dashboard" button
                                 this.project = response.data.project; // Update project data
-                                this.$page.props.flash.banner = response.data.message;
-                                this.$page.props.flash.bannerStyle = 'success';
+                                this.$page.props.flash.banner =
+                                    response.data.message;
+                                this.$page.props.flash.bannerStyle = "success";
                                 // Modal stays visible until user clicks "Go to Dashboard"
                             }
                         })
@@ -1085,7 +1131,7 @@ export default {
                             // Hide modal on error and show error
                             this.errors = err.response.data.errors;
                             this.$page.props.flash.banner = this.errors;
-                            this.$page.props.flash.bannerStyle = 'danger';
+                            this.$page.props.flash.bannerStyle = "danger";
                         });
                 } else {
                     // Use regular publish for non-embargo projects
@@ -1098,15 +1144,17 @@ export default {
                         .catch((err) => {
                             // Hide modal on error and show error
                             this.errors = err.response.data.errors;
-                            this.validation = err.response.data.validation.report;
+                            this.validation =
+                                err.response.data.validation.report;
                         })
                         .then((response) => {
                             if (response && response.data) {
                                 this.status = response.data.project.status;
                                 // Keep modal visible - user will navigate via "Go to Dashboard" button
                                 this.project = response.data.project; // Update project data
-                                this.$page.props.flash.banner = 'Project published successfully';
-                                this.$page.props.flash.bannerStyle = 'success';
+                                this.$page.props.flash.banner =
+                                    "Project published successfully";
+                                this.$page.props.flash.bannerStyle = "success";
                             }
                         });
                 }

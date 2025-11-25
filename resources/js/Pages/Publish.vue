@@ -1188,22 +1188,24 @@ export default {
             this.showPublishConfirmationModal = false;
             if (this.publishForm.conditions && this.publishForm.terms) {
                 this.errors = null;
-                
+
                 // Check if release date is in the future (embargo)
                 const releaseDate = new Date(this.publishForm.release_date);
                 const now = new Date();
                 const isEmbargo = releaseDate > now;
-                
+
                 // Choose the appropriate endpoint and HTTP method
-                const endpoint = isEmbargo ? 
-                    route("dashboard.project.setEmbargo", this.project.id) :
-                    route("dashboard.project.publish", this.project.id);
-                const httpMethod = isEmbargo ? 'put' : 'post';
-                
+                const endpoint = isEmbargo
+                    ? route("dashboard.project.setEmbargo", this.project.id)
+                    : route("dashboard.project.publish", this.project.id);
+                const httpMethod = isEmbargo ? "put" : "post";
+
                 axios[httpMethod](endpoint, this.publishForm)
                     .catch((err) => {
                         this.errors = err.response.data.errors;
-                        this.validation = err.response.data.validation ? err.response.data.validation.report : null;
+                        this.validation = err.response.data.validation
+                            ? err.response.data.validation.report
+                            : null;
                     })
                     .then((response) => {
                         if (response && response.data) {
