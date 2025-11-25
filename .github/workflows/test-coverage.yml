@@ -1,0 +1,79 @@
+name: PHPUnit Tests & Coverage Analysis
+
+on:
+  workflow_call:
+
+jobs:
+  test-coverage:
+    name: Tests & Coverage (PHP 8.3)
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: nmrxiv_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+        ports:
+        - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.3'
+        extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_pgsql, bcmath, soap, intl, gd, exif, iconv
+        coverage: pcov
+
+    - name: Cache Composer packages
+      uses: actions/cache@v4
+      with:
+        path: vendor
+        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-php-
+
+    - name: Install composer dependencies
+      run: composer install --ignore-platform-reqs
+    
+    - name: Prepare Laravel Application
+      run: |
+        php -r "file_exists('.env') || copy('.env.ci', '.env');"
+
+        echo AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID_DEV }} >> .env
+        echo AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY_DEV }} >> .env
+        echo MEILISEARCH_KEY=${{ secrets.MEILISEARCH_KEY_DEV }} >> .env
+        echo MEILISEARCH_PUBLICKEY=${{ secrets.MEILISEARCH_PUBLICKEY_DEV }} >> .env
+
+        php artisan key:generate
+        php artisan migrate --seed
+
+    - name: Cache Node modules
+      uses: actions/cache@v4
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+
+    - name: Install front-end dependencies
+      run: npm ci
+
+    - name: Build front-end assets
+      run: npm run build
+    
+    - name: Run tests and collect coverage
+      run: vendor/bin/phpunit --coverage-clover coverage.xml --display-skipped
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
+        token: ${{ secrets.CODECOV_TOKEN }}
