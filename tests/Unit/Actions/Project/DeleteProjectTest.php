@@ -30,6 +30,10 @@ class DeleteProjectTest extends TestCase
         parent::setUp();
         $this->action = new DeleteProject;
         Storage::fake('local');
+        // Set environment variable for FILESYSTEM_DRIVER to local for this test
+        putenv('FILESYSTEM_DRIVER=local');
+        $_ENV['FILESYSTEM_DRIVER'] = 'local';
+        config(['filesystems.default' => 'local']);
     }
 
     public function test_delete_public_project_archives_instead_of_deleting()
@@ -110,6 +114,9 @@ class DeleteProjectTest extends TestCase
 
     public function test_permanent_delete_removes_all_objects()
     {
+        // Create super-admin role for test
+        \Spatie\Permission\Models\Role::create(['name' => 'super-admin', 'guard_name' => 'web']);
+        
         $project = Project::factory()->create(['is_public' => false]);
         $study = Study::factory()->for($project)->create();
         $dataset = Dataset::factory()->for($study)->create();
@@ -221,12 +228,12 @@ class DeleteProjectTest extends TestCase
             'path' => 'test/file.txt',
         ]);
 
-        Storage::put($file->path, 'test content');
-        $this->assertTrue(Storage::exists($file->path));
+        Storage::disk('local')->put($file->path, 'test content');
+        $this->assertTrue(Storage::disk('local')->exists($file->path));
 
         $this->action->deleteFSO($file);
 
-        $this->assertFalse(Storage::exists($file->path));
+        $this->assertFalse(Storage::disk('local')->exists($file->path));
         $this->assertDatabaseMissing('file_system_objects', ['id' => $file->id]);
     }
 
@@ -237,13 +244,13 @@ class DeleteProjectTest extends TestCase
             'path' => 'test/directory',
         ]);
 
-        Storage::makeDirectory($directory->path);
-        Storage::put($directory->path.'/file.txt', 'test content');
-        $this->assertTrue(Storage::exists($directory->path));
+        Storage::disk('local')->makeDirectory($directory->path);
+        Storage::disk('local')->put($directory->path.'/file.txt', 'test content');
+        $this->assertTrue(Storage::disk('local')->exists($directory->path));
 
         $this->action->deleteFSO($directory);
 
-        $this->assertFalse(Storage::exists($directory->path));
+        $this->assertFalse(Storage::disk('local')->exists($directory->path));
         $this->assertDatabaseMissing('file_system_objects', ['id' => $directory->id]);
     }
 
