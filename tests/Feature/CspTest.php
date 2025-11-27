@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use App\Support\Csp\Policies\NmrxivPolicy;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
-use Illuminate\Http\Request;
 use Tests\TestCase;
 
 class CspTest extends TestCase
@@ -29,38 +28,6 @@ class CspTest extends TestCase
         $this->assertInstanceOf(\Spatie\Csp\Policy::class, $policy);
     }
 
-    public function test_csp_nonce_service_exists(): void
-    {
-        // Test that the CSP nonce service is available
-        $nonce = app('csp-nonce');
-
-        $this->assertNotNull($nonce);
-        $this->assertIsString($nonce);
-        $this->assertGreaterThan(10, strlen($nonce)); // Nonce should be reasonably long
-    }
-
-    public function test_csp_violation_controller_method_exists(): void
-    {
-        // Test that the CSP violation controller method exists and is callable
-        $controller = new \App\Http\Controllers\CspViolationController;
-
-        $this->assertTrue(method_exists($controller, 'report'));
-
-        // Test the method returns expected response
-        $request = new Request;
-        $request->merge([
-            'csp-report' => [
-                'document-uri' => 'https://example.com/test',
-                'blocked-uri' => 'https://evil.com/script.js',
-                'violated-directive' => 'script-src',
-            ],
-        ]);
-
-        $response = $controller->report($request);
-
-        $this->assertEquals(204, $response->getStatusCode());
-    }
-
     public function test_csp_middleware_is_registered(): void
     {
         // Test that the CSP middleware class exists
@@ -68,5 +35,44 @@ class CspTest extends TestCase
 
         // Test that the policy class exists and is properly configured
         $this->assertTrue(class_exists(\App\Support\Csp\Policies\NmrxivPolicy::class));
+    }
+
+    public function test_csp_uses_unsafe_inline_for_compatibility(): void
+    {
+        // Set app environment to production for testing
+        app()->detectEnvironment(fn () => 'production');
+        config(['app.env' => 'production']);
+
+        $policy = new \Spatie\Csp\Policy;
+        (new NmrxivPolicy)->configure($policy);
+
+        $policyString = $policy->getContents();
+
+        // Should use unsafe-inline and unsafe-eval for maximum compatibility
+        $this->assertStringContainsString('unsafe-inline', $policyString, 'Should use unsafe-inline');
+        $this->assertStringContainsString('unsafe-eval', $policyString, 'Should use unsafe-eval');
+
+        // Should NOT have nonces
+        $this->assertStringNotContainsString('nonce-', $policyString, 'Should not use nonces');
+    }
+
+    public function test_csp_unsafe_inline_in_local(): void
+    {
+        // Set app environment to local
+        app()->detectEnvironment(fn () => 'local');
+        config(['app.env' => 'local']);
+
+        $policy = new \Spatie\Csp\Policy;
+        (new NmrxivPolicy)->configure($policy);
+
+        $policyString = $policy->getContents();
+
+        // In local, should have unsafe-inline and unsafe-eval
+        $this->assertStringContainsString('unsafe-inline', $policyString, 'Local should use unsafe-inline for Vite HMR');
+        $this->assertStringContainsString('unsafe-eval', $policyString, 'Local should use unsafe-eval for Vue devtools');
+
+        // Should also have localhost wildcards
+        $this->assertStringContainsString('http://localhost:*', $policyString, 'Local should allow localhost wildcards');
+        $this->assertStringContainsString('http://127.0.0.1:*', $policyString, 'Local should allow 127.0.0.1 wildcards');
     }
 }

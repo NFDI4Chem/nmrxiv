@@ -789,7 +789,7 @@
                                 <a href="https://cheminf.uni-jena.de/">
                                     <img
                                         class="col-span-1 md:col-span-2 max-h-12 w-full object-contain lg:col-span-1"
-                                        src="https://www.uni-jena.de/unijenamedia/universitaet/abteilung-hochschulkommunikation/marketing/wort-bildmarke-universitaet-jena.jpg?height=335&width=1000"
+                                        src="/img/nfdi4chem-logo.jpg"
                                         alt="FSU"
                                         width="158"
                                         height="48"

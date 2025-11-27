@@ -743,7 +743,7 @@
                             <a target="_blank" href="/about-us">
                                 <img
                                     class="w-48"
-                                    src="https://www.uni-jena.de/unijenamedia/universitaet/abteilung-hochschulkommunikation/marketing/wort-bildmarke-universitaet-jena.jpg?height=335&width=1000"
+                                    src="/img/nfdi4chem-logo.jpg"
                                     alt="FSU Jena"
                                 />
                             </a>

@@ -40,15 +40,18 @@ class NmrxivPolicy implements Preset
 
     private function addUnifiedRules(Policy $policy): void
     {
-        // Allow inline scripts and styles
+        // Allow unsafe-inline and unsafe-eval for maximum compatibility
+        // This is acceptable when you control all inline scripts and have other security layers
         $policy
-            ->add(Directive::SCRIPT, Keyword::UNSAFE_INLINE, Keyword::UNSAFE_EVAL)
+            ->add(Directive::SCRIPT, Keyword::UNSAFE_INLINE)
+            ->add(Directive::SCRIPT, Keyword::UNSAFE_EVAL)
             ->add(Directive::STYLE, Keyword::UNSAFE_INLINE);
 
-        // Development server support
+        // Development server support (for local development with Vite)
         $policy
-            ->add(Directive::SCRIPT, 'http://localhost:5173', 'http://localhost:3000')
-            ->add(Directive::CONNECT, 'ws://localhost:5173', 'http://localhost:5173', 'http://localhost:3000');
+            ->add(Directive::SCRIPT, ['http://localhost:*', 'https://localhost:*', 'http://127.0.0.1:*', 'https://127.0.0.1:*'])
+            ->add(Directive::STYLE, ['http://localhost:*', 'https://localhost:*', 'http://127.0.0.1:*', 'https://127.0.0.1:*'])
+            ->add(Directive::CONNECT, ['ws://localhost:*', 'wss://localhost:*', 'http://localhost:*', 'https://localhost:*', 'ws://127.0.0.1:*', 'wss://127.0.0.1:*', 'http://127.0.0.1:*', 'https://127.0.0.1:*']);
     }
 
     /**
@@ -62,7 +65,6 @@ class NmrxivPolicy implements Preset
             ->add(Directive::IMG, Keyword::SELF)
             ->add(Directive::IMG, 'data:')
             ->add(Directive::IMG, 'blob:')
-            ->add(Directive::IMG, 'https://www.uni-jena.de')
             ->add(Directive::IMG, 'https://s3.uni-jena.de')
             ->add(Directive::IMG, 'https://orcid.org')
             ->add(Directive::IMG, 'https://ui-avatars.com')
