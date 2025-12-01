@@ -789,7 +789,7 @@
                                 <a href="https://cheminf.uni-jena.de/">
                                     <img
                                         class="col-span-1 md:col-span-2 max-h-12 w-full object-contain lg:col-span-1"
-                                        src="/img/nfdi4chem-logo.jpg"
+                                        src="/img/FSU-Jena-logo.jpg"
                                         alt="FSU"
                                         width="158"
                                         height="48"
@@ -798,7 +798,7 @@
                                 <a href="https://www.nfdi4chem.de/">
                                     <img
                                         class="col-span-2 max-h-12 w-full object-contain lg:col-span-1"
-                                        src="/img/nmrxiv-logo.png"
+                                        src="/img/nfdi4chem-logo.png"
                                         alt="NFDI4Chem"
                                         width="158"
                                         height="48"

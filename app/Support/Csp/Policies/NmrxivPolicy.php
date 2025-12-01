@@ -9,6 +9,25 @@ use Spatie\Csp\Preset;
 
 class NmrxivPolicy implements Preset
 {
+    /**
+     * Localhost and 127.0.0.1 HTTP/HTTPS hosts for dev server support.
+     */
+    private const LOCAL_HOSTS = [
+        'http://localhost:*',
+        'https://localhost:*',
+        'http://127.0.0.1:*',
+        'https://127.0.0.1:*',
+    ];
+
+    /**
+     * Localhost and 127.0.0.1 WebSocket hosts for dev server support.
+     */
+    private const LOCAL_WS_HOSTS = [
+        'ws://localhost:*',
+        'wss://localhost:*',
+        'ws://127.0.0.1:*',
+        'wss://127.0.0.1:*',
+    ];
     public function configure(Policy $policy): void
     {
         // Core security directives
@@ -49,9 +68,9 @@ class NmrxivPolicy implements Preset
 
         // Development server support (for local development with Vite)
         $policy
-            ->add(Directive::SCRIPT, ['http://localhost:*', 'https://localhost:*', 'http://127.0.0.1:*', 'https://127.0.0.1:*'])
-            ->add(Directive::STYLE, ['http://localhost:*', 'https://localhost:*', 'http://127.0.0.1:*', 'https://127.0.0.1:*'])
-            ->add(Directive::CONNECT, ['ws://localhost:*', 'wss://localhost:*', 'http://localhost:*', 'https://localhost:*', 'ws://127.0.0.1:*', 'wss://127.0.0.1:*', 'http://127.0.0.1:*', 'https://127.0.0.1:*']);
+            ->add(Directive::SCRIPT, self::LOCAL_HOSTS)
+            ->add(Directive::STYLE, self::LOCAL_HOSTS)
+            ->add(Directive::CONNECT, array_merge(self::LOCAL_WS_HOSTS, self::LOCAL_HOSTS));
     }
 
     /**
