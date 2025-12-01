@@ -28,6 +28,7 @@ class NmrxivPolicy implements Preset
         'ws://127.0.0.1:*',
         'wss://127.0.0.1:*',
     ];
+
     public function configure(Policy $policy): void
     {
         // Core security directives
