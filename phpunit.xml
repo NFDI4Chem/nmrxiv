@@ -27,6 +27,12 @@
     <env name="SESSION_DRIVER" value="array"/>
     <env name="TELESCOPE_ENABLED" value="false"/>
     <env name="DEBUGBAR_ENABLED" value="false"/>
+    <env name="AWS_ACCESS_KEY_ID" value="test-key"/>
+    <env name="AWS_SECRET_ACCESS_KEY" value="test-secret"/>
+    <env name="AWS_DEFAULT_REGION" value="us-east-1"/>
+    <env name="AWS_BUCKET" value="test-bucket"/>
+    <env name="AWS_BUCKET_PUBLIC" value="test-bucket-public"/>
+    <env name="AWS_URL" value="http://localhost:9000"/>
   </php>
   <source>
     <include>
