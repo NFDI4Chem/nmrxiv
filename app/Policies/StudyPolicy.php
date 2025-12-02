@@ -35,10 +35,14 @@ class StudyPolicy
      *
      * @return mixed
      */
-    public function viewStudy(User $user, Study $study)
+    public function viewStudy(?User $user, Study $study)
     {
-        if (is_null($user) && $study->is_public) {
+        if ($study->is_public) {
             return true;
+        }
+
+        if (is_null($user)) {
+            return false;
         }
 
         return $user->belongsToStudy($study);

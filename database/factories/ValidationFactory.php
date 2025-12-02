@@ -55,7 +55,6 @@ class ValidationFactory extends Factory
                     'keywords' => true,
                     'studies' => [
                         ['status' => true],
-                        ['status' => true],
                     ],
                 ],
                 'missing' => [],

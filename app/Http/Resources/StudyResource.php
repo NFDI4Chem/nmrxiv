@@ -33,7 +33,7 @@ class StudyResource extends JsonResource
             'name' => $this->name,
             'slug' => $this->slug,
             'description' => $this->description,
-            'molecules' => $this->sample->molecules,
+            'molecules' => $this->sample ? $this->sample->molecules : [],
             'team' => $this->when(! ($this->team && $this->team->personal_team), $this->team),
             'photo_url' => $this->study_photo_url,
             'tags' => $this->tags,
