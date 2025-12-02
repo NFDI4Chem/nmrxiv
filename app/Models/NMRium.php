@@ -22,8 +22,6 @@ class NMRium extends Model
         'nmriumable_id',
         'nmriumable_type',
         'dataset_id',
-        'nmriumable_id',
-        'nmriumable_type',
     ];
 
     /**
