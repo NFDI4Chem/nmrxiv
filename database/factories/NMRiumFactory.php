@@ -16,7 +16,8 @@ class NMRiumFactory extends Factory
     {
         return [
             'nmrium_info' => '{}',
-            'dataset_id' => 1,
+            'nmriumable_id' => 1,
+            'nmriumable_type' => \App\Models\Dataset::class,
         ];
     }
 }

@@ -73,6 +73,20 @@ class ProjectPolicy
     }
 
     /**
+     * Determine whether the user can publish the model.
+     *
+     * @return mixed
+     */
+    public function publishProject(User $user, Project $project)
+    {
+        if ($project->is_public || $project->is_archived || $project->is_deleted || $project->is_published) {
+            return false;
+        }
+
+        return $user->canUpdateProject($project);
+    }
+
+    /**
      * Determine whether the user can delete the model.
      *
      * @return mixed
