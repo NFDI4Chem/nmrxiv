@@ -743,7 +743,7 @@
                             <a target="_blank" href="/about-us">
                                 <img
                                     class="w-48"
-                                    src="https://www.uni-jena.de/unijenamedia/universitaet/abteilung-hochschulkommunikation/marketing/wort-bildmarke-universitaet-jena.jpg?height=335&width=1000"
+                                    src="/img/FSU-Jena-logo.jpg"
                                     alt="FSU Jena"
                                 />
                             </a>
@@ -754,7 +754,7 @@
                             <a target="_blank" href="https://www.nfdi4chem.de/">
                                 <img
                                     class="w-64"
-                                    src="/img/nmrxiv-logo.png"
+                                    src="/img/nfdi4chem-logo.png"
                                     alt="NFDI4Chem"
                                 />
                             </a>

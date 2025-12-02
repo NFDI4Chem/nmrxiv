@@ -13,7 +13,6 @@ use App\Models\Project;
 use App\Models\Sample;
 use App\Models\Study;
 use App\Models\User;
-use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -65,6 +64,8 @@ class StudyController extends Controller
 
     public function update(Request $request, UpdateStudy $updater, Study $study)
     {
+        Gate::authorize('updateStudy', $study);
+
         $updater->update($study, $request->all());
 
         $study = $study->fresh();
@@ -78,9 +79,7 @@ class StudyController extends Controller
 
     public function show(Request $request, Study $study, GetLicense $getLicense)
     {
-        if (! Gate::forUser($request->user())->check('viewStudy', $study)) {
-            throw new AuthorizationException;
-        }
+        Gate::forUser($request->user())->authorize('viewStudy', $study);
 
         $project = $study->project;
         $team = $project->nonPersonalTeam;
@@ -102,9 +101,7 @@ class StudyController extends Controller
 
     public function datasets(Request $request, Study $study)
     {
-        if (! Gate::forUser($request->user())->check('viewStudy', $study)) {
-            throw new AuthorizationException;
-        }
+        Gate::forUser($request->user())->authorize('viewStudy', $study);
 
         $project = $study->project;
         $team = $project->team;
@@ -208,6 +205,8 @@ class StudyController extends Controller
 
     public function moleculeStore(Request $request, Study $study)
     {
+        Gate::forUser($request->user())->authorize('updateStudy', $study);
+
         $sample = $study->sample;
         if (! $sample) {
             $sample = Sample::create([
@@ -277,6 +276,8 @@ class StudyController extends Controller
 
     public function nmriumInfo(Request $request, Study $study)
     {
+        Gate::forUser($request->user())->authorize('updateStudy', $study);
+
         // $version = $request->get('version');
         // $spectra = $request->get('spectra');
         // $molecules = $nmriumInfo['data']['molecules'];
@@ -380,9 +381,7 @@ class StudyController extends Controller
 
     public function files(Request $request, Study $study)
     {
-        if (! Gate::forUser($request->user())->check('viewStudy', $study)) {
-            throw new AuthorizationException;
-        }
+        Gate::forUser($request->user())->authorize('viewStudy', $study);
 
         $project = $study->project;
         $team = $project->nonPersonalTeam;
@@ -393,9 +392,7 @@ class StudyController extends Controller
 
     public function annotations(Request $request, Study $study)
     {
-        if (! Gate::forUser($request->user())->check('viewStudy', $study)) {
-            throw new AuthorizationException;
-        }
+        Gate::forUser($request->user())->authorize('viewStudy', $study);
 
         $studyFSObject = FileSystemObject::with('children')
             ->where([
@@ -497,6 +494,8 @@ class StudyController extends Controller
 
     public function settings(Request $request, Study $study)
     {
+        Gate::forUser($request->user())->authorize('viewStudy', $study);
+
         return Inertia::render('Study/Settings', [
             'study' => $study,
             'project' => $study->project,
@@ -508,6 +507,8 @@ class StudyController extends Controller
         StatefulGuard $guard,
         Study $study
     ) {
+        Gate::forUser($request->user())->authorize('deleteStudy', $study);
+
         $confirmed = app(ConfirmPassword::class)(
             $guard,
             $request->user(),
@@ -545,6 +546,8 @@ class StudyController extends Controller
 
     public function snapshot(Request $request, Study $study)
     {
+        Gate::forUser($request->user())->authorize('updateStudy', $study);
+
         $content = $request->get('img');
         if ($content) {
             $path = '/projects/'.$study->project->uuid.'/'.$study->slug.'.svg';

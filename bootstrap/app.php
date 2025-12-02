@@ -26,7 +26,6 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->validateCsrfTokens(except: [
             //
             'support-bubble',
-            'csp-violation-report',
         ]);
 
         $middleware->append(\Spatie\CookieConsent\CookieConsentMiddleware::class);
