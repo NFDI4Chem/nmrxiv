@@ -51,7 +51,7 @@ class NMRiumModelTest extends TestCase
 
     public function test_it_has_correct_fillable_attributes(): void
     {
-        $fillable = ['nmrium_info', 'dataset_id'];
+        $fillable = ['nmrium_info', 'nmriumable_id', 'nmriumable_type', 'dataset_id'];
         $nmrium = new NMRium;
 
         $this->assertEquals($fillable, $nmrium->getFillable());
@@ -211,15 +211,16 @@ class NMRiumModelTest extends TestCase
         $this->assertEquals(['test' => 'data'], $nmrium->nmrium_info);
     }
 
-    public function test_fillable_includes_legacy_dataset_id(): void
+    public function test_fillable_uses_polymorphic_attributes(): void
     {
-        // Test that dataset_id is in fillable for potential backward compatibility
-        // even though the actual DB uses polymorphic columns
+        // Test that polymorphic attributes are in fillable instead of legacy dataset_id
         $nmrium = new NMRium;
         $fillable = $nmrium->getFillable();
 
-        $this->assertContains('dataset_id', $fillable);
+        $this->assertContains('nmriumable_id', $fillable);
+        $this->assertContains('nmriumable_type', $fillable);
         $this->assertContains('nmrium_info', $fillable);
+        $this->assertContains('dataset_id', $fillable);
     }
 
     public function test_it_uses_has_factory_trait(): void

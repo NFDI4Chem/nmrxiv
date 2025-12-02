@@ -27,8 +27,10 @@ class RestoreProject
                 $study->datasets()->update(['is_deleted' => false]);
             }
             $draft = $project->draft;
-            $draft->is_deleted = false;
-            $draft->save();
+            if ($draft) {
+                $draft->is_deleted = false;
+                $draft->save();
+            }
             $project->is_deleted = false;
             $project->save();
         }
