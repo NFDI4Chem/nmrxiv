@@ -16,6 +16,7 @@ class StudyInvitation extends Model
      * @var array
      */
     protected $fillable = [
+        'study_id',
         'email',
         'role',
         'message',
