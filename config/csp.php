@@ -57,9 +57,9 @@ return [
 
     /*
      * All violations against a policy will be reported to this url.
-     * A great service you could use for this is https://report-uri.com/
+     * Set to null to disable violation reporting.
      */
-    'report_uri' => env('CSP_REPORT_URI', '/csp-violation-report'),
+    'report_uri' => null,
 
     /*
      * Headers will only be added if this setting is set to true.
