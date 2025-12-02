@@ -161,7 +161,7 @@ class StudyModelTest extends TestCase
             'is_archived' => false,
         ]);
 
-        $this->assertNull($privateStudy->shouldBeSearchable());
+        $this->assertFalse($privateStudy->shouldBeSearchable());
     }
 
     public function test_it_should_not_be_searchable_when_archived(): void
@@ -171,7 +171,7 @@ class StudyModelTest extends TestCase
             'is_archived' => true,
         ]);
 
-        $this->assertNull($archivedStudy->shouldBeSearchable());
+        $this->assertFalse($archivedStudy->shouldBeSearchable());
     }
 
     public function test_it_casts_arrays_properly(): void
@@ -196,11 +196,12 @@ class StudyModelTest extends TestCase
     {
         $fillable = [
             'name', 'slug', 'color', 'starred', 'location', 'is_public',
-            'obfuscationcode', 'description', 'type', 'uuid', 'access',
+            'is_archived', 'obfuscationcode', 'description', 'type', 'uuid', 'access',
             'access_type', 'team_id', 'draft_id', 'owner_id', 'project_id',
             'fs_id', 'study_photo_path', 'license_id', 'species', 'authors',
             'citations', 'molecules', 'submitted_through', 'external_id',
             'external_url', 'processing_logs', 'tracking_item_name',
+            'doi', 'identifier', 'validation_id',
         ];
 
         $study = new Study;
