@@ -11,7 +11,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class FileSystemControllerTest extends TestCase
+class FileSystemTest extends TestCase
 {
     use RefreshDatabase;
 
