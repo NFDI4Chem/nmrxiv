@@ -102,6 +102,9 @@
         "allow-plugins": {
             "php-http/discovery": true
         },
+        "platform": {
+            "php": "8.3.28"
+        },
         "audit": {
             "abandoned": "ignore"
         }

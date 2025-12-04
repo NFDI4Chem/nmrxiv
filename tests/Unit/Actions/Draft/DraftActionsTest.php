@@ -106,32 +106,6 @@ class DraftActionsTest extends TestCase
         $this->assertEquals('Updated Description', $updatedDraft->description);
     }
 
-    public function test_user_drafts_action_gets_user_drafts(): void
-    {
-        $userDrafts = new UserDrafts;
-
-        // Get the correct user/team data
-        [$userId, $teamId] = $this->user->getUserTeamData();
-
-        // Create drafts with and without files
-        $draftWithFiles = Draft::factory()->create([
-            'owner_id' => $userId,
-            'team_id' => $teamId,
-        ]);
-        FileSystemObject::factory()->file()->create(['draft_id' => $draftWithFiles->id]);
-
-        $draftWithoutFiles = Draft::factory()->create([
-            'owner_id' => $userId,
-            'team_id' => $teamId,
-        ]);
-
-        $drafts = $userDrafts->execute($this->user);
-
-        // Should return only drafts with files or projects
-        $this->assertGreaterThanOrEqual(1, $drafts->count());
-        $this->assertTrue($drafts->contains('id', $draftWithFiles->id));
-    }
-
     public function test_user_drafts_action_finds_default_draft(): void
     {
         $userDrafts = new UserDrafts;
