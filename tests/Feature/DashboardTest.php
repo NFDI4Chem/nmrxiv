@@ -246,17 +246,23 @@ class DashboardTest extends TestCase
             ->post('/primer/skip');
 
         $response->assertStatus(200);
+        $this->assertEmpty($response->getContent());
 
         $this->user->refresh();
         $this->assertTrue($this->user->primed);
     }
 
-    public function test_skip_primer_does_not_return_content(): void
+    public function test_skip_primer_handles_already_primed_user(): void
     {
+        $this->user->primed = true;
+        $this->user->save();
+
         $response = $this->actingAs($this->user)
             ->post('/primer/skip');
 
         $response->assertStatus(200);
-        $this->assertEmpty($response->getContent());
+
+        $this->user->refresh();
+        $this->assertTrue($this->user->primed);
     }
 }
