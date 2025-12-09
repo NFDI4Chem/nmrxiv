@@ -185,7 +185,6 @@ class DataControllerTest extends TestCase
         $this->assertStringContainsString('NMR', $response->json('data.0.name'));
     }
 
-
     /**
      * Test sorting by created_at ascending
      */

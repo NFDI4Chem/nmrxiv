@@ -66,8 +66,8 @@ Route::prefix('v1')->group(function () {
         Route::prefix('datacite')->group(function () {
             // Route::get('/{username}/{project}/{study?}/{dataset?}', [DataCiteController::class, 'modelSchemaByName']);
             Route::get('/{id}', [DataCiteController::class, 'modelSchemaByID']);
-            //Commented out DOI update route, as it could be security risk if left unprotected, also its not exposed via Swagger currently and the endpoint shares the smame path pattern as the datacite GET route.
-            //Route::put('/{id}', [DOIController::class, 'update']);
+            // Commented out DOI update route, as it could be security risk if left unprotected, also its not exposed via Swagger currently and the endpoint shares the smame path pattern as the datacite GET route.
+            // Route::put('/{id}', [DOIController::class, 'update']);
         });
     });
 });

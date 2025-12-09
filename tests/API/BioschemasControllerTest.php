@@ -2,11 +2,11 @@
 
 namespace Tests\API;
 
-use Tests\TestCase;
-use App\Models\User;
-use App\Models\Project;
 use App\Models\License;
+use App\Models\Project;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class BioschemasControllerTest extends TestCase
 {
@@ -19,7 +19,7 @@ class BioschemasControllerTest extends TestCase
     public function test_bioschemas_endpoint_exists()
     {
         $response = $this->getJson('/api/v1/schemas/bioschemas/P99999');
-        
+
         // Route exists - should return 404, 403, or 500 without full data
         $this->assertContains($response->status(), [403, 404, 500]);
     }

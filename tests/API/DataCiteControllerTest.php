@@ -2,11 +2,11 @@
 
 namespace Tests\API;
 
-use Tests\TestCase;
-use App\Models\User;
-use App\Models\Project;
 use App\Models\License;
+use App\Models\Project;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class DataCiteControllerTest extends TestCase
 {
@@ -40,7 +40,7 @@ class DataCiteControllerTest extends TestCase
     public function test_datacite_endpoint_exists()
     {
         $response = $this->getJson('/api/v1/schemas/datacite/P99999');
-        
+
         // Should return 500 (null model error) or 404
         $this->assertContains($response->status(), [404, 500]);
     }

@@ -2,8 +2,8 @@
 
 namespace Tests\API;
 
-use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class DataCatalogControllerTest extends TestCase
 {
