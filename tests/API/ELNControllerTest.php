@@ -426,4 +426,139 @@ class ELNControllerTest extends TestCase
             return true;
         });
     }
+
+    /**
+     * Test ELN upload with future release date
+     */
+    public function test_eln_upload_with_future_release_date()
+    {
+        Queue::fake();
+
+        $user = User::factory()->withPersonalTeam()->create();
+        $futureDate = Carbon::now()->addDays(30)->toDateString();
+
+        $response = $this->actingAs($user, 'sanctum')->postJson('/api/v1/chemotion/upload', [
+            'external_id' => 'CHEM-FUTURE-001',
+            'callback_url' => 'https://example.com/callback',
+            'zip_url' => 'https://example.com/data.zip',
+            'release_date' => $futureDate,
+        ]);
+
+        $response->assertStatus(200);
+        // API returns ISO 8601 format, check if date portion matches
+        $this->assertStringStartsWith($futureDate, $response->json('release_date'));
+
+        $draft = Draft::where('external_id', 'CHEM-FUTURE-001')->first();
+        // Database stores as date, compare date strings
+        $this->assertEquals($futureDate, $draft->release_date instanceof \Carbon\Carbon ? $draft->release_date->toDateString() : $draft->release_date);
+    }
+
+    /**
+     * Test ELN upload with past release date is ignored
+     */
+    public function test_eln_upload_with_past_release_date_is_ignored()
+    {
+        Queue::fake();
+
+        $user = User::factory()->withPersonalTeam()->create();
+        $pastDate = Carbon::now()->subDays(5)->toDateString();
+
+        $response = $this->actingAs($user, 'sanctum')->postJson('/api/v1/chemotion/upload', [
+            'external_id' => 'CHEM-PAST-001',
+            'callback_url' => 'https://example.com/callback',
+            'zip_url' => 'https://example.com/data.zip',
+            'release_date' => $pastDate,
+        ]);
+
+        $response->assertStatus(200);
+        // Past date should be null
+        $this->assertNull($response->json('release_date'));
+    }
+
+    /**
+     * Test ELN tracking service disabled
+     */
+    public function test_eln_tracking_service_disabled()
+    {
+        Queue::fake();
+
+        // Mock tracker service as disabled
+        $this->app->bind(ChemotionRepositoryTrackerService::class, function () {
+            return Mockery::mock(ChemotionRepositoryTrackerService::class, function ($mock) {
+                $mock->shouldReceive('isEnabled')->andReturn(false);
+                $mock->shouldReceive('sendSubmissionReceived')->never();
+            });
+        });
+
+        $user = User::factory()->withPersonalTeam()->create();
+
+        $response = $this->actingAs($user, 'sanctum')->postJson('/api/v1/chemotion/upload', [
+            'external_id' => 'CHEM-NO-TRACK-001',
+            'callback_url' => 'https://example.com/callback',
+            'zip_url' => 'https://example.com/data.zip',
+        ]);
+
+        $response->assertStatus(200);
+        // Should still succeed even if tracking is disabled
+    }
+
+    /**
+     * Test ELN tracking service creates submission tracking
+     */
+    public function test_eln_tracking_service_creates_submission_tracking()
+    {
+        Queue::fake();
+
+        // Mock tracker service as enabled and verify it's called
+        $this->app->bind(ChemotionRepositoryTrackerService::class, function () {
+            return Mockery::mock(ChemotionRepositoryTrackerService::class, function ($mock) {
+                $mock->shouldReceive('isEnabled')->andReturn(true);
+                $mock->shouldReceive('createElnSubmissionTracking')
+                    ->once()
+                    ->withArgs(function ($submissionId, $status, $metadata, $ownerName, $ownerEmail, $fromSystem, $toSystem) {
+                        return $submissionId === 'CHEM-TRACK-001' &&
+                               $status === ChemotionRepositoryTrackerService::STATUS_RECEIVED;
+                    })
+                    ->andReturn(['tracking_id' => '123']); // Return array as per signature
+            });
+        });
+
+        $user = User::factory()->withPersonalTeam()->create();
+
+        $response = $this->actingAs($user, 'sanctum')->postJson('/api/v1/chemotion/upload', [
+            'external_id' => 'CHEM-TRACK-001',
+            'callback_url' => 'https://example.com/callback',
+            'zip_url' => 'https://example.com/data.zip',
+        ]);
+
+        $response->assertStatus(200);
+    }
+
+    /**
+     * Test ELN tracking service handles exceptions gracefully
+     */
+    public function test_eln_tracking_service_handles_exceptions_gracefully()
+    {
+        Queue::fake();
+
+        // Mock tracker service to throw exception
+        $this->app->bind(ChemotionRepositoryTrackerService::class, function () {
+            return Mockery::mock(ChemotionRepositoryTrackerService::class, function ($mock) {
+                $mock->shouldReceive('isEnabled')->andReturn(true);
+                $mock->shouldReceive('createElnSubmissionTracking')
+                    ->andThrow(new \Exception('Tracking service unavailable'));
+            });
+        });
+
+        $user = User::factory()->withPersonalTeam()->create();
+
+        $response = $this->actingAs($user, 'sanctum')->postJson('/api/v1/chemotion/upload', [
+            'external_id' => 'CHEM-EXCEPTION-001',
+            'callback_url' => 'https://example.com/callback',
+            'zip_url' => 'https://example.com/data.zip',
+        ]);
+
+        // Should still succeed even if tracking fails
+        $response->assertStatus(200);
+    }
 }
