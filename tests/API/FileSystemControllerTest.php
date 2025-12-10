@@ -4,6 +4,7 @@ namespace Tests\API;
 
 use App\Models\FileSystemObject;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Tests\TestCase;
 
 class FileSystemControllerTest extends TestCase
@@ -147,19 +148,23 @@ class FileSystemControllerTest extends TestCase
         ]);
 
         // Create children with different types
+        Carbon::setTestNow(now());
         FileSystemObject::factory()->create([
             'parent_id' => $parent->id,
             'type' => 'directory',
             'name' => 'Folder 1',
         ]);
 
-        sleep(1); // Ensure different timestamps
+        // Advance time by 1 second to ensure different timestamps
+        Carbon::setTestNow(now()->addSecond());
 
         FileSystemObject::factory()->create([
             'parent_id' => $parent->id,
             'type' => 'file',
             'name' => 'File 1',
         ]);
+
+        Carbon::setTestNow(); // Reset time
 
         $response = $this->getJson('/api/v1/files/children/'.$parent->id);
 

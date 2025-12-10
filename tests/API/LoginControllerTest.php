@@ -97,7 +97,7 @@ class LoginControllerTest extends TestCase
             'password' => 'password123',
         ]);
 
-        $response->assertStatus(401);
+        $response->assertStatus(422);
     }
 
     /**
@@ -109,7 +109,7 @@ class LoginControllerTest extends TestCase
             'email' => 'test@example.com',
         ]);
 
-        $response->assertStatus(401);
+        $response->assertStatus(422);
     }
 
     /**
@@ -243,7 +243,7 @@ class LoginControllerTest extends TestCase
             'password' => 'password123',
         ]);
 
-        $response->assertStatus(401);
+        $response->assertStatus(422);
     }
 
     /**
@@ -256,7 +256,7 @@ class LoginControllerTest extends TestCase
             'password' => '',
         ]);
 
-        $response->assertStatus(401);
+        $response->assertStatus(422);
     }
 
     /**

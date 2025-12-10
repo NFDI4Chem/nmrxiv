@@ -123,7 +123,7 @@ class RegisterControllerTest extends TestCase
             'password' => 'password123',
         ]);
 
-        $response->assertStatus(401);
+        $response->assertStatus(422);
         $response->assertJsonValidationErrors(['first_name']);
     }
 
@@ -139,7 +139,7 @@ class RegisterControllerTest extends TestCase
             'password' => 'password123',
         ]);
 
-        $response->assertStatus(401);
+        $response->assertStatus(422);
         $response->assertJsonValidationErrors(['last_name']);
     }
 
@@ -155,7 +155,7 @@ class RegisterControllerTest extends TestCase
             'password' => 'password123',
         ]);
 
-        $response->assertStatus(401);
+        $response->assertStatus(422);
         $response->assertJsonValidationErrors(['email']);
     }
 
@@ -172,7 +172,7 @@ class RegisterControllerTest extends TestCase
             'password' => 'password123',
         ]);
 
-        $response->assertStatus(401);
+        $response->assertStatus(422);
         $response->assertJsonValidationErrors(['email']);
     }
 
@@ -193,7 +193,7 @@ class RegisterControllerTest extends TestCase
             'password' => 'password123',
         ]);
 
-        $response->assertStatus(401);
+        $response->assertStatus(422);
         $response->assertJsonValidationErrors(['email']);
     }
 
@@ -209,7 +209,7 @@ class RegisterControllerTest extends TestCase
             'password' => 'password123',
         ]);
 
-        $response->assertStatus(401);
+        $response->assertStatus(422);
         $response->assertJsonValidationErrors(['username']);
     }
 
@@ -230,7 +230,7 @@ class RegisterControllerTest extends TestCase
             'password' => 'password123',
         ]);
 
-        $response->assertStatus(401);
+        $response->assertStatus(422);
         $response->assertJsonValidationErrors(['username']);
     }
 
@@ -246,7 +246,7 @@ class RegisterControllerTest extends TestCase
             'username' => 'testuser',
         ]);
 
-        $response->assertStatus(401);
+        $response->assertStatus(422);
         $response->assertJsonValidationErrors(['password']);
     }
 
@@ -263,7 +263,7 @@ class RegisterControllerTest extends TestCase
             'password' => 'short',
         ]);
 
-        $response->assertStatus(401);
+        $response->assertStatus(422);
         $response->assertJsonValidationErrors(['password']);
     }
 
@@ -342,7 +342,7 @@ class RegisterControllerTest extends TestCase
             'password' => 'password123',
         ]);
 
-        $response->assertStatus(401);
+        $response->assertStatus(422);
         $response->assertJsonValidationErrors(['first_name']);
     }
 
@@ -361,7 +361,7 @@ class RegisterControllerTest extends TestCase
             'password' => 'password123',
         ]);
 
-        $response->assertStatus(401);
+        $response->assertStatus(422);
         $response->assertJsonValidationErrors(['last_name']);
     }
 
@@ -380,7 +380,7 @@ class RegisterControllerTest extends TestCase
             'password' => 'password123',
         ]);
 
-        $response->assertStatus(401);
+        $response->assertStatus(422);
         $response->assertJsonValidationErrors(['email']);
     }
 
@@ -399,7 +399,7 @@ class RegisterControllerTest extends TestCase
             'password' => 'password123',
         ]);
 
-        $response->assertStatus(401);
+        $response->assertStatus(422);
         $response->assertJsonValidationErrors(['username']);
     }
 

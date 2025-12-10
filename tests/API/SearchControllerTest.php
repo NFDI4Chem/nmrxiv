@@ -116,8 +116,7 @@ class SearchControllerTest extends TestCase
      */
     public function test_pagination_with_limit_parameter()
     {
-        Molecule::factory()->count(50)->create([
-        ]);
+        Molecule::factory()->count(50)->create();
 
         $response = $this->postJson('/api/v1/search', [
             'limit' => 10,
@@ -135,8 +134,7 @@ class SearchControllerTest extends TestCase
      */
     public function test_search_with_sort_parameter()
     {
-        Molecule::factory()->count(5)->create([
-        ]);
+        Molecule::factory()->count(5)->create();
 
         $response = $this->postJson('/api/v1/search?sort=recent', [
             'query' => '',
@@ -165,8 +163,7 @@ class SearchControllerTest extends TestCase
     {
         $this->markTestSkipped('Tagging functionality not implemented on Molecule model');
 
-        $molecule = Molecule::factory()->create([
-        ]);
+        $molecule = Molecule::factory()->create();
 
         $molecule->attachTag('organic', 'chemical_class');
 
@@ -184,8 +181,7 @@ class SearchControllerTest extends TestCase
      */
     public function test_empty_search_returns_all_molecules()
     {
-        Molecule::factory()->count(3)->create([
-        ]);
+        Molecule::factory()->count(3)->create();
 
         $response = $this->postJson('/api/v1/search', [
             'query' => '',
@@ -241,8 +237,7 @@ class SearchControllerTest extends TestCase
      */
     public function test_search_with_page_parameter()
     {
-        Molecule::factory()->count(30)->create([
-        ]);
+        Molecule::factory()->count(30)->create();
 
         $response = $this->postJson('/api/v1/search', [
             'page' => 2,
@@ -260,8 +255,7 @@ class SearchControllerTest extends TestCase
      */
     public function test_search_returns_pagination_metadata()
     {
-        Molecule::factory()->count(30)->create([
-        ]);
+        Molecule::factory()->count(30)->create();
 
         $response = $this->postJson('/api/v1/search', [
             'query' => '',
