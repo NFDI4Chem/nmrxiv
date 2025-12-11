@@ -248,7 +248,7 @@ class DatasetTest extends TestCase
      */
     public function test_snapshot_saves_svg_for_project_dataset()
     {
-        Storage::fake(env('FILESYSTEM_DRIVER_PUBLIC', 'public'));
+        Storage::fake('local');
 
         $user = User::factory()->withPersonalTeam()->create();
         $project = Project::factory()->create(['owner_id' => $user->id]);
@@ -270,7 +270,7 @@ class DatasetTest extends TestCase
         $expectedPath = "/projects/{$project->uuid}/{$study->uuid}/{$dataset->slug}.svg";
         $this->assertEquals($expectedPath, $dataset->dataset_photo_path);
 
-        Storage::disk(env('FILESYSTEM_DRIVER_PUBLIC', 'public'))
+        Storage::disk('local')
             ->assertExists($expectedPath);
     }
 
@@ -279,7 +279,7 @@ class DatasetTest extends TestCase
      */
     public function test_snapshot_saves_svg_for_sample_dataset()
     {
-        Storage::fake(env('FILESYSTEM_DRIVER_PUBLIC', 'public'));
+        Storage::fake('local');
 
         $user = User::factory()->withPersonalTeam()->create();
         $study = Study::factory()->create(['project_id' => null]); // Sample without project
@@ -300,7 +300,7 @@ class DatasetTest extends TestCase
         $expectedPath = "/samples/{$study->uuid}/{$dataset->slug}.svg";
         $this->assertEquals($expectedPath, $dataset->dataset_photo_path);
 
-        Storage::disk(env('FILESYSTEM_DRIVER_PUBLIC', 'public'))
+        Storage::disk('local')
             ->assertExists($expectedPath);
     }
 
@@ -309,7 +309,7 @@ class DatasetTest extends TestCase
      */
     public function test_snapshot_does_nothing_without_content()
     {
-        Storage::fake(env('FILESYSTEM_DRIVER_PUBLIC', 'public'));
+        Storage::fake('local');
 
         $user = User::factory()->withPersonalTeam()->create();
         $project = Project::factory()->create(['owner_id' => $user->id]);
