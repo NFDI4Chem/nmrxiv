@@ -19,11 +19,15 @@ class DatasetController extends Controller
     {
         $dataset = Dataset::where('slug', $slug)->firstOrFail();
 
-        if ($dataset->is_public) {
-            return Inertia::render('Public/Dataset', [
-                'dataset' => $dataset,
-            ]);
+        if (! $dataset->is_public) {
+            return response()->json([
+                'message' => 'Unauthorized',
+            ], 401);
         }
+
+        return Inertia::render('Public/Dataset', [
+            'dataset' => $dataset,
+        ]);
     }
 
     public function fetchNMRium(Request $request, Dataset $dataset)
