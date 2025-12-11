@@ -19,11 +19,15 @@ class DatasetController extends Controller
     {
         $dataset = Dataset::where('slug', $slug)->firstOrFail();
 
-        if ($dataset->is_public) {
-            return Inertia::render('Public/Dataset', [
-                'dataset' => $dataset,
-            ]);
+        if (! $dataset->is_public) {
+            return response()->json([
+                'message' => 'Unauthorized',
+            ], 401);
         }
+
+        return Inertia::render('Public/Dataset', [
+            'dataset' => $dataset,
+        ]);
     }
 
     public function fetchNMRium(Request $request, Dataset $dataset)
@@ -142,12 +146,12 @@ class DatasetController extends Controller
         if ($content) {
             if ($study->project) {
                 $path = '/projects/'.$study->project->uuid.'/'.$study->uuid.'/'.$dataset->slug.'.svg';
-                Storage::disk(env('FILESYSTEM_DRIVER_PUBLIC'))->put($path, $content, 'public');
+                Storage::disk(config('filesystems.default_public'))->put($path, $content, 'public');
                 $dataset->dataset_photo_path = $path;
                 $dataset->save();
             } else {
                 $path = '/samples/'.$study->uuid.'/'.$dataset->slug.'.svg';
-                Storage::disk(env('FILESYSTEM_DRIVER_PUBLIC'))->put($path, $content, 'public');
+                Storage::disk(config('filesystems.default_public'))->put($path, $content, 'public');
                 $dataset->dataset_photo_path = $path;
                 $dataset->save();
             }
