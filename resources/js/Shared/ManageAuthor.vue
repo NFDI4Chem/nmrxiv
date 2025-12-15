@@ -179,15 +179,17 @@
                                             Affiliation
                                         </label>
                                         <div class="mt-1">
-                                            <textarea
-                                                id="affiliation"
+                                            <ror-affiliation-typeahead
                                                 v-model="form.affiliation"
-                                                name="affiliation"
-                                                rows="3"
-                                                :class="textareaClasses"
-                                                placeholder="Name and address of affiliated University and Department. e.g. Institut für Anorganische und Analytische Chemie, Friedrich-Schiller-Universität, Schloßgasse 10, 07743 Jena"
+                                                v-model:ror-id="form.ror_id"
+                                                input-id="affiliation"
+                                                input-class="mt-1 block w-full"
+                                                placeholder="Start typing organization name..."
                                             />
                                         </div>
+                                        <p class="mt-1 text-xs text-gray-500">
+                                            Start typing to search for your organization. Select from the dropdown or enter a custom name.
+                                        </p>
                                         <jet-input-error
                                             :message="
                                                 authorsForm.errors.affiliation
@@ -608,6 +610,7 @@ import SelectRich from "@/Shared/SelectRich.vue";
 import Draggable from "vuedraggable";
 import Global from "@/Mixins/Global.js";
 import AuthorCard from "@/Shared/AuthorCard.vue";
+import RorAffiliationTypeahead from "@/Shared/RorAffiliationTypeahead.vue";
 
 export default {
     components: {
@@ -624,6 +627,7 @@ export default {
         SelectRich,
         Draggable,
         AuthorCard,
+        RorAffiliationTypeahead,
     },
 
     mixins: [Global],
@@ -639,6 +643,7 @@ export default {
                 given_name: "",
                 family_name: null,
                 affiliation: null,
+                ror_id: null,
                 orcid_id: null,
                 email_id: null,
                 contributor_type: null,
@@ -942,6 +947,7 @@ export default {
             this.form.family_name = author.family_name;
             this.form.email_id = author.email_id;
             this.form.affiliation = author.affiliation;
+            this.form.ror_id = author.ror_id || null;
             this.form.orcid_id = author.orcid_id;
             this.form.contributor_type = {};
             this.form.contributor_type.title = author.pivot
@@ -1279,6 +1285,7 @@ export default {
                 affiliation: this.form.affiliation
                     ? this.form.affiliation.trim()
                     : null,
+                ror_id: this.form.ror_id || null,
                 contributor_type: this.form.contributor_type
                     ? this.form.contributor_type.title.trim()
                     : "Researcher",
