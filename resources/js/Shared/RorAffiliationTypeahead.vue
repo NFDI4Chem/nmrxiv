@@ -16,7 +16,7 @@
             @keydown.enter.prevent="selectHighlighted"
             @keydown.escape="closeDropdown"
         />
-        
+
         <!-- Loading indicator -->
         <div
             v-if="loading"
@@ -79,7 +79,11 @@
 
             <!-- No results message -->
             <div
-                v-if="suggestions.length === 0 && searchQuery.length >= minLength && !loading"
+                v-if="
+                    suggestions.length === 0 &&
+                    searchQuery.length >= minLength &&
+                    !loading
+                "
                 class="px-4 py-3 text-sm text-gray-500"
             >
                 <p>No organizations found.</p>
@@ -213,15 +217,15 @@ export default {
             try {
                 // Build URL with only the query parameter
                 const url = new URL(this.apiUrl);
-                url.searchParams.append('query', this.searchQuery);
+                url.searchParams.append("query", this.searchQuery);
 
                 const headers = {
-                    'Accept': 'application/json',
+                    Accept: "application/json",
                     //'Client-Id': this.clientId || '', Enable Client-Id header after January 2026
                 };
 
                 const response = await fetch(url.toString(), {
-                    method: 'GET',
+                    method: "GET",
                     headers: headers,
                 });
 
@@ -248,21 +252,23 @@ export default {
             const altNames = this.getAltNames(org);
             const orgType = this.getOrgType(org);
             const location = this.getLocation(org);
-            
+
             // Format complete organization details
             let fullDetails = displayName;
-            
+
             if (altNames) {
                 fullDetails += ` (${altNames})`;
             }
-            
+
             if (orgType || location) {
-                const typeAndLocation = [orgType, location].filter(Boolean).join(' · ');
+                const typeAndLocation = [orgType, location]
+                    .filter(Boolean)
+                    .join(" · ");
                 if (typeAndLocation) {
                     fullDetails += ` - ${typeAndLocation}`;
                 }
             }
-            
+
             this.searchQuery = fullDetails;
             this.selectedRorId = org.id || "";
 
@@ -300,7 +306,9 @@ export default {
                 this.highlightedIndex >= 0 &&
                 this.highlightedIndex < this.suggestions.length
             ) {
-                this.selectOrganization(this.suggestions[this.highlightedIndex]);
+                this.selectOrganization(
+                    this.suggestions[this.highlightedIndex]
+                );
             } else if (this.allowFreeText && this.searchQuery.length > 0) {
                 // Allow free text entry
                 this.$emit("update:modelValue", this.searchQuery);

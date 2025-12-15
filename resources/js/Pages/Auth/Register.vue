@@ -11,7 +11,10 @@
         <form @submit.prevent="submit">
             <div>
                 <div
-                    v-if="$page.props.environment && $page.props.environment.toLowerCase() != 'production'"
+                    v-if="
+                        $page.props.environment &&
+                        $page.props.environment.toLowerCase() != 'production'
+                    "
                     class="pb-4"
                 >
                     <div
@@ -149,7 +152,8 @@
                     placeholder=""
                 />
                 <p class="mt-1 text-xs text-gray-500">
-                    Start typing to search for your organization. Select from the dropdown or enter a custom name.
+                    Start typing to search for your organization. Select from
+                    the dropdown or enter a custom name.
                 </p>
                 <jet-input-error :message="error.affiliation" class="mt-2" />
             </div>

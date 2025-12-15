@@ -168,7 +168,7 @@
                     for="affiliation"
                     value="Affiliation"
                 />
-                    <ror-affiliation-typeahead
+                <ror-affiliation-typeahead
                     v-model="form.affiliation"
                     v-model:ror-id="form.ror_id"
                     input-id="affiliation"
@@ -176,7 +176,8 @@
                     placeholder=""
                 />
                 <p class="mt-1 text-xs text-gray-500">
-                    Start typing to search for your organization. Select from the dropdown or enter a custom name.
+                    Start typing to search for your organization. Select from
+                    the dropdown or enter a custom name.
                 </p>
                 <jet-input-error
                     :message="form.errors.affiliation"
@@ -266,7 +267,7 @@ export default {
         JetLabel,
         JetSecondaryButton,
         SelectOrcidId,
-        RorAffiliationTypeahead
+        RorAffiliationTypeahead,
     },
 
     props: ["user"],

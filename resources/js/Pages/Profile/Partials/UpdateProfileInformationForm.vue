@@ -165,27 +165,28 @@
                 </div>
 
                 <!-- Affiliation -->
-            <div class="col-span-6 sm:col-span-4">
-                <jet-label
-                    class="after:content-['(optional)'] after:ml-0.5 after:text-gray-500"
-                    for="affiliation"
-                    value="Affiliation"
-                />
+                <div class="col-span-6 sm:col-span-4">
+                    <jet-label
+                        class="after:content-['(optional)'] after:ml-0.5 after:text-gray-500"
+                        for="affiliation"
+                        value="Affiliation"
+                    />
                     <ror-affiliation-typeahead
-                    v-model="form.affiliation"
-                    v-model:ror-id="form.ror_id"
-                    input-id="affiliation"
-                    input-class="mt-1 block w-full"
-                    placeholder=""
-                />
-                <p class="mt-1 text-xs text-gray-500">
-                    Start typing to search for your organization. Select from the dropdown or enter a custom name.
-                </p>
-                <jet-input-error
-                    :message="form.errors.affiliation"
-                    class="mt-2"
-                />
-            </div>
+                        v-model="form.affiliation"
+                        v-model:ror-id="form.ror_id"
+                        input-id="affiliation"
+                        input-class="mt-1 block w-full"
+                        placeholder=""
+                    />
+                    <p class="mt-1 text-xs text-gray-500">
+                        Start typing to search for your organization. Select
+                        from the dropdown or enter a custom name.
+                    </p>
+                    <jet-input-error
+                        :message="form.errors.affiliation"
+                        class="mt-2"
+                    />
+                </div>
             </template>
 
             <template #actions>

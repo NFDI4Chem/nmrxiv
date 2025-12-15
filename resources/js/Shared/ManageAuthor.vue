@@ -188,7 +188,9 @@
                                             />
                                         </div>
                                         <p class="mt-1 text-xs text-gray-500">
-                                            Start typing to search for your organization. Select from the dropdown or enter a custom name.
+                                            Start typing to search for your
+                                            organization. Select from the
+                                            dropdown or enter a custom name.
                                         </p>
                                         <jet-input-error
                                             :message="
