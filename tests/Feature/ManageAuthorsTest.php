@@ -752,6 +752,240 @@ class ManageAuthorsTest extends TestCase
     }
 
     /**
+     * Test author can be created with ROR ID
+     *
+     * @return void
+     */
+    public function test_author_with_ror_id_can_be_created()
+    {
+        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+
+        $project = Project::factory()->create([
+            'owner_id' => $user->id,
+        ]);
+
+        $body = [
+            'authors' => [[
+                'given_name' => 'Friedrich',
+                'family_name' => 'Schiller',
+                'email_id' => 'f.schiller@uni-jena.de',
+                'affiliation' => 'Friedrich Schiller University Jena (FSU, Friedrich-Schiller-Universität Jena) - Education · Jena, Germany',
+                'ror_id' => 'https://ror.org/05qghxh33',
+                'contributor_type' => 'Researcher',
+            ]],
+        ];
+
+        $response = $this->withHeaders([
+            'Accept' => 'application/json',
+        ])->post('authors/'.$project->id, $body);
+
+        $response->assertStatus(200);
+
+        // Verify ROR ID and full affiliation details were saved
+        $this->assertDatabaseHas('authors', [
+            'given_name' => 'Friedrich',
+            'family_name' => 'Schiller',
+            'email_id' => 'f.schiller@uni-jena.de',
+            'affiliation' => 'Friedrich Schiller University Jena (FSU, Friedrich-Schiller-Universität Jena) - Education · Jena, Germany',
+            'ror_id' => 'https://ror.org/05qghxh33',
+        ]);
+    }
+
+    /**
+     * Test author with ROR ID can be updated
+     *
+     * @return void
+     */
+    public function test_author_with_ror_id_can_be_updated()
+    {
+        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+
+        $project = Project::factory()->create([
+            'owner_id' => $user->id,
+        ]);
+
+        // Create author with ROR ID
+        $author = Author::factory()->create([
+            'given_name' => 'Test',
+            'family_name' => 'Author',
+            'email_id' => 'test@example.com',
+            'affiliation' => 'Old University',
+            'ror_id' => 'https://ror.org/oldid123',
+        ]);
+
+        $project->authors()->attach($author->id, [
+            'contributor_type' => 'Researcher',
+            'sort_order' => 0,
+        ]);
+
+        // Update author with new ROR ID and affiliation
+        $body = [
+            'authors' => [[
+                'id' => $author->id,
+                'given_name' => 'Test',
+                'family_name' => 'Author',
+                'email_id' => 'test@example.com',
+                'affiliation' => 'Friedrich Schiller University Jena (FSU, Friedrich-Schiller-Universität Jena) - Education · Jena, Germany',
+                'ror_id' => 'https://ror.org/05qghxh33',
+                'contributor_type' => 'Researcher',
+            ]],
+        ];
+
+        $response = $this->withHeaders([
+            'Accept' => 'application/json',
+        ])->post('authors/'.$project->id, $body);
+
+        $response->assertStatus(200);
+
+        // Verify updated ROR ID and affiliation
+        $this->assertDatabaseHas('authors', [
+            'id' => $author->id,
+            'affiliation' => 'Friedrich Schiller University Jena (FSU, Friedrich-Schiller-Universität Jena) - Education · Jena, Germany',
+            'ror_id' => 'https://ror.org/05qghxh33',
+        ]);
+    }
+
+    /**
+     * Test author can be created without ROR ID (free text affiliation)
+     *
+     * @return void
+     */
+    public function test_author_without_ror_id_can_be_created()
+    {
+        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+
+        $project = Project::factory()->create([
+            'owner_id' => $user->id,
+        ]);
+
+        $body = [
+            'authors' => [[
+                'given_name' => 'Manual',
+                'family_name' => 'Entry',
+                'email_id' => 'manual@example.com',
+                'affiliation' => 'Small Research Institute',
+                'ror_id' => null,
+                'contributor_type' => 'Researcher',
+            ]],
+        ];
+
+        $response = $this->withHeaders([
+            'Accept' => 'application/json',
+        ])->post('authors/'.$project->id, $body);
+
+        $response->assertStatus(200);
+
+        // Verify author was created with free text affiliation and no ROR ID
+        $this->assertDatabaseHas('authors', [
+            'given_name' => 'Manual',
+            'family_name' => 'Entry',
+            'email_id' => 'manual@example.com',
+            'affiliation' => 'Small Research Institute',
+            'ror_id' => null,
+        ]);
+    }
+
+    /**
+     * Test ROR ID can be removed from author (switching to free text)
+     *
+     * @return void
+     */
+    public function test_ror_id_can_be_removed_from_author()
+    {
+        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+
+        $project = Project::factory()->create([
+            'owner_id' => $user->id,
+        ]);
+
+        // Create author with ROR ID
+        $author = Author::factory()->create([
+            'given_name' => 'Test',
+            'family_name' => 'Author',
+            'email_id' => 'test@example.com',
+            'affiliation' => 'Friedrich Schiller University Jena (FSU, Friedrich-Schiller-Universität Jena) - Education · Jena, Germany',
+            'ror_id' => 'https://ror.org/05qghxh33',
+        ]);
+
+        $project->authors()->attach($author->id, [
+            'contributor_type' => 'Researcher',
+            'sort_order' => 0,
+        ]);
+
+        // Update author to remove ROR ID and use free text
+        $body = [
+            'authors' => [[
+                'id' => $author->id,
+                'given_name' => 'Test',
+                'family_name' => 'Author',
+                'email_id' => 'test@example.com',
+                'affiliation' => 'Independent Researcher',
+                'ror_id' => null,
+                'contributor_type' => 'Researcher',
+            ]],
+        ];
+
+        $response = $this->withHeaders([
+            'Accept' => 'application/json',
+        ])->post('authors/'.$project->id, $body);
+
+        $response->assertStatus(200);
+
+        // Verify ROR ID was removed
+        $this->assertDatabaseHas('authors', [
+            'id' => $author->id,
+            'affiliation' => 'Independent Researcher',
+            'ror_id' => null,
+        ]);
+    }
+
+    /**
+     * Test author affiliation stores full organization details
+     *
+     * @return void
+     */
+    public function test_author_affiliation_stores_full_details()
+    {
+        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+
+        $project = Project::factory()->create([
+            'owner_id' => $user->id,
+        ]);
+
+        // Test with long affiliation text that includes all details
+        $fullAffiliation = 'Massachusetts Institute of Technology (MIT, M.I.T.) - Education · Cambridge, United States';
+
+        $body = [
+            'authors' => [[
+                'given_name' => 'John',
+                'family_name' => 'Smith',
+                'email_id' => 'john@mit.edu',
+                'affiliation' => $fullAffiliation,
+                'ror_id' => 'https://ror.org/042nb2s44',
+                'contributor_type' => 'Researcher',
+            ]],
+        ];
+
+        $response = $this->withHeaders([
+            'Accept' => 'application/json',
+        ])->post('authors/'.$project->id, $body);
+
+        $response->assertStatus(200);
+
+        // Verify full affiliation text is stored without truncation
+        $this->assertDatabaseHas('authors', [
+            'given_name' => 'John',
+            'family_name' => 'Smith',
+            'affiliation' => $fullAffiliation,
+        ]);
+
+        // Also verify the full affiliation text is longer than old 255 character limit
+        $author = Author::where('email_id', 'john@mit.edu')->first();
+        $this->assertNotNull($author);
+        $this->assertEquals($fullAffiliation, $author->affiliation);
+    }
+
+    /**
      * Prepare request body for author
      *
      * @param  \App\Models\Author  $author
