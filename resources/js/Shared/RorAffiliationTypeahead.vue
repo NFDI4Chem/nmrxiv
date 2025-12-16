@@ -213,7 +213,7 @@ export default {
             this.loading = true;
 
             try {
-                const response = await axios.get(this.route('ror.search'), {
+                const response = await axios.get(this.route("ror.search"), {
                     params: {
                         query: this.searchQuery,
                     },
@@ -227,7 +227,7 @@ export default {
             } catch (error) {
                 console.error("Error fetching ROR organizations:", error);
                 this.suggestions = [];
-                
+
                 // Show error message if available
                 if (error.response?.data?.error) {
                     console.error(error.response.data.error);
