@@ -329,4 +329,28 @@ class OrcidControllerTest extends TestCase
             return $request->hasHeader('Accept', 'application/json');
         });
     }
+
+    /**
+     * Test person method returns error when orcidId is empty string
+     */
+    public function test_person_returns_error_when_orcid_id_is_empty(): void
+    {
+        $controller = new \App\Http\Controllers\OrcidController;
+        $response = $controller->person('');
+
+        $this->assertEquals(400, $response->status());
+        $this->assertEquals(['error' => 'ORCID ID is required'], $response->getData(true));
+    }
+
+    /**
+     * Test employment method returns error when orcidId is empty string
+     */
+    public function test_employment_returns_error_when_orcid_id_is_empty(): void
+    {
+        $controller = new \App\Http\Controllers\OrcidController;
+        $response = $controller->employment('');
+
+        $this->assertEquals(400, $response->status());
+        $this->assertEquals(['error' => 'ORCID ID is required'], $response->getData(true));
+    }
 }
