@@ -117,6 +117,10 @@ Route::middleware('web', WelcomesNewUsers::class)->group(function () {
     Route::post('welcome/{user}', [MyWelcomeController::class, 'savePassword'])->name('password.set');
 });
 
+// ROR API
+Route::get('ror/search', [\App\Http\Controllers\RorController::class, 'search'])
+    ->name('ror.search');
+
 Route::middleware('auth', 'verified')->group(function () {
     // License
     Route::get('licenses', [LicenseController::class, 'index'])

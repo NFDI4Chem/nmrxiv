@@ -151,8 +151,6 @@ export default {
             debounceTimeout: null,
             highlightedIndex: -1,
             selectedRorId: this.rorId,
-            apiUrl: this.$page.props.rorApiUrl,
-            clientId: this.$page.props.rorClientId,
         };
     },
     watch: {
@@ -215,34 +213,25 @@ export default {
             this.loading = true;
 
             try {
-                // Build URL with only the query parameter
-                const url = new URL(this.apiUrl);
-                url.searchParams.append("query", this.searchQuery);
-
-                const headers = {
-                    Accept: "application/json",
-                    //'Client-Id': this.clientId || '', Enable Client-Id header after January 2026
-                };
-
-                const response = await fetch(url.toString(), {
-                    method: "GET",
-                    headers: headers,
+                const response = await axios.get(this.route('ror.search'), {
+                    params: {
+                        query: this.searchQuery,
+                    },
                 });
 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const data = await response.json();
-
-                if (data && data.items) {
-                    this.suggestions = data.items;
+                if (response.data && response.data.items) {
+                    this.suggestions = response.data.items;
                     this.showDropdown = true;
                     this.highlightedIndex = -1;
                 }
             } catch (error) {
                 console.error("Error fetching ROR organizations:", error);
                 this.suggestions = [];
+                
+                // Show error message if available
+                if (error.response?.data?.error) {
+                    console.error(error.response.data.error);
+                }
             } finally {
                 this.loading = false;
             }

@@ -79,8 +79,6 @@ class HandleInertiaRequests extends Middleware
             'orcidSearchApi' => env('ORCID_ID_SEARCH_API'),
             'orcidPersonApi' => env('ORCID_ID_PERSON_API'),
             'orcidEmploymentApi' => env('ORCID_ID_EMPLOYMENT_API'),
-            'rorApiUrl' => config('ror.api_url'),
-            'rorClientId' => config('ror.client_id'),
             'CM_API' => env('CM_API'),
             'CROSSREF_API' => env('CROSSREF_API'),
             'DATACITE_API' => env('DATACITE_API'),
