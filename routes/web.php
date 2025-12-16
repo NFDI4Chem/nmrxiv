@@ -46,8 +46,8 @@ Route::prefix('auth')->group(function () {
         ->name('auth.checkPassword');
 });
 
-// ORCID Routes
-Route::prefix('orcid')->group(function () {
+// ORCID Routes with rate limiting
+Route::middleware(['throttle:60,1'])->prefix('orcid')->group(function () {
     Route::get('/search', [OrcidController::class, 'search']);
     Route::get('/{orcidId}/person', [OrcidController::class, 'person']);
     Route::get('/{orcidId}/employment', [OrcidController::class, 'employment']);

@@ -23,6 +23,13 @@ class OrcidController extends Controller
                 'q' => $query,
             ]);
 
+            if ($response->failed()) {
+                return response()->json([
+                    'error' => 'Failed to fetch ORCID search results',
+                    'message' => $response->json('error-desc.value') ?? 'ORCID API returned an error',
+                ], $response->status());
+            }
+
             return response()->json($response->json());
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to fetch ORCID search results'], 500);
@@ -40,6 +47,13 @@ class OrcidController extends Controller
                 'Accept' => 'application/json',
             ])->get(config('orcid.base_url').'/'.$orcidId.'/person');
 
+            if ($response->failed()) {
+                return response()->json([
+                    'error' => 'Failed to fetch person data',
+                    'message' => $response->json('error-desc.value') ?? 'ORCID API returned an error',
+                ], $response->status());
+            }
+
             return response()->json($response->json());
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to fetch person data'], 500);
@@ -56,6 +70,13 @@ class OrcidController extends Controller
             $response = Http::withHeaders([
                 'Accept' => 'application/json',
             ])->get(config('orcid.base_url').'/'.$orcidId.'/employments');
+
+            if ($response->failed()) {
+                return response()->json([
+                    'error' => 'Failed to fetch employment data',
+                    'message' => $response->json('error-desc.value') ?? 'ORCID API returned an error',
+                ], $response->status());
+            }
 
             return response()->json($response->json());
         } catch (\Exception $e) {
