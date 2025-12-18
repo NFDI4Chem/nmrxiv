@@ -27,6 +27,7 @@ class ProjectInvitationModelTest extends TestCase
     public function test_it_has_correct_fillable_attributes()
     {
         $fillable = [
+            'project_id',
             'email',
             'role',
             'message',
