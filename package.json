@@ -55,6 +55,7 @@
         "openchemlib": "^7.4.3",
         "pluralize": "^8.0.0",
         "popper.js": "^1.16.1",
+        "qs": "^6.14.1",
         "vue-instantsearch": "^4.3.3",
         "vue-simple-context-menu": "^4.0.4",
         "vue3-clipboard": "^1.0.0",
@@ -62,5 +63,8 @@
         "vue3-slider": "^1.7.0",
         "vue3-tour": "^0.2.0",
         "vuedraggable": "^4.1.0"
+    },
+    "overrides": {
+        "qs": "^6.14.1"
     }
 }
