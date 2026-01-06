@@ -5,7 +5,6 @@ namespace Tests\Unit\Jobs;
 use App\Actions\Project\DeleteProject;
 use App\Jobs\DeleteProjects;
 use App\Models\Project;
-use App\Notifications\ProjectDeletionReminderNotification;
 use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -190,7 +189,7 @@ class DeleteProjectsJobTest extends TestCase
         $sendList = $job->prepareSendList($this->project);
 
         $this->assertNotEmpty($sendList);
-        $userIds = array_map(fn($user) => $user->id, $sendList);
+        $userIds = array_map(fn ($user) => $user->id, $sendList);
         $this->assertContains($creator->id, $userIds);
     }
 

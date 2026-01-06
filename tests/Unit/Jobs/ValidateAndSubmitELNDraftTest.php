@@ -2,13 +2,10 @@
 
 namespace Tests\Unit\Jobs;
 
-use App\Jobs\ProcessSubmission;
 use App\Jobs\ValidateAndSubmitELNDraft;
 use App\Models\Draft;
 use App\Models\Project;
-use App\Models\Study;
 use App\Models\User;
-use App\Services\ChemotionRepositoryTrackerService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Log;
@@ -108,8 +105,8 @@ class ValidateAndSubmitELNDraftTest extends TestCase
         Log::shouldReceive('error')
             ->once()
             ->withArgs(function ($message, $context) use ($draftWithoutProject) {
-                return str_contains($message, 'No project found') && 
-                       isset($context['draft_id']) && 
+                return str_contains($message, 'No project found') &&
+                       isset($context['draft_id']) &&
                        $context['draft_id'] === $draftWithoutProject->id;
             });
 

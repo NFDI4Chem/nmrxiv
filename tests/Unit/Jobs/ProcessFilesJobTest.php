@@ -5,11 +5,9 @@ namespace Tests\Unit\Jobs;
 use App\Jobs\ProcessFiles;
 use App\Models\Draft;
 use App\Models\FileSystemObject;
-use App\Models\Project;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
