@@ -120,12 +120,12 @@ class DataBackupJobTest extends TestCase
         // Should complete without error when no backup files exist (empty directory)
         // The job will call listContents on an empty fake disk and handle it gracefully
         $this->expectOutputString('');
-        
+
         try {
             $job->handle();
             $this->assertTrue(true);
         } catch (\Exception $e) {
-            // If an exception is thrown due to missing env vars or config, 
+            // If an exception is thrown due to missing env vars or config,
             // that's expected in test environment
             $this->assertTrue(true);
         }
