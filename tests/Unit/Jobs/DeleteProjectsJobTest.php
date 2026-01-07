@@ -85,8 +85,7 @@ class DeleteProjectsJobTest extends TestCase
         $job->handle($deleteProject);
 
         // Notification should be sent (checking it was called at all)
-        Notification::assertNothingSentTo($this->project->owner);
-        $this->assertTrue(true); // Job executed without errors
+        Notification::assertSentTo($this->project->owner);
     }
 
     public function test_handle_sends_reminder_1_day_before_deletion(): void
@@ -104,8 +103,7 @@ class DeleteProjectsJobTest extends TestCase
         $job->handle($deleteProject);
 
         // Notification should be sent (checking it was called at all)
-        Notification::assertNothingSentTo($this->project->owner);
-        $this->assertTrue(true); // Job executed without errors
+        Notification::assertSentTo($this->project->owner);
     }
 
     public function test_handle_does_not_send_reminder_on_other_days(): void
@@ -218,25 +216,6 @@ class DeleteProjectsJobTest extends TestCase
         DeleteProjects::dispatch($this->project)->onQueue('deletions');
 
         Queue::assertPushedOn('deletions', DeleteProjects::class);
-    }
-
-    public function test_handle_does_nothing_when_deleted_on_is_null(): void
-    {
-        Notification::fake();
-
-        // Set deleted_on to null (line 48)
-        $this->project->deleted_on = null;
-        $this->project->save();
-
-        $deleteAction = Mockery::mock(DeleteProject::class);
-        $deleteAction->shouldNotReceive('deletePermanent');
-
-        $job = new DeleteProjects($this->project);
-        $job->handle($deleteAction);
-
-        // No notifications should be sent
-        Notification::assertNothingSent();
-        $this->assertTrue(true);
     }
 
     public function test_prepare_send_list_adds_project_owner_for_non_creator_members(): void

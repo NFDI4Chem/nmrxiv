@@ -118,9 +118,30 @@ class VerifyFileIntegrityJobTest extends TestCase
         $this->assertTrue(true);
     }
 
-    // Test removed: Job code at line 84-87 has a bug where it calls verifyFileIntegrity()
-    // with 2 parameters (service only accepts 1) and treats boolean return as array.
-    // This code path appears to be non-functional and should be fixed in the job itself.
+    public function test_handle_processes_files_without_checksums(): void
+    {
+        // Create a file without checksums
+        $fileWithoutChecksums = FileSystemObject::factory()->file()->create([
+            'checksum_md5' => null,
+            'checksum_sha256' => null,
+            'checksum_algorithm' => 'sha256', // Required by DB constraint
+            'integrity_status' => 'pending', // Required by DB constraint
+        ]);
+
+        $integrityService = Mockery::mock(FileIntegrityService::class);
+        $integrityService->shouldReceive('verifyFileIntegrity')
+            ->once()
+            ->with(Mockery::on(function ($arg) use ($fileWithoutChecksums) {
+                return $arg->id === $fileWithoutChecksums->id;
+            }))
+            ->andReturn(false);
+
+        $job = new VerifyFileIntegrityJob($fileWithoutChecksums);
+        $job->handle($integrityService);
+
+        // Job should have called the service method
+        $this->assertTrue(true);
+    }
 
     public function test_job_has_correct_queue_traits(): void
     {
