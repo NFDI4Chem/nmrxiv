@@ -5,6 +5,7 @@ namespace Tests\Unit\Jobs;
 use App\Actions\Project\DeleteProject;
 use App\Jobs\DeleteProjects;
 use App\Models\Project;
+use App\Notifications\ProjectDeletionReminderNotification;
 use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -77,6 +78,7 @@ class DeleteProjectsJobTest extends TestCase
         $coolOffPeriod = (int) env('COOL_OFF_PERIOD', 30);
         $this->project->deleted_on = Carbon::now()->subDays($coolOffPeriod - 7);
         $this->project->save();
+        $this->project->refresh();
 
         $deleteProject = Mockery::mock(DeleteProject::class);
         $deleteProject->shouldReceive('deletePermanent')->never();
@@ -84,8 +86,11 @@ class DeleteProjectsJobTest extends TestCase
         $job = new DeleteProjects($this->project);
         $job->handle($deleteProject);
 
-        // Notification should be sent (checking it was called at all)
-        Notification::assertSentTo($this->project->owner);
+        // Notification should be sent to project users
+        Notification::assertSentTo(
+            [$this->project->owner],
+            ProjectDeletionReminderNotification::class
+        );
     }
 
     public function test_handle_sends_reminder_1_day_before_deletion(): void
@@ -95,6 +100,7 @@ class DeleteProjectsJobTest extends TestCase
         $coolOffPeriod = (int) env('COOL_OFF_PERIOD', 30);
         $this->project->deleted_on = Carbon::now()->subDays($coolOffPeriod - 1);
         $this->project->save();
+        $this->project->refresh();
 
         $deleteProject = Mockery::mock(DeleteProject::class);
         $deleteProject->shouldReceive('deletePermanent')->never();
@@ -102,8 +108,11 @@ class DeleteProjectsJobTest extends TestCase
         $job = new DeleteProjects($this->project);
         $job->handle($deleteProject);
 
-        // Notification should be sent (checking it was called at all)
-        Notification::assertSentTo($this->project->owner);
+        // Notification should be sent to project users
+        Notification::assertSentTo(
+            [$this->project->owner],
+            ProjectDeletionReminderNotification::class
+        );
     }
 
     public function test_handle_does_not_send_reminder_on_other_days(): void
