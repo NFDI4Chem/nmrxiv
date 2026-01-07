@@ -23,11 +23,7 @@ RUN /sbin/apk add --no-cache \
     oniguruma-dev \
     postgresql-dev \
     zlib-dev \
-    supervisor \
-    autoconf \
-    gcc \
-    g++ \
-    make
+    supervisor
 
 # Install PostgreSQL client
 RUN /sbin/apk --update add postgresql17-client --repository=https://dl-cdn.alpinelinux.org/alpine/edge/main
@@ -35,10 +31,11 @@ RUN /sbin/apk --update add postgresql17-client --repository=https://dl-cdn.alpin
 # Install PHP extensions
 RUN docker-php-ext-install pdo pdo_pgsql mbstring exif pcntl bcmath gd intl zip
 
-# Install APCu and Redis via PECL and clean up build dependencies in same layer
-RUN pecl install apcu redis && \
+# Install APCu and Redis via PECL with build dependencies added and removed in same layer
+RUN /sbin/apk add --no-cache --virtual .build-deps autoconf gcc g++ make && \
+    pecl install apcu redis && \
     docker-php-ext-enable apcu redis && \
-    /sbin/apk del autoconf gcc g++ make && \
+    /sbin/apk del .build-deps && \
     rm -rf /tmp/pear
 
 # Configure PHP
