@@ -11,7 +11,10 @@
         <form @submit.prevent="submit">
             <div>
                 <div
-                    v-if="$page.props.environment.toLowerCase() != 'production'"
+                    v-if="
+                        $page.props.environment &&
+                        $page.props.environment.toLowerCase() != 'production'
+                    "
                     class="pb-4"
                 >
                     <div
@@ -166,13 +169,17 @@
                     for="affiliation"
                     value="Affiliation"
                 />
-                <jet-input
-                    id="affiliation"
+                <ror-affiliation-typeahead
                     v-model="form.affiliation"
-                    type="text"
-                    class="mt-1 block w-full"
-                    autocomplete="affiliation"
+                    v-model:ror-id="form.ror_id"
+                    input-id="affiliation"
+                    input-class="mt-1 block w-full"
+                    placeholder=""
                 />
+                <p class="mt-1 text-xs text-gray-500">
+                    Start typing to search for your organization. Select from
+                    the dropdown or enter a custom name.
+                </p>
                 <jet-input-error :message="error.affiliation" class="mt-2" />
             </div>
             <!-- Password -->
@@ -281,6 +288,7 @@ import { Head, Link } from "@inertiajs/vue3";
 import AnnouncementBanner from "@/Shared/AnnouncementBanner.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import SelectOrcidId from "@/Shared/SelectOrcidId.vue";
+import RorAffiliationTypeahead from "@/Shared/RorAffiliationTypeahead.vue";
 import { ref } from "vue";
 
 export default {
@@ -297,6 +305,7 @@ export default {
         AnnouncementBanner,
         JetInputError,
         SelectOrcidId,
+        RorAffiliationTypeahead,
     },
     setup() {
         const selectOrcidIdElement = ref(null);
@@ -314,6 +323,7 @@ export default {
                 username: "",
                 orcid_id: "",
                 affiliation: "",
+                ror_id: "",
                 password: "",
                 password_confirmation: "",
                 terms: false,
