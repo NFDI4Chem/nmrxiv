@@ -4,7 +4,7 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 
-class SupportBubbleAntiSpamTest extends TestCase
+class SupportBubbleTest extends TestCase
 {
     protected function setUp(): void
     {
@@ -202,5 +202,164 @@ class SupportBubbleAntiSpamTest extends TestCase
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['message']);
+    }
+
+    /**
+     * Test that exception handling works correctly when event fails
+     */
+    public function test_exception_handling_when_event_fails(): void
+    {
+        // Mock the SupportBubbleSubmittedEvent to throw an exception when constructed
+        $this->mock(\Spatie\SupportBubble\Events\SupportBubbleSubmittedEvent::class, function ($mock) {
+            $mock->shouldReceive('__construct')
+                ->andThrow(new \Exception('Event construction failed'));
+        });
+
+        // Listen for the event and throw an exception
+        \Event::listen(\Spatie\SupportBubble\Events\SupportBubbleSubmittedEvent::class, function () {
+            throw new \Exception('Event listener failed');
+        });
+
+        $validData = [
+            'email' => 'user@example.com',
+            'subject' => 'Test subject',
+            'message' => 'This is a test message that should trigger an exception.',
+            'url' => 'https://nmrxiv.org/dashboard',
+        ];
+
+        $response = $this->postSupportBubble($validData);
+
+        $response->assertStatus(500)
+            ->assertJson([
+                'success' => false,
+                'message' => 'An error occurred while processing your request. Please try again.',
+            ]);
+    }
+
+    /**
+     * Test that errors are logged when exception occurs
+     */
+    public function test_exception_is_logged_with_details(): void
+    {
+        // Set up Log spy to capture log messages
+        \Log::spy();
+
+        // Listen for the event and throw an exception
+        \Event::listen(\Spatie\SupportBubble\Events\SupportBubbleSubmittedEvent::class, function () {
+            throw new \Exception('Event listener failed');
+        });
+
+        $validData = [
+            'email' => 'user@example.com',
+            'subject' => 'Test subject',
+            'message' => 'This is a test message.',
+            'url' => 'https://nmrxiv.org/dashboard',
+        ];
+
+        $this->postSupportBubble($validData);
+
+        // Assert that error was logged
+        \Log::shouldHaveReceived('error')
+            ->once()
+            ->withArgs(function ($message, $context) use ($validData) {
+                return $message === 'Support bubble submission failed'
+                    && isset($context['error'])
+                    && isset($context['ip'])
+                    && isset($context['data'])
+                    && $context['data']['email'] === $validData['email']
+                    && $context['data']['subject'] === $validData['subject'];
+            });
+    }
+
+    /**
+     * Test successful submission fires event with correct parameters
+     */
+    public function test_successful_submission_fires_event_with_correct_parameters(): void
+    {
+        \Event::fake();
+
+        $validData = [
+            'email' => 'user@example.com',
+            'subject' => 'Need help',
+            'message' => 'This is a legitimate support request.',
+            'url' => 'https://nmrxiv.org/dashboard',
+            'name' => 'John Doe',
+        ];
+
+        $response = $this->post('/support-bubble', $validData);
+
+        $response->assertStatus(200);
+
+        \Event::assertDispatched(\Spatie\SupportBubble\Events\SupportBubbleSubmittedEvent::class, function ($event) use ($validData) {
+            return $event->subject === $validData['subject']
+                && $event->message === $validData['message']
+                && $event->email === $validData['email']
+                && $event->name === $validData['name']
+                && $event->url === $validData['url'];
+        });
+    }
+
+    /**
+     * Test successful submission without optional name field
+     */
+    public function test_successful_submission_without_name_field(): void
+    {
+        \Event::fake();
+
+        $validData = [
+            'email' => 'user@example.com',
+            'subject' => 'Help needed',
+            'message' => 'I need assistance with uploading files.',
+            'url' => 'https://nmrxiv.org/dashboard',
+        ];
+
+        $response = $this->post('/support-bubble', $validData);
+
+        $response->assertStatus(200);
+
+        \Event::assertDispatched(\Spatie\SupportBubble\Events\SupportBubbleSubmittedEvent::class);
+    }
+
+    /**
+     * Test that IP address and user agent are captured in event
+     */
+    public function test_ip_and_user_agent_captured_in_event(): void
+    {
+        \Event::fake();
+
+        $validData = [
+            'email' => 'user@example.com',
+            'subject' => 'Test subject',
+            'message' => 'Test message with sufficient length.',
+            'url' => 'https://nmrxiv.org/dashboard',
+        ];
+
+        $response = $this->withHeaders([
+            'User-Agent' => 'TestBrowser/1.0',
+        ])->post('/support-bubble', $validData);
+
+        $response->assertStatus(200);
+
+        \Event::assertDispatched(\Spatie\SupportBubble\Events\SupportBubbleSubmittedEvent::class, function ($event) {
+            return ! empty($event->ip) && ! empty($event->userAgent);
+        });
+    }
+
+    /**
+     * Test that success view is returned on successful submission
+     */
+    public function test_success_view_is_returned(): void
+    {
+        $validData = [
+            'email' => 'user@example.com',
+            'subject' => 'Question about features',
+            'message' => 'I would like to know more about the advanced features available.',
+            'url' => 'https://nmrxiv.org/dashboard',
+        ];
+
+        $response = $this->post('/support-bubble', $validData);
+
+        $response->assertStatus(200)
+            ->assertViewIs('support-bubble::success');
     }
 }

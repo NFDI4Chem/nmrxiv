@@ -12,7 +12,7 @@ class SupportBubbleController extends Controller
     /**
      * Handle support bubble form submission
      */
-    public function submit(SupportBubbleRequest $request): Response
+    public function submit(SupportBubbleRequest $request): Response|\Illuminate\Http\JsonResponse
     {
         try {
             // Fire the event
