@@ -168,13 +168,17 @@
                     for="affiliation"
                     value="Affiliation"
                 />
-                <jet-input
-                    id="affiliation"
+                <ror-affiliation-typeahead
                     v-model="form.affiliation"
-                    type="text"
-                    class="mt-1 block w-full"
-                    autocomplete="affiliation"
+                    v-model:ror-id="form.ror_id"
+                    input-id="affiliation"
+                    input-class="mt-1 block w-full"
+                    placeholder=""
                 />
+                <p class="mt-1 text-xs text-gray-500">
+                    Start typing to search for your organization. Select from
+                    the dropdown or enter a custom name.
+                </p>
                 <jet-input-error
                     :message="form.errors.affiliation"
                     class="mt-2"
@@ -250,6 +254,7 @@ import JetLabel from "@/Jetstream/Label.vue";
 import JetActionMessage from "@/Jetstream/ActionMessage.vue";
 import JetSecondaryButton from "@/Jetstream/SecondaryButton.vue";
 import SelectOrcidId from "@/Shared/SelectOrcidId.vue";
+import RorAffiliationTypeahead from "@/Shared/RorAffiliationTypeahead.vue";
 import { ref } from "vue";
 
 export default {
@@ -262,6 +267,7 @@ export default {
         JetLabel,
         JetSecondaryButton,
         SelectOrcidId,
+        RorAffiliationTypeahead,
     },
 
     props: ["user"],

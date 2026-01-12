@@ -56,4 +56,65 @@ class RegistrationTest extends TestCase
         $this->assertAuthenticated();
         $response->assertRedirect(AppServiceProvider::HOME);
     }
+
+    public function test_new_users_can_register_with_ror_id(): void
+    {
+        if (! Features::enabled(Features::registration())) {
+            $this->markTestSkipped('Registration support is not enabled.');
+        }
+
+        $response = $this->post('/register', [
+            'name' => 'Test User',
+            'first_name' => 'Test',
+            'last_name' => 'User',
+            'username' => 'testror',
+            'email' => 'testror@example.com',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+            'orcid_id' => 'test',
+            'affiliation' => 'Friedrich Schiller University Jena (FSU, Friedrich-Schiller-Universität Jena) - Education · Jena, Germany',
+            'ror_id' => 'https://ror.org/05qghxh33',
+            'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature(),
+        ]);
+
+        $this->assertAuthenticated();
+        $response->assertRedirect(AppServiceProvider::HOME);
+
+        // Verify ROR ID and full affiliation were saved
+        $this->assertDatabaseHas('users', [
+            'email' => 'testror@example.com',
+            'affiliation' => 'Friedrich Schiller University Jena (FSU, Friedrich-Schiller-Universität Jena) - Education · Jena, Germany',
+            'ror_id' => 'https://ror.org/05qghxh33',
+        ]);
+    }
+
+    public function test_new_users_can_register_without_ror_id(): void
+    {
+        if (! Features::enabled(Features::registration())) {
+            $this->markTestSkipped('Registration support is not enabled.');
+        }
+
+        $response = $this->post('/register', [
+            'name' => 'Test User',
+            'first_name' => 'Test',
+            'last_name' => 'User',
+            'username' => 'testnoror',
+            'email' => 'testnoror@example.com',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+            'orcid_id' => 'test',
+            'affiliation' => 'Independent Researcher',
+            'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature(),
+        ]);
+
+        $this->assertAuthenticated();
+        $response->assertRedirect(AppServiceProvider::HOME);
+
+        // Verify user was created with free text affiliation and no ROR ID
+        $this->assertDatabaseHas('users', [
+            'email' => 'testnoror@example.com',
+            'affiliation' => 'Independent Researcher',
+            'ror_id' => null,
+        ]);
+    }
 }

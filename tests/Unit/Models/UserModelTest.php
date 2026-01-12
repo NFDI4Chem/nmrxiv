@@ -205,7 +205,7 @@ class UserModelTest extends TestCase
     public function test_it_has_correct_fillable_attributes(): void
     {
         $fillable = [
-            'name', 'first_name', 'last_name', 'username', 'email', 'password', 'onboarded', 'orcid_id', 'affiliation',
+            'name', 'first_name', 'last_name', 'username', 'email', 'password', 'onboarded', 'orcid_id', 'affiliation', 'ror_id',
         ];
 
         $user = new User;

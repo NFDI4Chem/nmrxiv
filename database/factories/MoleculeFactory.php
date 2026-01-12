@@ -47,7 +47,7 @@ class MoleculeFactory extends Factory
             'updated_at' => Carbon::now()->timestamp,
             'doi' => null,
             'datacite_schema' => null,
-            'identifier' => null,
+            'identifier' => $this->faker->unique()->numberBetween(1, 999999), // bigint identifier for searches
             'name' => $this->faker->words(2, true),
             'name_trust_level' => 0,
             'annotation_level' => 0,

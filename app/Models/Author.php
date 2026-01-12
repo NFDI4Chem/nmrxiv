@@ -22,6 +22,7 @@ class Author extends Model
         'family_name',
         'email_id',
         'affiliation',
+        'ror_id',
     ];
 
     public function projects(): BelongsToMany
