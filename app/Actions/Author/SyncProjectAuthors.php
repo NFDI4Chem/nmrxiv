@@ -64,6 +64,7 @@ class SyncProjectAuthors
             'email_id' => ['nullable', 'email', 'max:320'],
             'orcid_id' => ['nullable', 'string', 'max:19'],
             'affiliation' => ['nullable', 'string', 'max:500'],
+            'ror_id' => ['nullable', 'string', 'max:255'],
             'contributor_type' => ['nullable', 'string', 'max:50'],
         ])->validate();
     }
@@ -105,6 +106,7 @@ class SyncProjectAuthors
             'orcid_id' => $authorData['orcid_id'] ?? null,
             'email_id' => $authorData['email_id'] ?? null,
             'affiliation' => $authorData['affiliation'] ?? null,
+            'ror_id' => $authorData['ror_id'] ?? null,
         ];
     }
 }
