@@ -16,6 +16,7 @@ class ProjectInvitation extends Model
      * @var array
      */
     protected $fillable = [
+        'project_id',
         'email',
         'role',
         'message',

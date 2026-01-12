@@ -33,6 +33,7 @@ class AuthorModelTest extends TestCase
             'family_name',
             'email_id',
             'affiliation',
+            'ror_id',
         ];
 
         $author = new Author;

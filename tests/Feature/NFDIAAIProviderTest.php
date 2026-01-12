@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Auth;
+namespace Tests\Feature;
 
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;

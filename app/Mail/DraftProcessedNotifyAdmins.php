@@ -34,13 +34,14 @@ class DraftProcessedNotifyAdmins extends Mailable
     public function build()
     {
         $releasedToday = false;
-        $releaseDate = Carbon::parse($this->project->release_date);
-
-        if ($releaseDate->isToday()) {
-            $releasedToday = true;
-        }
 
         if ($this->project) {
+            $releaseDate = Carbon::parse($this->project->release_date);
+
+            if ($releaseDate->isToday()) {
+                $releasedToday = true;
+            }
+
             return $this->markdown('vendor.mail.project-published-notify-admins', [
                 'url' => url(config('app.url').'/dashboard/projects/'.$this->project->id),
                 'projectName' => $this->project->name,

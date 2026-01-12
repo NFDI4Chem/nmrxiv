@@ -31,7 +31,7 @@ class StudyPublish extends Mailable
     public function build()
     {
         $releaseToday = false;
-        $releaseDate = Carbon::parse($this->studies[0]['release_date']);
+        $releaseDate = Carbon::parse($this->studies[0]->release_date);
 
         if ($releaseDate->isToday()) {
             $releaseToday = true;
