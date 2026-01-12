@@ -46,9 +46,9 @@ class DataBackupJob implements ShouldQueue
 
             // Set the visibility to public
             $disk->setVisibility($latestFile['path'], 'public');
-        }
 
-        // Print the URL of the latest file.
-        echo 'Download the file from URL '.$latestFile['path'];
+            // Print the URL of the latest file.
+            echo 'Download the file from URL '.$latestFile['path'];
+        }
     }
 }
