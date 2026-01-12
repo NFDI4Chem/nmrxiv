@@ -18,6 +18,7 @@ use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\DraftController;
 use App\Http\Controllers\FileSystemController;
 use App\Http\Controllers\OEmbedController;
+use App\Http\Controllers\OrcidController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectInvitationController;
 use App\Http\Controllers\ProjectMemberController;
@@ -43,6 +44,13 @@ Route::prefix('auth')->group(function () {
     Route::get('/login/{service}/callback', [SocialController::class, 'handleProviderCallback']);
     Route::get('/checkPassword', [UsersController::class, 'checkPassword'])
         ->name('auth.checkPassword');
+});
+
+// ORCID Routes with rate limiting
+Route::middleware(['throttle:60,1'])->prefix('orcid')->group(function () {
+    Route::get('/search', [OrcidController::class, 'search']);
+    Route::get('/{orcidId}/person', [OrcidController::class, 'person']);
+    Route::get('/{orcidId}/employment', [OrcidController::class, 'employment']);
 });
 
 Route::get('/', function () {
@@ -116,6 +124,11 @@ Route::middleware('web', WelcomesNewUsers::class)->group(function () {
     Route::get('welcome/{user}', [MyWelcomeController::class, 'showWelcomeForm'])->name('welcome');
     Route::post('welcome/{user}', [MyWelcomeController::class, 'savePassword'])->name('password.set');
 });
+
+// ROR API - publicly accessible with rate limiting
+Route::get('ror/search', [\App\Http\Controllers\RorController::class, 'search'])
+    ->middleware('throttle:60,1')
+    ->name('ror.search');
 
 Route::middleware('auth', 'verified')->group(function () {
     // License

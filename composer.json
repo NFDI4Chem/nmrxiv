@@ -9,7 +9,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.4",
-        "aws/aws-sdk-php": "^3.208",
+        "aws/aws-sdk-php": "^3.368",
         "darkaonline/l5-swagger": "^9.0",
         "doctrine/dbal": "^3.5",
         "guzzlehttp/guzzle": "^7.8",
