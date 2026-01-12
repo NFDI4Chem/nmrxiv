@@ -144,7 +144,9 @@ class VerificationController extends Controller
         }
 
         if ($request->user() && $request->user()->getKey() != $user_id) {
-            Auth::logout();
+            if (method_exists(Auth::guard(), 'logout')) {
+                Auth::logout();
+            }
             throw new AuthorizationException;
         }
 

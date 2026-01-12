@@ -276,7 +276,7 @@ class RegisterController extends Controller
                 'status' => false,
                 'message' => 'validation error',
                 'errors' => $validateUserDetails->errors(),
-            ], 401);
+            ], 422);
         }
 
         $authUser = auth('sanctum')->user();
