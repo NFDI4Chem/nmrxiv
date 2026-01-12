@@ -42,7 +42,7 @@ class DeleteProjects implements ShouldQueue
         $diffInDays = null;
         $coolOffPeriod = (int) env('COOL_OFF_PERIOD', '30');
         if ($deletedOn) {
-            $diffInDays = Carbon::parse($deletedOn)->diffInDays(Carbon::now());
+            $diffInDays = (int) Carbon::parse($deletedOn)->diffInDays(Carbon::now());
             // Sending reminder to user 1 week and 1 day before.
             if ($diffInDays == ($coolOffPeriod - 7) || $diffInDays == ($coolOffPeriod - 1)) {
                 $project->sendNotification('deletionReminder', $this->prepareSendList($project));
