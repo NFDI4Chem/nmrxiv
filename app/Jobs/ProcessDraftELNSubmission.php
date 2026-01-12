@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Actions\Author\SyncProjectAuthors;
 use App\Actions\Draft\DraftProcessingLogger;
 use App\Actions\Draft\ProcessDraft;
 use App\Http\Controllers\FileSystemController;
@@ -10,7 +11,6 @@ use App\Models\FileSystemObject;
 use App\Models\License;
 use App\Models\Molecule;
 use App\Models\Sample;
-use App\Services\AuthorService;
 use App\Services\ChemotionRepositoryTrackerService;
 use App\Services\ELNMetadataServiceFactory;
 use App\Services\FileSystemObjectService;
@@ -450,8 +450,7 @@ class ProcessDraftELNSubmission implements ShouldQueue
             }
 
             if (! empty($authorData)) {
-                $authorService = app(AuthorService::class);
-                $authorService->syncAuthors($project, $authorData);
+                app(SyncProjectAuthors::class)->handle($project, $authorData);
             }
 
         } catch (\Exception $e) {
