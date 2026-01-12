@@ -1,5 +1,5 @@
 <template>
-    <jet-dialog-modal :show="show" @close="show = false">
+    <jet-dialog-modal :show="show" @close="closeModal">
         <template #title> Select ORCID iD </template>
 
         <template #content>
@@ -7,10 +7,20 @@
                 <loading-button :loading="loading" />
             </div>
             <div
-                v-if="orcidIdSearchResults.length == 0 && !loading"
+                v-if="
+                    !loading && !hasError && orcidIdSearchResults.length === 0
+                "
+                class="sm:col-span-9 mt-4 align-centre text-gray-500"
+            >
+                <p>
+                    No results found. Please try again or enter the ID manually.
+                </p>
+            </div>
+            <div
+                v-if="!loading && hasError"
                 class="sm:col-span-9 mt-4 align-centre text-red-500"
             >
-                <p>Something went wrong. Please enter the id manually.</p>
+                <p>{{ errorMessage }}</p>
             </div>
             <div
                 v-if="!loading && orcidIdSearchResults.length > 0"
@@ -61,7 +71,7 @@
             </div>
         </template>
         <template #footer>
-            <jet-secondary-button @click="show = false">
+            <jet-secondary-button @click="closeModal">
                 Cancel
             </jet-secondary-button>
         </template>
@@ -79,150 +89,228 @@ export default {
         LoadingButton,
     },
     props: ["orcidId", "affiliation"],
-    emits: ["update:orcidId", "update:affiliation"],
+    emits: ["update:orcidId", "update:affiliation", "loadingComplete"],
     data() {
         return {
             show: false,
             selectedOrcidId: this.orcidId,
             selectedAffiliation: this.affiliation,
             loading: false,
+            hasError: false,
+            errorMessage: "",
             orcidIdSearchResults: [],
+            pendingRequests: 0,
+            isSearching: false,
         };
     },
     methods: {
+        /**
+         * Search for ORCID IDs by first and last name
+         * Prevents duplicate searches while one is in progress
+         * @param {string} first_name - User's first name
+         * @param {string} last_name - User's last name
+         */
         findOrcidID(first_name, last_name) {
+            // Prevent duplicate requests while search is in progress
+            if (this.isSearching) {
+                return;
+            }
+
+            // Validate input
+            if (!first_name || !last_name) {
+                return;
+            }
+
+            // Reset state for new search
+            this.resetSearchState();
+            this.isSearching = true;
+            this.loading = true;
+
+            axios
+                .get("/orcid/search", {
+                    headers: {
+                        accept: "application/json",
+                    },
+                    params: {
+                        q: `given-names:${first_name} AND family-name:${last_name}`,
+                    },
+                })
+                .then((res) => {
+                    if (
+                        res.data &&
+                        res.data.result &&
+                        res.data.result.length > 0
+                    ) {
+                        this.show = true;
+                        this.$emit("loadingComplete");
+                        this.getPersonData(res.data.result);
+                    } else {
+                        this.handleNoResults();
+                    }
+                })
+                .catch((error) => {
+                    this.handleSearchError(error);
+                });
+        },
+        /**
+         * Fetch detailed person data for each ORCID ID from search results
+         * Tracks pending requests to maintain loading state until all complete
+         * @param {Array} results - Array of ORCID search results
+         */
+        getPersonData(results) {
+            if (!results || results.length === 0) {
+                this.finalizeSearch();
+                return;
+            }
+
             this.orcidIdSearchResults = [];
-            if (first_name && last_name) {
-                this.loading = true;
-                this.show = true;
-                axios
-                    .get(this.$page.props.orcidSearchApi, {
-                        headers: {
-                            accept: "application/json",
-                        },
-                        params: {
-                            q:
-                                "given-names:" +
-                                first_name +
-                                " AND family-name:" +
-                                last_name,
-                        },
-                    })
-                    .then((res) => {
-                        if (res.data && res.data.result.length > 0) {
-                            this.getPersonData(res.data.result);
-                        } else {
-                            this.loading = false;
+            this.pendingRequests = results.length;
+
+            results.forEach((item) => {
+                const orcidId = item["orcid-identifier"]?.path;
+
+                if (!orcidId) {
+                    this.decrementPendingRequests();
+                    return;
+                }
+
+                this.fetchOrcidDetails(orcidId, item);
+            });
+        },
+
+        /**
+         * Fetch person and employment details for a single ORCID ID
+         * @param {string} orcidId - The ORCID identifier
+         * @param {Object} item - Original search result item
+         */
+        fetchOrcidDetails(orcidId, item) {
+            const requestPersonData = axios.get(`/orcid/${orcidId}/person`, {
+                headers: { accept: "application/json" },
+            });
+
+            const requestEmploymentData = axios.get(
+                `/orcid/${orcidId}/employment`,
+                {
+                    headers: { accept: "application/json" },
+                }
+            );
+
+            axios
+                .all([requestPersonData, requestEmploymentData])
+                .then(
+                    axios.spread((personResponse, employmentResponse) => {
+                        const personData = personResponse.data;
+                        const employmentData = employmentResponse.data;
+
+                        const element = this.formatOrcidResult(
+                            personData,
+                            employmentData,
+                            item
+                        );
+
+                        if (element) {
+                            this.orcidIdSearchResults.push(element);
                         }
                     })
-                    .catch((error) => {
-                        console.log(error);
-                    })
-                    .finally(() => {});
+                )
+                .catch((error) => {
+                    console.error(
+                        `Error fetching ORCID details for ${orcidId}:`,
+                        error
+                    );
+                })
+                .finally(() => {
+                    this.decrementPendingRequests();
+                });
+        },
+
+        /**
+         * Format raw ORCID API data into display-ready format
+         * @param {Object} personData - Person data from ORCID API
+         * @param {Object} employmentData - Employment data from ORCID API
+         * @param {Object} item - Original search result item
+         * @returns {Object|null} Formatted result object or null if data is invalid
+         */
+        formatOrcidResult(personData, employmentData, item) {
+            const element = {
+                firstName: personData?.name?.["given-names"]?.value || "",
+                lastName: personData?.name?.["family-name"]?.value || "",
+                email: personData?.emails?.email?.[0]?.email || "",
+                employer: this.extractEmployerName(employmentData),
+                orcidId: item["orcid-identifier"]?.uri || "",
+            };
+
+            return element.orcidId ? element : null;
+        },
+
+        /**
+         * Extract employer name from employment data
+         * @param {Object} employmentData - Employment data from ORCID API
+         * @returns {string} Employer name or empty string
+         */
+        extractEmployerName(employmentData) {
+            const affiliationGroup = employmentData?.["affiliation-group"]?.[0];
+            const summary = affiliationGroup?.summaries?.[0];
+            return summary?.["employment-summary"]?.organization?.name || "";
+        },
+
+        /**
+         * Decrement pending requests counter and finalize when all complete
+         */
+        decrementPendingRequests() {
+            this.pendingRequests--;
+            if (this.pendingRequests <= 0) {
+                this.finalizeSearch();
             }
         },
-        getPersonData(results) {
-            if (results) {
-                var personData = {};
-                var employmentdata = {};
-                var element = {};
-                var orcidId = "";
-                this.orcidIdSearchResults = [];
-                results.forEach((item) => {
-                    orcidId = item["orcid-identifier"]
-                        ? item["orcid-identifier"].path
-                        : null;
-                    if (orcidId) {
-                        let personDataAPI =
-                            this.$page.props.orcidPersonApi.replace(
-                                "{orcid_id}",
-                                orcidId
-                            );
-                        let employmentDataAPI =
-                            this.$page.props.orcidEmploymentApi.replace(
-                                "{orcid_id}",
-                                item["orcid-identifier"].path
-                            );
 
-                        const requestPersonData = axios.get(personDataAPI, {
-                            headers: {
-                                accept: "application/json",
-                            },
-                        });
-                        const requestEmploymentData = axios.get(
-                            employmentDataAPI,
-                            {
-                                headers: {
-                                    accept: "application/json",
-                                },
-                            }
-                        );
-                        axios
-                            .all([requestPersonData, requestEmploymentData])
-                            .then(
-                                axios.spread((...responses) => {
-                                    personData = responses[0].data;
-                                    employmentdata = responses[1].data;
-                                })
-                            )
-                            .catch((error) => {
-                                console.log(error);
-                            })
-                            .finally(() => {
-                                if (personData) {
-                                    element.firstName = personData["name"]
-                                        ? personData["name"]["given-names"]
-                                              .value
-                                        : "";
-                                    element.lastName = personData["name"]
-                                        ? personData["name"]["family-name"]
-                                              .value
-                                        : "";
-                                    if (personData["emails"]) {
-                                        element.email = personData["emails"][
-                                            "email"
-                                        ][0]
-                                            ? personData["emails"]["email"][0]
-                                                  .email
-                                            : "";
-                                    }
-                                }
-                                if (employmentdata) {
-                                    if (employmentdata["affiliation-group"]) {
-                                        if (
-                                            employmentdata[
-                                                "affiliation-group"
-                                            ][0]
-                                        ) {
-                                            if (
-                                                employmentdata[
-                                                    "affiliation-group"
-                                                ][0].summaries
-                                            ) {
-                                                element.employer =
-                                                    employmentdata[
-                                                        "affiliation-group"
-                                                    ][0].summaries[0]
-                                                        ? employmentdata[
-                                                              "affiliation-group"
-                                                          ][0].summaries[0][
-                                                              "employment-summary"
-                                                          ].organization.name
-                                                        : "";
-                                            }
-                                        }
-                                    }
-                                }
-                                element.orcidId = item["orcid-identifier"]
-                                    ? item["orcid-identifier"].uri
-                                    : "";
-                                this.orcidIdSearchResults.push(element);
-                                element = {};
-                                this.loading = false;
-                            });
-                    }
-                });
-            }
+        /**
+         * Complete the search process and update UI state
+         */
+        finalizeSearch() {
+            this.loading = false;
+            this.isSearching = false;
+        },
+
+        /**
+         * Handle case when no results are found
+         */
+        handleNoResults() {
+            this.finalizeSearch();
+            this.show = true;
+            this.$emit("loadingComplete");
+        },
+
+        /**
+         * Handle search errors with user-friendly messaging
+         * @param {Error} error - Error object from API call
+         */
+        handleSearchError(error) {
+            console.error("ORCID search error:", error);
+            this.hasError = true;
+            this.errorMessage =
+                "An error occurred while searching. Please try again or enter the ID manually.";
+            this.finalizeSearch();
+            this.show = true;
+            this.$emit("loadingComplete");
+        },
+
+        /**
+         * Reset search state for new search
+         */
+        resetSearchState() {
+            this.orcidIdSearchResults = [];
+            this.hasError = false;
+            this.errorMessage = "";
+            this.pendingRequests = 0;
+        },
+
+        /**
+         * Close modal and reset state
+         */
+        closeModal() {
+            this.show = false;
+            this.resetSearchState();
         },
         selectOrcidId(item) {
             this.selectedOrcidId = item.orcidId
