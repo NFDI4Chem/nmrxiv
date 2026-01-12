@@ -2,11 +2,14 @@
 
 namespace Tests\Feature;
 
+use App\Mail\DraftProcessed;
+use App\Mail\DraftProcessedNotifyAdmins;
 use App\Models\Draft;
 use App\Models\FileSystemObject;
 use App\Models\Project;
 use App\Models\Team;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -280,5 +283,181 @@ class DraftFeatureTest extends TestCase
             ->get("/dashboard/drafts/{$nonexistentId}/files");
 
         $response->assertStatus(404);
+    }
+
+    public function test_draft_processed_mail_can_be_rendered(): void
+    {
+        $project = Project::factory()->create([
+            'owner_id' => $this->user->id,
+            'team_id' => $this->team->id,
+            'name' => 'Test Project',
+            'release_date' => Carbon::now()->addDays(7),
+        ]);
+
+        $mailable = new DraftProcessed($project);
+        $content = $mailable->render();
+
+        $this->assertNotEmpty($content);
+        $this->assertStringContainsString($project->name, $content);
+    }
+
+    public function test_draft_processed_mail_has_project_property(): void
+    {
+        $project = Project::factory()->create([
+            'owner_id' => $this->user->id,
+            'team_id' => $this->team->id,
+            'name' => 'Test Project',
+            'release_date' => Carbon::now()->addDays(7),
+        ]);
+
+        $mailable = new DraftProcessed($project);
+
+        $this->assertSame($project->id, $mailable->project->id);
+        $this->assertSame($project->name, $mailable->project->name);
+    }
+
+    public function test_draft_processed_mail_renders_with_today_release_date(): void
+    {
+        $project = Project::factory()->create([
+            'owner_id' => $this->user->id,
+            'team_id' => $this->team->id,
+            'name' => 'Test Project',
+            'release_date' => Carbon::now(),
+        ]);
+
+        $mailable = new DraftProcessed($project);
+        $content = $mailable->render();
+
+        $this->assertNotEmpty($content);
+    }
+
+    public function test_draft_processed_mail_renders_with_future_release_date(): void
+    {
+        $project = Project::factory()->create([
+            'owner_id' => $this->user->id,
+            'team_id' => $this->team->id,
+            'name' => 'Test Project',
+            'release_date' => Carbon::now()->addDays(30),
+        ]);
+
+        $mailable = new DraftProcessed($project);
+        $content = $mailable->render();
+
+        $this->assertNotEmpty($content);
+    }
+
+    public function test_draft_processed_mail_contains_project_url(): void
+    {
+        $project = Project::factory()->create([
+            'owner_id' => $this->user->id,
+            'team_id' => $this->team->id,
+            'name' => 'Test Project',
+            'release_date' => Carbon::now()->addDays(7),
+        ]);
+
+        $mailable = new DraftProcessed($project);
+        $content = $mailable->render();
+
+        $this->assertStringContainsString('dashboard/projects', $content);
+        $this->assertStringContainsString((string) $project->id, $content);
+    }
+
+    public function test_draft_processed_notify_admins_mail_can_be_rendered_for_project(): void
+    {
+        $project = Project::factory()->create([
+            'owner_id' => $this->user->id,
+            'team_id' => $this->team->id,
+            'name' => 'Test Project',
+            'release_date' => Carbon::now()->addDays(7),
+        ]);
+
+        $mailable = new DraftProcessedNotifyAdmins($project, null);
+        $content = $mailable->render();
+
+        $this->assertNotEmpty($content);
+        $this->assertStringContainsString($project->name, $content);
+    }
+
+    public function test_draft_processed_notify_admins_mail_has_project_property(): void
+    {
+        $project = Project::factory()->create([
+            'owner_id' => $this->user->id,
+            'team_id' => $this->team->id,
+            'name' => 'Test Project',
+            'release_date' => Carbon::now()->addDays(7),
+        ]);
+
+        $mailable = new DraftProcessedNotifyAdmins($project, null);
+
+        $this->assertSame($project->id, $mailable->project->id);
+        $this->assertNull($mailable->studies);
+    }
+
+    public function test_draft_processed_notify_admins_mail_renders_with_today_release(): void
+    {
+        $project = Project::factory()->create([
+            'owner_id' => $this->user->id,
+            'team_id' => $this->team->id,
+            'name' => 'Test Project',
+            'release_date' => Carbon::now(),
+        ]);
+
+        $mailable = new DraftProcessedNotifyAdmins($project, null);
+        $content = $mailable->render();
+
+        $this->assertNotEmpty($content);
+    }
+
+    public function test_draft_processed_notify_admins_mail_can_be_rendered_for_studies(): void
+    {
+        $studies = [
+            (object) [
+                'id' => 1,
+                'name' => 'Test Study 1',
+                'doi' => '10.1234/test.1',
+                'release_date' => Carbon::now()->addDays(7)->toDateString(),
+            ],
+        ];
+
+        $mailable = new DraftProcessedNotifyAdmins(null, $studies);
+        $content = $mailable->render();
+
+        $this->assertNotEmpty($content);
+    }
+
+    public function test_draft_processed_notify_admins_mail_has_studies_property(): void
+    {
+        $studies = [
+            (object) ['id' => 1, 'name' => 'Study 1', 'doi' => '10.1234/test', 'release_date' => Carbon::now()->toDateString()],
+        ];
+
+        $mailable = new DraftProcessedNotifyAdmins(null, $studies);
+
+        $this->assertNull($mailable->project);
+        $this->assertCount(1, $mailable->studies);
+    }
+
+    public function test_draft_processed_mail_handles_project_with_identifier(): void
+    {
+        // Use raw DB update to set identifier since it's not fillable
+        $project = Project::factory()->create([
+            'owner_id' => $this->user->id,
+            'team_id' => $this->team->id,
+            'name' => 'Test Project',
+            'release_date' => Carbon::now()->addDays(7),
+        ]);
+
+        // Update identifier via database query
+        \DB::table('projects')->where('id', $project->id)->update(['identifier' => 123]);
+        $project = $project->fresh();
+
+        $mailable = new DraftProcessed($project);
+        $content = $mailable->render();
+
+        $this->assertNotEmpty($content);
+        // When identifier is set, the accessor returns "NMRXIV:P123"
+        // The mail should extract "P123" and use it in the public URL
+        // Just verify the mail renders successfully with the identifier
+        $this->assertStringContainsString($project->name, $content);
     }
 }

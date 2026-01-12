@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit;
+namespace Tests\Feature\ExternalServices\ELN;
 
 use App\Services\ChemotionRepositoryTrackerService;
 use Illuminate\Support\Facades\Http;
@@ -323,5 +323,270 @@ class ChemotionRepositoryTrackerServiceTest extends TestCase
         $this->assertCount(12, $validStatuses);
         $this->assertContains(ChemotionRepositoryTrackerService::STATUS_RECEIVED, $validStatuses);
         $this->assertContains(ChemotionRepositoryTrackerService::STATUS_PUBLISHED, $validStatuses);
+    }
+
+    public function test_authentication_missing_access_token(): void
+    {
+        Http::fake([
+            'http://test-tracker.example.com/oauth/token' => Http::response([
+                'token_type' => 'Bearer',
+                // Missing access_token
+            ], 200),
+        ]);
+
+        Log::shouldReceive('error')
+            ->once()
+            ->with('Authentication response missing access_token', \Mockery::any());
+
+        Log::shouldReceive('error')
+            ->once()
+            ->with('Chemotion tracking creation error', \Mockery::any());
+
+        $trackingData = ['status' => 'submitted', 'tracking_item_name' => 'test'];
+        $result = $this->service->createTracking($trackingData);
+
+        $this->assertNull($result);
+    }
+
+    public function test_create_tracking_with_admin_permission_error(): void
+    {
+        Http::fake([
+            'http://test-tracker.example.com/oauth/token' => Http::response([
+                'access_token' => 'test-token',
+                'token_type' => 'Bearer',
+            ], 200),
+            'http://test-tracker.example.com/api/v1/trackings' => Http::response([
+                'error' => 'User does not have admin permissions for Trackable System Admin',
+            ], 401),
+        ]);
+
+        Log::shouldReceive('debug')
+            ->once()
+            ->with('Chemotion Repository-Tracker authentication successful');
+
+        Log::shouldReceive('info')
+            ->once()
+            ->with('Creating Chemotion tracking', \Mockery::any());
+
+        Log::shouldReceive('error')
+            ->once()
+            ->with('Authorization failed: User does not have admin permissions for the trackable system', \Mockery::any());
+
+        $result = $this->service->createTracking(['status' => 'submitted', 'tracking_item_name' => 'test']);
+
+        $this->assertNull($result);
+    }
+
+    public function test_create_tracking_with_exception(): void
+    {
+        Http::fake([
+            'http://test-tracker.example.com/oauth/token' => Http::response([
+                'access_token' => 'test-token',
+                'token_type' => 'Bearer',
+            ], 200),
+            'http://test-tracker.example.com/api/v1/trackings' => function () {
+                throw new \Exception('Network error');
+            },
+        ]);
+
+        Log::shouldReceive('error')
+            ->once()
+            ->with('Chemotion tracking creation error', \Mockery::any());
+
+        $result = $this->service->createTracking(['status' => 'submitted', 'tracking_item_name' => 'test']);
+
+        $this->assertNull($result);
+    }
+
+    public function test_get_trackings_failure(): void
+    {
+        Http::fake([
+            'http://test-tracker.example.com/oauth/token' => Http::response([
+                'access_token' => 'test-token',
+                'token_type' => 'Bearer',
+            ], 200),
+            'http://test-tracker.example.com/api/v1/trackings' => Http::response([], 500),
+        ]);
+
+        Log::shouldReceive('debug')
+            ->once()
+            ->with('Chemotion Repository-Tracker authentication successful');
+
+        Log::shouldReceive('error')
+            ->once()
+            ->with('Failed to get Chemotion trackings', \Mockery::any());
+
+        $result = $this->service->getTrackings();
+
+        $this->assertNull($result);
+    }
+
+    public function test_get_trackings_exception(): void
+    {
+        Http::fake([
+            'http://test-tracker.example.com/oauth/token' => Http::response([
+                'access_token' => 'test-token',
+                'token_type' => 'Bearer',
+            ], 200),
+            'http://test-tracker.example.com/api/v1/trackings' => function () {
+                throw new \Exception('Connection timeout');
+            },
+        ]);
+
+        Log::shouldReceive('debug')
+            ->once()
+            ->with('Chemotion Repository-Tracker authentication successful');
+
+        Log::shouldReceive('error')
+            ->once()
+            ->with('Chemotion trackings retrieval error', \Mockery::any());
+
+        $result = $this->service->getTrackings();
+
+        $this->assertNull($result);
+    }
+
+    public function test_get_tracking_failure(): void
+    {
+        Http::fake([
+            'http://test-tracker.example.com/oauth/token' => Http::response([
+                'access_token' => 'test-token',
+                'token_type' => 'Bearer',
+            ], 200),
+            'http://test-tracker.example.com/api/v1/trackings/123' => Http::response([], 404),
+        ]);
+
+        Log::shouldReceive('debug')
+            ->once()
+            ->with('Chemotion Repository-Tracker authentication successful');
+
+        Log::shouldReceive('error')
+            ->once()
+            ->with('Failed to get Chemotion tracking', \Mockery::any());
+
+        $result = $this->service->getTracking(123);
+
+        $this->assertNull($result);
+    }
+
+    public function test_get_tracking_exception(): void
+    {
+        Http::fake([
+            'http://test-tracker.example.com/oauth/token' => Http::response([
+                'access_token' => 'test-token',
+                'token_type' => 'Bearer',
+            ], 200),
+            'http://test-tracker.example.com/api/v1/trackings/123' => function () {
+                throw new \Exception('Database error');
+            },
+        ]);
+
+        Log::shouldReceive('debug')
+            ->once()
+            ->with('Chemotion Repository-Tracker authentication successful');
+
+        Log::shouldReceive('error')
+            ->once()
+            ->with('Chemotion tracking retrieval error', \Mockery::any());
+
+        $result = $this->service->getTracking(123);
+
+        $this->assertNull($result);
+    }
+
+    public function test_get_tracking_items_failure(): void
+    {
+        Http::fake([
+            'http://test-tracker.example.com/oauth/token' => Http::response([
+                'access_token' => 'test-token',
+                'token_type' => 'Bearer',
+            ], 200),
+            'http://test-tracker.example.com/api/v1/tracking_items' => Http::response([], 503),
+        ]);
+
+        Log::shouldReceive('debug')
+            ->once()
+            ->with('Chemotion Repository-Tracker authentication successful');
+
+        Log::shouldReceive('error')
+            ->once()
+            ->with('Failed to get Chemotion tracking items', \Mockery::any());
+
+        $result = $this->service->getTrackingItems();
+
+        $this->assertNull($result);
+    }
+
+    public function test_get_tracking_items_exception(): void
+    {
+        Http::fake([
+            'http://test-tracker.example.com/oauth/token' => Http::response([
+                'access_token' => 'test-token',
+                'token_type' => 'Bearer',
+            ], 200),
+            'http://test-tracker.example.com/api/v1/tracking_items' => function () {
+                throw new \Exception('API error');
+            },
+        ]);
+
+        Log::shouldReceive('debug')
+            ->once()
+            ->with('Chemotion Repository-Tracker authentication successful');
+
+        Log::shouldReceive('error')
+            ->once()
+            ->with('Chemotion tracking items retrieval error', \Mockery::any());
+
+        $result = $this->service->getTrackingItems();
+
+        $this->assertNull($result);
+    }
+
+    public function test_get_tracking_item_failure(): void
+    {
+        Http::fake([
+            'http://test-tracker.example.com/oauth/token' => Http::response([
+                'access_token' => 'test-token',
+                'token_type' => 'Bearer',
+            ], 200),
+            'http://test-tracker.example.com/api/v1/tracking_items/item-123' => Http::response([], 404),
+        ]);
+
+        Log::shouldReceive('debug')
+            ->once()
+            ->with('Chemotion Repository-Tracker authentication successful');
+
+        Log::shouldReceive('error')
+            ->once()
+            ->with('Failed to get Chemotion tracking item', \Mockery::any());
+
+        $result = $this->service->getTrackingItem('item-123');
+
+        $this->assertNull($result);
+    }
+
+    public function test_get_tracking_item_exception(): void
+    {
+        Http::fake([
+            'http://test-tracker.example.com/oauth/token' => Http::response([
+                'access_token' => 'test-token',
+                'token_type' => 'Bearer',
+            ], 200),
+            'http://test-tracker.example.com/api/v1/tracking_items/item-123' => function () {
+                throw new \Exception('Server error');
+            },
+        ]);
+
+        Log::shouldReceive('debug')
+            ->once()
+            ->with('Chemotion Repository-Tracker authentication successful');
+
+        Log::shouldReceive('error')
+            ->once()
+            ->with('Chemotion tracking item retrieval error', \Mockery::any());
+
+        $result = $this->service->getTrackingItem('item-123');
+
+        $this->assertNull($result);
     }
 }
