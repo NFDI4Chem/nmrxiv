@@ -2,11 +2,15 @@
 
 namespace Tests\Feature;
 
+use App\Actions\Author\RemoveProjectAuthor;
+use App\Actions\Author\SyncProjectAuthors;
+use App\Actions\Project\UpdateProject;
 use App\Models\Author;
 use App\Models\Project;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class ManageAuthorsTest extends TestCase
@@ -983,6 +987,158 @@ class ManageAuthorsTest extends TestCase
         $author = Author::where('email_id', 'john@mit.edu')->first();
         $this->assertNotNull($author);
         $this->assertEquals($fullAffiliation, $author->affiliation);
+    }
+
+    /**
+     * Test sync authors action creates new authors
+     */
+    public function test_sync_authors_action_creates_new_authors(): void
+    {
+        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+
+        $project = Project::factory()->create([
+            'owner_id' => $user->id,
+        ]);
+
+        $updateProject = new UpdateProject;
+        $syncProjectAuthors = new SyncProjectAuthors($updateProject);
+
+        $authorsData = [
+            [
+                'given_name' => 'John',
+                'family_name' => 'Doe',
+                'email_id' => 'john@example.com',
+                'orcid_id' => '0000-0000-0000-0001',
+                'contributor_type' => 'Researcher',
+            ],
+        ];
+
+        $result = $syncProjectAuthors->handle($project, $authorsData);
+
+        $this->assertCount(1, $result);
+        $this->assertDatabaseHas('authors', [
+            'given_name' => 'John',
+            'family_name' => 'Doe',
+            'email_id' => 'john@example.com',
+        ]);
+    }
+
+    /**
+     * Test sync authors action handles empty array
+     */
+    public function test_sync_authors_action_handles_empty_array(): void
+    {
+        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+
+        $project = Project::factory()->create([
+            'owner_id' => $user->id,
+        ]);
+
+        $updateProject = new UpdateProject;
+        $syncProjectAuthors = new SyncProjectAuthors($updateProject);
+
+        $result = $syncProjectAuthors->handle($project, []);
+        $this->assertCount(0, $result);
+        $this->assertEquals(0, $project->authors()->count());
+    }
+
+    /**
+     * Test sync authors action validates required fields
+     */
+    public function test_sync_authors_action_validates_required_fields(): void
+    {
+        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+
+        $project = Project::factory()->create([
+            'owner_id' => $user->id,
+        ]);
+
+        $updateProject = new UpdateProject;
+        $syncProjectAuthors = new SyncProjectAuthors($updateProject);
+
+        $this->expectException(\Illuminate\Validation\ValidationException::class);
+        $authorsData = [
+            [
+                'given_name' => '',
+                'family_name' => 'Doe',
+                'email_id' => 'invalid-email',
+            ],
+        ];
+        $syncProjectAuthors->handle($project, $authorsData);
+    }
+
+    /**
+     * Test remove author action handles nonexistent author
+     */
+    public function test_remove_author_action_handles_nonexistent_author(): void
+    {
+        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+
+        $project = Project::factory()->create([
+            'owner_id' => $user->id,
+        ]);
+
+        $updateProject = new UpdateProject;
+        $removeProjectAuthor = new RemoveProjectAuthor($updateProject);
+
+        $removeProjectAuthor->handle($project, 9999);
+        $this->assertEquals(0, $project->authors()->count());
+    }
+
+    /**
+     * Test sync authors action uses database transaction
+     */
+    public function test_sync_authors_action_uses_database_transaction(): void
+    {
+        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+
+        $project = Project::factory()->create([
+            'owner_id' => $user->id,
+        ]);
+
+        $updateProject = new UpdateProject;
+        $syncProjectAuthors = new SyncProjectAuthors($updateProject);
+
+        DB::shouldReceive('transaction')->once()->andReturnUsing(function ($callback) {
+            return $callback();
+        });
+
+        $authorsData = [
+            [
+                'given_name' => 'John',
+                'family_name' => 'Doe',
+                'email_id' => 'john@example.com',
+                'contributor_type' => 'Researcher',
+            ],
+        ];
+
+        $syncProjectAuthors->handle($project, $authorsData);
+    }
+
+    /**
+     * Test sync authors action prevents N+1 queries
+     */
+    public function test_sync_authors_action_prevents_n_plus_one_queries(): void
+    {
+        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+
+        $project = Project::factory()->create([
+            'owner_id' => $user->id,
+        ]);
+
+        $updateProject = new UpdateProject;
+        $syncProjectAuthors = new SyncProjectAuthors($updateProject);
+
+        $authorsData = [
+            ['given_name' => 'John', 'family_name' => 'Doe', 'email_id' => 'john@example.com', 'contributor_type' => 'Researcher'],
+            ['given_name' => 'Jane', 'family_name' => 'Smith', 'email_id' => 'jane@example.com', 'contributor_type' => 'Researcher'],
+            ['given_name' => 'Bob', 'family_name' => 'Wilson', 'email_id' => 'bob@example.com', 'contributor_type' => 'Researcher'],
+        ];
+        DB::flushQueryLog();
+        DB::enableQueryLog();
+        $syncProjectAuthors->handle($project, $authorsData);
+        $queries = DB::getQueryLog();
+        $this->assertLessThan(15, count($queries));
     }
 
     /**
