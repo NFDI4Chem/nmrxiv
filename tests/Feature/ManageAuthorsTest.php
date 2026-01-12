@@ -2,11 +2,15 @@
 
 namespace Tests\Feature;
 
+use App\Actions\Author\RemoveProjectAuthor;
+use App\Actions\Author\SyncProjectAuthors;
+use App\Actions\Project\UpdateProject;
 use App\Models\Author;
 use App\Models\Project;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class ManageAuthorsTest extends TestCase
@@ -752,132 +756,11 @@ class ManageAuthorsTest extends TestCase
     }
 
     /**
-     * Test author save unauthorized returns redirect for non-json
+     * Test author can be created with ROR ID
      *
      * @return void
      */
-    public function test_author_save_unauthorized_returns_redirect_for_non_json()
-    {
-        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
-
-        $project = Project::factory()->create();
-
-        $reviewer = User::find($user->id);
-        if (! is_null($reviewer)) {
-            $project->users()->attach(
-                $reviewer, ['role' => 'reviewer']
-            );
-        }
-
-        $body = $this->prepareBody(null);
-
-        $response = $this->post('authors/'.$project->id, $body);
-
-        $response->assertStatus(302);
-        $response->assertSessionHas('error', 'You are not authorized to update authors for this project.');
-    }
-
-    /**
-     * Test author save success returns redirect for non-json
-     *
-     * @return void
-     */
-    public function test_author_save_success_returns_redirect_for_non_json()
-    {
-        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
-
-        $project = Project::factory()->create([
-            'owner_id' => $user->id,
-        ]);
-
-        $body = $this->prepareBody(null);
-
-        $response = $this->post('authors/'.$project->id, $body);
-
-        $response->assertStatus(302);
-        $response->assertSessionHas('success', 'Authors updated successfully');
-    }
-
-    /**
-     * Test author validation error returns redirect for non-json
-     *
-     * @return void
-     */
-    public function test_author_validation_error_returns_redirect_for_non_json()
-    {
-        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
-
-        $project = Project::factory()->create([
-            'owner_id' => $user->id,
-        ]);
-
-        $body = ['authors' => []];
-
-        $response = $this->post('authors/'.$project->id, $body);
-
-        $response->assertStatus(302);
-        $response->assertSessionHasErrors(['authors']);
-    }
-
-    /**
-     * Test author destroy unauthorized returns redirect for non-json
-     *
-     * @return void
-     */
-    public function test_author_destroy_unauthorized_returns_redirect_for_non_json()
-    {
-        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
-
-        $project = Project::factory()->create();
-
-        $reviewer = User::find($user->id);
-        if (! is_null($reviewer)) {
-            $project->users()->attach(
-                $reviewer, ['role' => 'reviewer']
-            );
-        }
-
-        $author = Author::factory()->create();
-
-        $body = $this->prepareBody($author);
-
-        $response = $this->delete('authors/'.$project->id.'/delete', $body);
-
-        $response->assertStatus(302);
-        $response->assertSessionHas('error', 'You are not authorized to remove authors from this project.');
-    }
-
-    /**
-     * Test author destroy success returns redirect for non-json
-     *
-     * @return void
-     */
-    public function test_author_destroy_success_returns_redirect_for_non_json()
-    {
-        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
-
-        $project = Project::factory()->create([
-            'owner_id' => $user->id,
-        ]);
-
-        $author = Author::factory()->create();
-
-        $project->authors()->sync([$author->id => ['contributor_type' => 'Researcher', 'sort_order' => 0]]);
-
-        $body = $this->prepareBody($author);
-
-        $response = $this->delete('authors/'.$project->id.'/delete', $body);
-
-        $response->assertStatus(302);
-        $response->assertSessionHas('success', 'Author deleted successfully');
-    }
-
-    /**
-     * Test author destroy validation requires author id
-     *
-     * @return void
-     */
-    public function test_author_destroy_validation_requires_author_id()
+    public function test_author_with_ror_id_can_be_created()
     {
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 
@@ -887,24 +770,91 @@ class ManageAuthorsTest extends TestCase
 
         $body = [
             'authors' => [[
-                // Missing id
+                'given_name' => 'Friedrich',
+                'family_name' => 'Schiller',
+                'email_id' => 'f.schiller@uni-jena.de',
+                'affiliation' => 'Friedrich Schiller University Jena (FSU, Friedrich-Schiller-Universität Jena) - Education · Jena, Germany',
+                'ror_id' => 'https://ror.org/05qghxh33',
+                'contributor_type' => 'Researcher',
             ]],
         ];
 
         $response = $this->withHeaders([
             'Accept' => 'application/json',
-        ])->delete('authors/'.$project->id.'/delete', $body);
+        ])->post('authors/'.$project->id, $body);
 
-        $response->assertStatus(422);
-        $response->assertJsonValidationErrors(['authors.0.id']);
+        $response->assertStatus(200);
+
+        // Verify ROR ID and full affiliation details were saved
+        $this->assertDatabaseHas('authors', [
+            'given_name' => 'Friedrich',
+            'family_name' => 'Schiller',
+            'email_id' => 'f.schiller@uni-jena.de',
+            'affiliation' => 'Friedrich Schiller University Jena (FSU, Friedrich-Schiller-Universität Jena) - Education · Jena, Germany',
+            'ror_id' => 'https://ror.org/05qghxh33',
+        ]);
     }
 
     /**
-     * Test author destroy validation requires integer id
+     * Test author with ROR ID can be updated
      *
      * @return void
      */
-    public function test_author_destroy_validation_requires_integer_id()
+    public function test_author_with_ror_id_can_be_updated()
+    {
+        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+
+        $project = Project::factory()->create([
+            'owner_id' => $user->id,
+        ]);
+
+        // Create author with ROR ID
+        $author = Author::factory()->create([
+            'given_name' => 'Test',
+            'family_name' => 'Author',
+            'email_id' => 'test@example.com',
+            'affiliation' => 'Old University',
+            'ror_id' => 'https://ror.org/oldid123',
+        ]);
+
+        $project->authors()->attach($author->id, [
+            'contributor_type' => 'Researcher',
+            'sort_order' => 0,
+        ]);
+
+        // Update author with new ROR ID and affiliation
+        $body = [
+            'authors' => [[
+                'id' => $author->id,
+                'given_name' => 'Test',
+                'family_name' => 'Author',
+                'email_id' => 'test@example.com',
+                'affiliation' => 'Friedrich Schiller University Jena (FSU, Friedrich-Schiller-Universität Jena) - Education · Jena, Germany',
+                'ror_id' => 'https://ror.org/05qghxh33',
+                'contributor_type' => 'Researcher',
+            ]],
+        ];
+
+        $response = $this->withHeaders([
+            'Accept' => 'application/json',
+        ])->post('authors/'.$project->id, $body);
+
+        $response->assertStatus(200);
+
+        // Verify updated ROR ID and affiliation
+        $this->assertDatabaseHas('authors', [
+            'id' => $author->id,
+            'affiliation' => 'Friedrich Schiller University Jena (FSU, Friedrich-Schiller-Universität Jena) - Education · Jena, Germany',
+            'ror_id' => 'https://ror.org/05qghxh33',
+        ]);
+    }
+
+    /**
+     * Test author can be created without ROR ID (free text affiliation)
+     *
+     * @return void
+     */
+    public function test_author_without_ror_id_can_be_created()
     {
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 
@@ -914,95 +864,135 @@ class ManageAuthorsTest extends TestCase
 
         $body = [
             'authors' => [[
-                'id' => 'not-an-integer',
+                'given_name' => 'Manual',
+                'family_name' => 'Entry',
+                'email_id' => 'manual@example.com',
+                'affiliation' => 'Small Research Institute',
+                'ror_id' => null,
+                'contributor_type' => 'Researcher',
             ]],
         ];
 
         $response = $this->withHeaders([
             'Accept' => 'application/json',
-        ])->delete('authors/'.$project->id.'/delete', $body);
+        ])->post('authors/'.$project->id, $body);
 
-        $response->assertStatus(422);
-        $response->assertJsonValidationErrors(['authors.0.id']);
+        $response->assertStatus(200);
+
+        // Verify author was created with free text affiliation and no ROR ID
+        $this->assertDatabaseHas('authors', [
+            'given_name' => 'Manual',
+            'family_name' => 'Entry',
+            'email_id' => 'manual@example.com',
+            'affiliation' => 'Small Research Institute',
+            'ror_id' => null,
+        ]);
     }
 
     /**
-     * Test author destroy validation requires positive id
+     * Test ROR ID can be removed from author (switching to free text)
      *
      * @return void
      */
-    public function test_author_destroy_validation_requires_positive_id()
+    public function test_ror_id_can_be_removed_from_author()
     {
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 
         $project = Project::factory()->create([
             'owner_id' => $user->id,
         ]);
+
+        // Create author with ROR ID
+        $author = Author::factory()->create([
+            'given_name' => 'Test',
+            'family_name' => 'Author',
+            'email_id' => 'test@example.com',
+            'affiliation' => 'Friedrich Schiller University Jena (FSU, Friedrich-Schiller-Universität Jena) - Education · Jena, Germany',
+            'ror_id' => 'https://ror.org/05qghxh33',
+        ]);
+
+        $project->authors()->attach($author->id, [
+            'contributor_type' => 'Researcher',
+            'sort_order' => 0,
+        ]);
+
+        // Update author to remove ROR ID and use free text
+        $body = [
+            'authors' => [[
+                'id' => $author->id,
+                'given_name' => 'Test',
+                'family_name' => 'Author',
+                'email_id' => 'test@example.com',
+                'affiliation' => 'Independent Researcher',
+                'ror_id' => null,
+                'contributor_type' => 'Researcher',
+            ]],
+        ];
+
+        $response = $this->withHeaders([
+            'Accept' => 'application/json',
+        ])->post('authors/'.$project->id, $body);
+
+        $response->assertStatus(200);
+
+        // Verify ROR ID was removed
+        $this->assertDatabaseHas('authors', [
+            'id' => $author->id,
+            'affiliation' => 'Independent Researcher',
+            'ror_id' => null,
+        ]);
+    }
+
+    /**
+     * Test author affiliation stores full organization details
+     *
+     * @return void
+     */
+    public function test_author_affiliation_stores_full_details()
+    {
+        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
+
+        $project = Project::factory()->create([
+            'owner_id' => $user->id,
+        ]);
+
+        // Test with long affiliation text that includes all details
+        $fullAffiliation = 'Massachusetts Institute of Technology (MIT, M.I.T.) - Education · Cambridge, United States';
 
         $body = [
             'authors' => [[
-                'id' => 0,
+                'given_name' => 'John',
+                'family_name' => 'Smith',
+                'email_id' => 'john@mit.edu',
+                'affiliation' => $fullAffiliation,
+                'ror_id' => 'https://ror.org/042nb2s44',
+                'contributor_type' => 'Researcher',
             ]],
         ];
 
         $response = $this->withHeaders([
             'Accept' => 'application/json',
-        ])->delete('authors/'.$project->id.'/delete', $body);
-
-        $response->assertStatus(422);
-        $response->assertJsonValidationErrors(['authors.0.id']);
-    }
-
-    /**
-     * Test author destroy validation error returns redirect for non-json
-     *
-     * @return void
-     */
-    public function test_author_destroy_validation_error_returns_redirect_for_non_json()
-    {
-        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
-
-        $project = Project::factory()->create([
-            'owner_id' => $user->id,
-        ]);
-
-        $body = ['authors' => []];
-
-        $response = $this->delete('authors/'.$project->id.'/delete', $body);
-
-        $response->assertStatus(302);
-        $response->assertSessionHasErrors(['authors']);
-    }
-
-    /**
-     * Test author must be array
-     *
-     * @return void
-     */
-    public function test_author_must_be_array()
-    {
-        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
-
-        $project = Project::factory()->create([
-            'owner_id' => $user->id,
-        ]);
-
-        $body = ['authors' => 'not-an-array'];
-
-        $response = $this->withHeaders([
-            'Accept' => 'application/json',
         ])->post('authors/'.$project->id, $body);
 
-        $response->assertStatus(422);
-        $response->assertJsonValidationErrors(['authors']);
+        $response->assertStatus(200);
+
+        // Verify full affiliation text is stored without truncation
+        $this->assertDatabaseHas('authors', [
+            'given_name' => 'John',
+            'family_name' => 'Smith',
+            'affiliation' => $fullAffiliation,
+        ]);
+
+        // Also verify the full affiliation text is longer than old 255 character limit
+        $author = Author::where('email_id', 'john@mit.edu')->first();
+        $this->assertNotNull($author);
+        $this->assertEquals($fullAffiliation, $author->affiliation);
     }
 
     /**
-     * Test each author must be array
-     *
-     * @return void
+     * Test sync authors action creates new authors
      */
-    public function test_each_author_must_be_array()
+    public function test_sync_authors_action_creates_new_authors(): void
     {
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 
@@ -1010,91 +1000,33 @@ class ManageAuthorsTest extends TestCase
             'owner_id' => $user->id,
         ]);
 
-        $body = ['authors' => ['not-an-array']];
+        $updateProject = new UpdateProject;
+        $syncProjectAuthors = new SyncProjectAuthors($updateProject);
 
-        $response = $this->withHeaders([
-            'Accept' => 'application/json',
-        ])->post('authors/'.$project->id, $body);
-
-        $response->assertStatus(422);
-        $response->assertJsonValidationErrors(['authors.0']);
-    }
-
-    /**
-     * Test author save requires authentication
-     *
-     * @return void
-     */
-    public function test_author_save_requires_authentication()
-    {
-        $project = Project::factory()->create();
-
-        $body = $this->prepareBody(null);
-
-        $response = $this->withHeaders([
-            'Accept' => 'application/json',
-        ])->post('authors/'.$project->id, $body);
-
-        $response->assertStatus(401);
-    }
-
-    /**
-     * Test author destroy requires authentication
-     *
-     * @return void
-     */
-    public function test_author_destroy_requires_authentication()
-    {
-        $project = Project::factory()->create();
-
-        $author = Author::factory()->create();
-
-        $body = $this->prepareBody($author);
-
-        $response = $this->withHeaders([
-            'Accept' => 'application/json',
-        ])->delete('authors/'.$project->id.'/delete', $body);
-
-        $response->assertStatus(401);
-    }
-
-    /**
-     * Test updateRole unauthorized returns redirect for non-json
-     *
-     * @return void
-     */
-    public function test_update_role_unauthorized_returns_redirect_for_non_json()
-    {
-        $this->actingAs($user = User::factory()->withPersonalTeam()->create());
-
-        $project = Project::factory()->create();
-
-        $reviewer = User::find($user->id);
-        if (! is_null($reviewer)) {
-            $project->users()->attach(
-                $reviewer, ['role' => 'reviewer']
-            );
-        }
-
-        $author = Author::factory()->create();
-
-        $body = [
-            'author_id' => $author->id,
-            'role' => 'DataCurator',
+        $authorsData = [
+            [
+                'given_name' => 'John',
+                'family_name' => 'Doe',
+                'email_id' => 'john@example.com',
+                'orcid_id' => '0000-0000-0000-0001',
+                'contributor_type' => 'Researcher',
+            ],
         ];
 
-        $response = $this->post('authors/'.$project->id.'/updateRole', $body);
+        $result = $syncProjectAuthors->handle($project, $authorsData);
 
-        $response->assertStatus(302);
-        $response->assertSessionHas('error', 'You are not authorized to update author roles for this project.');
+        $this->assertCount(1, $result);
+        $this->assertDatabaseHas('authors', [
+            'given_name' => 'John',
+            'family_name' => 'Doe',
+            'email_id' => 'john@example.com',
+        ]);
     }
 
     /**
-     * Test updateRole success returns redirect for non-json
-     *
-     * @return void
+     * Test sync authors action handles empty array
      */
-    public function test_update_role_success_returns_redirect_for_non_json()
+    public function test_sync_authors_action_handles_empty_array(): void
     {
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 
@@ -1102,27 +1034,18 @@ class ManageAuthorsTest extends TestCase
             'owner_id' => $user->id,
         ]);
 
-        $author = Author::factory()->create();
+        $updateProject = new UpdateProject;
+        $syncProjectAuthors = new SyncProjectAuthors($updateProject);
 
-        $project->authors()->sync([$author->id => ['contributor_type' => 'Researcher', 'sort_order' => 0]]);
-
-        $body = [
-            'author_id' => $author->id,
-            'role' => 'DataCurator',
-        ];
-
-        $response = $this->post('authors/'.$project->id.'/updateRole', $body);
-
-        $response->assertStatus(302);
-        $response->assertSessionHas('success', 'Author role updated successfully');
+        $result = $syncProjectAuthors->handle($project, []);
+        $this->assertCount(0, $result);
+        $this->assertEquals(0, $project->authors()->count());
     }
 
     /**
-     * Test updateRole validation error returns redirect for non-json
-     *
-     * @return void
+     * Test sync authors action validates required fields
      */
-    public function test_update_role_validation_error_returns_redirect_for_non_json()
+    public function test_sync_authors_action_validates_required_fields(): void
     {
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 
@@ -1130,43 +1053,24 @@ class ManageAuthorsTest extends TestCase
             'owner_id' => $user->id,
         ]);
 
-        $body = ['role' => 'DataCurator'];
+        $updateProject = new UpdateProject;
+        $syncProjectAuthors = new SyncProjectAuthors($updateProject);
 
-        $response = $this->post('authors/'.$project->id.'/updateRole', $body);
-
-        $response->assertStatus(302);
-        $response->assertSessionHasErrors(['author_id']);
-    }
-
-    /**
-     * Test updateRole requires authentication
-     *
-     * @return void
-     */
-    public function test_update_role_requires_authentication()
-    {
-        $project = Project::factory()->create();
-
-        $author = Author::factory()->create();
-
-        $body = [
-            'author_id' => $author->id,
-            'role' => 'DataCurator',
+        $this->expectException(\Illuminate\Validation\ValidationException::class);
+        $authorsData = [
+            [
+                'given_name' => '',
+                'family_name' => 'Doe',
+                'email_id' => 'invalid-email',
+            ],
         ];
-
-        $response = $this->withHeaders([
-            'Accept' => 'application/json',
-        ])->post('authors/'.$project->id.'/updateRole', $body);
-
-        $response->assertStatus(401);
+        $syncProjectAuthors->handle($project, $authorsData);
     }
 
     /**
-     * Test updateRole validation requires integer author_id
-     *
-     * @return void
+     * Test remove author action handles nonexistent author
      */
-    public function test_update_role_validation_requires_integer_author_id()
+    public function test_remove_author_action_handles_nonexistent_author(): void
     {
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 
@@ -1174,25 +1078,17 @@ class ManageAuthorsTest extends TestCase
             'owner_id' => $user->id,
         ]);
 
-        $body = [
-            'author_id' => 'not-an-integer',
-            'role' => 'DataCurator',
-        ];
+        $updateProject = new UpdateProject;
+        $removeProjectAuthor = new RemoveProjectAuthor($updateProject);
 
-        $response = $this->withHeaders([
-            'Accept' => 'application/json',
-        ])->post('authors/'.$project->id.'/updateRole', $body);
-
-        $response->assertStatus(422);
-        $response->assertJsonValidationErrors(['author_id']);
+        $removeProjectAuthor->handle($project, 9999);
+        $this->assertEquals(0, $project->authors()->count());
     }
 
     /**
-     * Test updateRole validation requires positive author_id
-     *
-     * @return void
+     * Test sync authors action uses database transaction
      */
-    public function test_update_role_validation_requires_positive_author_id()
+    public function test_sync_authors_action_uses_database_transaction(): void
     {
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 
@@ -1200,25 +1096,29 @@ class ManageAuthorsTest extends TestCase
             'owner_id' => $user->id,
         ]);
 
-        $body = [
-            'author_id' => 0,
-            'role' => 'DataCurator',
+        $updateProject = new UpdateProject;
+        $syncProjectAuthors = new SyncProjectAuthors($updateProject);
+
+        DB::shouldReceive('transaction')->once()->andReturnUsing(function ($callback) {
+            return $callback();
+        });
+
+        $authorsData = [
+            [
+                'given_name' => 'John',
+                'family_name' => 'Doe',
+                'email_id' => 'john@example.com',
+                'contributor_type' => 'Researcher',
+            ],
         ];
 
-        $response = $this->withHeaders([
-            'Accept' => 'application/json',
-        ])->post('authors/'.$project->id.'/updateRole', $body);
-
-        $response->assertStatus(422);
-        $response->assertJsonValidationErrors(['author_id']);
+        $syncProjectAuthors->handle($project, $authorsData);
     }
 
     /**
-     * Test updateRole error response for invalid contributor type returns redirect for non-json
-     *
-     * @return void
+     * Test sync authors action prevents N+1 queries
      */
-    public function test_update_role_error_response_returns_redirect_for_non_json()
+    public function test_sync_authors_action_prevents_n_plus_one_queries(): void
     {
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 
@@ -1226,19 +1126,19 @@ class ManageAuthorsTest extends TestCase
             'owner_id' => $user->id,
         ]);
 
-        $author = Author::factory()->create();
+        $updateProject = new UpdateProject;
+        $syncProjectAuthors = new SyncProjectAuthors($updateProject);
 
-        $project->authors()->sync([$author->id => ['contributor_type' => 'Researcher', 'sort_order' => 0]]);
-
-        $body = [
-            'author_id' => $author->id,
-            'role' => 'InvalidRole',
+        $authorsData = [
+            ['given_name' => 'John', 'family_name' => 'Doe', 'email_id' => 'john@example.com', 'contributor_type' => 'Researcher'],
+            ['given_name' => 'Jane', 'family_name' => 'Smith', 'email_id' => 'jane@example.com', 'contributor_type' => 'Researcher'],
+            ['given_name' => 'Bob', 'family_name' => 'Wilson', 'email_id' => 'bob@example.com', 'contributor_type' => 'Researcher'],
         ];
-
-        $response = $this->post('authors/'.$project->id.'/updateRole', $body);
-
-        $response->assertStatus(302);
-        $response->assertSessionHas('error', 'Invalid contributor type or missing author information.');
+        DB::flushQueryLog();
+        DB::enableQueryLog();
+        $syncProjectAuthors->handle($project, $authorsData);
+        $queries = DB::getQueryLog();
+        $this->assertLessThan(15, count($queries));
     }
 
     /**

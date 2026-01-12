@@ -25,7 +25,7 @@ class FileSystemObjectFactory extends Factory
             'description' => $this->faker->sentence(),
             'relative_url' => '/'.$this->faker->slug().'/'.$this->faker->word(),
             'path' => $this->faker->filePath(),
-            'type' => $this->faker->randomElement(['file', 'directory']),
+            'type' => $this->faker->randomElement(['file', 'directory']), // Changed from 'folder' to 'directory'
             'key' => Str::uuid(),
             'is_public' => false,
             'is_deleted' => false,

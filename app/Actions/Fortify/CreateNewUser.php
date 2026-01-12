@@ -39,6 +39,7 @@ class CreateNewUser implements CreatesNewUsers
                 'username' => $input['username'],
                 'orcid_id' => $input['orcid_id'],
                 'affiliation' => $input['affiliation'],
+                'ror_id' => $input['ror_id'] ?? null,
                 'password' => Hash::make($input['password']),
 
             ]), function (User $user) {

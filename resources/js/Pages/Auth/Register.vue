@@ -11,7 +11,10 @@
         <form @submit.prevent="submit">
             <div>
                 <div
-                    v-if="$page.props.environment.toLowerCase() != 'production'"
+                    v-if="
+                        $page.props.environment &&
+                        $page.props.environment.toLowerCase() != 'production'
+                    "
                     class="pb-4"
                 >
                     <div
@@ -117,20 +120,45 @@
                             class="rounded-l-md focus:ring-indigo-200 focus:border-indigo-200 block w-full rounded-none sm:text-medium border-gray-300"
                         />
                     </div>
-                    <div
-                        class="tooltip -ml-px relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500 cursor-pointer"
+                    <button
+                        type="button"
+                        class="tooltip -ml-px relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                        :disabled="loading"
                         @click="findOrcidID()"
                     >
+                        <svg
+                            v-if="loading"
+                            class="animate-spin h-5 w-5 text-gray-700"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                        >
+                            <circle
+                                class="opacity-25"
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                stroke="currentColor"
+                                stroke-width="4"
+                            ></circle>
+                            <path
+                                class="opacity-75"
+                                fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            ></path>
+                        </svg>
                         <img
+                            v-else
                             alt="ORCID logo"
                             src="https://orcid.org/assets/vectors/orcid.logo.icon.svg"
                             class="w-6"
                         />
                         <span
+                            v-if="!loading"
                             class="bg-gray-900 text-center text-white px-2 py-1 shadow-lg rounded-md tooltiptextbottom"
                             >Click to find ORCID iD</span
                         >
-                    </div>
+                    </button>
                 </div>
                 <jet-input-error :message="error.orcid" class="mt-2" />
             </div>
@@ -141,13 +169,17 @@
                     for="affiliation"
                     value="Affiliation"
                 />
-                <jet-input
-                    id="affiliation"
+                <ror-affiliation-typeahead
                     v-model="form.affiliation"
-                    type="text"
-                    class="mt-1 block w-full"
-                    autocomplete="affiliation"
+                    v-model:ror-id="form.ror_id"
+                    input-id="affiliation"
+                    input-class="mt-1 block w-full"
+                    placeholder=""
                 />
+                <p class="mt-1 text-xs text-gray-500">
+                    Start typing to search for your organization. Select from
+                    the dropdown or enter a custom name.
+                </p>
                 <jet-input-error :message="error.affiliation" class="mt-2" />
             </div>
             <!-- Password -->
@@ -240,6 +272,7 @@
         ref="selectOrcidIdElement"
         v-model:orcid-id="form.orcid_id"
         v-model:affiliation="form.affiliation"
+        @loading-complete="loading = false"
     />
 </template>
 
@@ -255,6 +288,7 @@ import { Head, Link } from "@inertiajs/vue3";
 import AnnouncementBanner from "@/Shared/AnnouncementBanner.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import SelectOrcidId from "@/Shared/SelectOrcidId.vue";
+import RorAffiliationTypeahead from "@/Shared/RorAffiliationTypeahead.vue";
 import { ref } from "vue";
 
 export default {
@@ -271,6 +305,7 @@ export default {
         AnnouncementBanner,
         JetInputError,
         SelectOrcidId,
+        RorAffiliationTypeahead,
     },
     setup() {
         const selectOrcidIdElement = ref(null);
@@ -288,6 +323,7 @@ export default {
                 username: "",
                 orcid_id: "",
                 affiliation: "",
+                ror_id: "",
                 password: "",
                 password_confirmation: "",
                 terms: false,
@@ -300,17 +336,36 @@ export default {
     },
 
     methods: {
+        /**
+         * Search for ORCID ID with validation and throttling
+         * Prevents multiple simultaneous searches
+         */
         findOrcidID() {
-            this.error.orcid = "";
-            if (this.form.first_name && this.form.last_name) {
-                this.selectOrcidIdElement.findOrcidID(
-                    this.form.first_name,
-                    this.form.last_name
-                );
-            } else {
-                this.error.orcid = "Please enter first name and last name";
+            // Prevent search if already loading
+            if (this.loading) {
+                return;
             }
+
+            this.error.orcid = "";
+
+            // Validate required fields
+            if (!this.form.first_name || !this.form.last_name) {
+                this.error.orcid = "Please enter first name and last name";
+                return;
+            }
+
+            if (!this.form.first_name.trim() || !this.form.last_name.trim()) {
+                this.error.orcid = "First name and last name cannot be empty";
+                return;
+            }
+
+            this.loading = true;
+            this.selectOrcidIdElement.findOrcidID(
+                this.form.first_name.trim(),
+                this.form.last_name.trim()
+            );
         },
+
         submit() {
             this.form.post(this.route("register"), {
                 onFinish: () =>
