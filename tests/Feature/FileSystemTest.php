@@ -9,6 +9,8 @@ use App\Models\Study;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class FileSystemTest extends TestCase
@@ -1078,5 +1080,621 @@ class FileSystemTest extends TestCase
 
         $varianFolder->refresh();
         $this->assertEquals('varian', $varianFolder->instrument_type);
+    }
+
+    // FileIntegrityService Tests
+
+    public function test_store_checksums_updates_file_with_md5(): void
+    {
+        $file = FileSystemObject::factory()->file()->create([
+            'draft_id' => $this->draft->id,
+            'name' => 'test.txt',
+        ]);
+
+        $service = app(\App\Services\FileIntegrityService::class);
+        $checksums = ['md5' => 'abc123def456'];
+        $fileSize = 1024;
+
+        $service->storeChecksums($file, $checksums, $fileSize);
+
+        $file->refresh();
+        $this->assertEquals('abc123def456', $file->checksum_md5);
+        $this->assertEquals('md5', $file->checksum_algorithm);
+        $this->assertEquals(1024, $file->file_size);
+        $this->assertEquals('pending', $file->integrity_status);
+    }
+
+    public function test_store_checksums_updates_file_with_sha256(): void
+    {
+        $file = FileSystemObject::factory()->file()->create([
+            'draft_id' => $this->draft->id,
+            'name' => 'test.txt',
+        ]);
+
+        $service = app(\App\Services\FileIntegrityService::class);
+        $checksums = ['sha256' => 'abc123def456789'];
+        $fileSize = 2048;
+
+        $service->storeChecksums($file, $checksums, $fileSize);
+
+        $file->refresh();
+        $this->assertEquals('abc123def456789', $file->checksum_sha256);
+        $this->assertEquals('sha256', $file->checksum_algorithm);
+        $this->assertEquals(2048, $file->file_size);
+        $this->assertEquals('pending', $file->integrity_status);
+    }
+
+    public function test_store_checksums_prefers_sha256_over_md5(): void
+    {
+        $file = FileSystemObject::factory()->file()->create([
+            'draft_id' => $this->draft->id,
+            'name' => 'test.txt',
+        ]);
+
+        $service = app(\App\Services\FileIntegrityService::class);
+        $checksums = [
+            'md5' => 'md5hash',
+            'sha256' => 'sha256hash',
+        ];
+
+        $service->storeChecksums($file, $checksums, 1024);
+
+        $file->refresh();
+        $this->assertEquals('md5hash', $file->checksum_md5);
+        $this->assertEquals('sha256hash', $file->checksum_sha256);
+        $this->assertEquals('sha256', $file->checksum_algorithm);
+    }
+
+    public function test_store_checksums_ignores_directories(): void
+    {
+        $folder = FileSystemObject::factory()->directory()->create([
+            'draft_id' => $this->draft->id,
+            'name' => 'folder',
+            'type' => 'directory',
+        ]);
+
+        $originalChecksum = $folder->checksum_md5;
+        $originalAlgorithm = $folder->checksum_algorithm;
+
+        $service = app(\App\Services\FileIntegrityService::class);
+        $checksums = ['md5' => 'abc123'];
+
+        $service->storeChecksums($folder, $checksums, 1024);
+
+        $folder->refresh();
+        // Should not update directories
+        $this->assertEquals($originalChecksum, $folder->checksum_md5);
+        $this->assertEquals($originalAlgorithm, $folder->checksum_algorithm);
+    }
+
+    public function test_verify_file_integrity_succeeds_with_matching_checksum(): void
+    {
+        \Illuminate\Support\Facades\Storage::fake('local');
+
+        $fileContent = 'test file content';
+        $sha256 = hash('sha256', $fileContent);
+
+        $file = FileSystemObject::factory()->file()->create([
+            'draft_id' => $this->draft->id,
+            'name' => 'test.txt',
+            'path' => '/drafts/test.txt',
+            'checksum_sha256' => $sha256,
+            'checksum_algorithm' => 'sha256',
+            'file_size' => strlen($fileContent),
+            'integrity_status' => 'pending',
+        ]);
+
+        \Illuminate\Support\Facades\Storage::disk('local')->put('drafts/test.txt', $fileContent);
+
+        $service = app(\App\Services\FileIntegrityService::class);
+        $result = $service->verifyFileIntegrity($file);
+
+        $this->assertTrue($result);
+        $file->refresh();
+        $this->assertEquals('verified', $file->integrity_status);
+        $this->assertNotNull($file->integrity_verified_at);
+        $this->assertNull($file->integrity_error);
+    }
+
+    public function test_verify_file_integrity_fails_with_mismatched_checksum(): void
+    {
+        \Illuminate\Support\Facades\Storage::fake('local');
+
+        $fileContent = 'test file content';
+        $wrongChecksum = 'wrongchecksumvalue';
+
+        $file = FileSystemObject::factory()->file()->create([
+            'draft_id' => $this->draft->id,
+            'name' => 'test.txt',
+            'path' => '/drafts/test.txt',
+            'checksum_sha256' => $wrongChecksum,
+            'checksum_algorithm' => 'sha256',
+            'file_size' => strlen($fileContent),
+            'integrity_status' => 'pending',
+        ]);
+
+        \Illuminate\Support\Facades\Storage::disk('local')->put('drafts/test.txt', $fileContent);
+
+        $service = app(\App\Services\FileIntegrityService::class);
+        $result = $service->verifyFileIntegrity($file);
+
+        $this->assertFalse($result);
+        $file->refresh();
+        $this->assertEquals('failed', $file->integrity_status);
+        $this->assertNotNull($file->integrity_error);
+        $this->assertStringContainsString('Checksum mismatch', $file->integrity_error);
+    }
+
+    public function test_verify_file_integrity_fails_with_size_mismatch(): void
+    {
+        \Illuminate\Support\Facades\Storage::fake('local');
+
+        $fileContent = 'test file content';
+        $sha256 = hash('sha256', $fileContent);
+
+        $file = FileSystemObject::factory()->file()->create([
+            'draft_id' => $this->draft->id,
+            'name' => 'test.txt',
+            'path' => '/drafts/test.txt',
+            'checksum_sha256' => $sha256,
+            'checksum_algorithm' => 'sha256',
+            'file_size' => 999999, // Wrong size
+            'integrity_status' => 'pending',
+        ]);
+
+        \Illuminate\Support\Facades\Storage::disk('local')->put('drafts/test.txt', $fileContent);
+
+        $service = app(\App\Services\FileIntegrityService::class);
+        $result = $service->verifyFileIntegrity($file);
+
+        $this->assertFalse($result);
+        $file->refresh();
+        $this->assertEquals('failed', $file->integrity_status);
+        $this->assertStringContainsString('File size mismatch', $file->integrity_error);
+    }
+
+    public function test_verify_file_integrity_fails_when_file_not_in_storage(): void
+    {
+        \Illuminate\Support\Facades\Storage::fake('local');
+
+        $file = FileSystemObject::factory()->file()->create([
+            'draft_id' => $this->draft->id,
+            'name' => 'missing.txt',
+            'path' => '/drafts/missing.txt',
+            'checksum_sha256' => 'somechecksum',
+            'checksum_algorithm' => 'sha256',
+            'integrity_status' => 'pending',
+        ]);
+
+        $service = app(\App\Services\FileIntegrityService::class);
+        $result = $service->verifyFileIntegrity($file);
+
+        $this->assertFalse($result);
+        $file->refresh();
+        $this->assertEquals('failed', $file->integrity_status);
+        $this->assertStringContainsString('File not found in storage', $file->integrity_error);
+    }
+
+    public function test_verify_file_integrity_fails_when_no_checksum(): void
+    {
+        $file = FileSystemObject::factory()->file()->create([
+            'draft_id' => $this->draft->id,
+            'name' => 'test.txt',
+            'path' => '/drafts/test.txt',
+            'checksum_sha256' => null,
+            'checksum_md5' => null,
+            'integrity_status' => 'pending',
+        ]);
+
+        $service = app(\App\Services\FileIntegrityService::class);
+        $result = $service->verifyFileIntegrity($file);
+
+        $this->assertFalse($result);
+        $file->refresh();
+        $this->assertEquals('failed', $file->integrity_status);
+        $this->assertStringContainsString('No checksum available', $file->integrity_error);
+    }
+
+    public function test_verify_file_integrity_throws_exception_for_directory(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Can only verify integrity of files, not directories');
+
+        $folder = FileSystemObject::factory()->directory()->create([
+            'draft_id' => $this->draft->id,
+            'name' => 'folder',
+        ]);
+
+        $service = app(\App\Services\FileIntegrityService::class);
+        $service->verifyFileIntegrity($folder);
+    }
+
+    public function test_download_file_from_storage_returns_content(): void
+    {
+        \Illuminate\Support\Facades\Storage::fake('local');
+
+        $fileContent = 'test file content';
+        $file = FileSystemObject::factory()->file()->create([
+            'draft_id' => $this->draft->id,
+            'name' => 'test.txt',
+            'path' => '/drafts/test.txt',
+        ]);
+
+        \Illuminate\Support\Facades\Storage::disk('local')->put('drafts/test.txt', $fileContent);
+
+        $service = app(\App\Services\FileIntegrityService::class);
+        $result = $service->downloadFileFromStorage($file);
+
+        $this->assertEquals($fileContent, $result);
+    }
+
+    public function test_download_file_from_storage_returns_null_when_missing(): void
+    {
+        \Illuminate\Support\Facades\Storage::fake('local');
+
+        $file = FileSystemObject::factory()->file()->create([
+            'draft_id' => $this->draft->id,
+            'name' => 'missing.txt',
+            'path' => '/drafts/missing.txt',
+        ]);
+
+        $service = app(\App\Services\FileIntegrityService::class);
+        $result = $service->downloadFileFromStorage($file);
+
+        $this->assertNull($result);
+    }
+
+    public function test_get_files_pending_verification(): void
+    {
+        // Clear any existing files
+        FileSystemObject::where('draft_id', $this->draft->id)->delete();
+
+        FileSystemObject::factory()->file()->create([
+            'draft_id' => $this->draft->id,
+            'checksum_sha256' => 'hash1',
+            'integrity_status' => 'pending',
+            'type' => 'file',
+        ]);
+
+        FileSystemObject::factory()->file()->create([
+            'draft_id' => $this->draft->id,
+            'checksum_md5' => 'hash2',
+            'integrity_status' => 'pending',
+            'type' => 'file',
+        ]);
+
+        FileSystemObject::factory()->file()->create([
+            'draft_id' => $this->draft->id,
+            'checksum_sha256' => 'hash3',
+            'integrity_status' => 'verified',
+            'type' => 'file',
+        ]);
+
+        $service = app(\App\Services\FileIntegrityService::class);
+        $pending = $service->getFilesPendingVerification();
+
+        $this->assertGreaterThanOrEqual(2, $pending->count());
+    }
+
+    public function test_get_files_with_failed_integrity(): void
+    {
+        FileSystemObject::factory()->file()->create([
+            'draft_id' => $this->draft->id,
+            'integrity_status' => 'failed',
+            'integrity_error' => 'test error',
+        ]);
+
+        FileSystemObject::factory()->file()->create([
+            'draft_id' => $this->draft->id,
+            'integrity_status' => 'failed',
+            'integrity_error' => 'another error',
+        ]);
+
+        FileSystemObject::factory()->file()->create([
+            'draft_id' => $this->draft->id,
+            'integrity_status' => 'verified',
+        ]);
+
+        $service = app(\App\Services\FileIntegrityService::class);
+        $failed = $service->getFilesWithFailedIntegrity();
+
+        $this->assertCount(2, $failed);
+    }
+
+    public function test_calculate_checksum_with_sha256(): void
+    {
+        $content = 'test content';
+        $expected = hash('sha256', $content);
+
+        $result = \App\Services\FileIntegrityService::calculateChecksum($content, 'sha256');
+
+        $this->assertEquals($expected, $result);
+    }
+
+    public function test_calculate_checksum_with_md5(): void
+    {
+        $content = 'test content';
+        $expected = md5($content);
+
+        $result = \App\Services\FileIntegrityService::calculateChecksum($content, 'md5');
+
+        $this->assertEquals($expected, $result);
+    }
+
+    public function test_calculate_checksum_with_sha1(): void
+    {
+        $content = 'test content';
+        $expected = sha1($content);
+
+        $result = \App\Services\FileIntegrityService::calculateChecksum($content, 'sha1');
+
+        $this->assertEquals($expected, $result);
+    }
+
+    public function test_calculate_checksum_defaults_to_sha256(): void
+    {
+        $content = 'test content';
+        $expected = hash('sha256', $content);
+
+        $result = \App\Services\FileIntegrityService::calculateChecksum($content);
+
+        $this->assertEquals($expected, $result);
+    }
+
+    public function test_get_integrity_statistics(): void
+    {
+        FileSystemObject::factory()->file()->create([
+            'draft_id' => $this->draft->id,
+            'integrity_status' => 'pending',
+        ]);
+
+        FileSystemObject::factory()->file()->count(2)->create([
+            'draft_id' => $this->draft->id,
+            'integrity_status' => 'verified',
+            'integrity_verified_at' => now(),
+        ]);
+
+        FileSystemObject::factory()->file()->create([
+            'draft_id' => $this->draft->id,
+            'integrity_status' => 'failed',
+        ]);
+
+        $service = app(\App\Services\FileIntegrityService::class);
+        $stats = $service->getIntegrityStatistics();
+
+        $this->assertEquals(1, $stats['pending']);
+        $this->assertEquals(2, $stats['verified']);
+        $this->assertEquals(1, $stats['failed']);
+        $this->assertEquals(4, $stats['total_files']);
+    }
+
+    public function test_retry_failed_verifications(): void
+    {
+        \Illuminate\Support\Facades\Storage::fake('local');
+
+        $fileContent = 'test file content';
+        $correctChecksum = hash('sha256', $fileContent);
+
+        $file = FileSystemObject::factory()->file()->create([
+            'draft_id' => $this->draft->id,
+            'name' => 'test.txt',
+            'path' => '/drafts/test.txt',
+            'checksum_sha256' => $correctChecksum,
+            'checksum_algorithm' => 'sha256',
+            'file_size' => strlen($fileContent),
+            'integrity_status' => 'failed',
+            'integrity_error' => 'previous error',
+            'verification_attempts' => 1,
+        ]);
+
+        \Illuminate\Support\Facades\Storage::disk('local')->put('drafts/test.txt', $fileContent);
+
+        $service = app(\App\Services\FileIntegrityService::class);
+        $results = $service->retryFailedVerifications();
+
+        $this->assertEquals(1, $results['total']);
+        $this->assertEquals(1, $results['success']);
+        $this->assertEquals(0, $results['failed']);
+
+        $file->refresh();
+        $this->assertEquals('verified', $file->integrity_status);
+    }
+
+    public function test_file_system_object_has_integrity_pending(): void
+    {
+        $file = FileSystemObject::factory()->file()->create([
+            'draft_id' => $this->draft->id,
+            'integrity_status' => 'pending',
+        ]);
+
+        $this->assertTrue($file->hasIntegrityPending());
+        $this->assertFalse($file->isIntegrityVerified());
+        $this->assertFalse($file->hasIntegrityFailed());
+    }
+
+    public function test_file_system_object_is_integrity_verified(): void
+    {
+        $file = FileSystemObject::factory()->file()->create([
+            'draft_id' => $this->draft->id,
+            'integrity_status' => 'verified',
+        ]);
+
+        $this->assertTrue($file->isIntegrityVerified());
+        $this->assertFalse($file->hasIntegrityPending());
+        $this->assertFalse($file->hasIntegrityFailed());
+    }
+
+    public function test_file_system_object_has_integrity_failed(): void
+    {
+        $file = FileSystemObject::factory()->file()->create([
+            'draft_id' => $this->draft->id,
+            'integrity_status' => 'failed',
+        ]);
+
+        $this->assertTrue($file->hasIntegrityFailed());
+        $this->assertFalse($file->hasIntegrityPending());
+        $this->assertFalse($file->isIntegrityVerified());
+    }
+
+    public function test_file_system_object_get_primary_checksum_sha256(): void
+    {
+        $file = FileSystemObject::factory()->file()->create([
+            'draft_id' => $this->draft->id,
+            'checksum_sha256' => 'sha256hash',
+            'checksum_algorithm' => 'sha256',
+        ]);
+
+        $this->assertEquals('sha256hash', $file->getPrimaryChecksum());
+    }
+
+    public function test_file_system_object_get_primary_checksum_md5(): void
+    {
+        $file = FileSystemObject::factory()->file()->create([
+            'draft_id' => $this->draft->id,
+            'checksum_md5' => 'md5hash',
+            'checksum_algorithm' => 'md5',
+        ]);
+
+        $this->assertEquals('md5hash', $file->getPrimaryChecksum());
+    }
+
+    public function test_file_system_object_mark_integrity_failed(): void
+    {
+        $file = FileSystemObject::factory()->file()->create([
+            'draft_id' => $this->draft->id,
+            'integrity_status' => 'pending',
+            'verification_attempts' => 0,
+        ]);
+
+        $file->markIntegrityFailed('Test error message');
+
+        $file->refresh();
+        $this->assertEquals('failed', $file->integrity_status);
+        $this->assertEquals('Test error message', $file->integrity_error);
+        $this->assertEquals(1, $file->verification_attempts);
+        $this->assertNotNull($file->last_verification_attempt);
+    }
+
+    public function test_file_system_object_mark_integrity_verified(): void
+    {
+        $file = FileSystemObject::factory()->file()->create([
+            'draft_id' => $this->draft->id,
+            'integrity_status' => 'pending',
+            'verification_attempts' => 0,
+        ]);
+
+        $file->markIntegrityVerified();
+
+        $file->refresh();
+        $this->assertEquals('verified', $file->integrity_status);
+        $this->assertNull($file->integrity_error);
+        $this->assertEquals(1, $file->verification_attempts);
+        $this->assertNotNull($file->integrity_verified_at);
+        $this->assertNotNull($file->last_verification_attempt);
+    }
+
+    public function test_storage_signed_url_service_generate_multiple_signed_urls(): void
+    {
+        $service = new \App\Services\StorageSignedUrlService;
+
+        $filePaths = [
+            'test/file1.txt' => ['size' => 1000, 'type' => 'text/plain'],
+            'test/file2.txt' => ['size' => 2000, 'type' => 'text/plain'],
+        ];
+
+        $result = $service->generateMultipleSignedUrls($filePaths);
+
+        $this->assertIsArray($result);
+        $this->assertCount(2, $result);
+
+        foreach ($result as $index => $signedUrl) {
+            $this->assertArrayHasKey('uuid', $signedUrl);
+            $this->assertArrayHasKey('bucket', $signedUrl);
+            $this->assertArrayHasKey('key', $signedUrl);
+            $this->assertArrayHasKey('url', $signedUrl);
+            $this->assertArrayHasKey('headers', $signedUrl);
+            $this->assertArrayHasKey('size', $signedUrl);
+            $this->assertArrayHasKey('type', $signedUrl);
+        }
+    }
+
+    public function test_storage_signed_url_service_generate_multiple_signed_urls_with_custom_bucket(): void
+    {
+        $service = new \App\Services\StorageSignedUrlService;
+
+        $customBucket = 'custom-bucket';
+        $filePaths = [
+            'test/file1.txt' => ['metadata' => 'test'],
+        ];
+
+        $result = $service->generateMultipleSignedUrls($filePaths, $customBucket);
+
+        $this->assertIsArray($result);
+        $this->assertCount(1, $result);
+        $this->assertEquals($customBucket, $result[0]['bucket']);
+        $this->assertArrayHasKey('metadata', $result[0]);
+    }
+
+    public function test_storage_signed_url_service_get_client(): void
+    {
+        $service = new \App\Services\StorageSignedUrlService;
+
+        $client = $service->getClient();
+
+        $this->assertInstanceOf(\Aws\S3\S3Client::class, $client);
+    }
+
+    public function test_path_generator_service_parse_directories(): void
+    {
+        $service = new \App\Services\PathGeneratorService;
+
+        $path = '/folder1/folder2/folder3/file.txt';
+        $filename = 'file.txt';
+
+        $directories = $service->parseDirectories($path, $filename);
+
+        $this->assertIsArray($directories);
+        $this->assertCount(3, $directories);
+        $this->assertEquals(['folder1', 'folder2', 'folder3'], $directories);
+    }
+
+    public function test_path_generator_service_parse_directories_with_no_folders(): void
+    {
+        $service = new \App\Services\PathGeneratorService;
+
+        $path = '/file.txt';
+        $filename = 'file.txt';
+
+        $directories = $service->parseDirectories($path, $filename);
+
+        $this->assertIsArray($directories);
+        $this->assertEmpty($directories);
+    }
+
+    public function test_path_generator_service_has_directories_with_path(): void
+    {
+        $service = new \App\Services\PathGeneratorService;
+
+        $result = $service->hasDirectories('folder/file.txt', '/');
+
+        $this->assertTrue($result);
+    }
+
+    public function test_path_generator_service_has_directories_with_non_root_destination(): void
+    {
+        $service = new \App\Services\PathGeneratorService;
+
+        $result = $service->hasDirectories(null, '/folder');
+
+        $this->assertTrue($result);
+    }
+
+    public function test_path_generator_service_has_directories_returns_false(): void
+    {
+        $service = new \App\Services\PathGeneratorService;
+
+        $result = $service->hasDirectories(null, '/');
+
+        $this->assertFalse($result);
     }
 }
