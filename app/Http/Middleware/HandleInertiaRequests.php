@@ -78,7 +78,7 @@ class HandleInertiaRequests extends Middleware
             'mailFromAddress' => env('MAIL_FROM_ADDRESS'),
             'orcidSearchApi' => env('ORCID_ID_SEARCH_API'),
             'orcidPersonApi' => env('ORCID_ID_PERSON_API'),
-            'michiStandardsUrl' => env('MICHI_STANDARDS_URL'),
+            'michiStandardsUrl' => config('external-links.michi_standards_url'),
             'orcidEmploymentApi' => env('ORCID_ID_EMPLOYMENT_API'),
             'CM_API' => env('CM_API'),
             'CROSSREF_API' => env('CROSSREF_API'),
