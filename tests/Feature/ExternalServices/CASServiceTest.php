@@ -1,15 +1,17 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\ExternalServices;
 
 use App\Models\User;
 use App\Services\CAS\CASService;
+use App\Services\CAS\CommonChemistry;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Http;
 use Mockery;
 use Tests\TestCase;
 
-class CASIntegrationTest extends TestCase
+class CASServiceTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -270,6 +272,137 @@ class CASIntegrationTest extends TestCase
         $response = $this->getJson('/cas/detail?cas_rn=50-00-0');
 
         $response->assertStatus(401);
+    }
+
+    /**
+     * Test CommonChemistry service get CAS details returns array on success
+     */
+    public function test_common_chemistry_service_get_cas_details_returns_array_on_success(): void
+    {
+        config([
+            'services.cas.base_url' => 'https://api.example.com',
+            'services.cas.api_token' => 'test-token',
+        ]);
+
+        $service = new CommonChemistry;
+
+        Http::fake([
+            'https://api.example.com/detail*' => Http::response([
+                'cas_rn' => '50-00-0',
+                'name' => 'Formaldehyde',
+            ], 200),
+        ]);
+
+        $result = $service->getCASDetails('50-00-0');
+
+        $this->assertIsArray($result);
+        $this->assertEquals('50-00-0', $result['cas_rn']);
+        $this->assertEquals('Formaldehyde', $result['name']);
+
+        Http::assertSent(function ($request) {
+            return $request->url() === 'https://api.example.com/detail?cas_rn=50-00-0' &&
+                   $request->method() === 'GET' &&
+                   $request->hasHeader('X-API-KEY', 'test-token');
+        });
+    }
+
+    /**
+     * Test CommonChemistry service get CAS details throws exception on invalid JSON
+     */
+    public function test_common_chemistry_service_get_cas_details_throws_exception_on_invalid_json(): void
+    {
+        config([
+            'services.cas.base_url' => 'https://api.example.com',
+            'services.cas.api_token' => 'test-token',
+        ]);
+
+        $service = new CommonChemistry;
+
+        Http::fake([
+            'https://api.example.com/detail*' => Http::response('invalid json', 200),
+        ]);
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Unable to retrieve CAS details. Please verify the CAS number and try again.');
+
+        $service->getCASDetails('50-00-0');
+    }
+
+    /**
+     * Test CommonChemistry service search CAS by SMILES returns CAS number on success
+     */
+    public function test_common_chemistry_service_search_cas_by_smiles_returns_cas_number_on_success(): void
+    {
+        config([
+            'services.cas.base_url' => 'https://api.example.com',
+            'services.cas.api_token' => 'test-token',
+        ]);
+
+        $service = new CommonChemistry;
+
+        Http::fake([
+            'https://api.example.com/search*' => Http::response([
+                'count' => 1,
+                'results' => [
+                    ['rn' => '50-00-0'],
+                ],
+            ], 200),
+        ]);
+
+        $result = $service->searchCASBySmiles('C=O');
+
+        $this->assertEquals('50-00-0', $result);
+
+        Http::assertSent(function ($request) {
+            return $request->url() === 'https://api.example.com/search?q=C%3DO' &&
+                   $request->method() === 'GET' &&
+                   $request->hasHeader('X-API-KEY', 'test-token');
+        });
+    }
+
+    /**
+     * Test CommonChemistry service search CAS by SMILES returns null on no results
+     */
+    public function test_common_chemistry_service_search_cas_by_smiles_returns_null_on_no_results(): void
+    {
+        config([
+            'services.cas.base_url' => 'https://api.example.com',
+            'services.cas.api_token' => 'test-token',
+        ]);
+
+        $service = new CommonChemistry;
+
+        Http::fake([
+            'https://api.example.com/search*' => Http::response([
+                'count' => 0,
+                'results' => [],
+            ], 200),
+        ]);
+
+        $result = $service->searchCASBySmiles('invalid-smiles');
+
+        $this->assertNull($result);
+    }
+
+    /**
+     * Test CommonChemistry service search CAS by SMILES returns null on exception
+     */
+    public function test_common_chemistry_service_search_cas_by_smiles_returns_null_on_exception(): void
+    {
+        config([
+            'services.cas.base_url' => 'https://api.example.com',
+            'services.cas.api_token' => 'test-token',
+        ]);
+
+        $service = new CommonChemistry;
+
+        Http::fake([
+            'https://api.example.com/search*' => Http::response([], 500),
+        ]);
+
+        $result = $service->searchCASBySmiles('C=O');
+
+        $this->assertNull($result);
     }
 
     protected function tearDown(): void
