@@ -55,6 +55,9 @@ RUN npm ci --production=false
 # Copy project files
 COPY . .
 
+# Remove conflicting Caddyfile that prevents worker mode
+RUN rm -f /var/www/html/deployment/Caddyfile
+
 # Generate FrankenPHP worker file for Octane
 RUN php artisan octane:install --server=frankenphp --no-interaction
 
@@ -87,11 +90,8 @@ COPY deployment/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY deployment/wait-for-db.sh /usr/local/bin/wait-for-db.sh
 RUN chmod +x /usr/local/bin/wait-for-db.sh
 
-# Generate swagger docs and optimize for production
-RUN php artisan l5-swagger:generate && \
-    php artisan config:cache && \
-    php artisan route:cache && \
-    php artisan view:cache
+# Generate swagger docs (do NOT cache configs - they need runtime env vars)
+RUN php artisan l5-swagger:generate
 
 # Expose port
 EXPOSE 80 443
