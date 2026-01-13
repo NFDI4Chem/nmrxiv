@@ -1,4 +1,4 @@
-FROM dunglas/frankenphp:1-php8.4-alpine
+FROM dunglas/frankenphp:1.7.0-alpine
 
 # Setup proxy settings using build arguments
 ARG HTTP_PROXY
@@ -51,9 +51,6 @@ RUN npm ci --production=false
 
 # Copy project files
 COPY . .
-
-# Generate FrankenPHP worker file for Octane
-RUN php artisan octane:install --server=frankenphp --no-interaction
 
 # Create directories and set permissions in one layer
 RUN mkdir -p /var/www/html/config/caddy \
