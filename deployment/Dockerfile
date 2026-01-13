@@ -77,11 +77,13 @@ RUN npm run build && \
 # Configure Supervisord and Caddy
 COPY deployment/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY deployment/Caddyfile /etc/caddy/Caddyfile
+COPY deployment/wait-for-db.sh /usr/local/bin/wait-for-db.sh
+RUN chmod +x /usr/local/bin/wait-for-db.sh
 
 RUN php artisan l5-swagger:generate
 
 # Expose port
 EXPOSE 80 443
 
-# Start FrankenPHP and supervisord
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+# Wait for database before starting supervisord
+CMD ["/bin/sh", "-c", "/usr/local/bin/wait-for-db.sh pgsql /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf"]
