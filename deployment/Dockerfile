@@ -11,6 +11,9 @@ ENV http_proxy=$HTTP_PROXY \
 # Setup working directory
 WORKDIR /var/www/html
 
+# Remove default Caddyfiles that conflict with Octane's worker mode
+RUN rm -f /etc/caddy/Caddyfile /etc/frankenphp/Caddyfile
+
 # Install system dependencies and build tools in fewer layers
 RUN /sbin/apk update && \
     /sbin/apk add --no-cache \
@@ -55,6 +58,11 @@ COPY . .
 # Generate FrankenPHP worker file for Octane
 RUN php artisan octane:install --server=frankenphp --no-interaction
 
+# Clear and rebuild bootstrap cache
+RUN php artisan config:clear && \
+    php artisan route:clear && \
+    php artisan view:clear
+
 # Create directories and set permissions in one layer
 RUN mkdir -p /var/www/html/config/caddy \
              /var/log/supervisor \
@@ -79,7 +87,11 @@ COPY deployment/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY deployment/wait-for-db.sh /usr/local/bin/wait-for-db.sh
 RUN chmod +x /usr/local/bin/wait-for-db.sh
 
-RUN php artisan l5-swagger:generate
+# Generate swagger docs and optimize for production
+RUN php artisan l5-swagger:generate && \
+    php artisan config:cache && \
+    php artisan route:cache && \
+    php artisan view:cache
 
 # Expose port
 EXPOSE 80 443
