@@ -74,9 +74,8 @@ RUN mkdir -p /var/www/html/config/caddy \
 RUN npm run build && \
     npm cache clean --force
 
-# Configure Supervisord and Caddy
+# Configure Supervisord
 COPY deployment/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-COPY deployment/Caddyfile /etc/caddy/Caddyfile
 COPY deployment/wait-for-db.sh /usr/local/bin/wait-for-db.sh
 RUN chmod +x /usr/local/bin/wait-for-db.sh
 
