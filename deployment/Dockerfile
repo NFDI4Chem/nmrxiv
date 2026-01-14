@@ -69,8 +69,8 @@ RUN npm run build && \
 # Configure Supervisord (Octane manages FrankenPHP internally, no Caddyfile needed)
 COPY deployment/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# Remove default Caddyfile to prevent conflicts with Octane worker mode
-RUN rm -f /etc/caddy/Caddyfile
+# Remove ALL default Caddyfiles to prevent conflicts with Octane worker mode
+RUN rm -f /etc/caddy/Caddyfile /etc/frankenphp/Caddyfile
 
 RUN php artisan l5-swagger:generate
 
