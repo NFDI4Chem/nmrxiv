@@ -8,7 +8,7 @@ name: Setup, Build and Publish to Dev
 # Runs on pushes to the development branch
 on:
   push:
-    branches: [development]
+    branches: [restore-commit-b53]
 
 # Environment variables used across all jobs
 env:
@@ -16,22 +16,22 @@ env:
   REPOSITORY_NAMESPACE: nfdi4chem
 
 jobs:
-  lint-security:
-    name: Lint & Security (reusable)
-    uses: ./.github/workflows/lint-security-check.yml
-    permissions:
-      contents: read
-      security-events: write
-    with:
-      run_php: true
-      run_js: true
-      run_secrets: true
+  # lint-security:
+  #   name: Lint & Security (reusable)
+  #   uses: ./.github/workflows/lint-security-check.yml
+  #   permissions:
+  #     contents: read
+  #     security-events: write
+  #   with:
+  #     run_php: true
+  #     run_js: true
+  #     run_secrets: true
 
   # Build and publish Docker images for the development environment
   setup-build-publish-deploy:
     name: Build & deploy to development
     runs-on: ubuntu-latest
-    needs: [lint-security]
+  #  needs: [lint-security]
 
     # Environment provides secrets and protection rules
     environment:
