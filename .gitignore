@@ -22,7 +22,6 @@ docs/.vitepress/dist
 docs/.vitepress/cache
 **/caddy
 frankenphp
-frankenphp-worker.php
 
 # Coverage reports
 coverage.xml
