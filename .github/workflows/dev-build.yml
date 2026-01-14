@@ -8,7 +8,7 @@ name: Setup, Build and Publish to Dev
 # Runs on pushes to the development branch
 on:
   push:
-    branches: [development]
+    branches: [restore-working-config]
 
 # Environment variables used across all jobs
 env:
