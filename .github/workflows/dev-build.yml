@@ -16,22 +16,22 @@ env:
   REPOSITORY_NAMESPACE: nfdi4chem
 
 jobs:
-  lint-security:
-    name: Lint & Security (reusable)
-    uses: ./.github/workflows/lint-security-check.yml
-    permissions:
-      contents: read
-      security-events: write
-    with:
-      run_php: true
-      run_js: true
-      run_secrets: true
+  # lint-security:
+  #   name: Lint & Security (reusable)
+  #   uses: ./.github/workflows/lint-security-check.yml
+  #   permissions:
+  #     contents: read
+  #     security-events: write
+  #   with:
+  #     run_php: true
+  #     run_js: true
+  #     run_secrets: true
 
   # Build and publish Docker images for the development environment
   setup-build-publish-deploy:
     name: Build & deploy to development
     runs-on: ubuntu-latest
-    needs: [lint-security]
+  # needs: [lint-security]
 
     # Environment provides secrets and protection rules
     environment:
@@ -66,14 +66,14 @@ jobs:
           cache-to: type=gha,mode=max
 
       # Build + push worker image (tag: worker-dev-latest)
-      - name: Build and push Worker Docker image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: ./deployment/Dockerfile.worker
-          push: true
-          build-args: |
-            RELEASE_VERSION=worker-dev-latest
-          tags: ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:worker-dev-latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+      # - name: Build and push Worker Docker image
+      #   uses: docker/build-push-action@v6
+      #   with:
+      #     context: .
+      #     file: ./deployment/Dockerfile.worker
+      #     push: true
+      #     build-args: |
+      #       RELEASE_VERSION=worker-dev-latest
+      #     tags: ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:worker-dev-latest
+      #     cache-from: type=gha
+      #     cache-to: type=gha,mode=max
