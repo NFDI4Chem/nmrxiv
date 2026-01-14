@@ -53,27 +53,21 @@ RUN npm ci --production=false
 COPY . .
 
 # Create directories and set permissions in one layer
-RUN mkdir -p /var/www/html/config/caddy \
-             /var/log/supervisor \
-             /run/supervisor \
-             /data/caddy/data \
-             /data/caddy/config && \
+RUN mkdir -p /var/log/supervisor \
+             /run/supervisor && \
     chmod -R 775 /var/www/html/config \
                  /var/www/html/public && \
-    chmod -R 755 /data/caddy && \
     chown -R www-data:www-data /var/www/html/storage \
                                /var/www/html/bootstrap/cache \
                                /var/www/html/config \
-                               /var/www/html/public \
-                               /data/caddy
+                               /var/www/html/public
 
 # Build frontend assets
 RUN npm run build && \
     npm cache clean --force
 
-# Configure Supervisord and Caddy
+# Configure Supervisord (Octane manages FrankenPHP internally, no Caddyfile needed)
 COPY deployment/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-COPY deployment/Caddyfile /etc/caddy/Caddyfile
 
 RUN php artisan l5-swagger:generate
 

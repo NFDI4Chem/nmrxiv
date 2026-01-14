@@ -56,7 +56,6 @@ services:
     restart: unless-stopped
     volumes:
     - app_storage:/var/www/html/storage
-    - caddy_data:/data/caddy
     - ../.env:/var/www/html/.env
 
 
@@ -160,8 +159,6 @@ services:
 
 volumes:
   app_storage:
-    driver: local
-  caddy_data:
     driver: local
   meilisearch_data:
     driver: local
