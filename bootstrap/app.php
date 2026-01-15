@@ -37,7 +37,10 @@ return Application::configure(basePath: dirname(__DIR__))
             \Spatie\Csp\AddCspHeaders::class,
         ]);
 
-        $middleware->throttleApi();
+        // Disable API throttling in testing environment to allow test suite to run
+        if (env('APP_ENV') !== 'testing') {
+            $middleware->throttleApi();
+        }
 
         $middleware->replace(\Illuminate\Http\Middleware\TrustProxies::class, \App\Http\Middleware\TrustProxies::class);
 
