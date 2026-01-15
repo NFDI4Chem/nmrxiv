@@ -38,7 +38,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         // Disable API throttling in testing environment to allow test suite to run
-        if (! app()->environment('testing')) {
+        if (env('APP_ENV') !== 'testing') {
             $middleware->throttleApi();
         }
 
