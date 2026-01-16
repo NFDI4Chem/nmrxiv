@@ -77,9 +77,9 @@ COPY deployment/Caddyfile /etc/caddy/Caddyfile
 
 RUN php artisan l5-swagger:generate
 
-# Add healthcheck - verify Octane server is responding
-HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-  CMD curl -f http://localhost/octane-test || exit 1
+# Add healthcheck - use Laravel health endpoint for broader compatibility
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+  CMD curl -f http://localhost/up || exit 1
 
 # Expose port
 EXPOSE 80 443
