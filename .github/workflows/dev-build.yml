@@ -16,7 +16,7 @@ env:
   REPOSITORY_NAMESPACE: nfdi4chem
 
 jobs:
-  #Lint and Security check
+  # Lint and Security check
   lint-security:
     name: Lint & Security
     uses: ./.github/workflows/lint-security-check.yml
