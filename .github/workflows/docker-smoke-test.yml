@@ -1,0 +1,62 @@
+name: Docker Image Smoke Tests
+
+on:
+  workflow_call:
+
+env:
+  REPOSITORY_NAME: nmrxiv
+  REPOSITORY_NAMESPACE: nfdi4chem
+
+jobs:
+  smoke-test:
+    name: Smoke test containers
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        container:
+          - name: app
+            file: ./deployment/Dockerfile
+            wait-time: 60
+          - name: worker
+            file: ./deployment/Dockerfile.worker
+            wait-time: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and export ${{ matrix.container.name }} image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ${{ matrix.container.file }}
+          load: true
+          tags: ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:${{ matrix.container.name }}-test
+          cache-from: type=gha,scope=${{ matrix.container.name }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.container.name }}
+
+      - name: Start ${{ matrix.container.name }} container
+        run: |
+          docker run -d --name nmrxiv-${{ matrix.container.name }}-test \
+            -e APP_KEY=base64:$(openssl rand -base64 32) \
+            -e APP_ENV=production \
+            -e DB_CONNECTION=sqlite \
+            -e CACHE_STORE=array \
+            -e SESSION_DRIVER=array \
+            -e QUEUE_CONNECTION=sync \
+            ${{ env.REPOSITORY_NAMESPACE }}/${{ env.REPOSITORY_NAME }}:${{ matrix.container.name }}-test
+
+      - name: Wait for ${{ matrix.container.name }} container health
+        uses: stringbean/docker-healthcheck-action@v3
+        with:
+          container: nmrxiv-${{ matrix.container.name }}-test
+          wait-time: ${{ matrix.container.wait-time }}
+          require-status: running
+          require-healthy: true
+
+      - name: Cleanup ${{ matrix.container.name }} container
+        if: always()
+        run: docker rm -f nmrxiv-${{ matrix.container.name }}-test

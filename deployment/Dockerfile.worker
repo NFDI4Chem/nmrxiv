@@ -66,5 +66,9 @@ COPY deployment/supervisord.worker.conf /etc/supervisor/conf.d/supervisord.conf
 # Create required directories for Supervisor
 RUN mkdir -p /var/log/supervisor /run/supervisor
 
+# Add healthcheck - verify Horizon process is running
+HEALTHCHECK --interval=10s --timeout=3s --start-period=30s --retries=3 \
+  CMD pgrep -f "artisan horizon" || exit 1
+
 # Start Supervisord
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"] 
