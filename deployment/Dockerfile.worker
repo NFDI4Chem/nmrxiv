@@ -66,5 +66,9 @@ COPY deployment/supervisord.worker.conf /etc/supervisor/conf.d/supervisord.conf
 # Create required directories for Supervisor
 RUN mkdir -p /var/log/supervisor /run/supervisor
 
+# Add healthcheck - verify supervisor and processes are running
+HEALTHCHECK --interval=10s --timeout=5s --start-period=20s --retries=3 \
+  CMD supervisorctl status | grep -q RUNNING || exit 1
+
 # Start Supervisord
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"] 
