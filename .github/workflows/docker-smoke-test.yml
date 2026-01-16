@@ -1,8 +1,5 @@
 name: Docker Image Smoke Tests
 
-# on:
-#   workflow_call:
-
 on:
   push:
     branches: [add-smoke-test-frankenphp]
