@@ -1,8 +1,7 @@
 name: Docker Image Smoke Tests
 
 on:
-  push:
-    branches: [add-smoke-test-frankenphp]
+  workflow_call:
 
 env:
   REPOSITORY_NAME: nmrxiv
@@ -21,7 +20,7 @@ jobs:
             wait-time: 60
           - name: worker
             file: ./deployment/Dockerfile.worker
-            wait-time: 30
+            wait-time: 60
     steps:
       - name: Checkout
         uses: actions/checkout@v4
