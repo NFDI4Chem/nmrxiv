@@ -27,11 +27,11 @@ class TeamMailTest extends TestCase
 
     public function test_team_invitation_mail_can_be_rendered(): void
     {
-        $invitation = TeamInvitationModel::create([
-            'team_id' => $this->team->id,
-            'email' => 'invitee@example.com',
-            'role' => 'editor',
-        ]);
+        $invitation = TeamInvitationModel::factory()
+            ->forTeam($this->team)
+            ->forEmail('invitee@example.com')
+            ->editor()
+            ->create();
 
         $mailable = new TeamInvitation($invitation);
         $content = $mailable->render();
@@ -41,11 +41,11 @@ class TeamMailTest extends TestCase
 
     public function test_team_invitation_mail_has_invitation_property(): void
     {
-        $invitation = TeamInvitationModel::create([
-            'team_id' => $this->team->id,
-            'email' => 'invitee@example.com',
-            'role' => 'editor',
-        ]);
+        $invitation = TeamInvitationModel::factory()
+            ->forTeam($this->team)
+            ->forEmail('invitee@example.com')
+            ->editor()
+            ->create();
 
         $mailable = new TeamInvitation($invitation);
 
@@ -56,11 +56,11 @@ class TeamMailTest extends TestCase
 
     public function test_team_invitation_mail_is_queueable(): void
     {
-        $invitation = TeamInvitationModel::create([
-            'team_id' => $this->team->id,
-            'email' => 'invitee@example.com',
-            'role' => 'editor',
-        ]);
+        $invitation = TeamInvitationModel::factory()
+            ->forTeam($this->team)
+            ->forEmail('invitee@example.com')
+            ->editor()
+            ->create();
 
         $mailable = new TeamInvitation($invitation);
 
@@ -72,11 +72,11 @@ class TeamMailTest extends TestCase
         $roles = ['admin', 'editor'];
 
         foreach ($roles as $role) {
-            $invitation = TeamInvitationModel::create([
-                'team_id' => $this->team->id,
-                'email' => "invitee-{$role}@example.com",
-                'role' => $role,
-            ]);
+            $invitation = TeamInvitationModel::factory()
+                ->forTeam($this->team)
+                ->forEmail("invitee-{$role}@example.com")
+                ->state(['role' => $role])
+                ->create();
 
             $mailable = new TeamInvitation($invitation);
             $content = $mailable->render();
@@ -91,11 +91,11 @@ class TeamMailTest extends TestCase
         $anotherUser = User::factory()->withPersonalTeam()->create();
         $anotherTeam = $anotherUser->currentTeam;
 
-        $invitation = TeamInvitationModel::create([
-            'team_id' => $anotherTeam->id,
-            'email' => 'invitee@example.com',
-            'role' => 'editor',
-        ]);
+        $invitation = TeamInvitationModel::factory()
+            ->forTeam($anotherTeam)
+            ->forEmail('invitee@example.com')
+            ->editor()
+            ->create();
 
         $mailable = new TeamInvitation($invitation);
 

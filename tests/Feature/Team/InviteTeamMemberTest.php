@@ -32,10 +32,11 @@ class InviteTeamMemberTest extends TestCase
     {
         $this->actingAs($user = User::factory()->withPersonalTeam()->create());
 
-        $invitation = $user->currentTeam->teamInvitations()->create([
-            'email' => 'test@example.com',
-            'role' => 'owner',
-        ]);
+        $invitation = \App\Models\TeamInvitation::factory()
+            ->forTeam($user->currentTeam)
+            ->forEmail('test@example.com')
+            ->owner()
+            ->create();
 
         $response = $this->delete('/team-invitations/'.$invitation->id);
 
