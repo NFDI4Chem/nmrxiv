@@ -1301,7 +1301,11 @@ export default {
                 return;
             }
             // Check if project has only one sample and project mode is enabled
-            if (this.project.studies && this.project.studies.length === 1 && this.publishForm.enableProjectMode) {
+            if (
+                this.project.studies &&
+                this.project.studies.length === 1 &&
+                this.publishForm.enableProjectMode
+            ) {
                 this.showSingleSampleModal = true;
                 return;
             }
