@@ -796,6 +796,68 @@
                 </div>
             </div>
 
+            <!-- Single Sample Modal -->
+            <jet-confirmation-modal
+                :show="showSingleSampleModal"
+                @close="showSingleSampleModal = false"
+            >
+                <template #title>
+                    <div class="flex items-center">
+                        <svg
+                            class="w-6 h-6 text-blue-500 mr-2"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                            ></path>
+                        </svg>
+                        Project Contains Single Sample
+                    </div>
+                </template>
+                <template #content>
+                    <div class="space-y-3">
+                        <p class="text-sm text-gray-600">
+                            Your project contains only one sample. You can
+                            choose to publish it as a sample or as a project.
+                        </p>
+                        <div
+                            class="bg-blue-50 border border-blue-200 rounded-md p-3"
+                        >
+                            <p class="text-sm text-blue-800">
+                                <strong>Publishing as a Sample:</strong> The
+                                data will be published as an individual sample.
+                            </p>
+                            <p class="text-sm text-blue-800 mt-2">
+                                <strong>Publishing as a Project:</strong> The
+                                data will be published as a project, containing
+                                your single sample.
+                            </p>
+                        </div>
+                        <p class="text-sm text-gray-600">
+                            How would you like to proceed?
+                        </p>
+                    </div>
+                </template>
+                <template #footer>
+                    <jet-secondary-button
+                        @click="showSingleSampleModal = false"
+                    >
+                        Cancel
+                    </jet-secondary-button>
+                    <jet-secondary-button class="ml-2" @click="publishAsSample">
+                        Publish as Sample
+                    </jet-secondary-button>
+                    <jet-success-button class="ml-2" @click="publishAsProject">
+                        Publish as Project
+                    </jet-success-button>
+                </template>
+            </jet-confirmation-modal>
+
             <!-- Draft Warning Modal -->
             <jet-confirmation-modal
                 :show="showDraftWarningModal"
@@ -860,20 +922,40 @@
             >
                 <template #title> Are you sure you want to publish? </template>
                 <template #content>
-                    <div v-if="isReleasedToday()">
-                        Once the data is published you will no longer be able to
-                        change the data uploaded! If published as a project, you
-                        may add more samples (spectra) to the project later.
+                    <div v-if="isReleasedToday()" class="text-sm text-gray-600">
+                        <span v-if="publishForm.enableProjectMode">
+                            Once the data is published you will no longer be
+                            able to change the data uploaded! If published as a
+                            project, you may add more samples (spectra) to the
+                            project later.
+                        </span>
+                        <span v-else>
+                            Once the data is published you will no longer be
+                            able to change the data uploaded! This sample will
+                            be published as an individual sample.
+                        </span>
                     </div>
-                    <div v-else>
-                        Opting for an Embargo publication grants your project a
-                        DOI, yet it stays private exclusively for you. You have
-                        the option to share the project with others and can
-                        adjust the release date or promptly make it public
-                        through the project's dashboard view. But once the data
-                        is published you will no longer be able to change the
-                        data uploaded! If published as a project, you may add
-                        more samples (spectra) to the project later if desired.
+                    <div v-else class="text-sm text-gray-600">
+                        <span v-if="publishForm.enableProjectMode">
+                            Opting for an Embargo publication grants your
+                            project a DOI, yet it stays private exclusively for
+                            you. You have the option to share the project with
+                            others and can adjust the release date or promptly
+                            make it public through the project's dashboard view.
+                            But once the data is published you will no longer be
+                            able to change the data uploaded! If published as a
+                            project, you may add more samples (spectra) to the
+                            project later if desired.
+                        </span>
+                        <span v-else>
+                            Opting for an Embargo publication grants your sample
+                            a DOI, yet it stays private exclusively for you. You
+                            have the option to share the sample with others and
+                            can adjust the release date or promptly make it
+                            public through the sample's dashboard view. But once
+                            the data is published you will no longer be able to
+                            change the data uploaded!
+                        </span>
                     </div>
                 </template>
                 <template #footer>
@@ -980,6 +1062,7 @@ export default {
             validation: null,
             showPublishConfirmationModal: false,
             showDraftWarningModal: false,
+            showSingleSampleModal: false,
             draftWarningConfirmed: false,
             photoPreview: null,
         };
@@ -1217,12 +1300,29 @@ export default {
                 this.showDraftWarningModal = true;
                 return;
             }
+            // Check if project has only one sample
+            if (this.project.studies && this.project.studies.length === 1) {
+                this.showSingleSampleModal = true;
+                return;
+            }
             // Proceed to normal publish confirmation
             this.showPublishConfirmationModal = true;
         },
         confirmDraftWarning() {
             this.draftWarningConfirmed = true;
             this.showDraftWarningModal = false;
+            this.showPublishConfirmationModal = true;
+        },
+        publishAsSample() {
+            this.showSingleSampleModal = false;
+            this.publishForm.enableProjectMode = false;
+            this.updateDraft();
+            this.showPublishConfirmationModal = true;
+        },
+        publishAsProject() {
+            this.showSingleSampleModal = false;
+            this.publishForm.enableProjectMode = true;
+            this.updateDraft();
             this.showPublishConfirmationModal = true;
         },
         publish() {
