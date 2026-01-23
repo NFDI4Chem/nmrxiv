@@ -920,7 +920,8 @@
                 :show="showPublishConfirmationModal"
                 @close="showPublishConfirmationModal = false"
             >
-                <template #title> Are you sure you want to publish? </template>
+                <template #title> 
+                     </template>
                 <template #content>
                     <div v-if="isReleasedToday()" class="text-sm text-gray-600">
                         <span v-if="publishForm.enableProjectMode">
@@ -1320,13 +1321,17 @@ export default {
         publishAsSample() {
             this.showSingleSampleModal = false;
             this.publishForm.enableProjectMode = false;
-            this.updateDraft();
+            if (this.draft) {
+                this.updateDraft();
+            }
             this.showPublishConfirmationModal = true;
         },
         publishAsProject() {
             this.showSingleSampleModal = false;
             this.publishForm.enableProjectMode = true;
-            this.updateDraft();
+            if (this.draft) {
+                this.updateDraft();
+            }
             this.showPublishConfirmationModal = true;
         },
         publish() {
