@@ -1300,8 +1300,8 @@ export default {
                 this.showDraftWarningModal = true;
                 return;
             }
-            // Check if project has only one sample
-            if (this.project.studies && this.project.studies.length === 1) {
+            // Check if project has only one sample and project mode is enabled
+            if (this.project.studies && this.project.studies.length === 1 && this.publishForm.enableProjectMode) {
                 this.showSingleSampleModal = true;
                 return;
             }
