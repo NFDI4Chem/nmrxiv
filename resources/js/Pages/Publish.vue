@@ -920,8 +920,7 @@
                 :show="showPublishConfirmationModal"
                 @close="showPublishConfirmationModal = false"
             >
-                <template #title> 
-                     </template>
+                <template #title> </template>
                 <template #content>
                     <div v-if="isReleasedToday()" class="text-sm text-gray-600">
                         <span v-if="publishForm.enableProjectMode">
