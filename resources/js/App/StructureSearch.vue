@@ -17,10 +17,10 @@
         </button>
         <button
             v-if="mode == 'button'"
-            class="w-full flex items-center justify-center px-4 py-3 border border-1 text-base font-medium rounded-full shadow-sm text-white bg-teal-500 sm:px-8"
+            class="inline-flex items-center justify-center px-6 py-3 text-base font-medium rounded-full text-white bg-gray-900 hover:bg-gray-800 transition-all duration-200"
             @click="openDialog(true)"
         >
-            <MagnifyingGlassIcon class="h-5 w-5" aria-hidden="true" />&nbsp;
+            <MagnifyingGlassIcon class="h-5 w-5 mr-2" aria-hidden="true" />
             Search Structure
         </button>
         <TransitionRoot
