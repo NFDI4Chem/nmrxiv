@@ -838,140 +838,7 @@
             </div>
         </main>
 
-        <footer
-            class="bg-white border-t border-gray-100"
-            aria-labelledby="footer-heading"
-        >
-            <h2 id="footer-heading" class="sr-only">Footer</h2>
-            <div
-                class="max-w-6xl mx-auto pt-16 pb-8 px-4 sm:px-6 lg:pt-24 lg:px-8"
-            >
-                <div class="md:grid md:grid-cols-3 md:gap-8">
-                    <div class="mt-12 xl:mt-0 items center content-center">
-                        <jet-application-logo class="p-0.5 ml-1.5" />
-                    </div>
-                    <div class="grid grid-cols-2 gap-8 md:col-span-2">
-                        <div class="md:grid md:grid-cols-2 md:gap-8">
-                            <div>
-                                <h3
-                                    class="text-sm font-semibold text-gray-400 tracking-wider uppercase"
-                                >
-                                    Quick links
-                                </h3>
-                                <ul role="list" class="mt-4 space-y-4">
-                                    <li
-                                        v-for="item in footerNavigation.quicklinks"
-                                        :key="item.name"
-                                    >
-                                        <Link
-                                            :href="item.href"
-                                            class="text-base text-gray-500 hover:text-gray-900"
-                                        >
-                                            {{ item.name }}
-                                        </Link>
-                                    </li>
-                                    <li>
-                                        <a
-                                            target="_blank"
-                                            href="https://docs.nmrxiv.org/FAQs.html"
-                                            class="text-base text-gray-500 hover:text-gray-900"
-                                        >
-                                            FAQs
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div class="mt-12 md:mt-0">
-                                <h3
-                                    class="text-sm font-semibold text-gray-400 tracking-wider uppercase"
-                                >
-                                    Support
-                                </h3>
-                                <ul role="list" class="mt-4 space-y-4">
-                                    <li
-                                        v-for="item in footerNavigation.support"
-                                        :key="item.name"
-                                    >
-                                        <a
-                                            target="_blank"
-                                            :href="item.href"
-                                            class="text-base text-gray-500 hover:text-gray-900"
-                                        >
-                                            {{ item.name }}
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="md:grid md:grid-cols-2 md:gap-8">
-                            <div>
-                                <h3
-                                    class="text-sm font-semibold text-gray-400 tracking-wider uppercase"
-                                >
-                                    About
-                                </h3>
-                                <ul role="list" class="mt-4 space-y-4">
-                                    <li
-                                        v-for="item in footerNavigation.About"
-                                        :key="item.name"
-                                    >
-                                        <a
-                                            target="_blank"
-                                            :href="item.href"
-                                            class="text-base text-gray-500 hover:text-gray-900"
-                                        >
-                                            {{ item.name }}
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div class="mt-12 md:mt-0">
-                                <h3
-                                    class="text-sm font-semibold text-gray-400 tracking-wider uppercase"
-                                >
-                                    Legal
-                                </h3>
-                                <ul role="list" class="mt-4 space-y-4">
-                                    <li
-                                        v-for="item in footerNavigation.legal"
-                                        :key="item.name"
-                                    >
-                                        <Link
-                                            :href="item.href"
-                                            class="text-base text-gray-500 hover:text-gray-900"
-                                        >
-                                            {{ item.name }}
-                                        </Link>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div
-                    class="my-12 px-12 border-t border-gray-200 pt-8 md:flex md:items-center md:justify-between lg:mt-16"
-                >
-                    <div class="flex space-x-6 md:order-2">
-                        <a
-                            v-for="item in footerNavigation.social"
-                            :key="item.name"
-                            :href="item.href"
-                            class="text-gray-400 hover:text-gray-500"
-                        >
-                            <span class="sr-only">{{ item.name }}</span>
-                            <component
-                                :is="item.icon"
-                                class="h-6 w-6"
-                                aria-hidden="true"
-                            />
-                        </a>
-                    </div>
-                    <p class="mt-8 text-base text-gray-400 md:mt-0 md:order-1">
-                        &copy; 2024 nmrXiv. All rights reserved.
-                    </p>
-                </div>
-            </div>
-        </footer>
+        <Footer />
     </div>
     <component :is="'script'" type="application/ld+json">{{
         schema
@@ -981,7 +848,6 @@
 <script>
 import { Head, Link } from "@inertiajs/vue3";
 import JetApplicationLogo from "@/Jetstream/ApplicationLogo.vue";
-import { defineComponent, h } from "vue";
 import {
     Popover,
     PopoverButton,
@@ -995,6 +861,7 @@ import {
     XMarkIcon,
 } from "@heroicons/vue/24/outline";
 import FlashMessages from "@/Shared/FlashMessages.vue";
+import Footer from "@/Shared/Footer.vue";
 
 const Search = [
     {
@@ -1012,53 +879,6 @@ const Search = [
         icon: MagnifyingGlassIcon,
     },
 ];
-const footerNavigation = {
-    // Search: [
-    //   { name: "Browse", href: "/projects" },
-    //   { name: "Advanced Search", href: "/projects" },
-    // ],
-    quicklinks: [
-        { name: "Projects", href: "/projects" },
-        { name: "Spectra", href: "/spectra" },
-    ],
-    support: [
-        { name: "Documentation", href: "https://docs.nmrxiv.org" },
-        {
-            name: "Guides",
-            href: "https://docs.nmrxiv.org/docs/submission-guides/overview",
-        },
-        {
-            name: "API Status",
-            href: "https://docs.nmrxiv.org/developer-guides/api.html",
-        },
-    ],
-    About: [
-        {
-            name: "Adivsory Board",
-            href: "https://docs.nmrxiv.org/docs/contributing/contributors-and-steering-committee",
-        },
-    ],
-    legal: [
-        { name: "Privacy", href: "/privacy-policy" },
-        { name: "Terms", href: "/terms-of-service" },
-    ],
-    social: [
-        {
-            name: "GitHub",
-            href: "https://github.com/nfdi4chem/nmrxiv",
-            icon: defineComponent({
-                render: () =>
-                    h("svg", { fill: "currentColor", viewBox: "0 0 24 24" }, [
-                        h("path", {
-                            "fill-rule": "evenodd",
-                            d: "M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z",
-                            "clip-rule": "evenodd",
-                        }),
-                    ]),
-            }),
-        },
-    ],
-};
 
 export default {
     components: {
@@ -1074,6 +894,7 @@ export default {
         PopoverGroup,
         PopoverPanel,
         FlashMessages,
+        Footer,
     },
 
     props: {
@@ -1083,7 +904,6 @@ export default {
 
     setup() {
         return {
-            footerNavigation,
             Search,
         };
     },
