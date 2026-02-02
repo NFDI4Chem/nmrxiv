@@ -1,30 +1,66 @@
 <template>
-    <Head title="Terms of Service" />
+    <div class="bg-white">
+        <Head title="Terms of Service" />
+        
+        <!-- Header -->
+        <header class="border-b border-gray-200">
+            <div class="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12 py-6">
+                <Link href="/" class="inline-block">
+                    <JetApplicationLogo class="h-10 w-auto" />
+                </Link>
+            </div>
+        </header>
 
-    <div class="font-sans text-gray-900 antialiased">
-        <div class="pt-4 bg-gray-100 index_beams">
-            <div class="min-h-screen flex flex-col items-center pt-6 sm:pt-0">
-                <div>
-                    <jet-authentication-card-logo />
+        <!-- Content -->
+        <main class="min-h-screen">
+            <div class="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12 py-12 sm:py-16">
+                <!-- Page Header -->
+                <div class="mb-12">
+                    <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-3">
+                        Terms of Service
+                    </h1>
+                    <p class="text-gray-500">
+                        Last updated: {{ new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) }}
+                    </p>
                 </div>
 
-                <div
-                    class="w-full sm:max-w-2xl mt-6 p-6 bg-white shadow-md overflow-hidden sm:rounded-lg prose"
+                <!-- Terms Content -->
+                <div 
+                    class="prose prose-gray max-w-none prose-headings:font-semibold prose-headings:text-gray-900 prose-p:text-gray-600 prose-a:text-teal-600 hover:prose-a:text-teal-700 prose-strong:text-gray-900"
                     v-html="sanitizeHtml(terms)"
                 ></div>
+
+                <!-- Back Link -->
+                <div class="mt-12 pt-8 border-t border-gray-200">
+                    <Link 
+                        href="/" 
+                        class="inline-flex items-center gap-2 text-teal-600 hover:text-teal-700 font-medium transition-colors"
+                    >
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                        Back to Home
+                    </Link>
+                </div>
             </div>
-        </div>
+        </main>
+
+        <!-- Footer -->
+        <Footer />
     </div>
 </template>
 
 <script>
-import { Head } from "@inertiajs/vue3";
-import JetAuthenticationCardLogo from "@/Jetstream/AuthenticationCardLogo.vue";
+import { Head, Link } from "@inertiajs/vue3";
+import JetApplicationLogo from "@/Jetstream/ApplicationLogo.vue";
+import Footer from "@/Shared/Footer.vue";
 
 export default {
     components: {
         Head,
-        JetAuthenticationCardLogo,
+        Link,
+        JetApplicationLogo,
+        Footer,
     },
     props: ["terms"],
 };
