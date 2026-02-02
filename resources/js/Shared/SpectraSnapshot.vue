@@ -23,6 +23,7 @@ export default {
     data() {
         return {
             spectraError: null,
+            loadingTimeout: null,
         };
     },
     computed: {
@@ -40,6 +41,11 @@ export default {
     },
     mounted() {
         this.registerEvents();
+    },
+    beforeUnmount() {
+        if (this.loadingTimeout) {
+            clearTimeout(this.loadingTimeout);
+        }
     },
     methods: {
         registerEvents() {
@@ -66,7 +72,8 @@ export default {
                     }
                     if (type == "nmr-wrapper:error") {
                         this.spectraError = e.data;
-                        this.updateLoadingStatus(false);
+                        console.error('NMRium error:', e.data);
+                        this.updateLoadingStatus(false, "error");
                         return;
                     }
                     let state = data.state;
@@ -113,6 +120,12 @@ export default {
         loadSpectra() {
             const iframe = window.frames.snapshotNMRiumIframe;
             this.spectraError = null;
+
+            if (this.loadingTimeout) {
+                clearTimeout(this.loadingTimeout);
+                this.loadingTimeout = null;
+            }
+
             if (iframe) {
                 axios
                     .get("/dashboard/datasets/" + this.id + "/nmriumInfo")
@@ -127,13 +140,31 @@ export default {
                                 { type: `nmr-wrapper:load`, data },
                                 "*"
                             );
+
+                            this.loadingTimeout = setTimeout(() => {
+                                console.warn('Spectra loading timeout for dataset', this.id);
+                                this.updateLoadingStatus(false, "error");
+                            }, 25000);
                         } else {
-                            this.loadFromURLs(null);
+                            console.warn('No NMRium info found for dataset', this.id);
+                            this.updateLoadingStatus(false, "error");
                         }
+                    })
+                    .catch((error) => {
+                        console.error('Failed to fetch NMRium info for dataset', this.id, error);
+                        this.updateLoadingStatus(false, "error");
                     });
+            } else {
+                console.error('Iframe not available for dataset', this.id);
+                this.updateLoadingStatus(false, "error");
             }
         },
         saveDSPreview(data) {
+            if (this.loadingTimeout) {
+                clearTimeout(this.loadingTimeout);
+                this.loadingTimeout = null;
+            }
+
             if (this.id) {
                 const reader = new FileReader();
                 reader.addEventListener("loadend", () => {
@@ -144,7 +175,15 @@ export default {
                         })
                         .then(() => {
                             this.updateLoadingStatus(false, "dataset loaded");
+                        })
+                        .catch((error) => {
+                            console.error('Failed to save snapshot for dataset', this.id, error);
+                            this.updateLoadingStatus(false, "error");
                         });
+                });
+                reader.addEventListener("error", () => {
+                    console.error('Failed to read blob for dataset', this.id);
+                    this.updateLoadingStatus(false, "error");
                 });
                 reader.readAsText(data.blob);
             }
