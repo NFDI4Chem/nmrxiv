@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Dataset;
+use App\Models\Molecule;
 use App\Models\Project;
 use App\Models\Study;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -35,6 +36,8 @@ function resolveIdentifier($identifier)
                 $model = Study::where([['identifier', $id]])->firstOrFail();
             } elseif ($namespace == 'Dataset') {
                 $model = Dataset::where([['identifier', $id]])->firstOrFail();
+            } elseif ($namespace == 'Molecule') {
+                $model = Molecule::where([['identifier', $id]])->firstOrFail();
             }
 
             return [
