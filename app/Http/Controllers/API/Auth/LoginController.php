@@ -88,21 +88,6 @@ class LoginController extends Controller
      *     ),
      *
      *     @OA\Response(
-     *         response=403,
-     *         description="Account not verified - Email verification required",
-     *
-     *         @OA\JsonContent(
-     *
-     *             @OA\Property(
-     *                 property="message",
-     *                 type="string",
-     *                 description="Error message indicating account verification status",
-     *                 example="Account is not yet verified. Please verify your email address by clicking on the link we just emailed to you."
-     *             )
-     *         )
-     *     ),
-     *
-     *     @OA\Response(
      *         response=422,
      *         description="Validation error - Invalid input data",
      *
@@ -189,8 +174,8 @@ class LoginController extends Controller
 
         if (! $user->hasVerifiedEmail()) {
             return response()->json([
-                'message' => 'Account is not yet verified. Please verify your email address by clicking on the link we just emailed to you.',
-            ], 403);
+                'message' => 'Invalid login details',
+            ], 401);
         }
 
         $token = $user->createToken('auth_token')->plainTextToken;
