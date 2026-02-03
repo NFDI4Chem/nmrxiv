@@ -28,7 +28,7 @@ export default defineConfig({
         }
     },
         server: {
-        host: '127.0.0.1', // Force IPv4 localhost to avoid CSP issues with [::1]
+        // host: '127.0.0.1', // Force IPv4 localhost to avoid CSP issues with [::1]
         https: false
     },
 });
