@@ -1,6 +1,7 @@
 <template>
     <div>
         <button
+            ref="searchButton"
             type="button"
             class="inline-flex items-center justify-center px-6 py-3 text-base font-medium rounded-full text-white bg-gray-900 hover:bg-gray-800 transition-all duration-200"
             @click="openModal"
@@ -30,7 +31,7 @@
                 >
                     <!-- Selection View -->
                     <TransitionChild
-                        v-if="!showStructureEditor"
+                        v-if="!showStructureEditor && !showSpectraUpload && !showPeakListSearch && !showMetadataSearch"
                         as="template"
                         enter="ease-out duration-200"
                         enter-from="opacity-0 scale-95"
@@ -40,7 +41,7 @@
                         leave-to="opacity-0 scale-95"
                     >
                         <DialogPanel
-                            class="mx-auto w-[80vw] max-h-[90vh] transform transition-all bg-white rounded-3xl p-8 shadow-2xl overflow-y-auto"
+                            class="mx-auto w-[90vw] max-w-6xl max-h-[90vh] transform transition-all bg-white rounded-3xl p-8 shadow-2xl overflow-y-auto"
                         >
                             <!-- Header -->
                             <div class="text-center mb-8">
@@ -62,12 +63,12 @@
                                 <div
                                     v-for="option in searchOptions"
                                     :key="option.type"
-                                    class="group relative bg-white rounded-3xl p-6 text-left transition-all duration-200 hover:shadow-lg active:scale-[0.98] min-h-[320px] flex flex-col cursor-pointer"
+                                    class="group relative bg-white rounded-3xl p-6 text-left transition-all duration-200 hover:shadow-lg active:scale-[0.98] min-h-[320px] flex flex-col cursor-pointer overflow-hidden"
                                     :class="selectedType === option.type ? 'border-2 border-blue-500 shadow-lg' : 'border border-gray-200 hover:border-gray-300'"
                                     @click="selectAndProceed(option.type)"
                                 >
                                     <!-- Content -->
-                                    <div class="flex-1">
+                                    <div class="flex-1 relative z-10">
                                         <p
                                             class="text-xs font-medium text-gray-500 uppercase tracking-wide"
                                         >
@@ -85,14 +86,19 @@
 
                                     <!-- Image Area -->
                                     <div
-                                        class="mt-4 flex-1 flex items-end justify-center"
+                                        class="absolute -bottom-20 -right-10 w-64 h-64 pointer-events-none"
                                     >
-                                        &nbsp;
+                                        <img
+                                            v-if="option.image"
+                                            :src="option.image"
+                                            :alt="option.title"
+                                            class="w-full h-full object-cover object-bottom-right grayscale opacity-20 rotate-10"
+                                        />
                                     </div>
 
                                     <!-- Plus Button -->
                                     <div
-                                        class="absolute bottom-4 right-4 w-8 h-8 bg-gray-900 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                                        class="absolute bottom-4 right-4 w-8 h-8 bg-gray-900 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-20"
                                     >
                                         <PlusIcon
                                             class="h-4 w-4 text-white"
@@ -104,14 +110,15 @@
 
                             <!-- Footer -->
                             <div class="mt-8 text-center">
-                                <a
-                                    type="button"
-                                    class="text-sm text-gray-500 hover:text-gray-900 transition-colors"
-                                    @click="closeModal"
+                                <!-- <a
+                                    href="#"
+                                    autofocus
+                                    class="text-sm text-gray-500 hover:text-gray-900 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 rounded px-2 py-1"
+                                    @click.prevent="closeModal"
                                 >
                                     Cancel
-                            </a>
-                                <span class="mx-3 text-gray-300">|</span>
+                                </a> -->
+                                <!-- <span class="mx-3 text-gray-300">|</span> -->
                                 <span class="text-sm text-gray-500">
                                     Press
                                     <kbd
@@ -136,7 +143,7 @@
                         leave-to="opacity-0 scale-95"
                     >
                         <DialogPanel
-                            class="mx-auto w-[95vw] max-w-6xl max-h-[95vh] transform transition-all bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col"
+                            class="mx-auto w-[90vw] max-w-6xl max-h-[90vh] transform transition-all bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col"
                         >
                             <!-- Main Content -->
                             <div class="flex-1 overflow-y-auto">
@@ -169,6 +176,139 @@
                             </div>
                         </DialogPanel>
                     </TransitionChild>
+
+                    <!-- Spectra Upload View -->
+                    <TransitionChild
+                        v-if="showSpectraUpload"
+                        as="template"
+                        enter="ease-out duration-200"
+                        enter-from="opacity-0 scale-95"
+                        enter-to="opacity-100 scale-100"
+                        leave="ease-in duration-150"
+                        leave-from="opacity-100 scale-100"
+                        leave-to="opacity-0 scale-95"
+                    >
+                        <DialogPanel
+                            class="mx-auto w-[90vw] max-w-6xl max-h-[90vh] transform transition-all bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col"
+                        >
+                            <!-- Main Content -->
+                            <div class="flex-1 overflow-y-auto">
+                                <div class="px-4 py-6 max-w-6xl mx-auto">
+                                    <SpectraUploadContent
+                                        @files-uploaded="handleSpectraFiles"
+                                    />
+                                </div>
+                            </div>
+                            
+                            <!-- Footer with Actions -->
+                            <div class="px-4 py-6 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
+                                <a
+                                    href="#"
+                                    autofocus
+                                    @click.prevent="backToOptions"
+                                    class="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 transition-colors"
+                                >
+                                    Cancel
+                                </a>
+                                <a
+                                    href="#"
+                                    @click.prevent="performSpectraSearch"
+                                    :class="spectraFiles.length === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-800'"
+                                    class="px-8 py-2.5 text-sm font-semibold text-white bg-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 shadow-sm transition-colors"
+                                >
+                                    Search {{ spectraFiles.length > 0 ? `(${spectraFiles.length} file${spectraFiles.length > 1 ? 's' : ''})` : '' }}
+                                </a>
+                            </div>
+                        </DialogPanel>
+                    </TransitionChild>
+
+                    <!-- Peak List Search View -->
+                    <TransitionChild
+                        v-if="showPeakListSearch"
+                        as="template"
+                        enter="ease-out duration-200"
+                        enter-from="opacity-0 scale-95"
+                        enter-to="opacity-100 scale-100"
+                        leave="ease-in duration-150"
+                        leave-from="opacity-100 scale-100"
+                        leave-to="opacity-0 scale-95"
+                    >
+                        <DialogPanel
+                            class="mx-auto w-[90vw] max-w-6xl max-h-[90vh] transform transition-all bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col"
+                        >
+                            <!-- Main Content -->
+                            <div class="flex-1 overflow-y-auto">
+                                <div class="px-4 py-6 max-w-6xl mx-auto">
+                                    <PeakListSearchContent
+                                        @search-params-updated="handlePeakListParams"
+                                    />
+                                </div>
+                            </div>
+                            
+                            <!-- Footer with Actions -->
+                            <div class="px-4 py-6 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
+                                <a
+                                    href="#"
+                                    autofocus
+                                    @click.prevent="backToOptions"
+                                    class="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 transition-colors"
+                                >
+                                    Cancel
+                                </a>
+                                <a
+                                    href="#"
+                                    @click.prevent="performPeakListSearch"
+                                    class="px-8 py-2.5 text-sm font-semibold text-white bg-gray-900 rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 shadow-sm transition-colors"
+                                >
+                                    Search
+                                </a>
+                            </div>
+                        </DialogPanel>
+                    </TransitionChild>
+
+                    <!-- Metadata Search View -->
+                    <TransitionChild
+                        v-if="showMetadataSearch"
+                        as="template"
+                        enter="ease-out duration-200"
+                        enter-from="opacity-0 scale-95"
+                        enter-to="opacity-100 scale-100"
+                        leave="ease-in duration-150"
+                        leave-from="opacity-100 scale-100"
+                        leave-to="opacity-0 scale-95"
+                    >
+                        <DialogPanel
+                            class="mx-auto w-[90vw] max-w-6xl max-h-[90vh] transform transition-all bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col"
+                        >
+                            <!-- Main Content -->
+                            <div class="flex-1 overflow-y-auto">
+                                <div class="px-4 py-6 max-w-6xl mx-auto">
+                                    <MetadataSearchContent
+                                        @search-params-updated="handleMetadataParams"
+                                    />
+                                </div>
+                            </div>
+                            
+                            <!-- Footer with Actions -->
+                            <div class="px-4 py-6 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
+                                <a
+                                    href="#"
+                                    autofocus
+                                    @click.prevent="backToOptions"
+                                    class="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 transition-colors"
+                                >
+                                    Cancel
+                                </a>
+                                <a
+                                    href="#"
+                                    @click.prevent="performMetadataSearch"
+                                    class="px-8 py-2.5 text-sm font-semibold text-white bg-gray-900 rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 shadow-sm transition-colors"
+                                >
+                                    Search
+                                </a>
+                            </div>
+                        </DialogPanel>
+                    </TransitionChild>
                 </div>
             </Dialog>
         </TransitionRoot>
@@ -194,6 +334,9 @@ import {
 } from "@heroicons/vue/24/outline";
 import OCL from "openchemlib/full";
 import StructureEditorContent from "@/Shared/StructureEditorContent.vue";
+import SpectraUploadContent from "@/Shared/SpectraUploadContent.vue";
+import PeakListSearchContent from "@/Shared/PeakListSearchContent.vue";
+import MetadataSearchContent from "@/Shared/MetadataSearchContent.vue";
 
 export default {
     components: {
@@ -208,6 +351,9 @@ export default {
         DocumentMagnifyingGlassIcon,
         PlusIcon,
         StructureEditorContent,
+        SpectraUploadContent,
+        PeakListSearchContent,
+        MetadataSearchContent,
     },
     emits: ["search-type-selected"],
     setup(props, { emit }) {
@@ -215,8 +361,15 @@ export default {
         const open = ref(false);
         const selectedType = ref(null);
         const showStructureEditor = ref(false);
+        const showSpectraUpload = ref(false);
+        const showPeakListSearch = ref(false);
+        const showMetadataSearch = ref(false);
         const structureEditor = ref(null);
         const structureSearchType = ref("exact");
+        const spectraFiles = ref([]);
+        const peakListParams = ref(null);
+        const metadataParams = ref(null);
+        const searchButton = ref(null);
 
         const searchOptions = [
             {
@@ -236,6 +389,7 @@ export default {
                 title: "NMR Spectra",
                 description:
                     "Upload raw NMR data from Bruker or JEOL to find similar spectra.",
+                image: "/img/instrument-format.png",
                 icon: markRaw(ChartBarIcon),
                 bgClass: "bg-indigo-100",
                 iconClass: "text-indigo-600",
@@ -246,6 +400,7 @@ export default {
                 title: "Peak List",
                 description:
                     "Enter peak positions to search for matching spectra in the database.",
+                image: "/img/spectra-format.png",
                 icon: markRaw(QueueListIcon),
                 bgClass: "bg-amber-100",
                 iconClass: "text-amber-600",
@@ -256,6 +411,7 @@ export default {
                 title: "Metadata",
                 description:
                     "Search by compound name, author, project, or other metadata.",
+                image: "/img/metadata-format.png",
                 icon: markRaw(DocumentMagnifyingGlassIcon),
                 bgClass: "bg-rose-100",
                 iconClass: "text-rose-600",
@@ -285,11 +441,21 @@ export default {
             open.value = true;
             showStructureEditor.value = false;
             updateUrl(true);
+            // Blur the search button to prevent focus trap issues
+            if (searchButton.value) {
+                searchButton.value.blur();
+            }
         };
 
         const closeModal = () => {
             open.value = false;
             showStructureEditor.value = false;
+            showSpectraUpload.value = false;
+            showPeakListSearch.value = false;
+            showMetadataSearch.value = false;
+            spectraFiles.value = [];
+            peakListParams.value = null;
+            metadataParams.value = null;
             updateUrl(false);
         };
 
@@ -310,24 +476,23 @@ export default {
                 return;
             }
 
-            // Small delay to show visual feedback before navigation
-            setTimeout(() => {
-                // Navigate to appropriate search page based on type
-                switch (type) {
-                    case "spectra":
-                        // TODO: Implement spectra search page
-                        window.location.href = "/?search=" + type;
-                        break;
-                    case "peaks":
-                        // TODO: Implement peak list search page
-                        window.location.href = "/?search=" + type;
-                        break;
-                    case "metadata":
-                        // TODO: Implement metadata search page
-                        window.location.href = "/?search=" + type;
-                        break;
-                }
-            }, 200);
+            // Handle spectra search - show upload interface
+            if (type === "spectra") {
+                showSpectraUpload.value = true;
+                return;
+            }
+
+            // Handle peak list search - show peak list form
+            if (type === "peaks") {
+                showPeakListSearch.value = true;
+                return;
+            }
+
+            // Handle metadata search - show metadata form
+            if (type === "metadata") {
+                showMetadataSearch.value = true;
+                return;
+            }
         };
 
         const initializeStructureEditor = () => {
@@ -355,7 +520,25 @@ export default {
 
         const backToOptions = () => {
             showStructureEditor.value = false;
+            showSpectraUpload.value = false;
+            showPeakListSearch.value = false;
+            showMetadataSearch.value = false;
+            spectraFiles.value = [];
+            peakListParams.value = null;
+            metadataParams.value = null;
             selectedType.value = null;
+        };
+
+        const handleSpectraFiles = (files) => {
+            spectraFiles.value = files;
+        };
+
+        const handlePeakListParams = (params) => {
+            peakListParams.value = params;
+        };
+
+        const handleMetadataParams = (params) => {
+            metadataParams.value = params;
         };
 
         const performStructureSearch = () => {
@@ -367,6 +550,36 @@ export default {
                     "&type=" +
                     structureSearchType.value;
             }
+        };
+
+        const performSpectraSearch = () => {
+            if (spectraFiles.value.length === 0) {
+                return;
+            }
+            // TODO: Implement spectra file upload and search
+            // For now, just log the files
+            console.log("Searching with spectra files:", spectraFiles.value);
+            alert(`Ready to search with ${spectraFiles.value.length} file(s). Upload functionality will be implemented next.`);
+        };
+
+        const performPeakListSearch = () => {
+            if (!peakListParams.value || !peakListParams.value.peaks) {
+                alert("Please enter at least one chemical peak");
+                return;
+            }
+            // TODO: Implement peak list search
+            console.log("Searching with peak list:", peakListParams.value);
+            alert("Peak list search functionality will be implemented next.");
+        };
+
+        const performMetadataSearch = () => {
+            if (!metadataParams.value) {
+                alert("Please enter search criteria");
+                return;
+            }
+            // TODO: Implement metadata search
+            console.log("Searching with metadata:", metadataParams.value);
+            alert("Metadata search functionality will be implemented next.");
         };
 
         // Check URL on mount and open modal if search param exists
@@ -395,14 +608,27 @@ export default {
             open,
             selectedType,
             showStructureEditor,
+            showSpectraUpload,
+            showPeakListSearch,
+            showMetadataSearch,
             structureEditor,
             structureSearchType,
+            spectraFiles,
+            peakListParams,
+            metadataParams,
+            searchButton,
             searchOptions,
             openModal,
             closeModal,
             selectAndProceed,
             backToOptions,
+            handleSpectraFiles,
+            handlePeakListParams,
+            handleMetadataParams,
             performStructureSearch,
+            performSpectraSearch,
+            performPeakListSearch,
+            performMetadataSearch,
         };
     },
 };
