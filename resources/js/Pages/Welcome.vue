@@ -243,10 +243,7 @@
                                     Browse Data
                                 </Link>
                                 
-                                <StructureSearch
-                                    ref="structure-search"
-                                    mode="button"
-                                ></StructureSearch>
+                                <UnifiedSearch></UnifiedSearch>
                                 
                                 <Link
                                     href="/register"
@@ -1045,6 +1042,7 @@ import JetApplicationLogo from "@/Jetstream/ApplicationLogo.vue";
 import Projects from "@/Shared/Projects.vue";
 import Footer from "@/Shared/Footer.vue";
 import StructureSearch from "@/App/StructureSearch.vue";
+import UnifiedSearch from "@/Shared/UnifiedSearch.vue";
 import {
     Popover,
     PopoverButton,
@@ -1222,6 +1220,7 @@ export default {
         FAQs,
         FlashMessages,
         StructureSearch,
+        UnifiedSearch,
         Footer,
     },
 
