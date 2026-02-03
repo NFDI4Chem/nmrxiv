@@ -469,10 +469,6 @@
                 </button>
                 <div class="flex-1 px-4 py-2 flex justify-between">
                     <div class="flex-1 flex">
-                        <!-- <search
-                            :host="MEILISEARCH_HOST"
-                            :akey="MEILISEARCH_PUBLICKEY"
-                        ></search> -->
                     </div>
                     <flash-messages />
                     <div class="ml-4 flex items-center md:ml-6">
@@ -914,6 +910,7 @@
 <script>
 import JetApplicationLogo from "@/Jetstream/ApplicationLogo.vue";
 import Search from "@/Shared/Search.vue";
+import UnifiedSearch from "@/Shared/UnifiedSearch.vue";
 import Create from "@/Shared/CreateButton.vue";
 import JetApplicationMark from "@/Jetstream/ApplicationMark.vue";
 import { Head, Link } from "@inertiajs/vue3";
@@ -1061,6 +1058,7 @@ export default {
         DialogPanel,
         AnnouncementBanner,
         Search,
+        UnifiedSearch,
         Create,
         ClockIcon,
         UsersIcon,
