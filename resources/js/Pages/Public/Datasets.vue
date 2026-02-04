@@ -23,7 +23,7 @@
                                 assignments. Learn more about
                                 <a
                                     class="text-teal-900"
-                                    href="https://docs.nmrxiv.org/docs/introduction/intro"
+                                    href="https://docs.nmrxiv.org/introduction/intro"
                                     target="_blank"
                                     >spectra</a
                                 >.
