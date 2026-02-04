@@ -108,7 +108,7 @@
                                     class="float-right text-xs cursor-pointer hover:text-blue-700 mb-2"
                                 >
                                     <a
-                                        href="https://docs.nmrxiv.org/docs/submission-guides/data-model/dataset"
+                                        href="https://docs.nmrxiv.org/submission-guides/data-model/dataset"
                                         target="_blank"
                                         >Learn more about spectra
                                     </a>
@@ -174,7 +174,7 @@
                                     class="text-xs cursor-pointer hover:text-blue-700 mt-2"
                                 >
                                     <a
-                                        href="https://docs.nmrxiv.org/docs/submission-guides/submission/upload/#manage-studies-and-datasets"
+                                        href="https://docs.nmrxiv.org/submission-guides/submission/upload/#manage-studies-and-datasets"
                                         target="_blank"
                                         >Need help?
                                     </a>
