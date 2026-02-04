@@ -139,9 +139,9 @@
                                             :href="child.href"
                                             :class="[
                                                 $page.url === child.href
-                                                    ? 'bg-gray-100 text-gray-900 border-l-4 border-gray-900'
-                                                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
-                                                'group flex items-center px-3 py-2 text-sm font-medium rounded-l-lg transition-all duration-200 ease-in-out',
+                                                    ? 'text-gray-900'
+                                                    : 'text-gray-700 hover:text-gray-600',
+                                                'group flex items-center px-3 py-2 text-sm font-medium rounded-l-lg transition-colors',
                                             ]"
                                         >
                                             <component
@@ -149,8 +149,8 @@
                                                 :class="[
                                                     $page.url === child.href
                                                         ? 'text-gray-900'
-                                                        : 'text-gray-400 group-hover:text-gray-600',
-                                                    'mr-3 h-4 w-4 transition-colors duration-200',
+                                                        : 'text-gray-500 group-hover:text-gray-600',
+                                                    'mr-3 h-4 w-4 transition-colors',
                                                 ]"
                                                 aria-hidden="true"
                                             />
@@ -287,9 +287,9 @@
                                         :href="child.href"
                                         :class="[
                                             $page.url === child.href
-                                                ? 'bg-gray-100 text-gray-900 shadow-sm'
-                                                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
-                                            'flex items-center justify-center w-12 h-12 rounded-lg transition-all duration-200 ease-in-out',
+                                                ? 'text-gray-900 shadow-sm'
+                                                : 'text-gray-700 hover:text-gray-600',
+                                            'flex items-center justify-center w-12 h-12 rounded-lg transition-colors',
                                         ]"
                                     >
                                         <component
@@ -297,8 +297,8 @@
                                             :class="[
                                                 $page.url === child.href
                                                     ? 'text-gray-900'
-                                                    : 'text-gray-500 group-hover:text-gray-700',
-                                                'h-5 w-5 transition-colors duration-200',
+                                                    : 'text-gray-500 group-hover:text-gray-600',
+                                                'h-5 w-5 transition-colors',
                                             ]"
                                             aria-hidden="true"
                                         />
@@ -418,9 +418,9 @@
                                     :href="child.href"
                                     :class="[
                                         $page.url === child.href
-                                            ? 'bg-gray-100 text-gray-900 border-r-4 border-gray-900'
-                                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
-                                        'group flex items-center px-3 py-2 text-sm font-medium rounded-l-lg transition-all duration-200 ease-in-out',
+                                            ? 'text-gray-900'
+                                            : 'text-gray-700 hover:text-gray-600',
+                                        'group flex items-center px-3 py-2 text-sm font-medium rounded-l-lg transition-colors',
                                     ]"
                                 >
                                     <component
@@ -428,8 +428,8 @@
                                         :class="[
                                             $page.url === child.href
                                                 ? 'text-gray-900'
-                                                : 'text-gray-400 group-hover:text-gray-600',
-                                            'mr-3 h-4 w-4 transition-colors duration-200',
+                                                : 'text-gray-500 group-hover:text-gray-600',
+                                            'mr-3 h-4 w-4 transition-colors',
                                         ]"
                                         aria-hidden="true"
                                     />
@@ -877,17 +877,16 @@
                             as="div"
                             class="ml-3 relative"
                         >
-                            <div class="inline-flex">
+                            <div class="inline-flex items-center gap-4">
                                 <Link
                                     href="/login"
-                                    class="px-3 py-2 whitespace-nowrap text-base font-medium text-gray-500 hover:text-gray-900"
+                                    class="whitespace-nowrap text-sm font-medium text-gray-900 hover:text-gray-600 transition-colors"
                                 >
                                     Login
                                 </Link>
                                 <Link
                                     href="/register"
-                                    type="button"
-                                    class="inline-flex ml-3 items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-gray-900 hover:bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                                    class="whitespace-nowrap inline-flex items-center justify-center px-5 py-2.5 border border-transparent rounded-full text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 transition-colors shadow-sm"
                                 >
                                     Register
                                 </Link>
