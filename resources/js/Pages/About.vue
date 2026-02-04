@@ -3,22 +3,67 @@
         <Head title="Welcome to nmrXiv"></Head>
         <FlashMessages />
         <main>
-            <div class="relative index_beams">
-                <header>
-                    <Popover class="relative">
+            <!-- Header and Hero with Animated Gradient -->
+            <div class="relative overflow-hidden">
+                <!-- Animated mesh gradient background -->
+                <div class="absolute inset-0 bg-gradient-to-br from-blue-50/30 via-indigo-50/30 to-purple-50/30"></div>
+                <div class="absolute inset-0 opacity-20">
+                    <div class="absolute top-0 left-1/4 w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
+                    <div class="absolute top-0 right-1/4 w-96 h-96 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
+                    <div class="absolute -bottom-32 left-1/3 w-96 h-96 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"></div>
+                </div>
+                
+                <!-- Gradient fade to white at bottom -->
+                <div class="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-b from-transparent to-white"></div>
+                
+                <header class="relative">
+                    <Popover class="relative border-b border-white/20">
                         <div
-                            class="flex justify-between items-center mx-auto px-4 py-6 sm:px-6 md:justify-start md:space-x-10 lg:px-8"
+                            class="flex justify-between items-center mx-auto max-w-7xl px-4 py-5 sm:px-6 lg:px-8"
                         >
-                            <div class="flex justify-start lg:w-0 lg:flex-1">
-                                <Link :href="'/'">
+                            <div class="flex justify-start items-center gap-10">
+                                <Link :href="'/'" class="flex-shrink-0">
                                     <jet-application-logo
-                                        class="block h-10 p-0.5 ml-1.5 w-auto"
+                                        class="block h-9 w-auto"
                                     />
                                 </Link>
+                                
+                                <!-- Desktop Navigation -->
+                                <PopoverGroup
+                                    as="nav"
+                                    class="hidden md:flex items-center gap-8"
+                                >
+                                    <Link
+                                        href="/projects"
+                                        class="text-sm font-medium text-gray-900 hover:text-gray-600 transition-colors"
+                                    >
+                                        Projects
+                                    </Link>
+                                    <Link
+                                        href="/spectra"
+                                        class="text-sm font-medium text-gray-900 hover:text-gray-600 transition-colors"
+                                    >
+                                        Spectra
+                                    </Link>
+                                    <Link
+                                        href="/compounds"
+                                        class="text-sm font-medium text-gray-900 hover:text-gray-600 transition-colors"
+                                    >
+                                        Compounds
+                                    </Link>
+                                    <Link
+                                        href="/about-us"
+                                        class="text-sm font-medium text-gray-900 hover:text-gray-600 transition-colors"
+                                    >
+                                        About
+                                    </Link>
+                                </PopoverGroup>
                             </div>
-                            <div class="-mr-2 -my-2 md:hidden">
+                            
+                            <!-- Mobile menu button -->
+                            <div class="md:hidden">
                                 <PopoverButton
-                                    class="rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-teal-500"
+                                    class="rounded-lg p-2 inline-flex items-center justify-center text-gray-900 hover:text-gray-600 hover:bg-white/50 focus:outline-none focus:ring-2 ring-brand transition-colors"
                                 >
                                     <span class="sr-only">Open menu</span>
                                     <Bars3Icon
@@ -27,68 +72,35 @@
                                     />
                                 </PopoverButton>
                             </div>
-                            <PopoverGroup
-                                as="nav"
-                                class="hidden md:flex space-x-10"
-                            >
-                                <Link
-                                    href="/projects"
-                                    class="text-base font-medium text-gray-500 hover:text-gray-900"
-                                >
-                                    Projects
-                                </Link>
-                                <Link
-                                    href="/spectra"
-                                    class="text-base font-medium text-gray-500 hover:text-gray-900"
-                                >
-                                    Spectra
-                                </Link>
-                                <Link
-                                    href="/compounds"
-                                    class="text-base font-medium text-gray-500 hover:text-gray-900"
-                                >
-                                    Compounds
-                                </Link>
-                                <Link
-                                    href="/about-us"
-                                    class="text-base font-medium text-gray-500 hover:text-gray-900"
-                                >
-                                    About
-                                </Link>
-                            </PopoverGroup>
-                            <!-- <div
                             
-                            class="ml-5 tooltip"
-                        >
-                            
-                        </div> -->
+                            <!-- Auth Buttons -->
                             <div
                                 v-if="
                                     $page.props.auth.user &&
                                     $page.props.auth.user?.first_name != null
                                 "
-                                class="hidden md:flex items-center justify-end md:flex-1 lg:w-0"
+                                class="hidden md:flex items-center"
                             >
                                 <Link
                                     href="/dashboard"
-                                    class="ml-8 whitespace-nowrap inline-flex items-center justify-center bg-gradient-to-r from-indigo-600 to-teal-600 bg-origin-border px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white hover:from-indigo-700 hover:to-teal-700"
+                                    class="whitespace-nowrap inline-flex items-center justify-center px-5 py-2.5 border border-transparent rounded-full text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 transition-colors shadow-sm"
                                 >
                                     Dashboard
                                 </Link>
                             </div>
                             <div
                                 v-else
-                                class="hidden md:flex items-center justify-end md:flex-1 lg:w-0"
+                                class="hidden md:flex items-center gap-4"
                             >
                                 <Link
                                     href="/login"
-                                    class="whitespace-nowrap text-base font-medium text-gray-500 hover:text-gray-900"
+                                    class="whitespace-nowrap text-sm font-medium text-gray-900 hover:text-gray-600 transition-colors"
                                 >
                                     Login
                                 </Link>
                                 <Link
                                     href="/register"
-                                    class="ml-8 whitespace-nowrap inline-flex items-center justify-center bg-gradient-to-r from-indigo-600 to-teal-600 bg-origin-border px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white hover:from-indigo-700 hover:to-teal-700"
+                                    class="whitespace-nowrap inline-flex items-center justify-center px-5 py-2.5 border border-transparent rounded-full text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 transition-colors shadow-sm"
                                 >
                                     Register
                                 </Link>
@@ -208,71 +220,10 @@
                         </transition>
                     </Popover>
                 </header>
-                <div class="min-h-screen pb-16 isolate">
-                    <div class="relative isolate -z-10">
-                        <svg
-                            class="absolute inset-x-0 top-0 -z-10 h-[64rem] w-full stroke-gray-200 [mask-image:radial-gradient(32rem_32rem_at_center,white,transparent)]"
-                            aria-hidden="true"
-                        >
-                            <defs>
-                                <pattern
-                                    id="1f932ae7-37de-4c0a-a8b0-a6e3b4d44b84"
-                                    width="200"
-                                    height="200"
-                                    x="50%"
-                                    y="-1"
-                                    patternUnits="userSpaceOnUse"
-                                >
-                                    <path d="M.5 200V.5H200" fill="none" />
-                                </pattern>
-                            </defs>
-                            <svg
-                                x="50%"
-                                y="-1"
-                                class="overflow-visible fill-gray-50"
-                            >
-                                <path
-                                    d="M-200 0h201v201h-201Z M600 0h201v201h-201Z M-400 600h201v201h-201Z M200 800h201v201h-201Z"
-                                    stroke-width="0"
-                                />
-                            </svg>
-                            <rect
-                                width="100%"
-                                height="100%"
-                                stroke-width="0"
-                                fill="url(#1f932ae7-37de-4c0a-a8b0-a6e3b4d44b84)"
-                            />
-                        </svg>
-                        <div
-                            class="absolute left-1/2 right-0 top-0 -z-10 -ml-24 transform-gpu overflow-hidden blur-3xl lg:ml-24 xl:ml-48"
-                            aria-hidden="true"
-                        >
-                            <div
-                                class="aspect-[801/1036] w-[50.0625rem] bg-gradient-to-tr from-[#ff80b5] to-[#9089fc] opacity-30"
-                                style="
-                                    clip-path: polygon(
-                                        63.1% 29.5%,
-                                        100% 17.1%,
-                                        76.6% 3%,
-                                        48.4% 0%,
-                                        44.6% 4.7%,
-                                        54.5% 25.3%,
-                                        59.8% 49%,
-                                        55.2% 57.8%,
-                                        44.4% 57.2%,
-                                        27.8% 47.9%,
-                                        35.1% 81.5%,
-                                        0% 97.7%,
-                                        39.2% 100%,
-                                        35.2% 81.4%,
-                                        97.2% 52.8%,
-                                        63.1% 29.5%
-                                    );
-                                "
-                            ></div>
-                        </div>
+                <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                    <div class="relative py-20 sm:py-24 lg:py-32">
                         <div class="overflow-hidden">
-                            <div class="mx-auto max-w-6xl pb-32 px-8">
+                            <div class="mx-auto max-w-6xl pb-8">
                                 <div
                                     class="mx-auto max-w-2xl gap-x-14 lg:mx-0 lg:flex lg:max-w-none lg:items-center"
                                 >
@@ -402,10 +353,14 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
 
-                    <div
-                        class="mx-auto -mt-12 max-w-6xl px-6 sm:mt-0 lg:px-8 xl:-mt-8"
-                    >
+            <!-- Our Mission Section (on white background) -->
+            <div class="relative bg-white z-10">
+                <div
+                    class="mx-auto -mt-12 max-w-6xl px-6 sm:mt-0 lg:px-8 xl:-mt-8"
+                >
                         <div class="mx-auto max-w-2xl lg:mx-0 lg:max-w-none">
                             <h2
                                 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl"
@@ -608,12 +563,13 @@
                                 class="flex flex-col justify-center items-center"
                             >
                                 <div
-                                    class="h-24 w-24 overflow-hidden rounded-full flex justify-center items-center"
+                                    class="bg-gray-200 h-24 w-24 overflow-hidden rounded-full flex justify-center items-center"
                                 >
                                     <img
-                                        class="mx-auto"
+                                        class="mx-auto h-24 w-24 object-cover"
                                         src="/img/gpauli.jpg"
                                         alt="Guido Pauli"
+                                        @error="handleImageError"
                                     />
                                 </div>
                                 <h3
@@ -630,12 +586,13 @@
                                 class="flex flex-col justify-center items-center"
                             >
                                 <div
-                                    class="bg-gray-300 h-24 w-24 overflow-hidden rounded-full flex justify-center items-center"
+                                    class="bg-gray-200 h-24 w-24 overflow-hidden rounded-full flex justify-center items-center"
                                 >
                                     <img
-                                        class="h-24 w-24"
-                                        src="/img/ph.jpg"
+                                        class="h-24 w-24 object-cover"
+                                        src="/img/nschloerer.jpg"
                                         alt="Nils Schlörer"
+                                        @error="handleImageError"
                                     />
                                 </div>
                                 <h3
@@ -652,12 +609,13 @@
                                 class="flex flex-col justify-center items-center"
                             >
                                 <div
-                                    class="h-24 w-24 overflow-hidden rounded-full flex justify-center items-center"
+                                    class="bg-gray-200 h-24 w-24 overflow-hidden rounded-full flex justify-center items-center"
                                 >
                                     <img
-                                        class="mx-auto"
+                                        class="mx-auto h-24 w-24 object-cover"
                                         src="/img/jw.jpeg"
                                         alt="Julien Wist"
+                                        @error="handleImageError"
                                     />
                                 </div>
                                 <h3
@@ -674,12 +632,13 @@
                                 class="flex flex-col justify-center items-center"
                             >
                                 <div
-                                    class="h-24 w-24 overflow-hidden rounded-full flex justify-center items-center"
+                                    class="bg-gray-200 h-24 w-24 overflow-hidden rounded-full flex justify-center items-center"
                                 >
                                     <img
-                                        class="mx-auto"
+                                        class="mx-auto h-24 w-24 object-cover"
                                         src="/img/lp.jpg"
                                         alt="Luc Patiny"
+                                        @error="handleImageError"
                                     />
                                 </div>
                                 <h3
@@ -696,12 +655,13 @@
                                 class="flex flex-col justify-center items-center"
                             >
                                 <div
-                                    class="bg-gray-300 h-24 w-24 overflow-hidden rounded-full flex justify-center items-center"
+                                    class="bg-gray-200 h-24 w-24 overflow-hidden rounded-full flex justify-center items-center"
                                 >
                                     <img
-                                        class="h-24 w-24"
-                                        src="/img/ph.jpg"
+                                        class="h-24 w-24 object-cover"
+                                        src="/img/skuhn.jpg"
                                         alt="Stephan Kuhn"
+                                        @error="handleImageError"
                                     />
                                 </div>
                                 <h3
@@ -718,12 +678,13 @@
                                 class="flex flex-col justify-center items-center"
                             >
                                 <div
-                                    class="h-24 w-24 overflow-hidden rounded-full flex justify-center items-center"
+                                    class="bg-gray-200 h-24 w-24 overflow-hidden rounded-full flex justify-center items-center"
                                 >
                                     <img
-                                        class="mx-auto"
+                                        class="mx-auto h-24 w-24 object-cover"
                                         src="/img/jl.jpeg"
                                         alt="Johannes Liermann"
+                                        @error="handleImageError"
                                     />
                                 </div>
                                 <h3
@@ -781,7 +742,7 @@
                             <h2
                                 class="text-center text-3xl tracking-tight font-bold leading-8 text-gray-900"
                             >
-                                nmrXiv Project Group
+                                Academic & Other Partners
                             </h2>
                             <div
                                 class="mx-auto mt-16 grid max-w-lg grid-cols-2 md:grid-cols-5 items-center gap-x-8 gap-y-10 sm:max-w-xl sm:grid-cols-6 sm:gap-x-10 lg:mx-0 lg:max-w-none lg:grid-cols-5"
@@ -834,7 +795,6 @@
                     </div>
 
                     <div class="mx-auto my-16 max-w-6xl">&nbsp;</div>
-                </div>
             </div>
         </main>
 
@@ -913,5 +873,68 @@ export default {
             schema: null,
         };
     },
+
+    methods: {
+        handleImageError(event) {
+            const img = event.target;
+            const parent = img.parentElement;
+            
+            // Hide the broken image
+            img.style.display = 'none';
+            
+            // Create placeholder if it doesn't exist
+            if (!parent.querySelector('.avatar-placeholder')) {
+                const placeholder = document.createElement('div');
+                placeholder.className = 'avatar-placeholder flex items-center justify-center w-full h-full';
+                
+                // Get initials from alt text
+                const altText = img.alt || 'User';
+                const initials = altText
+                    .split(' ')
+                    .map(word => word.charAt(0))
+                    .join('')
+                    .toUpperCase()
+                    .slice(0, 2);
+                
+                placeholder.innerHTML = `<span class="text-2xl font-semibold text-gray-500">${initials}</span>`;
+                parent.appendChild(placeholder);
+            }
+        },
+    },
 };
 </script>
+
+<style scoped>
+/* Custom brand color */
+.ring-brand {
+    --tw-ring-color: #FD0039;
+}
+
+/* Blob animations */
+@keyframes blob {
+    0% {
+        transform: translate(0px, 0px) scale(1);
+    }
+    33% {
+        transform: translate(30px, -50px) scale(1.1);
+    }
+    66% {
+        transform: translate(-20px, 20px) scale(0.9);
+    }
+    100% {
+        transform: translate(0px, 0px) scale(1);
+    }
+}
+
+.animate-blob {
+    animation: blob 7s infinite;
+}
+
+.animation-delay-2000 {
+    animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+    animation-delay: 4s;
+}
+</style>

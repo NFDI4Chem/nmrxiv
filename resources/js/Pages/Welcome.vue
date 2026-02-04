@@ -225,8 +225,8 @@
                         <div class="text-center">
                             <!-- Main Heading -->
                             <h1 class="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl lg:text-6xl">
-                                Open, FAIR and Consensus-Driven
-                                <span class="block mt-2 text-gray-900">NMR Data Repository</span>
+                                Open, <span class="highlight-word">FAIR</span> and Consensus-Driven
+                                <span class="block mt-2 text-gray-900"><span class="highlight-word highlight-word-delay">NMR Data Repository</span></span>
                             </h1>
                             
                             <!-- Description -->
@@ -294,7 +294,7 @@
             <!-- Journals Section with Transparent Background -->
             <div class="relative overflow-hidden bg-white">
                 <!-- Content -->
-                <div class="relative pb-16 pt-16 sm:pb-20 sm:pt-20">
+                <div class="relative py-2">
                     <div class="mx-auto max-w-6xl px-6 sm:px-8 lg:px-12">
                         <h2
                             class="text-center text-lg sm:text-xl font-semibold leading-8 text-gray-900"
@@ -335,12 +335,73 @@
                 </div>
             </div>
 
+            <!-- Promotional Section - Apple Music Style -->
+            <div class="relative">
+                <!-- Gradient background matching metrics section -->
+                <div class="absolute inset-0 bg-gradient-to-b from-white via-gray-50 to-white"></div>
+                
+                <div class="relative max-w-6xl mx-auto px-6 pt-20 sm:px-8 sm:pt-24 lg:px-12">
+                    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-gray-50 to-white border border-gray-200 shadow-sm">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 p-8 sm:p-12 items-center">
+                            <!-- Left Side: Content -->
+                            <div>
+                                <!-- Brand Text -->
+                                <div class="mb-6">
+                                    <p class="text-sm font-semibold text-gray-500 uppercase tracking-wide">NMR PREDICTION</p>
+                                </div>
+                                
+                                <!-- Main Heading -->
+                                <h2 class="text-3xl sm:text-4xl lg:text-5xl font-semibold text-gray-900 leading-tight tracking-tight">
+                                    Fast and accurate NMR spectra predictions from chemical structures
+                                </h2>
+                                
+                                <!-- Call to Action Button -->
+                                <div class="mt-8">
+                                    <a href="/predict" class="inline-flex items-center px-6 py-3 bg-blue-600 text-white text-base font-semibold rounded-full hover:bg-blue-700 transition-colors duration-200 shadow-md hover:shadow-lg">
+                                        Try now
+                                        <svg class="ml-2 w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                                        </svg>
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <!-- Right Side: Visual Element -->
+                            <div class="relative h-full flex items-center justify-center">
+                                <!-- Spectra Card Cascade -->
+                                <div class="relative w-full max-w-lg aspect-[4/3]">
+                                    <!-- Card 1 - Back layer -->
+                                    <div class="absolute inset-0 rounded-2xl overflow-hidden shadow-lg bg-white animate-cascade-rotate-1">
+                                        <img src="/img/spectra/1.png" alt="NMR Spectrum" class="w-full h-full object-cover" />
+                                    </div>
+                                    
+                                    <!-- Card 2 - Middle back -->
+                                    <div class="absolute inset-0 rounded-2xl overflow-hidden shadow-lg bg-white animate-cascade-rotate-2">
+                                        <img src="/img/spectra/2.png" alt="NMR Spectrum" class="w-full h-full object-cover" />
+                                    </div>
+                                    
+                                    <!-- Card 3 - Middle front -->
+                                    <div class="absolute inset-0 rounded-2xl overflow-hidden shadow-xl bg-white animate-cascade-rotate-3">
+                                        <img src="/img/spectra/3.png" alt="NMR Spectrum" class="w-full h-full object-cover" />
+                                    </div>
+                                    
+                                    <!-- Card 4 - Front layer -->
+                                    <div class="absolute inset-0 rounded-2xl overflow-hidden shadow-2xl bg-white animate-cascade-rotate-4 hover:scale-[1.02] transition-transform duration-300">
+                                        <img src="/img/spectra/4.png" alt="NMR Spectrum" class="w-full h-full object-cover" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Metrics Section - Apple iPad Style -->
             <div class="relative">
                 <!-- Gradient background: white -> gray -> white -->
                 <div class="absolute inset-0 bg-gradient-to-b from-white via-gray-50 to-white"></div>
                 
-                <div class="relative max-w-6xl mx-auto px-6 py-20 sm:px-8 sm:py-24 lg:px-12">
+                <div class="relative max-w-6xl mx-auto px-6 pb-20 sm:px-8 sm:pb-24 pt-4 lg:px-12">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <!-- Projects Card -->
                         <a
@@ -427,7 +488,7 @@
                         <div
                             class="px-4 z-20 max-w-xl mx-auto sm:px-6 lg:py-32 lg:max-w-none lg:mx-0 lg:px-0 lg:col-start-2"
                         >
-                            <div class="bg-white p-5 rounded-md border">
+                            <div class="bg-white p-8 rounded-3xl border border-gray-200 shadow-sm">
                                 <div>
                                     <span
                                         class="h-12 w-12 rounded-md flex items-center justify-center bg-blue-600"
@@ -451,7 +512,7 @@
                                         <a
                                             target="_blank"
                                             href="https://docs.nmrxiv.org/developer-guides/api.html"
-                                            class="inline-flex bg-blue-600 bg-origin-border px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white hover:bg-blue-700"
+                                            class="inline-flex items-center justify-center bg-blue-600 bg-origin-border px-6 py-3 border border-transparent text-base font-medium rounded-full shadow-sm text-white hover:bg-blue-700 transition-colors duration-200"
                                         >
                                             View API Docs
                                         </a>
@@ -704,7 +765,7 @@
                     </div>
                 </Dialog>
             </TransitionRoot>
-            <!-- nmrXiv Project Group Section - iPad Style -->
+            <!-- Academic and public/private partners Section - iPad Style -->
             <div class="bg-white border-t border-gray-100">
                 <div class="py-20">
                     <!-- Section Header with max-width -->
@@ -1008,7 +1069,7 @@
                             <div class="flex flex-col sm:flex-row gap-3">
                                 <Link
                                     href="/register"
-                                    class="group inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-slate-900 font-semibold rounded-xl hover:bg-blue-50 transition-colors duration-200"
+                                    class="group inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-slate-900 font-semibold rounded-full hover:bg-blue-50 transition-colors duration-200 shadow-sm"
                                 >
                                     Get started
                                     <ArrowRightIcon
@@ -1018,7 +1079,7 @@
                                 <a
                                     href="https://docs.nmrxiv.org/submission-guides/data-lifecycle.html"
                                     target="_blank"
-                                    class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-transparent text-white font-semibold rounded-xl border border-slate-600 hover:bg-slate-800 hover:border-slate-500 transition-colors duration-200"
+                                    class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-transparent text-white font-semibold rounded-full border border-slate-600 hover:bg-slate-800 hover:border-slate-500 transition-colors duration-200"
                                 >
                                     Learn more
                                 </a>
@@ -1429,5 +1490,134 @@ export default {
 
 .animate-fade-in-up {
     animation: fade-in-up 1s ease-out 0.3s both;
+}
+
+/* Highlight word animation with subtle color changes */
+.highlight-word {
+    position: relative;
+    display: inline-block;
+    z-index: 1;
+}
+
+.highlight-word::before {
+    content: '';
+    position: absolute;
+    left: -6px;
+    right: -6px;
+    top: 15%;
+    bottom: 15%;
+    background: linear-gradient(90deg, 
+        rgba(147, 197, 253, 0) 0%,
+        rgba(147, 197, 253, 0.3) 10%,
+        rgba(147, 197, 253, 0.3) 90%,
+        rgba(147, 197, 253, 0) 100%
+    );
+    border-radius: 4px;
+    z-index: -1;
+    transform-origin: left center;
+    animation: highlight-sweep 3s ease-in-out infinite, color-change 20s ease-in-out infinite;
+}
+
+.highlight-word-delay::before {
+    animation-delay: 1.5s, 0s;
+}
+
+@keyframes highlight-sweep {
+    0% {
+        opacity: 0;
+        transform: scaleX(0);
+    }
+    15% {
+        opacity: 1;
+        transform: scaleX(1);
+    }
+    85% {
+        opacity: 1;
+        transform: scaleX(1);
+    }
+    100% {
+        opacity: 0;
+        transform: scaleX(0);
+    }
+}
+
+@keyframes color-change {
+    0%, 100% {
+        background: linear-gradient(90deg, 
+            rgba(147, 197, 253, 0) 0%,
+            rgba(147, 197, 253, 0.3) 10%,
+            rgba(147, 197, 253, 0.3) 90%,
+            rgba(147, 197, 253, 0) 100%
+        ); /* Soft Blue */
+    }
+    25% {
+        background: linear-gradient(90deg, 
+            rgba(196, 181, 253, 0) 0%,
+            rgba(196, 181, 253, 0.3) 10%,
+            rgba(196, 181, 253, 0.3) 90%,
+            rgba(196, 181, 253, 0) 100%
+        ); /* Soft Lavender */
+    }
+    50% {
+        background: linear-gradient(90deg, 
+            rgba(167, 243, 208, 0) 0%,
+            rgba(167, 243, 208, 0.3) 10%,
+            rgba(167, 243, 208, 0.3) 90%,
+            rgba(167, 243, 208, 0) 100%
+        ); /* Soft Mint */
+    }
+    75% {
+        background: linear-gradient(90deg, 
+            rgba(253, 230, 138, 0) 0%,
+            rgba(253, 230, 138, 0.3) 10%,
+            rgba(253, 230, 138, 0.3) 90%,
+            rgba(253, 230, 138, 0) 100%
+        ); /* Soft Yellow */
+    }
+}
+
+/* Cascade rotation animations - cards cycle through positions */
+@keyframes cascade-cycle {
+    0% {
+        transform: translate(-24px, -24px) rotate(-3deg) scale(0.95);
+        opacity: 0.6;
+        z-index: 10;
+    }
+    25% {
+        transform: translate(-12px, -12px) rotate(-1deg) scale(0.97);
+        opacity: 0.75;
+        z-index: 20;
+    }
+    50% {
+        transform: translate(8px, 8px) rotate(1deg) scale(0.99);
+        opacity: 0.9;
+        z-index: 30;
+    }
+    75% {
+        transform: translate(16px, 16px) rotate(0deg) scale(1);
+        opacity: 1;
+        z-index: 40;
+    }
+    100% {
+        transform: translate(-24px, -24px) rotate(-3deg) scale(0.95);
+        opacity: 0.6;
+        z-index: 10;
+    }
+}
+
+.animate-cascade-rotate-1 {
+    animation: cascade-cycle 12s ease-in-out infinite;
+}
+
+.animate-cascade-rotate-2 {
+    animation: cascade-cycle 12s ease-in-out infinite 3s;
+}
+
+.animate-cascade-rotate-3 {
+    animation: cascade-cycle 12s ease-in-out infinite 6s;
+}
+
+.animate-cascade-rotate-4 {
+    animation: cascade-cycle 12s ease-in-out infinite 9s;
 }
 </style>
