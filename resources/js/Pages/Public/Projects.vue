@@ -1,67 +1,18 @@
 <template>
     <app-layout title="Projects">
         <template #header>
-            <div class="relative border-b border-zinc-900/5">
+            <div class="relative border-b border-zinc-900/5 overflow-hidden">
+                <!-- Animated mesh gradient background -->
+                <div class="absolute inset-0 bg-gradient-to-br from-blue-50/30 via-indigo-50/30 to-purple-50/30"></div>
+                <div class="absolute inset-0 opacity-20">
+                    <div class="absolute top-0 left-1/4 w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
+                    <div class="absolute top-0 right-1/4 w-96 h-96 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
+                    <div class="absolute -bottom-32 left-1/3 w-96 h-96 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"></div>
+                </div>
+                
                 <div
                     class="relative pt-10 dark:border-white/5 mx-8 py-12 sm:py-12"
                 >
-                    <div
-                        class="absolute inset-0 bg-gradient-to-r from-[#36b49f] to-[#DBFF75] opacity-40 [mask-image:radial-gradient(farthest-side_at_top,white,transparent)] dark:from-[#36b49f]/30 dark:to-[#DBFF75]/30 dark:opacity-100"
-                    >
-                        <svg
-                            aria-hidden="true"
-                            class="absolute inset-x-0 inset-y-[-50%] h-[200%] w-full skew-y-[-18deg] fill-black/40 stroke-black/50 mix-blend-overlay dark:fill-white/2.5 dark:stroke-white/5"
-                        >
-                            <defs>
-                                <pattern
-                                    id=":r99:"
-                                    width="72"
-                                    height="56"
-                                    patternUnits="userSpaceOnUse"
-                                    x="-12"
-                                    y="4"
-                                >
-                                    <path d="M.5 56V.5H72" fill="none"></path>
-                                </pattern>
-                            </defs>
-                            <rect
-                                width="100%"
-                                height="100%"
-                                stroke-width="0"
-                                fill="url(#:r99:)"
-                            ></rect>
-                            <svg x="-12" y="4" class="overflow-visible">
-                                <rect
-                                    stroke-width="0"
-                                    width="73"
-                                    height="57"
-                                    x="288"
-                                    y="168"
-                                ></rect>
-                                <rect
-                                    stroke-width="0"
-                                    width="73"
-                                    height="57"
-                                    x="144"
-                                    y="56"
-                                ></rect>
-                                <rect
-                                    stroke-width="0"
-                                    width="73"
-                                    height="57"
-                                    x="504"
-                                    y="168"
-                                ></rect>
-                                <rect
-                                    stroke-width="0"
-                                    width="73"
-                                    height="57"
-                                    x="720"
-                                    y="336"
-                                ></rect>
-                            </svg>
-                        </svg>
-                    </div>
                     <div
                         class="text-4xl mb-3 font-bold tracking-tight text-gray-900"
                     >
@@ -361,3 +312,33 @@ export default {
     },
 };
 </script>
+
+<style scoped>
+/* Blob animations */
+@keyframes blob {
+    0% {
+        transform: translate(0px, 0px) scale(1);
+    }
+    33% {
+        transform: translate(30px, -50px) scale(1.1);
+    }
+    66% {
+        transform: translate(-20px, 20px) scale(0.9);
+    }
+    100% {
+        transform: translate(0px, 0px) scale(1);
+    }
+}
+
+.animate-blob {
+    animation: blob 7s infinite;
+}
+
+.animation-delay-2000 {
+    animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+    animation-delay: 4s;
+}
+</style>
