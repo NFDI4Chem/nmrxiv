@@ -57,9 +57,14 @@ RUN mkdir -p /var/www/html/config/caddy \
              /var/log/supervisor \
              /run/supervisor \
              /data/caddy/data \
-             /data/caddy/config && \
+             /data/caddy/config \
+             /var/www/html/storage/logs \
+             /var/www/html/storage/framework/cache \
+             /var/www/html/storage/framework/sessions \
+             /var/www/html/storage/framework/views && \
     chmod -R 775 /var/www/html/config \
-                 /var/www/html/public && \
+                 /var/www/html/public \
+                 /var/www/html/storage && \
     chmod -R 755 /data/caddy && \
     chown -R www-data:www-data /var/www/html/storage \
                                /var/www/html/bootstrap/cache \

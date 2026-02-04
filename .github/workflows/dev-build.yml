@@ -8,8 +8,8 @@ name: Setup, Build and Publish to Dev
 # Runs on pushes to the development branch
 on:
   push:
-    branches: [development]
-
+    branches: [resolve-file-permission-issue]
+    
 # Environment variables used across all jobs
 env:
   REPOSITORY_NAME: nmrxiv

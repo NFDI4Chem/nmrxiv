@@ -48,8 +48,12 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 COPY . .
 
 # Create required directory for caddy
-RUN mkdir -p /var/www/html/config/caddy && \
-    chmod -R 775 /var/www/html/config
+RUN mkdir -p /var/www/html/config/caddy \
+             /var/www/html/storage/logs \
+             /var/www/html/storage/framework/cache \
+             /var/www/html/storage/framework/sessions \
+             /var/www/html/storage/framework/views && \
+    chmod -R 775 /var/www/html/config /var/www/html/storage
 
 # Install dependencies
 RUN composer install --no-dev --optimize-autoloader --no-interaction --no-progress
