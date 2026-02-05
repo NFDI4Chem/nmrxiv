@@ -1,5 +1,5 @@
 <template>
-    <section class="bg-white mt-4 border-t">
+    <section class="bg-white">
         <div class="relative mx-auto px-12 py-8">
             <div class="relative">
                 <div>
@@ -37,7 +37,7 @@
                         <div class="w-full">
                             <img
                                 src="/img/primer.png"
-                                class="h-[calc(40vh)] mx-auto"
+                                class="mx-auto"
                             />
                         </div>
                         <p class="text-md">
