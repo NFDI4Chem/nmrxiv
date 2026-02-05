@@ -182,7 +182,7 @@ export default {
                     header: {
                         title: "NMRium",
                     },
-                    content: `<small>Visualize and analyse your spectra data using NMRium.<br/> You can visualize both 1D and 2D spectra, do smart peak picking and much more. <br/>Click <a class="text-green-400 hover:text-decoration-line" href="https://docs.nmrxiv.org/docs/introduction/nmrium" target="_blank">here</a> to learn more about NMRium.</small> `,
+                    content: `<small>Visualize and analyse your spectra data using NMRium.<br/> You can visualize both 1D and 2D spectra, do smart peak picking and much more. <br/>Click <a class="text-green-400 hover:text-decoration-line" href="https://docs.nmrxiv.org/introduction/nmrium" target="_blank">here</a> to learn more about NMRium.</small> `,
                 },
                 {
                     target: "#tour-step-spectra-info",

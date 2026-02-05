@@ -1454,7 +1454,7 @@
                                                                             class="float-right text-xs cursor-pointer hover:text-blue-700 m-2"
                                                                         >
                                                                             <a
-                                                                                href="https://docs.nmrxiv.org/docs/submission-guides/submission/editor"
+                                                                                href="https://docs.nmrxiv.org/submission-guides/submission/editor"
                                                                                 target="_blank"
                                                                                 >Need
                                                                                 help?

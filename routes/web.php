@@ -88,6 +88,10 @@ Route::get('/about-us', function () {
     ]);
 })->name('about');
 
+Route::get('/predict', function () {
+    return Inertia::render('Predict');
+})->name('predict');
+
 // Custom support bubble route with rate limiting and enhanced security
 Route::post('support-bubble', [\App\Http\Controllers\SupportBubbleController::class, 'submit'])
     ->middleware(['throttle:support-bubble'])

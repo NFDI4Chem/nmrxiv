@@ -282,9 +282,9 @@
                                         :href="child.href"
                                         :class="[
                                             $page.url === child.href
-                                                ? 'bg-gray-100 text-gray-900 shadow-sm'
-                                                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
-                                            'flex items-center justify-center w-12 h-12 rounded-lg transition-all duration-200 ease-in-out',
+                                                ? 'text-gray-900 shadow-sm'
+                                                : 'text-gray-700 hover:text-gray-600',
+                                            'flex items-center justify-center w-12 h-12 rounded-lg transition-colors',
                                         ]"
                                     >
                                         <component
@@ -292,8 +292,8 @@
                                             :class="[
                                                 $page.url === child.href
                                                     ? 'text-gray-900'
-                                                    : 'text-gray-500 group-hover:text-gray-700',
-                                                'h-5 w-5 transition-colors duration-200',
+                                                    : 'text-gray-500 group-hover:text-gray-600',
+                                                'h-5 w-5 transition-colors',
                                             ]"
                                             aria-hidden="true"
                                         />
