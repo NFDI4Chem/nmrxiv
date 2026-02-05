@@ -166,7 +166,7 @@
                         <div v-else>
                             <span v-if="!currentStep">
                                 <Link
-                                    class="inline-flex items-center px-2.5 py-1 border border-gray-300 shadow-sm text-md font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                    class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200"
                                     :href="returnUrl"
                                 >
                                     Cancel
@@ -175,7 +175,7 @@
                             <span v-else>
                                 <span v-if="currentStep.id == '1'">
                                     <Link
-                                        class="mx-2 inline-flex items-center px-2.5 py-1 border border-gray-300 shadow-sm text-md font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                                        class="mx-2 inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200"
                                         :href="returnUrl"
                                     >
                                         Cancel
@@ -615,7 +615,7 @@
                         </div>
                     </div>
                     <div v-else>
-                        <div v-if="showPrimer" class="pt-6">
+                        <div v-if="showPrimer">
                             <div class="h-[calc(100vh-235px)] overflow-scroll">
                                 <primer />
                             </div>
