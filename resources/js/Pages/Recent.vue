@@ -65,32 +65,29 @@
         </template>
         <div class="px-12 py-8 mx-auto max-w-4xl">
             <team-projects :mode="'listing'" :projects="projects">
-                <template #emptyText
-                    ><div class="text-center py-12">
+                <template #emptyText>
+                    <div class="text-center py-16">
                         <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            class="mx-auto h-24 w-24 text-gray-400"
+                            class="mx-auto h-16 w-16 text-gray-300"
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
-                            stroke-width="2"
+                            stroke-width="1.5"
                         >
                             <path
                                 stroke-linecap="round"
                                 stroke-linejoin="round"
-                                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                                d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"
                             />
                         </svg>
-                        <h3 class="mt-2 text-sm font-medium text-gray-900">
-                            No Projects Yet.
+                        <h3 class="mt-4 text-base font-semibold text-gray-900">
+                            No recent activity
                         </h3>
-                        <p class="mt-1 text-sm text-gray-500">
-                            When you have projects associated with your account
-                            they appear here in the order of the most recently
-                            updated ones first.
+                        <p class="mt-2 text-sm text-gray-500 max-w-md mx-auto">
+                            Your recently updated projects will appear here for quick access.
                         </p>
-                    </div></template
-                >
+                    </div>
+                </template>
             </team-projects>
         </div>
     </app-layout>
