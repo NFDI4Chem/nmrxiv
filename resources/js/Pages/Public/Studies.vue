@@ -431,23 +431,25 @@
                     class="text-center rounded-lg border-2 border-dashed border-gray-300 p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 mt-5"
                 >
                     <svg
-                        class="mx-auto h-12 w-12 text-gray-400"
+                        class="mx-auto h-16 w-16 text-gray-300"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
+                        stroke-width="1.5"
                         aria-hidden="true"
                     >
                         <path
-                            vector-effect="non-scaling-stroke"
                             stroke-linecap="round"
                             stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"
+                            d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"
                         />
                     </svg>
-                    <h3 class="mt-2 text-sm font-medium text-gray-900">
-                        No studies
+                    <h3 class="mt-4 text-base font-semibold text-gray-900">
+                        No studies available
                     </h3>
+                    <p class="mt-2 text-sm text-gray-500 max-w-md mx-auto">
+                        Published studies will appear here for public access.
+                    </p>
                 </div>
             </div>
         </div>

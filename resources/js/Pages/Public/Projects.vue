@@ -248,23 +248,25 @@
                     class="text-center rounded-lg border-2 border-dashed border-gray-300 p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 mt-5"
                 >
                     <svg
-                        class="mx-auto h-12 w-12 text-gray-400"
+                        class="mx-auto h-16 w-16 text-gray-300"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
+                        stroke-width="1.5"
                         aria-hidden="true"
                     >
                         <path
-                            vector-effect="non-scaling-stroke"
                             stroke-linecap="round"
                             stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"
+                            d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z"
                         />
                     </svg>
-                    <h3 class="mt-2 text-sm font-medium text-gray-900">
-                        No projects
+                    <h3 class="mt-4 text-base font-semibold text-gray-900">
+                        No projects available
                     </h3>
+                    <p class="mt-2 text-sm text-gray-500 max-w-md mx-auto">
+                        Public projects will appear here once they are published.
+                    </p>
                 </div>
             </div>
         </div>
