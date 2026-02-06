@@ -82,7 +82,7 @@ class StudyController extends Controller
         Gate::forUser($request->user())->authorize('viewStudy', $study);
 
         $project = $study->project;
-        $team = $project->nonPersonalTeam;
+        $team = $project ? $project->nonPersonalTeam : null;
         $license = null;
         if ($study->license_id) {
             $license = $getLicense->getLicensebyId($study->license_id);
@@ -104,7 +104,7 @@ class StudyController extends Controller
         Gate::forUser($request->user())->authorize('viewStudy', $study);
 
         $project = $study->project;
-        $team = $project->team;
+        $team = $project ? $project->team : null;
 
         return $this->renderTabView('Datasets', $study, $team, $project, null, null, false);
     }
@@ -213,7 +213,7 @@ class StudyController extends Controller
                 'name' => $study->name.'_sample',
                 'slug' => Str::slug($study->name.'_sample', '-'),
                 'study_id' => $study->id,
-                'project_id' => $study->project->id,
+                'project_id' => $study->project ? $study->project->id : null,
             ]);
             $study->sample()->save($sample);
         }
@@ -384,7 +384,7 @@ class StudyController extends Controller
         Gate::forUser($request->user())->authorize('viewStudy', $study);
 
         $project = $study->project;
-        $team = $project->nonPersonalTeam;
+        $team = $project ? $project->nonPersonalTeam : null;
         $studyFSObject = $study->fsObject;
 
         return $this->renderTabView('Files', $study, $team, $project, null, $studyFSObject, false);
