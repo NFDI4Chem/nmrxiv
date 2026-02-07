@@ -997,7 +997,7 @@ const navigation = [
             },
             {
                 auth: false,
-                name: "Spectra",
+                name: "Samples",
                 href: "/spectra",
                 icon: Squares2X2Icon,
                 bg: "bg-white",

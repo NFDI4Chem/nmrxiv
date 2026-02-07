@@ -17,7 +17,7 @@
                         <div
                             class="text-4xl mb-3 font-bold tracking-tight text-gray-900"
                         >
-                            Browse Spectra (Samples)
+                            Browse Samples (Spectra)
                         </div>
                         <p>
                             Explore, analyse, and share raw spectra and
