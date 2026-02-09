@@ -31,6 +31,7 @@
         "meilisearch/meilisearch-php": "^1.14",
         "mpociot/versionable": "^4.4",
         "owen-it/laravel-auditing": "^14.0",
+        "psy/psysh": "^0.12.19",
         "phpunit/php-code-coverage": "^11.0.9",
         "predis/predis": "^2.2",
         "socialiteproviders/manager": "^4.7",
@@ -43,6 +44,7 @@
         "spatie/laravel-tags": "^4.9",
         "spatie/laravel-welcome-notification": "^2.4",
         "spatie/schema-org": "^3.11",
+        "symfony/process": "^7.4.5",
         "tightenco/ziggy": "^2.5"
     },
     "require-dev": {
@@ -54,7 +56,7 @@
         "laravel/sail": "^1.41",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.6",
-        "phpunit/phpunit": "^11.5.12"
+        "phpunit/phpunit": "^11.5.50"
     },
     "autoload": {
         "files": [
@@ -96,6 +98,9 @@
         }
     },
     "config": {
+        "platform": {
+            "php": "8.4.0"
+        },
         "optimize-autoloader": true,
         "preferred-install": "dist",
         "sort-packages": true,
