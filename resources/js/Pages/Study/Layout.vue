@@ -52,7 +52,7 @@
                                                 >
                                             </div>
                                         </li>
-                                        <li>
+                                        <li v-if="project">
                                             <div class="flex items-center">
                                                 <ChevronRightIcon
                                                     v-if="!preview"
