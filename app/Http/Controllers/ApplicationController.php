@@ -44,6 +44,7 @@ class ApplicationController extends Controller
             // This maintains the current compound viewing functionality
             // Use getRawOriginal to get the numeric identifier without NMRXIV:M prefix
             $compoundId = $model->getRawOriginal('identifier');
+
             return redirect('/spectra?compound='.$compoundId);
         } else {
             abort(404, 'Compound not found');
