@@ -14,7 +14,25 @@ class Provider extends AbstractProvider
 
     protected function getAuthUrl($state)
     {
-        return $this->buildAuthUrlFromBase('https://regapp.nfdi-aai.de/oidc/realms/nfdi/protocol/openid-connect/auth', $state);
+        $url = $this->buildAuthUrlFromBase('https://regapp.nfdi-aai.de/oidc/realms/nfdi/protocol/openid-connect/auth', $state);
+
+        // Ensure client_id is in the URL
+        if (! str_contains($url, 'client_id=')) {
+            $separator = str_contains($url, '?') ? '&' : '?';
+            $url .= $separator.'client_id='.urlencode($this->clientId);
+        }
+
+        return $url;
+    }
+
+    protected function getCodeFields($state = null): array
+    {
+        $fields = parent::getCodeFields($state);
+
+        // Ensure client_id is always included
+        $fields['client_id'] = $this->clientId;
+
+        return $fields;
     }
 
     protected function getTokenUrl()

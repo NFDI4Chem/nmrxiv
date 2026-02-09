@@ -48,7 +48,7 @@ class AddTeamMember implements AddsTeamMembers
             'email' => $email,
             'role' => $role,
         ], $this->rules(), [
-            'email.exists' => __('We were unable to find a registered user with this email address.'),
+            'email.exists' => __('Unable to add member with this email address.'),
         ])->after(
             $this->ensureUserIsNotAlreadyOnTeam($team, $email)
         )->validateWithBag('addTeamMember');
@@ -81,7 +81,7 @@ class AddTeamMember implements AddsTeamMembers
             $validator->errors()->addIf(
                 $team->hasUserWithEmail($email),
                 'email',
-                __('This user already belongs to the team.')
+                __('Unable to add member with this email address.')
             );
         };
     }

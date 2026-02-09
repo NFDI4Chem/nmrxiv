@@ -47,7 +47,7 @@ class AddStudyMember
             'email' => $email,
             'role' => $role,
         ], $this->rules(), [
-            'email.exists' => __('We were unable to find a registered user with this email address.'),
+            'email.exists' => __('Unable to add member with this email address.'),
         ])->after(
             $this->ensureUserIsNotAlreadyOnStudy($study, $email)
         )->validateWithBag('addStudyMember');
@@ -80,7 +80,7 @@ class AddStudyMember
             $validator->errors()->addIf(
                 $study->hasUserWithEmail($email),
                 'email',
-                __('This user already belongs to the study.')
+                __('Unable to add member with this email address.')
             );
         };
     }

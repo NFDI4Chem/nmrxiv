@@ -372,6 +372,7 @@
                                         ref="photo"
                                         type="file"
                                         class="hidden"
+                                        accept="image/jpeg,image/png,image/gif,image/webp"
                                         @change="updatePhotoPreview"
                                     />
 
