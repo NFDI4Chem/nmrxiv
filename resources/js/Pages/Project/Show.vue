@@ -35,9 +35,9 @@
                     v-else
                     class="text-center px-3 py-2 bg-green-50 text-green-700 border-b"
                 >
-                    <b>Info: </b> This project is public. You cannot edit a
-                    published project, please create a new version to update the
-                    project.
+                    <b>Info: </b> This project is published. You cannot edit a
+                    published project. Contact us at info.nmrxiv@uni-jena.de if
+                    you need to make changes.
                 </div>
             </div>
             <div v-if="preview">

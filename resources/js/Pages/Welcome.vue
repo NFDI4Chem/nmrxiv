@@ -357,12 +357,9 @@
                                 
                                 <!-- Call to Action Button -->
                                 <div class="mt-8">
-                                    <a href="/predict" class="inline-flex items-center px-6 py-3 bg-blue-600 text-white text-base font-semibold rounded-full hover:bg-blue-700 transition-colors duration-200 shadow-md hover:shadow-lg">
-                                        Try now
-                                        <svg class="ml-2 w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                                        </svg>
-                                    </a>
+                                    <span class="inline-flex items-center px-6 py-3 bg-gray-400 text-white text-base font-semibold rounded-full cursor-not-allowed opacity-60">
+                                        Coming Soon
+                                    </span>
                                 </div>
                             </div>
                             

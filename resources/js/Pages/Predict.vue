@@ -351,13 +351,13 @@
                         </div>
 
                         <!-- Results Section (Placeholder) -->
-                        <div class="mt-8 bg-gray-50 rounded-3xl border border-gray-200 p-8 text-center">
+                        <!-- <div class="mt-8 bg-gray-50 rounded-3xl border border-gray-200 p-8 text-center">
                             <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                             </svg>
                             <h3 class="mt-2 text-sm font-medium text-gray-900">No predictions yet</h3>
                             <p class="mt-1 text-sm text-gray-500">Draw a chemical structure and click predict to see results</p>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
             </div>

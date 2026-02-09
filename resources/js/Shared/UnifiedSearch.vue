@@ -63,10 +63,23 @@
                                 <div
                                     v-for="option in searchOptions"
                                     :key="option.type"
-                                    class="group relative bg-white rounded-3xl p-6 text-left transition-all duration-200 hover:shadow-lg active:scale-[0.98] min-h-[320px] flex flex-col cursor-pointer overflow-hidden"
-                                    :class="selectedType === option.type ? 'border-2 border-blue-500 shadow-lg' : 'border border-gray-200 hover:border-gray-300'"
-                                    @click="selectAndProceed(option.type)"
+                                    class="group relative bg-white rounded-3xl p-6 text-left transition-all duration-200 min-h-[320px] flex flex-col overflow-hidden"
+                                    :class="[
+                                        option.comingSoon 
+                                            ? 'border border-gray-200 cursor-not-allowed opacity-60' 
+                                            : 'cursor-pointer hover:shadow-lg active:scale-[0.98] border border-gray-200 hover:border-gray-300',
+                                        selectedType === option.type && !option.comingSoon ? 'border-2 border-blue-500 shadow-lg' : ''
+                                    ]"
+                                    @click="!option.comingSoon && selectAndProceed(option.type)"
                                 >
+                                    <!-- Coming Soon Badge -->
+                                    <div
+                                        v-if="option.comingSoon"
+                                        class="absolute bottom-4 right-4 z-20 bg-gray-900 text-white text-xs font-semibold px-3 py-1 rounded-full"
+                                    >
+                                        Coming Soon
+                                    </div>
+
                                     <!-- Content -->
                                     <div class="flex-1 relative z-10">
                                         <p
@@ -96,8 +109,9 @@
                                         />
                                     </div>
 
-                                    <!-- Plus Button -->
+                                    <!-- Plus Button (only show for active cards) -->
                                     <div
+                                        v-if="!option.comingSoon"
                                         class="absolute bottom-4 right-4 w-8 h-8 bg-gray-900 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-20"
                                     >
                                         <PlusIcon
@@ -382,6 +396,7 @@ export default {
                 icon: markRaw(BeakerIcon),
                 bgClass: "bg-teal-100",
                 iconClass: "text-teal-600",
+                comingSoon: false,
             },
             {
                 type: "spectra",
@@ -393,6 +408,7 @@ export default {
                 icon: markRaw(ChartBarIcon),
                 bgClass: "bg-indigo-100",
                 iconClass: "text-indigo-600",
+                comingSoon: true,
             },
             {
                 type: "peaks",
@@ -404,6 +420,7 @@ export default {
                 icon: markRaw(QueueListIcon),
                 bgClass: "bg-amber-100",
                 iconClass: "text-amber-600",
+                comingSoon: true,
             },
             {
                 type: "metadata",
@@ -415,6 +432,7 @@ export default {
                 icon: markRaw(DocumentMagnifyingGlassIcon),
                 bgClass: "bg-rose-100",
                 iconClass: "text-rose-600",
+                comingSoon: true,
             },
         ];
 
