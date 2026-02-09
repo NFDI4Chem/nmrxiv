@@ -42,7 +42,9 @@ class ApplicationController extends Controller
         if ($model && $namespace === 'Molecule') {
             // Redirect to spectra page with compound parameter for now
             // This maintains the current compound viewing functionality
-            return redirect('/spectra?compound='.substr($identifier, 1));
+            // Use getRawOriginal to get the numeric identifier without NMRXIV:M prefix
+            $compoundId = $model->getRawOriginal('identifier');
+            return redirect('/spectra?compound='.$compoundId);
         } else {
             abort(404, 'Compound not found');
         }

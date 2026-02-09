@@ -174,8 +174,8 @@ class LoginController extends Controller
 
         if (! $user->hasVerifiedEmail()) {
             return response()->json([
-                'message' => 'Invalid login details',
-            ], 401);
+                'message' => 'Account is not yet verified. Please verify your email address by clicking on the link we just emailed to you.',
+            ], 403);
         }
 
         $token = $user->createToken('auth_token')->plainTextToken;

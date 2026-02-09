@@ -260,7 +260,7 @@ class DataCatalogController extends Controller
         $dataCatalogSchema = Schema::DataCatalog();
         $dataCatalogSchema['@id'] = url(Config::get('app.url'));
         $dataCatalogSchema['dct:conformsTo'] = BioschemasHelper::conformsTo(['https://schema.org/DataCatalog']);
-        $dataCatalogSchema->description(env('APP_DESCRIPTION'));
+        $dataCatalogSchema->description(Config::get('app.description', 'NMRXIV is an open-access preprint repository for sharing and discovering nuclear magnetic resonance (NMR) spectroscopy data.'));
         $dataCatalogSchema->keywords($keywords);
         $dataCatalogSchema->name(Config::get('app.name'));
         $dataCatalogSchema->provider($nmrXivProvider);
