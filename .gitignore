@@ -3,6 +3,7 @@
 /public/build
 /public/storage
 /public/vendor
+/public/vendor/swagger-api
 /storage/*.key
 /storage/pail
 /vendor

@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Dataset;
+use App\Models\Molecule;
 use App\Models\Project;
 use App\Models\Study;
 use App\Models\Team;
@@ -101,6 +102,35 @@ class ApplicationControllerTest extends TestCase
     public function test_resolve_compound_returns_404_for_invalid_identifier(): void
     {
         $response = $this->get('/compound/INVALID');
+
+        $response->assertStatus(404);
+    }
+
+    public function test_resolve_compound_redirects_to_spectra_for_valid_molecule(): void
+    {
+        $molecule = Molecule::factory()->create([
+            'identifier' => 188,
+        ]);
+
+        $response = $this->get('/compound/M188');
+
+        $response->assertRedirect('/spectra?compound=188');
+    }
+
+    public function test_resolve_compound_with_lowercase_prefix(): void
+    {
+        $molecule = Molecule::factory()->create([
+            'identifier' => 189,
+        ]);
+
+        $response = $this->get('/compound/m189');
+
+        $response->assertRedirect('/spectra?compound=189');
+    }
+
+    public function test_resolve_compound_returns_404_for_non_existent_molecule(): void
+    {
+        $response = $this->get('/compound/M99999');
 
         $response->assertStatus(404);
     }

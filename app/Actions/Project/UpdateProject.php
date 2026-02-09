@@ -21,11 +21,13 @@ class UpdateProject
     {
         $errorMessages = [
             'license.required_if' => 'The license field is required when the project is made public.',
+            'photo.mimes' => 'The project image must be a file of type: jpg, jpeg, png, gif, webp.',
         ];
         Validator::make($input, [
             'name' => ['required', 'string', 'max:255',  Rule::unique('projects')
                 ->where('owner_id', $project->owner_id)->ignore($project->id), ],
             'license' => ['required_if:is_public,"true"'],
+            'photo' => ['nullable', 'mimes:jpg,jpeg,png,gif,webp', 'max:2048'],
         ], $errorMessages)->validate();
 
         return DB::transaction(function () use ($input, $project) {
