@@ -802,13 +802,15 @@
                 :show="showSingleSampleModal"
                 @close="showSingleSampleModal = false"
             >
-                <template #title>
-                    Single sample detected in project
-                </template>
+                <template #title> Single sample detected in project </template>
                 <template #content>
                     <div class="space-y-3">
                         <p class="text-sm text-gray-600">
-                           Your project contains only one sample. In nmrXiv, single samples can be published directly without creating a project. Projects are intended to group multiple related samples, for example those belonging to the same study or publication. 
+                            Your project contains only one sample. In nmrXiv,
+                            single samples can be published directly without
+                            creating a project. Projects are intended to group
+                            multiple related samples, for example those
+                            belonging to the same study or publication.
                             <a
                                 href="https://docs.nmrxiv.org/submission-guides/submission-process.html#step-3-publish-data"
                                 target="_blank"
