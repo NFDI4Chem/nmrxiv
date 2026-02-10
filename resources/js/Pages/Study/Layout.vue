@@ -5,27 +5,41 @@
                 v-if="study.is_deleted"
                 class="text-center px-3 py-1 bg-red-50 text-red-700 border-b"
             >
-                <b>Warning: </b> This sample is deleted. At the end of the
-                30-day period, this sample and all of its resources will be
-                deleted permanently and cannot be recovered. You can only
-                restore a deleted study/project within the 30-day recovery
-                period.
+                <b>Warning: </b> This {{ publishType }} is deleted. At the end
+                of the 30-day period, this {{ publishType }} and all of its
+                resources will be deleted permanently and cannot be recovered.
+                You can only restore a deleted {{ publishType }} within the
+                30-day recovery period.
+            </div>
+            <div
+                v-if="
+                    !study.is_public &&
+                    !study.is_published &&
+                    study.doi &&
+                    !preview
+                "
+                class="text-center px-3 py-2 bg-green-50 text-green-700 border-b"
+            >
+                <b>Info: </b> This sample is in embargo and set to be released
+                on {{ formatDate(study.release_date) }}. You cannot edit the
+                sample. Contact us at info.nmrxiv@uni-jena.de if you need to
+                make changes.
             </div>
             <div>
                 <div
                     v-if="study.is_public && study.is_archived"
                     class="text-center px-3 py-2 bg-yellow-50 text-yellow-700 border-b"
                 >
-                    <b>Warning: </b> This project is archived. It is now
-                    read-only.
+                    <b>Warning: </b> This {{ publishType }} is archived. It is
+                    now read-only.
                 </div>
                 <div
                     v-if="study.is_public && !study.is_archived"
                     class="text-center px-3 py-2 bg-green-50 text-green-700 border-b"
                 >
-                    <b>Info: </b> This project is published. You cannot edit a
-                    published project. Contact us at info.nmrxiv@uni-jena.de if
-                    you need to make changes.
+                    <b>Info: </b> This {{ publishType }} is published. You
+                    cannot edit a published {{ publishType }}. Contact us at
+                    info.nmrxiv@uni-jena.de if you need to make changes.
                 </div>
             </div>
             <div v-if="study.is_public && study.doi != null">
@@ -368,7 +382,11 @@
                                                     )
                                                 }}</b
                                             >
-                                            <b v-else
+                                            <b
+                                                v-else-if="
+                                                    project &&
+                                                    project.release_date
+                                                "
                                                 >Release date:
                                                 {{
                                                     formatDate(
@@ -440,6 +458,9 @@ export default {
             return this.studyPermissions
                 ? this.studyPermissions.canUpdateStudy
                 : false;
+        },
+        publishType() {
+            return this.project?.project_enabled ? "project" : "sample";
         },
     },
     methods: {

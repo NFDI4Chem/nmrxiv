@@ -213,7 +213,7 @@ class StudyController extends Controller
                 'name' => $study->name.'_sample',
                 'slug' => Str::slug($study->name.'_sample', '-'),
                 'study_id' => $study->id,
-                'project_id' => $study->project->id,
+                'project_id' => $study->project ? $study->project->id : null,
             ]);
             $study->sample()->save($sample);
         }
