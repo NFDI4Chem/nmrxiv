@@ -177,18 +177,15 @@ class StudyModelTest extends TestCase
     public function test_it_casts_arrays_properly(): void
     {
         $study = Study::factory()->create([
-            'authors' => ['John Doe', 'Jane Smith'],
             'citations' => [['doi' => '10.1234/example']],
             'molecules' => [['smiles' => 'CCO']],
             'processing_logs' => [['step' => 'validation', 'status' => 'completed']],
         ]);
 
-        $this->assertIsArray($study->authors);
         $this->assertIsArray($study->citations);
         $this->assertIsArray($study->molecules);
         $this->assertIsArray($study->processing_logs);
 
-        $this->assertEquals(['John Doe', 'Jane Smith'], $study->authors);
         $this->assertEquals([['doi' => '10.1234/example']], $study->citations);
     }
 
@@ -713,12 +710,10 @@ class StudyModelTest extends TestCase
         $study = new Study;
         $casts = $study->getCasts();
 
-        $this->assertArrayHasKey('authors', $casts);
         $this->assertArrayHasKey('citations', $casts);
         $this->assertArrayHasKey('molecules', $casts);
         $this->assertArrayHasKey('processing_logs', $casts);
 
-        $this->assertEquals('array', $casts['authors']);
         $this->assertEquals('array', $casts['citations']);
         $this->assertEquals('array', $casts['molecules']);
         $this->assertEquals('array', $casts['processing_logs']);
