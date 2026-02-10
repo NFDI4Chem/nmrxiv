@@ -47,7 +47,7 @@ class AddProjectMember
             'email' => $email,
             'role' => $role,
         ], $this->rules(), [
-            'email.exists' => __('Unable to add member with this email address.'),
+            'email.exists' => __('We were unable to find a registered user with this email address.'),
         ])->after(
             $this->ensureUserIsNotAlreadyOnProject($project, $email)
         )->validateWithBag('addModelMember');
@@ -80,7 +80,7 @@ class AddProjectMember
             $validator->errors()->addIf(
                 $project->hasUserWithEmail($email),
                 'email',
-                __('Unable to add member with this email address.')
+                __('This user already belongs to the project.')
             );
         };
     }
