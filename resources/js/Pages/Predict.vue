@@ -15,7 +15,7 @@
                                         class="block h-9 w-auto"
                                     />
                                 </Link>
-                                
+
                                 <!-- Desktop Navigation -->
                                 <PopoverGroup
                                     as="nav"
@@ -47,7 +47,7 @@
                                     </Link>
                                 </PopoverGroup>
                             </div>
-                            
+
                             <!-- Mobile menu button -->
                             <div class="md:hidden">
                                 <PopoverButton
@@ -60,7 +60,7 @@
                                     />
                                 </PopoverButton>
                             </div>
-                            
+
                             <!-- Auth Buttons -->
                             <div
                                 v-if="
@@ -111,7 +111,9 @@
                                     class="rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 bg-white divide-y-2 divide-gray-50"
                                 >
                                     <div class="pt-5 pb-6 px-5">
-                                        <div class="flex items-center justify-between">
+                                        <div
+                                            class="flex items-center justify-between"
+                                        >
                                             <div>
                                                 <jet-application-logo
                                                     class="block h-10 p-0.5 ml-1.5 w-auto"
@@ -121,7 +123,9 @@
                                                 <PopoverButton
                                                     class="bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset ring-brand"
                                                 >
-                                                    <span class="sr-only">Close menu</span>
+                                                    <span class="sr-only"
+                                                        >Close menu</span
+                                                    >
                                                     <XMarkIcon
                                                         class="h-6 w-6"
                                                         aria-hidden="true"
@@ -172,9 +176,13 @@
                                             >
                                                 Dashboard
                                             </Link>
-                                            <p class="mt-6 text-center text-sm font-medium text-gray-500">
+                                            <p
+                                                class="mt-6 text-center text-sm font-medium text-gray-500"
+                                            >
                                                 <Link
-                                                    v-if="!$page.props.auth.user"
+                                                    v-if="
+                                                        !$page.props.auth.user
+                                                    "
                                                     href="/login"
                                                     class="text-gray-900"
                                                 >
@@ -193,40 +201,66 @@
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                     <!-- Hero Section -->
                     <div class="text-center mb-12">
-                        <h1 class="text-4xl font-bold text-gray-900 sm:text-5xl md:text-6xl">
+                        <h1
+                            class="text-4xl font-bold text-gray-900 sm:text-5xl md:text-6xl"
+                        >
                             NMR Spectrum Prediction
                         </h1>
-                        <p class="mt-3 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
-                            Fast and accurate NMR spectra predictions from chemical structures
+                        <p
+                            class="mt-3 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl"
+                        >
+                            Fast and accurate NMR spectra predictions from
+                            chemical structures
                         </p>
                     </div>
 
                     <!-- Prediction Tool Container -->
                     <div class="max-w-6xl mx-auto">
-                        <div class="bg-white shadow-xl rounded-3xl overflow-hidden border border-gray-200">
+                        <div
+                            class="bg-white shadow-xl rounded-3xl overflow-hidden border border-gray-200"
+                        >
                             <div class="px-6 py-8 sm:p-10">
                                 <!-- Title Section -->
                                 <div class="mb-6">
-                                    <h2 class="text-2xl font-bold text-gray-900">
+                                    <h2
+                                        class="text-2xl font-bold text-gray-900"
+                                    >
                                         Draw or Import Structure
                                     </h2>
                                     <p class="mt-2 text-gray-600">
-                                        Draw, paste, or import a chemical structure for NMR prediction
+                                        Draw, paste, or import a chemical
+                                        structure for NMR prediction
                                     </p>
                                 </div>
 
                                 <!-- Input Options -->
-                                <div class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div
+                                    class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-3"
+                                >
                                     <!-- File Upload -->
                                     <label
                                         class="relative flex items-center justify-center px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-gray-400 hover:bg-gray-50 transition-colors"
-                                        :class="isDragging ? 'border-gray-900 bg-gray-50' : ''"
+                                        :class="
+                                            isDragging
+                                                ? 'border-gray-900 bg-gray-50'
+                                                : ''
+                                        "
                                         @dragover.prevent="isDragging = true"
                                         @dragleave.prevent="isDragging = false"
                                         @drop.prevent="handleDrop"
                                     >
-                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                                        <svg
+                                            class="w-4 h-4 mr-2"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="2"
+                                                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                                            />
                                         </svg>
                                         Drop or select MOL/SDF
                                         <input
@@ -243,13 +277,23 @@
                                         @click="pasteFromClipboard"
                                         class="flex items-center justify-center px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
                                     >
-                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                                        <svg
+                                            class="w-4 h-4 mr-2"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="2"
+                                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                                            />
                                         </svg>
                                         Paste from Clipboard
                                     </button>
                                 </div>
-                                
+
                                 <!-- Structure Editor Card -->
                                 <div
                                     id="predictionEditor"
@@ -259,15 +303,23 @@
 
                                 <!-- Prediction Type Selection -->
                                 <div class="mb-8">
-                                    <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                                    <h3
+                                        class="text-lg font-semibold text-gray-900 mb-4"
+                                    >
                                         Prediction Type
                                     </h3>
-                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div
+                                        class="grid grid-cols-1 md:grid-cols-3 gap-4"
+                                    >
                                         <!-- 1H NMR -->
                                         <label
                                             for="prediction-type-1h"
                                             class="relative flex items-start p-4 bg-white border-2 border-gray-200 rounded-xl cursor-pointer hover:border-gray-300 transition-all"
-                                            :class="predictionType === '1h' ? 'border-gray-900 bg-gray-50' : ''"
+                                            :class="
+                                                predictionType === '1h'
+                                                    ? 'border-gray-900 bg-gray-50'
+                                                    : ''
+                                            "
                                         >
                                             <input
                                                 id="prediction-type-1h"
@@ -278,20 +330,28 @@
                                                 class="sr-only"
                                             />
                                             <div class="flex-1">
-                                                <span class="block text-sm font-semibold text-gray-900">
+                                                <span
+                                                    class="block text-sm font-semibold text-gray-900"
+                                                >
                                                     <sup>1</sup>H NMR
                                                 </span>
-                                                <span class="block text-xs text-gray-500 mt-1">
+                                                <span
+                                                    class="block text-xs text-gray-500 mt-1"
+                                                >
                                                     Proton NMR prediction
                                                 </span>
                                             </div>
                                         </label>
-                                    
+
                                         <!-- 13C NMR -->
                                         <label
                                             for="prediction-type-13c"
                                             class="relative flex items-start p-4 bg-white border-2 border-gray-200 rounded-xl cursor-pointer hover:border-gray-300 transition-all"
-                                            :class="predictionType === '13c' ? 'border-gray-900 bg-gray-50' : ''"
+                                            :class="
+                                                predictionType === '13c'
+                                                    ? 'border-gray-900 bg-gray-50'
+                                                    : ''
+                                            "
                                         >
                                             <input
                                                 id="prediction-type-13c"
@@ -302,20 +362,28 @@
                                                 class="sr-only"
                                             />
                                             <div class="flex-1">
-                                                <span class="block text-sm font-semibold text-gray-900">
+                                                <span
+                                                    class="block text-sm font-semibold text-gray-900"
+                                                >
                                                     <sup>13</sup>C NMR
                                                 </span>
-                                                <span class="block text-xs text-gray-500 mt-1">
+                                                <span
+                                                    class="block text-xs text-gray-500 mt-1"
+                                                >
                                                     Carbon-13 NMR prediction
                                                 </span>
                                             </div>
                                         </label>
-                                    
+
                                         <!-- Both -->
                                         <label
                                             for="prediction-type-both"
                                             class="relative flex items-start p-4 bg-white border-2 border-gray-200 rounded-xl cursor-pointer hover:border-gray-300 transition-all"
-                                            :class="predictionType === 'both' ? 'border-gray-900 bg-gray-50' : ''"
+                                            :class="
+                                                predictionType === 'both'
+                                                    ? 'border-gray-900 bg-gray-50'
+                                                    : ''
+                                            "
                                         >
                                             <input
                                                 id="prediction-type-both"
@@ -326,11 +394,16 @@
                                                 class="sr-only"
                                             />
                                             <div class="flex-1">
-                                                <span class="block text-sm font-semibold text-gray-900">
+                                                <span
+                                                    class="block text-sm font-semibold text-gray-900"
+                                                >
                                                     Both
                                                 </span>
-                                                <span class="block text-xs text-gray-500 mt-1">
-                                                    <sup>1</sup>H and <sup>13</sup>C NMR
+                                                <span
+                                                    class="block text-xs text-gray-500 mt-1"
+                                                >
+                                                    <sup>1</sup>H and
+                                                    <sup>13</sup>C NMR
                                                 </span>
                                             </div>
                                         </label>
@@ -369,9 +442,13 @@
 </template>
 
 <script>
-import { ref } from "vue";
 import { Head, Link } from "@inertiajs/vue3";
-import { Popover, PopoverButton, PopoverGroup, PopoverPanel } from "@headlessui/vue";
+import {
+    Popover,
+    PopoverButton,
+    PopoverGroup,
+    PopoverPanel,
+} from "@headlessui/vue";
 import { Bars3Icon, XMarkIcon } from "@heroicons/vue/24/outline";
 import JetApplicationLogo from "@/Jetstream/ApplicationLogo.vue";
 import FlashMessages from "@/Shared/FlashMessages.vue";
@@ -401,7 +478,10 @@ export default {
     },
     mounted() {
         this.$nextTick(() => {
-            this.editor = OCL.StructureEditor.createSVGEditor("predictionEditor", 1);
+            this.editor = OCL.StructureEditor.createSVGEditor(
+                "predictionEditor",
+                1
+            );
         });
     },
     methods: {
@@ -418,11 +498,13 @@ export default {
         },
         async loadFile(file) {
             if (!this.editor) return;
-            
+
             const validExtensions = [".mol", ".sdf", ".sd"];
             const fileName = file.name.toLowerCase();
-            const isValid = validExtensions.some((ext) => fileName.endsWith(ext));
-            
+            const isValid = validExtensions.some((ext) =>
+                fileName.endsWith(ext)
+            );
+
             if (!isValid) {
                 alert("Please upload a MOL or SDF file");
                 return;
@@ -438,10 +520,10 @@ export default {
         },
         async pasteFromClipboard() {
             if (!this.editor) return;
-            
+
             try {
                 const text = await navigator.clipboard.readText();
-                
+
                 // Try as SMILES first
                 try {
                     const mol = OCL.Molecule.fromSmiles(text.trim());
@@ -452,12 +534,16 @@ export default {
                     if (text.includes("M  END") || text.includes("$$$$")) {
                         this.editor.setMolFile(text);
                     } else {
-                        alert("Clipboard content is not a valid SMILES or MOL format");
+                        alert(
+                            "Clipboard content is not a valid SMILES or MOL format"
+                        );
                     }
                 }
             } catch (error) {
                 console.error("Error reading clipboard:", error);
-                alert("Unable to read clipboard. Please allow clipboard access.");
+                alert(
+                    "Unable to read clipboard. Please allow clipboard access."
+                );
             }
         },
         predictSpectrum() {
@@ -465,17 +551,24 @@ export default {
                 alert("Structure editor not initialized");
                 return;
             }
-            
+
             try {
                 const smiles = this.editor.getSmiles();
                 if (!smiles || smiles.trim() === "") {
                     alert("Please draw or import a chemical structure first");
                     return;
                 }
-                
+
                 // TODO: Implement actual prediction API call
-                console.log("Predicting spectrum for:", smiles, "Type:", this.predictionType);
-                alert(`Prediction requested for:\nSMILES: ${smiles}\nType: ${this.predictionType}\n\nAPI integration coming soon!`);
+                console.log(
+                    "Predicting spectrum for:",
+                    smiles,
+                    "Type:",
+                    this.predictionType
+                );
+                alert(
+                    `Prediction requested for:\nSMILES: ${smiles}\nType: ${this.predictionType}\n\nAPI integration coming soon!`
+                );
             } catch (error) {
                 console.error("Error getting structure:", error);
                 alert("Error reading structure from editor");
